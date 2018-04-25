@@ -14,6 +14,7 @@
     <url>https://github.com/ExpediaDotCom/haystack-adaptive-alerting</url>
 
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.jdk.version>1.8</project.jdk.version>
 
         <!-- Dependencies -->
