@@ -1,4 +1,4 @@
-package com.expedia.haystack.adaptivealerting;
+package com.expedia.haystack.adaptivealerting.anomaly;
 
 import java.time.Instant;
 
@@ -7,14 +7,14 @@ import java.time.Instant;
  *
  * @author Willie Wheeler
  */
-public interface OutlierDetector {
+public interface AnomalyDetector {
     
     /**
-     * Assigns an {@link OutlierLevel} to the given data point.
+     * Assigns an {@link AnomalyLevel} to the given data point.
      *
      * @param instant Time instant.
      * @param value   Time series value.
      * @return Outlier level.
      */
-    OutlierLevel evaluate(Instant instant, double value);
+    AnomalyLevel evaluate(Instant instant, double value);
 }

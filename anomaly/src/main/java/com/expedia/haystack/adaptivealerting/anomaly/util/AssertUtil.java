@@ -1,4 +1,4 @@
-package com.expedia.haystack.adaptivealerting.util;
+package com.expedia.haystack.adaptivealerting.anomaly.util;
 
 /**
  * Assertion utilities.

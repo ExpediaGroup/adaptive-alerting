@@ -1,8 +1,6 @@
-package com.expedia.haystack.adaptivealerting.outlier;
+package com.expedia.haystack.adaptivealerting.anomaly;
 
-import com.expedia.haystack.adaptivealerting.OutlierDetector;
-import com.expedia.haystack.adaptivealerting.OutlierLevel;
-import com.expedia.haystack.adaptivealerting.util.AssertUtil;
+import com.expedia.haystack.adaptivealerting.anomaly.util.AssertUtil;
 
 import java.time.Instant;
 
@@ -11,7 +9,7 @@ import java.time.Instant;
  *
  * @author Willie Wheeler
  */
-public class ConstantThresholdOutlierDetector implements OutlierDetector {
+public class ConstantThresholdAnomalyDetector implements AnomalyDetector {
     public static final int LEFT_TAILED = 0;
     public static final int RIGHT_TAILED = 1;
     
@@ -20,15 +18,15 @@ public class ConstantThresholdOutlierDetector implements OutlierDetector {
     private final double largeThreshold;
     
     /**
-     * Builds a constant-threshold outlier detector that performs outlier tests in the specified tail. For left-tailed
+     * Builds a constant-threshold anomaly detector that performs anomaly tests in the specified tail. For left-tailed
      * detectors we expect largeThreshold &lt;= smallThreshold, and for right-tailed detectors we expect
      * smallThreshold &lt;= largeThreshold.
      *
      * @param tail           Either LEFT_TAILED or RIGHT_TAILED.
-     * @param smallThreshold Small outlier threshold.
-     * @param largeThreshold Large outlier threshold.
+     * @param smallThreshold Small anomaly threshold.
+     * @param largeThreshold Large anomaly threshold.
      */
-    public ConstantThresholdOutlierDetector(int tail, double smallThreshold, double largeThreshold) {
+    public ConstantThresholdAnomalyDetector(int tail, double smallThreshold, double largeThreshold) {
         if (tail == LEFT_TAILED) {
             AssertUtil.isTrue(largeThreshold <= smallThreshold,
                     "Left-tailed detector requires largeThreshold <= smallThreshold");
@@ -57,27 +55,27 @@ public class ConstantThresholdOutlierDetector implements OutlierDetector {
     }
     
     @Override
-    public OutlierLevel evaluate(Instant instant, double value) {
+    public AnomalyLevel evaluate(Instant instant, double value) {
         return tail == LEFT_TAILED ? evaluateLeftTailed(value) : evaluateRightTailed(value);
     }
     
-    private OutlierLevel evaluateLeftTailed(double value) {
+    private AnomalyLevel evaluateLeftTailed(double value) {
         if (value <= largeThreshold) {
-            return OutlierLevel.LARGE;
+            return AnomalyLevel.LARGE;
         } else if (value <= smallThreshold) {
-            return OutlierLevel.SMALL;
+            return AnomalyLevel.SMALL;
         } else {
-            return OutlierLevel.NORMAL;
+            return AnomalyLevel.NORMAL;
         }
     }
     
-    private OutlierLevel evaluateRightTailed(double value) {
+    private AnomalyLevel evaluateRightTailed(double value) {
         if (value >= largeThreshold) {
-            return OutlierLevel.LARGE;
+            return AnomalyLevel.LARGE;
         } else if (value >= smallThreshold) {
-            return OutlierLevel.SMALL;
+            return AnomalyLevel.SMALL;
         } else {
-            return OutlierLevel.NORMAL;
+            return AnomalyLevel.NORMAL;
         }
     }
 }

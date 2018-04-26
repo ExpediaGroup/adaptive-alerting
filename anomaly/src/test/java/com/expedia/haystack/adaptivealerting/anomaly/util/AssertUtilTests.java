@@ -1,8 +1,8 @@
-package com.expedia.haystack.adaptivealerting.util;
+package com.expedia.haystack.adaptivealerting.anomaly.util;
 
 import org.junit.Test;
 
-import static com.expedia.haystack.adaptivealerting.util.AssertUtil.isTrue;
+import static com.expedia.haystack.adaptivealerting.anomaly.util.AssertUtil.isTrue;
 
 /**
  * @author Willie Wheeler

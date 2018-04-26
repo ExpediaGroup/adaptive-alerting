@@ -1,19 +1,19 @@
-package com.expedia.haystack.adaptivealerting.outlier;
+package com.expedia.haystack.adaptivealerting.anomaly;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import java.time.Instant;
 
-import static com.expedia.haystack.adaptivealerting.OutlierLevel.*;
-import static com.expedia.haystack.adaptivealerting.outlier.ConstantThresholdOutlierDetector.LEFT_TAILED;
-import static com.expedia.haystack.adaptivealerting.outlier.ConstantThresholdOutlierDetector.RIGHT_TAILED;
+import static com.expedia.haystack.adaptivealerting.anomaly.AnomalyLevel.*;
+import static com.expedia.haystack.adaptivealerting.anomaly.ConstantThresholdAnomalyDetector.LEFT_TAILED;
+import static com.expedia.haystack.adaptivealerting.anomaly.ConstantThresholdAnomalyDetector.RIGHT_TAILED;
 import static junit.framework.TestCase.assertEquals;
 
 /**
  * @author Willie Wheeler
  */
-public class ConstantThresholdOutlierDetectorTests {
+public class ConstantThresholdAnomalyDetectorTests {
     private Instant instant;
     
     @Before
@@ -23,22 +23,22 @@ public class ConstantThresholdOutlierDetectorTests {
     
     @Test(expected = IllegalArgumentException.class)
     public void testValidateTail() {
-        new ConstantThresholdOutlierDetector(-1, 0.0, 1.0);
+        new ConstantThresholdAnomalyDetector(-1, 0.0, 1.0);
     }
     
     @Test(expected = IllegalArgumentException.class)
     public void testValidateLeftTailedThresholds() {
-        new ConstantThresholdOutlierDetector(LEFT_TAILED, 10.0, 30.0);
+        new ConstantThresholdAnomalyDetector(LEFT_TAILED, 10.0, 30.0);
     }
     
     @Test(expected = IllegalArgumentException.class)
     public void testValidateRightTailedThresholds() {
-        new ConstantThresholdOutlierDetector(RIGHT_TAILED, 30.0, 10.0);
+        new ConstantThresholdAnomalyDetector(RIGHT_TAILED, 30.0, 10.0);
     }
     
     @Test
     public void testAccessors() {
-        ConstantThresholdOutlierDetector detector = new ConstantThresholdOutlierDetector(RIGHT_TAILED, 30.0, 60.0);
+        ConstantThresholdAnomalyDetector detector = new ConstantThresholdAnomalyDetector(RIGHT_TAILED, 30.0, 60.0);
         assertEquals(RIGHT_TAILED, detector.getTail());
         assertEquals(30.0, detector.getSmallThreshold());
         assertEquals(60.0, detector.getLargeThreshold());
@@ -46,7 +46,7 @@ public class ConstantThresholdOutlierDetectorTests {
     
     @Test
     public void testEvaluateLeftTailed_positiveThresholds() {
-        ConstantThresholdOutlierDetector detector = new ConstantThresholdOutlierDetector(LEFT_TAILED, 300.0, 100.0);
+        ConstantThresholdAnomalyDetector detector = new ConstantThresholdAnomalyDetector(LEFT_TAILED, 300.0, 100.0);
         assertEquals(NORMAL, detector.evaluate(instant, 500.0));
         assertEquals(SMALL, detector.evaluate(instant, 300.0));
         assertEquals(SMALL, detector.evaluate(instant, 200.0));
@@ -56,7 +56,7 @@ public class ConstantThresholdOutlierDetectorTests {
     
     @Test
     public void testEvaluateLeftTailed_negativeThresholds() {
-        ConstantThresholdOutlierDetector detector = new ConstantThresholdOutlierDetector(LEFT_TAILED, -10.0, -30.0);
+        ConstantThresholdAnomalyDetector detector = new ConstantThresholdAnomalyDetector(LEFT_TAILED, -10.0, -30.0);
         assertEquals(NORMAL, detector.evaluate(instant, 1.0));
         assertEquals(SMALL, detector.evaluate(instant, -10.0));
         assertEquals(SMALL, detector.evaluate(instant, -15.0));
@@ -66,7 +66,7 @@ public class ConstantThresholdOutlierDetectorTests {
     
     @Test
     public void testEvaluateRightTailed_positiveThresholds() {
-        ConstantThresholdOutlierDetector detector = new ConstantThresholdOutlierDetector(RIGHT_TAILED, 200.0, 300.0);
+        ConstantThresholdAnomalyDetector detector = new ConstantThresholdAnomalyDetector(RIGHT_TAILED, 200.0, 300.0);
         assertEquals(NORMAL, detector.evaluate(instant, 100.0));
         assertEquals(SMALL, detector.evaluate(instant, 200.0));
         assertEquals(SMALL, detector.evaluate(instant, 220.0));
@@ -76,7 +76,7 @@ public class ConstantThresholdOutlierDetectorTests {
     
     @Test
     public void testEvaluateRightTailed_negativeThresholds() {
-        ConstantThresholdOutlierDetector detector = new ConstantThresholdOutlierDetector(RIGHT_TAILED, -300.0, -100.0);
+        ConstantThresholdAnomalyDetector detector = new ConstantThresholdAnomalyDetector(RIGHT_TAILED, -300.0, -100.0);
         assertEquals(NORMAL, detector.evaluate(instant, -1000.0));
         assertEquals(SMALL, detector.evaluate(instant, -300.0));
         assertEquals(SMALL, detector.evaluate(instant, -250.0));
