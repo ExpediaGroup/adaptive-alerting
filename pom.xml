@@ -5,13 +5,18 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.expedia.haystack</groupId>
-    <artifactId>haystack-adaptive-alerting</artifactId>
+    <artifactId>adaptive-alerting</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Anomaly detection for streaming time series.</description>
     <url>https://github.com/ExpediaDotCom/haystack-adaptive-alerting</url>
+
+    <modules>
+        <module>anomaly</module>
+        <module>kafka</module>
+    </modules>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -35,7 +40,6 @@
     </dependencies>
 
     <build>
-        <finalName>haystack-adaptive-alerting</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
