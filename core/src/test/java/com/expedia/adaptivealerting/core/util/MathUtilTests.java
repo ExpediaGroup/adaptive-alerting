@@ -13,26 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.expedia.adaptivealerting.core.util;
 
 import org.junit.Test;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
+import static com.expedia.adaptivealerting.core.util.MathUtil.isApproximatelyEqual;
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertFalse;
 
-/**
- * @author Willie Wheeler
- */
-public class AssertUtilTests {
+public class MathUtilTests {
     
     @Test
-    public void testIsTrue_trueValue() {
-        // Expect this to work without throwing an exception
-        isTrue(true, "The param must be true");
-    }
-    
-    @Test(expected = IllegalArgumentException.class)
-    public void testIsTrue_falseValue() {
-        isTrue(false, "The param must be true");
+    public void testIsApproximatelyEqual() {
+        assertTrue(isApproximatelyEqual(2.0, 2.0, 0.0));
+        assertTrue(isApproximatelyEqual(2.0, 2.0, 0.1));
+        
+        // This is surprising, but it's because floating point is only approximate.
+        assertFalse(isApproximatelyEqual(2.0, 2.1, 0.1));
+        
+        assertTrue(isApproximatelyEqual(2.0, 2.1, 0.11));
     }
 }
