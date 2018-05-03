@@ -16,7 +16,15 @@
 package com.expedia.adaptivealerting.core.model;
 
 import com.expedia.adaptivealerting.core.AnomalyLevel;
+import com.opencsv.bean.CsvToBeanBuilder;
+import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.List;
+import java.util.ListIterator;
 
 import static com.expedia.adaptivealerting.core.util.MathUtil.isApproximatelyEqual;
 import static junit.framework.TestCase.assertEquals;
@@ -28,18 +36,57 @@ import static junit.framework.TestCase.assertTrue;
 public class EwmaAnomalyDetectorTests {
     private static final double TOLERANCE = 0.01;
     
+    private static List<EwmaTestRow> calInflowTestRows;
+    
+    @BeforeClass
+    public static void setUpClass() throws IOException {
+        readData_calInflow();
+    }
+    
     @Test
     public void testEvaluate() {
-        EwmaAnomalyDetector detector = new EwmaAnomalyDetector(0.2, 2.0, 3.0, 300.0);
         
-        assertEquals(0.2, detector.getAlpha());
-        assertEquals(2.0, detector.getSmallMultiplier());
-        assertEquals(3.0, detector.getLargeMultiplier());
-        assertEquals(300.0, detector.getMean());
+        // Params
+        final double alpha = 0.05;
+        final double smallMult = 2.0;
+        final double largeMult = 3.0;
+        
+        final ListIterator<EwmaTestRow> testRows = calInflowTestRows.listIterator();
+        final EwmaTestRow testRow0 = testRows.next();
+        final double observed0 = testRow0.getObserved();
+        final EwmaAnomalyDetector detector = new EwmaAnomalyDetector(alpha, smallMult, largeMult, observed0);
+    
+        // Params
+        assertEquals(alpha, detector.getAlpha());
+        assertEquals(smallMult, detector.getSmallMultiplier());
+        assertEquals(largeMult, detector.getLargeMultiplier());
+        
+        // Seed observation
+        assertEquals(observed0, detector.getMean());
         assertEquals(0.0, detector.getVariance());
         
-        AnomalyLevel actualLevel = detector.evaluate(305.0);
-        assertEquals(AnomalyLevel.LARGE, actualLevel);
+        while (testRows.hasNext()) {
+            final EwmaTestRow testRow = testRows.next();
+            final int observed = testRow.getObserved();
+            final String expectedLevel = testRow.getLevel();
+            final AnomalyLevel actualLevel = detector.evaluate(observed);
+            
+            assertApproxEqual(testRow.getMean(), detector.getMean());
+            assertApproxEqual(testRow.getVar(), detector.getVariance());
+    
+            if (!expectedLevel.isEmpty()) {
+                assertEquals(expectedLevel, actualLevel.name());
+            }
+        }
+    }
+    
+    private static void readData_calInflow() {
+        final InputStream is = ClassLoader.getSystemResourceAsStream("datasets/cal-inflow-tests-ewma.csv");
+        calInflowTestRows = new CsvToBeanBuilder<EwmaTestRow>(new InputStreamReader(is))
+                .withType(EwmaTestRow.class)
+                .build()
+                .parse();
+
     }
     
     private static void assertApproxEqual(double d1, double d2) {
