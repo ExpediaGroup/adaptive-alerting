@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.core.model;
 
-import com.expedia.adaptivealerting.core.AnomalyLevel;
 import com.opencsv.bean.CsvToBeanBuilder;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -34,7 +33,7 @@ import static junit.framework.TestCase.assertTrue;
  * @author Willie Wheeler
  */
 public class EwmaAnomalyDetectorTests {
-    private static final double TOLERANCE = 0.01;
+    private static final double TOLERANCE = 0.001;
     
     private static List<EwmaTestRow> calInflowTestRows;
     
@@ -68,20 +67,17 @@ public class EwmaAnomalyDetectorTests {
         while (testRows.hasNext()) {
             final EwmaTestRow testRow = testRows.next();
             final int observed = testRow.getObserved();
-            final String expectedLevel = testRow.getLevel();
-            final AnomalyLevel actualLevel = detector.evaluate(observed);
+            detector.evaluate(observed);
             
+            assertApproxEqual(testRow.getKnownMean(), testRow.getMean());
             assertApproxEqual(testRow.getMean(), detector.getMean());
             assertApproxEqual(testRow.getVar(), detector.getVariance());
-    
-            if (!expectedLevel.isEmpty()) {
-                assertEquals(expectedLevel, actualLevel.name());
-            }
+            // TODO Assert AnomalyLevel
         }
     }
     
     private static void readData_calInflow() {
-        final InputStream is = ClassLoader.getSystemResourceAsStream("datasets/cal-inflow-tests-ewma.csv");
+        final InputStream is = ClassLoader.getSystemResourceAsStream("tests/cal-inflow-tests-ewma.csv");
         calInflowTestRows = new CsvToBeanBuilder<EwmaTestRow>(new InputStreamReader(is))
                 .withType(EwmaTestRow.class)
                 .build()
