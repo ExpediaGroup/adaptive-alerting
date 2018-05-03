@@ -48,4 +48,4 @@ plot(data$observed[1:480], type="l", col="blue")
 lines(known.mean[1:480], col="black")
 
 # Dump tests
-write.table(tests, "../tests/cal-inflow-tests-emwa.csv", sep = ",", row.names = FALSE)
+write.table(tests, "../tests/cal-inflow-tests-ewma.csv", sep = ",", row.names = FALSE)
