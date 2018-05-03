@@ -2,10 +2,8 @@
 
 These are public datasets for machine learning.
 
-`.xlsx` files contain the test sources, and the corresponding `.csv` files are for consumption by unit tests.
+## cal-inflow.csv
 
-## cal-inflow-tests-ewma
-
-| Source | Dua, D. and Karra Taniskidou, E. (2017). UCI Machine Learning Repository [http://archive.ics.uci.edu/ml]. Irvine, CA: University of California, School of Information and Computer Science. |
-| Dataset | https://archive.ics.uci.edu/ml/datasets/CalIt2+Building+People+Counts |
-| Notes | The original `CalIt2.data` file contains both the inflows and outflows, but here we do only inflows. Note that the original `CalIt2.data` data file contains two extra CRs that need to be removed. |
+- **Source:** Dua, D. and Karra Taniskidou, E. (2017). UCI Machine Learning Repository [http://archive.ics.uci.edu/ml]. Irvine, CA: University of California, School of Information and Computer Science.
+- **Dataset:** https://archive.ics.uci.edu/ml/datasets/CalIt2+Building+People+Counts
+- **Notes:** The original `CalIt2.data` file contains both the inflows and outflows, but here we do only inflows. Note that the original `CalIt2.data` data file contains two extra CRs that need to be removed.
