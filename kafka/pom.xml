@@ -34,4 +34,11 @@
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Anomaly detection for streaming time series.</description>
     <url>https://github.com/ExpediaDotCom/haystack-adaptive-alerting</url>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+    </dependencies>
 </project>
