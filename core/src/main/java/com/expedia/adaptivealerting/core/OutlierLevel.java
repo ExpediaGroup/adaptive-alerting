@@ -16,24 +16,24 @@
 package com.expedia.adaptivealerting.core;
 
 /**
- * Anomaly level enum.
+ * Outlier level enum.
  *
  * @author Willie Wheeler
  */
-public enum AnomalyLevel {
+public enum OutlierLevel {
     
     /**
-     * Normal data point (not an anomaly).
+     * Normal data point (not an outlier).
      */
     NORMAL,
     
     /**
-     * Small anomaly.
+     * Weak outlier.
      */
-    SMALL,
+    WEAK,
     
     /**
-     * Large anomaly.
+     * Strong outlier.
      */
-    LARGE
+    STRONG
 }

@@ -15,7 +15,10 @@
  */
 package com.expedia.adaptivealerting.core.model;
 
-import com.expedia.adaptivealerting.core.AnomalyLevel;
+import com.expedia.adaptivealerting.core.OutlierDetector;
+import com.expedia.adaptivealerting.core.OutlierLevel;
+
+import java.time.Instant;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.sqrt;
@@ -35,7 +38,7 @@ import static java.lang.Math.sqrt;
  *
  * @author Willie Wheeler
  */
-public class EwmaAnomalyDetector {
+public class EwmaOutlierDetector implements OutlierDetector {
     
     /**
      * Smoothing param. Somewhat misnamed because higher values lead to less smoothing, but it's called the smoothing
@@ -44,14 +47,14 @@ public class EwmaAnomalyDetector {
     private double alpha;
     
     /**
-     * Small anomaly threshold multiplier param.
+     * Weak outlier threshold, in sigmas.
      */
-    private double smallMultiplier;
+    private double weakThreshold;
     
     /**
-     * Large anomaly threshold multiplier param.
+     * Strong outlier threshold, in sigmas.
      */
-    private double largeMultiplier;
+    private double strongThreshold;
     
     /**
      * Local mean estimate.
@@ -67,14 +70,14 @@ public class EwmaAnomalyDetector {
      * Creates a new EWMA anomaly detector. Initial mean is given by initValue and initial variance is 0.
      *
      * @param alpha           Smoothing parameter.
-     * @param smallMultiplier Small multiplier parameter, applied to the standard deviation.
-     * @param largeMultiplier Large multiplier parameter, applied to the standard deviation.
+     * @param weakThreshold   Weak outlier threshold, in sigmas.
+     * @param strongThreshold Strong outlier threshold, in sigmas.
      * @param initValue       Initial observation, used to set the first mean estimate.
      */
-    public EwmaAnomalyDetector(double alpha, double smallMultiplier, double largeMultiplier, double initValue) {
+    public EwmaOutlierDetector(double alpha, double weakThreshold, double strongThreshold, double initValue) {
         this.alpha = alpha;
-        this.smallMultiplier = smallMultiplier;
-        this.largeMultiplier = largeMultiplier;
+        this.weakThreshold = weakThreshold;
+        this.strongThreshold = strongThreshold;
         this.mean = initValue;
         this.variance = 0.0;
     }
@@ -83,12 +86,12 @@ public class EwmaAnomalyDetector {
         return alpha;
     }
     
-    public double getSmallMultiplier() {
-        return smallMultiplier;
+    public double getWeakThreshold() {
+        return weakThreshold;
     }
     
-    public double getLargeMultiplier() {
-        return largeMultiplier;
+    public double getStrongThreshold() {
+        return strongThreshold;
     }
     
     public double getMean() {
@@ -99,20 +102,25 @@ public class EwmaAnomalyDetector {
         return variance;
     }
     
-    public AnomalyLevel evaluate(double value) {
-        AnomalyLevel level = null;
+    @Override
+    public OutlierLevel evaluate(Instant instant, double value) {
+        
+        // TODO Currently we just ignore the instant. Would be helpful to have a way to detect missing data points in
+        // the stream, and to define strategies for dealing with this. [WLW]
+        
+        OutlierLevel level = null;
         
         final double dist = abs(value - mean);
         final double stdDev = sqrt(variance);
-        final double largeThreshold = largeMultiplier * stdDev;
-        final double smallThreshold = smallMultiplier * stdDev;
+        final double largeThreshold = strongThreshold * stdDev;
+        final double smallThreshold = weakThreshold * stdDev;
         
         if (dist > largeThreshold) {
-            level = AnomalyLevel.LARGE;
+            level = OutlierLevel.STRONG;
         } else if (dist > smallThreshold) {
-            level = AnomalyLevel.SMALL;
+            level = OutlierLevel.WEAK;
         } else {
-            level = AnomalyLevel.NORMAL;
+            level = OutlierLevel.NORMAL;
         }
         
         updateEstimates(value);
