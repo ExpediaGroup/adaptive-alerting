@@ -32,7 +32,7 @@ import static junit.framework.TestCase.assertTrue;
 /**
  * @author Willie Wheeler
  */
-public class EwmaAnomalyDetectorTests {
+public class EwmaOutlierDetectorTests {
     private static final double TOLERANCE = 0.001;
     
     private static List<EwmaTestRow> calInflowTestRows;
@@ -47,18 +47,18 @@ public class EwmaAnomalyDetectorTests {
         
         // Params
         final double alpha = 0.05;
-        final double smallMult = 2.0;
-        final double largeMult = 3.0;
+        final double weakThreshold = 2.0;
+        final double strongThreshold = 3.0;
         
         final ListIterator<EwmaTestRow> testRows = calInflowTestRows.listIterator();
         final EwmaTestRow testRow0 = testRows.next();
         final double observed0 = testRow0.getObserved();
-        final EwmaAnomalyDetector detector = new EwmaAnomalyDetector(alpha, smallMult, largeMult, observed0);
+        final EwmaOutlierDetector detector = new EwmaOutlierDetector(alpha, weakThreshold, strongThreshold, observed0);
     
         // Params
         assertEquals(alpha, detector.getAlpha());
-        assertEquals(smallMult, detector.getSmallMultiplier());
-        assertEquals(largeMult, detector.getLargeMultiplier());
+        assertEquals(weakThreshold, detector.getWeakThreshold());
+        assertEquals(strongThreshold, detector.getStrongThreshold());
         
         // Seed observation
         assertEquals(observed0, detector.getMean());
@@ -67,12 +67,15 @@ public class EwmaAnomalyDetectorTests {
         while (testRows.hasNext()) {
             final EwmaTestRow testRow = testRows.next();
             final int observed = testRow.getObserved();
-            detector.evaluate(observed);
+            
+            // This detector doesn't currently do anything with the instant, so we can just pass null.
+            // This may change in the future.
+            detector.evaluate(null, observed);
             
             assertApproxEqual(testRow.getKnownMean(), testRow.getMean());
             assertApproxEqual(testRow.getMean(), detector.getMean());
             assertApproxEqual(testRow.getVar(), detector.getVariance());
-            // TODO Assert AnomalyLevel
+            // TODO Assert OutlierLevel
         }
     }
     
