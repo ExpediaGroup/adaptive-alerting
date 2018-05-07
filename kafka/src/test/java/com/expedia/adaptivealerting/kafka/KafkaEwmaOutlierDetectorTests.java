@@ -15,5 +15,16 @@
  */
 package com.expedia.adaptivealerting.kafka;
 
-public class Dummy {
+import org.junit.Before;
+import org.junit.Test;
+
+public class KafkaEwmaOutlierDetectorTests {
+    
+    @Before
+    public void setUp() {
+    }
+    
+    @Test
+    public void testDummy() {
+    }
 }
