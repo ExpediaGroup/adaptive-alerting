@@ -13,18 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka;
+package com.expedia.adaptivealerting.core.datasource;
 
-import org.junit.Before;
-import org.junit.Test;
+import com.expedia.www.haystack.commons.entities.MetricPoint;
 
-public class KafkaEwmaOutlierDetectorTests {
+/**
+ * Data generator callback.
+ *
+ * @author Willie Wheeler
+ */
+public interface DataSourceCallback {
     
-    @Before
-    public void setUp() {
-    }
-    
-    @Test
-    public void testDummy() {
-    }
+    void next(MetricPoint metricPoint);
 }

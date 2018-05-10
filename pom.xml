@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
   ~ Copyright 2018 Expedia Group, Inc.
   ~
@@ -14,7 +15,6 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -41,6 +41,7 @@
         <!-- Dependencies -->
         <junit.version>4.12</junit.version>
         <kafka.streams.version>1.1.0</kafka.streams.version>
+        <msgpack.version>0.8.13</msgpack.version>
         <opencsv.version>4.1</opencsv.version>
 
         <!-- Maven plugins -->
@@ -50,6 +51,15 @@
 
     <dependencyManagement>
         <dependencies>
+
+            <!-- Haystack -->
+            <dependency>
+                <groupId>com.expedia.www</groupId>
+                <artifactId>haystack-commons</artifactId>
+                <version>1.0.18</version>
+            </dependency>
+
+            <!-- Third-party -->
             <dependency>
                 <groupId>com.opencsv</groupId>
                 <artifactId>opencsv</artifactId>
@@ -65,6 +75,11 @@
                 <groupId>org.apache.kafka</groupId>
                 <artifactId>kafka-streams</artifactId>
                 <version>${kafka.streams.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.msgpack</groupId>
+                <artifactId>msgpack-core</artifactId>
+                <version>${msgpack.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

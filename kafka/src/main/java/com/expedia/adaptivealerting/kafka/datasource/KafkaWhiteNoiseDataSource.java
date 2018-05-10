@@ -13,22 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.util;
+package com.expedia.adaptivealerting.kafka.datasource;
+
+import com.expedia.adaptivealerting.core.datasource.WhiteNoiseDataSource;
 
 /**
- * Assertion utilities.
+ * <p>
+ * Kafka producer that generates an infinite series of white noise {@link com.expedia.www.haystack.commons.entities.MetricPoint}s
+ * at a given rate. The data distribution is Gaussian and configurable. The rate is likewise configurable.
+ * </p>
+ * <p>
+ * This class is primarily intended to support testing.
+ * </p>
  *
  * @author Willie Wheeler
  */
-public class AssertUtil {
+public class KafkaWhiteNoiseDataSource {
     
-    public static void isTrue(boolean b, String message) {
-        if (!b) {
-            throw new IllegalArgumentException(message);
-        }
-    }
-    
-    public static void isBetween(double value, double lowerBd, double upperBd, String message) {
-        isTrue(lowerBd <= value && value <= upperBd, message);
+    public static void main(String[] args) {
+        new WhiteNoiseDataSource().start(new KafkaDataSourceCallback("metrics"));
     }
 }

@@ -13,22 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.util;
+package com.expedia.adaptivealerting.core.datasource;
 
 /**
- * Assertion utilities.
+ * Interface for data generators.
  *
  * @author Willie Wheeler
  */
-public class AssertUtil {
+public interface DataSource {
     
-    public static void isTrue(boolean b, String message) {
-        if (!b) {
-            throw new IllegalArgumentException(message);
-        }
-    }
-    
-    public static void isBetween(double value, double lowerBd, double upperBd, String message) {
-        isTrue(lowerBd <= value && value <= upperBd, message);
-    }
+    /**
+     * Start the data generator.
+     */
+    void start(DataSourceCallback callback);
 }

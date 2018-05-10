@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.model;
+package com.expedia.adaptivealerting.core.detector;
 
 import com.expedia.adaptivealerting.core.OutlierDetector;
 import com.expedia.adaptivealerting.core.OutlierLevel;
 
 import java.time.Instant;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isBetween;
 import static java.lang.Math.abs;
 import static java.lang.Math.sqrt;
 
@@ -75,6 +76,8 @@ public class EwmaOutlierDetector implements OutlierDetector {
      * @param initValue       Initial observation, used to set the first mean estimate.
      */
     public EwmaOutlierDetector(double alpha, double weakThreshold, double strongThreshold, double initValue) {
+        isBetween(alpha, 0.0, 1.0, "alpha must be in the range [0, 1]");
+        
         this.alpha = alpha;
         this.weakThreshold = weakThreshold;
         this.strongThreshold = strongThreshold;

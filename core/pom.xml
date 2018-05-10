@@ -36,6 +36,14 @@
     <url>https://github.com/ExpediaDotCom/haystack-adaptive-alerting</url>
 
     <dependencies>
+
+        <!-- Haystack -->
+        <dependency>
+            <groupId>com.expedia.www</groupId>
+            <artifactId>haystack-commons</artifactId>
+        </dependency>
+
+        <!-- Third-party -->
         <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>

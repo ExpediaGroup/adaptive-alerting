@@ -1,4 +1,4 @@
-package com.expedia.adaptivealerting.core.model;
+package com.expedia.adaptivealerting.core.detector;
 
 import com.opencsv.bean.CsvBindByName;
 

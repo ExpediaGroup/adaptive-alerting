@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.core.util;
 
 import org.junit.Test;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isBetween;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 
 /**
@@ -34,5 +35,15 @@ public class AssertUtilTests {
     @Test(expected = IllegalArgumentException.class)
     public void testIsTrue_falseValue() {
         isTrue(false, "The param must be true");
+    }
+    
+    @Test
+    public void testIsBetween_trueValue() {
+        isBetween(3.0, 0.0, 5.0, "Blah blah blah");
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testIsBetween_falseValue() {
+        isBetween(-3.0, 0.0, 5.0, "Blah blah blah");
     }
 }

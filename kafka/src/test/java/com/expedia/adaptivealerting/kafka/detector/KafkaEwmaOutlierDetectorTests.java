@@ -13,22 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.util;
+package com.expedia.adaptivealerting.kafka.detector;
 
-/**
- * Assertion utilities.
- *
- * @author Willie Wheeler
- */
-public class AssertUtil {
+import org.junit.Before;
+import org.junit.Test;
+
+public class KafkaEwmaOutlierDetectorTests {
     
-    public static void isTrue(boolean b, String message) {
-        if (!b) {
-            throw new IllegalArgumentException(message);
-        }
+    @Before
+    public void setUp() {
     }
     
-    public static void isBetween(double value, double lowerBd, double upperBd, String message) {
-        isTrue(lowerBd <= value && value <= upperBd, message);
+    @Test
+    public void testDummy() {
     }
 }
