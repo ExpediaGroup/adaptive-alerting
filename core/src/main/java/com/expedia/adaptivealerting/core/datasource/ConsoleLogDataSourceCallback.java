@@ -13,22 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.util;
+package com.expedia.adaptivealerting.core.datasource;
+
+import com.expedia.www.haystack.commons.entities.MetricPoint;
 
 /**
- * Assertion utilities.
+ * Logs generated data to the console.
  *
  * @author Willie Wheeler
  */
-public class AssertUtil {
+public class ConsoleLogDataSourceCallback implements DataSourceCallback {
     
-    public static void isTrue(boolean b, String message) {
-        if (!b) {
-            throw new IllegalArgumentException(message);
-        }
-    }
-    
-    public static void isBetween(double value, double lowerBd, double upperBd, String message) {
-        isTrue(lowerBd <= value && value <= upperBd, message);
+    @Override
+    public void next(MetricPoint metricPoint) {
+        
+        // TODO Use logger
+        System.out.println(metricPoint);
     }
 }

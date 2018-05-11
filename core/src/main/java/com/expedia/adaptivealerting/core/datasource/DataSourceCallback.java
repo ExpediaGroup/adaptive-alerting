@@ -13,7 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka;
+package com.expedia.adaptivealerting.core.datasource;
 
-public class Dummy {
+import com.expedia.www.haystack.commons.entities.MetricPoint;
+
+/**
+ * Data generator callback.
+ *
+ * @author Willie Wheeler
+ */
+public interface DataSourceCallback {
+    
+    void next(MetricPoint metricPoint);
 }

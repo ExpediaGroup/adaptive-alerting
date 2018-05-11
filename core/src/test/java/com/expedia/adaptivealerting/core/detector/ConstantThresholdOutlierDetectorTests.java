@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.expedia.adaptivealerting.core.model;
+package com.expedia.adaptivealerting.core.detector;
 
 import com.expedia.adaptivealerting.core.OutlierLevel;
 import org.junit.Before;
@@ -22,8 +22,8 @@ import org.junit.Test;
 
 import java.time.Instant;
 
-import static com.expedia.adaptivealerting.core.model.ConstantThresholdOutlierDetector.LEFT_TAILED;
-import static com.expedia.adaptivealerting.core.model.ConstantThresholdOutlierDetector.RIGHT_TAILED;
+import static com.expedia.adaptivealerting.core.detector.ConstantThresholdOutlierDetector.LEFT_TAILED;
+import static com.expedia.adaptivealerting.core.detector.ConstantThresholdOutlierDetector.RIGHT_TAILED;
 import static junit.framework.TestCase.assertEquals;
 
 /**

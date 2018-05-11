@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.model;
+package com.expedia.adaptivealerting.core.detector;
 
 import com.opencsv.bean.CsvToBeanBuilder;
 import org.junit.BeforeClass;
@@ -40,6 +40,11 @@ public class EwmaOutlierDetectorTests {
     @BeforeClass
     public static void setUpClass() throws IOException {
         readData_calInflow();
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructor_alphaOutOfRange() {
+        new EwmaOutlierDetector(2.0, 100.0, 150.0, 0.0);
     }
     
     @Test

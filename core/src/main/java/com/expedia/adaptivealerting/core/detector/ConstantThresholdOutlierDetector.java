@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.model;
+package com.expedia.adaptivealerting.core.detector;
 
 import com.expedia.adaptivealerting.core.OutlierLevel;
 import com.expedia.adaptivealerting.core.OutlierDetector;

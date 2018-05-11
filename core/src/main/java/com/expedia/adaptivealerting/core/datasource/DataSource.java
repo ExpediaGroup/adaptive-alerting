@@ -13,20 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka;
+package com.expedia.adaptivealerting.core.datasource;
 
-import org.junit.Before;
-import org.junit.Test;
-
-public class DummyTests {
+/**
+ * Interface for data generators.
+ *
+ * @author Willie Wheeler
+ */
+public interface DataSource {
     
-    @Before
-    public void setUp() {
-        new Dummy();
-    }
-    
-    @Test
-    public void testDumm() {
-        new Dummy();
-    }
+    /**
+     * Start the data generator.
+     */
+    void start(DataSourceCallback callback);
 }

@@ -30,6 +30,8 @@ The goal here is to automatically select and fit the best model available for an
 this to improve the signal-to-noise ratio for alerting, thus increasing our ability to scale our monitoring to a larger
 number of metrics.
 
+See [AutoML](http://www.ml4aad.org/automl/) for an example of what we are talking about here.
+
 This is just a goal at this point. Watch this space for future developments.
 
 ## Reference

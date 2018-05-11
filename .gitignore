@@ -22,7 +22,8 @@
 hs_err_pid*
 
 # Maven
-target
+target/
 
 # IDE-specific
-.idea
+*.iml
+.idea/
