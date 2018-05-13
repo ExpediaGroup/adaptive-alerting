@@ -20,6 +20,9 @@ import org.junit.Test;
 
 public class KafkaEwmaOutlierDetectorTests {
     
+    // Class under test
+    private KafkaEwmaOutlierDetector detector;
+    
     @Before
     public void setUp() {
     }

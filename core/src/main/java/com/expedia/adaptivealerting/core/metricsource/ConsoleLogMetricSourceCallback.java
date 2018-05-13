@@ -13,21 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.datasource;
+package com.expedia.adaptivealerting.core.metricsource;
 
 import com.expedia.www.haystack.commons.entities.MetricPoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Logs generated data to the console.
  *
  * @author Willie Wheeler
  */
-public class ConsoleLogDataSourceCallback implements DataSourceCallback {
+public class ConsoleLogMetricSourceCallback implements MetricSourceCallback {
+    private static final Logger log = LoggerFactory.getLogger(ConsoleLogMetricSourceCallback.class);
     
     @Override
     public void next(MetricPoint metricPoint) {
-        
-        // TODO Use logger
-        System.out.println(metricPoint);
+        log.info(metricPoint.toString());
     }
 }

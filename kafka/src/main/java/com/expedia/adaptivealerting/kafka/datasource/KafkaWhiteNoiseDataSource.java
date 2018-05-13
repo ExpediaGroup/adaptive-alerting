@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.kafka.datasource;
 
-import com.expedia.adaptivealerting.core.datasource.WhiteNoiseDataSource;
+import com.expedia.adaptivealerting.core.metricsource.WhiteNoiseMetricSource;
 
 /**
  * <p>
@@ -31,6 +31,6 @@ import com.expedia.adaptivealerting.core.datasource.WhiteNoiseDataSource;
 public class KafkaWhiteNoiseDataSource {
     
     public static void main(String[] args) {
-        new WhiteNoiseDataSource().start(new KafkaDataSourceCallback("metrics"));
+        new WhiteNoiseMetricSource().start(new KafkaMetricSourceCallback("metrics"));
     }
 }

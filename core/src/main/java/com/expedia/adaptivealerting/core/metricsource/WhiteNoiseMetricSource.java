@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.datasource;
+package com.expedia.adaptivealerting.core.metricsource;
 
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.entities.MetricType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import scala.Enumeration;
 import scala.collection.immutable.Map;
 import scala.collection.immutable.Map$;
@@ -38,17 +40,21 @@ import static java.lang.Math.sqrt;
  *
  * @author Willie Wheeler
  */
-public final class WhiteNoiseDataSource implements DataSource {
+public final class WhiteNoiseMetricSource implements MetricSource {
+    private static final Logger log = LoggerFactory.getLogger(WhiteNoiseMetricSource.class);
+    
     private final String name;
     private final double mean;
     private final double variance;
     private final long period;
     
+    private Timer timer;
+    
     /**
      * Creates a new, normally-distributed white noise generator. The series name is "white noise" and the period is one
      * second.
      */
-    public WhiteNoiseDataSource() {
+    public WhiteNoiseMetricSource() {
         this("white-noise", 0.0, 1.0, 1000L);
     }
     
@@ -60,7 +66,7 @@ public final class WhiteNoiseDataSource implements DataSource {
      * @param variance Gaussian variance.
      * @param period   Tick period in milliseconds.
      */
-    public WhiteNoiseDataSource(String name, double mean, double variance, long period) {
+    public WhiteNoiseMetricSource(String name, double mean, double variance, long period) {
         this.name = name;
         this.mean = mean;
         this.variance = variance;
@@ -68,13 +74,14 @@ public final class WhiteNoiseDataSource implements DataSource {
     }
     
     @Override
-    public void start(DataSourceCallback callback) {
+    public void start(MetricSourceCallback callback) {
         final Random random = new Random();
         final double stdDev = sqrt(variance);
         final Enumeration.Value type = MetricType.Gauge();
         final Map<String, String> tags = Map$.MODULE$.<String, String>empty();
-        
-        final Timer timer = new Timer();
+    
+        this.timer = new Timer();
+        log.info("Starting WhiteNoiseMetricSource");
         timer.scheduleAtFixedRate(new TimerTask() {
             
             @Override
@@ -84,5 +91,13 @@ public final class WhiteNoiseDataSource implements DataSource {
                 callback.next(new MetricPoint(name, type, tags, value, now));
             }
         }, 0L, period);
+    }
+    
+    @Override
+    public void stop() {
+        log.info("Stopping WhiteNoiseMetricSource");
+        timer.cancel();
+        timer.purge();
+        this.timer = null;
     }
 }

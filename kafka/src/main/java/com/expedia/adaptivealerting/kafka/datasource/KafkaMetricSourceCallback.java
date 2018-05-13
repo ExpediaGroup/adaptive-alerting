@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.kafka.datasource;
 
-import com.expedia.adaptivealerting.core.datasource.DataSourceCallback;
+import com.expedia.adaptivealerting.core.metricsource.MetricSourceCallback;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.kstreams.serde.metricpoint.MetricPointSerializer;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -30,7 +30,7 @@ import java.util.Properties;
  *
  * @author Willie Wheeler
  */
-public class KafkaDataSourceCallback implements DataSourceCallback {
+public class KafkaMetricSourceCallback implements MetricSourceCallback {
     private final String topicName;
     private final KafkaProducer<String, MetricPoint> producer;
     
@@ -39,7 +39,7 @@ public class KafkaDataSourceCallback implements DataSourceCallback {
      *
      * @param topicName Kafka topic name.
      */
-    public KafkaDataSourceCallback(String topicName) {
+    public KafkaMetricSourceCallback(String topicName) {
         this.topicName = topicName;
         
         // TODO Externalize
