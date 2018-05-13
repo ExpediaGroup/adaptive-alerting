@@ -13,21 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.detector;
+package com.expedia.adaptivealerting.core.datasource;
 
 import org.junit.Before;
 import org.junit.Test;
 
-public class KafkaEwmaOutlierDetectorTests {
+/**
+ * @author Willie Wheeler
+ */
+public class WhiteNoiseDataSourceTests {
     
     // Class under test
-    private KafkaEwmaOutlierDetector detector;
+    private WhiteNoiseDataSource dataSource;
     
     @Before
     public void setUp() {
+        this.dataSource = new WhiteNoiseDataSource();
     }
     
     @Test
-    public void testDummy() {
+    public void testStart() {
+        // TODO
     }
 }
