@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.datasource;
+package com.expedia.adaptivealerting.core.metricsource;
 
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.entities.MetricType;
@@ -26,17 +26,17 @@ import scala.collection.immutable.Map$;
 /**
  * @author Willie Wheeler
  */
-public class ConsoleLogDataSourceCallbackTests {
+public class ConsoleLogMetricSourceCallbackTests {
     
     // Class under test
-    private ConsoleLogDataSourceCallback callback;
+    private ConsoleLogMetricSourceCallback callback;
     
     // Test objects
     private MetricPoint metricPoint;
     
     @Before
     public void setUp() {
-        this.callback = new ConsoleLogDataSourceCallback();
+        this.callback = new ConsoleLogMetricSourceCallback();
     
         final Enumeration.Value type = MetricType.Gauge();
         final Map<String, String> tags = Map$.MODULE$.<String, String>empty();

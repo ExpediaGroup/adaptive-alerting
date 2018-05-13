@@ -50,4 +50,26 @@ What this means is that for any given time series value, we go through the follo
   already been fit to the data)
 - Evaluate the time series value against that instantiated model.
 
+## Design proposal
 
+Given the above, we need some way to uniquely identify a given time series. In Haystack, the
+triple <service, operation, type> is sufficient, but AA isn't tied to Haystack, so we need a
+more general schema.
+
+One proposal is to simply hash the <service, operation, type> triple, and presumably, to hash
+other time series names in non-Haystack cases. The challenge I see here is that this scheme
+would seem to require coordination between time series producers in order to avoid collisions
+resulting from time series with the same name/hash input. For example, if there are two time
+series called "cars-bookings-counts", then they'll both have the same hash value.
+
+My suggestion would be to assign a GUID to the time series at onboarding time, and then use that
+GUID going forward as the Kafka key for the metric point. The time series producer would know
+how to assign a GUID to the time series in question. For example, Haystack would use the
+<service, operation, type> triple to look up the GUID before publishing to Kakfa.
+
+This scheme has the following characteristics:
+
+- The metric point's key is the time series GUID, which establishes partition affinity since
+  all metric points from the same time series have the same GUID.
+- The GUID gives us a way to get at the instantiated model for the given time series.
+- Using GUIDs avoids the need for coordination across time series producers.

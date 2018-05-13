@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.datasource;
+package com.expedia.adaptivealerting.core.metricsource;
+
+import com.expedia.www.haystack.commons.entities.MetricPoint;
 
 /**
- * Interface for data generators.
+ * Data generator callback.
  *
  * @author Willie Wheeler
  */
-public interface DataSource {
+public interface MetricSourceCallback {
     
-    /**
-     * Start the data generator.
-     */
-    void start(DataSourceCallback callback);
+    void next(MetricPoint metricPoint);
 }

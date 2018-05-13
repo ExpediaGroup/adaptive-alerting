@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.kafka.detector;
 import com.expedia.adaptivealerting.core.OutlierLevel;
 import com.expedia.adaptivealerting.core.detector.EwmaOutlierDetector;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
+import com.expedia.www.haystack.commons.entities.MetricType;
 import com.expedia.www.haystack.commons.kstreams.serde.metricpoint.MetricTankSerde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
@@ -26,6 +27,7 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.KStream;
+import scala.collection.immutable.Map$;
 
 import java.time.Instant;
 import java.util.Properties;
@@ -37,6 +39,11 @@ import java.util.Properties;
  */
 public class KafkaEwmaOutlierDetector {
     private static final String OUTLIER_LEVEL_TAG = "outlierLevel";
+    
+    // FIXME Hack because I'm not sure how to handle null MetricPoints below.
+    // But definitely don't want to keep this as it messes up the model.
+    private static final MetricPoint NULL_METRIC_POINT =
+            new MetricPoint("null", MetricType.Gauge(), Map$.MODULE$.<String, String>empty(), 0, 0);
     
     public static void main(String[] args) {
         
@@ -59,14 +66,14 @@ public class KafkaEwmaOutlierDetector {
         
         metrics
                 .map((key, metricPoint) -> {
-                    if (metricPoint != null) {
-                        final Instant instant = Instant.ofEpochSecond(metricPoint.epochTimeInSeconds());
-                        final OutlierLevel level = detector.evaluate(instant, metricPoint.value());
-                        final MetricPoint classified = classifiedMetricPoint(metricPoint, level);
-                        return KeyValue.pair(null, classified);
-                    } else {
-                        return null;
+                    // FIXME Hack, see above
+                    if (metricPoint == null) {
+                        metricPoint = NULL_METRIC_POINT;
                     }
+                    final Instant instant = Instant.ofEpochSecond(metricPoint.epochTimeInSeconds());
+                    final OutlierLevel level = detector.evaluate(instant, metricPoint.value());
+                    MetricPoint classified = classifiedMetricPoint(metricPoint, level);
+                    return KeyValue.pair(null, classified);
                 })
                 .filterNot((key, metricPoint) ->
                         OutlierLevel.NORMAL.name().equals(metricPoint.tags().get(OUTLIER_LEVEL_TAG).get()))
