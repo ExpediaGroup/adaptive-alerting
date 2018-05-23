@@ -4,7 +4,7 @@ import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.adaptivealerting.core.util.MathUtil;
 
 /**
- * Calculates Root-mean-squared error i.e. the standard deviation of the residuals (prediction errors).
+ * Calculates Root-mean-squared error. https://en.wikipedia.org/wiki/Root-mean-square_deviation.
  * 
  * @author kashah
  *
