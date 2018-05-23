@@ -30,7 +30,7 @@ public class RmseEvaluatorTests {
     public void testScore() {
         double[] sample = { 4, 10, 15, 45, 19, 50, 70 };
         double[] prediction = { 3, 12, 19, 50, 18, 60, 100 };
-        double expected = 12.0;
+        double expected = 12.229939843328282;
         double actual = evaluator.getScore(sample, prediction);
         assertEquals(expected, actual, 0);
     }

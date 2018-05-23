@@ -4,8 +4,7 @@ import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.adaptivealerting.core.util.MathUtil;
 
 /**
- * Calculates Root-mean-squared error i.e. differences between values (sample and prediction values) predicted by a
- * model.
+ * Calculates Root-mean-squared error i.e. the standard deviation of the residuals (prediction errors).
  * 
  * @author kashah
  *
@@ -20,7 +19,7 @@ public class RmseEvaluator implements Evaluator {
         for (int i = 0; i < n; i++) {
             resSumSquares += MathUtil.getSquare(actual[i] - prediction[i]);
         }
-        return MathUtil.roundToThree(MathUtil.getSquareRoot((resSumSquares / n)));
+        return MathUtil.getSquareRoot((resSumSquares / n));
     }
 
 }

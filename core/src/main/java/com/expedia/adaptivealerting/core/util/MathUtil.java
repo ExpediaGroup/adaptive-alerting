@@ -39,9 +39,5 @@ public class MathUtil {
     public static double getSquareRoot(double value) {
         return Math.sqrt(value);
     }
-
-    public static double roundToThree(double value) {
-        return (Math.round(value * 1000) / 1000);
-    }
     
 }
