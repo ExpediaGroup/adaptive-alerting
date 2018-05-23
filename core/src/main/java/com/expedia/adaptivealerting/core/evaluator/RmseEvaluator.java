@@ -1,5 +1,7 @@
 package com.expedia.adaptivealerting.core.evaluator;
 
+import com.expedia.adaptivealerting.core.util.MathUtil;
+
 /**
  * Calculates Root-mean-squared error i.e. differences between values (sample and prediction values) predicted by a
  * model.
@@ -17,12 +19,9 @@ public class RmseEvaluator implements Evaluator {
         int n = actual.length;
         double resSumSquares = 0.0;
         for (int i = 0; i < n; i++) {
-            resSumSquares += Math.pow(actual[i] - prediction[i], 2);
+            resSumSquares += MathUtil.getSquare(actual[i] - prediction[i]);
         }
-        return roundToThree(Math.sqrt(resSumSquares / n));
+        return MathUtil.roundToThree(MathUtil.getSquareRoot((resSumSquares / n)));
     }
 
-    private double roundToThree(double value) {
-        return (Math.round(value * 1000) / 1000);
-    }
 }
