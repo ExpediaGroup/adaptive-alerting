@@ -1,4 +1,5 @@
 package com.expedia.adaptivealerting.core.evaluator;
+
 import com.expedia.adaptivealerting.core.util.MathUtil;
 
 /**
@@ -9,9 +10,19 @@ import com.expedia.adaptivealerting.core.util.MathUtil;
  */
 
 public class RmseEvaluator implements Evaluator {
+
+    private int n;
+    private double resSumSquares;
+
+    public RmseEvaluator(int n, double resSumSquares) {
+        this.n = n;
+        this.resSumSquares = resSumSquares;
+    }
+
     @Override
-    public double getScore(double observed, double prediction) {
-        double resSumSquares = MathUtil.getSquare(observed - prediction);
-        return MathUtil.getSquareRoot(resSumSquares);
+    public double computeScore(double observed, double predicted) {
+        this.resSumSquares += MathUtil.getSquare(observed - predicted);
+        this.n += 1;
+        return MathUtil.getSquareRoot(resSumSquares / n);
     }
 }

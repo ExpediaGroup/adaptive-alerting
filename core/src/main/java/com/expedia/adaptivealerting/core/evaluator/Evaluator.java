@@ -8,5 +8,5 @@ package com.expedia.adaptivealerting.core.evaluator;
  */
 
 public interface Evaluator {
-	double getScore(double observed, double prediction);
+	double computeScore(double observed, double prediction);
 }
