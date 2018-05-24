@@ -1,6 +1,4 @@
 package com.expedia.adaptivealerting.core.evaluator;
-
-import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.adaptivealerting.core.util.MathUtil;
 
 /**
@@ -12,14 +10,8 @@ import com.expedia.adaptivealerting.core.util.MathUtil;
 
 public class RmseEvaluator implements Evaluator {
     @Override
-    public double getScore(double[] actual, double[] prediction) {
-        AssertUtil.isTrue(actual.length == prediction.length, "actual.length != prediction.length");
-        int n = actual.length;
-        double resSumSquares = 0.0;
-        for (int i = 0; i < n; i++) {
-            resSumSquares += MathUtil.getSquare(actual[i] - prediction[i]);
-        }
-        return MathUtil.getSquareRoot((resSumSquares / n));
+    public double getScore(double observed, double prediction) {
+        double resSumSquares = MathUtil.getSquare(observed - prediction);
+        return MathUtil.getSquareRoot(resSumSquares);
     }
-
 }
