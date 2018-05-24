@@ -33,7 +33,7 @@ public class RmseTestRow {
         return rmse;
     }
 
-    public void setKnownMean(double rmse) {
+    public void setRmse(double rmse) {
         this.rmse = rmse;
     }
 }
