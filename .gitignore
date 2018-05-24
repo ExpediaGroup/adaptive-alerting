@@ -27,3 +27,8 @@ target/
 # IDE-specific
 *.iml
 .idea/
+
+.DS_Store
+.project
+.settings
+*.classpath

@@ -14,9 +14,9 @@ public class RmseEvaluator implements Evaluator {
     private int n;
     private double resSumSquares;
 
-    public RmseEvaluator(int n, double resSumSquares) {
-        this.n = n;
-        this.resSumSquares = resSumSquares;
+    public RmseEvaluator() {
+        this.n = 0;
+        this.resSumSquares = 0;
     }
 
     @Override

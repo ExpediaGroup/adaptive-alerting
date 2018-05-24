@@ -31,7 +31,7 @@ public class RmseEvaluatorTests {
 
     @Before
     public void setUp() {
-        this.evaluator = new RmseEvaluator(0, 0);
+        this.evaluator = new RmseEvaluator();
     }
 
     @Test
