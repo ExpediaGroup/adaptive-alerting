@@ -31,4 +31,8 @@ public class AssertUtil {
     public static void isBetween(double value, double lowerBd, double upperBd, String message) {
         isTrue(lowerBd <= value && value <= upperBd, message);
     }
+
+    public static void isBetweenExclusive(double value, double lowerBd, double upperBd, String message) {
+        isTrue(lowerBd < value && value < upperBd, message);
+    }
 }
