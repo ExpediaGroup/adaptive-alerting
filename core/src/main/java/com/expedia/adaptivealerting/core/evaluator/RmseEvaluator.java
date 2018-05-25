@@ -24,11 +24,11 @@ public class RmseEvaluator implements Evaluator {
         double residual = observed - predicted;
         this.resSumSquares += residual * residual;
         this.n += 1;
-        setRmse(Math.sqrt(resSumSquares / n));
     }
 
     @Override
     public double evaluate() {
+        this.rmse = Math.sqrt(resSumSquares / n);
         return rmse;
     }
 
@@ -38,20 +38,4 @@ public class RmseEvaluator implements Evaluator {
         this.resSumSquares = 0;
         this.rmse = 0;
     }
-
-    /**
-     * @return the rmse
-     */
-    public double getRmse() {
-        return rmse;
-    }
-
-    /**
-     * @param rmse
-     *            the rmse to set
-     */
-    public void setRmse(double rmse) {
-        this.rmse = rmse;
-    }
-
 }
