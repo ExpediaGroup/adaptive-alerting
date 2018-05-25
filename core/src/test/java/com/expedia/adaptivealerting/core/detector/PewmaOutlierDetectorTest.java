@@ -23,9 +23,6 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -37,7 +34,6 @@ import static junit.framework.TestCase.assertTrue;
 public class PewmaOutlierDetectorTest {
     private static final double WEAK_THRESHOLD = 2.0;
     private static final double STRONG_THRESHOLD = 3.0;
-    private static final int DEFAULT_TRAINING_LENGTH = 30;
     private static final double DEFAULT_ALPHA = 0.05;
 
     @Test
@@ -47,7 +43,7 @@ public class PewmaOutlierDetectorTest {
         final ListIterator<String[]> testRows = readCsv("tests/pewma-sample-input.csv").listIterator();
         final Double initialValue = Double.parseDouble(testRows.next()[0]);
         final PewmaOutlierDetector pewmaOutlierDetector = new PewmaOutlierDetector(
-                DEFAULT_ALPHA, beta, DEFAULT_TRAINING_LENGTH, WEAK_THRESHOLD, STRONG_THRESHOLD, initialValue);
+                DEFAULT_ALPHA, beta, WEAK_THRESHOLD, STRONG_THRESHOLD, initialValue);
         final EwmaOutlierDetector ewmaOutlierDetector = new EwmaOutlierDetector(
                 DEFAULT_ALPHA, WEAK_THRESHOLD, STRONG_THRESHOLD, initialValue);
 
@@ -63,7 +59,7 @@ public class PewmaOutlierDetectorTest {
 
             OutlierLevel pOL = pewmaOutlierDetector.evaluate(null, value);
             OutlierLevel eOL = ewmaOutlierDetector.evaluate(null, value);
-            if (rowCount > DEFAULT_TRAINING_LENGTH) {
+            if (rowCount > PewmaOutlierDetector.DEFAULT_TRAINING_LENGTH) {
                 assertEquals(pOL, eOL);
             }
             rowCount++;
@@ -77,7 +73,7 @@ public class PewmaOutlierDetectorTest {
         final ListIterator<PewmaTestRow> testRows = readData_calInflow().listIterator();
         final PewmaTestRow testRow0 = testRows.next();
         final PewmaOutlierDetector detector = new PewmaOutlierDetector(
-                DEFAULT_ALPHA, beta, DEFAULT_TRAINING_LENGTH, WEAK_THRESHOLD, STRONG_THRESHOLD, testRow0.getObserved());
+                DEFAULT_ALPHA, beta, WEAK_THRESHOLD, STRONG_THRESHOLD, testRow0.getObserved());
 
         while (testRows.hasNext()) {
             final PewmaTestRow testRow = testRows.next();

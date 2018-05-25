@@ -20,10 +20,9 @@ import com.expedia.adaptivealerting.core.OutlierLevel;
 
 import java.time.Instant;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.isBetweenExclusive;
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isBetween;
 import static java.lang.Math.abs;
 import static java.lang.Math.exp;
-import static java.lang.Math.pow;
 import static java.lang.Math.sqrt;
 
 /**
@@ -44,6 +43,7 @@ import static java.lang.Math.sqrt;
  * @author David Sutherland
  */
 public class PewmaOutlierDetector implements OutlierDetector {
+    static final int DEFAULT_TRAINING_LENGTH = 30;
 
     /**
      * Smoothing param.
@@ -96,6 +96,26 @@ public class PewmaOutlierDetector implements OutlierDetector {
      */
     private double stdDev;
 
+
+    /**
+     * Creates a new PEWMA anomaly detector. Initial mean is given by initValue and initial standard deviation is 0.
+     *
+     * @param initialAlpha    Smoothing parameter.
+     * @param beta            Outlier weighting parameter.
+     * @param weakThreshold   Weak outlier threshold, in sigmas.
+     * @param strongThreshold Strong outlier threshold, in sigmas.
+     * @param initValue       Initial observation, used to set the first mean estimate.
+     */
+    public PewmaOutlierDetector(
+            double initialAlpha,
+            double beta,
+            double weakThreshold,
+            double strongThreshold,
+            double initValue
+    ) {
+        this(initialAlpha, beta, DEFAULT_TRAINING_LENGTH, weakThreshold, strongThreshold, initValue);
+    }
+
     /**
      * Creates a new PEWMA anomaly detector. Initial mean is given by initValue and initial standard deviation is 0.
      *
@@ -114,7 +134,7 @@ public class PewmaOutlierDetector implements OutlierDetector {
             double strongThreshold,
             double initValue
     ) {
-        isBetweenExclusive(initialAlpha, 0.0, 1.0, "initialAlpha must be in the range (0, 1)");
+        isBetween(initialAlpha, 0.0, 1.0, "initialAlpha must be in the range [0, 1]");
 
         this.alpha0 = 1 - initialAlpha;  // To standardise with the EWMA implementation we use the complement value.
         this.beta = beta;
@@ -123,13 +143,13 @@ public class PewmaOutlierDetector implements OutlierDetector {
         this.weakThreshold = weakThreshold;
         this.strongThreshold = strongThreshold;
         this.s1 = initValue;
-        this.s2 = pow(initValue, 2);
+        this.s2 = initValue*initValue;
         updateMeanAndStdDev();
     }
 
     private void updateMeanAndStdDev() {
         this.mean = this.s1;
-        this.stdDev = sqrt(this.s2 - pow(this.s1, 2));
+        this.stdDev = sqrt(this.s2 - this.s1*this.s1);
     }
     
     @Override
@@ -159,11 +179,11 @@ public class PewmaOutlierDetector implements OutlierDetector {
         if (this.stdDev != 0) {
             zt = (value - this.mean)/this.stdDev;
         }
-        double pt = (1/sqrt(2*Math.PI)) * exp(-(pow(zt, 2)/2));
+        double pt = (1/sqrt(2*Math.PI)) * exp(-0.5*zt*zt);
         double alpha = calculateAlpha(pt);
 
         this.s1 = alpha*this.s1 + (1 - alpha)*value;
-        this.s2 = alpha*this.s2 + (1 - alpha)*(pow(value, 2));
+        this.s2 = alpha*this.s2 + (1 - alpha)*value*value;
 
         updateMeanAndStdDev();
     }
