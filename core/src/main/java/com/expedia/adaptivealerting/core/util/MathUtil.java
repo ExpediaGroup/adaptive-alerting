@@ -16,16 +16,20 @@
 package com.expedia.adaptivealerting.core.util;
 
 public class MathUtil {
-    
+
     /**
      * Indicates whether the distance between d1 and d2 is less than or equal to the given threshold.
      *
-     * @param d1        Value 1
-     * @param d2        Value 2
-     * @param threshold Threshold
+     * @param d1
+     *            Value 1
+     * @param d2
+     *            Value 2
+     * @param threshold
+     *            Threshold
      * @return Boolean indicating whether the two value are approximately equal
      */
     public static boolean isApproximatelyEqual(double d1, double d2, double threshold) {
         return Math.abs(d1 - d2) <= threshold;
     }
+    
 }
