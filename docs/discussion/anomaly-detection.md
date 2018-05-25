@@ -17,7 +17,7 @@ anomaly detection involves a fundamental tradeoff between capturing all anomalie
 only anomalies. Put another way, there's a tradeoff between avoiding false negatives and
 avoiding false positives. 
 
-![Normal data, noise and anomalies](images/normal-noise-anomaly.png)
+![Normal data, noise and anomalies](../images/normal-noise-anomaly.png)
 
 (Adapted from a figure in _Outlier Analysis_ by Charu C. Aggarwal.)
 
