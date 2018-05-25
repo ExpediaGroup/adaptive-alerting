@@ -11,31 +11,31 @@ public class RmseEvaluator implements Evaluator {
 
     private int n;
     private double resSumSquares;
-    private double rmse;
 
+    /**
+     * Creates a new RmseEvaluator. Initial n and residual sum of squares values are set to 0.
+     * 
+     */
     public RmseEvaluator() {
         this.n = 0;
         this.resSumSquares = 0;
-        this.rmse = 0;
     }
 
     @Override
     public void update(double observed, double predicted) {
         double residual = observed - predicted;
         this.resSumSquares += residual * residual;
-        this.n += 1;
+        this.n++;
     }
 
     @Override
     public double evaluate() {
-        this.rmse = Math.sqrt(resSumSquares / n);
-        return rmse;
+        return Math.sqrt(resSumSquares / n);
     }
 
     @Override
     public void reset() {
         this.n = 0;
         this.resSumSquares = 0;
-        this.rmse = 0;
     }
 }
