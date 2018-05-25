@@ -1,7 +1,5 @@
 package com.expedia.adaptivealerting.core.evaluator;
 
-import com.expedia.adaptivealerting.core.util.MathUtil;
-
 /**
  * Calculates Root-mean-squared error. https://en.wikipedia.org/wiki/Root-mean-square_deviation.
  * 
@@ -13,16 +11,46 @@ public class RmseEvaluator implements Evaluator {
 
     private int n;
     private double resSumSquares;
+    private double rmse;
 
     public RmseEvaluator() {
         this.n = 0;
         this.resSumSquares = 0;
+        this.rmse = 0;
     }
 
     @Override
-    public double computeScore(double observed, double predicted) {
-        this.resSumSquares += MathUtil.getSquare(observed - predicted);
+    public void update(double observed, double predicted) {
+        double residual = observed - predicted;
+        this.resSumSquares += residual * residual;
         this.n += 1;
-        return MathUtil.getSquareRoot(resSumSquares / n);
+        setRmse(Math.sqrt(resSumSquares / n));
     }
+
+    @Override
+    public double evaluate() {
+        return rmse;
+    }
+
+    @Override
+    public void reset() {
+        this.n = 0;
+        this.resSumSquares = 0;
+    }
+
+    /**
+     * @return the rmse
+     */
+    public double getRmse() {
+        return rmse;
+    }
+
+    /**
+     * @param rmse
+     *            the rmse to set
+     */
+    public void setRmse(double rmse) {
+        this.rmse = rmse;
+    }
+
 }

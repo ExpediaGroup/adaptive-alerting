@@ -41,7 +41,8 @@ public class RmseEvaluatorTests {
             final RmseTestRow testRow = testRows.next();
             final double observed = testRow.getObserved();
             final double predicted = testRow.getPredicted();
-            assertEquals(testRow.getRmse(), evaluator.computeScore(observed, predicted), 0);
+            evaluator.update(observed, predicted);
+            assertEquals(testRow.getRmse(), evaluator.getRmse(), 0);
         }
     }
 

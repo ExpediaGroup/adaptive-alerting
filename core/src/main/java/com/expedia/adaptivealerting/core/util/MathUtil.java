@@ -31,13 +31,5 @@ public class MathUtil {
     public static boolean isApproximatelyEqual(double d1, double d2, double threshold) {
         return Math.abs(d1 - d2) <= threshold;
     }
-
-    public static double getSquare(double value) {
-        return Math.pow(value, 2);
-    }
-
-    public static double getSquareRoot(double value) {
-        return Math.sqrt(value);
-    }
     
 }
