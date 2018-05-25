@@ -36,6 +36,7 @@ public class RmseEvaluator implements Evaluator {
     public void reset() {
         this.n = 0;
         this.resSumSquares = 0;
+        this.rmse = 0;
     }
 
     /**
