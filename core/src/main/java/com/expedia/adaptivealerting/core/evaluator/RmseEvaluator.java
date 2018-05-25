@@ -31,8 +31,7 @@ public class RmseEvaluator implements Evaluator {
      * 
      */
     public RmseEvaluator() {
-        this.n = 0;
-        this.resSumSquares = 0;
+        reset();
     }
 
     @Override
