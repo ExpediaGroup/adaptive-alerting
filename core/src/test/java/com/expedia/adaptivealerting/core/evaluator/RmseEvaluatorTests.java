@@ -16,12 +16,6 @@
 package com.expedia.adaptivealerting.core.evaluator;
 
 import static org.junit.Assert.assertEquals;
-
-/**
- * @author kashah
- *
- */
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -31,6 +25,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import com.opencsv.bean.CsvToBeanBuilder;
+
+/**
+ * @author kashah
+ *
+ */
 
 public class RmseEvaluatorTests {
 
