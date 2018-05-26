@@ -14,10 +14,10 @@ diagram. Below I describe their role in the overall system.
 The _Outlier Detection_ module is the heart of the system. It accepts incoming
 metric points and classifies them as normal, weak outliers or strong outliers.
 This classification is an initial signal indicating a possible anomaly. Outliers
-(whether weak or strong) feed into the anomaly detection module for further
+(whether weak or strong) feed into the Anomaly Detection module for further
 analysis.
 
-The emphasis for outlier detection is speed. Most incoming metric points are
+The emphasis for outlier detection is _speed_. Most incoming metric points are
 normal, and we want to filter them out to avoid unnecessary processing, which
 helps us scale the number of metrics we can process.
 
@@ -31,7 +31,7 @@ in the data.
 
 Simpler outlier detectors like constant threshold, EWMA or PEWMA generally don't
 require offline training. But more complex ones often do. For example, neural
-network detectors like LSTM involves offline training. To support these, you can
+network detectors like LSTM involve offline training. To support these, you can
 deploy Docker containers that know how to handle models of a given type. Your
 detectors can use these models to perform outlier detection. The container pulls
 trained models down from a model store, such as S3.
@@ -44,11 +44,22 @@ seasonality and trend. This is where the _Matchmaker_ comes in. It inspects the
 metric point and then routes it to the correct detector. (We may change the name
 of this component.)
 
-Finally, we need to ensure that models are producing good classifications. The
-_Performance Monitor_ tracks the model fit using standard measures such as RMSE
-or sMAPE. If the model fit is poor, the Performance Monitor can schedule a model
-rebuild with the model training module, or else simply log the issue for further
-remediation.
+Finally, we need to ensure that models are producing good time series
+predictions and outlier classifications. The _Performance Monitor_ tracks these
+concerns:
+
+- For time series model fit we will use standard measures such as RMSE or sMAPE.
+  If the model fit is poor, the Performance Monitor can schedule a model rebuild
+  with the model training module, or else simply log the issue for further
+  remediation.
+- For outlier classifications, since the Outlier Detection module provides a
+  pre-filter into Anomaly Detection, we would track classification
+  [precision and recall](https://en.wikipedia.org/wiki/Precision_and_recall);
+  i.e., the extent to which the outlier detector captures all and only ground
+  truth anomalies. It is an open problem how we will establish ground truth
+  here. We can probably use outputs from the Anomaly Detection module as a
+  rough proxy here. Other possibilities include simulation and user feedback
+  loops.
 
 ## Anomaly Detection
 
@@ -81,10 +92,8 @@ metric involved, and various ML-based providers (naive Bayes classifiers,
 multiple logistic regression, neural network classifiers, etc.) to help decide
 whether an outlier represents an anomaly.
 
-We will also need to evaluate the anomaly detection classifications. We will
-need some way to capture the "ground truth" around real anomalies, and then
-assess the precision/recall of our models (i.e., the extent to which they
-capture _all_ and _only_ anomalies).
+We will also need to evaluate the anomaly detection classifications. Precision,
+recall and F measure make sense here too.
 
 ## Model Training
 
@@ -107,9 +116,20 @@ to identify for any given metric the best (or at least a reasonable) model and
 hyperparameters. The _Model Selection and Hyperparameter Optimization (MS/HPO)_
 module is responsible for accomplishing this task.
 
+What counts as "the best" is to some extent subjective. The core concern is RMSE
+(or similar) performance under modern data splitting and resampling approaches.
+But that's not the only factor. We also care about things like model simplicity,
+interpretability, and computational cost in both training and deployment
+contexts. See chapter 4 in _Applied Predictive Modeling_ (Springer) for a
+discussion, as well as a general scheme for model selection.
+
 As with the Anomaly Detection module, the design for this module is TBD. A
-provider model might make sense here too. For example, there could be a
-rule-based provider that selects a model based on tags on the metric point.
+provider model might make sense here too. For example, for model selection,
+there could be a rule-based provider that select candidate model types based on
+tags on the metric point. For HPO, there could be providers for random search
+and grid search. [AutoWEKA 2.0](http://www.jmlr.org/papers/volume18/16-261/16-261.pdf)
+even describes a Bayesian optimization process to solve a combined MS/HPO
+problem.
 
 ## Model Service
 
