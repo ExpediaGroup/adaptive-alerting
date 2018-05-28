@@ -15,7 +15,8 @@ The _Outlier Detection_ module is the heart of the system. It accepts incoming
 metric points and classifies them as normal, weak outliers or strong outliers.
 This classification is an initial signal indicating a possible anomaly. Outliers
 (whether weak or strong) feed into the Anomaly Detection module for further
-analysis.
+analysis. (See [Uber's blog post on Argos](https://eng.uber.com/argos/),
+describing an anomaly detection system with the same sort of split.)
 
 The emphasis for outlier detection is _speed_. Most incoming metric points are
 normal, and we want to filter them out to avoid unnecessary processing, which
@@ -40,9 +41,9 @@ When a metric point comes in, we need to route it to the right detector type.
 For instance, if a disk available metric comes in, we would probably want to
 pass this to a constant threshold detector. If a sales-related metric point
 arrives, we probably want that to go to a detector that's equipped to handle
-seasonality and trend. This is where the _Matchmaker_ comes in. It inspects the
-metric point and then routes it to the correct detector. (We may change the name
-of this component.)
+seasonality and trend. This is where the _Metric Router_ (formerly called
+_Matchmaker_) comes in. It inspects the metric point and then routes it to the
+correct detector.
 
 Finally, we need to ensure that models are producing good time series
 predictions and outlier classifications. The _Performance Monitor_ tracks these
@@ -86,7 +87,7 @@ filtering process and a slower but more careful verification process.
 The design of this module is TBD, but I envision some kind of provider-based
 design where we have different strategies for deciding whether outliers
 represent true anomalies, and then perhaps an aggregation layer on top to
-create an ensemble-based approach. For example, we can imagine having
+create an ensemble-based approach. For example, we can imagine having a
 rules-based provider that makes certain Splunk queries depending on the metric
 metric involved, and various ML-based providers (naive Bayes classifiers,
 multiple logistic regression, neural network classifiers, etc.) to help decide
