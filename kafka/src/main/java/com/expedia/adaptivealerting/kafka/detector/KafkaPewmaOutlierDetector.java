@@ -46,6 +46,6 @@ public class KafkaPewmaOutlierDetector {
         // FIXME Create a map of these (see KafkaEwmaOutlierDetector for more details).
         final OutlierDetector detector = new PewmaOutlierDetector(0.05, 1.0, 2.0, 3.0, 100.0);
 
-        DetectorUtil.startStreams(detector, "pewma-outlier-detector", "pewma-metics");
+        DetectorUtil.startStreams(detector, "pewma-outlier-detector", "pewma-metrics");
     }
-}
+}x

@@ -13,6 +13,6 @@ public class KafkaConstantThresholdOutlierDetector {
         // FIXME Create a map of these (see KafkaEwmaOutlierDetector for more details).
         final OutlierDetector detector = new ConstantThresholdOutlierDetector(RIGHT_TAILED, 0.95, 0.99);
 
-        DetectorUtil.startStreams(detector, "constant-outlier-detector", "constant-metics");
+        DetectorUtil.startStreams(detector, "constant-outlier-detector", "constant-metrics");
     }
 }

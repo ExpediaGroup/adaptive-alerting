@@ -50,6 +50,6 @@ public class KafkaEwmaOutlierDetector {
         // But fine for now as this is just a demo. [WLW]
         final OutlierDetector detector = new EwmaOutlierDetector(0.8, 2.0, 3.0, 100.0);
 
-        DetectorUtil.startStreams(detector, "ewma-outlier-detector", "ewma-metics");
+        DetectorUtil.startStreams(detector, "ewma-outlier-detector", "ewma-metrics");
     }
 }
