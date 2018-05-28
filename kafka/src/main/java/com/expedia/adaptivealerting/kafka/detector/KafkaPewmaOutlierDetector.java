@@ -16,28 +16,13 @@
 package com.expedia.adaptivealerting.kafka.detector;
 
 import com.expedia.adaptivealerting.core.OutlierDetector;
-import com.expedia.adaptivealerting.core.OutlierLevel;
 import com.expedia.adaptivealerting.core.detector.PewmaOutlierDetector;
 import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
-import com.expedia.www.haystack.commons.entities.MetricPoint;
-import com.expedia.www.haystack.commons.entities.MetricType;
-import com.expedia.www.haystack.commons.kstreams.serde.metricpoint.MetricTankSerde;
-import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.streams.KafkaStreams;
-import org.apache.kafka.streams.KeyValue;
-import org.apache.kafka.streams.StreamsBuilder;
-import org.apache.kafka.streams.StreamsConfig;
-import org.apache.kafka.streams.Topology;
-import org.apache.kafka.streams.kstream.KStream;
-import scala.collection.immutable.Map$;
-
-import java.time.Instant;
-import java.util.Properties;
 
 /**
- * Kafka Streams application for the EWMA outlier detector.
+ * Kafka Streams application for the PEWMA outlier detector.
  *
- * @author Willie Wheeler
+ * @author David Sutherland
  */
 public class KafkaPewmaOutlierDetector {
     
@@ -48,4 +33,4 @@ public class KafkaPewmaOutlierDetector {
 
         DetectorUtil.startStreams(detector, "pewma-outlier-detector", "pewma-metrics");
     }
-}x
+}
