@@ -26,7 +26,7 @@ import static junit.framework.TestCase.assertTrue;
 /**
  * @author Willie Wheeler
  */
-public class WhiteNoiseMetricSourceTests {
+public class WhiteNoiseMetricSourceTest {
     
     // Class under test
     private WhiteNoiseMetricSource metricSource;

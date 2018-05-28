@@ -21,7 +21,7 @@ import static com.expedia.adaptivealerting.core.util.MathUtil.isApproximatelyEqu
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertFalse;
 
-public class MathUtilTests {
+public class MathUtilTest {
     
     @Test
     public void testIsApproximatelyEqual() {

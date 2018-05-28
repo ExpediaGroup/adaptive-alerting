@@ -29,7 +29,7 @@ import static junit.framework.TestCase.assertEquals;
 /**
  * @author Willie Wheeler
  */
-public class ConstantThresholdOutlierDetectorTests {
+public class ConstantThresholdOutlierDetectorTest {
     private Instant instant;
     
     @Before

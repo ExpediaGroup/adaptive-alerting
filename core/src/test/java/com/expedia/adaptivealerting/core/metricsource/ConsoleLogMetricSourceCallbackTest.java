@@ -26,7 +26,7 @@ import scala.collection.immutable.Map$;
 /**
  * @author Willie Wheeler
  */
-public class ConsoleLogMetricSourceCallbackTests {
+public class ConsoleLogMetricSourceCallbackTest {
     
     // Class under test
     private ConsoleLogMetricSourceCallback callback;
