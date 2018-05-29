@@ -24,7 +24,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 /**
  * @author Willie Wheeler
  */
-public class AssertUtilTests {
+public class AssertUtilTest {
     
     @Test
     public void testIsTrue_trueValue() {

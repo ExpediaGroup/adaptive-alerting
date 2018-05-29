@@ -16,25 +16,21 @@
 package com.expedia.adaptivealerting.kafka.detector;
 
 import com.expedia.adaptivealerting.core.OutlierDetector;
-import com.expedia.adaptivealerting.core.detector.EwmaOutlierDetector;
+import com.expedia.adaptivealerting.core.detector.PewmaOutlierDetector;
 import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
 
 /**
- * Kafka Streams application for the EWMA outlier detector.
+ * Kafka Streams application for the PEWMA outlier detector.
  *
- * @author Willie Wheeler
+ * @author David Sutherland
  */
-public class KafkaEwmaOutlierDetector {
+public class KafkaPewmaOutlierDetector {
     
     public static void main(String[] args) {
         
-        // FIXME Create a map of these, rather than just using a single one across the board.
-        // This will be a little involved because currently we are using metric names like "latency", and there are
-        // many distinct series with that name. So we have to decide whether we want names to be unique or whether we
-        // want to use tags for unique names.
-        // But fine for now as this is just a demo. [WLW]
-        final OutlierDetector detector = new EwmaOutlierDetector(0.8, 2.0, 3.0, 100.0);
+        // FIXME Create a map of these (see KafkaEwmaOutlierDetector for more details).
+        final OutlierDetector detector = new PewmaOutlierDetector(0.05, 1.0, 2.0, 3.0, 100.0);
 
-        DetectorUtil.startStreams(detector, "ewma-outlier-detector", "ewma-metrics");
+        DetectorUtil.startStreams(detector, "pewma-outlier-detector", "pewma-metrics");
     }
 }

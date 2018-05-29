@@ -31,7 +31,7 @@ import com.opencsv.bean.CsvToBeanBuilder;
  *
  */
 
-public class RmseEvaluatorTests {
+public class RmseEvaluatorTest {
 
     private static List<RmseTestRow> calInflowTestRows;
 

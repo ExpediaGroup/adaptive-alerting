@@ -32,7 +32,7 @@ import static junit.framework.TestCase.assertTrue;
 /**
  * @author Willie Wheeler
  */
-public class EwmaOutlierDetectorTests {
+public class EwmaOutlierDetectorTest {
     private static final double TOLERANCE = 0.001;
     
     private static List<EwmaTestRow> calInflowTestRows;
