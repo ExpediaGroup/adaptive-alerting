@@ -1,10 +1,10 @@
-# Adaptive Alerting architecture
+# Adaptive Alerting architectural overview
 
 This page describes the Adaptive Alerting architecture in its current form. This
 is a living document: no doubt the architecture will evolve as we develop a
 deeper understanding of the domain.
 
-![Adaptive Alerting architecture](images/aa-arch-0.5.png)
+![Adaptive Alerting architecture](images/aa-arch.png)
 
 Adaptive Alerting has five modules, which appear as larger gray boxes in the
 diagram. Below I describe their role in the overall system.
@@ -30,20 +30,18 @@ threshold detector, which simply checks to see whether the metric point exceeds
 a fixed threshold. Other outlier detectors account for seasonalities and trends
 in the data.
 
-Simpler outlier detectors like constant threshold, EWMA or PEWMA generally don't
-require offline training. But more complex ones often do. For example, neural
-network detectors like LSTM involve offline training. To support these, you can
-deploy Docker containers that know how to handle models of a given type. Your
-detectors can use these models to perform outlier detection. The container pulls
-trained models down from a model store, such as S3.
+Simpler outlier detectors like constant threshold, EWMA or PEWMA generally don't require offline training. But more
+complex ones often do. For example, neural network detectors like LSTM involve offline training. To support these, you
+can deploy Docker containers that know how to handle [custom outlier detection models](custom-od-models.md) of a given
+type. Your detectors can use these models to perform outlier detection. The container pulls trained models down from a
+model store, such as S3.
 
 When a metric point comes in, we need to route it to the right detector type.
 For instance, if a disk available metric comes in, we would probably want to
 pass this to a constant threshold detector. If a sales-related metric point
 arrives, we probably want that to go to a detector that's equipped to handle
-seasonality and trend. This is where the _Metric Router_ (formerly called
-_Matchmaker_) comes in. It inspects the metric point and then routes it to the
-correct detector.
+seasonality and trend. This is where the _Metric Router_ comes in. It inspects
+the metric point and then routes it to the correct detector.
 
 Finally, we need to ensure that models are producing good time series
 predictions and outlier classifications. The _Performance Monitor_ tracks these
@@ -108,6 +106,8 @@ Detector module.
 Note AWS SageMaker in the diagram. This is just one example--the intent is that
 we can use external ML platforms and frameworks (e.g., TensorFlow, MXNet, Keras)
 to train models as well as using trainers that ship with Adaptive Alerting.
+
+Users can also train [custom outlier detection models](custom-od-models.md).
 
 ## Model Selection and Hyperparameter Optimization
 
