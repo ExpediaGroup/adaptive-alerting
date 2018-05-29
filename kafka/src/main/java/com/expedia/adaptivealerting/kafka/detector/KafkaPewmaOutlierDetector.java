@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.kafka.detector;
 
-import com.expedia.adaptivealerting.core.OutlierDetector;
 import com.expedia.adaptivealerting.core.detector.PewmaOutlierDetector;
 import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
 
@@ -27,10 +26,10 @@ import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
 public class KafkaPewmaOutlierDetector {
     
     public static void main(String[] args) {
-        
-        // FIXME Create a map of these (see KafkaEwmaOutlierDetector for more details).
-        final OutlierDetector detector = new PewmaOutlierDetector(0.05, 1.0, 2.0, 3.0, 100.0);
-
-        DetectorUtil.startStreams(detector, "pewma-outlier-detector", "pewma-metrics");
+        DetectorUtil.startStreams(
+                id -> new PewmaOutlierDetector(0.05, 1.0, 2.0, 3.0, 100.0),
+                "pewma-outlier-detector",
+                "pewma-metrics"
+        );
     }
 }

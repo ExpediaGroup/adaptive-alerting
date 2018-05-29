@@ -19,6 +19,8 @@ import com.expedia.adaptivealerting.core.OutlierDetector;
 import com.expedia.adaptivealerting.core.OutlierLevel;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.entities.MetricType;
+import com.expedia.www.haystack.commons.entities.encoders.Encoder;
+import com.expedia.www.haystack.commons.entities.encoders.PeriodReplacementEncoder;
 import com.expedia.www.haystack.commons.kstreams.serde.metricpoint.MetricTankSerde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
@@ -30,17 +32,21 @@ import org.apache.kafka.streams.kstream.KStream;
 import scala.collection.immutable.Map$;
 
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
+import java.util.function.Function;
 
 public class DetectorUtil {
-    private static final String OUTLIER_LEVEL_TAG = "outlierLevel";
+    static final String OUTLIER_LEVEL_TAG = "outlierLevel";
 
     // FIXME Hack because I'm not sure how to handle null MetricPoints below.
     // But definitely don't want to keep this as it messes up the model.
-    private static final MetricPoint NULL_METRIC_POINT =
+    static final MetricPoint NULL_METRIC_POINT =
             new MetricPoint("null", MetricType.Gauge(), Map$.MODULE$.<String, String>empty(), 0, 0);
+    private final static Encoder ENCODER = new PeriodReplacementEncoder();
 
-    public static void startStreams(OutlierDetector detector, String appId, String topicName) {
+    public static void startStreams(Function<String, OutlierDetector> detectorFactory, String appId, String topicName) {
         final Properties conf = new Properties();
 
         // TODO Move to config file.
@@ -52,15 +58,10 @@ public class DetectorUtil {
         final StreamsBuilder builder = new StreamsBuilder();
         final KStream<String, MetricPoint> metrics = builder.stream(topicName);
 
+        final Map<String, OutlierDetector> detectors = new HashMap<>();
         metrics
                 .map((key, metricPoint) -> {
-                    // FIXME Hack, see above
-                    if (metricPoint == null) {
-                        metricPoint = NULL_METRIC_POINT;
-                    }
-                    final Instant instant = Instant.ofEpochSecond(metricPoint.epochTimeInSeconds());
-                    final OutlierLevel level = detector.evaluate(instant, metricPoint.value());
-                    MetricPoint classified = classifiedMetricPoint(metricPoint, level);
+                    MetricPoint classified = evaluateMetric(metricPoint, detectors, detectorFactory);
                     return KeyValue.pair(null, classified);
                 })
                 .to("anomalies");
@@ -71,6 +72,30 @@ public class DetectorUtil {
 
         streams.start();
         Runtime.getRuntime().addShutdownHook(new Thread(streams::close));
+    }
+
+    static MetricPoint evaluateMetric(
+            MetricPoint metricPoint,
+            Map<String, OutlierDetector> detectors,
+            Function<String, OutlierDetector> detectorFactory
+    ) {
+        // FIXME Hack, see above
+        if (metricPoint == null) {
+            metricPoint = NULL_METRIC_POINT;
+        }
+        final String metricId = extractMetricId(metricPoint);
+        if (!detectors.containsKey(metricId)) {
+            detectors.put(metricId, detectorFactory.apply(metricId));
+        }
+
+        final OutlierDetector detector = detectors.get(metricId);
+        final Instant instant = Instant.ofEpochSecond(metricPoint.epochTimeInSeconds());
+        final OutlierLevel level = detector.evaluate(instant, metricPoint.value());
+        return classifiedMetricPoint(metricPoint, level);
+    }
+
+    static String extractMetricId(MetricPoint metricPoint) {
+        return metricPoint.getMetricPointKey(ENCODER); // TODO: find out how we'll be getting the ids.
     }
 
     private static MetricPoint classifiedMetricPoint(MetricPoint metricPoint, OutlierLevel level) {
