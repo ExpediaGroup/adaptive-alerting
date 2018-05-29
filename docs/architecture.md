@@ -89,9 +89,9 @@ design where we have different strategies for deciding whether outliers
 represent true anomalies, and then perhaps an aggregation layer on top to
 create an ensemble-based approach. For example, we can imagine having a
 rules-based provider that makes certain Splunk queries depending on the metric
-metric involved, and various ML-based providers (naive Bayes classifiers,
-multiple logistic regression, neural network classifiers, etc.) to help decide
-whether an outlier represents an anomaly.
+involved, and various ML-based providers (naive Bayes classifiers, multiple
+logistic regression, neural network classifiers, etc.) to help decide whether an
+outlier represents an anomaly.
 
 We will also need to evaluate the anomaly detection classifications. Precision,
 recall and F measure make sense here too.
