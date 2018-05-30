@@ -4,7 +4,7 @@ This page describes the Adaptive Alerting architecture in its current form. This
 is a living document: no doubt the architecture will evolve as we develop a
 deeper understanding of the domain.
 
-![Adaptive Alerting architecture](images/aa-arch.png)
+![Adaptive Alerting architecture](images/aa-arch-overview.png)
 
 Adaptive Alerting has five modules, which appear as larger gray boxes in the
 diagram. Below I describe their role in the overall system.
