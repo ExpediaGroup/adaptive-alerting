@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.datasource;
+package com.expedia.adaptivealerting.kafka.metricsource;
 
-import com.expedia.adaptivealerting.core.metricsource.MetricSourceCallback;
+import com.expedia.adaptivealerting.core.metricsource.MetricSubscriber;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.kstreams.serde.metricpoint.MetricPointSerializer;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -30,7 +30,7 @@ import java.util.Properties;
  *
  * @author Willie Wheeler
  */
-public class KafkaMetricSourceCallback implements MetricSourceCallback {
+public class KafkaMetricSubscriber implements MetricSubscriber {
     private final String topicName;
     private final KafkaProducer<String, MetricPoint> producer;
     
@@ -39,7 +39,7 @@ public class KafkaMetricSourceCallback implements MetricSourceCallback {
      *
      * @param topicName Kafka topic name.
      */
-    public KafkaMetricSourceCallback(String topicName) {
+    public KafkaMetricSubscriber(String topicName) {
         this.topicName = topicName;
         
         // TODO Externalize

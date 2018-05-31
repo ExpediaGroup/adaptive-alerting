@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.datasource;
+package com.expedia.adaptivealerting.kafka.metricsource;
 
+import com.expedia.adaptivealerting.core.metricsource.MetricSource;
 import com.expedia.adaptivealerting.core.metricsource.WhiteNoiseMetricSource;
 
 /**
@@ -33,15 +34,21 @@ public class KafkaWhiteNoiseDataSource {
     public static void main(String[] args) {
 
         // constant
-        new WhiteNoiseMetricSource("latency", 0.0, 1.0, 5000L).start(new KafkaMetricSourceCallback("metrics"));
+        startSource("latency", 5000L, 0.0, 1.0);
 
         // ewma
-        new WhiteNoiseMetricSource("ewma", 0.0, 1.0, 10000L).start(new KafkaMetricSourceCallback("metrics"));
+        startSource("ewma", 1000L, 0.0, 1.0);
 
         // pewma
-        new WhiteNoiseMetricSource("pewma", 0.0, 1.0, 15000L).start(new KafkaMetricSourceCallback("metrics"));
+        startSource("pewma", 15000L, 0.0, 1.0);
 
         // other
-        new WhiteNoiseMetricSource("default", 0.0, 1.0, 1000L).start(new KafkaMetricSourceCallback("metrics"));
+        startSource("default", 1000L, 0.0, 1.0);
+    }
+    
+    private static void startSource(String name, long period, double mean, double variance) {
+        final MetricSource source = new WhiteNoiseMetricSource(name, period, mean, variance);
+        source.addSubscriber(new KafkaMetricSubscriber("metrics"));
+        source.start();
     }
 }

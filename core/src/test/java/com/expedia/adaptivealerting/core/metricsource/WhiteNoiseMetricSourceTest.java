@@ -16,7 +16,6 @@
 package com.expedia.adaptivealerting.core.metricsource;
 
 import com.expedia.www.haystack.commons.entities.MetricPoint;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.concurrent.Executors;
@@ -28,34 +27,32 @@ import static junit.framework.TestCase.assertTrue;
  */
 public class WhiteNoiseMetricSourceTest {
     
-    // Class under test
-    private WhiteNoiseMetricSource metricSource;
-    
-    @Before
-    public void setUp() {
-        this.metricSource = new WhiteNoiseMetricSource();
-    }
-    
     @Test
     public void testStartAndStop() throws Exception {
         final boolean[] calledNext = new boolean[1];
+        
+        final MetricSubscriber subscriber = new MetricSubscriber() {
+            
+            @Override
+            public void next(MetricPoint metricPoint) {
+                calledNext[0] = true;
+            }
+        };
+        
+        final WhiteNoiseMetricSource metricSource = new WhiteNoiseMetricSource();
+        metricSource.addSubscriber(subscriber);
         
         Executors.newSingleThreadExecutor().execute(new Runnable() {
             
             @Override
             public void run() {
-                metricSource.start(new MetricSourceCallback() {
-                    
-                    @Override
-                    public void next(MetricPoint metricPoint) {
-                        calledNext[0] = true;
-                    }
-                });
+                metricSource.start();
             }
         });
         Thread.sleep(1000L);
         metricSource.stop();
-        
+        metricSource.removeSubscriber(subscriber);
+    
         assertTrue(calledNext[0]);
     }
 }

@@ -23,12 +23,20 @@ package com.expedia.adaptivealerting.core.metricsource;
 public interface MetricSource {
     
     /**
-     * Start the metric source.
+     * Add a metric source subscriber.
+     *
+     * @param subscriber Metric source subscriber.
      */
-    void start(MetricSourceCallback callback);
+    void addSubscriber(MetricSubscriber subscriber);
     
     /**
-     * Stop the metric source.
+     * Remove a metric source subscriber.
+     *
+     * @param subscriber Metric source subscriber.
      */
+    void removeSubscriber(MetricSubscriber subscriber);
+    
+    void start();
+    
     void stop();
 }

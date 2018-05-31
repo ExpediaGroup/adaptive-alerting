@@ -22,7 +22,7 @@ import com.expedia.www.haystack.commons.entities.MetricPoint;
  *
  * @author Willie Wheeler
  */
-public interface MetricSourceCallback {
+public interface MetricSubscriber {
     
     void next(MetricPoint metricPoint);
 }

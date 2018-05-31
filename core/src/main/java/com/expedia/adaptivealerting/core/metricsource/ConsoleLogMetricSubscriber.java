@@ -24,8 +24,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author Willie Wheeler
  */
-public class ConsoleLogMetricSourceCallback implements MetricSourceCallback {
-    private static final Logger log = LoggerFactory.getLogger(ConsoleLogMetricSourceCallback.class);
+public class ConsoleLogMetricSubscriber implements MetricSubscriber {
+    private static final Logger log = LoggerFactory.getLogger(ConsoleLogMetricSubscriber.class);
     
     @Override
     public void next(MetricPoint metricPoint) {
