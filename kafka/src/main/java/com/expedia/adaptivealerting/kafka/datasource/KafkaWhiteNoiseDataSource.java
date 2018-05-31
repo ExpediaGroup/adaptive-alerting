@@ -31,6 +31,17 @@ import com.expedia.adaptivealerting.core.metricsource.WhiteNoiseMetricSource;
 public class KafkaWhiteNoiseDataSource {
     
     public static void main(String[] args) {
-        new WhiteNoiseMetricSource().start(new KafkaMetricSourceCallback("metrics"));
+
+        // constant
+        new WhiteNoiseMetricSource("latency", 0.0, 1.0, 5000L).start(new KafkaMetricSourceCallback("metrics"));
+
+        // ewma
+        new WhiteNoiseMetricSource("ewma", 0.0, 1.0, 10000L).start(new KafkaMetricSourceCallback("metrics"));
+
+        // pewma
+        new WhiteNoiseMetricSource("pewma", 0.0, 1.0, 15000L).start(new KafkaMetricSourceCallback("metrics"));
+
+        // other
+        new WhiteNoiseMetricSource("default", 0.0, 1.0, 1000L).start(new KafkaMetricSourceCallback("metrics"));
     }
 }
