@@ -23,14 +23,19 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.time.Instant;
 import java.util.List;
 import java.util.ListIterator;
 
 import static com.expedia.adaptivealerting.core.util.MathUtil.isApproximatelyEqual;
+import static com.expedia.adaptivealerting.core.util.MetricPointUtil.metricPoint;
 import static java.lang.Math.sqrt;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 
+/**
+ * @author David Sutherland
+ */
 public class PewmaOutlierDetectorTest {
     private static final double WEAK_THRESHOLD = 2.0;
     private static final double STRONG_THRESHOLD = 3.0;
@@ -49,7 +54,7 @@ public class PewmaOutlierDetectorTest {
 
         int rowCount = 1;
         while (testRows.hasNext()) {
-            final Double value = Double.parseDouble(testRows.next()[0]);
+            final Float value = Float.parseFloat(testRows.next()[0]);
 
             double ewmaStdDev = sqrt(ewmaOutlierDetector.getVariance());
 
@@ -57,8 +62,8 @@ public class PewmaOutlierDetectorTest {
             assertApproxEqual(ewmaOutlierDetector.getMean(), pewmaOutlierDetector.getMean(), threshold);
             assertApproxEqual(ewmaStdDev, pewmaOutlierDetector.getStdDev(), threshold);
 
-            OutlierLevel pOL = pewmaOutlierDetector.evaluate(null, value);
-            OutlierLevel eOL = ewmaOutlierDetector.evaluate(null, value);
+            OutlierLevel pOL = pewmaOutlierDetector.classify(metricPoint(Instant.now(), value));
+            OutlierLevel eOL = ewmaOutlierDetector.classify(metricPoint(Instant.now(), value));
             if (rowCount > PewmaOutlierDetector.DEFAULT_TRAINING_LENGTH) {
                 assertEquals(pOL, eOL);
             }
@@ -80,9 +85,9 @@ public class PewmaOutlierDetectorTest {
 
             final double observed = testRow.getObserved();
 
-            // This detector doesn't currently do anything with the instant, so we can just pass null.
+            // This detector doesn't currently do anything with the instant, so we can just pass now().
             // This may change in the future.
-            OutlierLevel level = detector.evaluate(null, observed);
+            OutlierLevel level = detector.classify(metricPoint(Instant.now(), (float) observed));
 
             assertApproxEqual(testRow.getMean(), detector.getMean(), 0.00001);
             assertApproxEqual(testRow.getStd(), detector.getStdDev(), 0.00001);

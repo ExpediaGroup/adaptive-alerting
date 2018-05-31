@@ -22,10 +22,12 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.time.Instant;
 import java.util.List;
 import java.util.ListIterator;
 
 import static com.expedia.adaptivealerting.core.util.MathUtil.isApproximatelyEqual;
+import static com.expedia.adaptivealerting.core.util.MetricPointUtil.metricPoint;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 
@@ -73,9 +75,9 @@ public class EwmaOutlierDetectorTest {
             final EwmaTestRow testRow = testRows.next();
             final int observed = testRow.getObserved();
             
-            // This detector doesn't currently do anything with the instant, so we can just pass null.
+            // This detector doesn't currently do anything with the instant, so we can just pass now().
             // This may change in the future.
-            detector.evaluate(null, observed);
+            detector.classify(metricPoint(Instant.now(), observed));
             
             assertApproxEqual(testRow.getKnownMean(), testRow.getMean());
             assertApproxEqual(testRow.getMean(), detector.getMean());

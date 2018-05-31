@@ -31,7 +31,6 @@ import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.KStream;
 import scala.collection.immutable.Map$;
 
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -94,8 +93,7 @@ public class DetectorUtil {
         }
 
         final OutlierDetector detector = detectors.get(metricId);
-        final Instant instant = Instant.ofEpochSecond(metricPoint.epochTimeInSeconds());
-        final OutlierLevel level = detector.evaluate(instant, metricPoint.value());
+        final OutlierLevel level = detector.classify(metricPoint);
         return classifiedMetricPoint(metricPoint, level);
     }
 

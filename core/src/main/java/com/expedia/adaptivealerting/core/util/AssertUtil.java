@@ -22,6 +22,12 @@ package com.expedia.adaptivealerting.core.util;
  */
 public class AssertUtil {
     
+    /**
+     * Prevent instantiation.
+     */
+    private AssertUtil() {
+    }
+    
     public static void isTrue(boolean b, String message) {
         if (!b) {
             throw new IllegalArgumentException(message);
