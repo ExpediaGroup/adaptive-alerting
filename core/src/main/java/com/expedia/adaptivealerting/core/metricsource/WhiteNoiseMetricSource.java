@@ -15,14 +15,11 @@
  */
 package com.expedia.adaptivealerting.core.metricsource;
 
-import com.expedia.www.haystack.commons.entities.MetricPoint;
-import com.expedia.www.haystack.commons.entities.MetricType;
+import com.expedia.adaptivealerting.core.util.MetricPointUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Enumeration;
-import scala.collection.immutable.Map;
-import scala.collection.immutable.Map$;
 
+import java.time.Instant;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -77,8 +74,6 @@ public final class WhiteNoiseMetricSource implements MetricSource {
     public void start(MetricSourceCallback callback) {
         final Random random = new Random();
         final double stdDev = sqrt(variance);
-        final Enumeration.Value type = MetricType.Gauge();
-        final Map<String, String> tags = Map$.MODULE$.<String, String>empty();
     
         this.timer = new Timer();
         log.info("Starting WhiteNoiseMetricSource");
@@ -87,8 +82,7 @@ public final class WhiteNoiseMetricSource implements MetricSource {
             @Override
             public void run() {
                 final float value = (float) (stdDev * random.nextGaussian() + mean);
-                final long now = System.currentTimeMillis() / 1000;
-                callback.next(new MetricPoint(name, type, tags, value, now));
+                callback.next(MetricPointUtil.metricPoint(name, Instant.now(), value));
             }
         }, 0L, period);
     }

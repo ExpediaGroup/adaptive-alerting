@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.core;
 
-import java.time.Instant;
+import com.expedia.www.haystack.commons.entities.MetricPoint;
 
 /**
  * Outlier detector interface.
@@ -25,11 +25,10 @@ import java.time.Instant;
 public interface OutlierDetector {
     
     /**
-     * Assigns an {@link OutlierLevel} to the given data point.
+     * Classifies the given {@link MetricPoint} with an {@link OutlierLevel}.
      *
-     * @param instant Time instant.
-     * @param value   Time series value.
+     * @param metricPoint Metric point to classify.
      * @return Outlier level.
      */
-    OutlierLevel evaluate(Instant instant, double value);
+    OutlierLevel classify(MetricPoint metricPoint);
 }

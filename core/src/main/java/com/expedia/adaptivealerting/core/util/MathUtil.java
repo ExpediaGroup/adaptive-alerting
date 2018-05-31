@@ -15,8 +15,19 @@
  */
 package com.expedia.adaptivealerting.core.util;
 
-public class MathUtil {
-
+/**
+ * Math utilities.
+ *
+ * @author Willie Wheeler
+ */
+public final class MathUtil {
+    
+    /**
+     * Prevent instantiation.
+     */
+    private MathUtil() {
+    }
+    
     /**
      * Indicates whether the distance between d1 and d2 is less than or equal to the given threshold.
      *

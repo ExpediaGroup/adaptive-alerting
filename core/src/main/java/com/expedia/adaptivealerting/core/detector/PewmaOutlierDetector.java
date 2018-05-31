@@ -17,13 +17,10 @@ package com.expedia.adaptivealerting.core.detector;
 
 import com.expedia.adaptivealerting.core.OutlierDetector;
 import com.expedia.adaptivealerting.core.OutlierLevel;
-
-import java.time.Instant;
+import com.expedia.www.haystack.commons.entities.MetricPoint;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.isBetween;
-import static java.lang.Math.abs;
-import static java.lang.Math.exp;
-import static java.lang.Math.sqrt;
+import static java.lang.Math.*;
 
 /**
  * <p>
@@ -153,24 +150,21 @@ public class PewmaOutlierDetector implements OutlierDetector {
     }
     
     @Override
-    public OutlierLevel evaluate(Instant instant, double value) {
-        
-        // TODO Currently we just ignore the instant. Would be helpful to have a way to detect missing data points in
-        // the stream, and to define strategies for dealing with this. [WLW]
-
+    public OutlierLevel classify(MetricPoint metricPoint) {
+        final float value = metricPoint.value();
         final double dist = abs(value - mean);
         final double largeThreshold = strongThreshold * stdDev;
         final double smallThreshold = weakThreshold * stdDev;
-
+    
         OutlierLevel level = OutlierLevel.NORMAL;
         if (dist > largeThreshold) {
             level = OutlierLevel.STRONG;
         } else if (dist > smallThreshold) {
             level = OutlierLevel.WEAK;
         }
-
+    
         updateEstimates(value);
-
+    
         return level;
     }
 

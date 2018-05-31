@@ -15,11 +15,10 @@
  */
 package com.expedia.adaptivealerting.core.detector;
 
-import com.expedia.adaptivealerting.core.OutlierLevel;
 import com.expedia.adaptivealerting.core.OutlierDetector;
+import com.expedia.adaptivealerting.core.OutlierLevel;
 import com.expedia.adaptivealerting.core.util.AssertUtil;
-
-import java.time.Instant;
+import com.expedia.www.haystack.commons.entities.MetricPoint;
 
 /**
  * Outlier detector with one-sided constant thresholds for weak and strong outliers.
@@ -72,7 +71,8 @@ public class ConstantThresholdOutlierDetector implements OutlierDetector {
     }
     
     @Override
-    public OutlierLevel evaluate(Instant instant, double value) {
+    public OutlierLevel classify(MetricPoint metricPoint) {
+        final float value = metricPoint.value();
         return tail == LEFT_TAILED ? evaluateLeftTailed(value) : evaluateRightTailed(value);
     }
     
