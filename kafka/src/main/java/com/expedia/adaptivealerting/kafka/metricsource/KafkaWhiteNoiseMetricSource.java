@@ -29,7 +29,7 @@ import com.expedia.adaptivealerting.core.metricsource.WhiteNoiseMetricSource;
  *
  * @author Willie Wheeler
  */
-public class KafkaWhiteNoiseDataSource {
+public class KafkaWhiteNoiseMetricSource {
     
     public static void main(String[] args) {
 
