@@ -47,13 +47,7 @@ public class DetectorUtil {
     private final static Encoder ENCODER = new PeriodReplacementEncoder();
 
     public static void startStreams(Function<String, OutlierDetector> detectorFactory, String appId, String topicName) {
-        final Properties conf = new Properties();
-
-        // TODO Move to config file.
-        conf.put(StreamsConfig.APPLICATION_ID_CONFIG, appId);
-        conf.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        conf.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
-        conf.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, MetricTankSerde.class);
+        final Properties conf = getStreamConfig(appId);
 
         final StreamsBuilder builder = new StreamsBuilder();
         final KStream<String, MetricPoint> metrics = builder.stream(topicName);
@@ -72,6 +66,17 @@ public class DetectorUtil {
 
         streams.start();
         Runtime.getRuntime().addShutdownHook(new Thread(streams::close));
+    }
+
+    public static Properties getStreamConfig(String appId) {
+        final Properties conf = new Properties();
+
+        // TODO Move to config file.
+        conf.put(StreamsConfig.APPLICATION_ID_CONFIG, appId);
+        conf.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        conf.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
+        conf.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, MetricTankSerde.class);
+        return conf;
     }
 
     static MetricPoint evaluateMetric(
