@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.metricsource;
+package com.expedia.adaptivealerting.tools.kafka;
 
-import com.expedia.adaptivealerting.core.metricsource.MetricSubscriber;
+import com.expedia.adaptivealerting.tools.metricsource.MetricSubscriber;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.kstreams.serde.metricpoint.MetricPointSerializer;
 import org.apache.kafka.clients.producer.KafkaProducer;
