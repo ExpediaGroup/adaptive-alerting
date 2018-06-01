@@ -26,17 +26,17 @@ import scala.collection.immutable.Map$;
 /**
  * @author Willie Wheeler
  */
-public class ConsoleLogMetricSourceCallbackTest {
+public class ConsoleLogMetricSubscriberTest {
     
     // Class under test
-    private ConsoleLogMetricSourceCallback callback;
+    private ConsoleLogMetricSubscriber callback;
     
     // Test objects
     private MetricPoint metricPoint;
     
     @Before
     public void setUp() {
-        this.callback = new ConsoleLogMetricSourceCallback();
+        this.callback = new ConsoleLogMetricSubscriber();
     
         final Enumeration.Value type = MetricType.Gauge();
         final Map<String, String> tags = Map$.MODULE$.<String, String>empty();

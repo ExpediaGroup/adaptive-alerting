@@ -34,6 +34,10 @@ public class AssertUtil {
         }
     }
     
+    public static void notNull(Object o, String message) {
+        isTrue(o != null, message);
+    }
+    
     public static void isBetween(double value, double lowerBd, double upperBd, String message) {
         isTrue(lowerBd <= value && value <= upperBd, message);
     }
