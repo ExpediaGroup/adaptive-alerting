@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.metricsource;
+package com.expedia.adaptivealerting.tools.kafka;
 
-import com.expedia.adaptivealerting.core.metricsource.MetricSource;
-import com.expedia.adaptivealerting.core.metricsource.WhiteNoiseMetricSource;
+import com.expedia.adaptivealerting.tools.metricsource.MetricSource;
+import com.expedia.adaptivealerting.tools.metricsource.WhiteNoiseMetricSource;
 
 /**
  * <p>

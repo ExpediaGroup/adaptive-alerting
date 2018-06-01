@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.metricsource;
+package com.expedia.adaptivealerting.tools.metricsource;
 
+import com.expedia.adaptivealerting.core.util.MetricPointUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
 import java.time.Instant;
 import java.util.Random;
 
-import static com.expedia.adaptivealerting.core.util.MetricPointUtil.metricPoint;
 import static java.lang.Math.sqrt;
 
 /**
@@ -60,6 +60,6 @@ public final class WhiteNoiseMetricSource extends AbstractMetricSource {
     @Override
     public MetricPoint next() {
         final float value = (float) (stdDev * random.nextGaussian() + mean);
-        return metricPoint(getName(), Instant.now(), value);
+        return MetricPointUtil.metricPoint(getName(), Instant.now(), value);
     }
 }
