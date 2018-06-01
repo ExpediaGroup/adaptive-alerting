@@ -40,7 +40,13 @@ public class PewmaOutlierDetectorTest {
     private static final double WEAK_THRESHOLD = 2.0;
     private static final double STRONG_THRESHOLD = 3.0;
     private static final double DEFAULT_ALPHA = 0.05;
-
+    
+    @Test
+    public void testDefaultConstructor() {
+        final PewmaOutlierDetector detector = new PewmaOutlierDetector();
+        assertEquals(0.0, detector.getMean());
+    }
+    
     @Test
     public void pewmaCloseToEwmaWithZeroBeta() throws IOException {
         double beta = 0.0;

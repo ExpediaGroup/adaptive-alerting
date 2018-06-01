@@ -13,26 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core;
+package com.expedia.adaptivealerting.tools.pipeline;
 
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
- * Outlier detector interface.
- *
  * @author Willie Wheeler
  */
-public interface OutlierDetector {
+public class MetricPublisherSupport implements MetricPublisher {
+    private final List<MetricSubscriber> subscribers = new LinkedList<>();
     
-    // TODO I am thinking that classify() should return the classified MetricPoint instead of simply returning the
-    // classification. The reason is that we always push the classified MetricPoint to the next pipeline stage, and it
-    // doesn't make sense to make the various wrappers (Kafka, Kinesis, etc.) have to do it. [WLW]
+    @Override
+    public void addSubscriber(MetricSubscriber subscriber) {
+        subscribers.add(subscriber);
+    }
     
-    /**
-     * Classifies the given {@link MetricPoint} with an {@link OutlierLevel}.
-     *
-     * @param metricPoint Metric point to classify.
-     * @return Outlier level.
-     */
-    OutlierLevel classify(MetricPoint metricPoint);
+    @Override
+    public void removeSubscriber(MetricSubscriber subscriber) {
+        subscribers.remove(subscriber);
+    }
+    
+    public void publish(MetricPoint metricPoint) {
+        subscribers.stream().forEach(listener -> listener.next(metricPoint));
+    }
 }

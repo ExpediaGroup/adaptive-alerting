@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.tools.metricsource;
+package com.expedia.adaptivealerting.tools.pipeline.source;
 
+import com.expedia.adaptivealerting.tools.pipeline.MetricPublisherSupport;
+import com.expedia.adaptivealerting.tools.pipeline.MetricSource;
+import com.expedia.adaptivealerting.tools.pipeline.MetricSubscriber;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -32,8 +33,8 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 public abstract class AbstractMetricSource implements MetricSource {
     private final String name;
     private final long period;
+    private final MetricPublisherSupport support = new MetricPublisherSupport();
     private final Timer timer = new Timer();
-    private final List<MetricSubscriber> subscribers = new LinkedList<>();
     
     /**
      * Creates a new metric source with the given period.
@@ -54,12 +55,12 @@ public abstract class AbstractMetricSource implements MetricSource {
     
     @Override
     public void addSubscriber(MetricSubscriber subscriber) {
-        subscribers.add(subscriber);
+        support.addSubscriber(subscriber);
     }
     
     @Override
     public void removeSubscriber(MetricSubscriber subscriber) {
-        subscribers.remove(subscriber);
+        support.removeSubscriber(subscriber);
     }
     
     @Override
@@ -68,7 +69,10 @@ public abstract class AbstractMetricSource implements MetricSource {
             
             @Override
             public void run() {
-                publish(next());
+                final MetricPoint next = next();
+                if (next != null) {
+                    support.publish(next);
+                }
             }
         }, 0L, period);
     }
@@ -84,9 +88,5 @@ public abstract class AbstractMetricSource implements MetricSource {
     public void stop() {
         timer.cancel();
         timer.purge();
-    }
-    
-    private void publish(MetricPoint metricPoint) {
-        subscribers.stream().forEach(listener -> listener.next(metricPoint));
     }
 }

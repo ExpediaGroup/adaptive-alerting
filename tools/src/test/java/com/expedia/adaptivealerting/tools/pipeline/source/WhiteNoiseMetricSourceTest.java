@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.tools.metricsource;
+package com.expedia.adaptivealerting.tools.pipeline.source;
 
+import com.expedia.adaptivealerting.tools.pipeline.MetricSubscriber;
+import com.expedia.adaptivealerting.tools.pipeline.source.WhiteNoiseMetricSource;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import org.junit.Test;
 

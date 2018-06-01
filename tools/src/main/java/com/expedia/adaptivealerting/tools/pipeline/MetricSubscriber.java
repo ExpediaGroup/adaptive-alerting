@@ -13,22 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.tools.metricsource;
+package com.expedia.adaptivealerting.tools.pipeline;
 
 import com.expedia.www.haystack.commons.entities.MetricPoint;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * Logs generated data to the console.
+ * Data generator callback.
  *
  * @author Willie Wheeler
  */
-public class ConsoleLogMetricSubscriber implements MetricSubscriber {
-    private static final Logger log = LoggerFactory.getLogger(ConsoleLogMetricSubscriber.class);
+public interface MetricSubscriber {
     
-    @Override
-    public void next(MetricPoint metricPoint) {
-        log.info(metricPoint.toString());
-    }
+    void next(MetricPoint metricPoint);
 }

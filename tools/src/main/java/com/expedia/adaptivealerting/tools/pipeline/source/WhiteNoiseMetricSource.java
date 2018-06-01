@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.tools.metricsource;
+package com.expedia.adaptivealerting.tools.pipeline.source;
 
-import com.expedia.adaptivealerting.core.util.MetricPointUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
 import java.time.Instant;
 import java.util.Random;
 
+import static com.expedia.adaptivealerting.core.util.MetricPointUtil.metricPoint;
 import static java.lang.Math.sqrt;
 
 /**
@@ -45,14 +45,13 @@ public final class WhiteNoiseMetricSource extends AbstractMetricSource {
     /**
      * Creates a new white noise data generator.
      *
-     * @param name     Series name.
+     * @param name     Metric name.
      * @param period   Timer period in milliseconds.
      * @param mean     Gaussian mean.
      * @param variance Gaussian variance.
      */
     public WhiteNoiseMetricSource(String name, long period, double mean, double variance) {
         super(name, period);
-        
         this.mean = mean;
         this.stdDev = sqrt(variance);
     }
@@ -60,6 +59,6 @@ public final class WhiteNoiseMetricSource extends AbstractMetricSource {
     @Override
     public MetricPoint next() {
         final float value = (float) (stdDev * random.nextGaussian() + mean);
-        return MetricPointUtil.metricPoint(getName(), Instant.now(), value);
+        return metricPoint(getName(), Instant.now(), value);
     }
 }
