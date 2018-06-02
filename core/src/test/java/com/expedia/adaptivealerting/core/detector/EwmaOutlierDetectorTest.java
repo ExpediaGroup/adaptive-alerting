@@ -47,7 +47,7 @@ public class EwmaOutlierDetectorTest {
     @Test
     public void testDefaultConstructor() {
         final EwmaOutlierDetector detector = new EwmaOutlierDetector();
-        assertEquals(0.5, detector.getAlpha());
+        assertEquals(0.15, detector.getAlpha());
         assertEquals(2.0, detector.getWeakThresholdSigmas());
         assertEquals(3.0, detector.getStrongThresholdSigmas());
     }

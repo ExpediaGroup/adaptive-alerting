@@ -70,7 +70,7 @@ public class EwmaOutlierDetector extends AbstractOutlierDetector {
      * 0.0.
      */
     public EwmaOutlierDetector() {
-        this(0.5, 3.0, 2.0, 0.0);
+        this(0.15, 3.0, 2.0, 0.0);
     }
     
     /**

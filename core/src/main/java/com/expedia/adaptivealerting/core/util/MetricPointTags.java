@@ -23,8 +23,8 @@ public class MetricPointTags {
     // TODO Probably want to namespace these tag names in some way to avoid conflicts. [WLW]
     public static final String OUTLIER_LEVEL = "outlierLevel";
     public static final String PREDICTION = "prediction";
-    public static final String UPPER_THRESHOLD_STRONG = "upperThresholdStrong";
-    public static final String UPPER_THRESHOLD_WEAK = "upperThresholdWeak";
-    public static final String LOWER_THRESHOLD_STRONG = "lowerThresholdStrong";
-    public static final String LOWER_THRESHOLD_WEAK = "lowerThresholdWeak";
+    public static final String STRONG_THRESHOLD_UPPER = "strongThresholdUpper";
+    public static final String STRONG_THRESHOLD_LOWER = "strongThresholdLower";
+    public static final String WEAK_THRESHOLD_UPPER = "weakThresholdUpper";
+    public static final String WEAK_THRESHOLD_LOWER = "weakThresholdLower";
 }
