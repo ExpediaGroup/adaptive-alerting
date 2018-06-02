@@ -51,7 +51,7 @@ public class WhiteNoisePipeline {
         pewmaFilter.addSubscriber(new ChartSink(pewmaSeries));
     
         showChartFrame(createChartFrame(
-                "Cal Inflow",
+                "White Noise",
                 createChart("EWMA", ewmaSeries),
                 createChart("PEWMA", pewmaSeries)));
         
