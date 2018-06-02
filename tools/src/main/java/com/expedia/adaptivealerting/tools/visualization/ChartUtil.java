@@ -38,6 +38,8 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author Willie Wheeler
  */
 public class ChartUtil {
+    private static final Color STRONG_OUTLIER_COLOR = Color.RED;
+    private static final Color WEAK_OUTLIER_COLOR = new Color(255, 194, 0);
     private static final Color OBSERVED_COLOR = Color.BLUE;
     private static final Color MIDPOINT_COLOR = Color.DARK_GRAY;
     private static final Color THRESHOLD_COLOR = new Color(204, 204, 204, 80);
@@ -46,32 +48,43 @@ public class ChartUtil {
         notNull(title, "title can't be null");
         notNull(chartSeries, "chartSeries can't be null");
         
-        final TimeSeriesCollection strongThreshold = new TimeSeriesCollection();
-        strongThreshold.addSeries(chartSeries.getStrongThresholdUpper());
-        strongThreshold.addSeries(chartSeries.getStrongThresholdLower());
+        final TimeSeriesCollection strongOutlier = new TimeSeriesCollection(chartSeries.getStrongOutlier());
+        final TimeSeriesCollection weakOutlier = new TimeSeriesCollection(chartSeries.getWeakOutlier());
+        
+        final TimeSeriesCollection observed = new TimeSeriesCollection(chartSeries.getObserved());
+        final TimeSeriesCollection midpoint = new TimeSeriesCollection(chartSeries.getMidpoint());
     
         final TimeSeriesCollection weakThreshold = new TimeSeriesCollection();
         weakThreshold.addSeries(chartSeries.getWeakThresholdUpper());
         weakThreshold.addSeries(chartSeries.getWeakThresoldLower());
     
-        final TimeSeriesCollection observed = new TimeSeriesCollection(chartSeries.getObserved());
-        final TimeSeriesCollection midpoint = new TimeSeriesCollection(chartSeries.getMidpoint());
+        final TimeSeriesCollection strongThreshold = new TimeSeriesCollection();
+        strongThreshold.addSeries(chartSeries.getStrongThresholdUpper());
+        strongThreshold.addSeries(chartSeries.getStrongThresholdLower());
         
         final JFreeChart chart = ChartFactory.createTimeSeriesChart(
                 title,
                 "Seconds",
                 "Value",
-                observed,
+                strongOutlier,
                 false,
                 false,
                 false);
         
         final XYPlot plot = chart.getXYPlot();
         
-        plot.setDataset(1, midpoint);
-        plot.setDataset(2, weakThreshold);
-        plot.setDataset(3, strongThreshold);
-    
+        plot.setDataset(1, weakOutlier);
+        plot.setDataset(2, observed);
+        plot.setDataset(3, midpoint);
+        plot.setDataset(4, weakThreshold);
+        plot.setDataset(5, strongThreshold);
+        
+        final XYLineAndShapeRenderer strongOutlierRenderer = new XYLineAndShapeRenderer(false, true);
+        strongOutlierRenderer.setSeriesPaint(0, STRONG_OUTLIER_COLOR);
+        
+        final XYLineAndShapeRenderer weakOutlierRenderer = new XYLineAndShapeRenderer(false, true);
+        weakOutlierRenderer.setSeriesPaint(0, WEAK_OUTLIER_COLOR);
+        
         final XYLineAndShapeRenderer observedRenderer = new XYLineAndShapeRenderer(true, false);
         observedRenderer.setSeriesPaint(0, OBSERVED_COLOR);
         
@@ -88,10 +101,12 @@ public class ChartUtil {
         strongThresholdRenderer.setSeriesPaint(0, THRESHOLD_COLOR);
         strongThresholdRenderer.setSeriesPaint(1, THRESHOLD_COLOR);
         
-        plot.setRenderer(0, observedRenderer);
-        plot.setRenderer(1, midpointRenderer);
-        plot.setRenderer(2, weakThresholdRenderer);
-        plot.setRenderer(3, strongThresholdRenderer);
+        plot.setRenderer(0, strongOutlierRenderer);
+        plot.setRenderer(1, weakOutlierRenderer);
+        plot.setRenderer(2, observedRenderer);
+        plot.setRenderer(3, midpointRenderer);
+        plot.setRenderer(4, weakThresholdRenderer);
+        plot.setRenderer(5, strongThresholdRenderer);
     
         plot.setDomainGridlinePaint(Color.GRAY);
         plot.setRangeGridlinePaint(Color.GRAY);

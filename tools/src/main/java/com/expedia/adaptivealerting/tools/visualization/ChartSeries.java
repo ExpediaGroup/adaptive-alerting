@@ -29,6 +29,8 @@ public class ChartSeries {
     private final TimeSeries strongThresholdLower = new TimeSeries("strongThresholdLower");
     private final TimeSeries weakThresholdUpper = new TimeSeries("weakThresholdUpper");
     private final TimeSeries weakThresoldLower = new TimeSeries("weakThresholdLower");
+    private final TimeSeries strongOutlier = new TimeSeries("strongOutlier");
+    private final TimeSeries weakOutlier = new TimeSeries("weakOutlier");
     
     public TimeSeries getObserved() {
         return observed;
@@ -52,5 +54,13 @@ public class ChartSeries {
     
     public TimeSeries getWeakThresoldLower() {
         return weakThresoldLower;
+    }
+    
+    public TimeSeries getStrongOutlier() {
+        return strongOutlier;
+    }
+    
+    public TimeSeries getWeakOutlier() {
+        return weakOutlier;
     }
 }

@@ -15,14 +15,18 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.sink;
 
+import com.expedia.adaptivealerting.core.OutlierLevel;
 import com.expedia.adaptivealerting.tools.pipeline.MetricSink;
 import com.expedia.adaptivealerting.tools.visualization.ChartSeries;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeries;
 
+import static com.expedia.adaptivealerting.core.OutlierLevel.STRONG;
+import static com.expedia.adaptivealerting.core.OutlierLevel.WEAK;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 import static com.expedia.adaptivealerting.core.util.MetricPointTags.*;
+import static com.expedia.adaptivealerting.core.util.MetricPointUtil.outlierLevel;
 import static com.expedia.adaptivealerting.core.util.MetricPointUtil.thresholdValue;
 
 public class ChartSink implements MetricSink {
@@ -42,6 +46,8 @@ public class ChartSink implements MetricSink {
         this.currentSecond = (currentSecond == null ? new Second() : (Second) currentSecond.next());
         
         final float observed = metricPoint.value();
+        final OutlierLevel level = outlierLevel(metricPoint);
+        
         chartSeries.getObserved().add(currentSecond, observed);
         
         addPoint(metricPoint, chartSeries.getMidpoint(), PREDICTION);
@@ -49,6 +55,13 @@ public class ChartSink implements MetricSink {
         addPoint(metricPoint, chartSeries.getStrongThresholdLower(), STRONG_THRESHOLD_LOWER);
         addPoint(metricPoint, chartSeries.getWeakThresholdUpper(), WEAK_THRESHOLD_UPPER);
         addPoint(metricPoint, chartSeries.getWeakThresoldLower(), WEAK_THRESHOLD_LOWER);
+        
+        if (level == STRONG) {
+            chartSeries.getStrongOutlier().add(currentSecond, observed);
+        } else if (level == WEAK) {
+            chartSeries.getWeakOutlier().add(currentSecond, observed);
+        }
+        
     }
     
     private void addPoint(MetricPoint metricPoint, TimeSeries timeSeries, String tagName) {
