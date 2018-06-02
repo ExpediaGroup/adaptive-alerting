@@ -20,6 +20,7 @@ import com.expedia.adaptivealerting.core.OutlierLevel;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.isBetween;
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 import static java.lang.Math.*;
 
 /**
@@ -92,10 +93,17 @@ public class PewmaOutlierDetector implements OutlierDetector {
      * Local standard deviation estimate.
      */
     private double stdDev;
-
-
+    
     /**
-     * Creates a new PEWMA anomaly detector. Initial mean is given by initValue and initial standard deviation is 0.
+     * Creates a new PEWMA outlier detector with initialAlpha = 0, beta = 1.0, weakThreshold = 2.0,
+     * strongThreshold = 3.0 and initValue = 0.0.
+     */
+    public PewmaOutlierDetector() {
+        this(0.5, 1.0, 2.0, 3.0, 0.0);
+    }
+    
+    /**
+     * Creates a new PEWMA outlier detector. Initial mean is given by initValue and initial standard deviation is 0.
      *
      * @param initialAlpha    Smoothing parameter.
      * @param beta            Outlier weighting parameter.
@@ -114,7 +122,7 @@ public class PewmaOutlierDetector implements OutlierDetector {
     }
 
     /**
-     * Creates a new PEWMA anomaly detector. Initial mean is given by initValue and initial standard deviation is 0.
+     * Creates a new PEWMA outlier detector. Initial mean is given by initValue and initial standard deviation is 0.
      *
      * @param initialAlpha    Smoothing parameter.
      * @param beta            Outlier weighting parameter.
@@ -151,6 +159,8 @@ public class PewmaOutlierDetector implements OutlierDetector {
     
     @Override
     public OutlierLevel classify(MetricPoint metricPoint) {
+        notNull(metricPoint, "metricPoint can't be null");
+        
         final float value = metricPoint.value();
         final double dist = abs(value - mean);
         final double largeThreshold = strongThreshold * stdDev;

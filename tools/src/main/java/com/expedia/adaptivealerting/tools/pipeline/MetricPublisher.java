@@ -13,14 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.tools.metricsource;
+package com.expedia.adaptivealerting.tools.pipeline;
 
-/**
- * Interface for metric sources.
- *
- * @author Willie Wheeler
- */
-public interface MetricSource {
+public interface MetricPublisher {
     
     /**
      * Add a metric source subscriber.
@@ -35,8 +30,4 @@ public interface MetricSource {
      * @param subscriber Metric source subscriber.
      */
     void removeSubscriber(MetricSubscriber subscriber);
-    
-    void start();
-    
-    void stop();
 }

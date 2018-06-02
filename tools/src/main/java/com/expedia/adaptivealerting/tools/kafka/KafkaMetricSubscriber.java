@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.tools.kafka;
 
-import com.expedia.adaptivealerting.tools.metricsource.MetricSubscriber;
+import com.expedia.adaptivealerting.tools.pipeline.MetricSubscriber;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.kstreams.serde.metricpoint.MetricPointSerializer;
 import org.apache.kafka.clients.producer.KafkaProducer;

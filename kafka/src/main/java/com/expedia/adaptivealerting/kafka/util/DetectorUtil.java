@@ -36,6 +36,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.function.Function;
 
+import static com.expedia.adaptivealerting.core.util.MetricPointUtil.classify;
+
 public class DetectorUtil {
     static final String OUTLIER_LEVEL_TAG = "outlierLevel";
 
@@ -94,19 +96,10 @@ public class DetectorUtil {
 
         final OutlierDetector detector = detectors.get(metricId);
         final OutlierLevel level = detector.classify(metricPoint);
-        return classifiedMetricPoint(metricPoint, level);
+        return classify(metricPoint, level);
     }
 
     static String extractMetricId(MetricPoint metricPoint) {
         return metricPoint.getMetricPointKey(ENCODER); // TODO: find out how we'll be getting the ids.
-    }
-
-    private static MetricPoint classifiedMetricPoint(MetricPoint metricPoint, OutlierLevel level) {
-        return new MetricPoint(
-                metricPoint.metric(),
-                metricPoint.type(),
-                metricPoint.tags().updated(OUTLIER_LEVEL_TAG, level.name()),
-                metricPoint.value(),
-                metricPoint.epochTimeInSeconds());
     }
 }

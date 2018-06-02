@@ -37,11 +37,19 @@ import static junit.framework.TestCase.assertTrue;
 public class EwmaOutlierDetectorTest {
     private static final double TOLERANCE = 0.001;
     
-    private static List<EwmaTestRow> calInflowTestRows;
+    private static List<EwmaTestRow> data;
     
     @BeforeClass
     public static void setUpClass() throws IOException {
         readData_calInflow();
+    }
+    
+    @Test
+    public void testDefaultConstructor() {
+        final EwmaOutlierDetector detector = new EwmaOutlierDetector();
+        assertEquals(0.5, detector.getAlpha());
+        assertEquals(2.0, detector.getWeakThreshold());
+        assertEquals(3.0, detector.getStrongThreshold());
     }
     
     @Test(expected = IllegalArgumentException.class)
@@ -57,7 +65,7 @@ public class EwmaOutlierDetectorTest {
         final double weakThreshold = 2.0;
         final double strongThreshold = 3.0;
         
-        final ListIterator<EwmaTestRow> testRows = calInflowTestRows.listIterator();
+        final ListIterator<EwmaTestRow> testRows = data.listIterator();
         final EwmaTestRow testRow0 = testRows.next();
         final double observed0 = testRow0.getObserved();
         final EwmaOutlierDetector detector = new EwmaOutlierDetector(alpha, weakThreshold, strongThreshold, observed0);
@@ -88,7 +96,7 @@ public class EwmaOutlierDetectorTest {
     
     private static void readData_calInflow() {
         final InputStream is = ClassLoader.getSystemResourceAsStream("tests/cal-inflow-tests-ewma.csv");
-        calInflowTestRows = new CsvToBeanBuilder<EwmaTestRow>(new InputStreamReader(is))
+        data = new CsvToBeanBuilder<EwmaTestRow>(new InputStreamReader(is))
                 .withType(EwmaTestRow.class)
                 .build()
                 .parse();

@@ -67,7 +67,15 @@ public class EwmaOutlierDetector implements OutlierDetector {
     private double variance;
     
     /**
-     * Creates a new EWMA anomaly detector. Initial mean is given by initValue and initial variance is 0.
+     * Creates a new EWMA outlier detector with alpha = 0.5, weakThreshold = 2.0, strongThreshold = 3.0 and initValue =
+     * 0.0.
+     */
+    public EwmaOutlierDetector() {
+        this(0.5, 2.0, 3.0, 0.0);
+    }
+    
+    /**
+     * Creates a new EWMA outlier detector. Initial mean is given by initValue and initial variance is 0.
      *
      * @param alpha           Smoothing parameter.
      * @param weakThreshold   Weak outlier threshold, in sigmas.

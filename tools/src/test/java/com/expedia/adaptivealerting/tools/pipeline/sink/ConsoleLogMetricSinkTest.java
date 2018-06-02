@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.tools.metricsource;
+package com.expedia.adaptivealerting.tools.pipeline.sink;
 
+import com.expedia.adaptivealerting.tools.pipeline.sink.ConsoleLogMetricSink;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.entities.MetricType;
 import org.junit.Before;
@@ -26,17 +27,17 @@ import scala.collection.immutable.Map$;
 /**
  * @author Willie Wheeler
  */
-public class ConsoleLogMetricSubscriberTest {
+public class ConsoleLogMetricSinkTest {
     
     // Class under test
-    private ConsoleLogMetricSubscriber callback;
+    private ConsoleLogMetricSink callback;
     
     // Test objects
     private MetricPoint metricPoint;
     
     @Before
     public void setUp() {
-        this.callback = new ConsoleLogMetricSubscriber();
+        this.callback = new ConsoleLogMetricSink();
     
         final Enumeration.Value type = MetricType.Gauge();
         final Map<String, String> tags = Map$.MODULE$.<String, String>empty();

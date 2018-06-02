@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.tools.kafka;
 
-import com.expedia.adaptivealerting.tools.metricsource.MetricSource;
-import com.expedia.adaptivealerting.tools.metricsource.WhiteNoiseMetricSource;
+import com.expedia.adaptivealerting.tools.pipeline.MetricSource;
+import com.expedia.adaptivealerting.tools.pipeline.source.WhiteNoiseMetricSource;
 
 /**
  * <p>

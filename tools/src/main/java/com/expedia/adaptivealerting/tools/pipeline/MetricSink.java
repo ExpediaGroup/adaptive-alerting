@@ -13,16 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.tools.metricsource;
-
-import com.expedia.www.haystack.commons.entities.MetricPoint;
+package com.expedia.adaptivealerting.tools.pipeline;
 
 /**
- * Data generator callback.
- *
  * @author Willie Wheeler
  */
-public interface MetricSubscriber {
-    
-    void next(MetricPoint metricPoint);
+public interface MetricSink extends MetricSubscriber {
 }
