@@ -13,23 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.detector;
-
-import com.expedia.adaptivealerting.core.detector.EwmaOutlierDetector;
-import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
+package com.expedia.adaptivealerting.core.util;
 
 /**
- * Kafka Streams application for the EWMA outlier detector.
- *
  * @author Willie Wheeler
  */
-public class KafkaEwmaOutlierDetector {
+public class MetricPointTags {
     
-    public static void main(String[] args) {
-        DetectorUtil.startStreams(
-                id -> new EwmaOutlierDetector(0.8, 3.0, 2.0, 100.0),
-                "ewma-outlier-detector",
-                "ewma-metrics"
-        );
-    }
+    // TODO Probably want to namespace these tag names in some way to avoid conflicts. [WLW]
+    public static final String OUTLIER_LEVEL = "outlierLevel";
+    public static final String PREDICTION = "prediction";
+    public static final String UPPER_THRESHOLD_STRONG = "upperThresholdStrong";
+    public static final String UPPER_THRESHOLD_WEAK = "upperThresholdWeak";
+    public static final String LOWER_THRESHOLD_STRONG = "lowerThresholdStrong";
+    public static final String LOWER_THRESHOLD_WEAK = "lowerThresholdWeak";
 }

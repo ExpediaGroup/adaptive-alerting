@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.core.detector;
 
 import com.expedia.adaptivealerting.core.OutlierLevel;
+import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBeanBuilder;
 import org.junit.Test;
@@ -29,6 +30,7 @@ import java.util.ListIterator;
 
 import static com.expedia.adaptivealerting.core.util.MathUtil.isApproximatelyEqual;
 import static com.expedia.adaptivealerting.core.util.MetricPointUtil.metricPoint;
+import static com.expedia.adaptivealerting.core.util.MetricPointUtil.outlierLevel;
 import static java.lang.Math.sqrt;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
@@ -56,7 +58,7 @@ public class PewmaOutlierDetectorTest {
         final PewmaOutlierDetector pewmaOutlierDetector = new PewmaOutlierDetector(
                 DEFAULT_ALPHA, beta, WEAK_THRESHOLD, STRONG_THRESHOLD, initialValue);
         final EwmaOutlierDetector ewmaOutlierDetector = new EwmaOutlierDetector(
-                DEFAULT_ALPHA, WEAK_THRESHOLD, STRONG_THRESHOLD, initialValue);
+                DEFAULT_ALPHA, STRONG_THRESHOLD, WEAK_THRESHOLD, initialValue);
 
         int rowCount = 1;
         while (testRows.hasNext()) {
@@ -67,9 +69,12 @@ public class PewmaOutlierDetectorTest {
             double threshold = 1.0/rowCount; // results converge with more iterations
             assertApproxEqual(ewmaOutlierDetector.getMean(), pewmaOutlierDetector.getMean(), threshold);
             assertApproxEqual(ewmaStdDev, pewmaOutlierDetector.getStdDev(), threshold);
-
-            OutlierLevel pOL = pewmaOutlierDetector.classify(metricPoint(Instant.now(), value));
-            OutlierLevel eOL = ewmaOutlierDetector.classify(metricPoint(Instant.now(), value));
+            
+            final MetricPoint pewmaResult = pewmaOutlierDetector.classify(metricPoint(Instant.now(), value));
+            final MetricPoint ewmaResult = ewmaOutlierDetector.classify(metricPoint(Instant.now(), value));
+            
+            OutlierLevel pOL = outlierLevel(pewmaResult);
+            OutlierLevel eOL = outlierLevel(ewmaResult);
             if (rowCount > PewmaOutlierDetector.DEFAULT_TRAINING_LENGTH) {
                 assertEquals(pOL, eOL);
             }
@@ -93,8 +98,9 @@ public class PewmaOutlierDetectorTest {
 
             // This detector doesn't currently do anything with the instant, so we can just pass now().
             // This may change in the future.
-            OutlierLevel level = detector.classify(metricPoint(Instant.now(), (float) observed));
-
+            final MetricPoint result = detector.classify(metricPoint(Instant.now(), (float) observed));
+            
+            final OutlierLevel level = outlierLevel(result);
             assertApproxEqual(testRow.getMean(), detector.getMean(), 0.00001);
             assertApproxEqual(testRow.getStd(), detector.getStdDev(), 0.00001);
             assertEquals(OutlierLevel.valueOf(testRow.getLevel()), level);

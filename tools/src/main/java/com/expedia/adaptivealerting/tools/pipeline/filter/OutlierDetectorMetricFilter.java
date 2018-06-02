@@ -16,11 +16,9 @@
 package com.expedia.adaptivealerting.tools.pipeline.filter;
 
 import com.expedia.adaptivealerting.core.OutlierDetector;
-import com.expedia.adaptivealerting.core.OutlierLevel;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
-import static com.expedia.adaptivealerting.core.util.MetricPointUtil.classify;
 
 /**
  * Metric filter that applies an outlier detector to the metric.
@@ -38,7 +36,6 @@ public final class OutlierDetectorMetricFilter extends AbstractMetricFilter {
     @Override
     public void next(MetricPoint metricPoint) {
         notNull(metricPoint, "metricPoint can't be null");
-        final OutlierLevel outlierLevel = outlierDetector.classify(metricPoint);
-        publish(classify(metricPoint, outlierLevel));
+        publish(outlierDetector.classify(metricPoint));
     }
 }

@@ -24,15 +24,11 @@ import com.expedia.www.haystack.commons.entities.MetricPoint;
  */
 public interface OutlierDetector {
     
-    // TODO I am thinking that classify() should return the classified MetricPoint instead of simply returning the
-    // classification. The reason is that we always push the classified MetricPoint to the next pipeline stage, and it
-    // doesn't make sense to make the various wrappers (Kafka, Kinesis, etc.) have to do it. [WLW]
-    
     /**
-     * Classifies the given {@link MetricPoint} with an {@link OutlierLevel}.
+     * Classifies the given metric point.
      *
-     * @param metricPoint Metric point to classify.
-     * @return Outlier level.
+     * @param metricPoint Metric point.
+     * @return A new copy of the metric point, with classification and additional information attached.
      */
-    OutlierLevel classify(MetricPoint metricPoint);
+    MetricPoint classify(MetricPoint metricPoint);
 }

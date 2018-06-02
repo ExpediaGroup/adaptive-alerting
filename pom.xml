@@ -40,6 +40,7 @@
         <project.jdk.version>1.8</project.jdk.version>
 
         <!-- Dependencies -->
+        <jfreechart.version>1.0.19</jfreechart.version>
         <junit.version>4.12</junit.version>
         <kafka.streams.version>1.1.0</kafka.streams.version>
         <msgpack.version>0.8.13</msgpack.version>
@@ -77,6 +78,11 @@
                 <groupId>org.apache.kafka</groupId>
                 <artifactId>kafka-streams</artifactId>
                 <version>${kafka.streams.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jfree</groupId>
+                <artifactId>jfreechart</artifactId>
+                <version>${jfreechart.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.msgpack</groupId>

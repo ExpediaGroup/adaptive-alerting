@@ -15,27 +15,51 @@
  */
 package com.expedia.adaptivealerting.samples;
 
+import com.expedia.adaptivealerting.core.OutlierDetector;
 import com.expedia.adaptivealerting.core.detector.PewmaOutlierDetector;
 import com.expedia.adaptivealerting.tools.pipeline.MetricFilter;
 import com.expedia.adaptivealerting.tools.pipeline.MetricSink;
 import com.expedia.adaptivealerting.tools.pipeline.MetricSource;
 import com.expedia.adaptivealerting.tools.pipeline.filter.OutlierDetectorMetricFilter;
+import com.expedia.adaptivealerting.tools.pipeline.sink.ChartSink;
 import com.expedia.adaptivealerting.tools.pipeline.sink.ConsoleLogMetricSink;
 import com.expedia.adaptivealerting.tools.pipeline.source.CsvMetricSource;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.TimeSeriesCollection;
+import org.jfree.ui.ApplicationFrame;
 
 import java.io.InputStream;
+
+import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.*;
 
 public class CsvPipeline {
     
     public static void main(String[] args) {
         final InputStream is = ClassLoader.getSystemResourceAsStream("samples/sample001.csv");
-        final MetricSource source = new CsvMetricSource(is, "data", 1000L);
+        final MetricSource source = new CsvMetricSource(is, "data", 200L);
     
-        final MetricFilter filter = new OutlierDetectorMetricFilter(new PewmaOutlierDetector());
+        final OutlierDetector detector = new PewmaOutlierDetector(0.1, 1.0, 2.0, 3.0, 0.0);
+        final MetricFilter filter = new OutlierDetectorMetricFilter(detector);
         source.addSubscriber(filter);
     
-        final MetricSink sink = new ConsoleLogMetricSink();
-        filter.addSubscriber(sink);
+        final MetricSink consoleSink = new ConsoleLogMetricSink();
+        filter.addSubscriber(consoleSink);
+    
+        final TimeSeries observed = new TimeSeries("observed");
+        final TimeSeries predictedUpper = new TimeSeries("predictedUpper");
+        final TimeSeries predictedLower = new TimeSeries("predictedLower");
+    
+        final MetricSink chartSink = new ChartSink(predictedUpper, predictedLower, observed);
+        filter.addSubscriber(chartSink);
+    
+        final TimeSeriesCollection band = new TimeSeriesCollection();
+        band.addSeries(predictedUpper);
+        band.addSeries(predictedLower);
+    
+        final JFreeChart chart = createChart("Cal Inflow", band, new TimeSeriesCollection(observed));
+        final ApplicationFrame chartFrame = createChartFrame(chart);
+        showChartFrame(chartFrame);
     
         source.start();
     }

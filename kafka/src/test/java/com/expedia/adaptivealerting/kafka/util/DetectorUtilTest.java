@@ -33,7 +33,7 @@ import static org.junit.Assert.*;
 
 public class DetectorUtilTest {
     private static final Function<String, OutlierDetector> DETECTOR_FACTORY =
-            id -> new ConstantThresholdOutlierDetector(RIGHT_TAILED, 0.95f, 0.99f);
+            id -> new ConstantThresholdOutlierDetector(RIGHT_TAILED, 0.99f, 0.95f);
 
     @Test
     public void extractMetricIdForNullMetric() {

@@ -19,10 +19,13 @@ import com.expedia.adaptivealerting.core.OutlierLevel;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.entities.MetricType;
 import scala.Enumeration;
+import scala.Option;
 import scala.collection.immutable.Map;
 import scala.collection.immutable.Map$;
 
 import java.time.Instant;
+
+import static com.expedia.adaptivealerting.core.util.MetricPointTags.OUTLIER_LEVEL;
 
 /**
  * {@link MetricPoint} utilities.
@@ -30,8 +33,6 @@ import java.time.Instant;
  * @author Willie Wheeler
  */
 public final class MetricPointUtil {
-    public static final String OUTLIER_LEVEL_TAG_NAME = "outlierLevel";
-    
     private static final Enumeration.Value DEFAULT_TYPE = MetricType.Gauge();
     private static final Map<String, String> DEFAULT_TAGS = Map$.MODULE$.<String, String>empty();
     
@@ -64,26 +65,14 @@ public final class MetricPointUtil {
         return new MetricPoint(name, DEFAULT_TYPE, DEFAULT_TAGS, value, instant.getEpochSecond());
     }
     
-    /**
-     * <p>
-     * Copies the given metric point and enriches the copy with its classification.
-     * </p>
-     * <p>
-     * We'll probably move this into an abstract base class for outlier detectors, but I want to chat with the team
-     * first.
-     * </p>
-     *
-     * @param metricPoint  Metric point.
-     * @param outlierLevel Outlier level.
-     * @return A new metric tagged with the outlier level (tag is "outlierLevel").
-     */
-    public static MetricPoint classify(MetricPoint metricPoint, OutlierLevel outlierLevel) {
-        final Map tags = metricPoint.tags().updated(OUTLIER_LEVEL_TAG_NAME, outlierLevel.name());
-        return new MetricPoint(
-                metricPoint.metric(),
-                metricPoint.type(),
-                tags,
-                metricPoint.value(),
-                metricPoint.epochTimeInSeconds());
+    public static OutlierLevel outlierLevel(MetricPoint metricPoint) {
+        final Option option = metricPoint.tags().get(OUTLIER_LEVEL);
+        return (option.isEmpty() ? null : OutlierLevel.valueOf((String) option.get()));
+    }
+    
+    public static Float thresholdValue(MetricPoint metricPoint, String tagName) {
+        final Option option = metricPoint.tags().get(tagName);
+//        return (option.isEmpty() ? null : Float.parseFloat((String) option.get()));
+        return (option.isEmpty() ? null : (Float) option.get());
     }
 }

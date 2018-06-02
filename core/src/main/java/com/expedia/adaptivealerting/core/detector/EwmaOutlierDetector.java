@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.core.detector;
 
-import com.expedia.adaptivealerting.core.OutlierDetector;
 import com.expedia.adaptivealerting.core.OutlierLevel;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
@@ -38,7 +37,7 @@ import static java.lang.Math.sqrt;
  *
  * @author Willie Wheeler
  */
-public class EwmaOutlierDetector implements OutlierDetector {
+public class EwmaOutlierDetector extends AbstractOutlierDetector {
     
     /**
      * Smoothing param. Somewhat misnamed because higher values lead to less smoothing, but it's called the smoothing
@@ -47,14 +46,14 @@ public class EwmaOutlierDetector implements OutlierDetector {
     private double alpha;
     
     /**
-     * Weak outlier threshold, in sigmas.
-     */
-    private double weakThreshold;
-    
-    /**
      * Strong outlier threshold, in sigmas.
      */
-    private double strongThreshold;
+    private double strongThresholdSigmas;
+    
+    /**
+     * Weak outlier threshold, in sigmas.
+     */
+    private double weakThresholdSigmas;
     
     /**
      * Local mean estimate.
@@ -67,27 +66,31 @@ public class EwmaOutlierDetector implements OutlierDetector {
     private double variance;
     
     /**
-     * Creates a new EWMA outlier detector with alpha = 0.5, weakThreshold = 2.0, strongThreshold = 3.0 and initValue =
+     * Creates a new EWMA outlier detector with alpha = 0.5, weakThresholdSigmas = 2.0, strongThresholdSigmas = 3.0 and initValue =
      * 0.0.
      */
     public EwmaOutlierDetector() {
-        this(0.5, 2.0, 3.0, 0.0);
+        this(0.5, 3.0, 2.0, 0.0);
     }
     
     /**
      * Creates a new EWMA outlier detector. Initial mean is given by initValue and initial variance is 0.
-     *
-     * @param alpha           Smoothing parameter.
-     * @param weakThreshold   Weak outlier threshold, in sigmas.
-     * @param strongThreshold Strong outlier threshold, in sigmas.
+     *  @param alpha           Smoothing parameter.
+     * @param strongThresholdSigmas Strong outlier threshold, in sigmas.
+     * @param weakThresholdSigmas   Weak outlier threshold, in sigmas.
      * @param initValue       Initial observation, used to set the first mean estimate.
      */
-    public EwmaOutlierDetector(double alpha, double weakThreshold, double strongThreshold, double initValue) {
+    public EwmaOutlierDetector(
+            double alpha,
+            double strongThresholdSigmas,
+            double weakThresholdSigmas,
+            double initValue) {
+        
         isBetween(alpha, 0.0, 1.0, "alpha must be in the range [0, 1]");
         
         this.alpha = alpha;
-        this.weakThreshold = weakThreshold;
-        this.strongThreshold = strongThreshold;
+        this.weakThresholdSigmas = weakThresholdSigmas;
+        this.strongThresholdSigmas = strongThresholdSigmas;
         this.mean = initValue;
         this.variance = 0.0;
     }
@@ -96,12 +99,12 @@ public class EwmaOutlierDetector implements OutlierDetector {
         return alpha;
     }
     
-    public double getWeakThreshold() {
-        return weakThreshold;
+    public double getWeakThresholdSigmas() {
+        return weakThresholdSigmas;
     }
     
-    public double getStrongThreshold() {
-        return strongThreshold;
+    public double getStrongThresholdSigmas() {
+        return strongThresholdSigmas;
     }
     
     public double getMean() {
@@ -113,26 +116,33 @@ public class EwmaOutlierDetector implements OutlierDetector {
     }
     
     @Override
-    public OutlierLevel classify(MetricPoint metricPoint) {
-        OutlierLevel level = null;
+    public MetricPoint classify(MetricPoint metricPoint) {
+        OutlierLevel outlierLevel = null;
     
         final float value = metricPoint.value();
         final double dist = abs(value - mean);
         final double stdDev = sqrt(variance);
-        final double largeThreshold = strongThreshold * stdDev;
-        final double smallThreshold = weakThreshold * stdDev;
+        final double strongThreshold = strongThresholdSigmas * stdDev;
+        final double weakThreshold = weakThresholdSigmas * stdDev;
     
-        if (dist > largeThreshold) {
-            level = OutlierLevel.STRONG;
-        } else if (dist > smallThreshold) {
-            level = OutlierLevel.WEAK;
+        if (dist > strongThreshold) {
+            outlierLevel = OutlierLevel.STRONG;
+        } else if (dist > weakThreshold) {
+            outlierLevel = OutlierLevel.WEAK;
         } else {
-            level = OutlierLevel.NORMAL;
+            outlierLevel = OutlierLevel.NORMAL;
         }
-    
+        
+        final MetricPoint tagged = tag(
+                metricPoint,
+                outlierLevel,
+                (float)mean,
+                (float)(mean + strongThreshold),
+                (float)(mean + weakThreshold),
+                (float)(mean - strongThreshold),
+                (float)(mean - weakThreshold));
         updateEstimates(value);
-    
-        return level;
+        return tagged;
     }
     
     private void updateEstimates(double value) {

@@ -16,7 +16,6 @@
 package com.expedia.adaptivealerting.kafka.util;
 
 import com.expedia.adaptivealerting.core.OutlierDetector;
-import com.expedia.adaptivealerting.core.OutlierLevel;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.entities.MetricType;
 import com.expedia.www.haystack.commons.entities.encoders.Encoder;
@@ -35,8 +34,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.Function;
-
-import static com.expedia.adaptivealerting.core.util.MetricPointUtil.classify;
 
 public class DetectorUtil {
     static final String OUTLIER_LEVEL_TAG = "outlierLevel";
@@ -95,8 +92,7 @@ public class DetectorUtil {
         }
 
         final OutlierDetector detector = detectors.get(metricId);
-        final OutlierLevel level = detector.classify(metricPoint);
-        return classify(metricPoint, level);
+        return detector.classify(metricPoint);
     }
 
     static String extractMetricId(MetricPoint metricPoint) {

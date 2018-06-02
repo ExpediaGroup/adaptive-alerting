@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
-import static com.expedia.adaptivealerting.core.util.MetricPointUtil.OUTLIER_LEVEL_TAG_NAME;
+import static com.expedia.adaptivealerting.core.util.MetricPointUtil.outlierLevel;
 
 /**
  * Logs generated data to the console.
@@ -34,9 +34,9 @@ public class ConsoleLogMetricSink implements MetricSink {
     @Override
     public void next(MetricPoint metricPoint) {
         notNull(metricPoint, "metricPoint can't be null");
-        final String name = metricPoint.metric();
-        final float value = metricPoint.value();
-        final String outlierLevel = metricPoint.tags().get(OUTLIER_LEVEL_TAG_NAME).toString();
-        log.info("MetricPoint: name={}, value={}, outlierLevel={}", name, value, outlierLevel);
+        log.info("MetricPoint: name={}, value={}, outlierLevel={}",
+                metricPoint.metric(),
+                metricPoint.value(),
+                outlierLevel(metricPoint));
     }
 }
