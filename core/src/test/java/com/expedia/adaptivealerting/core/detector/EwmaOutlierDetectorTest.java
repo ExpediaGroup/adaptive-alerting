@@ -48,13 +48,13 @@ public class EwmaOutlierDetectorTest {
     public void testDefaultConstructor() {
         final EwmaOutlierDetector detector = new EwmaOutlierDetector();
         assertEquals(0.5, detector.getAlpha());
-        assertEquals(2.0, detector.getWeakThreshold());
-        assertEquals(3.0, detector.getStrongThreshold());
+        assertEquals(2.0, detector.getWeakThresholdSigmas());
+        assertEquals(3.0, detector.getStrongThresholdSigmas());
     }
     
     @Test(expected = IllegalArgumentException.class)
     public void testConstructor_alphaOutOfRange() {
-        new EwmaOutlierDetector(2.0, 100.0, 150.0, 0.0);
+        new EwmaOutlierDetector(2.0, 150.0, 100.0, 0.0);
     }
     
     @Test
@@ -68,12 +68,12 @@ public class EwmaOutlierDetectorTest {
         final ListIterator<EwmaTestRow> testRows = data.listIterator();
         final EwmaTestRow testRow0 = testRows.next();
         final double observed0 = testRow0.getObserved();
-        final EwmaOutlierDetector detector = new EwmaOutlierDetector(alpha, weakThreshold, strongThreshold, observed0);
+        final EwmaOutlierDetector detector = new EwmaOutlierDetector(alpha, strongThreshold, weakThreshold, observed0);
     
         // Params
         assertEquals(alpha, detector.getAlpha());
-        assertEquals(weakThreshold, detector.getWeakThreshold());
-        assertEquals(strongThreshold, detector.getStrongThreshold());
+        assertEquals(weakThreshold, detector.getWeakThresholdSigmas());
+        assertEquals(strongThreshold, detector.getStrongThresholdSigmas());
         
         // Seed observation
         assertEquals(observed0, detector.getMean());

@@ -15,10 +15,12 @@
  */
 package com.expedia.adaptivealerting.core.detector;
 
-import com.expedia.adaptivealerting.core.OutlierDetector;
 import com.expedia.adaptivealerting.core.OutlierLevel;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
+import static com.expedia.adaptivealerting.core.OutlierLevel.NORMAL;
+import static com.expedia.adaptivealerting.core.OutlierLevel.STRONG;
+import static com.expedia.adaptivealerting.core.OutlierLevel.WEAK;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 
 /**
@@ -26,72 +28,79 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
  *
  * @author Willie Wheeler
  */
-public class ConstantThresholdOutlierDetector implements OutlierDetector {
+public class ConstantThresholdOutlierDetector extends AbstractOutlierDetector {
     public static final int LEFT_TAILED = 0;
     public static final int RIGHT_TAILED = 1;
     
     private final int tail;
-    private final double weakThreshold;
-    private final double largeThreshold;
+    private final float strongThreshold;
+    private final float weakThreshold;
+    
+    // TODO Support two-tailed strategy.
     
     /**
      * Builds a constant-threshold anomaly detector that performs anomaly tests in the specified tail. For left-tailed
-     * detectors we expect largeThreshold &lt;= weakThreshold, and for right-tailed detectors we expect
-     * weakThreshold &lt;= largeThreshold.
-     *
-     * @param tail           Either LEFT_TAILED or RIGHT_TAILED.
-     * @param smallThreshold Small anomaly threshold.
-     * @param largeThreshold Large anomaly threshold.
+     * detectors we expect strongThreshold &lt;= weakThreshold, and for right-tailed detectors we expect
+     * weakThreshold &lt;= strongThreshold.
+     *  @param tail            Either LEFT_TAILED or RIGHT_TAILED.
+     * @param strongThreshold Large outlier threshold.
+     * @param weakThreshold   Small outlier threshold.
      */
-    public ConstantThresholdOutlierDetector(int tail, double smallThreshold, double largeThreshold) {
+    public ConstantThresholdOutlierDetector(int tail, float strongThreshold, float weakThreshold) {
         if (tail == LEFT_TAILED) {
-            isTrue(largeThreshold <= smallThreshold, "Left-tailed detector requires largeThreshold <= weakThreshold");
+            isTrue(strongThreshold <= weakThreshold, "Left-tailed detector requires strongThreshold <= weakThreshold");
         } else if (tail == RIGHT_TAILED) {
-            isTrue(smallThreshold <= largeThreshold, "Right-tailed detector required weakThreshold <= largeThreshold");
+            isTrue(weakThreshold <= strongThreshold, "Right-tailed detector requires weakThreshold <= strongThreshold");
         } else {
             throw new IllegalArgumentException("tail must be either LEFT_TAILED or RIGHT_TAILED");
         }
         
         this.tail = tail;
-        this.weakThreshold = smallThreshold;
-        this.largeThreshold = largeThreshold;
+        this.weakThreshold = weakThreshold;
+        this.strongThreshold = strongThreshold;
     }
     
     public int getTail() {
         return tail;
     }
     
-    public Double getWeakThreshold() {
+    public Float getWeakThreshold() {
         return weakThreshold;
     }
     
-    public Double getLargeThreshold() {
-        return largeThreshold;
+    public Float getStrongThreshold() {
+        return strongThreshold;
     }
     
     @Override
-    public OutlierLevel classify(MetricPoint metricPoint) {
+    public MetricPoint classify(MetricPoint metricPoint) {
         final float value = metricPoint.value();
-        return tail == LEFT_TAILED ? evaluateLeftTailed(value) : evaluateRightTailed(value);
+        if (tail == LEFT_TAILED) {
+            final OutlierLevel level = evaluateLeftTailed(value);
+            return tag(metricPoint, level, null, null, null, strongThreshold, weakThreshold);
+        } else { // right-tailed til we handle two-tailed
+            final OutlierLevel level = evaluateRightTailed(value);
+            return tag(metricPoint, level, null, strongThreshold, weakThreshold, null, null);
+        }
     }
     
     private OutlierLevel evaluateLeftTailed(double value) {
-        if (value <= largeThreshold) {
-            return OutlierLevel.STRONG;
+        if (value <= strongThreshold) {
+            return STRONG;
         } else if (value <= weakThreshold) {
-            return OutlierLevel.WEAK;
+            return WEAK;
         } else {
-            return OutlierLevel.NORMAL;
+            return NORMAL;
         }
     }
     
     private OutlierLevel evaluateRightTailed(double value) {
-        if (value >= largeThreshold) {
-            return OutlierLevel.STRONG;
+        if (value >= strongThreshold) {
+            return STRONG;
         } else if (value >= weakThreshold) {
-            return OutlierLevel.WEAK;
+            return WEAK;
         } else {
-            return OutlierLevel.NORMAL;
+            return NORMAL;
         }
     }
 }

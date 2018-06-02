@@ -18,12 +18,14 @@ package com.expedia.adaptivealerting.tools.visualization;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.data.time.TimeSeries;
-import org.jfree.data.time.TimeSeriesCollection;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYDifferenceRenderer;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.ui.ApplicationFrame;
 import org.jfree.ui.RefineryUtilities;
 
+import java.awt.Color;
 import java.awt.Dimension;
 
 /**
@@ -32,14 +34,47 @@ import java.awt.Dimension;
  * @author Willie Wheeler
  */
 public class ChartUtil {
+    private static final Color BAND_COLOR = new Color(204, 204, 204, 80);
+    private static final Color OBSERVED_COLOR = Color.BLUE;
     
-    public static ApplicationFrame createChartFrame(String title, TimeSeries timeSeries) {
-        ApplicationFrame chartFrame = new ApplicationFrame("White Noise");
-        final XYDataset dataset = new TimeSeriesCollection(timeSeries);
-        final JFreeChart chart = createChart(title, dataset);
+    public static JFreeChart createChart(String title, XYDataset predicted, XYDataset observed) {
+        final JFreeChart chart = ChartFactory.createTimeSeriesChart(
+                title,
+                "Seconds",
+                "Value",
+                predicted,
+                false,
+                false,
+                false);
+        
+        final XYPlot plot = chart.getXYPlot();
+        
+        final XYDifferenceRenderer bandRenderer = new XYDifferenceRenderer();
+        bandRenderer.setPositivePaint(BAND_COLOR);
+        bandRenderer.setSeriesPaint(0, BAND_COLOR);
+        bandRenderer.setSeriesPaint(1, BAND_COLOR);
+    
+        final XYLineAndShapeRenderer observedRenderer = new XYLineAndShapeRenderer(true, false);
+        observedRenderer.setSeriesPaint(0, OBSERVED_COLOR);
+        
+        plot.setDomainGridlinePaint(Color.GRAY);
+        plot.setRangeGridlinePaint(Color.GRAY);
+        plot.setBackgroundPaint(Color.WHITE);
+    
+        plot.setDataset(1, observed);
+        plot.setRenderer(0, bandRenderer);
+        plot.setRenderer(1, observedRenderer);
+        
+        return chart;
+    }
+    
+    public static ApplicationFrame createChartFrame(JFreeChart chart) {
+        ApplicationFrame chartFrame = new ApplicationFrame(chart.getTitle().getText());
+        
         final ChartPanel chartPanel = new ChartPanel(chart);
-        chartPanel.setPreferredSize(new Dimension(600, 480));
+        chartPanel.setPreferredSize(new Dimension(800, 600));
         chartPanel.setMouseZoomable(true, false);
+        
         chartFrame.setContentPane(chartPanel);
         return chartFrame;
     }
@@ -48,16 +83,5 @@ public class ChartUtil {
         chartFrame.pack();
         RefineryUtilities.positionFrameRandomly(chartFrame);
         chartFrame.setVisible(true);
-    }
-    
-    private static JFreeChart createChart(String title, final XYDataset dataset) {
-        return ChartFactory.createTimeSeriesChart(
-                title,
-                "Seconds",
-                "Value",
-                dataset,
-                false,
-                false,
-                false);
     }
 }

@@ -24,7 +24,7 @@ public class KafkaConstantThresholdOutlierDetector {
 
     public static void main(String[] args) {
         DetectorUtil.startStreams(
-                id -> new ConstantThresholdOutlierDetector(RIGHT_TAILED, 0.95, 0.99),
+                id -> new ConstantThresholdOutlierDetector(RIGHT_TAILED, 0.99f, 0.95f),
                 "constant-outlier-detector",
                 "constant-metrics"
         );

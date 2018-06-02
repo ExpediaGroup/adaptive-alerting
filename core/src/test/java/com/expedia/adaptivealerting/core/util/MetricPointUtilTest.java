@@ -15,14 +15,11 @@
  */
 package com.expedia.adaptivealerting.core.util;
 
-import com.expedia.adaptivealerting.core.OutlierLevel;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import org.junit.Test;
 
 import java.time.Instant;
 
-import static com.expedia.adaptivealerting.core.util.MetricPointUtil.OUTLIER_LEVEL_TAG_NAME;
-import static com.expedia.adaptivealerting.core.util.MetricPointUtil.classify;
 import static com.expedia.adaptivealerting.core.util.MetricPointUtil.metricPoint;
 import static org.junit.Assert.assertEquals;
 
@@ -32,13 +29,5 @@ public class MetricPointUtilTest {
     public void testMetricPoint() {
         final MetricPoint actual = metricPoint(Instant.now(), 1.414f);
         assertEquals("data", actual.metric());
-    }
-    
-    @Test
-    public void testClassify() {
-        final MetricPoint orig = metricPoint(Instant.now(), 1.414f);
-        final MetricPoint copy = classify(orig, OutlierLevel.STRONG);
-        assertEquals("data", copy.metric());
-        assertEquals(OutlierLevel.STRONG.name(), copy.tags().get(OUTLIER_LEVEL_TAG_NAME).get());
     }
 }

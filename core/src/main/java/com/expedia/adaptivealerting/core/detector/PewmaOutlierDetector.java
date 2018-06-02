@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.core.detector;
 
-import com.expedia.adaptivealerting.core.OutlierDetector;
 import com.expedia.adaptivealerting.core.OutlierLevel;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
@@ -40,7 +39,7 @@ import static java.lang.Math.*;
  *
  * @author David Sutherland
  */
-public class PewmaOutlierDetector implements OutlierDetector {
+public class PewmaOutlierDetector extends AbstractOutlierDetector {
     static final int DEFAULT_TRAINING_LENGTH = 30;
 
     /**
@@ -73,16 +72,16 @@ public class PewmaOutlierDetector implements OutlierDetector {
      * Internal state for PEWMA algorithm.
      */
     private double s2;
+    
+    /**
+     * Strong outlier threshold, in sigmas.
+     */
+    private final double strongThresholdSigmas;
 
     /**
      * Weak outlier threshold, in sigmas.
      */
-    private final double weakThreshold;
-
-    /**
-     * Strong outlier threshold, in sigmas.
-     */
-    private final double strongThreshold;
+    private final double weakThresholdSigmas;
 
     /**
      * Local mean estimate.
@@ -95,8 +94,8 @@ public class PewmaOutlierDetector implements OutlierDetector {
     private double stdDev;
     
     /**
-     * Creates a new PEWMA outlier detector with initialAlpha = 0, beta = 1.0, weakThreshold = 2.0,
-     * strongThreshold = 3.0 and initValue = 0.0.
+     * Creates a new PEWMA outlier detector with initialAlpha = 0, beta = 1.0, weakThresholdSigmas = 2.0,
+     * strongThresholdSigmas = 3.0 and initValue = 0.0.
      */
     public PewmaOutlierDetector() {
         this(0.5, 1.0, 2.0, 3.0, 0.0);
@@ -107,18 +106,18 @@ public class PewmaOutlierDetector implements OutlierDetector {
      *
      * @param initialAlpha    Smoothing parameter.
      * @param beta            Outlier weighting parameter.
-     * @param weakThreshold   Weak outlier threshold, in sigmas.
-     * @param strongThreshold Strong outlier threshold, in sigmas.
+     * @param weakThresholdSigmas   Weak outlier threshold, in sigmas.
+     * @param strongThresholdSigmas Strong outlier threshold, in sigmas.
      * @param initValue       Initial observation, used to set the first mean estimate.
      */
     public PewmaOutlierDetector(
             double initialAlpha,
             double beta,
-            double weakThreshold,
-            double strongThreshold,
+            double weakThresholdSigmas,
+            double strongThresholdSigmas,
             double initValue
     ) {
-        this(initialAlpha, beta, DEFAULT_TRAINING_LENGTH, weakThreshold, strongThreshold, initValue);
+        this(initialAlpha, beta, DEFAULT_TRAINING_LENGTH, weakThresholdSigmas, strongThresholdSigmas, initValue);
     }
 
     /**
@@ -127,16 +126,16 @@ public class PewmaOutlierDetector implements OutlierDetector {
      * @param initialAlpha    Smoothing parameter.
      * @param beta            Outlier weighting parameter.
      * @param trainingLength  How many iterations to train for.
-     * @param weakThreshold   Weak outlier threshold, in sigmas.
-     * @param strongThreshold Strong outlier threshold, in sigmas.
+     * @param weakThresholdSigmas   Weak outlier threshold, in sigmas.
+     * @param strongThresholdSigmas Strong outlier threshold, in sigmas.
      * @param initValue       Initial observation, used to set the first mean estimate.
      */
     public PewmaOutlierDetector(
             double initialAlpha,
             double beta,
             int trainingLength,
-            double weakThreshold,
-            double strongThreshold,
+            double weakThresholdSigmas,
+            double strongThresholdSigmas,
             double initValue
     ) {
         isBetween(initialAlpha, 0.0, 1.0, "initialAlpha must be in the range [0, 1]");
@@ -145,8 +144,8 @@ public class PewmaOutlierDetector implements OutlierDetector {
         this.beta = beta;
         this.trainingLength = trainingLength;
         this.trainingCount = 1;
-        this.weakThreshold = weakThreshold;
-        this.strongThreshold = strongThreshold;
+        this.weakThresholdSigmas = weakThresholdSigmas;
+        this.strongThresholdSigmas = strongThresholdSigmas;
         this.s1 = initValue;
         this.s2 = initValue*initValue;
         updateMeanAndStdDev();
@@ -158,24 +157,31 @@ public class PewmaOutlierDetector implements OutlierDetector {
     }
     
     @Override
-    public OutlierLevel classify(MetricPoint metricPoint) {
+    public MetricPoint classify(MetricPoint metricPoint) {
         notNull(metricPoint, "metricPoint can't be null");
         
         final float value = metricPoint.value();
         final double dist = abs(value - mean);
-        final double largeThreshold = strongThreshold * stdDev;
-        final double smallThreshold = weakThreshold * stdDev;
+        final double strongThreshold = strongThresholdSigmas * stdDev;
+        final double weakThreshold = weakThresholdSigmas * stdDev;
     
-        OutlierLevel level = OutlierLevel.NORMAL;
-        if (dist > largeThreshold) {
-            level = OutlierLevel.STRONG;
-        } else if (dist > smallThreshold) {
-            level = OutlierLevel.WEAK;
+        OutlierLevel outlierLevel = OutlierLevel.NORMAL;
+        if (dist > strongThreshold) {
+            outlierLevel = OutlierLevel.STRONG;
+        } else if (dist > weakThreshold) {
+            outlierLevel = OutlierLevel.WEAK;
         }
     
+        final MetricPoint tagged = tag(
+                metricPoint,
+                outlierLevel,
+                (float)mean,
+                (float)(mean + strongThreshold),
+                (float)(mean + weakThreshold),
+                (float)(mean - strongThreshold),
+                (float)(mean - weakThreshold));
         updateEstimates(value);
-    
-        return level;
+        return tagged;
     }
 
     private void updateEstimates(double value) {

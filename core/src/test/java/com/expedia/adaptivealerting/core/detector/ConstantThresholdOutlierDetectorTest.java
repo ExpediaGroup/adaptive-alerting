@@ -16,15 +16,20 @@
 
 package com.expedia.adaptivealerting.core.detector;
 
+import com.expedia.adaptivealerting.core.OutlierDetector;
 import com.expedia.adaptivealerting.core.OutlierLevel;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.time.Instant;
 
+import static com.expedia.adaptivealerting.core.OutlierLevel.NORMAL;
+import static com.expedia.adaptivealerting.core.OutlierLevel.STRONG;
+import static com.expedia.adaptivealerting.core.OutlierLevel.WEAK;
 import static com.expedia.adaptivealerting.core.detector.ConstantThresholdOutlierDetector.LEFT_TAILED;
 import static com.expedia.adaptivealerting.core.detector.ConstantThresholdOutlierDetector.RIGHT_TAILED;
 import static com.expedia.adaptivealerting.core.util.MetricPointUtil.metricPoint;
+import static com.expedia.adaptivealerting.core.util.MetricPointUtil.outlierLevel;
 import static junit.framework.TestCase.assertEquals;
 
 /**
@@ -40,64 +45,69 @@ public class ConstantThresholdOutlierDetectorTest {
     
     @Test(expected = IllegalArgumentException.class)
     public void testValidateTail() {
-        new ConstantThresholdOutlierDetector(-1, 0.0, 1.0);
+        new ConstantThresholdOutlierDetector(-1, 1.0f, 0.0f);
     }
     
     @Test(expected = IllegalArgumentException.class)
     public void testValidateLeftTailedThresholds() {
-        new ConstantThresholdOutlierDetector(LEFT_TAILED, 10.0, 30.0);
+        new ConstantThresholdOutlierDetector(LEFT_TAILED, 30.0f, 10.0f);
     }
     
     @Test(expected = IllegalArgumentException.class)
     public void testValidateRightTailedThresholds() {
-        new ConstantThresholdOutlierDetector(RIGHT_TAILED, 30.0, 10.0);
+        new ConstantThresholdOutlierDetector(RIGHT_TAILED, 10.0f, 30.0f);
     }
     
     @Test
     public void testAccessors() {
-        ConstantThresholdOutlierDetector detector = new ConstantThresholdOutlierDetector(RIGHT_TAILED, 30.0, 60.0);
+        ConstantThresholdOutlierDetector detector = new ConstantThresholdOutlierDetector(RIGHT_TAILED, 60.0f, 30.0f);
         assertEquals(RIGHT_TAILED, detector.getTail());
-        assertEquals(30.0, detector.getWeakThreshold());
-        assertEquals(60.0, detector.getLargeThreshold());
+        assertEquals(30.0f, detector.getWeakThreshold());
+        assertEquals(60.0f, detector.getStrongThreshold());
     }
     
     @Test
     public void testEvaluateLeftTailed_positiveThresholds() {
-        ConstantThresholdOutlierDetector detector = new ConstantThresholdOutlierDetector(LEFT_TAILED, 300.0, 100.0);
-        assertEquals(OutlierLevel.NORMAL, detector.classify(metricPoint(instant, 500.0f)));
-        assertEquals(OutlierLevel.WEAK, detector.classify(metricPoint(instant, 300.0f)));
-        assertEquals(OutlierLevel.WEAK, detector.classify(metricPoint(instant, 200.0f)));
-        assertEquals(OutlierLevel.STRONG, detector.classify(metricPoint(instant, 100.0f)));
-        assertEquals(OutlierLevel.STRONG, detector.classify(metricPoint(instant, 50.0f)));
+        ConstantThresholdOutlierDetector detector = new ConstantThresholdOutlierDetector(LEFT_TAILED, 100.0f, 300.0f);
+        assertEquals(NORMAL, level(detector, instant, 500.0f));
+        assertEquals(WEAK, level(detector, instant, 300.0f));
+        assertEquals(WEAK, level(detector, instant, 200.0f));
+        assertEquals(STRONG, level(detector, instant, 100.0f));
+        assertEquals(STRONG, level(detector, instant, 50.0f));
     }
     
     @Test
     public void testEvaluateLeftTailed_negativeThresholds() {
-        ConstantThresholdOutlierDetector detector = new ConstantThresholdOutlierDetector(LEFT_TAILED, -10.0, -30.0);
-        assertEquals(OutlierLevel.NORMAL, detector.classify(metricPoint(instant, 1.0f)));
-        assertEquals(OutlierLevel.WEAK, detector.classify(metricPoint(instant, -10.0f)));
-        assertEquals(OutlierLevel.WEAK, detector.classify(metricPoint(instant, -15.0f)));
-        assertEquals(OutlierLevel.STRONG, detector.classify(metricPoint(instant, -30.0f)));
-        assertEquals(OutlierLevel.STRONG, detector.classify(metricPoint(instant, -50.0f)));
+        ConstantThresholdOutlierDetector detector = new ConstantThresholdOutlierDetector(LEFT_TAILED, -30.0f, -10.0f);
+        assertEquals(NORMAL, level(detector, instant, 1.0f));
+        assertEquals(WEAK, level(detector, instant, -10.0f));
+        assertEquals(WEAK, level(detector, instant, -15.0f));
+        assertEquals(STRONG, level(detector, instant, -30.0f));
+        assertEquals(STRONG, level(detector, instant, -50.0f));
     }
     
     @Test
     public void testEvaluateRightTailed_positiveThresholds() {
-        ConstantThresholdOutlierDetector detector = new ConstantThresholdOutlierDetector(RIGHT_TAILED, 200.0, 300.0);
-        assertEquals(OutlierLevel.NORMAL, detector.classify(metricPoint(instant, 100.0f)));
-        assertEquals(OutlierLevel.WEAK, detector.classify(metricPoint(instant, 200.0f)));
-        assertEquals(OutlierLevel.WEAK, detector.classify(metricPoint(instant, 220.0f)));
-        assertEquals(OutlierLevel.STRONG, detector.classify(metricPoint(instant, 300.0f)));
-        assertEquals(OutlierLevel.STRONG, detector.classify(metricPoint(instant, 8675309.0f)));
+        ConstantThresholdOutlierDetector detector = new ConstantThresholdOutlierDetector(RIGHT_TAILED, 300.0f, 200.0f);
+        assertEquals(NORMAL, level(detector, instant, 100.0f));
+        assertEquals(WEAK, level(detector, instant, 200.0f));
+        assertEquals(WEAK, level(detector, instant, 220.0f));
+        assertEquals(STRONG, level(detector, instant, 300.0f));
+        assertEquals(STRONG, level(detector, instant, 8675309.0f));
     }
     
     @Test
     public void testEvaluateRightTailed_negativeThresholds() {
-        ConstantThresholdOutlierDetector detector = new ConstantThresholdOutlierDetector(RIGHT_TAILED, -300.0, -100.0);
-        assertEquals(OutlierLevel.NORMAL, detector.classify(metricPoint(instant, -1000.0f)));
-        assertEquals(OutlierLevel.WEAK, detector.classify(metricPoint(instant, -300.0f)));
-        assertEquals(OutlierLevel.WEAK, detector.classify(metricPoint(instant, -250.0f)));
-        assertEquals(OutlierLevel.STRONG, detector.classify(metricPoint(instant, -100.0f)));
-        assertEquals(OutlierLevel.STRONG, detector.classify(metricPoint(instant, 0.0f)));
+        ConstantThresholdOutlierDetector detector =
+                new ConstantThresholdOutlierDetector(RIGHT_TAILED, -100.0f, -300.0f);
+        assertEquals(NORMAL, level(detector, instant, -1000.0f));
+        assertEquals(WEAK, level(detector, instant, -300.0f));
+        assertEquals(WEAK, level(detector, instant, -250.0f));
+        assertEquals(STRONG, level(detector, instant, -100.0f));
+        assertEquals(STRONG, level(detector, instant, 0.0f));
+    }
+    
+    private OutlierLevel level(OutlierDetector detector, Instant instant, float value) {
+        return outlierLevel(detector.classify(metricPoint(instant, value)));
     }
 }

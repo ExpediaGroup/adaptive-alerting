@@ -24,9 +24,9 @@ public class WhiteNoisePipeline {
         final MetricSink consoleSink = new ConsoleLogMetricSink();
         filter.addSubscriber(consoleSink);
     
-        final TimeSeries timeSeries = new TimeSeries("white-noise");
-        final ApplicationFrame chartFrame = createChartFrame("White Noise", timeSeries);
-        final MetricSink chartSink = new ChartSink(timeSeries);
+        final TimeSeries observed = new TimeSeries("white-noise");
+        final ApplicationFrame chartFrame = createChartFrame("White Noise", observed);
+        final MetricSink chartSink = new ChartSink(observed);
         filter.addSubscriber(chartSink);
         
         showChartFrame(chartFrame);
@@ -36,6 +36,8 @@ public class WhiteNoisePipeline {
 ```
 
 Here's the associated visualization:
+
+![White noise visualization](./docs/images/data-pipeline-chart.png)
 
 (Note: We'll add threshold bands and running RMSE shortly.)
 
