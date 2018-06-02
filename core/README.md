@@ -1,1 +1,2 @@
-# core
+# Adaptive Alerting - Core
+

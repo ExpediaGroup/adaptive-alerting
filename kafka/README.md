@@ -1,1 +1,1 @@
-# kafka
+# Adaptive Alerting - Kafka

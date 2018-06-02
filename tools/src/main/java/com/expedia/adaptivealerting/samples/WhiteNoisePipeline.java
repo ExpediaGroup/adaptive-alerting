@@ -20,8 +20,14 @@ import com.expedia.adaptivealerting.tools.pipeline.MetricFilter;
 import com.expedia.adaptivealerting.tools.pipeline.MetricSink;
 import com.expedia.adaptivealerting.tools.pipeline.MetricSource;
 import com.expedia.adaptivealerting.tools.pipeline.filter.OutlierDetectorMetricFilter;
+import com.expedia.adaptivealerting.tools.pipeline.sink.ChartSink;
 import com.expedia.adaptivealerting.tools.pipeline.sink.ConsoleLogMetricSink;
 import com.expedia.adaptivealerting.tools.pipeline.source.WhiteNoiseMetricSource;
+import org.jfree.data.time.TimeSeries;
+import org.jfree.ui.ApplicationFrame;
+
+import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.createChartFrame;
+import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showChartFrame;
 
 /**
  * This is a sample pipeline based on white noise and a PEWMA filter.
@@ -36,9 +42,15 @@ public class WhiteNoisePipeline {
         final MetricFilter filter = new OutlierDetectorMetricFilter(new PewmaOutlierDetector());
         source.addSubscriber(filter);
         
-        final MetricSink sink = new ConsoleLogMetricSink();
-        filter.addSubscriber(sink);
+        final MetricSink consoleSink = new ConsoleLogMetricSink();
+        filter.addSubscriber(consoleSink);
+    
+        final TimeSeries timeSeries = new TimeSeries("white-noise");
+        final ApplicationFrame chartFrame = createChartFrame("White Noise", timeSeries);
+        final MetricSink chartSink = new ChartSink(timeSeries);
+        filter.addSubscriber(chartSink);
         
+        showChartFrame(chartFrame);
         source.start();
     }
 }
