@@ -13,23 +13,30 @@ systems like Kafka or Kinesis.
 Here's a sample pipeline:
 
 ```
-public class WhiteNoisePipeline {
+public class CsvPipeline {
     
     public static void main(String[] args) {
-        final MetricSource source = new WhiteNoiseMetricSource();
+        final InputStream is = ClassLoader.getSystemResourceAsStream("samples/sample001.csv");
+        final MetricSource source = new CsvMetricSource(is, "data", 200L);
         
-        final MetricFilter filter = new OutlierDetectorMetricFilter(new PewmaOutlierDetector());
-        source.addSubscriber(filter);
+        final MetricFilter ewmaFilter = new OutlierDetectorMetricFilter(new EwmaOutlierDetector());
+        final MetricFilter pewmaFilter = new OutlierDetectorMetricFilter(new PewmaOutlierDetector());
         
-        final MetricSink consoleSink = new ConsoleLogMetricSink();
-        filter.addSubscriber(consoleSink);
+        final ChartSeries ewmaSeries = new ChartSeries();
+        final ChartSeries pewmaSeries = new ChartSeries();
     
-        final TimeSeries observed = new TimeSeries("white-noise");
-        final ApplicationFrame chartFrame = createChartFrame("White Noise", observed);
-        final MetricSink chartSink = new ChartSink(observed);
-        filter.addSubscriber(chartSink);
+        source.addSubscriber(ewmaFilter);
+        source.addSubscriber(pewmaFilter);
+        ewmaFilter.addSubscriber(new ConsoleLogMetricSink());
+        ewmaFilter.addSubscriber(new ChartSink(ewmaSeries));
+        pewmaFilter.addSubscriber(new ConsoleLogMetricSink());
+        pewmaFilter.addSubscriber(new ChartSink(pewmaSeries));
         
-        showChartFrame(chartFrame);
+        showChartFrame(createChartFrame(
+                "Cal Inflow",
+                createChart("EWMA", ewmaSeries),
+                createChart("PEWMA", pewmaSeries)));
+    
         source.start();
     }
 }
@@ -37,7 +44,7 @@ public class WhiteNoisePipeline {
 
 Here's the associated visualization:
 
-![White noise visualization](./docs/images/data-pipeline-chart.png)
+![Data pipeline chart](./docs/images/ewma-v-pewma.png)
 
 (Note: We'll add threshold bands and running RMSE shortly.)
 

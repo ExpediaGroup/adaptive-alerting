@@ -42,16 +42,16 @@ public abstract class AbstractOutlierDetector implements OutlierDetector {
             tags = tags.updated(PREDICTION, prediction);
         }
         if (upperThresholdStrong != null) {
-            tags = tags.updated(UPPER_THRESHOLD_STRONG, upperThresholdStrong);
+            tags = tags.updated(STRONG_THRESHOLD_UPPER, upperThresholdStrong);
         }
         if (upperThresholdWeak != null) {
-            tags = tags.updated(UPPER_THRESHOLD_WEAK, upperThresholdWeak);
+            tags = tags.updated(WEAK_THRESHOLD_UPPER, upperThresholdWeak);
         }
         if (lowerThresholdStrong != null) {
-            tags = tags.updated(LOWER_THRESHOLD_STRONG, lowerThresholdStrong);
+            tags = tags.updated(STRONG_THRESHOLD_LOWER, lowerThresholdStrong);
         }
         if (lowerThresholdWeak != null) {
-            tags = tags.updated(LOWER_THRESHOLD_WEAK, lowerThresholdWeak);
+            tags = tags.updated(WEAK_THRESHOLD_LOWER, lowerThresholdWeak);
         }
     
         return new MetricPoint(

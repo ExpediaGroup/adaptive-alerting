@@ -15,44 +15,59 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.sink;
 
+import com.expedia.adaptivealerting.core.OutlierLevel;
 import com.expedia.adaptivealerting.tools.pipeline.MetricSink;
+import com.expedia.adaptivealerting.tools.visualization.ChartSeries;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeries;
 
+import static com.expedia.adaptivealerting.core.OutlierLevel.STRONG;
+import static com.expedia.adaptivealerting.core.OutlierLevel.WEAK;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
-import static com.expedia.adaptivealerting.core.util.MetricPointTags.LOWER_THRESHOLD_STRONG;
-import static com.expedia.adaptivealerting.core.util.MetricPointTags.UPPER_THRESHOLD_STRONG;
+import static com.expedia.adaptivealerting.core.util.MetricPointTags.*;
+import static com.expedia.adaptivealerting.core.util.MetricPointUtil.outlierLevel;
 import static com.expedia.adaptivealerting.core.util.MetricPointUtil.thresholdValue;
 
 public class ChartSink implements MetricSink {
-    private final TimeSeries predictedUpper;
-    private final TimeSeries predictedLower;
-    private final TimeSeries observed;
+    private final ChartSeries chartSeries;
     
     // FIXME For now, just impose timestamps.
     // Later update to use actual metric point timestamps.
     private Second currentSecond;
     
-    public ChartSink(TimeSeries predictedUpper, TimeSeries predictedLower, TimeSeries observed) {
-        notNull(predictedUpper, "predictedUpper can't be null");
-        notNull(predictedLower, "predictedLower can't be null");
-        notNull(observed, "observed can't be null");
-        
-        this.predictedUpper = predictedUpper;
-        this.predictedLower = predictedLower;
-        this.observed = observed;
+    public ChartSink(ChartSeries chartSeries) {
+        notNull(chartSeries, "chartSeries can't be null");
+        this.chartSeries = chartSeries;
     }
     
     @Override
     public void next(MetricPoint metricPoint) {
         this.currentSecond = (currentSecond == null ? new Second() : (Second) currentSecond.next());
-        final float value = metricPoint.value();
-        final float upperThresholdStrong = thresholdValue(metricPoint, UPPER_THRESHOLD_STRONG);
-        final float lowerThresholdStrong = thresholdValue(metricPoint, LOWER_THRESHOLD_STRONG);
         
-        predictedUpper.add(currentSecond, upperThresholdStrong);
-        predictedLower.add(currentSecond, lowerThresholdStrong);
-        observed.add(currentSecond, value);
+        final float observed = metricPoint.value();
+        final OutlierLevel level = outlierLevel(metricPoint);
+        
+        chartSeries.getObserved().add(currentSecond, observed);
+        
+        addPoint(metricPoint, chartSeries.getMidpoint(), PREDICTION);
+        addPoint(metricPoint, chartSeries.getStrongThresholdUpper(), STRONG_THRESHOLD_UPPER);
+        addPoint(metricPoint, chartSeries.getStrongThresholdLower(), STRONG_THRESHOLD_LOWER);
+        addPoint(metricPoint, chartSeries.getWeakThresholdUpper(), WEAK_THRESHOLD_UPPER);
+        addPoint(metricPoint, chartSeries.getWeakThresoldLower(), WEAK_THRESHOLD_LOWER);
+        
+        if (level == STRONG) {
+            chartSeries.getStrongOutlier().add(currentSecond, observed);
+        } else if (level == WEAK) {
+            chartSeries.getWeakOutlier().add(currentSecond, observed);
+        }
+        
+    }
+    
+    private void addPoint(MetricPoint metricPoint, TimeSeries timeSeries, String tagName) {
+        final Float value = thresholdValue(metricPoint, tagName);
+        if (value != null) {
+            timeSeries.add(currentSecond, value);
+        }
     }
 }

@@ -98,7 +98,7 @@ public class PewmaOutlierDetector extends AbstractOutlierDetector {
      * strongThresholdSigmas = 3.0 and initValue = 0.0.
      */
     public PewmaOutlierDetector() {
-        this(0.5, 1.0, 2.0, 3.0, 0.0);
+        this(0.15, 1.0, 2.0, 3.0, 0.0);
     }
     
     /**
