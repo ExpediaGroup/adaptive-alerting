@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.core.detector;
 
-import com.expedia.adaptivealerting.core.OutlierLevel;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBeanBuilder;
@@ -70,8 +69,8 @@ public class PewmaOutlierDetectorTest {
             assertApproxEqual(ewmaOutlierDetector.getMean(), pewmaOutlierDetector.getMean(), threshold);
             assertApproxEqual(ewmaStdDev, pewmaOutlierDetector.getStdDev(), threshold);
             
-            final MetricPoint pewmaResult = pewmaOutlierDetector.classify(metricPoint(Instant.now(), value));
-            final MetricPoint ewmaResult = ewmaOutlierDetector.classify(metricPoint(Instant.now(), value));
+            final MetricPoint pewmaResult = pewmaOutlierDetector.classifyAndEnrich(metricPoint(Instant.now(), value));
+            final MetricPoint ewmaResult = ewmaOutlierDetector.classifyAndEnrich(metricPoint(Instant.now(), value));
             
             OutlierLevel pOL = outlierLevel(pewmaResult);
             OutlierLevel eOL = outlierLevel(ewmaResult);
@@ -98,7 +97,7 @@ public class PewmaOutlierDetectorTest {
 
             // This detector doesn't currently do anything with the instant, so we can just pass now().
             // This may change in the future.
-            final MetricPoint result = detector.classify(metricPoint(Instant.now(), (float) observed));
+            final MetricPoint result = detector.classifyAndEnrich(metricPoint(Instant.now(), (float) observed));
             
             final OutlierLevel level = outlierLevel(result);
             assertApproxEqual(testRow.getMean(), detector.getMean(), 0.00001);

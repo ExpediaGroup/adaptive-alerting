@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core;
+package com.expedia.adaptivealerting.core.detector;
 
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
@@ -28,7 +28,20 @@ public interface OutlierDetector {
      * Classifies the given metric point.
      *
      * @param metricPoint Metric point.
-     * @return A new copy of the metric point, with classification and additional information attached.
+     * @return Outlier classification result, with supporting data such as the prediction, outlier score and various
+     * thresholds.
      */
-    MetricPoint classify(MetricPoint metricPoint);
+    OutlierDetectorResult classify(MetricPoint metricPoint);
+    
+    /**
+     * Classifies the given metric point, and enriches it with the classification.
+     *
+     * @param metricPoint Metric point.
+     * @return A new copy of the metric point, with classification and additional information attached.
+     * @deprecated It is incorrect to add the outlier classification result and supporting data to the metric point as
+     * tags. Metric 2.0 tags are intended to identify the metric itself, not the metric values. Use
+     * {@link #classify(MetricPoint)} instead.
+     */
+    @Deprecated
+    MetricPoint classifyAndEnrich(MetricPoint metricPoint);
 }

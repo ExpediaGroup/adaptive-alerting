@@ -15,15 +15,15 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.sink;
 
-import com.expedia.adaptivealerting.core.OutlierLevel;
+import com.expedia.adaptivealerting.core.detector.OutlierLevel;
 import com.expedia.adaptivealerting.tools.pipeline.MetricSink;
 import com.expedia.adaptivealerting.tools.visualization.ChartSeries;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeries;
 
-import static com.expedia.adaptivealerting.core.OutlierLevel.STRONG;
-import static com.expedia.adaptivealerting.core.OutlierLevel.WEAK;
+import static com.expedia.adaptivealerting.core.detector.OutlierLevel.STRONG;
+import static com.expedia.adaptivealerting.core.detector.OutlierLevel.WEAK;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 import static com.expedia.adaptivealerting.core.util.MetricPointTags.*;
 import static com.expedia.adaptivealerting.core.util.MetricPointUtil.outlierLevel;
