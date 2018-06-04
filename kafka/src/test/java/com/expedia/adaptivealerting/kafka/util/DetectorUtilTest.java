@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.kafka.util;
 
-import com.expedia.adaptivealerting.core.OutlierDetector;
+import com.expedia.adaptivealerting.core.detector.OutlierDetector;
 import com.expedia.adaptivealerting.core.detector.ConstantThresholdOutlierDetector;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.entities.MetricType;

@@ -15,9 +15,11 @@
  */
 package com.expedia.adaptivealerting.core.detector;
 
-import com.expedia.adaptivealerting.core.OutlierLevel;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
+import static com.expedia.adaptivealerting.core.detector.OutlierLevel.NORMAL;
+import static com.expedia.adaptivealerting.core.detector.OutlierLevel.STRONG;
+import static com.expedia.adaptivealerting.core.detector.OutlierLevel.WEAK;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.isBetween;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 import static java.lang.Math.*;
@@ -41,33 +43,32 @@ import static java.lang.Math.*;
  */
 public class PewmaOutlierDetector extends AbstractOutlierDetector {
     static final int DEFAULT_TRAINING_LENGTH = 30;
-
+    
     /**
      * Smoothing param.
      */
     private final double alpha0;
-
-
+    
     /**
      * Outlier weighting param.
      */
     private final double beta;
-
+    
     /**
      * How many iterations to train for.
      */
     private final double trainingLength;
-
+    
     /**
      * Smoothing param.
      */
     private double trainingCount;
-
+    
     /**
      * Internal state for PEWMA algorithm.
      */
     private double s1;
-
+    
     /**
      * Internal state for PEWMA algorithm.
      */
@@ -77,38 +78,50 @@ public class PewmaOutlierDetector extends AbstractOutlierDetector {
      * Strong outlier threshold, in sigmas.
      */
     private final double strongThresholdSigmas;
-
+    
     /**
      * Weak outlier threshold, in sigmas.
      */
     private final double weakThresholdSigmas;
-
+    
     /**
      * Local mean estimate.
      */
     private double mean;
-
+    
     /**
      * Local standard deviation estimate.
      */
     private double stdDev;
     
     /**
-     * Creates a new PEWMA outlier detector with initialAlpha = 0, beta = 1.0, weakThresholdSigmas = 2.0,
+     * Creates a new PEWMA outlier detector with initialAlpha = 0.15, beta = 1.0, weakThresholdSigmas = 2.0,
      * strongThresholdSigmas = 3.0 and initValue = 0.0.
      */
     public PewmaOutlierDetector() {
         this(0.15, 1.0, 2.0, 3.0, 0.0);
     }
     
+    // FIXME "initialAlpha" is a confusing name for this parameter as it suggests that the value evolves over time.
+    // I understand that the intent is to handle reversing the alpha. I would suggest just using "alpha" as the param
+    // name since that's what we expose to the client, and then choosing some other name internally (lambda or
+    // reverseAlpha or alphaPrime or whatever). I think it's more important that EWMA and PEWMA expose use the same
+    // name for the parameter in question than it is for this implementation to use the same name as what's in the
+    // paper.
+    //
+    // If you think that's likely to be confusing, then another option would be to expose a parameter called "lambda"
+    // on both EWMA and PEWMA, and then use alpha here as per the paper.
+    //
+    // I don't have a strong preference between those two. [WLW]
+    
     /**
      * Creates a new PEWMA outlier detector. Initial mean is given by initValue and initial standard deviation is 0.
      *
-     * @param initialAlpha    Smoothing parameter.
-     * @param beta            Outlier weighting parameter.
+     * @param initialAlpha          Smoothing parameter.
+     * @param beta                  Outlier weighting parameter.
      * @param weakThresholdSigmas   Weak outlier threshold, in sigmas.
      * @param strongThresholdSigmas Strong outlier threshold, in sigmas.
-     * @param initValue       Initial observation, used to set the first mean estimate.
+     * @param initValue             Initial observation, used to set the first mean estimate.
      */
     public PewmaOutlierDetector(
             double initialAlpha,
@@ -119,16 +132,16 @@ public class PewmaOutlierDetector extends AbstractOutlierDetector {
     ) {
         this(initialAlpha, beta, DEFAULT_TRAINING_LENGTH, weakThresholdSigmas, strongThresholdSigmas, initValue);
     }
-
+    
     /**
      * Creates a new PEWMA outlier detector. Initial mean is given by initValue and initial standard deviation is 0.
      *
-     * @param initialAlpha    Smoothing parameter.
-     * @param beta            Outlier weighting parameter.
-     * @param trainingLength  How many iterations to train for.
+     * @param initialAlpha          Smoothing parameter.
+     * @param beta                  Outlier weighting parameter.
+     * @param trainingLength        How many iterations to train for.
      * @param weakThresholdSigmas   Weak outlier threshold, in sigmas.
      * @param strongThresholdSigmas Strong outlier threshold, in sigmas.
-     * @param initValue       Initial observation, used to set the first mean estimate.
+     * @param initValue             Initial observation, used to set the first mean estimate.
      */
     public PewmaOutlierDetector(
             double initialAlpha,
@@ -139,7 +152,7 @@ public class PewmaOutlierDetector extends AbstractOutlierDetector {
             double initValue
     ) {
         isBetween(initialAlpha, 0.0, 1.0, "initialAlpha must be in the range [0, 1]");
-
+        
         this.alpha0 = 1 - initialAlpha;  // To standardise with the EWMA implementation we use the complement value.
         this.beta = beta;
         this.trainingLength = trainingLength;
@@ -147,69 +160,88 @@ public class PewmaOutlierDetector extends AbstractOutlierDetector {
         this.weakThresholdSigmas = weakThresholdSigmas;
         this.strongThresholdSigmas = strongThresholdSigmas;
         this.s1 = initValue;
-        this.s2 = initValue*initValue;
+        this.s2 = initValue * initValue;
         updateMeanAndStdDev();
     }
-
+    
     private void updateMeanAndStdDev() {
         this.mean = this.s1;
-        this.stdDev = sqrt(this.s2 - this.s1*this.s1);
+        this.stdDev = sqrt(this.s2 - this.s1 * this.s1);
     }
     
     @Override
-    public MetricPoint classify(MetricPoint metricPoint) {
+    public OutlierDetectorResult classify(MetricPoint metricPoint) {
         notNull(metricPoint, "metricPoint can't be null");
-        
-        final float value = metricPoint.value();
-        final double dist = abs(value - mean);
-        final double strongThreshold = strongThresholdSigmas * stdDev;
-        final double weakThreshold = weakThresholdSigmas * stdDev;
     
-        OutlierLevel outlierLevel = OutlierLevel.NORMAL;
+        final double observed = metricPoint.value();
+        final double dist = abs(observed - mean);
+        final double weakThreshold = weakThresholdSigmas * stdDev;
+        final double strongThreshold = strongThresholdSigmas * stdDev;
+    
+        OutlierLevel outlierLevel = NORMAL;
         if (dist > strongThreshold) {
-            outlierLevel = OutlierLevel.STRONG;
+            outlierLevel = STRONG;
         } else if (dist > weakThreshold) {
-            outlierLevel = OutlierLevel.WEAK;
+            outlierLevel = WEAK;
         }
     
-        final MetricPoint tagged = tag(
-                metricPoint,
-                outlierLevel,
-                (float)mean,
-                (float)(mean + strongThreshold),
-                (float)(mean + weakThreshold),
-                (float)(mean - strongThreshold),
-                (float)(mean - weakThreshold));
-        updateEstimates(value);
-        return tagged;
+        final OutlierDetectorResult result = new OutlierDetectorResult();
+        result.setEpochSecond(metricPoint.epochTimeInSeconds());
+        result.setObserved(observed);
+        result.setPredicted(mean);
+        result.setWeakThresholdUpper(mean + weakThreshold);
+        result.setWeakThresholdLower(mean - weakThreshold);
+        result.setStrongThresholdUpper(mean + strongThreshold);
+        result.setStrongThresholdLower(mean - strongThreshold);
+        result.setOutlierScore(dist);
+        result.setOutlierLevel(outlierLevel);
+    
+        updateEstimates(observed);
+    
+        return result;
     }
-
+    
+    @Override
+    public MetricPoint classifyAndEnrich(MetricPoint metricPoint) {
+        notNull(metricPoint, "metricPoint can't be null");
+    
+        final OutlierDetectorResult result = classify(metricPoint);
+        return tag(
+                metricPoint,
+                result.getOutlierLevel(),
+                result.getPredicted(),
+                result.getWeakThresholdUpper(),
+                result.getWeakThresholdLower(),
+                result.getStrongThresholdUpper(),
+                result.getStrongThresholdLower());
+    }
+    
     private void updateEstimates(double value) {
         double zt = 0;
         if (this.stdDev != 0) {
-            zt = (value - this.mean)/this.stdDev;
+            zt = (value - this.mean) / this.stdDev;
         }
-        double pt = (1/sqrt(2*Math.PI)) * exp(-0.5*zt*zt);
+        double pt = (1 / sqrt(2 * Math.PI)) * exp(-0.5 * zt * zt);
         double alpha = calculateAlpha(pt);
-
-        this.s1 = alpha*this.s1 + (1 - alpha)*value;
-        this.s2 = alpha*this.s2 + (1 - alpha)*value*value;
-
+        
+        this.s1 = alpha * this.s1 + (1 - alpha) * value;
+        this.s2 = alpha * this.s2 + (1 - alpha) * value * value;
+        
         updateMeanAndStdDev();
     }
-
+    
     private double calculateAlpha(double pt) {
         if (this.trainingCount < this.trainingLength) {
             this.trainingCount++;
-            return 1 - 1.0/this.trainingCount;
+            return 1 - 1.0 / this.trainingCount;
         }
-        return (1 - this.beta*pt)*this.alpha0;
+        return (1 - this.beta * pt) * this.alpha0;
     }
-
+    
     public double getMean() {
         return mean;
     }
-
+    
     public double getStdDev() {
         return stdDev;
     }

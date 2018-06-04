@@ -15,8 +15,6 @@
  */
 package com.expedia.adaptivealerting.core.detector;
 
-import com.expedia.adaptivealerting.core.OutlierDetector;
-import com.expedia.adaptivealerting.core.OutlierLevel;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import scala.collection.immutable.Map;
 
@@ -27,11 +25,11 @@ public abstract class AbstractOutlierDetector implements OutlierDetector {
     protected MetricPoint tag(
             MetricPoint metricPoint,
             OutlierLevel outlierLevel,
-            Float prediction,
-            Float upperThresholdStrong,
-            Float upperThresholdWeak,
-            Float lowerThresholdStrong,
-            Float lowerThresholdWeak) {
+            Double prediction,
+            Double weakThresholdUpper,
+            Double weakThresholdLower,
+            Double strongThresholdUpper,
+            Double strongThresholdLower) {
     
         Map tags = metricPoint.tags();
         
@@ -39,19 +37,19 @@ public abstract class AbstractOutlierDetector implements OutlierDetector {
             tags = tags.updated(OUTLIER_LEVEL, outlierLevel.name());
         }
         if (prediction != null) {
-            tags = tags.updated(PREDICTION, prediction);
+            tags = tags.updated(PREDICTION, prediction.floatValue());
         }
-        if (upperThresholdStrong != null) {
-            tags = tags.updated(STRONG_THRESHOLD_UPPER, upperThresholdStrong);
+        if (weakThresholdUpper != null) {
+            tags = tags.updated(WEAK_THRESHOLD_UPPER, weakThresholdUpper.floatValue());
         }
-        if (upperThresholdWeak != null) {
-            tags = tags.updated(WEAK_THRESHOLD_UPPER, upperThresholdWeak);
+        if (weakThresholdLower != null) {
+            tags = tags.updated(WEAK_THRESHOLD_LOWER, weakThresholdLower.floatValue());
         }
-        if (lowerThresholdStrong != null) {
-            tags = tags.updated(STRONG_THRESHOLD_LOWER, lowerThresholdStrong);
+        if (strongThresholdUpper != null) {
+            tags = tags.updated(STRONG_THRESHOLD_UPPER, strongThresholdUpper.floatValue());
         }
-        if (lowerThresholdWeak != null) {
-            tags = tags.updated(WEAK_THRESHOLD_LOWER, lowerThresholdWeak);
+        if (strongThresholdLower != null) {
+            tags = tags.updated(STRONG_THRESHOLD_LOWER, strongThresholdLower.floatValue());
         }
     
         return new MetricPoint(

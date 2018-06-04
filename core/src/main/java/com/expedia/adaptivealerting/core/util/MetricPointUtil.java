@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.core.util;
 
-import com.expedia.adaptivealerting.core.OutlierLevel;
+import com.expedia.adaptivealerting.core.detector.OutlierLevel;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.entities.MetricType;
 import scala.Enumeration;

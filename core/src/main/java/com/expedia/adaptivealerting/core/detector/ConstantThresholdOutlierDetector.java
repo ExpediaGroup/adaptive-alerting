@@ -15,12 +15,9 @@
  */
 package com.expedia.adaptivealerting.core.detector;
 
-import com.expedia.adaptivealerting.core.OutlierLevel;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
-import static com.expedia.adaptivealerting.core.OutlierLevel.NORMAL;
-import static com.expedia.adaptivealerting.core.OutlierLevel.STRONG;
-import static com.expedia.adaptivealerting.core.OutlierLevel.WEAK;
+import static com.expedia.adaptivealerting.core.detector.OutlierLevel.*;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 
 /**
@@ -33,8 +30,8 @@ public class ConstantThresholdOutlierDetector extends AbstractOutlierDetector {
     public static final int RIGHT_TAILED = 1;
     
     private final int tail;
-    private final float strongThreshold;
-    private final float weakThreshold;
+    private final double strongThreshold;
+    private final double weakThreshold;
     
     // TODO Support two-tailed strategy.
     
@@ -42,11 +39,12 @@ public class ConstantThresholdOutlierDetector extends AbstractOutlierDetector {
      * Builds a constant-threshold anomaly detector that performs anomaly tests in the specified tail. For left-tailed
      * detectors we expect strongThreshold &lt;= weakThreshold, and for right-tailed detectors we expect
      * weakThreshold &lt;= strongThreshold.
-     *  @param tail            Either LEFT_TAILED or RIGHT_TAILED.
+     *
+     * @param tail            Either LEFT_TAILED or RIGHT_TAILED.
      * @param strongThreshold Large outlier threshold.
      * @param weakThreshold   Small outlier threshold.
      */
-    public ConstantThresholdOutlierDetector(int tail, float strongThreshold, float weakThreshold) {
+    public ConstantThresholdOutlierDetector(int tail, double strongThreshold, double weakThreshold) {
         if (tail == LEFT_TAILED) {
             isTrue(strongThreshold <= weakThreshold, "Left-tailed detector requires strongThreshold <= weakThreshold");
         } else if (tail == RIGHT_TAILED) {
@@ -64,43 +62,66 @@ public class ConstantThresholdOutlierDetector extends AbstractOutlierDetector {
         return tail;
     }
     
-    public Float getWeakThreshold() {
+    public double getWeakThreshold() {
         return weakThreshold;
     }
     
-    public Float getStrongThreshold() {
+    public double getStrongThreshold() {
         return strongThreshold;
     }
     
     @Override
-    public MetricPoint classify(MetricPoint metricPoint) {
-        final float value = metricPoint.value();
+    public OutlierDetectorResult classify(MetricPoint metricPoint) {
+        final double observed = metricPoint.value();
+        
+        Double weakThresholdUpper = null;
+        Double weakThresholdLower = null;
+        Double strongThresholdUpper = null;
+        Double strongThresholdLower = null;
+        OutlierLevel outlierLevel = NORMAL;
+        
         if (tail == LEFT_TAILED) {
-            final OutlierLevel level = evaluateLeftTailed(value);
-            return tag(metricPoint, level, null, null, null, strongThreshold, weakThreshold);
-        } else { // right-tailed til we handle two-tailed
-            final OutlierLevel level = evaluateRightTailed(value);
-            return tag(metricPoint, level, null, strongThreshold, weakThreshold, null, null);
+            weakThresholdLower = weakThreshold;
+            strongThresholdLower = strongThreshold;
+            if (observed <= strongThreshold) {
+                outlierLevel = STRONG;
+            } else if (observed <= weakThreshold) {
+                outlierLevel = WEAK;
+            }
+        } else if (tail == RIGHT_TAILED) {
+            weakThresholdUpper = weakThreshold;
+            strongThresholdUpper = strongThreshold;
+            if (observed >= strongThreshold) {
+                outlierLevel = STRONG;
+            } else if (observed >= weakThreshold) {
+                outlierLevel = WEAK;
+            }
+        } else {
+            throw new IllegalStateException("Illegal tail: " + tail);
         }
+        
+        final OutlierDetectorResult result = new OutlierDetectorResult();
+        result.setEpochSecond(metricPoint.epochTimeInSeconds());
+        result.setObserved(observed);
+        result.setWeakThresholdUpper(weakThresholdUpper);
+        result.setWeakThresholdLower(weakThresholdLower);
+        result.setStrongThresholdUpper(strongThresholdUpper);
+        result.setStrongThresholdLower(strongThresholdLower);
+        result.setOutlierLevel(outlierLevel);
+        return result;
     }
     
-    private OutlierLevel evaluateLeftTailed(double value) {
-        if (value <= strongThreshold) {
-            return STRONG;
-        } else if (value <= weakThreshold) {
-            return WEAK;
-        } else {
-            return NORMAL;
-        }
-    }
-    
-    private OutlierLevel evaluateRightTailed(double value) {
-        if (value >= strongThreshold) {
-            return STRONG;
-        } else if (value >= weakThreshold) {
-            return WEAK;
-        } else {
-            return NORMAL;
-        }
+    @Override
+    public MetricPoint classifyAndEnrich(MetricPoint metricPoint) {
+        final OutlierDetectorResult result = classify(metricPoint);
+        return tag(
+                metricPoint,
+                result.getOutlierLevel(),
+                result.getPredicted(),
+                result.getWeakThresholdUpper(),
+                result.getWeakThresholdLower(),
+                result.getStrongThresholdUpper(),
+                result.getStrongThresholdLower()
+        );
     }
 }

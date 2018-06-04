@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.kafka.util;
 
-import com.expedia.adaptivealerting.core.OutlierDetector;
+import com.expedia.adaptivealerting.core.detector.OutlierDetector;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.entities.MetricType;
 import com.expedia.www.haystack.commons.entities.encoders.Encoder;
@@ -92,7 +92,7 @@ public class DetectorUtil {
         }
 
         final OutlierDetector detector = detectors.get(metricId);
-        return detector.classify(metricPoint);
+        return detector.classifyAndEnrich(metricPoint);
     }
 
     static String extractMetricId(MetricPoint metricPoint) {

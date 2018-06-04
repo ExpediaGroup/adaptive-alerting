@@ -15,10 +15,13 @@
  */
 package com.expedia.adaptivealerting.core.detector;
 
-import com.expedia.adaptivealerting.core.OutlierLevel;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
+import static com.expedia.adaptivealerting.core.detector.OutlierLevel.NORMAL;
+import static com.expedia.adaptivealerting.core.detector.OutlierLevel.STRONG;
+import static com.expedia.adaptivealerting.core.detector.OutlierLevel.WEAK;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.isBetween;
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 import static java.lang.Math.abs;
 import static java.lang.Math.sqrt;
 
@@ -41,7 +44,7 @@ public class EwmaOutlierDetector extends AbstractOutlierDetector {
     
     /**
      * Smoothing param. Somewhat misnamed because higher values lead to less smoothing, but it's called the smoothing
-     * smoothing parameter in the literature.
+     * parameter in the literature.
      */
     private double alpha;
     
@@ -66,8 +69,8 @@ public class EwmaOutlierDetector extends AbstractOutlierDetector {
     private double variance;
     
     /**
-     * Creates a new EWMA outlier detector with alpha = 0.5, weakThresholdSigmas = 2.0, strongThresholdSigmas = 3.0 and initValue =
-     * 0.0.
+     * Creates a new EWMA outlier detector with alpha = 0.15, weakThresholdSigmas = 2.0, strongThresholdSigmas = 3.0 and
+     * initValue = 0.0.
      */
     public EwmaOutlierDetector() {
         this(0.15, 3.0, 2.0, 0.0);
@@ -75,10 +78,11 @@ public class EwmaOutlierDetector extends AbstractOutlierDetector {
     
     /**
      * Creates a new EWMA outlier detector. Initial mean is given by initValue and initial variance is 0.
-     *  @param alpha           Smoothing parameter.
+     *
+     * @param alpha                 Smoothing parameter.
      * @param strongThresholdSigmas Strong outlier threshold, in sigmas.
      * @param weakThresholdSigmas   Weak outlier threshold, in sigmas.
-     * @param initValue       Initial observation, used to set the first mean estimate.
+     * @param initValue             Initial observation, used to set the first mean estimate.
      */
     public EwmaOutlierDetector(
             double alpha,
@@ -116,33 +120,51 @@ public class EwmaOutlierDetector extends AbstractOutlierDetector {
     }
     
     @Override
-    public MetricPoint classify(MetricPoint metricPoint) {
-        OutlierLevel outlierLevel = null;
+    public OutlierDetectorResult classify(MetricPoint metricPoint) {
+        notNull(metricPoint, "metricPoint can't be null");
     
-        final float value = metricPoint.value();
-        final double dist = abs(value - mean);
+        final double observed = metricPoint.value();
+        final double dist = abs(observed - mean);
         final double stdDev = sqrt(variance);
-        final double strongThreshold = strongThresholdSigmas * stdDev;
         final double weakThreshold = weakThresholdSigmas * stdDev;
+        final double strongThreshold = strongThresholdSigmas * stdDev;
     
+        OutlierLevel outlierLevel = NORMAL;
         if (dist > strongThreshold) {
-            outlierLevel = OutlierLevel.STRONG;
+            outlierLevel = STRONG;
         } else if (dist > weakThreshold) {
-            outlierLevel = OutlierLevel.WEAK;
-        } else {
-            outlierLevel = OutlierLevel.NORMAL;
+            outlierLevel = WEAK;
         }
+    
+        final OutlierDetectorResult result = new OutlierDetectorResult();
+        result.setEpochSecond(metricPoint.epochTimeInSeconds());
+        result.setObserved(observed);
+        result.setPredicted(mean);
+        result.setWeakThresholdUpper(mean + weakThreshold);
+        result.setWeakThresholdLower(mean - weakThreshold);
+        result.setStrongThresholdUpper(mean + strongThreshold);
+        result.setStrongThresholdLower(mean - strongThreshold);
+        result.setOutlierScore(dist);
+        result.setOutlierLevel(outlierLevel);
+    
+        updateEstimates(observed);
         
-        final MetricPoint tagged = tag(
+        return result;
+    }
+    
+    @Override
+    public MetricPoint classifyAndEnrich(MetricPoint metricPoint) {
+        notNull(metricPoint, "metricPoint can't be null");
+        
+        final OutlierDetectorResult result = classify(metricPoint);
+        return tag(
                 metricPoint,
-                outlierLevel,
-                (float)mean,
-                (float)(mean + strongThreshold),
-                (float)(mean + weakThreshold),
-                (float)(mean - strongThreshold),
-                (float)(mean - weakThreshold));
-        updateEstimates(value);
-        return tagged;
+                result.getOutlierLevel(),
+                result.getPredicted(),
+                result.getWeakThresholdUpper(),
+                result.getWeakThresholdLower(),
+                result.getStrongThresholdUpper(),
+                result.getStrongThresholdLower());
     }
     
     private void updateEstimates(double value) {
