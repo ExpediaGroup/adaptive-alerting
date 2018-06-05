@@ -60,14 +60,4 @@ public final class MetricPointUtil {
     public static MetricPoint metricPoint(String name, Instant instant, float value) {
         return new MetricPoint(name, DEFAULT_TYPE, DEFAULT_TAGS, value, instant.getEpochSecond());
     }
-    
-//    public static OutlierLevel outlierLevel(MetricPoint metricPoint) {
-//        final Option option = metricPoint.tags().get(OUTLIER_LEVEL);
-//        return (option.isEmpty() ? null : OutlierLevel.valueOf((String) option.get()));
-//    }
-//
-//    public static Float thresholdValue(MetricPoint metricPoint, String tagName) {
-//        final Option option = metricPoint.tags().get(tagName);
-//        return (option.isEmpty() ? null : (Float) option.get());
-//    }
 }
