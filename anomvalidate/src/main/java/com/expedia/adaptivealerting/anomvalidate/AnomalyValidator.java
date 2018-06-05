@@ -13,27 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect;
+package com.expedia.adaptivealerting.anomvalidate;
+
+import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 
 /**
- * Outlier level enum.
+ * Anomaly validator interface.
  *
  * @author Willie Wheeler
  */
-public enum AnomalyLevel {
+public interface AnomalyValidator {
     
     /**
-     * Normal data point (not an outlier).
+     * Validates the given anomaly result.
+     *
+     * @param result Anomaly result.
+     * @return Validated anomaly result.
      */
-    NORMAL,
-    
-    /**
-     * Weak outlier.
-     */
-    WEAK,
-    
-    /**
-     * Strong outlier.
-     */
-    STRONG
+    AnomalyResult validate(AnomalyResult result);
 }

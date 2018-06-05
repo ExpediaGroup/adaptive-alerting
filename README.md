@@ -32,5 +32,8 @@ For more details, see
 
 - [Architectural overview](docs/architecture.md)
 - [Core platform](core/README.md)
+- [Anomaly detection](anomdetect/README.md)
+- [Anomaly validation](anomvalidate/README.md)
 - [Kafka deployments](kafka/README.md)
 - [Development tools](tools/README.md)
+- [Samples](samples/README.md)

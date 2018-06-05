@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.kafka.util;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.AnomalyResult;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.entities.MetricType;
 import com.expedia.www.haystack.commons.entities.encoders.Encoder;

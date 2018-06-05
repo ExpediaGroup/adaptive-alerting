@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.tools.pipeline.filter;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.AnomalyResult;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.tools.pipeline.StreamPublisherSupport;
 import com.expedia.adaptivealerting.tools.pipeline.StreamSubscriber;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
