@@ -30,9 +30,10 @@
     <url>https://github.com/ExpediaDotCom/haystack-adaptive-alerting</url>
 
     <modules>
-        <module>core</module>
         <module>anomdetect</module>
+        <module>core</module>
         <module>kafka</module>
+        <module>samples</module>
         <module>tools</module>
     </modules>
 
