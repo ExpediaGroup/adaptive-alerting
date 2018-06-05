@@ -16,6 +16,7 @@
 
 package com.expedia.adaptivealerting.anomdetect;
 
+import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.util.MetricPointUtil;
 import org.junit.Before;
 import org.junit.Test;

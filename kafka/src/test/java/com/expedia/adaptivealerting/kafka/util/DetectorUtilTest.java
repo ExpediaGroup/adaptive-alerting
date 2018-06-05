@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.kafka.util;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.AnomalyResult;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.anomdetect.ConstantThresholdAnomalyDetector;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.entities.MetricType;
@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import static com.expedia.adaptivealerting.anomdetect.ConstantThresholdAnomalyDetector.RIGHT_TAILED;
-import static com.expedia.adaptivealerting.anomdetect.AnomalyLevel.*;
+import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.*;
 import static org.junit.Assert.assertEquals;
 
 public class DetectorUtilTest {

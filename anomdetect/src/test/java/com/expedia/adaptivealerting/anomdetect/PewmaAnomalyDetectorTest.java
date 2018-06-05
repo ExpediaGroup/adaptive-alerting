@@ -15,6 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
+import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.util.MathUtil;
 import com.expedia.adaptivealerting.core.util.MetricPointUtil;
 import com.opencsv.CSVReader;

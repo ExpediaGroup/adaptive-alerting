@@ -13,24 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect;
+package com.expedia.adaptivealerting.modelservice;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.www.haystack.commons.entities.MetricPoint;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-/**
- * Anomaly detector interface.
- *
- * @author Willie Wheeler
- */
-public interface AnomalyDetector {
+@SpringBootApplication
+public class ModelServiceApp {
     
-    /**
-     * Classifies the given metric point.
-     *
-     * @param metricPoint Metric point.
-     * @return Anomaly classification result, with supporting data such as the prediction, anomaly score and various
-     * thresholds.
-     */
-    AnomalyResult classify(MetricPoint metricPoint);
+    public static void main(String[] args) {
+        SpringApplication.run(ModelServiceApp.class, args);
+    }
 }

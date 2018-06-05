@@ -1,1 +1,1 @@
-# Adaptive Alerting - Outlier Detection
+# Adaptive Alerting - Anomaly Detection

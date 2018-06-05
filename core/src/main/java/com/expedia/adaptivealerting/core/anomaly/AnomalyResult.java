@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect;
+package com.expedia.adaptivealerting.core.anomaly;
 
 /**
- * Outlier detector result.
+ * Anomaly result.
  *
  * @author Willie Wheeler
  */
@@ -28,7 +28,7 @@ public class AnomalyResult {
     private Double weakThresholdLower;
     private Double strongThresholdUpper;
     private Double strongThresholdLower;
-    private Double outlierScore;
+    private Double anomalyScore;
     private AnomalyLevel anomalyLevel;
     
     public Long getEpochSecond() {
@@ -87,12 +87,12 @@ public class AnomalyResult {
         this.strongThresholdLower = strongThresholdLower;
     }
     
-    public Double getOutlierScore() {
-        return outlierScore;
+    public Double getAnomalyScore() {
+        return anomalyScore;
     }
     
-    public void setOutlierScore(Double outlierScore) {
-        this.outlierScore = outlierScore;
+    public void setAnomalyScore(Double anomalyScore) {
+        this.anomalyScore = anomalyScore;
     }
     
     public AnomalyLevel getAnomalyLevel() {
@@ -113,7 +113,7 @@ public class AnomalyResult {
                 ", weakThresholdLower=" + weakThresholdLower +
                 ", strongThresholdUpper=" + strongThresholdUpper +
                 ", strongThresholdLower=" + strongThresholdLower +
-                ", outlierScore=" + outlierScore +
+                ", anomalyScore=" + anomalyScore +
                 ", anomalyLevel=" + anomalyLevel +
                 '}';
     }

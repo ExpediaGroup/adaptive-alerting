@@ -77,12 +77,12 @@ public abstract class AbstractMetricSource {
         timer.purge();
     }
     
-    public void addSubscriber(StreamSubscriber<MetricPoint> subscriber) {
+    public void addMetricPointSubscriber(StreamSubscriber<MetricPoint> subscriber) {
         notNull(subscriber, "subscriber can't be null");
         publisherSupport.addSubscriber(subscriber);
     }
     
-    public void removeSubscriber(StreamSubscriber<MetricPoint> subscriber) {
+    public void removeMetricPointSubscriber(StreamSubscriber<MetricPoint> subscriber) {
         notNull(subscriber, "subscriber can't be null");
         publisherSupport.removeSubscriber(subscriber);
     }

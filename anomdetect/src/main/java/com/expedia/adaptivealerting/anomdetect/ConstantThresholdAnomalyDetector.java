@@ -15,10 +15,12 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
+import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
-import static com.expedia.adaptivealerting.anomdetect.AnomalyLevel.*;
+import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.*;
 
 /**
  * Outlier detector with one-sided constant thresholds for weak and strong outliers.

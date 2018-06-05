@@ -13,24 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect;
+package com.expedia.adaptivealerting.modelservice.web;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.www.haystack.commons.entities.MetricPoint;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Anomaly detector interface.
- *
- * @author Willie Wheeler
- */
-public interface AnomalyDetector {
+@RestController
+public class HelloController {
     
-    /**
-     * Classifies the given metric point.
-     *
-     * @param metricPoint Metric point.
-     * @return Anomaly classification result, with supporting data such as the prediction, anomaly score and various
-     * thresholds.
-     */
-    AnomalyResult classify(MetricPoint metricPoint);
+    @RequestMapping("/hello")
+    public String hello() {
+        return "hello";
+    }
 }

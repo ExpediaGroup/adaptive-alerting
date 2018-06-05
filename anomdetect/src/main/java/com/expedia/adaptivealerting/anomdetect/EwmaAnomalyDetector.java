@@ -15,10 +15,12 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
+import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
-import static com.expedia.adaptivealerting.anomdetect.AnomalyLevel.*;
+import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.*;
 import static java.lang.Math.abs;
 import static java.lang.Math.sqrt;
 
@@ -141,7 +143,7 @@ public class EwmaAnomalyDetector implements AnomalyDetector {
         result.setWeakThresholdLower(mean - weakThreshold);
         result.setStrongThresholdUpper(mean + strongThreshold);
         result.setStrongThresholdLower(mean - strongThreshold);
-        result.setOutlierScore(dist);
+        result.setAnomalyScore(dist);
         result.setAnomalyLevel(anomalyLevel);
     
         updateEstimates(observed);
