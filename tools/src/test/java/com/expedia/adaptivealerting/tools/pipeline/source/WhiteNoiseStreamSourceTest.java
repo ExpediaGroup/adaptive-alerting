@@ -40,7 +40,7 @@ public class WhiteNoiseStreamSourceTest {
             }
         };
         
-        final WhiteNoiseMetricSource metricSource = new WhiteNoiseMetricSource();
+        final WhiteNoiseMetricSource metricSource = new WhiteNoiseMetricSource("white-noise", 100L, 0.0, 1.0);
         metricSource.addMetricPointSubscriber(subscriber);
         
         Executors.newSingleThreadExecutor().execute(new Runnable() {
@@ -51,9 +51,7 @@ public class WhiteNoiseStreamSourceTest {
             }
         });
         
-        // This has to be long enough to deal with the 1s delay, which has to be there given our current 1s metric
-        // resolution. [WLW]
-        Thread.sleep(1500L);
+        Thread.sleep(500L);
         
         metricSource.stop();
         metricSource.removeMetricPointSubscriber(subscriber);

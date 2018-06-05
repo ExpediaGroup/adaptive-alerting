@@ -27,6 +27,9 @@ import java.io.InputStream;
 
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.*;
 
+/**
+ * @author Willie Wheeler
+ */
 public class CsvTrafficEwmaVsPewma {
     
     public static void main(String[] args) {
