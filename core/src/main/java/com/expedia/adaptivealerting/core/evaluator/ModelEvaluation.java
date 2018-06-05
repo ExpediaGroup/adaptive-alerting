@@ -13,28 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * 
+ */
 package com.expedia.adaptivealerting.core.evaluator;
 
 /**
- * Interface for components that evaluate model performance, using measures such as RMSE, MAPE, sMAPE, etc.
- * 
  * @author kashah
+ *
  */
-public interface Evaluator {
+public class ModelEvaluation {
+
+    private double evaluatorScore;
 
     /**
-     * Updates the internal state of the evaluator.
+     * @return the evaluatorScore
      */
-    void update(double observed, double predicted);
+    public double getEvaluatorScore() {
+        return evaluatorScore;
+    }
 
     /**
-     * Returns a score which tells how good the fit is. Exact score is implementation-dependent and some scores are
-     * scale-dependent and some scale-independent.
+     * @param evaluatorScore
+     *            the evaluatorScore to set
      */
-    ModelEvaluation evaluate();
+    public void setEvaluatorScore(double evaluatorScore) {
+        this.evaluatorScore = evaluatorScore;
+    }
 
-    /**
-     * Resets the internal state of the evaluator.
-     */
-    void reset();
 }
