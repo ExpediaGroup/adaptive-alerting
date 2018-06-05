@@ -15,9 +15,8 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.source;
 
-import com.expedia.adaptivealerting.tools.pipeline.MetricPublisherSupport;
-import com.expedia.adaptivealerting.tools.pipeline.MetricSource;
-import com.expedia.adaptivealerting.tools.pipeline.MetricSubscriber;
+import com.expedia.adaptivealerting.tools.pipeline.StreamPublisherSupport;
+import com.expedia.adaptivealerting.tools.pipeline.StreamSubscriber;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
 import java.util.Timer;
@@ -30,11 +29,12 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  *
  * @author Willie Wheeler
  */
-public abstract class AbstractMetricSource implements MetricSource {
+public abstract class AbstractMetricSource {
     private final String name;
     private final long period;
-    private final MetricPublisherSupport support = new MetricPublisherSupport();
+    
     private final Timer timer = new Timer();
+    private final StreamPublisherSupport<MetricPoint> publisherSupport = new StreamPublisherSupport<>();
     
     /**
      * Creates a new metric source with the given period.
@@ -44,7 +44,6 @@ public abstract class AbstractMetricSource implements MetricSource {
      */
     public AbstractMetricSource(String name, long period) {
         notNull(name, "name can't be null");
-        
         this.name = name;
         this.period = period;
     }
@@ -53,17 +52,6 @@ public abstract class AbstractMetricSource implements MetricSource {
         return name;
     }
     
-    @Override
-    public void addSubscriber(MetricSubscriber subscriber) {
-        support.addSubscriber(subscriber);
-    }
-    
-    @Override
-    public void removeSubscriber(MetricSubscriber subscriber) {
-        support.removeSubscriber(subscriber);
-    }
-    
-    @Override
     public void start() {
         timer.scheduleAtFixedRate(new TimerTask() {
             
@@ -71,22 +59,31 @@ public abstract class AbstractMetricSource implements MetricSource {
             public void run() {
                 final MetricPoint next = next();
                 if (next != null) {
-                    support.publish(next);
+                    publisherSupport.publish(next);
                 }
             }
         }, 0L, period);
     }
     
     /**
-     * Returns the next metric point.
+     * Returns the next message in the stream.
      *
      * @return Next metric point.
      */
     public abstract MetricPoint next();
     
-    @Override
     public void stop() {
         timer.cancel();
         timer.purge();
+    }
+    
+    public void addSubscriber(StreamSubscriber<MetricPoint> subscriber) {
+        notNull(subscriber, "subscriber can't be null");
+        publisherSupport.addSubscriber(subscriber);
+    }
+    
+    public void removeSubscriber(StreamSubscriber<MetricPoint> subscriber) {
+        notNull(subscriber, "subscriber can't be null");
+        publisherSupport.removeSubscriber(subscriber);
     }
 }

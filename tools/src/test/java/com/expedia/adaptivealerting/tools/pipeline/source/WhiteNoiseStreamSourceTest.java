@@ -15,8 +15,7 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.source;
 
-import com.expedia.adaptivealerting.tools.pipeline.MetricSubscriber;
-import com.expedia.adaptivealerting.tools.pipeline.source.WhiteNoiseMetricSource;
+import com.expedia.adaptivealerting.tools.pipeline.StreamSubscriber;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import org.junit.Test;
 
@@ -27,13 +26,13 @@ import static junit.framework.TestCase.assertTrue;
 /**
  * @author Willie Wheeler
  */
-public class WhiteNoiseMetricSourceTest {
+public class WhiteNoiseStreamSourceTest {
     
     @Test
     public void testStartAndStop() throws Exception {
         final boolean[] calledNext = new boolean[1];
         
-        final MetricSubscriber subscriber = new MetricSubscriber() {
+        final StreamSubscriber subscriber = new StreamSubscriber<MetricPoint>() {
             
             @Override
             public void next(MetricPoint metricPoint) {

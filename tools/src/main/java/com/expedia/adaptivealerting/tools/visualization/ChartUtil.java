@@ -21,6 +21,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYDifferenceRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.ui.ApplicationFrame;
 import org.jfree.ui.RefineryUtilities;
@@ -29,6 +30,8 @@ import javax.swing.JPanel;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.time.Instant;
+import java.util.Date;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
@@ -52,7 +55,7 @@ public class ChartUtil {
         final TimeSeriesCollection weakOutlier = new TimeSeriesCollection(chartSeries.getWeakOutlier());
         
         final TimeSeriesCollection observed = new TimeSeriesCollection(chartSeries.getObserved());
-        final TimeSeriesCollection midpoint = new TimeSeriesCollection(chartSeries.getMidpoint());
+        final TimeSeriesCollection midpoint = new TimeSeriesCollection(chartSeries.getPredicted());
     
         final TimeSeriesCollection weakThreshold = new TimeSeriesCollection();
         weakThreshold.addSeries(chartSeries.getWeakThresholdUpper());
@@ -123,7 +126,7 @@ public class ChartUtil {
         
         for (JFreeChart chart : charts) {
             final ChartPanel chartPanel = new ChartPanel(chart);
-            chartPanel.setPreferredSize(new Dimension(800, 400));
+            chartPanel.setPreferredSize(new Dimension(800, 300));
             chartPanel.setMouseZoomable(true, false);
             panel.add(chartPanel);
         }
@@ -136,5 +139,9 @@ public class ChartUtil {
         chartFrame.pack();
         RefineryUtilities.positionFrameRandomly(chartFrame);
         chartFrame.setVisible(true);
+    }
+    
+    public static Second toSecond(long epochSecond) {
+        return new Second(Date.from(Instant.ofEpochSecond(epochSecond)));
     }
 }

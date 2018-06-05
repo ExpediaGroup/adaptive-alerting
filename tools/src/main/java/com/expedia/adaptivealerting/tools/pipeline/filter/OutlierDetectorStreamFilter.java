@@ -16,19 +16,23 @@
 package com.expedia.adaptivealerting.tools.pipeline.filter;
 
 import com.expedia.adaptivealerting.core.detector.OutlierDetector;
+import com.expedia.adaptivealerting.core.detector.OutlierDetectorResult;
+import com.expedia.adaptivealerting.tools.pipeline.StreamPublisherSupport;
+import com.expedia.adaptivealerting.tools.pipeline.StreamSubscriber;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
- * Metric filter that applies an outlier detector to the metric.
+ * Stream filter that applies an outlier detector to metrics and generates outlier detector results.
  *
  * @author Willie Wheeler
  */
-public final class OutlierDetectorMetricFilter extends AbstractMetricFilter {
+public final class OutlierDetectorStreamFilter implements StreamSubscriber<MetricPoint> {
     private final OutlierDetector outlierDetector;
+    private final StreamPublisherSupport<OutlierDetectorResult> publisherSupport = new StreamPublisherSupport<>();
     
-    public OutlierDetectorMetricFilter(OutlierDetector outlierDetector) {
+    public OutlierDetectorStreamFilter(OutlierDetector outlierDetector) {
         notNull(outlierDetector, "outlierDetector can't be null");
         this.outlierDetector = outlierDetector;
     }
@@ -36,6 +40,16 @@ public final class OutlierDetectorMetricFilter extends AbstractMetricFilter {
     @Override
     public void next(MetricPoint metricPoint) {
         notNull(metricPoint, "metricPoint can't be null");
-        publish(outlierDetector.classifyAndEnrich(metricPoint));
+        publisherSupport.publish(outlierDetector.classify(metricPoint));
+    }
+    
+    public void addSubscriber(StreamSubscriber<OutlierDetectorResult> subscriber) {
+        notNull(subscriber, "subscriber can't be null");
+        publisherSupport.addSubscriber(subscriber);
+    }
+    
+    public void removeSubscriber(StreamSubscriber<OutlierDetectorResult> subscriber) {
+        notNull(subscriber, "subscriber can't be null");
+        publisherSupport.removeSubscriber(subscriber);
     }
 }

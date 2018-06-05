@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.sink;
 
-import com.expedia.adaptivealerting.tools.pipeline.sink.ConsoleLogMetricSink;
+import com.expedia.adaptivealerting.core.detector.OutlierDetectorResult;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.entities.MetricType;
 import org.junit.Before;
@@ -27,17 +27,17 @@ import scala.collection.immutable.Map$;
 /**
  * @author Willie Wheeler
  */
-public class ConsoleLogMetricSinkTest {
+public class ConsoleLogStreamSinkTest {
     
     // Class under test
-    private ConsoleLogMetricSink callback;
+    private ConsoleLogStreamSink sink;
     
     // Test objects
     private MetricPoint metricPoint;
     
     @Before
     public void setUp() {
-        this.callback = new ConsoleLogMetricSink();
+        this.sink = new ConsoleLogStreamSink<OutlierDetectorResult>();
     
         final Enumeration.Value type = MetricType.Gauge();
         final Map<String, String> tags = Map$.MODULE$.<String, String>empty();
@@ -46,6 +46,6 @@ public class ConsoleLogMetricSinkTest {
     
     @Test
     public void testNext() {
-        callback.next(metricPoint);
+        sink.next(metricPoint);
     }
 }

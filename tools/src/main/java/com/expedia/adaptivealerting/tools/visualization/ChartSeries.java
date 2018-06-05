@@ -24,11 +24,11 @@ import org.jfree.data.time.TimeSeries;
  */
 public class ChartSeries {
     private final TimeSeries observed = new TimeSeries("observed");
-    private final TimeSeries midpoint = new TimeSeries("midpoint");
-    private final TimeSeries strongThresholdUpper = new TimeSeries("strongThresholdUpper");
-    private final TimeSeries strongThresholdLower = new TimeSeries("strongThresholdLower");
+    private final TimeSeries predicted = new TimeSeries("predicted");
     private final TimeSeries weakThresholdUpper = new TimeSeries("weakThresholdUpper");
     private final TimeSeries weakThresoldLower = new TimeSeries("weakThresholdLower");
+    private final TimeSeries strongThresholdUpper = new TimeSeries("strongThresholdUpper");
+    private final TimeSeries strongThresholdLower = new TimeSeries("strongThresholdLower");
     private final TimeSeries strongOutlier = new TimeSeries("strongOutlier");
     private final TimeSeries weakOutlier = new TimeSeries("weakOutlier");
     
@@ -36,16 +36,8 @@ public class ChartSeries {
         return observed;
     }
     
-    public TimeSeries getMidpoint() {
-        return midpoint;
-    }
-    
-    public TimeSeries getStrongThresholdUpper() {
-        return strongThresholdUpper;
-    }
-    
-    public TimeSeries getStrongThresholdLower() {
-        return strongThresholdLower;
+    public TimeSeries getPredicted() {
+        return predicted;
     }
     
     public TimeSeries getWeakThresholdUpper() {
@@ -54,6 +46,14 @@ public class ChartSeries {
     
     public TimeSeries getWeakThresoldLower() {
         return weakThresoldLower;
+    }
+    
+    public TimeSeries getStrongThresholdUpper() {
+        return strongThresholdUpper;
+    }
+    
+    public TimeSeries getStrongThresholdLower() {
+        return strongThresholdLower;
     }
     
     public TimeSeries getStrongOutlier() {

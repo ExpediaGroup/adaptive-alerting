@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.core.detector;
 
-import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBeanBuilder;
 import org.junit.Test;
@@ -29,7 +28,6 @@ import java.util.ListIterator;
 
 import static com.expedia.adaptivealerting.core.util.MathUtil.isApproximatelyEqual;
 import static com.expedia.adaptivealerting.core.util.MetricPointUtil.metricPoint;
-import static com.expedia.adaptivealerting.core.util.MetricPointUtil.outlierLevel;
 import static java.lang.Math.sqrt;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
@@ -51,76 +49,75 @@ public class PewmaOutlierDetectorTest {
     @Test
     public void pewmaCloseToEwmaWithZeroBeta() throws IOException {
         double beta = 0.0;
-
+        
         final ListIterator<String[]> testRows = readCsv("tests/pewma-sample-input.csv").listIterator();
         final Double initialValue = Double.parseDouble(testRows.next()[0]);
         final PewmaOutlierDetector pewmaOutlierDetector = new PewmaOutlierDetector(
                 DEFAULT_ALPHA, beta, WEAK_THRESHOLD, STRONG_THRESHOLD, initialValue);
         final EwmaOutlierDetector ewmaOutlierDetector = new EwmaOutlierDetector(
                 DEFAULT_ALPHA, STRONG_THRESHOLD, WEAK_THRESHOLD, initialValue);
-
+        
         int rowCount = 1;
         while (testRows.hasNext()) {
             final Float value = Float.parseFloat(testRows.next()[0]);
-
+            
             double ewmaStdDev = sqrt(ewmaOutlierDetector.getVariance());
-
-            double threshold = 1.0/rowCount; // results converge with more iterations
+            
+            double threshold = 1.0 / rowCount; // results converge with more iterations
             assertApproxEqual(ewmaOutlierDetector.getMean(), pewmaOutlierDetector.getMean(), threshold);
             assertApproxEqual(ewmaStdDev, pewmaOutlierDetector.getStdDev(), threshold);
             
-            final MetricPoint pewmaResult = pewmaOutlierDetector.classifyAndEnrich(metricPoint(Instant.now(), value));
-            final MetricPoint ewmaResult = ewmaOutlierDetector.classifyAndEnrich(metricPoint(Instant.now(), value));
+            final OutlierDetectorResult pewmaResult = pewmaOutlierDetector.classify(metricPoint(Instant.now(), value));
+            final OutlierDetectorResult ewmaResult = ewmaOutlierDetector.classify(metricPoint(Instant.now(), value));
             
-            OutlierLevel pOL = outlierLevel(pewmaResult);
-            OutlierLevel eOL = outlierLevel(ewmaResult);
+            OutlierLevel pOL = pewmaResult.getOutlierLevel();
+            OutlierLevel eOL = ewmaResult.getOutlierLevel();
             if (rowCount > PewmaOutlierDetector.DEFAULT_TRAINING_LENGTH) {
                 assertEquals(pOL, eOL);
             }
             rowCount++;
         }
     }
-
+    
     @Test
     public void evaluate() {
         double beta = 0.5;
-
+        
         final ListIterator<PewmaTestRow> testRows = readData_calInflow().listIterator();
         final PewmaTestRow testRow0 = testRows.next();
         final PewmaOutlierDetector detector = new PewmaOutlierDetector(
                 DEFAULT_ALPHA, beta, WEAK_THRESHOLD, STRONG_THRESHOLD, testRow0.getObserved());
-
+        
         while (testRows.hasNext()) {
             final PewmaTestRow testRow = testRows.next();
-
+            
             final double observed = testRow.getObserved();
-
+            
             // This detector doesn't currently do anything with the instant, so we can just pass now().
             // This may change in the future.
-            final MetricPoint result = detector.classifyAndEnrich(metricPoint(Instant.now(), (float) observed));
+            final OutlierDetectorResult result = detector.classify(metricPoint(Instant.now(), (float) observed));
             
-            final OutlierLevel level = outlierLevel(result);
+            final OutlierLevel level = result.getOutlierLevel();
             assertApproxEqual(testRow.getMean(), detector.getMean(), 0.00001);
             assertApproxEqual(testRow.getStd(), detector.getStdDev(), 0.00001);
             assertEquals(OutlierLevel.valueOf(testRow.getLevel()), level);
         }
     }
-
+    
     private static List<String[]> readCsv(String path) throws IOException {
         final InputStream is = ClassLoader.getSystemResourceAsStream(path);
         CSVReader reader = new CSVReader(new InputStreamReader(is));
         return reader.readAll();
     }
-
+    
     private static List<PewmaTestRow> readData_calInflow() {
         final InputStream is = ClassLoader.getSystemResourceAsStream("tests/cal-inflow-tests-pewma.csv");
         return new CsvToBeanBuilder<PewmaTestRow>(new InputStreamReader(is))
                 .withType(PewmaTestRow.class)
                 .build()
                 .parse();
-
     }
-
+    
     private static void assertApproxEqual(double d1, double d2, double tolerance) {
         assertTrue(d1 + " !~ " + d2, isApproximatelyEqual(d1, d2, tolerance));
     }

@@ -102,4 +102,19 @@ public class OutlierDetectorResult {
     public void setOutlierLevel(OutlierLevel outlierLevel) {
         this.outlierLevel = outlierLevel;
     }
+    
+    @Override
+    public String toString() {
+        return "OutlierDetectorResult{" +
+                "epochSecond=" + epochSecond +
+                ", observed=" + observed +
+                ", predicted=" + predicted +
+                ", weakThresholdUpper=" + weakThresholdUpper +
+                ", weakThresholdLower=" + weakThresholdLower +
+                ", strongThresholdUpper=" + strongThresholdUpper +
+                ", strongThresholdLower=" + strongThresholdLower +
+                ", outlierScore=" + outlierScore +
+                ", outlierLevel=" + outlierLevel +
+                '}';
+    }
 }
