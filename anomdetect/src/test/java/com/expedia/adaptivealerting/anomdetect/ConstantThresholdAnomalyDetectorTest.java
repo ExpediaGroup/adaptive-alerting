@@ -61,44 +61,44 @@ public class ConstantThresholdAnomalyDetectorTest {
     @Test
     public void testEvaluateLeftTailed_positiveThresholds() {
         ConstantThresholdAnomalyDetector detector = new ConstantThresholdAnomalyDetector(ConstantThresholdAnomalyDetector.LEFT_TAILED, 100.0, 300.0);
-        assertEquals(OutlierLevel.NORMAL, level(detector, instant, 500.0f));
-        assertEquals(OutlierLevel.WEAK, level(detector, instant, 300.0f));
-        assertEquals(OutlierLevel.WEAK, level(detector, instant, 200.0f));
-        assertEquals(OutlierLevel.STRONG, level(detector, instant, 100.0f));
-        assertEquals(OutlierLevel.STRONG, level(detector, instant, 50.0f));
+        assertEquals(AnomalyLevel.NORMAL, level(detector, instant, 500.0f));
+        assertEquals(AnomalyLevel.WEAK, level(detector, instant, 300.0f));
+        assertEquals(AnomalyLevel.WEAK, level(detector, instant, 200.0f));
+        assertEquals(AnomalyLevel.STRONG, level(detector, instant, 100.0f));
+        assertEquals(AnomalyLevel.STRONG, level(detector, instant, 50.0f));
     }
     
     @Test
     public void testEvaluateLeftTailed_negativeThresholds() {
         ConstantThresholdAnomalyDetector detector = new ConstantThresholdAnomalyDetector(ConstantThresholdAnomalyDetector.LEFT_TAILED, -30.0, -10.0);
-        assertEquals(OutlierLevel.NORMAL, level(detector, instant, 1.0f));
-        assertEquals(OutlierLevel.WEAK, level(detector, instant, -10.0f));
-        assertEquals(OutlierLevel.WEAK, level(detector, instant, -15.0f));
-        assertEquals(OutlierLevel.STRONG, level(detector, instant, -30.0f));
-        assertEquals(OutlierLevel.STRONG, level(detector, instant, -50.0f));
+        assertEquals(AnomalyLevel.NORMAL, level(detector, instant, 1.0f));
+        assertEquals(AnomalyLevel.WEAK, level(detector, instant, -10.0f));
+        assertEquals(AnomalyLevel.WEAK, level(detector, instant, -15.0f));
+        assertEquals(AnomalyLevel.STRONG, level(detector, instant, -30.0f));
+        assertEquals(AnomalyLevel.STRONG, level(detector, instant, -50.0f));
     }
     
     @Test
     public void testEvaluateRightTailed_positiveThresholds() {
         ConstantThresholdAnomalyDetector detector = new ConstantThresholdAnomalyDetector(ConstantThresholdAnomalyDetector.RIGHT_TAILED, 300.0, 200.0);
-        assertEquals(OutlierLevel.NORMAL, level(detector, instant, 100.0f));
-        assertEquals(OutlierLevel.WEAK, level(detector, instant, 200.0f));
-        assertEquals(OutlierLevel.WEAK, level(detector, instant, 220.0f));
-        assertEquals(OutlierLevel.STRONG, level(detector, instant, 300.0f));
-        assertEquals(OutlierLevel.STRONG, level(detector, instant, 8675309.0f));
+        assertEquals(AnomalyLevel.NORMAL, level(detector, instant, 100.0f));
+        assertEquals(AnomalyLevel.WEAK, level(detector, instant, 200.0f));
+        assertEquals(AnomalyLevel.WEAK, level(detector, instant, 220.0f));
+        assertEquals(AnomalyLevel.STRONG, level(detector, instant, 300.0f));
+        assertEquals(AnomalyLevel.STRONG, level(detector, instant, 8675309.0f));
     }
     
     @Test
     public void testEvaluateRightTailed_negativeThresholds() {
         ConstantThresholdAnomalyDetector detector = new ConstantThresholdAnomalyDetector(ConstantThresholdAnomalyDetector.RIGHT_TAILED, -100.0, -300.0);
-        assertEquals(OutlierLevel.NORMAL, level(detector, instant, -1000.0f));
-        assertEquals(OutlierLevel.WEAK, level(detector, instant, -300.0f));
-        assertEquals(OutlierLevel.WEAK, level(detector, instant, -250.0f));
-        assertEquals(OutlierLevel.STRONG, level(detector, instant, -100.0f));
-        assertEquals(OutlierLevel.STRONG, level(detector, instant, 0.0f));
+        assertEquals(AnomalyLevel.NORMAL, level(detector, instant, -1000.0f));
+        assertEquals(AnomalyLevel.WEAK, level(detector, instant, -300.0f));
+        assertEquals(AnomalyLevel.WEAK, level(detector, instant, -250.0f));
+        assertEquals(AnomalyLevel.STRONG, level(detector, instant, -100.0f));
+        assertEquals(AnomalyLevel.STRONG, level(detector, instant, 0.0f));
     }
     
-    private OutlierLevel level(AnomalyDetector detector, Instant instant, float value) {
-        return detector.classify(MetricPointUtil.metricPoint(instant, value)).getOutlierLevel();
+    private AnomalyLevel level(AnomalyDetector detector, Instant instant, float value) {
+        return detector.classify(MetricPointUtil.metricPoint(instant, value)).getAnomalyLevel();
     }
 }

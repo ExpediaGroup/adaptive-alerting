@@ -20,7 +20,7 @@ package com.expedia.adaptivealerting.anomdetect;
  *
  * @author Willie Wheeler
  */
-public class OutlierResult {
+public class AnomalyResult {
     private Long epochSecond;
     private Double observed;
     private Double predicted;
@@ -29,7 +29,7 @@ public class OutlierResult {
     private Double strongThresholdUpper;
     private Double strongThresholdLower;
     private Double outlierScore;
-    private OutlierLevel outlierLevel;
+    private AnomalyLevel anomalyLevel;
     
     public Long getEpochSecond() {
         return epochSecond;
@@ -95,17 +95,17 @@ public class OutlierResult {
         this.outlierScore = outlierScore;
     }
     
-    public OutlierLevel getOutlierLevel() {
-        return outlierLevel;
+    public AnomalyLevel getAnomalyLevel() {
+        return anomalyLevel;
     }
     
-    public void setOutlierLevel(OutlierLevel outlierLevel) {
-        this.outlierLevel = outlierLevel;
+    public void setAnomalyLevel(AnomalyLevel anomalyLevel) {
+        this.anomalyLevel = anomalyLevel;
     }
     
     @Override
     public String toString() {
-        return "OutlierResult{" +
+        return "AnomalyResult{" +
                 "epochSecond=" + epochSecond +
                 ", observed=" + observed +
                 ", predicted=" + predicted +
@@ -114,7 +114,7 @@ public class OutlierResult {
                 ", strongThresholdUpper=" + strongThresholdUpper +
                 ", strongThresholdLower=" + strongThresholdLower +
                 ", outlierScore=" + outlierScore +
-                ", outlierLevel=" + outlierLevel +
+                ", anomalyLevel=" + anomalyLevel +
                 '}';
     }
 }

@@ -67,11 +67,11 @@ public class PewmaAnomalyDetectorTest {
             assertApproxEqual(ewmaOutlierDetector.getMean(), pewmaOutlierDetector.getMean(), threshold);
             assertApproxEqual(ewmaStdDev, pewmaOutlierDetector.getStdDev(), threshold);
             
-            final OutlierResult pewmaResult = pewmaOutlierDetector.classify(MetricPointUtil.metricPoint(Instant.now(), value));
-            final OutlierResult ewmaResult = ewmaOutlierDetector.classify(MetricPointUtil.metricPoint(Instant.now(), value));
+            final AnomalyResult pewmaResult = pewmaOutlierDetector.classify(MetricPointUtil.metricPoint(Instant.now(), value));
+            final AnomalyResult ewmaResult = ewmaOutlierDetector.classify(MetricPointUtil.metricPoint(Instant.now(), value));
             
-            OutlierLevel pOL = pewmaResult.getOutlierLevel();
-            OutlierLevel eOL = ewmaResult.getOutlierLevel();
+            AnomalyLevel pOL = pewmaResult.getAnomalyLevel();
+            AnomalyLevel eOL = ewmaResult.getAnomalyLevel();
             if (rowCount > PewmaAnomalyDetector.DEFAULT_TRAINING_LENGTH) {
                 assertEquals(pOL, eOL);
             }
@@ -95,12 +95,12 @@ public class PewmaAnomalyDetectorTest {
             
             // This detector doesn't currently do anything with the instant, so we can just pass now().
             // This may change in the future.
-            final OutlierResult result = detector.classify(MetricPointUtil.metricPoint(Instant.now(), (float) observed));
+            final AnomalyResult result = detector.classify(MetricPointUtil.metricPoint(Instant.now(), (float) observed));
             
-            final OutlierLevel level = result.getOutlierLevel();
+            final AnomalyLevel level = result.getAnomalyLevel();
             assertApproxEqual(testRow.getMean(), detector.getMean(), 0.00001);
             assertApproxEqual(testRow.getStd(), detector.getStdDev(), 0.00001);
-            assertEquals(OutlierLevel.valueOf(testRow.getLevel()), level);
+            assertEquals(AnomalyLevel.valueOf(testRow.getLevel()), level);
         }
     }
     

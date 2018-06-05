@@ -18,7 +18,7 @@ package com.expedia.adaptivealerting.anomdetect;
 import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
-import static com.expedia.adaptivealerting.anomdetect.OutlierLevel.*;
+import static com.expedia.adaptivealerting.anomdetect.AnomalyLevel.*;
 
 /**
  * Outlier detector with one-sided constant thresholds for weak and strong outliers.
@@ -71,43 +71,43 @@ public class ConstantThresholdAnomalyDetector implements AnomalyDetector {
     }
     
     @Override
-    public OutlierResult classify(MetricPoint metricPoint) {
+    public AnomalyResult classify(MetricPoint metricPoint) {
         final double observed = metricPoint.value();
         
         Double weakThresholdUpper = null;
         Double weakThresholdLower = null;
         Double strongThresholdUpper = null;
         Double strongThresholdLower = null;
-        OutlierLevel outlierLevel = NORMAL;
+        AnomalyLevel anomalyLevel = NORMAL;
         
         if (tail == LEFT_TAILED) {
             weakThresholdLower = weakThreshold;
             strongThresholdLower = strongThreshold;
             if (observed <= strongThreshold) {
-                outlierLevel = STRONG;
+                anomalyLevel = STRONG;
             } else if (observed <= weakThreshold) {
-                outlierLevel = WEAK;
+                anomalyLevel = WEAK;
             }
         } else if (tail == RIGHT_TAILED) {
             weakThresholdUpper = weakThreshold;
             strongThresholdUpper = strongThreshold;
             if (observed >= strongThreshold) {
-                outlierLevel = STRONG;
+                anomalyLevel = STRONG;
             } else if (observed >= weakThreshold) {
-                outlierLevel = WEAK;
+                anomalyLevel = WEAK;
             }
         } else {
             throw new IllegalStateException("Illegal tail: " + tail);
         }
         
-        final OutlierResult result = new OutlierResult();
+        final AnomalyResult result = new AnomalyResult();
         result.setEpochSecond(metricPoint.epochTimeInSeconds());
         result.setObserved(observed);
         result.setWeakThresholdUpper(weakThresholdUpper);
         result.setWeakThresholdLower(weakThresholdLower);
         result.setStrongThresholdUpper(strongThresholdUpper);
         result.setStrongThresholdLower(strongThresholdLower);
-        result.setOutlierLevel(outlierLevel);
+        result.setAnomalyLevel(anomalyLevel);
         return result;
     }
 }

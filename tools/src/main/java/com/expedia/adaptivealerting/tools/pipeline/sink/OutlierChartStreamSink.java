@@ -15,22 +15,22 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.sink;
 
-import com.expedia.adaptivealerting.anomdetect.OutlierResult;
-import com.expedia.adaptivealerting.anomdetect.OutlierLevel;
+import com.expedia.adaptivealerting.anomdetect.AnomalyLevel;
+import com.expedia.adaptivealerting.anomdetect.AnomalyResult;
 import com.expedia.adaptivealerting.tools.pipeline.StreamSubscriber;
 import com.expedia.adaptivealerting.tools.visualization.ChartSeries;
 import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeries;
 
-import static com.expedia.adaptivealerting.anomdetect.OutlierLevel.STRONG;
-import static com.expedia.adaptivealerting.anomdetect.OutlierLevel.WEAK;
+import static com.expedia.adaptivealerting.anomdetect.AnomalyLevel.STRONG;
+import static com.expedia.adaptivealerting.anomdetect.AnomalyLevel.WEAK;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.toSecond;
 
 /**
  * @author Willie Wheeler
  */
-public final class OutlierChartStreamSink implements StreamSubscriber<OutlierResult> {
+public final class OutlierChartStreamSink implements StreamSubscriber<AnomalyResult> {
     private final ChartSeries chartSeries;
     
     public OutlierChartStreamSink(ChartSeries chartSeries) {
@@ -39,12 +39,12 @@ public final class OutlierChartStreamSink implements StreamSubscriber<OutlierRes
     }
     
     @Override
-    public void next(OutlierResult result) {
+    public void next(AnomalyResult result) {
         notNull(result, "result can't be null");
         
         final long epochSecond = result.getEpochSecond();
         final double observed = result.getObserved();
-        final OutlierLevel level = result.getOutlierLevel();
+        final AnomalyLevel level = result.getAnomalyLevel();
         final Second second = toSecond(epochSecond);
         
         chartSeries.getObserved().add(second, observed);

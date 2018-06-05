@@ -90,7 +90,7 @@ public class EwmaAnomalyDetectorTest {
             assertApproxEqual(testRow.getKnownMean(), testRow.getMean());
             assertApproxEqual(testRow.getMean(), detector.getMean());
             assertApproxEqual(testRow.getVar(), detector.getVariance());
-            // TODO Assert OutlierLevel
+            // TODO Assert AnomalyLevel
         }
     }
     

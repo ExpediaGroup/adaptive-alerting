@@ -16,8 +16,8 @@
 package com.expedia.adaptivealerting.kafka.util;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.AnomalyResult;
 import com.expedia.adaptivealerting.anomdetect.ConstantThresholdAnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.OutlierResult;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.entities.MetricType;
 import org.junit.Test;
@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import static com.expedia.adaptivealerting.anomdetect.ConstantThresholdAnomalyDetector.RIGHT_TAILED;
-import static com.expedia.adaptivealerting.anomdetect.OutlierLevel.*;
+import static com.expedia.adaptivealerting.anomdetect.AnomalyLevel.*;
 import static org.junit.Assert.assertEquals;
 
 public class DetectorUtilTest {
@@ -44,32 +44,32 @@ public class DetectorUtilTest {
 
     @Test
     public void classifyForNullMetric() {
-        OutlierResult result = DetectorUtil.classify(
+        AnomalyResult result = DetectorUtil.classify(
                 DetectorUtil.NULL_METRIC_POINT,
                 new HashMap<>(),
                 DETECTOR_FACTORY
         );
-        assertEquals(NORMAL, result.getOutlierLevel());
+        assertEquals(NORMAL, result.getAnomalyLevel());
     }
 
     @Test
     public void classifyForWeakMetric() {
-        OutlierResult result = DetectorUtil.classify(
+        AnomalyResult result = DetectorUtil.classify(
                 new MetricPoint("test", MetricType.Gauge(), Map$.MODULE$.empty(), 0.95f, 0),
                 new HashMap<>(),
                 DETECTOR_FACTORY
         );
-        assertEquals(WEAK, result.getOutlierLevel());
+        assertEquals(WEAK, result.getAnomalyLevel());
     }
 
     @Test
     public void classifyForStrongMetric() {
-        OutlierResult result = DetectorUtil.classify(
+        AnomalyResult result = DetectorUtil.classify(
                 new MetricPoint("test", MetricType.Gauge(), Map$.MODULE$.empty(), 0.99f, 0),
                 new HashMap<>(),
                 DETECTOR_FACTORY
         );
-        assertEquals(STRONG, result.getOutlierLevel());
+        assertEquals(STRONG, result.getAnomalyLevel());
     }
 
     @Test

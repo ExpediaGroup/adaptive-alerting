@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.kafka.util;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.OutlierResult;
+import com.expedia.adaptivealerting.anomdetect.AnomalyResult;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.entities.MetricType;
 import com.expedia.www.haystack.commons.entities.encoders.Encoder;
@@ -54,7 +54,7 @@ public class DetectorUtil {
         final Map<String, AnomalyDetector> detectors = new HashMap<>();
         metrics
                 .map((key, metricPoint) -> {
-                    OutlierResult classified = classify(metricPoint, detectors, detectorFactory);
+                    AnomalyResult classified = classify(metricPoint, detectors, detectorFactory);
                     return KeyValue.pair(null, classified);
                 })
                 .to("anomalies");
@@ -78,7 +78,7 @@ public class DetectorUtil {
         return conf;
     }
 
-    static OutlierResult classify(
+    static AnomalyResult classify(
             MetricPoint metricPoint,
             Map<String, AnomalyDetector> detectors,
             Function<String, AnomalyDetector> detectorFactory

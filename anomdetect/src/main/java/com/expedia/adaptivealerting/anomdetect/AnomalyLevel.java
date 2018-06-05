@@ -20,7 +20,7 @@ package com.expedia.adaptivealerting.anomdetect;
  *
  * @author Willie Wheeler
  */
-public enum OutlierLevel {
+public enum AnomalyLevel {
     
     /**
      * Normal data point (not an outlier).

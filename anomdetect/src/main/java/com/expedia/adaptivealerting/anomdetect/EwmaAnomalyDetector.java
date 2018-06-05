@@ -18,7 +18,7 @@ package com.expedia.adaptivealerting.anomdetect;
 import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
-import static com.expedia.adaptivealerting.anomdetect.OutlierLevel.*;
+import static com.expedia.adaptivealerting.anomdetect.AnomalyLevel.*;
 import static java.lang.Math.abs;
 import static java.lang.Math.sqrt;
 
@@ -117,7 +117,7 @@ public class EwmaAnomalyDetector implements AnomalyDetector {
     }
     
     @Override
-    public OutlierResult classify(MetricPoint metricPoint) {
+    public AnomalyResult classify(MetricPoint metricPoint) {
         AssertUtil.notNull(metricPoint, "metricPoint can't be null");
     
         final double observed = metricPoint.value();
@@ -126,14 +126,14 @@ public class EwmaAnomalyDetector implements AnomalyDetector {
         final double weakThreshold = weakThresholdSigmas * stdDev;
         final double strongThreshold = strongThresholdSigmas * stdDev;
     
-        OutlierLevel outlierLevel = NORMAL;
+        AnomalyLevel anomalyLevel = NORMAL;
         if (dist > strongThreshold) {
-            outlierLevel = STRONG;
+            anomalyLevel = STRONG;
         } else if (dist > weakThreshold) {
-            outlierLevel = WEAK;
+            anomalyLevel = WEAK;
         }
     
-        final OutlierResult result = new OutlierResult();
+        final AnomalyResult result = new AnomalyResult();
         result.setEpochSecond(metricPoint.epochTimeInSeconds());
         result.setObserved(observed);
         result.setPredicted(mean);
@@ -142,7 +142,7 @@ public class EwmaAnomalyDetector implements AnomalyDetector {
         result.setStrongThresholdUpper(mean + strongThreshold);
         result.setStrongThresholdLower(mean - strongThreshold);
         result.setOutlierScore(dist);
-        result.setOutlierLevel(outlierLevel);
+        result.setAnomalyLevel(anomalyLevel);
     
         updateEstimates(observed);
         

@@ -31,5 +31,5 @@ public interface AnomalyDetector {
      * @return Outlier classification result, with supporting data such as the prediction, outlier score and various
      * thresholds.
      */
-    OutlierResult classify(MetricPoint metricPoint);
+    AnomalyResult classify(MetricPoint metricPoint);
 }
