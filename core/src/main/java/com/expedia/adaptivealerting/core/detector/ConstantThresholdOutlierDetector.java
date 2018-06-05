@@ -71,7 +71,7 @@ public class ConstantThresholdOutlierDetector implements OutlierDetector {
     }
     
     @Override
-    public OutlierDetectorResult classify(MetricPoint metricPoint) {
+    public OutlierResult classify(MetricPoint metricPoint) {
         final double observed = metricPoint.value();
         
         Double weakThresholdUpper = null;
@@ -100,7 +100,7 @@ public class ConstantThresholdOutlierDetector implements OutlierDetector {
             throw new IllegalStateException("Illegal tail: " + tail);
         }
         
-        final OutlierDetectorResult result = new OutlierDetectorResult();
+        final OutlierResult result = new OutlierResult();
         result.setEpochSecond(metricPoint.epochTimeInSeconds());
         result.setObserved(observed);
         result.setWeakThresholdUpper(weakThresholdUpper);

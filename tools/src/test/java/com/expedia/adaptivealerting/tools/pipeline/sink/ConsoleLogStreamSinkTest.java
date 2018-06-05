@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.sink;
 
-import com.expedia.adaptivealerting.core.detector.OutlierDetectorResult;
+import com.expedia.adaptivealerting.core.detector.OutlierResult;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.entities.MetricType;
 import org.junit.Before;
@@ -37,7 +37,7 @@ public class ConsoleLogStreamSinkTest {
     
     @Before
     public void setUp() {
-        this.sink = new ConsoleLogStreamSink<OutlierDetectorResult>();
+        this.sink = new ConsoleLogStreamSink<OutlierResult>();
     
         final Enumeration.Value type = MetricType.Gauge();
         final Map<String, String> tags = Map$.MODULE$.<String, String>empty();

@@ -67,8 +67,8 @@ public class PewmaOutlierDetectorTest {
             assertApproxEqual(ewmaOutlierDetector.getMean(), pewmaOutlierDetector.getMean(), threshold);
             assertApproxEqual(ewmaStdDev, pewmaOutlierDetector.getStdDev(), threshold);
             
-            final OutlierDetectorResult pewmaResult = pewmaOutlierDetector.classify(metricPoint(Instant.now(), value));
-            final OutlierDetectorResult ewmaResult = ewmaOutlierDetector.classify(metricPoint(Instant.now(), value));
+            final OutlierResult pewmaResult = pewmaOutlierDetector.classify(metricPoint(Instant.now(), value));
+            final OutlierResult ewmaResult = ewmaOutlierDetector.classify(metricPoint(Instant.now(), value));
             
             OutlierLevel pOL = pewmaResult.getOutlierLevel();
             OutlierLevel eOL = ewmaResult.getOutlierLevel();
@@ -95,7 +95,7 @@ public class PewmaOutlierDetectorTest {
             
             // This detector doesn't currently do anything with the instant, so we can just pass now().
             // This may change in the future.
-            final OutlierDetectorResult result = detector.classify(metricPoint(Instant.now(), (float) observed));
+            final OutlierResult result = detector.classify(metricPoint(Instant.now(), (float) observed));
             
             final OutlierLevel level = result.getOutlierLevel();
             assertApproxEqual(testRow.getMean(), detector.getMean(), 0.00001);

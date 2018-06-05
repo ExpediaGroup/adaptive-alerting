@@ -17,7 +17,7 @@ package com.expedia.adaptivealerting.kafka.util;
 
 import com.expedia.adaptivealerting.core.detector.ConstantThresholdOutlierDetector;
 import com.expedia.adaptivealerting.core.detector.OutlierDetector;
-import com.expedia.adaptivealerting.core.detector.OutlierDetectorResult;
+import com.expedia.adaptivealerting.core.detector.OutlierResult;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.entities.MetricType;
 import org.junit.Test;
@@ -44,7 +44,7 @@ public class DetectorUtilTest {
 
     @Test
     public void classifyForNullMetric() {
-        OutlierDetectorResult result = DetectorUtil.classify(
+        OutlierResult result = DetectorUtil.classify(
                 DetectorUtil.NULL_METRIC_POINT,
                 new HashMap<>(),
                 DETECTOR_FACTORY
@@ -54,7 +54,7 @@ public class DetectorUtilTest {
 
     @Test
     public void classifyForWeakMetric() {
-        OutlierDetectorResult result = DetectorUtil.classify(
+        OutlierResult result = DetectorUtil.classify(
                 new MetricPoint("test", MetricType.Gauge(), Map$.MODULE$.empty(), 0.95f, 0),
                 new HashMap<>(),
                 DETECTOR_FACTORY
@@ -64,7 +64,7 @@ public class DetectorUtilTest {
 
     @Test
     public void classifyForStrongMetric() {
-        OutlierDetectorResult result = DetectorUtil.classify(
+        OutlierResult result = DetectorUtil.classify(
                 new MetricPoint("test", MetricType.Gauge(), Map$.MODULE$.empty(), 0.99f, 0),
                 new HashMap<>(),
                 DETECTOR_FACTORY

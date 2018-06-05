@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.sink;
 
-import com.expedia.adaptivealerting.core.detector.OutlierDetectorResult;
+import com.expedia.adaptivealerting.core.detector.OutlierResult;
 import com.expedia.adaptivealerting.core.detector.OutlierLevel;
 import com.expedia.adaptivealerting.tools.pipeline.StreamSubscriber;
 import com.expedia.adaptivealerting.tools.visualization.ChartSeries;
@@ -30,7 +30,7 @@ import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.toSecon
 /**
  * @author Willie Wheeler
  */
-public final class OutlierChartStreamSink implements StreamSubscriber<OutlierDetectorResult> {
+public final class OutlierChartStreamSink implements StreamSubscriber<OutlierResult> {
     private final ChartSeries chartSeries;
     
     public OutlierChartStreamSink(ChartSeries chartSeries) {
@@ -39,7 +39,7 @@ public final class OutlierChartStreamSink implements StreamSubscriber<OutlierDet
     }
     
     @Override
-    public void next(OutlierDetectorResult result) {
+    public void next(OutlierResult result) {
         notNull(result, "result can't be null");
         
         final long epochSecond = result.getEpochSecond();

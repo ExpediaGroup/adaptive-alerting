@@ -31,5 +31,5 @@ public interface OutlierDetector {
      * @return Outlier classification result, with supporting data such as the prediction, outlier score and various
      * thresholds.
      */
-    OutlierDetectorResult classify(MetricPoint metricPoint);
+    OutlierResult classify(MetricPoint metricPoint);
 }

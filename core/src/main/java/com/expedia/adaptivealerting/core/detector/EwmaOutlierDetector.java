@@ -120,7 +120,7 @@ public class EwmaOutlierDetector implements OutlierDetector {
     }
     
     @Override
-    public OutlierDetectorResult classify(MetricPoint metricPoint) {
+    public OutlierResult classify(MetricPoint metricPoint) {
         notNull(metricPoint, "metricPoint can't be null");
     
         final double observed = metricPoint.value();
@@ -136,7 +136,7 @@ public class EwmaOutlierDetector implements OutlierDetector {
             outlierLevel = WEAK;
         }
     
-        final OutlierDetectorResult result = new OutlierDetectorResult();
+        final OutlierResult result = new OutlierResult();
         result.setEpochSecond(metricPoint.epochTimeInSeconds());
         result.setObserved(observed);
         result.setPredicted(mean);

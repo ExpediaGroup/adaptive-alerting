@@ -20,7 +20,7 @@ package com.expedia.adaptivealerting.core.detector;
  *
  * @author Willie Wheeler
  */
-public class OutlierDetectorResult {
+public class OutlierResult {
     private Long epochSecond;
     private Double observed;
     private Double predicted;
@@ -105,7 +105,7 @@ public class OutlierDetectorResult {
     
     @Override
     public String toString() {
-        return "OutlierDetectorResult{" +
+        return "OutlierResult{" +
                 "epochSecond=" + epochSecond +
                 ", observed=" + observed +
                 ", predicted=" + predicted +
