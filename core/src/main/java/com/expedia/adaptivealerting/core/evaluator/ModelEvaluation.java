@@ -26,19 +26,19 @@ package com.expedia.adaptivealerting.core.evaluator;
  */
 public class ModelEvaluation {
 
-    private String evalutorMethod;
+    private String evaluatorMethod;
     private double evaluatorScore;
 
     public ModelEvaluation(String method, double score) {
-        this.evalutorMethod = method;
+        this.evaluatorMethod = method;
         this.evaluatorScore = score;
     }
 
     /**
      * @return the evaluatorScore
      */
-    public String getEvalutorMethod() {
-        return evalutorMethod;
+    public String getEvaluatorMethod() {
+        return evaluatorMethod;
     }
 
     /**
