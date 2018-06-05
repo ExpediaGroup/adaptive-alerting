@@ -43,12 +43,12 @@ public final class OutlierDetectorStreamFilter implements StreamSubscriber<Metri
         publisherSupport.publish(anomalyDetector.classify(metricPoint));
     }
     
-    public void addSubscriber(StreamSubscriber<AnomalyResult> subscriber) {
+    public void addAnomalyResultSubscriber(StreamSubscriber<AnomalyResult> subscriber) {
         notNull(subscriber, "subscriber can't be null");
         publisherSupport.addSubscriber(subscriber);
     }
     
-    public void removeSubscriber(StreamSubscriber<AnomalyResult> subscriber) {
+    public void removeAnomalyResultSubscriber(StreamSubscriber<AnomalyResult> subscriber) {
         notNull(subscriber, "subscriber can't be null");
         publisherSupport.removeSubscriber(subscriber);
     }

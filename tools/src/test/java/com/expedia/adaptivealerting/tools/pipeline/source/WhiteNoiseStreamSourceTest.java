@@ -41,7 +41,7 @@ public class WhiteNoiseStreamSourceTest {
         };
         
         final WhiteNoiseMetricSource metricSource = new WhiteNoiseMetricSource();
-        metricSource.addSubscriber(subscriber);
+        metricSource.addMetricPointSubscriber(subscriber);
         
         Executors.newSingleThreadExecutor().execute(new Runnable() {
             
@@ -52,7 +52,7 @@ public class WhiteNoiseStreamSourceTest {
         });
         Thread.sleep(1000L);
         metricSource.stop();
-        metricSource.removeSubscriber(subscriber);
+        metricSource.removeMetricPointSubscriber(subscriber);
     
         assertTrue(calledNext[0]);
     }

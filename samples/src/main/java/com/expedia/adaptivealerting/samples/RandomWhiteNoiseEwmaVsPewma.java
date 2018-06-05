@@ -41,12 +41,12 @@ public class RandomWhiteNoiseEwmaVsPewma {
         final ChartSeries ewmaSeries = new ChartSeries();
         final ChartSeries pewmaSeries = new ChartSeries();
     
-        source.addSubscriber(ewmaFilter);
-        source.addSubscriber(pewmaFilter);
-        ewmaFilter.addSubscriber(new ConsoleLogStreamSink());
-        ewmaFilter.addSubscriber(new OutlierChartStreamSink(ewmaSeries));
-        pewmaFilter.addSubscriber(new ConsoleLogStreamSink());
-        pewmaFilter.addSubscriber(new OutlierChartStreamSink(pewmaSeries));
+        source.addMetricPointSubscriber(ewmaFilter);
+        source.addMetricPointSubscriber(pewmaFilter);
+        ewmaFilter.addAnomalyResultSubscriber(new ConsoleLogStreamSink());
+        ewmaFilter.addAnomalyResultSubscriber(new OutlierChartStreamSink(ewmaSeries));
+        pewmaFilter.addAnomalyResultSubscriber(new ConsoleLogStreamSink());
+        pewmaFilter.addAnomalyResultSubscriber(new OutlierChartStreamSink(pewmaSeries));
     
         showChartFrame(createChartFrame(
                 "White Noise",
