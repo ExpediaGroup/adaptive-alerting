@@ -44,7 +44,7 @@ public class EvaluatorStreamFilter implements StreamSubscriber<AnomalyResult> {
     @Override
     public void next(AnomalyResult anamolyResult) {
         notNull(anamolyResult, "anamolyResult can't be null");
-        evaluator.update(anamolyResult.getObserved(), anamolyResult.getObserved());
+        evaluator.update(anamolyResult.getObserved(), anamolyResult.getPredicted());
         publisherSupport.publish(evaluator.evaluate());
     }
 

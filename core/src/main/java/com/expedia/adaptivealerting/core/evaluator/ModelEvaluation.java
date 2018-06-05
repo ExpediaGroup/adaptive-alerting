@@ -19,26 +19,33 @@
 package com.expedia.adaptivealerting.core.evaluator;
 
 /**
+ * ModelEvaluation
+ * 
  * @author kashah
  *
  */
 public class ModelEvaluation {
 
+    private String evalutorMethod;
     private double evaluatorScore;
+
+    public ModelEvaluation(String method, double score) {
+        this.evalutorMethod = method;
+        this.evaluatorScore = score;
+    }
+
+    /**
+     * @return the evaluatorScore
+     */
+    public String getEvalutorMethod() {
+        return evalutorMethod;
+    }
 
     /**
      * @return the evaluatorScore
      */
     public double getEvaluatorScore() {
         return evaluatorScore;
-    }
-
-    /**
-     * @param evaluatorScore
-     *            the evaluatorScore to set
-     */
-    public void setEvaluatorScore(double evaluatorScore) {
-        this.evaluatorScore = evaluatorScore;
     }
 
 }
