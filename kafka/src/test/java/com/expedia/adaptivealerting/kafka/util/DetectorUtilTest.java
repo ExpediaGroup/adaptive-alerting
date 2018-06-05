@@ -15,8 +15,9 @@
  */
 package com.expedia.adaptivealerting.kafka.util;
 
-import com.expedia.adaptivealerting.core.detector.OutlierDetector;
 import com.expedia.adaptivealerting.core.detector.ConstantThresholdOutlierDetector;
+import com.expedia.adaptivealerting.core.detector.OutlierDetector;
+import com.expedia.adaptivealerting.core.detector.OutlierResult;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.entities.MetricType;
 import org.junit.Test;
@@ -29,7 +30,8 @@ import java.util.Map;
 import java.util.function.Function;
 
 import static com.expedia.adaptivealerting.core.detector.ConstantThresholdOutlierDetector.RIGHT_TAILED;
-import static org.junit.Assert.*;
+import static com.expedia.adaptivealerting.core.detector.OutlierLevel.*;
+import static org.junit.Assert.assertEquals;
 
 public class DetectorUtilTest {
     private static final Function<String, OutlierDetector> DETECTOR_FACTORY =
@@ -41,40 +43,40 @@ public class DetectorUtilTest {
     }
 
     @Test
-    public void evaluateMetricForNullMetric() {
-        MetricPoint evaluated = DetectorUtil.evaluateMetric(
+    public void classifyForNullMetric() {
+        OutlierResult result = DetectorUtil.classify(
                 DetectorUtil.NULL_METRIC_POINT,
                 new HashMap<>(),
                 DETECTOR_FACTORY
         );
-        assertEquals("NORMAL", evaluated.tags().get(DetectorUtil.OUTLIER_LEVEL_TAG).get());
+        assertEquals(NORMAL, result.getOutlierLevel());
     }
 
     @Test
-    public void evaluateMetricForWeakMetric() {
-        MetricPoint evaluated = DetectorUtil.evaluateMetric(
+    public void classifyForWeakMetric() {
+        OutlierResult result = DetectorUtil.classify(
                 new MetricPoint("test", MetricType.Gauge(), Map$.MODULE$.empty(), 0.95f, 0),
                 new HashMap<>(),
                 DETECTOR_FACTORY
         );
-        assertEquals("WEAK", evaluated.tags().get(DetectorUtil.OUTLIER_LEVEL_TAG).get());
+        assertEquals(WEAK, result.getOutlierLevel());
     }
 
     @Test
-    public void evaluateMetricForStrongMetric() {
-        MetricPoint evaluated = DetectorUtil.evaluateMetric(
+    public void classifyForStrongMetric() {
+        OutlierResult result = DetectorUtil.classify(
                 new MetricPoint("test", MetricType.Gauge(), Map$.MODULE$.empty(), 0.99f, 0),
                 new HashMap<>(),
                 DETECTOR_FACTORY
         );
-        assertEquals("STRONG", evaluated.tags().get(DetectorUtil.OUTLIER_LEVEL_TAG).get());
+        assertEquals(STRONG, result.getOutlierLevel());
     }
 
     @Test
-    public void evaluateMetricCreatesNewDetectorIfNotPresent() {
+    public void classifyCreatesNewDetectorIfNotPresent() {
         Map<String, OutlierDetector> detectors = new HashMap<>();
         assertEquals(0, detectors.size());
-        DetectorUtil.evaluateMetric(
+        DetectorUtil.classify(
                 DetectorUtil.NULL_METRIC_POINT,
                 detectors,
                 DETECTOR_FACTORY
@@ -88,7 +90,7 @@ public class DetectorUtilTest {
                 DetectorUtil.extractMetricId(DetectorUtil.NULL_METRIC_POINT),
                 DETECTOR_FACTORY.apply("")
         );
-        DetectorUtil.evaluateMetric(
+        DetectorUtil.classify(
                 DetectorUtil.NULL_METRIC_POINT,
                 detectors,
                 null // Cannot create new detectors without factory.
@@ -101,7 +103,7 @@ public class DetectorUtilTest {
         Map<String, OutlierDetector> detectors = new HashMap<>();
         assertEquals(0, detectors.size());
 
-        DetectorUtil.evaluateMetric(
+        DetectorUtil.classify(
                 DetectorUtil.NULL_METRIC_POINT,
                 detectors,
                 DETECTOR_FACTORY
@@ -110,7 +112,7 @@ public class DetectorUtilTest {
         Collection<OutlierDetector> firstDetectors = detectors.values();
         assertEquals(1, detectors.size());
 
-        DetectorUtil.evaluateMetric(
+        DetectorUtil.classify(
                 DetectorUtil.NULL_METRIC_POINT,
                 detectors,
                 DETECTOR_FACTORY

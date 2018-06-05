@@ -17,11 +17,9 @@ package com.expedia.adaptivealerting.samples;
 
 import com.expedia.adaptivealerting.core.detector.EwmaOutlierDetector;
 import com.expedia.adaptivealerting.core.detector.PewmaOutlierDetector;
-import com.expedia.adaptivealerting.tools.pipeline.MetricFilter;
-import com.expedia.adaptivealerting.tools.pipeline.MetricSource;
-import com.expedia.adaptivealerting.tools.pipeline.filter.OutlierDetectorMetricFilter;
-import com.expedia.adaptivealerting.tools.pipeline.sink.ChartSink;
-import com.expedia.adaptivealerting.tools.pipeline.sink.ConsoleLogMetricSink;
+import com.expedia.adaptivealerting.tools.pipeline.filter.OutlierDetectorStreamFilter;
+import com.expedia.adaptivealerting.tools.pipeline.sink.OutlierChartStreamSink;
+import com.expedia.adaptivealerting.tools.pipeline.sink.ConsoleLogStreamSink;
 import com.expedia.adaptivealerting.tools.pipeline.source.CsvMetricSource;
 import com.expedia.adaptivealerting.tools.visualization.ChartSeries;
 
@@ -29,24 +27,24 @@ import java.io.InputStream;
 
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.*;
 
-public class CsvPipeline {
+public class CsvTrafficEwmaVsPewma {
     
     public static void main(String[] args) {
         final InputStream is = ClassLoader.getSystemResourceAsStream("samples/sample001.csv");
-        final MetricSource source = new CsvMetricSource(is, "data", 200L);
+        final CsvMetricSource source = new CsvMetricSource(is, "data", 1000L);
         
-        final MetricFilter ewmaFilter = new OutlierDetectorMetricFilter(new EwmaOutlierDetector());
-        final MetricFilter pewmaFilter = new OutlierDetectorMetricFilter(new PewmaOutlierDetector());
+        final OutlierDetectorStreamFilter ewmaFilter = new OutlierDetectorStreamFilter(new EwmaOutlierDetector());
+        final OutlierDetectorStreamFilter pewmaFilter = new OutlierDetectorStreamFilter(new PewmaOutlierDetector());
         
         final ChartSeries ewmaSeries = new ChartSeries();
         final ChartSeries pewmaSeries = new ChartSeries();
     
         source.addSubscriber(ewmaFilter);
         source.addSubscriber(pewmaFilter);
-        ewmaFilter.addSubscriber(new ConsoleLogMetricSink());
-        ewmaFilter.addSubscriber(new ChartSink(ewmaSeries));
-        pewmaFilter.addSubscriber(new ConsoleLogMetricSink());
-        pewmaFilter.addSubscriber(new ChartSink(pewmaSeries));
+        ewmaFilter.addSubscriber(new ConsoleLogStreamSink());
+        ewmaFilter.addSubscriber(new OutlierChartStreamSink(ewmaSeries));
+        pewmaFilter.addSubscriber(new ConsoleLogStreamSink());
+        pewmaFilter.addSubscriber(new OutlierChartStreamSink(pewmaSeries));
         
         showChartFrame(createChartFrame(
                 "Cal Inflow",

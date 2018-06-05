@@ -15,19 +15,12 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline;
 
-public interface MetricPublisher {
+/**
+ * Stream subscriber.
+ *
+ * @author Willie Wheeler
+ */
+public interface StreamSubscriber<T> {
     
-    /**
-     * Add a metric source subscriber.
-     *
-     * @param subscriber Metric source subscriber.
-     */
-    void addSubscriber(MetricSubscriber subscriber);
-    
-    /**
-     * Remove a metric source subscriber.
-     *
-     * @param subscriber Metric source subscriber.
-     */
-    void removeSubscriber(MetricSubscriber subscriber);
+    void next(T message);
 }

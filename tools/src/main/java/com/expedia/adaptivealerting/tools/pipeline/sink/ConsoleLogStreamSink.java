@@ -13,10 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.tools.pipeline;
+package com.expedia.adaptivealerting.tools.pipeline.sink;
+
+import com.expedia.adaptivealerting.tools.pipeline.StreamSubscriber;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
+ * Logs generated data to the console.
+ *
  * @author Willie Wheeler
  */
-public interface MetricSink extends MetricSubscriber {
+public final class ConsoleLogStreamSink<T> implements StreamSubscriber<T> {
+    private static final Logger log = LoggerFactory.getLogger(ConsoleLogStreamSink.class);
+    
+    @Override
+    public void next(T message) {
+        notNull(message, "message can't be null");
+        log.info("Received message: {}", message);
+    }
 }

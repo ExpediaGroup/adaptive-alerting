@@ -21,13 +21,10 @@ import org.junit.Test;
 
 import java.time.Instant;
 
-import static com.expedia.adaptivealerting.core.detector.OutlierLevel.NORMAL;
-import static com.expedia.adaptivealerting.core.detector.OutlierLevel.STRONG;
-import static com.expedia.adaptivealerting.core.detector.OutlierLevel.WEAK;
 import static com.expedia.adaptivealerting.core.detector.ConstantThresholdOutlierDetector.LEFT_TAILED;
 import static com.expedia.adaptivealerting.core.detector.ConstantThresholdOutlierDetector.RIGHT_TAILED;
+import static com.expedia.adaptivealerting.core.detector.OutlierLevel.*;
 import static com.expedia.adaptivealerting.core.util.MetricPointUtil.metricPoint;
-import static com.expedia.adaptivealerting.core.util.MetricPointUtil.outlierLevel;
 import static junit.framework.TestCase.assertEquals;
 
 /**
@@ -105,6 +102,6 @@ public class ConstantThresholdOutlierDetectorTest {
     }
     
     private OutlierLevel level(OutlierDetector detector, Instant instant, float value) {
-        return outlierLevel(detector.classifyAndEnrich(metricPoint(instant, value)));
+        return detector.classify(metricPoint(instant, value)).getOutlierLevel();
     }
 }

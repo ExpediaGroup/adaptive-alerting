@@ -40,7 +40,7 @@ import static java.lang.Math.sqrt;
  *
  * @author Willie Wheeler
  */
-public class EwmaOutlierDetector extends AbstractOutlierDetector {
+public class EwmaOutlierDetector implements OutlierDetector {
     
     /**
      * Smoothing param. Somewhat misnamed because higher values lead to less smoothing, but it's called the smoothing
@@ -120,7 +120,7 @@ public class EwmaOutlierDetector extends AbstractOutlierDetector {
     }
     
     @Override
-    public OutlierDetectorResult classify(MetricPoint metricPoint) {
+    public OutlierResult classify(MetricPoint metricPoint) {
         notNull(metricPoint, "metricPoint can't be null");
     
         final double observed = metricPoint.value();
@@ -136,7 +136,7 @@ public class EwmaOutlierDetector extends AbstractOutlierDetector {
             outlierLevel = WEAK;
         }
     
-        final OutlierDetectorResult result = new OutlierDetectorResult();
+        final OutlierResult result = new OutlierResult();
         result.setEpochSecond(metricPoint.epochTimeInSeconds());
         result.setObserved(observed);
         result.setPredicted(mean);
@@ -150,21 +150,6 @@ public class EwmaOutlierDetector extends AbstractOutlierDetector {
         updateEstimates(observed);
         
         return result;
-    }
-    
-    @Override
-    public MetricPoint classifyAndEnrich(MetricPoint metricPoint) {
-        notNull(metricPoint, "metricPoint can't be null");
-        
-        final OutlierDetectorResult result = classify(metricPoint);
-        return tag(
-                metricPoint,
-                result.getOutlierLevel(),
-                result.getPredicted(),
-                result.getWeakThresholdUpper(),
-                result.getWeakThresholdLower(),
-                result.getStrongThresholdUpper(),
-                result.getStrongThresholdLower());
     }
     
     private void updateEstimates(double value) {

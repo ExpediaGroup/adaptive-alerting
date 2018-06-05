@@ -36,7 +36,7 @@ import static com.expedia.adaptivealerting.core.util.MetricPointUtil.metricPoint
  *
  * @author Willie Wheeler
  */
-public class CsvMetricSource extends AbstractMetricSource {
+public final class CsvMetricSource extends AbstractMetricSource {
     private ListIterator<Double> data;
     
     /**
@@ -58,11 +58,7 @@ public class CsvMetricSource extends AbstractMetricSource {
     
     @Override
     public MetricPoint next() {
-        if (data.hasNext()) {
-            return metricPoint(getName(), Instant.now(), data.next().floatValue());
-        } else {
-            return null;
-        }
+        return data.hasNext() ? metricPoint(getName(), Instant.now(), data.next().floatValue()) : null;
     }
     
     private ListIterator<Double> readData(InputStream csvIn) throws IOException {

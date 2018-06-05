@@ -25,7 +25,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
  *
  * @author Willie Wheeler
  */
-public class ConstantThresholdOutlierDetector extends AbstractOutlierDetector {
+public class ConstantThresholdOutlierDetector implements OutlierDetector {
     public static final int LEFT_TAILED = 0;
     public static final int RIGHT_TAILED = 1;
     
@@ -71,7 +71,7 @@ public class ConstantThresholdOutlierDetector extends AbstractOutlierDetector {
     }
     
     @Override
-    public OutlierDetectorResult classify(MetricPoint metricPoint) {
+    public OutlierResult classify(MetricPoint metricPoint) {
         final double observed = metricPoint.value();
         
         Double weakThresholdUpper = null;
@@ -100,7 +100,7 @@ public class ConstantThresholdOutlierDetector extends AbstractOutlierDetector {
             throw new IllegalStateException("Illegal tail: " + tail);
         }
         
-        final OutlierDetectorResult result = new OutlierDetectorResult();
+        final OutlierResult result = new OutlierResult();
         result.setEpochSecond(metricPoint.epochTimeInSeconds());
         result.setObserved(observed);
         result.setWeakThresholdUpper(weakThresholdUpper);
@@ -109,19 +109,5 @@ public class ConstantThresholdOutlierDetector extends AbstractOutlierDetector {
         result.setStrongThresholdLower(strongThresholdLower);
         result.setOutlierLevel(outlierLevel);
         return result;
-    }
-    
-    @Override
-    public MetricPoint classifyAndEnrich(MetricPoint metricPoint) {
-        final OutlierDetectorResult result = classify(metricPoint);
-        return tag(
-                metricPoint,
-                result.getOutlierLevel(),
-                result.getPredicted(),
-                result.getWeakThresholdUpper(),
-                result.getWeakThresholdLower(),
-                result.getStrongThresholdUpper(),
-                result.getStrongThresholdLower()
-        );
     }
 }

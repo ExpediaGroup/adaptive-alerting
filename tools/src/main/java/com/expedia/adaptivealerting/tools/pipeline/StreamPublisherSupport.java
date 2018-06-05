@@ -15,28 +15,29 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline;
 
-import com.expedia.www.haystack.commons.entities.MetricPoint;
-
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * @author Willie Wheeler
  */
-public class MetricPublisherSupport implements MetricPublisher {
-    private final List<MetricSubscriber> subscribers = new LinkedList<>();
+public class StreamPublisherSupport<T> {
+    private final List<StreamSubscriber<T>> subscribers = new LinkedList<>();
     
-    @Override
-    public void addSubscriber(MetricSubscriber subscriber) {
+    public void addSubscriber(StreamSubscriber<T> subscriber) {
+        notNull(subscriber, "subscriber can't be null");
         subscribers.add(subscriber);
     }
     
-    @Override
-    public void removeSubscriber(MetricSubscriber subscriber) {
+    public void removeSubscriber(StreamSubscriber<T> subscriber) {
+        notNull(subscriber, "subscriber can't be null");
         subscribers.remove(subscriber);
     }
     
-    public void publish(MetricPoint metricPoint) {
-        subscribers.stream().forEach(listener -> listener.next(metricPoint));
+    public void publish(T message) {
+        notNull(message, "message can't be null");
+        subscribers.stream().forEach(subscriber -> subscriber.next(message));
     }
 }

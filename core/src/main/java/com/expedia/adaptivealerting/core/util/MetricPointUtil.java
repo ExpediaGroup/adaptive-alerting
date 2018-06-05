@@ -15,17 +15,13 @@
  */
 package com.expedia.adaptivealerting.core.util;
 
-import com.expedia.adaptivealerting.core.detector.OutlierLevel;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.entities.MetricType;
 import scala.Enumeration;
-import scala.Option;
 import scala.collection.immutable.Map;
 import scala.collection.immutable.Map$;
 
 import java.time.Instant;
-
-import static com.expedia.adaptivealerting.core.util.MetricPointTags.OUTLIER_LEVEL;
 
 /**
  * {@link MetricPoint} utilities.
@@ -63,16 +59,5 @@ public final class MetricPointUtil {
      */
     public static MetricPoint metricPoint(String name, Instant instant, float value) {
         return new MetricPoint(name, DEFAULT_TYPE, DEFAULT_TAGS, value, instant.getEpochSecond());
-    }
-    
-    public static OutlierLevel outlierLevel(MetricPoint metricPoint) {
-        final Option option = metricPoint.tags().get(OUTLIER_LEVEL);
-        return (option.isEmpty() ? null : OutlierLevel.valueOf((String) option.get()));
-    }
-    
-    public static Float thresholdValue(MetricPoint metricPoint, String tagName) {
-        final Option option = metricPoint.tags().get(tagName);
-//        return (option.isEmpty() ? null : Float.parseFloat((String) option.get()));
-        return (option.isEmpty() ? null : (Float) option.get());
     }
 }

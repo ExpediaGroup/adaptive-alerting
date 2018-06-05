@@ -85,7 +85,7 @@ public class EwmaOutlierDetectorTest {
             
             // This detector doesn't currently do anything with the instant, so we can just pass now().
             // This may change in the future.
-            detector.classifyAndEnrich(metricPoint(Instant.now(), observed));
+            detector.classify(metricPoint(Instant.now(), observed));
             
             assertApproxEqual(testRow.getKnownMean(), testRow.getMean());
             assertApproxEqual(testRow.getMean(), detector.getMean());

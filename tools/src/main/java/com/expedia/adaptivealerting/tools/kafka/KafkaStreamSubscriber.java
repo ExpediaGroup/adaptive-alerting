@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.tools.kafka;
 
-import com.expedia.adaptivealerting.tools.pipeline.MetricSubscriber;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.kstreams.serde.metricpoint.MetricPointSerializer;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -26,11 +25,9 @@ import org.apache.kafka.streams.StreamsConfig;
 import java.util.Properties;
 
 /**
- * Data generator callback that writes to a Kafka topic.
- *
  * @author Willie Wheeler
  */
-public class KafkaMetricSubscriber implements MetricSubscriber {
+public class KafkaStreamSubscriber {
     private final String topicName;
     private final KafkaProducer<String, MetricPoint> producer;
     
@@ -39,7 +36,7 @@ public class KafkaMetricSubscriber implements MetricSubscriber {
      *
      * @param topicName Kafka topic name.
      */
-    public KafkaMetricSubscriber(String topicName) {
+    public KafkaStreamSubscriber(String topicName) {
         this.topicName = topicName;
         
         // TODO Externalize
@@ -51,7 +48,6 @@ public class KafkaMetricSubscriber implements MetricSubscriber {
         this.producer = new KafkaProducer<>(conf);
     }
     
-    @Override
     public void next(MetricPoint metricPoint) {
         producer.send(new ProducerRecord<String, MetricPoint>(topicName, null, metricPoint));
     }

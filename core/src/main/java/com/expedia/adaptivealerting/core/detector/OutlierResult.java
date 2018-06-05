@@ -20,7 +20,7 @@ package com.expedia.adaptivealerting.core.detector;
  *
  * @author Willie Wheeler
  */
-public class OutlierDetectorResult {
+public class OutlierResult {
     private Long epochSecond;
     private Double observed;
     private Double predicted;
@@ -101,5 +101,20 @@ public class OutlierDetectorResult {
     
     public void setOutlierLevel(OutlierLevel outlierLevel) {
         this.outlierLevel = outlierLevel;
+    }
+    
+    @Override
+    public String toString() {
+        return "OutlierResult{" +
+                "epochSecond=" + epochSecond +
+                ", observed=" + observed +
+                ", predicted=" + predicted +
+                ", weakThresholdUpper=" + weakThresholdUpper +
+                ", weakThresholdLower=" + weakThresholdLower +
+                ", strongThresholdUpper=" + strongThresholdUpper +
+                ", strongThresholdLower=" + strongThresholdLower +
+                ", outlierScore=" + outlierScore +
+                ", outlierLevel=" + outlierLevel +
+                '}';
     }
 }
