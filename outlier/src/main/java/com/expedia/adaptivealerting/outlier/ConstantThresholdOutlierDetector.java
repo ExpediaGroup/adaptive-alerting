@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.detector;
+package com.expedia.adaptivealerting.outlier;
 
+import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
-import static com.expedia.adaptivealerting.core.detector.OutlierLevel.*;
-import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
+import static com.expedia.adaptivealerting.outlier.OutlierLevel.*;
 
 /**
  * Outlier detector with one-sided constant thresholds for weak and strong outliers.
@@ -46,9 +46,9 @@ public class ConstantThresholdOutlierDetector implements OutlierDetector {
      */
     public ConstantThresholdOutlierDetector(int tail, double strongThreshold, double weakThreshold) {
         if (tail == LEFT_TAILED) {
-            isTrue(strongThreshold <= weakThreshold, "Left-tailed detector requires strongThreshold <= weakThreshold");
+            AssertUtil.isTrue(strongThreshold <= weakThreshold, "Left-tailed detector requires strongThreshold <= weakThreshold");
         } else if (tail == RIGHT_TAILED) {
-            isTrue(weakThreshold <= strongThreshold, "Right-tailed detector requires weakThreshold <= strongThreshold");
+            AssertUtil.isTrue(weakThreshold <= strongThreshold, "Right-tailed detector requires weakThreshold <= strongThreshold");
         } else {
             throw new IllegalArgumentException("tail must be either LEFT_TAILED or RIGHT_TAILED");
         }

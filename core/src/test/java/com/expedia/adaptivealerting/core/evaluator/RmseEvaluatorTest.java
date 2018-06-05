@@ -15,22 +15,22 @@
  */
 package com.expedia.adaptivealerting.core.evaluator;
 
-import static org.junit.Assert.assertEquals;
+import com.opencsv.bean.CsvToBeanBuilder;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.ListIterator;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import com.opencsv.bean.CsvToBeanBuilder;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author kashah
- *
  */
-
 public class RmseEvaluatorTest {
 
     private static List<RmseTestRow> calInflowTestRows;

@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.sink;
 
-import com.expedia.adaptivealerting.core.detector.OutlierResult;
+import com.expedia.adaptivealerting.outlier.OutlierResult;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.entities.MetricType;
 import org.junit.Before;

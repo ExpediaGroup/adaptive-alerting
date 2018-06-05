@@ -13,15 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.detector;
+package com.expedia.adaptivealerting.outlier;
 
+import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
-import static com.expedia.adaptivealerting.core.detector.OutlierLevel.NORMAL;
-import static com.expedia.adaptivealerting.core.detector.OutlierLevel.STRONG;
-import static com.expedia.adaptivealerting.core.detector.OutlierLevel.WEAK;
-import static com.expedia.adaptivealerting.core.util.AssertUtil.isBetween;
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.outlier.OutlierLevel.*;
 import static java.lang.Math.*;
 
 /**
@@ -151,7 +148,7 @@ public class PewmaOutlierDetector implements OutlierDetector {
             double strongThresholdSigmas,
             double initValue
     ) {
-        isBetween(initialAlpha, 0.0, 1.0, "initialAlpha must be in the range [0, 1]");
+        AssertUtil.isBetween(initialAlpha, 0.0, 1.0, "initialAlpha must be in the range [0, 1]");
         
         this.alpha0 = 1 - initialAlpha;  // To standardise with the EWMA implementation we use the complement value.
         this.beta = beta;
@@ -171,7 +168,7 @@ public class PewmaOutlierDetector implements OutlierDetector {
     
     @Override
     public OutlierResult classify(MetricPoint metricPoint) {
-        notNull(metricPoint, "metricPoint can't be null");
+        AssertUtil.notNull(metricPoint, "metricPoint can't be null");
     
         final double observed = metricPoint.value();
         final double dist = abs(observed - mean);

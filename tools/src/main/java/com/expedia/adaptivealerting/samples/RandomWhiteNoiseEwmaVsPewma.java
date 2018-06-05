@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.core.detector.EwmaOutlierDetector;
-import com.expedia.adaptivealerting.core.detector.PewmaOutlierDetector;
+import com.expedia.adaptivealerting.outlier.EwmaOutlierDetector;
+import com.expedia.adaptivealerting.outlier.PewmaOutlierDetector;
 import com.expedia.adaptivealerting.tools.pipeline.filter.OutlierDetectorStreamFilter;
 import com.expedia.adaptivealerting.tools.pipeline.sink.OutlierChartStreamSink;
 import com.expedia.adaptivealerting.tools.pipeline.sink.ConsoleLogStreamSink;

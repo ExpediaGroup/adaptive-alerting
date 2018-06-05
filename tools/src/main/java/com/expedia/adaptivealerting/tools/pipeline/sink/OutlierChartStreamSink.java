@@ -15,15 +15,15 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.sink;
 
-import com.expedia.adaptivealerting.core.detector.OutlierResult;
-import com.expedia.adaptivealerting.core.detector.OutlierLevel;
+import com.expedia.adaptivealerting.outlier.OutlierResult;
+import com.expedia.adaptivealerting.outlier.OutlierLevel;
 import com.expedia.adaptivealerting.tools.pipeline.StreamSubscriber;
 import com.expedia.adaptivealerting.tools.visualization.ChartSeries;
 import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeries;
 
-import static com.expedia.adaptivealerting.core.detector.OutlierLevel.STRONG;
-import static com.expedia.adaptivealerting.core.detector.OutlierLevel.WEAK;
+import static com.expedia.adaptivealerting.outlier.OutlierLevel.STRONG;
+import static com.expedia.adaptivealerting.outlier.OutlierLevel.WEAK;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.toSecond;
 

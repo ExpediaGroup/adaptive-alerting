@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.kafka.detector;
 
-import com.expedia.adaptivealerting.core.detector.PewmaOutlierDetector;
+import com.expedia.adaptivealerting.outlier.PewmaOutlierDetector;
 import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
 
 /**

@@ -13,9 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.detector;
+package com.expedia.adaptivealerting.outlier;
 
+import com.expedia.adaptivealerting.core.util.MathUtil;
+import com.expedia.adaptivealerting.core.util.MetricPointUtil;
 import com.opencsv.bean.CsvToBeanBuilder;
+import junit.framework.TestCase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -26,10 +29,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.ListIterator;
 
-import static com.expedia.adaptivealerting.core.util.MathUtil.isApproximatelyEqual;
-import static com.expedia.adaptivealerting.core.util.MetricPointUtil.metricPoint;
 import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
 
 /**
  * @author Willie Wheeler
@@ -85,7 +85,7 @@ public class EwmaOutlierDetectorTest {
             
             // This detector doesn't currently do anything with the instant, so we can just pass now().
             // This may change in the future.
-            detector.classify(metricPoint(Instant.now(), observed));
+            detector.classify(MetricPointUtil.metricPoint(Instant.now(), observed));
             
             assertApproxEqual(testRow.getKnownMean(), testRow.getMean());
             assertApproxEqual(testRow.getMean(), detector.getMean());
@@ -104,6 +104,6 @@ public class EwmaOutlierDetectorTest {
     }
     
     private static void assertApproxEqual(double d1, double d2) {
-        assertTrue(isApproximatelyEqual(d1, d2, TOLERANCE));
+        TestCase.assertTrue(MathUtil.isApproximatelyEqual(d1, d2, TOLERANCE));
     }
 }

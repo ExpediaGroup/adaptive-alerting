@@ -13,15 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.detector;
+package com.expedia.adaptivealerting.outlier;
 
+import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
-import static com.expedia.adaptivealerting.core.detector.OutlierLevel.NORMAL;
-import static com.expedia.adaptivealerting.core.detector.OutlierLevel.STRONG;
-import static com.expedia.adaptivealerting.core.detector.OutlierLevel.WEAK;
-import static com.expedia.adaptivealerting.core.util.AssertUtil.isBetween;
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.outlier.OutlierLevel.*;
 import static java.lang.Math.abs;
 import static java.lang.Math.sqrt;
 
@@ -90,7 +87,7 @@ public class EwmaOutlierDetector implements OutlierDetector {
             double weakThresholdSigmas,
             double initValue) {
         
-        isBetween(alpha, 0.0, 1.0, "alpha must be in the range [0, 1]");
+        AssertUtil.isBetween(alpha, 0.0, 1.0, "alpha must be in the range [0, 1]");
         
         this.alpha = alpha;
         this.weakThresholdSigmas = weakThresholdSigmas;
@@ -121,7 +118,7 @@ public class EwmaOutlierDetector implements OutlierDetector {
     
     @Override
     public OutlierResult classify(MetricPoint metricPoint) {
-        notNull(metricPoint, "metricPoint can't be null");
+        AssertUtil.notNull(metricPoint, "metricPoint can't be null");
     
         final double observed = metricPoint.value();
         final double dist = abs(observed - mean);

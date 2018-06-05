@@ -39,13 +39,20 @@
 
         <!-- Haystack -->
         <dependency>
+            <groupId>com.expedia.www</groupId>
+            <artifactId>haystack-commons</artifactId>
+        </dependency>
+
+        <!-- Adaptive Alerting -->
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>adaptive-alerting-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.expedia.www</groupId>
-            <artifactId>haystack-commons</artifactId>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>adaptive-alerting-outlier</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- Third-party -->

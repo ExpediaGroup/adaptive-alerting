@@ -15,9 +15,9 @@
  */
 package com.expedia.adaptivealerting.kafka.util;
 
-import com.expedia.adaptivealerting.core.detector.ConstantThresholdOutlierDetector;
-import com.expedia.adaptivealerting.core.detector.OutlierDetector;
-import com.expedia.adaptivealerting.core.detector.OutlierResult;
+import com.expedia.adaptivealerting.outlier.ConstantThresholdOutlierDetector;
+import com.expedia.adaptivealerting.outlier.OutlierDetector;
+import com.expedia.adaptivealerting.outlier.OutlierResult;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.entities.MetricType;
 import org.junit.Test;
@@ -29,8 +29,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import static com.expedia.adaptivealerting.core.detector.ConstantThresholdOutlierDetector.RIGHT_TAILED;
-import static com.expedia.adaptivealerting.core.detector.OutlierLevel.*;
+import static com.expedia.adaptivealerting.outlier.ConstantThresholdOutlierDetector.RIGHT_TAILED;
+import static com.expedia.adaptivealerting.outlier.OutlierLevel.*;
 import static org.junit.Assert.assertEquals;
 
 public class DetectorUtilTest {

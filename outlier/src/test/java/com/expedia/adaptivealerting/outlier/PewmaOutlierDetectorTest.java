@@ -13,10 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.detector;
+package com.expedia.adaptivealerting.outlier;
 
+import com.expedia.adaptivealerting.core.util.MathUtil;
+import com.expedia.adaptivealerting.core.util.MetricPointUtil;
 import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBeanBuilder;
+import junit.framework.TestCase;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -26,11 +29,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.ListIterator;
 
-import static com.expedia.adaptivealerting.core.util.MathUtil.isApproximatelyEqual;
-import static com.expedia.adaptivealerting.core.util.MetricPointUtil.metricPoint;
 import static java.lang.Math.sqrt;
 import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
 
 /**
  * @author David Sutherland
@@ -67,8 +67,8 @@ public class PewmaOutlierDetectorTest {
             assertApproxEqual(ewmaOutlierDetector.getMean(), pewmaOutlierDetector.getMean(), threshold);
             assertApproxEqual(ewmaStdDev, pewmaOutlierDetector.getStdDev(), threshold);
             
-            final OutlierResult pewmaResult = pewmaOutlierDetector.classify(metricPoint(Instant.now(), value));
-            final OutlierResult ewmaResult = ewmaOutlierDetector.classify(metricPoint(Instant.now(), value));
+            final OutlierResult pewmaResult = pewmaOutlierDetector.classify(MetricPointUtil.metricPoint(Instant.now(), value));
+            final OutlierResult ewmaResult = ewmaOutlierDetector.classify(MetricPointUtil.metricPoint(Instant.now(), value));
             
             OutlierLevel pOL = pewmaResult.getOutlierLevel();
             OutlierLevel eOL = ewmaResult.getOutlierLevel();
@@ -95,7 +95,7 @@ public class PewmaOutlierDetectorTest {
             
             // This detector doesn't currently do anything with the instant, so we can just pass now().
             // This may change in the future.
-            final OutlierResult result = detector.classify(metricPoint(Instant.now(), (float) observed));
+            final OutlierResult result = detector.classify(MetricPointUtil.metricPoint(Instant.now(), (float) observed));
             
             final OutlierLevel level = result.getOutlierLevel();
             assertApproxEqual(testRow.getMean(), detector.getMean(), 0.00001);
@@ -119,6 +119,6 @@ public class PewmaOutlierDetectorTest {
     }
     
     private static void assertApproxEqual(double d1, double d2, double tolerance) {
-        assertTrue(d1 + " !~ " + d2, isApproximatelyEqual(d1, d2, tolerance));
+        TestCase.assertTrue(d1 + " !~ " + d2, MathUtil.isApproximatelyEqual(d1, d2, tolerance));
     }
 }

@@ -15,10 +15,10 @@
  */
 package com.expedia.adaptivealerting.kafka.detector;
 
-import com.expedia.adaptivealerting.core.detector.ConstantThresholdOutlierDetector;
+import com.expedia.adaptivealerting.outlier.ConstantThresholdOutlierDetector;
 import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
 
-import static com.expedia.adaptivealerting.core.detector.ConstantThresholdOutlierDetector.RIGHT_TAILED;
+import static com.expedia.adaptivealerting.outlier.ConstantThresholdOutlierDetector.RIGHT_TAILED;
 
 public class KafkaConstantThresholdOutlierDetector {
 
