@@ -15,29 +15,27 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.core.detector.EwmaOutlierDetector;
-import com.expedia.adaptivealerting.core.detector.PewmaOutlierDetector;
+import com.expedia.adaptivealerting.anomdetect.EwmaAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.PewmaAnomalyDetector;
 import com.expedia.adaptivealerting.tools.pipeline.filter.OutlierDetectorStreamFilter;
 import com.expedia.adaptivealerting.tools.pipeline.sink.OutlierChartStreamSink;
 import com.expedia.adaptivealerting.tools.pipeline.sink.ConsoleLogStreamSink;
-import com.expedia.adaptivealerting.tools.pipeline.source.WhiteNoiseMetricSource;
+import com.expedia.adaptivealerting.tools.pipeline.source.CsvMetricSource;
 import com.expedia.adaptivealerting.tools.visualization.ChartSeries;
+
+import java.io.InputStream;
 
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.*;
 
-/**
- * This is a sample pipeline based on white noise and a PEWMA filter.
- *
- * @author Willie Wheeler
- */
-public class RandomWhiteNoiseEwmaVsPewma {
+public class CsvTrafficEwmaVsPewma {
     
     public static void main(String[] args) {
-        final WhiteNoiseMetricSource source = new WhiteNoiseMetricSource("white-noise", 1000L, 0.0, 1.0);
-    
-        final OutlierDetectorStreamFilter ewmaFilter = new OutlierDetectorStreamFilter(new EwmaOutlierDetector());
-        final OutlierDetectorStreamFilter pewmaFilter = new OutlierDetectorStreamFilter(new PewmaOutlierDetector());
-    
+        final InputStream is = ClassLoader.getSystemResourceAsStream("samples/sample001.csv");
+        final CsvMetricSource source = new CsvMetricSource(is, "data", 1000L);
+        
+        final OutlierDetectorStreamFilter ewmaFilter = new OutlierDetectorStreamFilter(new EwmaAnomalyDetector());
+        final OutlierDetectorStreamFilter pewmaFilter = new OutlierDetectorStreamFilter(new PewmaAnomalyDetector());
+        
         final ChartSeries ewmaSeries = new ChartSeries();
         final ChartSeries pewmaSeries = new ChartSeries();
     
@@ -47,12 +45,12 @@ public class RandomWhiteNoiseEwmaVsPewma {
         ewmaFilter.addSubscriber(new OutlierChartStreamSink(ewmaSeries));
         pewmaFilter.addSubscriber(new ConsoleLogStreamSink());
         pewmaFilter.addSubscriber(new OutlierChartStreamSink(pewmaSeries));
-    
+        
         showChartFrame(createChartFrame(
-                "White Noise",
+                "Cal Inflow",
                 createChart("EWMA", ewmaSeries),
                 createChart("PEWMA", pewmaSeries)));
-        
+    
         source.start();
     }
 }

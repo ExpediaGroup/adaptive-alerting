@@ -13,15 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.detector;
+package com.expedia.adaptivealerting.anomdetect;
 
+import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
-import static com.expedia.adaptivealerting.core.detector.OutlierLevel.NORMAL;
-import static com.expedia.adaptivealerting.core.detector.OutlierLevel.STRONG;
-import static com.expedia.adaptivealerting.core.detector.OutlierLevel.WEAK;
-import static com.expedia.adaptivealerting.core.util.AssertUtil.isBetween;
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.anomdetect.AnomalyLevel.*;
 import static java.lang.Math.abs;
 import static java.lang.Math.sqrt;
 
@@ -40,7 +37,7 @@ import static java.lang.Math.sqrt;
  *
  * @author Willie Wheeler
  */
-public class EwmaOutlierDetector implements OutlierDetector {
+public class EwmaAnomalyDetector implements AnomalyDetector {
     
     /**
      * Smoothing param. Somewhat misnamed because higher values lead to less smoothing, but it's called the smoothing
@@ -72,7 +69,7 @@ public class EwmaOutlierDetector implements OutlierDetector {
      * Creates a new EWMA outlier detector with alpha = 0.15, weakThresholdSigmas = 2.0, strongThresholdSigmas = 3.0 and
      * initValue = 0.0.
      */
-    public EwmaOutlierDetector() {
+    public EwmaAnomalyDetector() {
         this(0.15, 3.0, 2.0, 0.0);
     }
     
@@ -84,13 +81,13 @@ public class EwmaOutlierDetector implements OutlierDetector {
      * @param weakThresholdSigmas   Weak outlier threshold, in sigmas.
      * @param initValue             Initial observation, used to set the first mean estimate.
      */
-    public EwmaOutlierDetector(
+    public EwmaAnomalyDetector(
             double alpha,
             double strongThresholdSigmas,
             double weakThresholdSigmas,
             double initValue) {
         
-        isBetween(alpha, 0.0, 1.0, "alpha must be in the range [0, 1]");
+        AssertUtil.isBetween(alpha, 0.0, 1.0, "alpha must be in the range [0, 1]");
         
         this.alpha = alpha;
         this.weakThresholdSigmas = weakThresholdSigmas;
@@ -120,8 +117,8 @@ public class EwmaOutlierDetector implements OutlierDetector {
     }
     
     @Override
-    public OutlierResult classify(MetricPoint metricPoint) {
-        notNull(metricPoint, "metricPoint can't be null");
+    public AnomalyResult classify(MetricPoint metricPoint) {
+        AssertUtil.notNull(metricPoint, "metricPoint can't be null");
     
         final double observed = metricPoint.value();
         final double dist = abs(observed - mean);
@@ -129,14 +126,14 @@ public class EwmaOutlierDetector implements OutlierDetector {
         final double weakThreshold = weakThresholdSigmas * stdDev;
         final double strongThreshold = strongThresholdSigmas * stdDev;
     
-        OutlierLevel outlierLevel = NORMAL;
+        AnomalyLevel anomalyLevel = NORMAL;
         if (dist > strongThreshold) {
-            outlierLevel = STRONG;
+            anomalyLevel = STRONG;
         } else if (dist > weakThreshold) {
-            outlierLevel = WEAK;
+            anomalyLevel = WEAK;
         }
     
-        final OutlierResult result = new OutlierResult();
+        final AnomalyResult result = new AnomalyResult();
         result.setEpochSecond(metricPoint.epochTimeInSeconds());
         result.setObserved(observed);
         result.setPredicted(mean);
@@ -145,7 +142,7 @@ public class EwmaOutlierDetector implements OutlierDetector {
         result.setStrongThresholdUpper(mean + strongThreshold);
         result.setStrongThresholdLower(mean - strongThreshold);
         result.setOutlierScore(dist);
-        result.setOutlierLevel(outlierLevel);
+        result.setAnomalyLevel(anomalyLevel);
     
         updateEstimates(observed);
         

@@ -13,9 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.detector;
+package com.expedia.adaptivealerting.anomdetect;
 
+import com.expedia.adaptivealerting.core.util.MathUtil;
+import com.expedia.adaptivealerting.core.util.MetricPointUtil;
 import com.opencsv.bean.CsvToBeanBuilder;
+import junit.framework.TestCase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -26,15 +29,12 @@ import java.time.Instant;
 import java.util.List;
 import java.util.ListIterator;
 
-import static com.expedia.adaptivealerting.core.util.MathUtil.isApproximatelyEqual;
-import static com.expedia.adaptivealerting.core.util.MetricPointUtil.metricPoint;
 import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
 
 /**
  * @author Willie Wheeler
  */
-public class EwmaOutlierDetectorTest {
+public class EwmaAnomalyDetectorTest {
     private static final double TOLERANCE = 0.001;
     
     private static List<EwmaTestRow> data;
@@ -46,7 +46,7 @@ public class EwmaOutlierDetectorTest {
     
     @Test
     public void testDefaultConstructor() {
-        final EwmaOutlierDetector detector = new EwmaOutlierDetector();
+        final EwmaAnomalyDetector detector = new EwmaAnomalyDetector();
         assertEquals(0.15, detector.getAlpha());
         assertEquals(2.0, detector.getWeakThresholdSigmas());
         assertEquals(3.0, detector.getStrongThresholdSigmas());
@@ -54,7 +54,7 @@ public class EwmaOutlierDetectorTest {
     
     @Test(expected = IllegalArgumentException.class)
     public void testConstructor_alphaOutOfRange() {
-        new EwmaOutlierDetector(2.0, 150.0, 100.0, 0.0);
+        new EwmaAnomalyDetector(2.0, 150.0, 100.0, 0.0);
     }
     
     @Test
@@ -68,7 +68,7 @@ public class EwmaOutlierDetectorTest {
         final ListIterator<EwmaTestRow> testRows = data.listIterator();
         final EwmaTestRow testRow0 = testRows.next();
         final double observed0 = testRow0.getObserved();
-        final EwmaOutlierDetector detector = new EwmaOutlierDetector(alpha, strongThreshold, weakThreshold, observed0);
+        final EwmaAnomalyDetector detector = new EwmaAnomalyDetector(alpha, strongThreshold, weakThreshold, observed0);
     
         // Params
         assertEquals(alpha, detector.getAlpha());
@@ -85,12 +85,12 @@ public class EwmaOutlierDetectorTest {
             
             // This detector doesn't currently do anything with the instant, so we can just pass now().
             // This may change in the future.
-            detector.classify(metricPoint(Instant.now(), observed));
+            detector.classify(MetricPointUtil.metricPoint(Instant.now(), observed));
             
             assertApproxEqual(testRow.getKnownMean(), testRow.getMean());
             assertApproxEqual(testRow.getMean(), detector.getMean());
             assertApproxEqual(testRow.getVar(), detector.getVariance());
-            // TODO Assert OutlierLevel
+            // TODO Assert AnomalyLevel
         }
     }
     
@@ -104,6 +104,6 @@ public class EwmaOutlierDetectorTest {
     }
     
     private static void assertApproxEqual(double d1, double d2) {
-        assertTrue(isApproximatelyEqual(d1, d2, TOLERANCE));
+        TestCase.assertTrue(MathUtil.isApproximatelyEqual(d1, d2, TOLERANCE));
     }
 }

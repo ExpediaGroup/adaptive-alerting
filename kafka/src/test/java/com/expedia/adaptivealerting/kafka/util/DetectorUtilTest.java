@@ -15,9 +15,9 @@
  */
 package com.expedia.adaptivealerting.kafka.util;
 
-import com.expedia.adaptivealerting.core.detector.ConstantThresholdOutlierDetector;
-import com.expedia.adaptivealerting.core.detector.OutlierDetector;
-import com.expedia.adaptivealerting.core.detector.OutlierResult;
+import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.ConstantThresholdAnomalyDetector;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.entities.MetricType;
 import org.junit.Test;
@@ -29,13 +29,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import static com.expedia.adaptivealerting.core.detector.ConstantThresholdOutlierDetector.RIGHT_TAILED;
-import static com.expedia.adaptivealerting.core.detector.OutlierLevel.*;
+import static com.expedia.adaptivealerting.anomdetect.ConstantThresholdAnomalyDetector.RIGHT_TAILED;
+import static com.expedia.adaptivealerting.anomdetect.AnomalyLevel.*;
 import static org.junit.Assert.assertEquals;
 
 public class DetectorUtilTest {
-    private static final Function<String, OutlierDetector> DETECTOR_FACTORY =
-            id -> new ConstantThresholdOutlierDetector(RIGHT_TAILED, 0.99f, 0.95f);
+    private static final Function<String, AnomalyDetector> DETECTOR_FACTORY =
+            id -> new ConstantThresholdAnomalyDetector(RIGHT_TAILED, 0.99f, 0.95f);
 
     @Test
     public void extractMetricIdForNullMetric() {
@@ -44,37 +44,37 @@ public class DetectorUtilTest {
 
     @Test
     public void classifyForNullMetric() {
-        OutlierResult result = DetectorUtil.classify(
+        AnomalyResult result = DetectorUtil.classify(
                 DetectorUtil.NULL_METRIC_POINT,
                 new HashMap<>(),
                 DETECTOR_FACTORY
         );
-        assertEquals(NORMAL, result.getOutlierLevel());
+        assertEquals(NORMAL, result.getAnomalyLevel());
     }
 
     @Test
     public void classifyForWeakMetric() {
-        OutlierResult result = DetectorUtil.classify(
+        AnomalyResult result = DetectorUtil.classify(
                 new MetricPoint("test", MetricType.Gauge(), Map$.MODULE$.empty(), 0.95f, 0),
                 new HashMap<>(),
                 DETECTOR_FACTORY
         );
-        assertEquals(WEAK, result.getOutlierLevel());
+        assertEquals(WEAK, result.getAnomalyLevel());
     }
 
     @Test
     public void classifyForStrongMetric() {
-        OutlierResult result = DetectorUtil.classify(
+        AnomalyResult result = DetectorUtil.classify(
                 new MetricPoint("test", MetricType.Gauge(), Map$.MODULE$.empty(), 0.99f, 0),
                 new HashMap<>(),
                 DETECTOR_FACTORY
         );
-        assertEquals(STRONG, result.getOutlierLevel());
+        assertEquals(STRONG, result.getAnomalyLevel());
     }
 
     @Test
     public void classifyCreatesNewDetectorIfNotPresent() {
-        Map<String, OutlierDetector> detectors = new HashMap<>();
+        Map<String, AnomalyDetector> detectors = new HashMap<>();
         assertEquals(0, detectors.size());
         DetectorUtil.classify(
                 DetectorUtil.NULL_METRIC_POINT,
@@ -86,7 +86,7 @@ public class DetectorUtilTest {
 
     @Test
     public void evaluateMetricUsesDetectorIfPresent() {
-        Map<String, OutlierDetector> detectors = Collections.singletonMap(
+        Map<String, AnomalyDetector> detectors = Collections.singletonMap(
                 DetectorUtil.extractMetricId(DetectorUtil.NULL_METRIC_POINT),
                 DETECTOR_FACTORY.apply("")
         );
@@ -100,7 +100,7 @@ public class DetectorUtilTest {
 
     @Test
     public void evaluateMetricReusesDetectors() {
-        Map<String, OutlierDetector> detectors = new HashMap<>();
+        Map<String, AnomalyDetector> detectors = new HashMap<>();
         assertEquals(0, detectors.size());
 
         DetectorUtil.classify(
@@ -109,7 +109,7 @@ public class DetectorUtilTest {
                 DETECTOR_FACTORY
         );
 
-        Collection<OutlierDetector> firstDetectors = detectors.values();
+        Collection<AnomalyDetector> firstDetectors = detectors.values();
         assertEquals(1, detectors.size());
 
         DetectorUtil.classify(
@@ -117,7 +117,7 @@ public class DetectorUtilTest {
                 detectors,
                 DETECTOR_FACTORY
         );
-        Collection<OutlierDetector> secondDetectors = detectors.values();
+        Collection<AnomalyDetector> secondDetectors = detectors.values();
 
         assertEquals(1, firstDetectors.size());
         assertEquals(1, secondDetectors.size());

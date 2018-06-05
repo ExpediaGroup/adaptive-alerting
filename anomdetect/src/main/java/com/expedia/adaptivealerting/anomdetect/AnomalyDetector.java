@@ -13,27 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.detector;
+package com.expedia.adaptivealerting.anomdetect;
+
+import com.expedia.www.haystack.commons.entities.MetricPoint;
 
 /**
- * Outlier level enum.
+ * Outlier detector interface.
  *
  * @author Willie Wheeler
  */
-public enum OutlierLevel {
+public interface AnomalyDetector {
     
     /**
-     * Normal data point (not an outlier).
+     * Classifies the given metric point.
+     *
+     * @param metricPoint Metric point.
+     * @return Outlier classification result, with supporting data such as the prediction, outlier score and various
+     * thresholds.
      */
-    NORMAL,
-    
-    /**
-     * Weak outlier.
-     */
-    WEAK,
-    
-    /**
-     * Strong outlier.
-     */
-    STRONG
+    AnomalyResult classify(MetricPoint metricPoint);
 }

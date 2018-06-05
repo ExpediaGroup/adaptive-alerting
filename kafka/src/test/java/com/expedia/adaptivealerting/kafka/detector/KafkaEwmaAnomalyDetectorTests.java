@@ -18,7 +18,7 @@ package com.expedia.adaptivealerting.kafka.detector;
 import org.junit.Before;
 import org.junit.Test;
 
-public class KafkaEwmaOutlierDetectorTests {
+public class KafkaEwmaAnomalyDetectorTests {
     
     // Class under test
     private KafkaEwmaOutlierDetector detector;

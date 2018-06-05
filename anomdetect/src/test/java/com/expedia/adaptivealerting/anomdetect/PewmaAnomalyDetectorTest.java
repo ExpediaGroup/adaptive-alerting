@@ -13,10 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.detector;
+package com.expedia.adaptivealerting.anomdetect;
 
+import com.expedia.adaptivealerting.core.util.MathUtil;
+import com.expedia.adaptivealerting.core.util.MetricPointUtil;
 import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBeanBuilder;
+import junit.framework.TestCase;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -26,23 +29,20 @@ import java.time.Instant;
 import java.util.List;
 import java.util.ListIterator;
 
-import static com.expedia.adaptivealerting.core.util.MathUtil.isApproximatelyEqual;
-import static com.expedia.adaptivealerting.core.util.MetricPointUtil.metricPoint;
 import static java.lang.Math.sqrt;
 import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
 
 /**
  * @author David Sutherland
  */
-public class PewmaOutlierDetectorTest {
+public class PewmaAnomalyDetectorTest {
     private static final double WEAK_THRESHOLD = 2.0;
     private static final double STRONG_THRESHOLD = 3.0;
     private static final double DEFAULT_ALPHA = 0.05;
     
     @Test
     public void testDefaultConstructor() {
-        final PewmaOutlierDetector detector = new PewmaOutlierDetector();
+        final PewmaAnomalyDetector detector = new PewmaAnomalyDetector();
         assertEquals(0.0, detector.getMean());
     }
     
@@ -52,9 +52,9 @@ public class PewmaOutlierDetectorTest {
         
         final ListIterator<String[]> testRows = readCsv("tests/pewma-sample-input.csv").listIterator();
         final Double initialValue = Double.parseDouble(testRows.next()[0]);
-        final PewmaOutlierDetector pewmaOutlierDetector = new PewmaOutlierDetector(
+        final PewmaAnomalyDetector pewmaOutlierDetector = new PewmaAnomalyDetector(
                 DEFAULT_ALPHA, beta, WEAK_THRESHOLD, STRONG_THRESHOLD, initialValue);
-        final EwmaOutlierDetector ewmaOutlierDetector = new EwmaOutlierDetector(
+        final EwmaAnomalyDetector ewmaOutlierDetector = new EwmaAnomalyDetector(
                 DEFAULT_ALPHA, STRONG_THRESHOLD, WEAK_THRESHOLD, initialValue);
         
         int rowCount = 1;
@@ -67,12 +67,12 @@ public class PewmaOutlierDetectorTest {
             assertApproxEqual(ewmaOutlierDetector.getMean(), pewmaOutlierDetector.getMean(), threshold);
             assertApproxEqual(ewmaStdDev, pewmaOutlierDetector.getStdDev(), threshold);
             
-            final OutlierResult pewmaResult = pewmaOutlierDetector.classify(metricPoint(Instant.now(), value));
-            final OutlierResult ewmaResult = ewmaOutlierDetector.classify(metricPoint(Instant.now(), value));
+            final AnomalyResult pewmaResult = pewmaOutlierDetector.classify(MetricPointUtil.metricPoint(Instant.now(), value));
+            final AnomalyResult ewmaResult = ewmaOutlierDetector.classify(MetricPointUtil.metricPoint(Instant.now(), value));
             
-            OutlierLevel pOL = pewmaResult.getOutlierLevel();
-            OutlierLevel eOL = ewmaResult.getOutlierLevel();
-            if (rowCount > PewmaOutlierDetector.DEFAULT_TRAINING_LENGTH) {
+            AnomalyLevel pOL = pewmaResult.getAnomalyLevel();
+            AnomalyLevel eOL = ewmaResult.getAnomalyLevel();
+            if (rowCount > PewmaAnomalyDetector.DEFAULT_TRAINING_LENGTH) {
                 assertEquals(pOL, eOL);
             }
             rowCount++;
@@ -85,7 +85,7 @@ public class PewmaOutlierDetectorTest {
         
         final ListIterator<PewmaTestRow> testRows = readData_calInflow().listIterator();
         final PewmaTestRow testRow0 = testRows.next();
-        final PewmaOutlierDetector detector = new PewmaOutlierDetector(
+        final PewmaAnomalyDetector detector = new PewmaAnomalyDetector(
                 DEFAULT_ALPHA, beta, WEAK_THRESHOLD, STRONG_THRESHOLD, testRow0.getObserved());
         
         while (testRows.hasNext()) {
@@ -95,12 +95,12 @@ public class PewmaOutlierDetectorTest {
             
             // This detector doesn't currently do anything with the instant, so we can just pass now().
             // This may change in the future.
-            final OutlierResult result = detector.classify(metricPoint(Instant.now(), (float) observed));
+            final AnomalyResult result = detector.classify(MetricPointUtil.metricPoint(Instant.now(), (float) observed));
             
-            final OutlierLevel level = result.getOutlierLevel();
+            final AnomalyLevel level = result.getAnomalyLevel();
             assertApproxEqual(testRow.getMean(), detector.getMean(), 0.00001);
             assertApproxEqual(testRow.getStd(), detector.getStdDev(), 0.00001);
-            assertEquals(OutlierLevel.valueOf(testRow.getLevel()), level);
+            assertEquals(AnomalyLevel.valueOf(testRow.getLevel()), level);
         }
     }
     
@@ -119,6 +119,6 @@ public class PewmaOutlierDetectorTest {
     }
     
     private static void assertApproxEqual(double d1, double d2, double tolerance) {
-        assertTrue(d1 + " !~ " + d2, isApproximatelyEqual(d1, d2, tolerance));
+        TestCase.assertTrue(d1 + " !~ " + d2, MathUtil.isApproximatelyEqual(d1, d2, tolerance));
     }
 }

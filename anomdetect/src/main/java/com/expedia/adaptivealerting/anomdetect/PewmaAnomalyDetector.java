@@ -13,15 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.detector;
+package com.expedia.adaptivealerting.anomdetect;
 
+import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
-import static com.expedia.adaptivealerting.core.detector.OutlierLevel.NORMAL;
-import static com.expedia.adaptivealerting.core.detector.OutlierLevel.STRONG;
-import static com.expedia.adaptivealerting.core.detector.OutlierLevel.WEAK;
-import static com.expedia.adaptivealerting.core.util.AssertUtil.isBetween;
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.anomdetect.AnomalyLevel.*;
 import static java.lang.Math.*;
 
 /**
@@ -41,7 +38,7 @@ import static java.lang.Math.*;
  *
  * @author David Sutherland
  */
-public class PewmaOutlierDetector implements OutlierDetector {
+public class PewmaAnomalyDetector implements AnomalyDetector {
     static final int DEFAULT_TRAINING_LENGTH = 30;
     
     /**
@@ -98,7 +95,7 @@ public class PewmaOutlierDetector implements OutlierDetector {
      * Creates a new PEWMA outlier detector with initialAlpha = 0.15, beta = 1.0, weakThresholdSigmas = 2.0,
      * strongThresholdSigmas = 3.0 and initValue = 0.0.
      */
-    public PewmaOutlierDetector() {
+    public PewmaAnomalyDetector() {
         this(0.15, 1.0, 2.0, 3.0, 0.0);
     }
     
@@ -123,7 +120,7 @@ public class PewmaOutlierDetector implements OutlierDetector {
      * @param strongThresholdSigmas Strong outlier threshold, in sigmas.
      * @param initValue             Initial observation, used to set the first mean estimate.
      */
-    public PewmaOutlierDetector(
+    public PewmaAnomalyDetector(
             double initialAlpha,
             double beta,
             double weakThresholdSigmas,
@@ -143,7 +140,7 @@ public class PewmaOutlierDetector implements OutlierDetector {
      * @param strongThresholdSigmas Strong outlier threshold, in sigmas.
      * @param initValue             Initial observation, used to set the first mean estimate.
      */
-    public PewmaOutlierDetector(
+    public PewmaAnomalyDetector(
             double initialAlpha,
             double beta,
             int trainingLength,
@@ -151,7 +148,7 @@ public class PewmaOutlierDetector implements OutlierDetector {
             double strongThresholdSigmas,
             double initValue
     ) {
-        isBetween(initialAlpha, 0.0, 1.0, "initialAlpha must be in the range [0, 1]");
+        AssertUtil.isBetween(initialAlpha, 0.0, 1.0, "initialAlpha must be in the range [0, 1]");
         
         this.alpha0 = 1 - initialAlpha;  // To standardise with the EWMA implementation we use the complement value.
         this.beta = beta;
@@ -170,22 +167,22 @@ public class PewmaOutlierDetector implements OutlierDetector {
     }
     
     @Override
-    public OutlierResult classify(MetricPoint metricPoint) {
-        notNull(metricPoint, "metricPoint can't be null");
+    public AnomalyResult classify(MetricPoint metricPoint) {
+        AssertUtil.notNull(metricPoint, "metricPoint can't be null");
     
         final double observed = metricPoint.value();
         final double dist = abs(observed - mean);
         final double weakThreshold = weakThresholdSigmas * stdDev;
         final double strongThreshold = strongThresholdSigmas * stdDev;
     
-        OutlierLevel outlierLevel = NORMAL;
+        AnomalyLevel anomalyLevel = NORMAL;
         if (dist > strongThreshold) {
-            outlierLevel = STRONG;
+            anomalyLevel = STRONG;
         } else if (dist > weakThreshold) {
-            outlierLevel = WEAK;
+            anomalyLevel = WEAK;
         }
     
-        final OutlierResult result = new OutlierResult();
+        final AnomalyResult result = new AnomalyResult();
         result.setEpochSecond(metricPoint.epochTimeInSeconds());
         result.setObserved(observed);
         result.setPredicted(mean);
@@ -194,7 +191,7 @@ public class PewmaOutlierDetector implements OutlierDetector {
         result.setStrongThresholdUpper(mean + strongThreshold);
         result.setStrongThresholdLower(mean - strongThreshold);
         result.setOutlierScore(dist);
-        result.setOutlierLevel(outlierLevel);
+        result.setAnomalyLevel(anomalyLevel);
     
         updateEstimates(observed);
     

@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.kafka.detector;
 
-import com.expedia.adaptivealerting.core.detector.EwmaOutlierDetector;
+import com.expedia.adaptivealerting.anomdetect.EwmaAnomalyDetector;
 import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
 
 /**
@@ -27,7 +27,7 @@ public class KafkaEwmaOutlierDetector {
     
     public static void main(String[] args) {
         DetectorUtil.startStreams(
-                id -> new EwmaOutlierDetector(0.8, 3.0, 2.0, 100.0),
+                id -> new EwmaAnomalyDetector(0.8, 3.0, 2.0, 100.0),
                 "ewma-outlier-detector",
                 "ewma-metrics"
         );

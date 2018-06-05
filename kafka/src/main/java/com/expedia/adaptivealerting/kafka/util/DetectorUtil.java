@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.kafka.util;
 
-import com.expedia.adaptivealerting.core.detector.OutlierDetector;
-import com.expedia.adaptivealerting.core.detector.OutlierResult;
+import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.AnomalyResult;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.entities.MetricType;
 import com.expedia.www.haystack.commons.entities.encoders.Encoder;
@@ -45,16 +45,16 @@ public class DetectorUtil {
             new MetricPoint("null", MetricType.Gauge(), Map$.MODULE$.<String, String>empty(), 0, 0);
     private final static Encoder ENCODER = new PeriodReplacementEncoder();
 
-    public static void startStreams(Function<String, OutlierDetector> detectorFactory, String appId, String topicName) {
+    public static void startStreams(Function<String, AnomalyDetector> detectorFactory, String appId, String topicName) {
         final Properties conf = getStreamConfig(appId);
 
         final StreamsBuilder builder = new StreamsBuilder();
         final KStream<String, MetricPoint> metrics = builder.stream(topicName);
 
-        final Map<String, OutlierDetector> detectors = new HashMap<>();
+        final Map<String, AnomalyDetector> detectors = new HashMap<>();
         metrics
                 .map((key, metricPoint) -> {
-                    OutlierResult classified = classify(metricPoint, detectors, detectorFactory);
+                    AnomalyResult classified = classify(metricPoint, detectors, detectorFactory);
                     return KeyValue.pair(null, classified);
                 })
                 .to("anomalies");
@@ -78,10 +78,10 @@ public class DetectorUtil {
         return conf;
     }
 
-    static OutlierResult classify(
+    static AnomalyResult classify(
             MetricPoint metricPoint,
-            Map<String, OutlierDetector> detectors,
-            Function<String, OutlierDetector> detectorFactory
+            Map<String, AnomalyDetector> detectors,
+            Function<String, AnomalyDetector> detectorFactory
     ) {
         // FIXME Hack, see above
         if (metricPoint == null) {
@@ -92,7 +92,7 @@ public class DetectorUtil {
             detectors.put(metricId, detectorFactory.apply(metricId));
         }
 
-        final OutlierDetector detector = detectors.get(metricId);
+        final AnomalyDetector detector = detectors.get(metricId);
         return detector.classify(metricPoint);
     }
 
