@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.outlier;
+package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
-import static com.expedia.adaptivealerting.outlier.OutlierLevel.*;
+import static com.expedia.adaptivealerting.anomdetect.OutlierLevel.*;
 
 /**
  * Outlier detector with one-sided constant thresholds for weak and strong outliers.
  *
  * @author Willie Wheeler
  */
-public class ConstantThresholdOutlierDetector implements OutlierDetector {
+public class ConstantThresholdAnomalyDetector implements AnomalyDetector {
     public static final int LEFT_TAILED = 0;
     public static final int RIGHT_TAILED = 1;
     
@@ -44,7 +44,7 @@ public class ConstantThresholdOutlierDetector implements OutlierDetector {
      * @param strongThreshold Large outlier threshold.
      * @param weakThreshold   Small outlier threshold.
      */
-    public ConstantThresholdOutlierDetector(int tail, double strongThreshold, double weakThreshold) {
+    public ConstantThresholdAnomalyDetector(int tail, double strongThreshold, double weakThreshold) {
         if (tail == LEFT_TAILED) {
             AssertUtil.isTrue(strongThreshold <= weakThreshold, "Left-tailed detector requires strongThreshold <= weakThreshold");
         } else if (tail == RIGHT_TAILED) {

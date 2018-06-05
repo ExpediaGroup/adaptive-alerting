@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.outlier.EwmaOutlierDetector;
-import com.expedia.adaptivealerting.outlier.PewmaOutlierDetector;
+import com.expedia.adaptivealerting.anomdetect.EwmaAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.PewmaAnomalyDetector;
 import com.expedia.adaptivealerting.tools.pipeline.filter.OutlierDetectorStreamFilter;
 import com.expedia.adaptivealerting.tools.pipeline.sink.OutlierChartStreamSink;
 import com.expedia.adaptivealerting.tools.pipeline.sink.ConsoleLogStreamSink;
@@ -35,8 +35,8 @@ public class RandomWhiteNoiseEwmaVsPewma {
     public static void main(String[] args) {
         final WhiteNoiseMetricSource source = new WhiteNoiseMetricSource("white-noise", 1000L, 0.0, 1.0);
     
-        final OutlierDetectorStreamFilter ewmaFilter = new OutlierDetectorStreamFilter(new EwmaOutlierDetector());
-        final OutlierDetectorStreamFilter pewmaFilter = new OutlierDetectorStreamFilter(new PewmaOutlierDetector());
+        final OutlierDetectorStreamFilter ewmaFilter = new OutlierDetectorStreamFilter(new EwmaAnomalyDetector());
+        final OutlierDetectorStreamFilter pewmaFilter = new OutlierDetectorStreamFilter(new PewmaAnomalyDetector());
     
         final ChartSeries ewmaSeries = new ChartSeries();
         final ChartSeries pewmaSeries = new ChartSeries();

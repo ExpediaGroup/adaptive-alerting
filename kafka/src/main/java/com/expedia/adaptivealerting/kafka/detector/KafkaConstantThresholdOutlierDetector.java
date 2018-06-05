@@ -15,16 +15,16 @@
  */
 package com.expedia.adaptivealerting.kafka.detector;
 
-import com.expedia.adaptivealerting.outlier.ConstantThresholdOutlierDetector;
+import com.expedia.adaptivealerting.anomdetect.ConstantThresholdAnomalyDetector;
 import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
 
-import static com.expedia.adaptivealerting.outlier.ConstantThresholdOutlierDetector.RIGHT_TAILED;
+import static com.expedia.adaptivealerting.anomdetect.ConstantThresholdAnomalyDetector.RIGHT_TAILED;
 
 public class KafkaConstantThresholdOutlierDetector {
 
     public static void main(String[] args) {
         DetectorUtil.startStreams(
-                id -> new ConstantThresholdOutlierDetector(RIGHT_TAILED, 0.99f, 0.95f),
+                id -> new ConstantThresholdAnomalyDetector(RIGHT_TAILED, 0.99f, 0.95f),
                 "constant-outlier-detector",
                 "constant-metrics"
         );

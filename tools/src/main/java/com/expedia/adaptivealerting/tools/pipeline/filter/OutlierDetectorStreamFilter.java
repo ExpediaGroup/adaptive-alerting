@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.filter;
 
-import com.expedia.adaptivealerting.outlier.OutlierDetector;
-import com.expedia.adaptivealerting.outlier.OutlierResult;
+import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.OutlierResult;
 import com.expedia.adaptivealerting.tools.pipeline.StreamPublisherSupport;
 import com.expedia.adaptivealerting.tools.pipeline.StreamSubscriber;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
@@ -29,18 +29,18 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author Willie Wheeler
  */
 public final class OutlierDetectorStreamFilter implements StreamSubscriber<MetricPoint> {
-    private final OutlierDetector outlierDetector;
+    private final AnomalyDetector anomalyDetector;
     private final StreamPublisherSupport<OutlierResult> publisherSupport = new StreamPublisherSupport<>();
     
-    public OutlierDetectorStreamFilter(OutlierDetector outlierDetector) {
-        notNull(outlierDetector, "outlierDetector can't be null");
-        this.outlierDetector = outlierDetector;
+    public OutlierDetectorStreamFilter(AnomalyDetector anomalyDetector) {
+        notNull(anomalyDetector, "anomalyDetector can't be null");
+        this.anomalyDetector = anomalyDetector;
     }
     
     @Override
     public void next(MetricPoint metricPoint) {
         notNull(metricPoint, "metricPoint can't be null");
-        publisherSupport.publish(outlierDetector.classify(metricPoint));
+        publisherSupport.publish(anomalyDetector.classify(metricPoint));
     }
     
     public void addSubscriber(StreamSubscriber<OutlierResult> subscriber) {

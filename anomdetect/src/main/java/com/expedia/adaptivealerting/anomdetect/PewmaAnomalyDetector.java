@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.outlier;
+package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
-import static com.expedia.adaptivealerting.outlier.OutlierLevel.*;
+import static com.expedia.adaptivealerting.anomdetect.OutlierLevel.*;
 import static java.lang.Math.*;
 
 /**
@@ -38,7 +38,7 @@ import static java.lang.Math.*;
  *
  * @author David Sutherland
  */
-public class PewmaOutlierDetector implements OutlierDetector {
+public class PewmaAnomalyDetector implements AnomalyDetector {
     static final int DEFAULT_TRAINING_LENGTH = 30;
     
     /**
@@ -95,7 +95,7 @@ public class PewmaOutlierDetector implements OutlierDetector {
      * Creates a new PEWMA outlier detector with initialAlpha = 0.15, beta = 1.0, weakThresholdSigmas = 2.0,
      * strongThresholdSigmas = 3.0 and initValue = 0.0.
      */
-    public PewmaOutlierDetector() {
+    public PewmaAnomalyDetector() {
         this(0.15, 1.0, 2.0, 3.0, 0.0);
     }
     
@@ -120,7 +120,7 @@ public class PewmaOutlierDetector implements OutlierDetector {
      * @param strongThresholdSigmas Strong outlier threshold, in sigmas.
      * @param initValue             Initial observation, used to set the first mean estimate.
      */
-    public PewmaOutlierDetector(
+    public PewmaAnomalyDetector(
             double initialAlpha,
             double beta,
             double weakThresholdSigmas,
@@ -140,7 +140,7 @@ public class PewmaOutlierDetector implements OutlierDetector {
      * @param strongThresholdSigmas Strong outlier threshold, in sigmas.
      * @param initValue             Initial observation, used to set the first mean estimate.
      */
-    public PewmaOutlierDetector(
+    public PewmaAnomalyDetector(
             double initialAlpha,
             double beta,
             int trainingLength,

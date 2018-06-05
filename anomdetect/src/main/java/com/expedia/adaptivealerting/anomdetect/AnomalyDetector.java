@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.outlier;
+package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
@@ -22,7 +22,7 @@ import com.expedia.www.haystack.commons.entities.MetricPoint;
  *
  * @author Willie Wheeler
  */
-public interface OutlierDetector {
+public interface AnomalyDetector {
     
     /**
      * Classifies the given metric point.

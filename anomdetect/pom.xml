@@ -27,7 +27,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.expedia.adaptivealerting</groupId>
-    <artifactId>adaptive-alerting-outlier</artifactId>
+    <artifactId>adaptive-alerting-anomdetect</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 

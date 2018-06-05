@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.outlier;
+package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
-import static com.expedia.adaptivealerting.outlier.OutlierLevel.*;
+import static com.expedia.adaptivealerting.anomdetect.OutlierLevel.*;
 import static java.lang.Math.abs;
 import static java.lang.Math.sqrt;
 
@@ -37,7 +37,7 @@ import static java.lang.Math.sqrt;
  *
  * @author Willie Wheeler
  */
-public class EwmaOutlierDetector implements OutlierDetector {
+public class EwmaAnomalyDetector implements AnomalyDetector {
     
     /**
      * Smoothing param. Somewhat misnamed because higher values lead to less smoothing, but it's called the smoothing
@@ -69,7 +69,7 @@ public class EwmaOutlierDetector implements OutlierDetector {
      * Creates a new EWMA outlier detector with alpha = 0.15, weakThresholdSigmas = 2.0, strongThresholdSigmas = 3.0 and
      * initValue = 0.0.
      */
-    public EwmaOutlierDetector() {
+    public EwmaAnomalyDetector() {
         this(0.15, 3.0, 2.0, 0.0);
     }
     
@@ -81,7 +81,7 @@ public class EwmaOutlierDetector implements OutlierDetector {
      * @param weakThresholdSigmas   Weak outlier threshold, in sigmas.
      * @param initValue             Initial observation, used to set the first mean estimate.
      */
-    public EwmaOutlierDetector(
+    public EwmaAnomalyDetector(
             double alpha,
             double strongThresholdSigmas,
             double weakThresholdSigmas,

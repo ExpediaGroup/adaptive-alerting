@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.outlier;
+package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.core.util.MathUtil;
 import com.expedia.adaptivealerting.core.util.MetricPointUtil;
@@ -34,7 +34,7 @@ import static junit.framework.TestCase.assertEquals;
 /**
  * @author Willie Wheeler
  */
-public class EwmaOutlierDetectorTest {
+public class EwmaAnomalyDetectorTest {
     private static final double TOLERANCE = 0.001;
     
     private static List<EwmaTestRow> data;
@@ -46,7 +46,7 @@ public class EwmaOutlierDetectorTest {
     
     @Test
     public void testDefaultConstructor() {
-        final EwmaOutlierDetector detector = new EwmaOutlierDetector();
+        final EwmaAnomalyDetector detector = new EwmaAnomalyDetector();
         assertEquals(0.15, detector.getAlpha());
         assertEquals(2.0, detector.getWeakThresholdSigmas());
         assertEquals(3.0, detector.getStrongThresholdSigmas());
@@ -54,7 +54,7 @@ public class EwmaOutlierDetectorTest {
     
     @Test(expected = IllegalArgumentException.class)
     public void testConstructor_alphaOutOfRange() {
-        new EwmaOutlierDetector(2.0, 150.0, 100.0, 0.0);
+        new EwmaAnomalyDetector(2.0, 150.0, 100.0, 0.0);
     }
     
     @Test
@@ -68,7 +68,7 @@ public class EwmaOutlierDetectorTest {
         final ListIterator<EwmaTestRow> testRows = data.listIterator();
         final EwmaTestRow testRow0 = testRows.next();
         final double observed0 = testRow0.getObserved();
-        final EwmaOutlierDetector detector = new EwmaOutlierDetector(alpha, strongThreshold, weakThreshold, observed0);
+        final EwmaAnomalyDetector detector = new EwmaAnomalyDetector(alpha, strongThreshold, weakThreshold, observed0);
     
         // Params
         assertEquals(alpha, detector.getAlpha());

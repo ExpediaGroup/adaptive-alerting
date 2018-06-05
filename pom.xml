@@ -31,7 +31,7 @@
 
     <modules>
         <module>core</module>
-        <module>outlier</module>
+        <module>anomdetect</module>
         <module>kafka</module>
         <module>tools</module>
     </modules>

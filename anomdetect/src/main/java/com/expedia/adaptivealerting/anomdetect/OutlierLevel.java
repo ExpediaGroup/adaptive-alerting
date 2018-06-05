@@ -13,21 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.detector;
+package com.expedia.adaptivealerting.anomdetect;
 
-import org.junit.Before;
-import org.junit.Test;
-
-public class KafkaEwmaOutlierDetectorTests {
+/**
+ * Outlier level enum.
+ *
+ * @author Willie Wheeler
+ */
+public enum OutlierLevel {
     
-    // Class under test
-    private KafkaEwmaOutlierDetector detector;
+    /**
+     * Normal data point (not an outlier).
+     */
+    NORMAL,
     
-    @Before
-    public void setUp() {
-    }
+    /**
+     * Weak outlier.
+     */
+    WEAK,
     
-    @Test
-    public void testDummy() {
-    }
+    /**
+     * Strong outlier.
+     */
+    STRONG
 }

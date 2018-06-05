@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.outlier;
+package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.core.util.MathUtil;
 import com.expedia.adaptivealerting.core.util.MetricPointUtil;
@@ -35,14 +35,14 @@ import static junit.framework.TestCase.assertEquals;
 /**
  * @author David Sutherland
  */
-public class PewmaOutlierDetectorTest {
+public class PewmaAnomalyDetectorTest {
     private static final double WEAK_THRESHOLD = 2.0;
     private static final double STRONG_THRESHOLD = 3.0;
     private static final double DEFAULT_ALPHA = 0.05;
     
     @Test
     public void testDefaultConstructor() {
-        final PewmaOutlierDetector detector = new PewmaOutlierDetector();
+        final PewmaAnomalyDetector detector = new PewmaAnomalyDetector();
         assertEquals(0.0, detector.getMean());
     }
     
@@ -52,9 +52,9 @@ public class PewmaOutlierDetectorTest {
         
         final ListIterator<String[]> testRows = readCsv("tests/pewma-sample-input.csv").listIterator();
         final Double initialValue = Double.parseDouble(testRows.next()[0]);
-        final PewmaOutlierDetector pewmaOutlierDetector = new PewmaOutlierDetector(
+        final PewmaAnomalyDetector pewmaOutlierDetector = new PewmaAnomalyDetector(
                 DEFAULT_ALPHA, beta, WEAK_THRESHOLD, STRONG_THRESHOLD, initialValue);
-        final EwmaOutlierDetector ewmaOutlierDetector = new EwmaOutlierDetector(
+        final EwmaAnomalyDetector ewmaOutlierDetector = new EwmaAnomalyDetector(
                 DEFAULT_ALPHA, STRONG_THRESHOLD, WEAK_THRESHOLD, initialValue);
         
         int rowCount = 1;
@@ -72,7 +72,7 @@ public class PewmaOutlierDetectorTest {
             
             OutlierLevel pOL = pewmaResult.getOutlierLevel();
             OutlierLevel eOL = ewmaResult.getOutlierLevel();
-            if (rowCount > PewmaOutlierDetector.DEFAULT_TRAINING_LENGTH) {
+            if (rowCount > PewmaAnomalyDetector.DEFAULT_TRAINING_LENGTH) {
                 assertEquals(pOL, eOL);
             }
             rowCount++;
@@ -85,7 +85,7 @@ public class PewmaOutlierDetectorTest {
         
         final ListIterator<PewmaTestRow> testRows = readData_calInflow().listIterator();
         final PewmaTestRow testRow0 = testRows.next();
-        final PewmaOutlierDetector detector = new PewmaOutlierDetector(
+        final PewmaAnomalyDetector detector = new PewmaAnomalyDetector(
                 DEFAULT_ALPHA, beta, WEAK_THRESHOLD, STRONG_THRESHOLD, testRow0.getObserved());
         
         while (testRows.hasNext()) {
