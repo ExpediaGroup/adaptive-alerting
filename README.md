@@ -31,9 +31,10 @@ Adaptive Alerting is organized into a number of modules, shown above. Here's wha
 For more details, see
 
 - [Architectural overview](docs/architecture.md)
-- [Core platform](core/README.md)
-- [Anomaly detection](anomdetect/README.md)
-- [Anomaly validation](anomvalidate/README.md)
-- [Kafka deployments](kafka/README.md)
+- [Core library](core/README.md)
+- [Model Service](modelservice/README.md)
+- [Anomaly Detection](anomdetect/README.md)
+- [Anomaly Validation](anomvalidate/README.md)
+- [Kafka deployment](kafka/README.md)
 - [Development tools](tools/README.md)
 - [Samples](samples/README.md)
