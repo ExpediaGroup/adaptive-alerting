@@ -13,16 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.tools.pipeline;
+package com.expedia.adaptivealerting.tools.pipeline.util;
 
-import com.expedia.adaptivealerting.core.evaluator.ModelEvaluation;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 
 /**
- * @author kashah
- *
+ * @author Willie Wheeler
  */
-public interface ModelEvaluationSubscriber {
+public interface AnomalyResultSubscriber {
     
-    void next(ModelEvaluation modelEvaluation);
-
+    void next(AnomalyResult anomalyResult);
 }

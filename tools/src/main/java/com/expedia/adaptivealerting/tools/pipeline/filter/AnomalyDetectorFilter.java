@@ -17,25 +17,25 @@ package com.expedia.adaptivealerting.tools.pipeline.filter;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.tools.pipeline.AnomalyResultSubscriber;
-import com.expedia.adaptivealerting.tools.pipeline.MetricPointSubscriber;
+import com.expedia.adaptivealerting.tools.pipeline.util.AnomalyResultSubscriber;
+import com.expedia.adaptivealerting.tools.pipeline.util.MetricPointSubscriber;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
-
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * Stream filter that applies an outlier detector to metrics and generates outlier detector results.
  *
  * @author Willie Wheeler
  */
-public final class AnomalyDetectorStreamFilter implements MetricPointSubscriber {
+public final class AnomalyDetectorFilter implements MetricPointSubscriber {
     private final AnomalyDetector anomalyDetector;
     private final List<AnomalyResultSubscriber> subscribers = new LinkedList<>();
 
-    public AnomalyDetectorStreamFilter(AnomalyDetector anomalyDetector) {
+    public AnomalyDetectorFilter(AnomalyDetector anomalyDetector) {
         notNull(anomalyDetector, "anomalyDetector can't be null");
         this.anomalyDetector = anomalyDetector;
     }

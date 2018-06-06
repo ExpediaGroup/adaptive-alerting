@@ -17,10 +17,11 @@ package com.expedia.adaptivealerting.samples;
 
 import com.expedia.adaptivealerting.anomdetect.EwmaAnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.PewmaAnomalyDetector;
-import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorStreamFilter;
-import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartStreamSink;
+import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorFilter;
+import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartSink;
 import com.expedia.adaptivealerting.tools.pipeline.source.RandomWalkMetricSource;
 import com.expedia.adaptivealerting.tools.visualization.ChartSeries;
+import org.jfree.chart.JFreeChart;
 
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.*;
 
@@ -34,22 +35,25 @@ public class RandomWalkEwmaVsPewma {
     public static void main(String[] args) {
         final RandomWalkMetricSource source = new RandomWalkMetricSource();
         
-        final AnomalyDetectorStreamFilter ewmaFilter = new AnomalyDetectorStreamFilter(new EwmaAnomalyDetector());
-        final AnomalyDetectorStreamFilter pewmaFilter = new AnomalyDetectorStreamFilter(new PewmaAnomalyDetector());
+        final AnomalyDetectorFilter ewmaFilter = new AnomalyDetectorFilter(new EwmaAnomalyDetector());
+        final AnomalyDetectorFilter pewmaFilter = new AnomalyDetectorFilter(new PewmaAnomalyDetector());
         
         final ChartSeries ewmaSeries = new ChartSeries();
         final ChartSeries pewmaSeries = new ChartSeries();
         
+        final JFreeChart ewmaChart = createChart("EWMA", ewmaSeries);
+        final JFreeChart pewmaChart = createChart("PEWMA", pewmaSeries);
+        
+        final AnomalyChartSink ewmaSink = new AnomalyChartSink(ewmaChart, ewmaSeries);
+        final AnomalyChartSink pewmaSink = new AnomalyChartSink(pewmaChart, pewmaSeries);
+        
         source.addSubscriber(ewmaFilter);
         source.addSubscriber(pewmaFilter);
-        ewmaFilter.addSubscriber(new AnomalyChartStreamSink(ewmaSeries));
-        pewmaFilter.addSubscriber(new AnomalyChartStreamSink(pewmaSeries));
         
-        showChartFrame(createChartFrame(
-                "Random Walk",
-                createChart("EWMA", ewmaSeries),
-                createChart("PEWMA", pewmaSeries)));
+        ewmaFilter.addSubscriber(ewmaSink);
+        pewmaFilter.addSubscriber(pewmaSink);
         
+        showChartFrame(createChartFrame("Random Walk", ewmaChart, pewmaChart));
         source.start();
     }
 }

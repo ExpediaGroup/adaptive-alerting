@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.tools.pipeline.source;
 
 import com.expedia.adaptivealerting.core.util.ThreadUtil;
-import com.expedia.adaptivealerting.tools.pipeline.MetricPointSubscriber;
+import com.expedia.adaptivealerting.tools.pipeline.util.MetricPointSubscriber;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
 import java.util.concurrent.Executors;

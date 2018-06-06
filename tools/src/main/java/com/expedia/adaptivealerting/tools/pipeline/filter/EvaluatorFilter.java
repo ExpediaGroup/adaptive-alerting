@@ -24,8 +24,8 @@ import java.util.List;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.evaluator.Evaluator;
 import com.expedia.adaptivealerting.core.evaluator.ModelEvaluation;
-import com.expedia.adaptivealerting.tools.pipeline.AnomalyResultSubscriber;
-import com.expedia.adaptivealerting.tools.pipeline.ModelEvaluationSubscriber;
+import com.expedia.adaptivealerting.tools.pipeline.util.AnomalyResultSubscriber;
+import com.expedia.adaptivealerting.tools.pipeline.util.ModelEvaluationSubscriber;
 
 
 /**
@@ -34,12 +34,12 @@ import com.expedia.adaptivealerting.tools.pipeline.ModelEvaluationSubscriber;
  * @author kashah
  *
  */
-public class EvaluatorStreamFilter implements AnomalyResultSubscriber {
+public class EvaluatorFilter implements AnomalyResultSubscriber {
 
     private final Evaluator evaluator;
     private final List<ModelEvaluationSubscriber> subscribers = new LinkedList<>();
 
-    public EvaluatorStreamFilter(Evaluator evaluator) {
+    public EvaluatorFilter(Evaluator evaluator) {
         notNull(evaluator, "evaluator can't be null");
         this.evaluator = evaluator;
     }

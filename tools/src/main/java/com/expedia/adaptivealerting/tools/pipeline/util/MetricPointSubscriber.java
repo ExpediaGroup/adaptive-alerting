@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.tools.pipeline;
+package com.expedia.adaptivealerting.tools.pipeline.util;
 
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
