@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.tools.pipeline.source;
 
 import com.expedia.adaptivealerting.core.util.ThreadUtil;
-import com.expedia.adaptivealerting.tools.pipeline.StreamSubscriber;
+import com.expedia.adaptivealerting.tools.pipeline.MetricPointSubscriber;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
 import java.util.concurrent.Executors;
@@ -41,7 +41,7 @@ public final class MetricSourceTestSupport {
     public void testStartAndStop(MetricSource metricSource, long runMillis) {
         final boolean[] calledNext = new boolean[1];
         
-        final StreamSubscriber subscriber = new StreamSubscriber<MetricPoint>() {
+        final MetricPointSubscriber subscriber = new MetricPointSubscriber() {
             @Override
             public void next(MetricPoint metricPoint) {
                 calledNext[0] = true;

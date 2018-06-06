@@ -17,7 +17,6 @@ package com.expedia.adaptivealerting.samples;
 
 import com.expedia.adaptivealerting.anomdetect.PewmaAnomalyDetector;
 import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorStreamFilter;
-import com.expedia.adaptivealerting.tools.pipeline.sink.ConsoleLogStreamSink;
 import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartStreamSink;
 import com.expedia.adaptivealerting.tools.pipeline.source.CsvMetricSource;
 import com.expedia.adaptivealerting.tools.visualization.ChartSeries;
@@ -50,11 +49,8 @@ public class CsvTrafficPewmaVariants {
         source.addMetricPointSubscriber(pewma2Filter);
         source.addMetricPointSubscriber(pewma3Filter);
         
-        pewma1Filter.addAnomalyResultSubscriber(new ConsoleLogStreamSink());
         pewma1Filter.addAnomalyResultSubscriber(new AnomalyChartStreamSink(pewma1Series));
-        pewma2Filter.addAnomalyResultSubscriber(new ConsoleLogStreamSink());
         pewma2Filter.addAnomalyResultSubscriber(new AnomalyChartStreamSink(pewma2Series));
-        pewma3Filter.addAnomalyResultSubscriber(new ConsoleLogStreamSink());
         pewma3Filter.addAnomalyResultSubscriber(new AnomalyChartStreamSink(pewma3Series));
         
         showChartFrame(createChartFrame(
