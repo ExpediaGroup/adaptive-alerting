@@ -25,6 +25,8 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeries;
 
+import java.text.DecimalFormat;
+
 import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.STRONG;
 import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.WEAK;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -37,16 +39,23 @@ public final class AnomalyChartSink implements AnomalyResultSubscriber, ModelEva
     private final JFreeChart chart;
     private final String baseTitle;
     private final ChartSeries chartSeries;
+    private final DecimalFormat format = new DecimalFormat(".###");
     
-    // TODO Should be able to get the chart series from the chart itself.
-    // Once we do that, just get rid of the chartSeries parameter. [WLW]
     public AnomalyChartSink(JFreeChart chart, ChartSeries chartSeries) {
         notNull(chart, "chart can't be null");
         notNull(chartSeries, "chartSeries can't be null");
         
         this.chart = chart;
-        this.baseTitle = chart.getTitle().getText();
         this.chartSeries = chartSeries;
+        this.baseTitle = chart.getTitle().getText();
+    }
+    
+    public JFreeChart getChart() {
+    
+    }
+    
+    public ChartSeries getChartSeries() {
+        return chartSeries;
     }
     
     @Override
@@ -81,7 +90,7 @@ public final class AnomalyChartSink implements AnomalyResultSubscriber, ModelEva
                 .append(" (")
                 .append(evaluation.getEvaluatorMethod())
                 .append("=")
-                .append(evaluation.getEvaluatorScore())
+                .append(format.format(evaluation.getEvaluatorScore()))
                 .append(")")
                 .toString();
         chart.setTitle(title);
