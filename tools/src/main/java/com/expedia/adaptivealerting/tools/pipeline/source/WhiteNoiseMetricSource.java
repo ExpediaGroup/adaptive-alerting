@@ -58,7 +58,7 @@ public final class WhiteNoiseMetricSource extends AbstractMetricSource {
     
     @Override
     public MetricPoint next() {
-        final float value = (float) (stdDev * random.nextGaussian() + mean);
-        return metricPoint(getName(), Instant.now(), value);
+        final double value = mean + stdDev * random.nextGaussian();
+        return metricPoint(getMetricName(), Instant.now(), value);
     }
 }

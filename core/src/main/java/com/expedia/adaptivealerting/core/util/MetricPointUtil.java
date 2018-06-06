@@ -45,7 +45,7 @@ public final class MetricPointUtil {
      * @param value   Metric value.
      * @return Metric point.
      */
-    public static MetricPoint metricPoint(Instant instant, float value) {
+    public static MetricPoint metricPoint(Instant instant, double value) {
         return metricPoint("data", instant, value);
     }
     
@@ -57,7 +57,8 @@ public final class MetricPointUtil {
      * @param value   Metric value.
      * @return Metric point.
      */
-    public static MetricPoint metricPoint(String name, Instant instant, float value) {
-        return new MetricPoint(name, DEFAULT_TYPE, DEFAULT_TAGS, value, instant.getEpochSecond());
+    public static MetricPoint metricPoint(String name, Instant instant, double value) {
+        long epochSecond = instant.getEpochSecond();
+        return new MetricPoint(name, DEFAULT_TYPE, DEFAULT_TAGS, (float) value, epochSecond);
     }
 }
