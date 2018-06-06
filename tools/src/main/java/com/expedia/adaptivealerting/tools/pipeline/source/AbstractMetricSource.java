@@ -22,6 +22,7 @@ import com.expedia.www.haystack.commons.entities.MetricPoint;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
@@ -29,29 +30,45 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  *
  * @author Willie Wheeler
  */
-public abstract class AbstractMetricSource {
-    private final String name;
+public abstract class AbstractMetricSource implements MetricSource {
+    private final String metricName;
     private final long period;
     
-    private final Timer timer = new Timer();
     private final StreamPublisherSupport<MetricPoint> publisherSupport = new StreamPublisherSupport<>();
+    private final Timer timer = new Timer();
     
     /**
      * Creates a new metric source with the given period.
      *
-     * @param name   Metric name.
-     * @param period Timer period in seconds.
+     * @param metricName Metric metricName.
+     * @param period     Timer period in seconds.
      */
-    public AbstractMetricSource(String name, long period) {
-        notNull(name, "name can't be null");
-        this.name = name;
+    public AbstractMetricSource(String metricName, long period) {
+        notNull(metricName, "metricName can't be null");
+        isTrue(period > 0, "period must be > 0");
+        
+        this.metricName = metricName;
         this.period = period;
     }
     
-    public String getName() {
-        return name;
+    @Override
+    public String getMetricName() {
+        return metricName;
     }
     
+    @Override
+    public void addMetricPointSubscriber(StreamSubscriber<MetricPoint> subscriber) {
+        notNull(subscriber, "subscriber can't be null");
+        publisherSupport.addSubscriber(subscriber);
+    }
+    
+    @Override
+    public void removeMetricPointSubscriber(StreamSubscriber<MetricPoint> subscriber) {
+        notNull(subscriber, "subscriber can't be null");
+        publisherSupport.removeSubscriber(subscriber);
+    }
+    
+    @Override
     public void start() {
         timer.scheduleAtFixedRate(new TimerTask() {
             
@@ -65,25 +82,9 @@ public abstract class AbstractMetricSource {
         }, 0L, period);
     }
     
-    /**
-     * Returns the next message in the stream.
-     *
-     * @return Next metric point.
-     */
-    public abstract MetricPoint next();
-    
+    @Override
     public void stop() {
         timer.cancel();
         timer.purge();
-    }
-    
-    public void addMetricPointSubscriber(StreamSubscriber<MetricPoint> subscriber) {
-        notNull(subscriber, "subscriber can't be null");
-        publisherSupport.addSubscriber(subscriber);
-    }
-    
-    public void removeMetricPointSubscriber(StreamSubscriber<MetricPoint> subscriber) {
-        notNull(subscriber, "subscriber can't be null");
-        publisherSupport.removeSubscriber(subscriber);
     }
 }
