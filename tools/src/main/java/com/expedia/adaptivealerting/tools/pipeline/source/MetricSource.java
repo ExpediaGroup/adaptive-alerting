@@ -37,14 +37,14 @@ public interface MetricSource {
      *
      * @param subscriber Metric point subscriber.
      */
-    void addMetricPointSubscriber(MetricPointSubscriber subscriber);
+    void addSubscriber(MetricPointSubscriber subscriber);
     
     /**
      * Removes a metric point subscriber from this source.
      *
      * @param subscriber Metric point subscriber.
      */
-    void removeMetricPointSubscriber(MetricPointSubscriber subscriber);
+    void removeSubscriber(MetricPointSubscriber subscriber);
     
     /**
      * Starts the metric source.

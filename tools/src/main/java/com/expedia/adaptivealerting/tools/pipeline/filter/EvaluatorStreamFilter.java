@@ -19,11 +19,14 @@
 package com.expedia.adaptivealerting.tools.pipeline.filter;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import java.util.LinkedList;
+import java.util.List;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.evaluator.Evaluator;
 import com.expedia.adaptivealerting.core.evaluator.ModelEvaluation;
-import com.expedia.adaptivealerting.tools.pipeline.StreamPublisherSupport;
-import com.expedia.adaptivealerting.tools.pipeline.StreamSubscriber;
+import com.expedia.adaptivealerting.tools.pipeline.AnomalyResultSubscriber;
+import com.expedia.adaptivealerting.tools.pipeline.ModelEvaluationSubscriber;
+
 
 /**
  * Stream filter that applies model evaluator to metrics and publishes the score.
@@ -31,10 +34,10 @@ import com.expedia.adaptivealerting.tools.pipeline.StreamSubscriber;
  * @author kashah
  *
  */
-public class EvaluatorStreamFilter implements StreamSubscriber<AnomalyResult> {
+public class EvaluatorStreamFilter implements AnomalyResultSubscriber {
 
     private final Evaluator evaluator;
-    private final StreamPublisherSupport<ModelEvaluation> publisherSupport = new StreamPublisherSupport<>();
+    private final List<ModelEvaluationSubscriber> subscribers = new LinkedList<>();
 
     public EvaluatorStreamFilter(Evaluator evaluator) {
         notNull(evaluator, "evaluator can't be null");
@@ -42,10 +45,24 @@ public class EvaluatorStreamFilter implements StreamSubscriber<AnomalyResult> {
     }
 
     @Override
-    public void next(AnomalyResult anamolyResult) {
-        notNull(anamolyResult, "anamolyResult can't be null");
-        evaluator.update(anamolyResult.getObserved(), anamolyResult.getPredicted());
-        publisherSupport.publish(evaluator.evaluate());
+    public void next(AnomalyResult anomalyResult) {
+        notNull(anomalyResult, "anamolyResult can't be null");
+        evaluator.update(anomalyResult.getObserved(), anomalyResult.getPredicted());
+        publish(evaluator.evaluate());
+    }
+
+    public void addSubscriber(ModelEvaluationSubscriber subscriber) {
+        notNull(subscriber, "subscriber can't be null");
+        subscribers.add(subscriber);
+    }
+
+    public void removeSubscriber(ModelEvaluationSubscriber subscriber) {
+        notNull(subscriber, "subscriber can't be null");
+        subscribers.remove(subscriber);
+    }
+
+    private void publish(ModelEvaluation modelEvaluation) {
+        subscribers.stream().forEach(subscriber -> subscriber.next(modelEvaluation));
     }
 
 }

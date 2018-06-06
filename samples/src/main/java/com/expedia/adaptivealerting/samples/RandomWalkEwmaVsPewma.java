@@ -40,10 +40,10 @@ public class RandomWalkEwmaVsPewma {
         final ChartSeries ewmaSeries = new ChartSeries();
         final ChartSeries pewmaSeries = new ChartSeries();
         
-        source.addMetricPointSubscriber(ewmaFilter);
-        source.addMetricPointSubscriber(pewmaFilter);
-        ewmaFilter.addAnomalyResultSubscriber(new AnomalyChartStreamSink(ewmaSeries));
-        pewmaFilter.addAnomalyResultSubscriber(new AnomalyChartStreamSink(pewmaSeries));
+        source.addSubscriber(ewmaFilter);
+        source.addSubscriber(pewmaFilter);
+        ewmaFilter.addSubscriber(new AnomalyChartStreamSink(ewmaSeries));
+        pewmaFilter.addSubscriber(new AnomalyChartStreamSink(pewmaSeries));
         
         showChartFrame(createChartFrame(
                 "Random Walk",

@@ -15,31 +15,31 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 import java.util.LinkedList;
 import java.util.List;
-
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import com.expedia.adaptivealerting.core.evaluator.ModelEvaluation;
 
 /**
- * @author Willie Wheeler
+ * @author kashah
  */
-public final class AnomalyResultPublisherSupport {
-    private final List<AnomalyResultSubscriber> subscribers = new LinkedList<>();
-    
-    public void addSubscriber(AnomalyResultSubscriber subscriber) {
+public class ModelEvaluationPublisherSupport {
+
+    private final List<ModelEvaluationSubscriber> subscribers = new LinkedList<>();
+
+    public void addSubscriber(ModelEvaluationSubscriber subscriber) {
         notNull(subscriber, "subscriber can't be null");
         subscribers.add(subscriber);
     }
-    
-    public void removeSubscriber(AnomalyResultSubscriber subscriber) {
+
+    public void removeSubscriber(ModelEvaluationSubscriber subscriber) {
         notNull(subscriber, "subscriber can't be null");
         subscribers.remove(subscriber);
     }
-    
-    public void publish(AnomalyResult anomalyResult) {
-        notNull(anomalyResult, "anomalyResult can't be null");
-        subscribers.stream().forEach(subscriber -> subscriber.next(anomalyResult));
+
+    public void publish(ModelEvaluation modelEvaluation) {
+        notNull(modelEvaluation, "modelEvaluation can't be null");
+        subscribers.stream().forEach(subscriber -> subscriber.next(modelEvaluation));
     }
 }

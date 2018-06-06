@@ -45,13 +45,13 @@ public class CsvTrafficPewmaVariants {
         final ChartSeries pewma2Series = new ChartSeries();
         final ChartSeries pewma3Series = new ChartSeries();
         
-        source.addMetricPointSubscriber(pewma1Filter);
-        source.addMetricPointSubscriber(pewma2Filter);
-        source.addMetricPointSubscriber(pewma3Filter);
+        source.addSubscriber(pewma1Filter);
+        source.addSubscriber(pewma2Filter);
+        source.addSubscriber(pewma3Filter);
         
-        pewma1Filter.addAnomalyResultSubscriber(new AnomalyChartStreamSink(pewma1Series));
-        pewma2Filter.addAnomalyResultSubscriber(new AnomalyChartStreamSink(pewma2Series));
-        pewma3Filter.addAnomalyResultSubscriber(new AnomalyChartStreamSink(pewma3Series));
+        pewma1Filter.addSubscriber(new AnomalyChartStreamSink(pewma1Series));
+        pewma2Filter.addSubscriber(new AnomalyChartStreamSink(pewma2Series));
+        pewma3Filter.addSubscriber(new AnomalyChartStreamSink(pewma3Series));
         
         showChartFrame(createChartFrame(
                 "Cal Inflow",

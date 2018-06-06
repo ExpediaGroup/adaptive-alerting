@@ -48,7 +48,7 @@ public final class MetricSourceTestSupport {
             }
         };
         
-        metricSource.addMetricPointSubscriber(subscriber);
+        metricSource.addSubscriber(subscriber);
         
         Executors.newSingleThreadExecutor().execute(new Runnable() {
             @Override
@@ -59,7 +59,7 @@ public final class MetricSourceTestSupport {
         
         ThreadUtil.sleep(runMillis);
         metricSource.stop();
-        metricSource.removeMetricPointSubscriber(subscriber);
+        metricSource.removeSubscriber(subscriber);
     
         assertTrue(calledNext[0]);
     }

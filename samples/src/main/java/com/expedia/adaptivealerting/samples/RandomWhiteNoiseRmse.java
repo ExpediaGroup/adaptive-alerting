@@ -16,41 +16,34 @@
 package com.expedia.adaptivealerting.samples;
 
 import com.expedia.adaptivealerting.anomdetect.EwmaAnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.PewmaAnomalyDetector;
+import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorStreamFilter;
-import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartStreamSink;
-import com.expedia.adaptivealerting.tools.pipeline.source.CsvMetricSource;
+import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorStreamFilter;
+import com.expedia.adaptivealerting.tools.pipeline.source.WhiteNoiseMetricSource;
 import com.expedia.adaptivealerting.tools.visualization.ChartSeries;
-
-import java.io.InputStream;
 
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.*;
 
 /**
- * @author Willie Wheeler
+ * This is a sample pipeline to calculate RMSE
+ *
+ * @author Karan Shah
  */
-public class CsvTrafficEwmaVsPewma {
+public class RandomWhiteNoiseRmse {
     
     public static void main(String[] args) {
-        final InputStream is = ClassLoader.getSystemResourceAsStream("samples/sample001.csv");
-        final CsvMetricSource source = new CsvMetricSource(is, "data", 1000L);
+        final WhiteNoiseMetricSource source = new WhiteNoiseMetricSource("white-noise", 1000L, 0.0, 1.0);
         
         final AnomalyDetectorStreamFilter ewmaFilter = new AnomalyDetectorStreamFilter(new EwmaAnomalyDetector());
-        final AnomalyDetectorStreamFilter pewmaFilter = new AnomalyDetectorStreamFilter(new PewmaAnomalyDetector());
-        
-        final ChartSeries ewmaSeries = new ChartSeries();
-        final ChartSeries pewmaSeries = new ChartSeries();
-    
         source.addSubscriber(ewmaFilter);
-        source.addSubscriber(pewmaFilter);
-        ewmaFilter.addSubscriber(new AnomalyChartStreamSink(ewmaSeries));
-        pewmaFilter.addSubscriber(new AnomalyChartStreamSink(pewmaSeries));
+        final EvaluatorStreamFilter evaluatorFilter = new EvaluatorStreamFilter(new RmseEvaluator());
+        ewmaFilter.addSubscriber(evaluatorFilter);
         
-        showChartFrame(createChartFrame(
-                "Cal Inflow",
-                createChart("EWMA", ewmaSeries),
-                createChart("PEWMA", pewmaSeries)));
-    
+        
+        
+        //final ChartSeries rmseSeries = new ChartSeries();
+        //showChartFrame(createChartFrame("RMSE", createChart("RMSE", rmseSeries)));
+
         source.start();
     }
 }
