@@ -26,6 +26,6 @@ public final class RandomWalkMetricSourceTest {
     @Test
     public void testStartAndStop() {
         final MetricSource metricSource = new RandomWalkMetricSource("random-walk", 100L, 0);
-        support.testStartAndStop(metricSource, 500L);
+        support.testStartAndStop(metricSource, 1000L);
     }
 }
