@@ -12,13 +12,13 @@ mvn clean package
 Build the docker image:
 
 ```bash
-docker build -f docker/{APP_NAME e.g. constant-detector}/Dockerfile .
+docker build -f docker/{APP_NAME e.g. constant-detector}/Dockerfile -t {APP_NAME} .
 ```
 
 run the docker image:
 
 ```bash
-docker run $(docker images -q | head -1)
+docker run {APP_NAME}
 ```
 
 ### Troubleshooting
