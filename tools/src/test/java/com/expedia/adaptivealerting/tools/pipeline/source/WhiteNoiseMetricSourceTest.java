@@ -26,6 +26,6 @@ public final class WhiteNoiseMetricSourceTest {
     @Test
     public void testStartAndStop() {
         final MetricSource metricSource = new WhiteNoiseMetricSource("white-noise", 100L, 0.0, 1.0);
-        support.testStartAndStop(metricSource, 500L);
+        support.testStartAndStop(metricSource, 1000L);
     }
 }
