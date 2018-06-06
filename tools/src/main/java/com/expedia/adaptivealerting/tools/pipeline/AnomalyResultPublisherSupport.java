@@ -15,6 +15,8 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline;
 
+import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,21 +25,21 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 /**
  * @author Willie Wheeler
  */
-public class StreamPublisherSupport<T> {
-    private final List<StreamSubscriber<T>> subscribers = new LinkedList<>();
+public final class AnomalyResultPublisherSupport {
+    private final List<AnomalyResultSubscriber> subscribers = new LinkedList<>();
     
-    public void addSubscriber(StreamSubscriber<T> subscriber) {
+    public void addSubscriber(AnomalyResultSubscriber subscriber) {
         notNull(subscriber, "subscriber can't be null");
         subscribers.add(subscriber);
     }
     
-    public void removeSubscriber(StreamSubscriber<T> subscriber) {
+    public void removeSubscriber(AnomalyResultSubscriber subscriber) {
         notNull(subscriber, "subscriber can't be null");
         subscribers.remove(subscriber);
     }
     
-    public void publish(T message) {
-        notNull(message, "message can't be null");
-        subscribers.stream().forEach(subscriber -> subscriber.next(message));
+    public void publish(AnomalyResult anomalyResult) {
+        notNull(anomalyResult, "anomalyResult can't be null");
+        subscribers.stream().forEach(subscriber -> subscriber.next(anomalyResult));
     }
 }

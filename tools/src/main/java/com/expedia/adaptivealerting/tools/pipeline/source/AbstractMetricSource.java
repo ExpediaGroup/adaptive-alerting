@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.source;
 
-import com.expedia.adaptivealerting.tools.pipeline.StreamPublisherSupport;
-import com.expedia.adaptivealerting.tools.pipeline.StreamSubscriber;
+import com.expedia.adaptivealerting.tools.pipeline.MetricPointPublisherSupport;
+import com.expedia.adaptivealerting.tools.pipeline.MetricPointSubscriber;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
 import java.util.Timer;
@@ -34,7 +34,7 @@ public abstract class AbstractMetricSource implements MetricSource {
     private final String metricName;
     private final long period;
     
-    private final StreamPublisherSupport<MetricPoint> publisherSupport = new StreamPublisherSupport<>();
+    private final MetricPointPublisherSupport publisherSupport = new MetricPointPublisherSupport();
     private final Timer timer = new Timer();
     
     /**
@@ -57,13 +57,13 @@ public abstract class AbstractMetricSource implements MetricSource {
     }
     
     @Override
-    public void addMetricPointSubscriber(StreamSubscriber<MetricPoint> subscriber) {
+    public void addMetricPointSubscriber(MetricPointSubscriber subscriber) {
         notNull(subscriber, "subscriber can't be null");
         publisherSupport.addSubscriber(subscriber);
     }
     
     @Override
-    public void removeMetricPointSubscriber(StreamSubscriber<MetricPoint> subscriber) {
+    public void removeMetricPointSubscriber(MetricPointSubscriber subscriber) {
         notNull(subscriber, "subscriber can't be null");
         publisherSupport.removeSubscriber(subscriber);
     }
