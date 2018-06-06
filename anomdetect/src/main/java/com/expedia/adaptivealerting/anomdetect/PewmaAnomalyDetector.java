@@ -184,7 +184,7 @@ public class PewmaAnomalyDetector implements AnomalyDetector {
             anomalyLevel = WEAK;
         }
     
-        final AnomalyResult result = new AnomalyResult();
+        final AnomalyResult result = new AnomalyResult(this.getClass());
         result.setEpochSecond(metricPoint.epochTimeInSeconds());
         result.setObserved(observed);
         result.setPredicted(mean);

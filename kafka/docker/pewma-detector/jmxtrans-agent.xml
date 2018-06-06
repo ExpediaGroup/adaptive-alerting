@@ -1,0 +1,110 @@
+<!--
+  ~ Copyright 2018 Expedia Group, Inc.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<jmxtrans-agent>
+    <queries>
+
+        <!-- JVM -->
+        <query objectName="java.lang:type=Memory" attribute="HeapMemoryUsage" key="used"
+            resultAlias="jvm.heapMemoryUsage.used"/>
+        <query objectName="java.lang:type=Memory" attribute="HeapMemoryUsage" key="committed"
+            resultAlias="jvm.heapMemoryUsage.committed"/>
+        <query objectName="java.lang:type=Memory" attribute="NonHeapMemoryUsage" key="used"
+            resultAlias="jvm.nonHeapMemoryUsage.used"/>
+        <query objectName="java.lang:type=Memory" attribute="NonHeapMemoryUsage" key="committed"
+            resultAlias="jvm.nonHeapMemoryUsage.committed"/>
+        <!--<query objectName="java.lang:type=GarbageCollector,name=ParNew" resultAlias="gc.young.#attribute#"/>-->
+        <!--<query objectName="java.lang:type=GarbageCollector,name=ConcurrentMarkSweep" resultAlias="gc.old.#attribute#"/>-->
+        <!--<query objectName="java.lang:type=ClassLoading" attribute="LoadedClassCount" resultAlias="jvm.loadedClasses"/>-->
+        <!--<query objectName="java.lang:type=Threading" attribute="ThreadCount" resultAlias="jvm.thread"/>-->
+
+        <query objectName="kafka.producer:type=producer-metrics,client-id=*" attribute="record-send-rate" resultAlias="kafka-producer-%client-id%.record-send.rate"/>
+        <query objectName="kafka.producer:type=producer-metrics,client-id=*" attribute="buffer-exhausted-rate" resultAlias="kafka-producer-%client-id%.buffer-exhausted.rate"/>
+        <query objectName="kafka.producer:type=producer-metrics,client-id=*" attribute="record-retry-rate" resultAlias="kafka-producer-%client-id%.record-retry.rate"/>
+        <query objectName="kafka.producer:type=producer-metrics,client-id=*" attribute="request-latency-avg" resultAlias="kafka-producer-%client-id%.request-latency.avg"/>
+        <query objectName="kafka.producer:type=producer-metrics,client-id=*" attribute="buffer-available-bytes" resultAlias="kafka-producer-%client-id%.buffer-bytes.available"/>
+        <query objectName="kafka.producer:type=producer-metrics,client-id=*" attribute="request-size-max" resultAlias="kafka-producer-%client-id%.request-size.max"/>
+        <query objectName="kafka.producer:type=producer-metrics,client-id=*" attribute="request-rate" resultAlias="kafka-producer-%client-id%.request.rate"/>
+        <query objectName="kafka.producer:type=producer-metrics,client-id=*" attribute="response-rate" resultAlias="kafka-producer-%client-id%.response.rate"/>
+        <query objectName="kafka.producer:type=producer-metrics,client-id=*" attribute="record-error-rate" resultAlias="kafka-producer-%client-id%.record-error.rate"/>
+        <query objectName="kafka.producer:type=producer-metrics,client-id=*" attribute="requests-in-flight" resultAlias="kafka-producer-%client-id%.request-in-flight.count"/>
+        <query objectName="kafka.producer:type=producer-metrics,client-id=*" attribute="batch-size-avg" resultAlias="kafka-producer-%client-id%.batch-size.avg"/>
+        <query objectName="metrics:name=kafka.produce.failure" attributes="OneMinuteRate" resultAlias="kafka-producer.failure.#attribute#"/>
+
+        <!-- kafka consumer metrics -->
+        <query objectName="kafka.consumer:type=consumer-metrics,client-id=*" attribute="request-rate" resultAlias="kafka-consumer-%client-id%.request.rate"/>
+        <query objectName="kafka.consumer:type=consumer-metrics,client-id=*" attribute="response-rate" resultAlias="kafka-consumer-%client-id%.response.rate"/>
+        <query objectName="kafka.consumer:type=consumer-metrics,client-id=*" attribute="incoming-byte-rate" resultAlias="kafka-consumer-%client-id%.incoming-byte.rate"/>
+        <query objectName="kafka.consumer:type=consumer-fetch-manager-metrics,client-id=*" attribute="records-lag-max" resultAlias="kafka-consumer-%client-id%.records-lag.max"/>
+        <query objectName="kafka.consumer:type=consumer-fetch-manager-metrics,client-id=*" attribute="records-consumed-rate" resultAlias="kafka-consumer-%client-id%.records-consumed.rate"/>
+
+        <!-- kafka streams mbeans -->
+        <query objectName="kafka.streams:type=*,client-id=*"
+            resultAlias="kstreams.%type%.#attribute#"/>
+        <query objectName="kafka.streams:type=*,client-id=*,task-id=*,in-memory-lru-state-id=trend-metric-store"
+            resultAlias="kstreams.%type%.%task-id%.trend-metric-store.#attribute#"/>
+        <query objectName="kafka.streams:type=*,client-id=*,task-id=*,processor-node-id=*"
+            resultAlias="kstreams.%type%.%task-id%.%processor-node-id%.#attribute#"/>
+
+
+        <!-- service mbeans -->
+        <query objectName="metrics:name=metricpoint.deser.failure" attributes="OneMinuteRate,MeanRate"
+            resultAlias="metricpoint.deser.failure.#attribute#"/>
+        <query objectName="metrics:name=metricpoint.ser.failure" attributes="OneMinuteRate,MeanRate"
+            resultAlias="metricpoint.ser.failure.#attribute#"/>
+        <query objectName="metrics:name=metricpoint.ser.success" attributes="OneMinuteRate,MeanRate"
+            resultAlias="metricpoint.ser.success.#attribute#"/>
+        <query objectName="metrics:name=metricpoints.disordered" attributes="OneMinuteRate,MeanRate"
+            resultAlias="metricpoint.disordered.#attribute#"/>
+        <query objectName="metrics:name=metricpoints.compute.failure" attributes="OneMinuteRate,MeanRate"
+            resultAlias="metricpoint.compute.failure.#attribute#"/>
+        <query objectName="metrics:name=metricprocessor.invalid" attributes="OneMinuteRate,MeanRate"
+            resultAlias="metricprocessor.invalid.#attribute#"/>
+        <query objectName="metrics:name=metricpoint.kafka-external.success" attributes="OneMinuteRate,MeanRate"
+            resultAlias="metricpoint.kafka-external.success.#attribute#"/>
+        <query objectName="metrics:name=metricpoint.kafka-external.failure" attributes="OneMinuteRate,MeanRate"
+            resultAlias="metricpoint.kafka-external.failure.#attribute#"/>
+
+        <query objectName="metrics:name=trendmetric.deser.failure" attributes="OneMinuteRate,MeanRate"
+            resultAlias="trend-metric.deser.failure.#attribute#"/>
+        <query objectName="metrics:name=trendmetric.ser.success" attributes="OneMinuteRate,MeanRate"
+            resultAlias="trend-metric.ser.success.#attribute#"/>
+        <query objectName="metrics:name=trendmetric.deser.success" attributes="OneMinuteRate,MeanRate"
+            resultAlias="trend-metric.deser.success.#attribute#"/>
+        <query objectName="metrics:name=trendmetric.compute.time"
+            attributes="50thPercentile,99thPercentile,OneMinuteRate"
+            resultAlias="trend-metric.compute.time.#attribute#"/>
+
+        <query objectName="metrics:name=histogram.metric.compute.time"
+            attributes="50thPercentile,99thPercentile,OneMinuteRate"
+            resultAlias="histogram-metric.compute.time.#attribute#"/>
+
+        <query objectName="metrics:name=count.metric.compute.time"
+            attributes="50thPercentile,99thPercentile,OneMinuteRate"
+            resultAlias="count-metric.compute.time.#attribute#"/>
+
+        <query objectName="metrics:name=metricprocessor.trendcount.*"
+            resultAlias="%name%.#attribute#"/>
+
+    </queries>
+    <outputWriter class="org.jmxtrans.agent.GraphitePlainTextTcpOutputWriter">
+        <host>${HAYSTACK_GRAPHITE_HOST:monitoring-influxdb-graphite.kube-system.svc}</host>
+        <port>${HAYSTACK_GRAPHITE_PORT:2003}</port>
+        <enabled>${HAYSTACK_GRAPHITE_ENABLED:true}</enabled>
+        <namePrefix>haystack.pewma.detector.#hostname#.</namePrefix>
+    </outputWriter>
+    <collectIntervalInSeconds>60</collectIntervalInSeconds>
+</jmxtrans-agent>

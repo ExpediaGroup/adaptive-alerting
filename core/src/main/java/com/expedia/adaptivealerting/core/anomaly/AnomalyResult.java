@@ -30,6 +30,17 @@ public class AnomalyResult {
     private Double strongThresholdLower;
     private Double anomalyScore;
     private AnomalyLevel anomalyLevel;
+    private String detector;
+
+    public  AnomalyResult() {
+        // For jackson
+    }
+
+    public AnomalyResult(Class detector) {
+
+        // using a String for the detector for now as it's just a convenience label not for reconstructing the detector.
+        this.detector = detector.getSimpleName();
+    }
     
     public Long getEpochSecond() {
         return epochSecond;
@@ -102,7 +113,15 @@ public class AnomalyResult {
     public void setAnomalyLevel(AnomalyLevel anomalyLevel) {
         this.anomalyLevel = anomalyLevel;
     }
-    
+
+    public String getDetector() {
+        return detector;
+    }
+
+    public void setDetector(String detector) {
+        this.detector = detector;
+    }
+
     @Override
     public String toString() {
         return "AnomalyResult{" +
@@ -115,6 +134,7 @@ public class AnomalyResult {
                 ", strongThresholdLower=" + strongThresholdLower +
                 ", anomalyScore=" + anomalyScore +
                 ", anomalyLevel=" + anomalyLevel +
+                ", detector=" + detector +
                 '}';
     }
 }

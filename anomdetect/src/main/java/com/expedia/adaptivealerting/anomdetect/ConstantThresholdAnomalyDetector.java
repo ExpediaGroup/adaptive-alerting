@@ -102,7 +102,7 @@ public class ConstantThresholdAnomalyDetector implements AnomalyDetector {
             throw new IllegalStateException("Illegal tail: " + tail);
         }
         
-        final AnomalyResult result = new AnomalyResult();
+        final AnomalyResult result = new AnomalyResult(this.getClass());
         result.setEpochSecond(metricPoint.epochTimeInSeconds());
         result.setObserved(observed);
         result.setWeakThresholdUpper(weakThresholdUpper);
