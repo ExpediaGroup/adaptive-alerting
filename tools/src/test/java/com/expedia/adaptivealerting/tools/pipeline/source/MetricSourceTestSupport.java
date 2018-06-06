@@ -15,46 +15,49 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.source;
 
+import com.expedia.adaptivealerting.core.util.ThreadUtil;
 import com.expedia.adaptivealerting.tools.pipeline.StreamSubscriber;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
-import org.junit.Test;
 
 import java.util.concurrent.Executors;
 
 import static junit.framework.TestCase.assertTrue;
 
 /**
+ * Support for writing metric source unit tests.
+ *
  * @author Willie Wheeler
  */
-public class WhiteNoiseStreamSourceTest {
+public final class MetricSourceTestSupport {
     
-    @Test
-    public void testStartAndStop() throws Exception {
+    /**
+     * Exercises the start/stop methods, and verifies that the source called next().
+     *
+     * @param metricSource Metric source.
+     * @param runMillis    How long to let the source run, in milliseconds, before stopping it. Be sure this is long
+     *                     enough for the source to call next(). (This is particularly important for timer-based
+     *                     sources.)
+     */
+    public void testStartAndStop(MetricSource metricSource, long runMillis) {
         final boolean[] calledNext = new boolean[1];
         
         final StreamSubscriber subscriber = new StreamSubscriber<MetricPoint>() {
-            
             @Override
             public void next(MetricPoint metricPoint) {
                 calledNext[0] = true;
             }
         };
         
-        final WhiteNoiseMetricSource metricSource = new WhiteNoiseMetricSource();
         metricSource.addMetricPointSubscriber(subscriber);
         
         Executors.newSingleThreadExecutor().execute(new Runnable() {
-            
             @Override
             public void run() {
                 metricSource.start();
             }
         });
         
-        // This has to be long enough to deal with the 1s delay, which has to be there given our current 1s metric
-        // resolution. [WLW]
-        Thread.sleep(1500L);
-        
+        ThreadUtil.sleep(runMillis);
         metricSource.stop();
         metricSource.removeMetricPointSubscriber(subscriber);
     

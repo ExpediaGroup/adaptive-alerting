@@ -20,25 +20,24 @@ import com.expedia.adaptivealerting.anomdetect.PewmaAnomalyDetector;
 import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorStreamFilter;
 import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartStreamSink;
 import com.expedia.adaptivealerting.tools.pipeline.sink.ConsoleLogStreamSink;
-import com.expedia.adaptivealerting.tools.pipeline.source.CsvMetricSource;
+import com.expedia.adaptivealerting.tools.pipeline.source.WhiteNoiseMetricSource;
 import com.expedia.adaptivealerting.tools.visualization.ChartSeries;
-
-import java.io.InputStream;
 
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.*;
 
 /**
+ * Sample pipeline based on white noise with EWMA and PEWMA filters.
+ *
  * @author Willie Wheeler
  */
-public class CsvTrafficEwmaVsPewma {
+public class WhiteNoiseEwmaVsPewma {
     
     public static void main(String[] args) {
-        final InputStream is = ClassLoader.getSystemResourceAsStream("samples/sample001.csv");
-        final CsvMetricSource source = new CsvMetricSource(is, "data", 1000L);
-        
+        final WhiteNoiseMetricSource source = new WhiteNoiseMetricSource("white-noise", 1000L, 0.0, 1.0);
+    
         final AnomalyDetectorStreamFilter ewmaFilter = new AnomalyDetectorStreamFilter(new EwmaAnomalyDetector());
         final AnomalyDetectorStreamFilter pewmaFilter = new AnomalyDetectorStreamFilter(new PewmaAnomalyDetector());
-        
+    
         final ChartSeries ewmaSeries = new ChartSeries();
         final ChartSeries pewmaSeries = new ChartSeries();
     
@@ -48,12 +47,12 @@ public class CsvTrafficEwmaVsPewma {
         ewmaFilter.addAnomalyResultSubscriber(new AnomalyChartStreamSink(ewmaSeries));
         pewmaFilter.addAnomalyResultSubscriber(new ConsoleLogStreamSink());
         pewmaFilter.addAnomalyResultSubscriber(new AnomalyChartStreamSink(pewmaSeries));
-        
+    
         showChartFrame(createChartFrame(
-                "Cal Inflow",
+                "White Noise",
                 createChart("EWMA", ewmaSeries),
                 createChart("PEWMA", pewmaSeries)));
-    
+        
         source.start();
     }
 }
