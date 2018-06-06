@@ -18,38 +18,38 @@ package com.expedia.adaptivealerting.samples;
 import com.expedia.adaptivealerting.anomdetect.EwmaAnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.PewmaAnomalyDetector;
 import com.expedia.adaptivealerting.tools.pipeline.filter.OutlierDetectorStreamFilter;
-import com.expedia.adaptivealerting.tools.pipeline.sink.OutlierChartStreamSink;
 import com.expedia.adaptivealerting.tools.pipeline.sink.ConsoleLogStreamSink;
-import com.expedia.adaptivealerting.tools.pipeline.source.WhiteNoiseMetricSource;
+import com.expedia.adaptivealerting.tools.pipeline.sink.OutlierChartStreamSink;
+import com.expedia.adaptivealerting.tools.pipeline.source.RandomWalkMetricSource;
 import com.expedia.adaptivealerting.tools.visualization.ChartSeries;
 
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.*;
 
 /**
- * This is a sample pipeline based on white noise and a PEWMA filter.
+ * Sample pipeline based on a random walk with EWMA and PEWMA filters.
  *
  * @author Willie Wheeler
  */
-public class RandomWhiteNoiseEwmaVsPewma {
+public class RandomWalkEwmaVsPewma {
     
     public static void main(String[] args) {
-        final WhiteNoiseMetricSource source = new WhiteNoiseMetricSource("white-noise", 1000L, 0.0, 1.0);
-    
+        final RandomWalkMetricSource source = new RandomWalkMetricSource();
+        
         final OutlierDetectorStreamFilter ewmaFilter = new OutlierDetectorStreamFilter(new EwmaAnomalyDetector());
         final OutlierDetectorStreamFilter pewmaFilter = new OutlierDetectorStreamFilter(new PewmaAnomalyDetector());
-    
+        
         final ChartSeries ewmaSeries = new ChartSeries();
         final ChartSeries pewmaSeries = new ChartSeries();
-    
+        
         source.addMetricPointSubscriber(ewmaFilter);
         source.addMetricPointSubscriber(pewmaFilter);
         ewmaFilter.addAnomalyResultSubscriber(new ConsoleLogStreamSink());
         ewmaFilter.addAnomalyResultSubscriber(new OutlierChartStreamSink(ewmaSeries));
         pewmaFilter.addAnomalyResultSubscriber(new ConsoleLogStreamSink());
         pewmaFilter.addAnomalyResultSubscriber(new OutlierChartStreamSink(pewmaSeries));
-    
+        
         showChartFrame(createChartFrame(
-                "White Noise",
+                "Random Walk",
                 createChart("EWMA", ewmaSeries),
                 createChart("PEWMA", pewmaSeries)));
         

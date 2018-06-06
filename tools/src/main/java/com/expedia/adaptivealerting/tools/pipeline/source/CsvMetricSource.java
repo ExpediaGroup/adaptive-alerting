@@ -58,7 +58,7 @@ public final class CsvMetricSource extends AbstractMetricSource {
     
     @Override
     public MetricPoint next() {
-        return data.hasNext() ? metricPoint(getName(), Instant.now(), data.next().floatValue()) : null;
+        return data.hasNext() ? metricPoint(getMetricName(), Instant.now(), data.next().floatValue()) : null;
     }
     
     private ListIterator<Double> readData(InputStream csvIn) throws IOException {

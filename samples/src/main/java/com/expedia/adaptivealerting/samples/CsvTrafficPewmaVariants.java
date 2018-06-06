@@ -29,7 +29,7 @@ import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.*;
 /**
  * @author Willie Wheeler
  */
-public class CsvPewmaVariants {
+public class CsvTrafficPewmaVariants {
     
     public static void main(String[] args) {
         final InputStream is = ClassLoader.getSystemResourceAsStream("samples/sample001.csv");
