@@ -44,8 +44,7 @@ public class RmseEvaluator implements Evaluator {
     @Override
     public ModelEvaluation evaluate() {
         double rmse = Math.sqrt(resSumSquares / n);
-        ModelEvaluation modelEvaluation = new ModelEvaluation("rmse", rmse);
-        return modelEvaluation;
+        return new ModelEvaluation("rmse", rmse);
     }
 
     @Override
