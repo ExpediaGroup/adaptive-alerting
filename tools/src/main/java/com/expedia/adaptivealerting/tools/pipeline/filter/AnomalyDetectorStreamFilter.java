@@ -28,11 +28,11 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  *
  * @author Willie Wheeler
  */
-public final class OutlierDetectorStreamFilter implements StreamSubscriber<MetricPoint> {
+public final class AnomalyDetectorStreamFilter implements StreamSubscriber<MetricPoint> {
     private final AnomalyDetector anomalyDetector;
     private final StreamPublisherSupport<AnomalyResult> publisherSupport = new StreamPublisherSupport<>();
     
-    public OutlierDetectorStreamFilter(AnomalyDetector anomalyDetector) {
+    public AnomalyDetectorStreamFilter(AnomalyDetector anomalyDetector) {
         notNull(anomalyDetector, "anomalyDetector can't be null");
         this.anomalyDetector = anomalyDetector;
     }
