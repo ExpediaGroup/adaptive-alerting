@@ -47,3 +47,9 @@ Try adding the following entry to your hosts file:
 ```bash
 {YOUR_EXTERNAL_IP} monitoring-influxdb-graphite.kube-system.svc
 ```
+
+you may also need something to listen on that port so you can run:
+
+```bash
+python -m SimpleHTTPServer 2003
+```
