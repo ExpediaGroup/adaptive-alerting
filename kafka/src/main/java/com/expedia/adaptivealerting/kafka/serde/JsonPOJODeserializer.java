@@ -14,6 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
+ *
+ * Copyright 2018 The Apache Software Foundation.
+ *
  * From: https://github.com/apache/kafka/blob/1.1.0/streams/examples/src/main/java/org/apache/kafka/streams/examples/pageview/JsonPOJODeserializer.java
  */
 package com.expedia.adaptivealerting.kafka.serde;
