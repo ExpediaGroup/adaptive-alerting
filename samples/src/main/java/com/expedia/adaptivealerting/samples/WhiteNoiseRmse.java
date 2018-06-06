@@ -15,11 +15,15 @@
  */
 package com.expedia.adaptivealerting.samples;
 
+import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.createChartFrame;
+import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showChartFrame;
 import com.expedia.adaptivealerting.anomdetect.EwmaAnomalyDetector;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
+import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartSink;
 import com.expedia.adaptivealerting.tools.pipeline.source.WhiteNoiseMetricSource;
+import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
 
 /**
  * This is a sample pipeline to calculate RMSE
@@ -27,18 +31,23 @@ import com.expedia.adaptivealerting.tools.pipeline.source.WhiteNoiseMetricSource
  * @author Karan Shah
  */
 public class WhiteNoiseRmse {
-    
+
     public static void main(String[] args) {
         final WhiteNoiseMetricSource source = new WhiteNoiseMetricSource("white-noise", 1000L, 0.0, 1.0);
-        
+
         final AnomalyDetectorFilter ewmaFilter = new AnomalyDetectorFilter(new EwmaAnomalyDetector());
         final EvaluatorFilter evaluatorFilter = new EvaluatorFilter(new RmseEvaluator());
-        
         source.addSubscriber(ewmaFilter);
+        // Evaluator listening to the detector
         ewmaFilter.addSubscriber(evaluatorFilter);
-        
-        // TODO I removed your chart code here because I changed the chart factory. See the other samples. [WLW]
 
+        final AnomalyChartSink ewmaChart = PipelineFactory.createChartSink("EWMA");
+        final AnomalyChartSink rmseChart = PipelineFactory.createChartSink("White Noise RMSE");
+
+        ewmaFilter.addSubscriber(ewmaChart);
+        evaluatorFilter.addSubscriber(rmseChart);
+
+        showChartFrame(createChartFrame("White Noise EMWA RMSE", ewmaChart.getChart(), rmseChart.getChart()));
         source.start();
     }
 }
