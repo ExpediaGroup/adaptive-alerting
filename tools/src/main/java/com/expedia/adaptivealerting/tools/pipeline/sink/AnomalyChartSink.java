@@ -37,8 +37,8 @@ import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.toSecon
  */
 public final class AnomalyChartSink implements AnomalyResultSubscriber, ModelEvaluationSubscriber {
     private final JFreeChart chart;
-    private final String baseTitle;
     private final ChartSeries chartSeries;
+    private final String baseTitle;
     private final DecimalFormat format = new DecimalFormat(".###");
     
     public AnomalyChartSink(JFreeChart chart, ChartSeries chartSeries) {
@@ -51,7 +51,7 @@ public final class AnomalyChartSink implements AnomalyResultSubscriber, ModelEva
     }
     
     public JFreeChart getChart() {
-    
+        return chart;
     }
     
     public ChartSeries getChartSeries() {
