@@ -20,10 +20,10 @@ import com.expedia.adaptivealerting.anomdetect.PewmaAnomalyDetector;
 import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartSink;
 import com.expedia.adaptivealerting.tools.pipeline.source.WhiteNoiseMetricSource;
-import com.expedia.adaptivealerting.tools.visualization.ChartSeries;
-import org.jfree.chart.JFreeChart;
+import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
 
-import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.*;
+import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.createChartFrame;
+import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showChartFrame;
 
 /**
  * Sample pipeline based on white noise with EWMA and PEWMA filters.
@@ -38,22 +38,16 @@ public class WhiteNoiseEwmaVsPewma {
         final AnomalyDetectorFilter ewmaFilter = new AnomalyDetectorFilter(new EwmaAnomalyDetector());
         final AnomalyDetectorFilter pewmaFilter = new AnomalyDetectorFilter(new PewmaAnomalyDetector());
     
-        final ChartSeries ewmaSeries = new ChartSeries();
-        final ChartSeries pewmaSeries = new ChartSeries();
-    
-        final JFreeChart ewmaChart = createChart("EWMA", ewmaSeries);
-        final JFreeChart pewmaChart = createChart("PEWMA", pewmaSeries);
-    
-        final AnomalyChartSink ewmaSink = new AnomalyChartSink(ewmaChart, ewmaSeries);
-        final AnomalyChartSink pewmaSink = new AnomalyChartSink(pewmaChart, pewmaSeries);
+        final AnomalyChartSink ewmaChart = PipelineFactory.createChartSink("EWMA");
+        final AnomalyChartSink pewmaChart = PipelineFactory.createChartSink("PEWMA");
     
         source.addSubscriber(ewmaFilter);
         source.addSubscriber(pewmaFilter);
     
-        ewmaFilter.addSubscriber(ewmaSink);
-        pewmaFilter.addSubscriber(pewmaSink);
+        ewmaFilter.addSubscriber(ewmaChart);
+        pewmaFilter.addSubscriber(pewmaChart);
     
-        showChartFrame(createChartFrame("White Noise", ewmaChart, pewmaChart));
+        showChartFrame(createChartFrame("White Noise", ewmaChart.getChart(), pewmaChart.getChart()));
         source.start();
     }
 }

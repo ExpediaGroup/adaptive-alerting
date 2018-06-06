@@ -19,12 +19,12 @@ import com.expedia.adaptivealerting.anomdetect.PewmaAnomalyDetector;
 import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartSink;
 import com.expedia.adaptivealerting.tools.pipeline.source.CsvMetricSource;
-import com.expedia.adaptivealerting.tools.visualization.ChartSeries;
-import org.jfree.chart.JFreeChart;
+import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
 
 import java.io.InputStream;
 
-import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.*;
+import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.createChartFrame;
+import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showChartFrame;
 
 /**
  * @author Willie Wheeler
@@ -42,27 +42,19 @@ public class CsvTrafficPewmaVariants {
         final AnomalyDetectorFilter filter3 =
                 new AnomalyDetectorFilter(new PewmaAnomalyDetector(0.35, 1.0, 2.0, 3.0, 0.0));
         
-        final ChartSeries series1 = new ChartSeries();
-        final ChartSeries series2 = new ChartSeries();
-        final ChartSeries series3 = new ChartSeries();
+        final AnomalyChartSink chart1 = PipelineFactory.createChartSink("PEWMA: alpha=0.15");
+        final AnomalyChartSink chart2 = PipelineFactory.createChartSink("PEWMA: alpha=0.25");
+        final AnomalyChartSink chart3 = PipelineFactory.createChartSink("PEWMA: alpha=0.35");
     
-        final JFreeChart chart1 = createChart("PEWMA: alpha=0.15", series1);
-        final JFreeChart chart2 = createChart("PEWMA: alpha=0.25", series2);
-        final JFreeChart chart3 = createChart("PEWMA: alpha=0.35", series3);
-    
-        final AnomalyChartSink sink1 = new AnomalyChartSink(chart1, series1);
-        final AnomalyChartSink sink2 = new AnomalyChartSink(chart2, series2);
-        final AnomalyChartSink sink3 = new AnomalyChartSink(chart3, series3);
-        
         source.addSubscriber(filter1);
         source.addSubscriber(filter2);
         source.addSubscriber(filter3);
         
-        filter1.addSubscriber(sink1);
-        filter2.addSubscriber(sink2);
-        filter3.addSubscriber(sink3);
+        filter1.addSubscriber(chart1);
+        filter2.addSubscriber(chart2);
+        filter3.addSubscriber(chart3);
         
-        showChartFrame(createChartFrame("Cal Inflow", chart1, chart2, chart3));
+        showChartFrame(createChartFrame("Cal Inflow", chart1.getChart(), chart2.getChart(), chart3.getChart()));
         source.start();
     }
 }

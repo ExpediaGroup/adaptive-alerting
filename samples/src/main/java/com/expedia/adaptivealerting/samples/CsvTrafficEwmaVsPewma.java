@@ -20,8 +20,7 @@ import com.expedia.adaptivealerting.anomdetect.PewmaAnomalyDetector;
 import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartSink;
 import com.expedia.adaptivealerting.tools.pipeline.source.CsvMetricSource;
-import com.expedia.adaptivealerting.tools.visualization.ChartSeries;
-import org.jfree.chart.JFreeChart;
+import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
 
 import java.io.InputStream;
 
@@ -36,24 +35,18 @@ public class CsvTrafficEwmaVsPewma {
         final InputStream is = ClassLoader.getSystemResourceAsStream("samples/sample001.csv");
         final CsvMetricSource source = new CsvMetricSource(is, "data", 1000L);
         
-        final AnomalyDetectorFilter ewmaFilter = new AnomalyDetectorFilter(new EwmaAnomalyDetector());
-        final AnomalyDetectorFilter pewmaFilter = new AnomalyDetectorFilter(new PewmaAnomalyDetector());
+        final AnomalyDetectorFilter ewmaAD = new AnomalyDetectorFilter(new EwmaAnomalyDetector());
+        final AnomalyDetectorFilter pewmaAD = new AnomalyDetectorFilter(new PewmaAnomalyDetector());
         
-        final ChartSeries ewmaSeries = new ChartSeries();
-        final ChartSeries pewmaSeries = new ChartSeries();
-        
-        final JFreeChart ewmaChart = createChart("EWMA", ewmaSeries);
-        final JFreeChart pewmaChart = createChart("PEWMA", pewmaSeries);
+        final AnomalyChartSink ewmaChart = PipelineFactory.createChartSink("EWMA");
+        final AnomalyChartSink pewmaChart = PipelineFactory.createChartSink("PEWMA");
     
-        final AnomalyChartSink ewmaSink = new AnomalyChartSink(ewmaChart, ewmaSeries);
-        final AnomalyChartSink pewmaSink = new AnomalyChartSink(pewmaChart, pewmaSeries);
-    
-        source.addSubscriber(ewmaFilter);
-        source.addSubscriber(pewmaFilter);
-        ewmaFilter.addSubscriber(ewmaSink);
-        pewmaFilter.addSubscriber(pewmaSink);
+        source.addSubscriber(ewmaAD);
+        source.addSubscriber(pewmaAD);
+        ewmaAD.addSubscriber(ewmaChart);
+        pewmaAD.addSubscriber(pewmaChart);
         
-        showChartFrame(createChartFrame("Cal Inflow", ewmaChart, pewmaChart));
+        showChartFrame(createChartFrame("Cal Inflow", ewmaChart.getChart(), pewmaChart.getChart()));
         source.start();
     }
 }

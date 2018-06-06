@@ -32,12 +32,12 @@ public class WhiteNoiseRmse {
         final WhiteNoiseMetricSource source = new WhiteNoiseMetricSource("white-noise", 1000L, 0.0, 1.0);
         
         final AnomalyDetectorFilter ewmaFilter = new AnomalyDetectorFilter(new EwmaAnomalyDetector());
-        source.addSubscriber(ewmaFilter);
         final EvaluatorFilter evaluatorFilter = new EvaluatorFilter(new RmseEvaluator());
+        
+        source.addSubscriber(ewmaFilter);
         ewmaFilter.addSubscriber(evaluatorFilter);
         
-        //final ChartSeries rmseSeries = new ChartSeries();
-        //showChartFrame(createChartFrame("RMSE", createChart("RMSE", rmseSeries)));
+        // TODO I removed your chart code here because I changed the chart factory. See the other samples. [WLW]
 
         source.start();
     }
