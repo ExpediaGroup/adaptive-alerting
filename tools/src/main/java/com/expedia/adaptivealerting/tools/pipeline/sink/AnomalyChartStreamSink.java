@@ -30,10 +30,10 @@ import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.toSecon
 /**
  * @author Willie Wheeler
  */
-public final class OutlierChartStreamSink implements StreamSubscriber<AnomalyResult> {
+public final class AnomalyChartStreamSink implements StreamSubscriber<AnomalyResult> {
     private final ChartSeries chartSeries;
     
-    public OutlierChartStreamSink(ChartSeries chartSeries) {
+    public AnomalyChartStreamSink(ChartSeries chartSeries) {
         notNull(chartSeries, "chartSeries can't be null");
         this.chartSeries = chartSeries;
     }
