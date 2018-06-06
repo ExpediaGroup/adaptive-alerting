@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.source;
 
-import com.expedia.adaptivealerting.tools.pipeline.StreamSubscriber;
+import com.expedia.adaptivealerting.tools.pipeline.MetricPointSubscriber;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
 /**
@@ -37,14 +37,14 @@ public interface MetricSource {
      *
      * @param subscriber Metric point subscriber.
      */
-    void addMetricPointSubscriber(StreamSubscriber<MetricPoint> subscriber);
+    void addMetricPointSubscriber(MetricPointSubscriber subscriber);
     
     /**
      * Removes a metric point subscriber from this source.
      *
      * @param subscriber Metric point subscriber.
      */
-    void removeMetricPointSubscriber(StreamSubscriber<MetricPoint> subscriber);
+    void removeMetricPointSubscriber(MetricPointSubscriber subscriber);
     
     /**
      * Starts the metric source.
