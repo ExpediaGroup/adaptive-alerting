@@ -49,7 +49,7 @@ public class KafkaWhiteNoiseMetricSource {
         
         // FIXME For this to work generically, we'll need a publisher interface. [WLW]
         final WhiteNoiseMetricSource source = new WhiteNoiseMetricSource(name, period, mean, variance);
-        source.addMetricPointSubscriber(new KafkaStreamSubscriber("metrics"));
+        source.addSubscriber(new KafkaStreamSubscriber("metrics"));
         source.start();
     }
 }
