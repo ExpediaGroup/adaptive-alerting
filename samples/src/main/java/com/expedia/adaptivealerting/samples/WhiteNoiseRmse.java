@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.samples;
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.createChartFrame;
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showChartFrame;
 import com.expedia.adaptivealerting.anomdetect.EwmaAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.PewmaAnomalyDetector;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
@@ -36,18 +37,25 @@ public class WhiteNoiseRmse {
         final WhiteNoiseMetricSource source = new WhiteNoiseMetricSource("white-noise", 1000L, 0.0, 1.0);
 
         final AnomalyDetectorFilter ewmaFilter = new AnomalyDetectorFilter(new EwmaAnomalyDetector());
-        final EvaluatorFilter evaluatorFilter = new EvaluatorFilter(new RmseEvaluator());
-        source.addSubscriber(ewmaFilter);
-        // Evaluator listening to the detector
-        ewmaFilter.addSubscriber(evaluatorFilter);
+        final AnomalyDetectorFilter pewmaFilter = new AnomalyDetectorFilter(new PewmaAnomalyDetector());
+
+        final EvaluatorFilter ewmaEval = new EvaluatorFilter(new RmseEvaluator());
+        final EvaluatorFilter pewmaEval = new EvaluatorFilter(new RmseEvaluator());
 
         final AnomalyChartSink ewmaChart = PipelineFactory.createChartSink("EWMA");
-        final AnomalyChartSink rmseChart = PipelineFactory.createChartSink("White Noise RMSE");
+        final AnomalyChartSink pewmaChart = PipelineFactory.createChartSink("PEWMA");
 
+        source.addSubscriber(ewmaFilter);
+        ewmaFilter.addSubscriber(ewmaEval);
         ewmaFilter.addSubscriber(ewmaChart);
-        evaluatorFilter.addSubscriber(rmseChart);
+        ewmaEval.addSubscriber(ewmaChart);
 
-        showChartFrame(createChartFrame("White Noise EMWA RMSE", ewmaChart.getChart(), rmseChart.getChart()));
+        source.addSubscriber(pewmaFilter);
+        pewmaFilter.addSubscriber(pewmaEval);
+        pewmaFilter.addSubscriber(pewmaChart);
+        ewmaEval.addSubscriber(pewmaChart);
+
+        showChartFrame(createChartFrame("White Noise RMSE", ewmaChart.getChart(), pewmaChart.getChart()));
         source.start();
     }
 }
