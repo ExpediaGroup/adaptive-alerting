@@ -15,15 +15,17 @@
 FROM openjdk:8-jre
 MAINTAINER Haystack <haystack@expedia.com>
 
-ENV APP_NAME metric-router
+ENV APP_NAME {{{APP_NAME}}}
 ENV APP_HOME /app/bin
 ENV JMXTRANS_AGENT jmxtrans-agent-1.2.6
 
 RUN mkdir -p ${APP_HOME}
 
+RUN ls -lha tmp
+
 COPY target/adaptive-alerting-kafka*with-dependencies.jar ${APP_HOME}/adaptive-alerting-kafka.jar
-COPY docker/${APP_NAME}/start-app.sh ${APP_HOME}/
-COPY docker/${APP_NAME}/jmxtrans-agent.xml ${APP_HOME}/
+COPY docker/tmp/start-app.sh ${APP_HOME}/
+COPY docker/tmp/jmxtrans-agent.xml ${APP_HOME}/
 
 ADD https://github.com/jmxtrans/jmxtrans-agent/releases/download/${JMXTRANS_AGENT}/${JMXTRANS_AGENT}.jar ${APP_HOME}/
 

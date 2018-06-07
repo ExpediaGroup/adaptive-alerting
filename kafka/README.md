@@ -9,16 +9,22 @@ Need to package the app (if other modules have been updated those will need to b
 mvn clean package
 ```
 
-Build the docker image:
+Build the docker image (use the appropriate script for the app):
 
 ```bash
-docker build -f docker/{APP_NAME e.g. constant-detector}/Dockerfile -t {APP_NAME} .
+docker/scripts/build-{APP_NAME e.g. constant-detector}.sh
 ```
 
-run the docker image:
+Run pre-built docker image:
 
 ```bash
 docker run {APP_NAME}
+```
+
+To do all these steps: Run maven package, build the docker image and run it (use the appropriate script for the app):
+   
+```bash
+docker/scripts/build-{APP_NAME}.sh -p -r
 ```
 
 ### Troubleshooting

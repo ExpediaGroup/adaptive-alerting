@@ -30,4 +30,4 @@ JAVA_OPTS="${JAVA_OPTS} \
 -Dapplication.name=${APP_NAME} \
 -Dapplication.home=${APP_HOME}"
 
-exec java ${JAVA_OPTS} -cp "${APP_HOME}/adaptive-alerting-kafka.jar" com.expedia.adaptivealerting.kafka.detector.KafkaConstantThresholdOutlierDetector
+exec java ${JAVA_OPTS} -cp "${APP_HOME}/adaptive-alerting-kafka.jar" {{{MAIN_CLASS}}}
