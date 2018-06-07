@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.tools.kafka;
 
+import com.expedia.adaptivealerting.tools.pipeline.util.MetricPointSubscriber;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.kstreams.serde.metricpoint.MetricPointSerializer;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -27,7 +28,7 @@ import java.util.Properties;
 /**
  * @author Willie Wheeler
  */
-public class KafkaStreamSubscriber {
+public class KafkaStreamSubscriber implements MetricPointSubscriber {
     private final String topicName;
     private final KafkaProducer<String, MetricPoint> producer;
     

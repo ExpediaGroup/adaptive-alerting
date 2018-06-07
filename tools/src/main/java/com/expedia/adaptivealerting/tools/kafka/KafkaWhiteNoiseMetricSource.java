@@ -15,6 +15,8 @@
  */
 package com.expedia.adaptivealerting.tools.kafka;
 
+import com.expedia.adaptivealerting.tools.pipeline.source.WhiteNoiseMetricSource;
+
 /**
  * <p>
  * Kafka producer that generates an infinite series of white noise {@link com.expedia.www.haystack.commons.entities.MetricPoint}s
@@ -34,7 +36,7 @@ public class KafkaWhiteNoiseMetricSource {
         startSource("latency", 5000L, 0.0, 1.0);
 
         // ewma
-        startSource("ewma", 1000L, 0.0, 1.0);
+        startSource("ewma", 10000L, 0.0, 1.0);
 
         // pewma
         startSource("pewma", 15000L, 0.0, 1.0);
@@ -46,8 +48,8 @@ public class KafkaWhiteNoiseMetricSource {
     private static void startSource(String name, long period, double mean, double variance) {
         
         // FIXME For this to work generically, we'll need a publisher interface. [WLW]
-//        final StreamSource source = new WhiteNoiseMetricSource(name, period, mean, variance);
-//        source.addAnomalyResultSubscriber(new KafkaStreamSubscriber("metrics"));
-//        source.start();
+        final WhiteNoiseMetricSource source = new WhiteNoiseMetricSource(name, period, mean, variance);
+        source.addSubscriber(new KafkaStreamSubscriber("metrics"));
+        source.start();
     }
 }

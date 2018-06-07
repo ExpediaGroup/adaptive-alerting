@@ -17,23 +17,21 @@ package com.expedia.adaptivealerting.kafka.util;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.kafka.serde.JsonPojoSerializer;
+import com.expedia.adaptivealerting.kafka.serde.JsonPojoDeserializer;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.entities.MetricType;
 import com.expedia.www.haystack.commons.entities.encoders.Encoder;
 import com.expedia.www.haystack.commons.entities.encoders.PeriodReplacementEncoder;
-import com.expedia.www.haystack.commons.kstreams.serde.metricpoint.MetricTankSerde;
 import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
-import org.apache.kafka.streams.StreamsConfig;
-import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.KStream;
+import org.apache.kafka.streams.kstream.Produced;
 import scala.collection.immutable.Map$;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.function.Function;
 
 public class DetectorUtil {
@@ -45,9 +43,8 @@ public class DetectorUtil {
             new MetricPoint("null", MetricType.Gauge(), Map$.MODULE$.<String, String>empty(), 0, 0);
     private final static Encoder ENCODER = new PeriodReplacementEncoder();
 
-    public static void startStreams(Function<String, AnomalyDetector> detectorFactory, String appId, String topicName) {
-        final Properties conf = getStreamConfig(appId);
-
+    public static StreamsBuilder createDetectorStreamsBuilder(
+            String topicName, Function<String, AnomalyDetector> detectorFactory) {
         final StreamsBuilder builder = new StreamsBuilder();
         final KStream<String, MetricPoint> metrics = builder.stream(topicName);
 
@@ -55,27 +52,11 @@ public class DetectorUtil {
         metrics
                 .map((key, metricPoint) -> {
                     AnomalyResult classified = classify(metricPoint, detectors, detectorFactory);
-                    return KeyValue.pair(null, classified);
+                    return KeyValue.pair(key, classified);
                 })
-                .to("anomalies");
-
-        final Topology topology = builder.build();
-
-        final KafkaStreams streams = new KafkaStreams(topology, conf);
-
-        streams.start();
-        Runtime.getRuntime().addShutdownHook(new Thread(streams::close));
-    }
-
-    public static Properties getStreamConfig(String appId) {
-        final Properties conf = new Properties();
-
-        // TODO Move to config file.
-        conf.put(StreamsConfig.APPLICATION_ID_CONFIG, appId);
-        conf.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        conf.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
-        conf.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, MetricTankSerde.class);
-        return conf;
+                .to("anomalies", Produced.valueSerde(
+                        Serdes.serdeFrom(new JsonPojoSerializer<>(), new JsonPojoDeserializer<>())));
+        return builder;
     }
 
     static AnomalyResult classify(
