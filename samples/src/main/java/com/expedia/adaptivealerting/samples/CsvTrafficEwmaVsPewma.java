@@ -17,9 +17,8 @@ package com.expedia.adaptivealerting.samples;
 
 import com.expedia.adaptivealerting.anomdetect.EwmaAnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.PewmaAnomalyDetector;
-import com.expedia.adaptivealerting.tools.pipeline.filter.OutlierDetectorStreamFilter;
-import com.expedia.adaptivealerting.tools.pipeline.sink.OutlierChartStreamSink;
-import com.expedia.adaptivealerting.tools.pipeline.sink.ConsoleLogStreamSink;
+import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorStreamFilter;
+import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartStreamSink;
 import com.expedia.adaptivealerting.tools.pipeline.source.CsvMetricSource;
 import com.expedia.adaptivealerting.tools.visualization.ChartSeries;
 
@@ -36,18 +35,16 @@ public class CsvTrafficEwmaVsPewma {
         final InputStream is = ClassLoader.getSystemResourceAsStream("samples/sample001.csv");
         final CsvMetricSource source = new CsvMetricSource(is, "data", 1000L);
         
-        final OutlierDetectorStreamFilter ewmaFilter = new OutlierDetectorStreamFilter(new EwmaAnomalyDetector());
-        final OutlierDetectorStreamFilter pewmaFilter = new OutlierDetectorStreamFilter(new PewmaAnomalyDetector());
+        final AnomalyDetectorStreamFilter ewmaFilter = new AnomalyDetectorStreamFilter(new EwmaAnomalyDetector());
+        final AnomalyDetectorStreamFilter pewmaFilter = new AnomalyDetectorStreamFilter(new PewmaAnomalyDetector());
         
         final ChartSeries ewmaSeries = new ChartSeries();
         final ChartSeries pewmaSeries = new ChartSeries();
     
         source.addMetricPointSubscriber(ewmaFilter);
         source.addMetricPointSubscriber(pewmaFilter);
-        ewmaFilter.addAnomalyResultSubscriber(new ConsoleLogStreamSink());
-        ewmaFilter.addAnomalyResultSubscriber(new OutlierChartStreamSink(ewmaSeries));
-        pewmaFilter.addAnomalyResultSubscriber(new ConsoleLogStreamSink());
-        pewmaFilter.addAnomalyResultSubscriber(new OutlierChartStreamSink(pewmaSeries));
+        ewmaFilter.addAnomalyResultSubscriber(new AnomalyChartStreamSink(ewmaSeries));
+        pewmaFilter.addAnomalyResultSubscriber(new AnomalyChartStreamSink(pewmaSeries));
         
         showChartFrame(createChartFrame(
                 "Cal Inflow",

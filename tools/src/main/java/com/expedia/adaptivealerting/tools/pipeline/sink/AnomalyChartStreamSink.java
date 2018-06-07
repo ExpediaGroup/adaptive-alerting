@@ -17,7 +17,7 @@ package com.expedia.adaptivealerting.tools.pipeline.sink;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.tools.pipeline.StreamSubscriber;
+import com.expedia.adaptivealerting.tools.pipeline.AnomalyResultSubscriber;
 import com.expedia.adaptivealerting.tools.visualization.ChartSeries;
 import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeries;
@@ -30,10 +30,10 @@ import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.toSecon
 /**
  * @author Willie Wheeler
  */
-public final class OutlierChartStreamSink implements StreamSubscriber<AnomalyResult> {
+public final class AnomalyChartStreamSink implements AnomalyResultSubscriber {
     private final ChartSeries chartSeries;
     
-    public OutlierChartStreamSink(ChartSeries chartSeries) {
+    public AnomalyChartStreamSink(ChartSeries chartSeries) {
         notNull(chartSeries, "chartSeries can't be null");
         this.chartSeries = chartSeries;
     }

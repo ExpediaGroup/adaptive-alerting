@@ -15,12 +15,12 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline;
 
+import com.expedia.www.haystack.commons.entities.MetricPoint;
+
 /**
- * Stream subscriber.
- *
  * @author Willie Wheeler
  */
-public interface StreamSubscriber<T> {
+public interface MetricPointSubscriber {
     
-    void next(T message);
+    void next(MetricPoint metricPoint);
 }

@@ -16,9 +16,9 @@
 package com.expedia.adaptivealerting.tools.pipeline.filter;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.tools.pipeline.StreamPublisherSupport;
-import com.expedia.adaptivealerting.tools.pipeline.StreamSubscriber;
+import com.expedia.adaptivealerting.tools.pipeline.AnomalyResultPublisherSupport;
+import com.expedia.adaptivealerting.tools.pipeline.AnomalyResultSubscriber;
+import com.expedia.adaptivealerting.tools.pipeline.MetricPointSubscriber;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -28,11 +28,11 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  *
  * @author Willie Wheeler
  */
-public final class OutlierDetectorStreamFilter implements StreamSubscriber<MetricPoint> {
+public final class AnomalyDetectorStreamFilter implements MetricPointSubscriber {
     private final AnomalyDetector anomalyDetector;
-    private final StreamPublisherSupport<AnomalyResult> publisherSupport = new StreamPublisherSupport<>();
+    private final AnomalyResultPublisherSupport publisherSupport = new AnomalyResultPublisherSupport();
     
-    public OutlierDetectorStreamFilter(AnomalyDetector anomalyDetector) {
+    public AnomalyDetectorStreamFilter(AnomalyDetector anomalyDetector) {
         notNull(anomalyDetector, "anomalyDetector can't be null");
         this.anomalyDetector = anomalyDetector;
     }
@@ -43,12 +43,12 @@ public final class OutlierDetectorStreamFilter implements StreamSubscriber<Metri
         publisherSupport.publish(anomalyDetector.classify(metricPoint));
     }
     
-    public void addAnomalyResultSubscriber(StreamSubscriber<AnomalyResult> subscriber) {
+    public void addAnomalyResultSubscriber(AnomalyResultSubscriber subscriber) {
         notNull(subscriber, "subscriber can't be null");
         publisherSupport.addSubscriber(subscriber);
     }
     
-    public void removeAnomalyResultSubscriber(StreamSubscriber<AnomalyResult> subscriber) {
+    public void removeAnomalyResultSubscriber(AnomalyResultSubscriber subscriber) {
         notNull(subscriber, "subscriber can't be null");
         publisherSupport.removeSubscriber(subscriber);
     }
