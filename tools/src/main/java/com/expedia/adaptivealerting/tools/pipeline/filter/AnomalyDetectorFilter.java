@@ -13,9 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.tools.pipeline;
+package com.expedia.adaptivealerting.tools.pipeline.filter;
 
+import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.tools.pipeline.util.AnomalyResultSubscriber;
+import com.expedia.adaptivealerting.tools.pipeline.util.MetricPointSubscriber;
+import com.expedia.www.haystack.commons.entities.MetricPoint;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -23,23 +27,36 @@ import java.util.List;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
+ * Stream filter that applies an outlier detector to metrics and generates outlier detector results.
+ *
  * @author Willie Wheeler
  */
-public final class AnomalyResultPublisherSupport {
+public final class AnomalyDetectorFilter implements MetricPointSubscriber {
+    private final AnomalyDetector anomalyDetector;
     private final List<AnomalyResultSubscriber> subscribers = new LinkedList<>();
-    
+
+    public AnomalyDetectorFilter(AnomalyDetector anomalyDetector) {
+        notNull(anomalyDetector, "anomalyDetector can't be null");
+        this.anomalyDetector = anomalyDetector;
+    }
+
+    @Override
+    public void next(MetricPoint metricPoint) {
+        notNull(metricPoint, "metricPoint can't be null");
+        publish(anomalyDetector.classify(metricPoint));
+    }
+
     public void addSubscriber(AnomalyResultSubscriber subscriber) {
         notNull(subscriber, "subscriber can't be null");
         subscribers.add(subscriber);
     }
-    
+
     public void removeSubscriber(AnomalyResultSubscriber subscriber) {
         notNull(subscriber, "subscriber can't be null");
         subscribers.remove(subscriber);
     }
-    
-    public void publish(AnomalyResult anomalyResult) {
-        notNull(anomalyResult, "anomalyResult can't be null");
+
+    private void publish(AnomalyResult anomalyResult) {
         subscribers.stream().forEach(subscriber -> subscriber.next(anomalyResult));
     }
 }

@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.tools.pipeline.source;
 
 import com.expedia.adaptivealerting.core.util.ThreadUtil;
-import com.expedia.adaptivealerting.tools.pipeline.MetricPointSubscriber;
+import com.expedia.adaptivealerting.tools.pipeline.util.MetricPointSubscriber;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
 import java.util.concurrent.Executors;
@@ -48,7 +48,7 @@ public final class MetricSourceTestSupport {
             }
         };
         
-        metricSource.addMetricPointSubscriber(subscriber);
+        metricSource.addSubscriber(subscriber);
         
         Executors.newSingleThreadExecutor().execute(new Runnable() {
             @Override
@@ -59,7 +59,7 @@ public final class MetricSourceTestSupport {
         
         ThreadUtil.sleep(runMillis);
         metricSource.stop();
-        metricSource.removeMetricPointSubscriber(subscriber);
+        metricSource.removeSubscriber(subscriber);
     
         assertTrue(calledNext[0]);
     }

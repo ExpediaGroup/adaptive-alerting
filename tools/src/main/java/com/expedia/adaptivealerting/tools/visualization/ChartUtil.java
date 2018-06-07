@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.tools.visualization;
 
+import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartSink;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
