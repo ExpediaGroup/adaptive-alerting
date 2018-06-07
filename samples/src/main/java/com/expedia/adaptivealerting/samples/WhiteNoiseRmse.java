@@ -15,8 +15,6 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.createChartFrame;
-import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showChartFrame;
 import com.expedia.adaptivealerting.anomdetect.EwmaAnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.PewmaAnomalyDetector;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
@@ -25,6 +23,9 @@ import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartSink;
 import com.expedia.adaptivealerting.tools.pipeline.source.WhiteNoiseMetricSource;
 import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
+
+import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.createChartFrame;
+import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showChartFrame;
 
 /**
  * This is a sample pipeline to calculate RMSE
@@ -53,7 +54,7 @@ public class WhiteNoiseRmse {
         source.addSubscriber(pewmaFilter);
         pewmaFilter.addSubscriber(pewmaEval);
         pewmaFilter.addSubscriber(pewmaChart);
-        ewmaEval.addSubscriber(pewmaChart);
+        pewmaEval.addSubscriber(pewmaChart);
 
         showChartFrame(createChartFrame("White Noise RMSE", ewmaChart.getChart(), pewmaChart.getChart()));
         source.start();
