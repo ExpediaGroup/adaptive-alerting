@@ -28,13 +28,13 @@ import org.apache.kafka.common.serialization.Serializer;
 
 import java.util.Map;
 
-public class JsonPOJOSerializer<T> implements Serializer<T> {
+public class JsonPojoSerializer<T> implements Serializer<T> {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * Default constructor needed by Kafka
      */
-    public JsonPOJOSerializer() {
+    public JsonPojoSerializer() {
     }
 
     @Override

@@ -12,11 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-die() {
-    printf '%s\n' "$1" >&2
-    exit 1
-}
-
 show_help() {
 cat << EOF
 Usage: ${0##*/} [-h] [-p] [-r]
@@ -26,6 +21,7 @@ Usage: ${0##*/} [-h] [-p] [-r]
     -r, --run       run docker image.
 EOF
 }
+
 package=0
 run=0
 while :; do

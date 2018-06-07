@@ -17,8 +17,8 @@ package com.expedia.adaptivealerting.kafka.util;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.kafka.serde.JsonPOJOSerializer;
-import com.expedia.adaptivealerting.kafka.serde.JsonPOJODeserializer;
+import com.expedia.adaptivealerting.kafka.serde.JsonPojoSerializer;
+import com.expedia.adaptivealerting.kafka.serde.JsonPojoDeserializer;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.entities.MetricType;
 import com.expedia.www.haystack.commons.entities.encoders.Encoder;
@@ -32,7 +32,6 @@ import scala.collection.immutable.Map$;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.function.Function;
 
 public class DetectorUtil {
@@ -56,7 +55,7 @@ public class DetectorUtil {
                     return KeyValue.pair(key, classified);
                 })
                 .to("anomalies", Produced.valueSerde(
-                        Serdes.serdeFrom(new JsonPOJOSerializer<>(), new JsonPOJODeserializer<>())));
+                        Serdes.serdeFrom(new JsonPojoSerializer<>(), new JsonPojoDeserializer<>())));
         return builder;
     }
 
