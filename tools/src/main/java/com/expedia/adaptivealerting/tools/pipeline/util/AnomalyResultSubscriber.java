@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.tools.pipeline;
+package com.expedia.adaptivealerting.tools.pipeline.util;
 
-import com.expedia.www.haystack.commons.entities.MetricPoint;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 
 /**
  * @author Willie Wheeler
  */
-public interface MetricPointSubscriber {
+public interface AnomalyResultSubscriber {
     
-    void next(MetricPoint metricPoint);
+    void next(AnomalyResult anomalyResult);
 }

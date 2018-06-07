@@ -1,0 +1,68 @@
+/*
+ * Copyright 2018 Expedia Group, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
+ * 
+ */
+package com.expedia.adaptivealerting.tools.pipeline.filter;
+
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import java.util.LinkedList;
+import java.util.List;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.core.evaluator.Evaluator;
+import com.expedia.adaptivealerting.core.evaluator.ModelEvaluation;
+import com.expedia.adaptivealerting.tools.pipeline.util.AnomalyResultSubscriber;
+import com.expedia.adaptivealerting.tools.pipeline.util.ModelEvaluationSubscriber;
+
+
+/**
+ * Stream filter that applies model evaluator to metrics and publishes the score.
+ * 
+ * @author kashah
+ *
+ */
+public class EvaluatorFilter implements AnomalyResultSubscriber {
+
+    private final Evaluator evaluator;
+    private final List<ModelEvaluationSubscriber> subscribers = new LinkedList<>();
+
+    public EvaluatorFilter(Evaluator evaluator) {
+        notNull(evaluator, "evaluator can't be null");
+        this.evaluator = evaluator;
+    }
+
+    @Override
+    public void next(AnomalyResult anomalyResult) {
+        notNull(anomalyResult, "anamolyResult can't be null");
+        evaluator.update(anomalyResult.getObserved(), anomalyResult.getPredicted());
+        publish(evaluator.evaluate());
+    }
+
+    public void addSubscriber(ModelEvaluationSubscriber subscriber) {
+        notNull(subscriber, "subscriber can't be null");
+        subscribers.add(subscriber);
+    }
+
+    public void removeSubscriber(ModelEvaluationSubscriber subscriber) {
+        notNull(subscriber, "subscriber can't be null");
+        subscribers.remove(subscriber);
+    }
+
+    private void publish(ModelEvaluation modelEvaluation) {
+        subscribers.stream().forEach(subscriber -> subscriber.next(modelEvaluation));
+    }
+
+}

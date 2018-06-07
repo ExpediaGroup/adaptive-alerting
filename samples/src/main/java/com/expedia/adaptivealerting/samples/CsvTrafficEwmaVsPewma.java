@@ -17,40 +17,50 @@ package com.expedia.adaptivealerting.samples;
 
 import com.expedia.adaptivealerting.anomdetect.EwmaAnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.PewmaAnomalyDetector;
-import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorStreamFilter;
-import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartStreamSink;
+import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
+import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorFilter;
+import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
+import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartSink;
 import com.expedia.adaptivealerting.tools.pipeline.source.CsvMetricSource;
-import com.expedia.adaptivealerting.tools.visualization.ChartSeries;
+import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
 
 import java.io.InputStream;
 
-import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.*;
+import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.createChartFrame;
+import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showChartFrame;
 
 /**
+ * Sample that creates a pipeline for traffic data sourced from a CSV file. We have both EWMA and PEWMA charts, both
+ * with RMSE evaluators.
+ *
  * @author Willie Wheeler
  */
-public class CsvTrafficEwmaVsPewma {
+public final class CsvTrafficEwmaVsPewma {
     
     public static void main(String[] args) {
         final InputStream is = ClassLoader.getSystemResourceAsStream("samples/sample001.csv");
         final CsvMetricSource source = new CsvMetricSource(is, "data", 1000L);
         
-        final AnomalyDetectorStreamFilter ewmaFilter = new AnomalyDetectorStreamFilter(new EwmaAnomalyDetector());
-        final AnomalyDetectorStreamFilter pewmaFilter = new AnomalyDetectorStreamFilter(new PewmaAnomalyDetector());
-        
-        final ChartSeries ewmaSeries = new ChartSeries();
-        final ChartSeries pewmaSeries = new ChartSeries();
+        final AnomalyDetectorFilter ewmaAD = new AnomalyDetectorFilter(new EwmaAnomalyDetector());
+        final AnomalyDetectorFilter pewmaAD = new AnomalyDetectorFilter(new PewmaAnomalyDetector());
     
-        source.addMetricPointSubscriber(ewmaFilter);
-        source.addMetricPointSubscriber(pewmaFilter);
-        ewmaFilter.addAnomalyResultSubscriber(new AnomalyChartStreamSink(ewmaSeries));
-        pewmaFilter.addAnomalyResultSubscriber(new AnomalyChartStreamSink(pewmaSeries));
+        final EvaluatorFilter ewmaEval = new EvaluatorFilter(new RmseEvaluator());
+        final EvaluatorFilter pewmaEval = new EvaluatorFilter(new RmseEvaluator());
         
-        showChartFrame(createChartFrame(
-                "Cal Inflow",
-                createChart("EWMA", ewmaSeries),
-                createChart("PEWMA", pewmaSeries)));
-    
+        final AnomalyChartSink ewmaChart = PipelineFactory.createChartSink("EWMA");
+        final AnomalyChartSink pewmaChart = PipelineFactory.createChartSink("PEWMA");
+        
+        source.addSubscriber(ewmaAD);
+        ewmaAD.addSubscriber(ewmaEval);
+        ewmaAD.addSubscriber(ewmaChart);
+        ewmaEval.addSubscriber(ewmaChart);
+        
+        source.addSubscriber(pewmaAD);
+        pewmaAD.addSubscriber(pewmaEval);
+        pewmaAD.addSubscriber(pewmaChart);
+        pewmaEval.addSubscriber(pewmaChart);
+        
+        showChartFrame(createChartFrame("Cal Inflow", ewmaChart.getChart(), pewmaChart.getChart()));
         source.start();
     }
 }
