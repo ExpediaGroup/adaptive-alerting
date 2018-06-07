@@ -15,12 +15,7 @@
  */
 package com.expedia.adaptivealerting.tools.kafka;
 
-import com.expedia.adaptivealerting.core.util.MetricPointUtil;
-import com.expedia.adaptivealerting.tools.pipeline.StreamPublisherSupport;
 import com.expedia.adaptivealerting.tools.pipeline.source.WhiteNoiseMetricSource;
-import com.expedia.www.haystack.commons.entities.MetricPoint;
-
-import javax.xml.transform.stream.StreamSource;
 
 /**
  * <p>
