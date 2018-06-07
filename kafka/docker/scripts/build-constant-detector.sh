@@ -18,6 +18,6 @@ APP_NAME="constant-detector"
 DOTTED_APP_NAME="constant.detector"
 MAIN_CLASS="com.expedia.adaptivealerting.kafka.detector.KafkaConstantThresholdOutlierDetector"
 
-cd "$(dirname "$(realpath "$0")")";
+cd `cd -P -- "$(dirname -- "$0")" && pwd -P`
 
 . common.sh

@@ -30,16 +30,24 @@ public class AnomalyResult {
     private Double strongThresholdLower;
     private Double anomalyScore;
     private AnomalyLevel anomalyLevel;
-    private String detector;
+
+    /**
+     * Param that is used for differentiating AnomalyResults. This will likely be expanded in future to provide more
+     * information so it shouldn't be relied upon to contain stable information.
+     */
+    private String label;
 
     public  AnomalyResult() {
         // For jackson
     }
 
-    public AnomalyResult(Class detector) {
 
-        // using a String for the detector for now as it's just a convenience label not for reconstructing the detector.
-        this.detector = detector.getSimpleName();
+    /**
+     * Convenience constructor for assigning a label based off of the Class of the detector.
+     * @param detector The AnomalyDetector that created this AnomalyResult
+     */
+    public AnomalyResult(Class detector) {
+        this.label = detector.getSimpleName();
     }
     
     public Long getEpochSecond() {
@@ -114,12 +122,12 @@ public class AnomalyResult {
         this.anomalyLevel = anomalyLevel;
     }
 
-    public String getDetector() {
-        return detector;
+    public String getLabel() {
+        return label;
     }
 
-    public void setDetector(String detector) {
-        this.detector = detector;
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     @Override
@@ -134,7 +142,7 @@ public class AnomalyResult {
                 ", strongThresholdLower=" + strongThresholdLower +
                 ", anomalyScore=" + anomalyScore +
                 ", anomalyLevel=" + anomalyLevel +
-                ", detector=" + detector +
+                ", label=" + label +
                 '}';
     }
 }

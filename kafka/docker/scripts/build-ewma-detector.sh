@@ -18,6 +18,6 @@ APP_NAME="ewma-detector"
 DOTTED_APP_NAME="ewma.detector"
 MAIN_CLASS="com.expedia.adaptivealerting.kafka.detector.KafkaEwmaOutlierDetector"
 
-cd "$(dirname "$(realpath "$0")")";
+cd `cd -P -- "$(dirname -- "$0")" && pwd -P`
 
 . common.sh
