@@ -1,5 +1,19 @@
 # Adaptive Alerting - Kafka
 
+## Running KStream app locally with maven
+
+Need to build (if other modules have been updated those will need to be re-built with `mvn install`):
+
+```bash
+mvn compile
+```
+
+Run the following with the appropriate `mainClass`:
+
+```bash
+mvn exec:java -Dexec.mainClass="com.expedia.adaptivealerting.kafka.detector.KafkaPewmaOutlierDetector"
+```
+
 
 ## Running KStream apps in docker
 
@@ -21,7 +35,7 @@ Run pre-built docker image:
 docker run {APP_NAME}
 ```
 
-To do all these steps: Run maven package, build the docker image and run it (use the appropriate script for the app):
+To do all these steps: run maven package, build the docker image and run it (use the appropriate script for the app):
    
 ```bash
 docker/scripts/build-{APP_NAME}.sh -p -r
@@ -29,33 +43,53 @@ docker/scripts/build-{APP_NAME}.sh -p -r
 
 ### Troubleshooting
 
-If you get an error:
+1. If you get an error:
 
-```java
-Caused by: org.apache.kafka.common.config.ConfigException: No resolvable bootstrap urls given in bootstrap.servers
-```
+    ```java
+    Caused by: org.apache.kafka.common.config.ConfigException: No resolvable bootstrap urls given in bootstrap.servers
+    ```
+    
+    Try adding the following entry to your hosts file:
+    
+    ```bash
+    {YOUR_EXTERNAL_IP} kafkasvc
+    ```
 
-Try adding the following entry to your hosts file:
+1. If you get an error:
 
-```bash
-{YOUR_EXTERNAL_IP} kafkasvc
-```
+    ```java
+    com.expedia.www.haystack.commons.kstreams.app.StreamsFactory$TopicNotPresentException: Topic 'XXXXXXXX' is configured as a consumer and it is not present
+    ```
+    
+    Your kafka instance might not be set to automatically add topics. Try creating them manually:
 
+    ```bash
+    kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic metrics
+    kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic ewma-metrics
+    kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic pewma-metrics
+    kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic constant-metrics
+    kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic anomalies
+    
+    kafka-topics --list --zookeeper localhost:2181
+    ```
+    
+    If `kafka-topics` is not found you will need to locate `kafka-topics` or `kafka-topics.sh` file
+     (might be in the bin directory of your kafka install) and use that to run the command.
 
-If you get an error:
+1. If you get an error:
 
-```java
-java.net.ConnectException: Exception connecting to HostAndPort{host='monitoring-influxdb-graphite.kube-system.svc', port=2003}
-```
-
-Try adding the following entry to your hosts file:
-
-```bash
-{YOUR_EXTERNAL_IP} monitoring-influxdb-graphite.kube-system.svc
-```
-
-you may also need something to listen on that port so you can run:
-
-```bash
-python -m SimpleHTTPServer 2003
-```
+    ```java
+    java.net.ConnectException: Exception connecting to HostAndPort{host='monitoring-influxdb-graphite.kube-system.svc', port=2003}
+    ```
+    
+    Try adding the following entry to your hosts file:
+    
+    ```bash
+    {YOUR_EXTERNAL_IP} monitoring-influxdb-graphite.kube-system.svc
+    ```
+    
+    you may also need something to listen on that port so you can run:
+    
+    ```bash
+    python -m SimpleHTTPServer 2003
+    ```
