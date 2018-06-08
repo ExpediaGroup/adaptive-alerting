@@ -16,7 +16,9 @@
 package com.expedia.adaptivealerting.samples;
 
 import com.expedia.adaptivealerting.anomdetect.PewmaAnomalyDetector;
+import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorFilter;
+import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartSink;
 import com.expedia.adaptivealerting.tools.pipeline.source.CsvMetricSource;
 import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
@@ -35,24 +37,36 @@ public class CsvTrafficPewmaVariants {
         final InputStream is = ClassLoader.getSystemResourceAsStream("samples/sample001.csv");
         final CsvMetricSource source = new CsvMetricSource(is, "data", 1000L);
         
-        final AnomalyDetectorFilter filter1 =
+        final AnomalyDetectorFilter ad1 =
                 new AnomalyDetectorFilter(new PewmaAnomalyDetector(0.15, 1.0, 2.0, 3.0, 0.0));
-        final AnomalyDetectorFilter filter2 =
+        final AnomalyDetectorFilter ad2 =
                 new AnomalyDetectorFilter(new PewmaAnomalyDetector(0.25, 1.0, 2.0, 3.0, 0.0));
-        final AnomalyDetectorFilter filter3 =
+        final AnomalyDetectorFilter ad3 =
                 new AnomalyDetectorFilter(new PewmaAnomalyDetector(0.35, 1.0, 2.0, 3.0, 0.0));
+    
+        final EvaluatorFilter eval1 = new EvaluatorFilter(new RmseEvaluator());
+        final EvaluatorFilter eval2 = new EvaluatorFilter(new RmseEvaluator());
+        final EvaluatorFilter eval3 = new EvaluatorFilter(new RmseEvaluator());
         
         final AnomalyChartSink chart1 = PipelineFactory.createChartSink("PEWMA: alpha=0.15");
         final AnomalyChartSink chart2 = PipelineFactory.createChartSink("PEWMA: alpha=0.25");
         final AnomalyChartSink chart3 = PipelineFactory.createChartSink("PEWMA: alpha=0.35");
     
-        source.addSubscriber(filter1);
-        source.addSubscriber(filter2);
-        source.addSubscriber(filter3);
+        source.addSubscriber(ad1);
+        source.addSubscriber(ad2);
+        source.addSubscriber(ad3);
+    
+        ad1.addSubscriber(eval1);
+        ad2.addSubscriber(eval2);
+        ad3.addSubscriber(eval3);
         
-        filter1.addSubscriber(chart1);
-        filter2.addSubscriber(chart2);
-        filter3.addSubscriber(chart3);
+        ad1.addSubscriber(chart1);
+        ad2.addSubscriber(chart2);
+        ad3.addSubscriber(chart3);
+        
+        eval1.addSubscriber(chart1);
+        eval2.addSubscriber(chart2);
+        eval3.addSubscriber(chart3);
         
         showChartFrame(createChartFrame("Cal Inflow", chart1.getChart(), chart2.getChart(), chart3.getChart()));
         source.start();
