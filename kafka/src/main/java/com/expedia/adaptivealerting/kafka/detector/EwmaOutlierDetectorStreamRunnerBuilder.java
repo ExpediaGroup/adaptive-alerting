@@ -15,13 +15,21 @@
  */
 package com.expedia.adaptivealerting.kafka.detector;
 
+import com.expedia.adaptivealerting.anomdetect.EwmaAnomalyDetector;
 import com.expedia.adaptivealerting.kafka.util.AppUtil;
+import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
+import com.expedia.adaptivealerting.kafka.util.StreamRunnerBuilder;
+import com.expedia.www.haystack.commons.kstreams.app.StreamsRunner;
 import com.typesafe.config.Config;
+import org.apache.kafka.streams.StreamsBuilder;
 
-public class KafkaConstantThresholdOutlierDetector {
-
-    public static void main(String[] args) {
-        Config appConfig = AppUtil.getAppConfig("constant-detector");
-        AppUtil.launchStreamRunner(new ConstantThresholdOutlierDetectorStreamRunnerBuilder().build(appConfig));
-    }
+public class EwmaOutlierDetectorStreamRunnerBuilder implements StreamRunnerBuilder {
+  @Override
+  public StreamsRunner build(Config appConfig) {
+    final StreamsBuilder builder = DetectorUtil.createDetectorStreamsBuilder(
+            appConfig.getString("topic"),
+            id -> new EwmaAnomalyDetector(0.8, 3.0, 2.0, 100.0)
+    );
+    return AppUtil.createStreamsRunner(appConfig, builder);
+  }
 }
