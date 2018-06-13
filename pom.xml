@@ -55,6 +55,14 @@
         <!-- Maven plugins -->
         <maven.compiler.plugin.version>3.7.0</maven.compiler.plugin.version>
         <maven.jar.plugin.version>3.1.0</maven.jar.plugin.version>
+        <scalatest.version>3.0.3</scalatest.version>
+        <scala.major.version>2</scala.major.version>
+        <scala.minor.version>12</scala.minor.version>
+        <scala.major.minor.version>${scala.major.version}.${scala.minor.version}</scala.major.minor.version>
+        <scala.maintenance.version>2</scala.maintenance.version>
+        <scala-library.version>${scala.major.minor.version}.${scala.maintenance.version}</scala-library.version>
+        <pegdown.version>1.4.2</pegdown.version>
+        <kafka.version>1.1.0</kafka.version>
     </properties>
 
     <dependencyManagement>
@@ -121,6 +129,50 @@
                 <artifactId>slf4j-log4j12</artifactId>
                 <version>${slf4j.version}</version>
                 <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala-library</artifactId>
+                <version>${scala-library.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.scalatest</groupId>
+                <artifactId>scalatest_${scala.major.minor.version}</artifactId>
+                <version>${scalatest.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.pegdown</groupId>
+                <artifactId>pegdown</artifactId>
+                <version>${pegdown.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka-streams</artifactId>
+                <version>${kafka.version}</version>
+                <classifier>test</classifier>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka-clients</artifactId>
+                <version>${kafka.version}</version>
+                <classifier>test</classifier>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka_${scala.major.minor.version}</artifactId>
+                <version>${kafka.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka_${scala.major.minor.version}</artifactId>
+                <version>${kafka.version}</version>
+                <classifier>test</classifier>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -13,15 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.detector;
+package com.expedia.adaptivealerting.kafka.util;
 
-import com.expedia.adaptivealerting.kafka.util.AppUtil;
+import com.expedia.www.haystack.commons.kstreams.app.StreamsRunner;
 import com.typesafe.config.Config;
 
-public class KafkaConstantThresholdOutlierDetector {
-
-    public static void main(String[] args) {
-        Config appConfig = AppUtil.getAppConfig("constant-detector");
-        AppUtil.launchStreamRunner(new ConstantThresholdOutlierDetectorStreamRunnerBuilder().build(appConfig));
-    }
+public interface StreamRunnerBuilder {
+  StreamsRunner build(Config config);
 }

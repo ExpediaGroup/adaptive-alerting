@@ -15,12 +15,8 @@
  */
 package com.expedia.adaptivealerting.kafka.detector;
 
-import com.expedia.adaptivealerting.anomdetect.EwmaAnomalyDetector;
 import com.expedia.adaptivealerting.kafka.util.AppUtil;
-import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
-import com.expedia.www.haystack.commons.kstreams.app.StreamsRunner;
 import com.typesafe.config.Config;
-import org.apache.kafka.streams.StreamsBuilder;
 
 /**
  * Kafka Streams application for the EWMA outlier detector.
@@ -31,13 +27,6 @@ public class KafkaEwmaOutlierDetector {
     
     public static void main(String[] args) {
         Config appConfig = AppUtil.getAppConfig("ewma-detector");
-
-        final StreamsBuilder builder = DetectorUtil.createDetectorStreamsBuilder(
-                appConfig.getString("topic"),
-                id -> new EwmaAnomalyDetector(0.8, 3.0, 2.0, 100.0)
-        );
-
-        StreamsRunner streamsRunner = AppUtil.createStreamsRunner(appConfig, builder);
-        AppUtil.launchStreamRunner(streamsRunner);
+        AppUtil.launchStreamRunner(new EwmaOutlierDetectorStreamRunnerBuilder().build(appConfig));
     }
 }

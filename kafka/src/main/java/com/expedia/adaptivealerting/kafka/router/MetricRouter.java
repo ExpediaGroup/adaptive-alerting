@@ -16,46 +16,12 @@
 package com.expedia.adaptivealerting.kafka.router;
 
 import com.expedia.adaptivealerting.kafka.util.AppUtil;
-import com.expedia.www.haystack.commons.entities.MetricPoint;
-import com.expedia.www.haystack.commons.kstreams.app.StreamsRunner;
 import com.typesafe.config.Config;
-import org.apache.kafka.streams.StreamsBuilder;
-import org.apache.kafka.streams.kstream.KStream;
-
-import java.util.Arrays;
-import java.util.Collections;
 
 public class MetricRouter {
 
     public static void main(String[] args) {
         Config appConfig = AppUtil.getAppConfig("metricrouter");
-
-        final StreamsBuilder builder = createStreamsBuilder(appConfig);
-
-        StreamsRunner streamsRunner = AppUtil.createStreamsRunner(appConfig, builder);
-        AppUtil.launchStreamRunner(streamsRunner);
-    }
-
-    private static StreamsBuilder createStreamsBuilder(Config appConfig) {
-        final StreamsBuilder builder = new StreamsBuilder();
-        final KStream<String, MetricPoint> metrics = builder.stream(appConfig.getString("topic"));
-
-        metrics.filter(MetricRouter::isConstant).to("constant-metrics");
-        metrics.filter(MetricRouter::isEwma).to("ewma-metrics");
-        metrics.filter(MetricRouter::isPewma).to("pewma-metrics");
-        return builder;
-    }
-
-    // TODO: add real routing conditions
-    private static boolean isConstant(String key, MetricPoint metricPoint) {
-        return Arrays.asList("latency", "duration").contains(metricPoint.metric());
-    }
-
-    private static boolean isEwma(String key, MetricPoint metricPoint) {
-        return Collections.singletonList("ewma").contains(metricPoint.metric());
-    }
-
-    private static boolean isPewma(String key, MetricPoint metricPoint) {
-        return Collections.singletonList("pewma").contains(metricPoint.metric());
+        AppUtil.launchStreamRunner(new MetricRouterStreamBuilder().build(appConfig));
     }
 }
