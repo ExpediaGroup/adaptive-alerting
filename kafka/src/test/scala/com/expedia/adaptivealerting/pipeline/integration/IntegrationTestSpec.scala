@@ -57,7 +57,6 @@ class IntegrationTestSpec extends WordSpec with GivenWhenThen with Matchers with
     var idx = 0
     scheduler.scheduleWithFixedDelay(() => {
       if (idx < metrics.size) {
-        System.out.println("PUSH")
         currentTime = currentTime + ((idx * PUNCTUATE_INTERVAL_MS) / (metrics.size - 1))
         val metricPoint = metrics.apply(idx)
         val records = List(new KeyValue[String, MetricPoint](metricPoint.metric, metricPoint)).asJava
