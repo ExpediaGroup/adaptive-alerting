@@ -13,15 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.router;
+package com.expedia.adaptivealerting.anomvalidate.investigation;
 
-import com.expedia.adaptivealerting.kafka.util.AppUtil;
-import com.typesafe.config.Config;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.core.anomaly.InvestigationResult;
 
-public class MetricRouter {
+import java.util.List;
 
-    public static void main(String[] args) {
-        Config appConfig = AppUtil.getAppConfig("metric-router");
-        AppUtil.launchStreamRunner(new MetricRouterStreamBuilder().build(appConfig));
-    }
+/**
+ * Anomaly investigator interface.
+ *
+ * @author Willie Wheeler
+ */
+public interface AnomalyInvestigator {
+    
+    /**
+     * Investigates the given anomaly result.
+     *
+     * @param result Anomaly result.
+     * @return a List of InvestigationResults.
+     */
+    List<InvestigationResult> investigate(AnomalyResult result);
 }

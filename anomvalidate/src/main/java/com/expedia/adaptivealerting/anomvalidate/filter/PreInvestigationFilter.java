@@ -13,22 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomvalidate;
+package com.expedia.adaptivealerting.anomvalidate.filter;
 
+import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 
-/**
- * Anomaly validator interface.
- *
- * @author Willie Wheeler
- */
-public interface AnomalyValidator {
-    
-    /**
-     * Validates the given anomaly result.
-     *
-     * @param result Anomaly result.
-     * @return Validated anomaly result.
-     */
-    AnomalyResult validate(AnomalyResult result);
+import java.util.Arrays;
+import java.util.List;
+
+public class PreInvestigationFilter implements InvestigationFilter {
+    private static final List<AnomalyLevel> KEEP_LEVELS = Arrays.asList(AnomalyLevel.WEAK, AnomalyLevel.STRONG);
+
+    // TODO: make configurable
+    @Override
+    public boolean keep(String key, AnomalyResult anomalyResult) {
+        return anomalyResult != null && KEEP_LEVELS.contains(anomalyResult.getAnomalyLevel());
+    }
 }

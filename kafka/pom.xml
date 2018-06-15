@@ -59,6 +59,11 @@
             <artifactId>adaptive-alerting-anomdetect</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.expedia.adaptivealerting</groupId>
+            <artifactId>adaptive-alerting-anomvalidate</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- Third-party -->
         <dependency>

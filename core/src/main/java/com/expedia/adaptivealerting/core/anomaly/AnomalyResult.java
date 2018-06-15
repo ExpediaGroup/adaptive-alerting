@@ -15,6 +15,11 @@
  */
 package com.expedia.adaptivealerting.core.anomaly;
 
+import com.expedia.adaptivealerting.core.metric.Metric;
+import com.expedia.www.haystack.commons.entities.MetricPoint;
+
+import java.util.List;
+
 /**
  * Anomaly result.
  *
@@ -30,12 +35,14 @@ public class AnomalyResult {
     private Double strongThresholdLower;
     private Double anomalyScore;
     private AnomalyLevel anomalyLevel;
+    private Metric metric;
+    private List<InvestigationResult> investigationResults;
 
     /**
      * Param that is used for differentiating AnomalyResults. This will likely be expanded in future to provide more
      * information so it shouldn't be relied upon to contain stable information.
      */
-    private String label;
+    private String detectorLabel;
 
     public  AnomalyResult() {
         // For jackson
@@ -43,11 +50,14 @@ public class AnomalyResult {
 
 
     /**
-     * Convenience constructor for assigning a label based off of the Class of the detector.
+     * Convenience constructor for assigning a detector label based on the Class of the detector and Metric from a
+     * MetricPoint.
+     *
      * @param detector The AnomalyDetector that created this AnomalyResult
      */
-    public AnomalyResult(Class detector) {
-        this.label = detector.getSimpleName();
+    public AnomalyResult(Class detector, MetricPoint metricPoint) {
+        this.detectorLabel = detector.getSimpleName();
+        this.metric = new Metric(metricPoint);
     }
     
     public Long getEpochSecond() {
@@ -122,12 +132,28 @@ public class AnomalyResult {
         this.anomalyLevel = anomalyLevel;
     }
 
-    public String getLabel() {
-        return label;
+    public String getDetectorLabel() {
+        return detectorLabel;
     }
 
-    public void setLabel(String label) {
-        this.label = label;
+    public void setDetectorLabel(String detectorLabel) {
+        this.detectorLabel = detectorLabel;
+    }
+
+    public Metric getMetric() {
+        return metric;
+    }
+
+    public void setMetric(Metric metric) {
+        this.metric = metric;
+    }
+
+    public List<InvestigationResult> getInvestigationResults() {
+        return investigationResults;
+    }
+
+    public void setInvestigationResults(List<InvestigationResult> investigationResults) {
+        this.investigationResults = investigationResults;
     }
 
     @Override
@@ -142,7 +168,8 @@ public class AnomalyResult {
                 ", strongThresholdLower=" + strongThresholdLower +
                 ", anomalyScore=" + anomalyScore +
                 ", anomalyLevel=" + anomalyLevel +
-                ", label=" + label +
+                ", detectorLabel=" + detectorLabel +
+                ", metric=" + (metric == null ? "null" : metric.getName()) +
                 '}';
     }
 }

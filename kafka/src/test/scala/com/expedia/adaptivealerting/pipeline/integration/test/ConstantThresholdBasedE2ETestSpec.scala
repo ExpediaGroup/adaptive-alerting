@@ -33,7 +33,7 @@ import scala.concurrent.duration._
 
 class ConstantThresholdBasedE2ETestSpec extends IntegrationTestSpec {
   protected val INTERMEDIATE_TOPIC = "constant-metrics"
-  protected val metricRouterStreamConfig = streamConfigProperties("metricrouter", "metric-router")
+  protected val metricRouterStreamConfig = streamConfigProperties("metric-router", "metric-router")
   protected val constantThresholdStreamConfig = streamConfigProperties("constant-detector", "constant-threshold-detector")
   protected var constantThresholdTopicConsumerConfig = consumerConfig("constant-detector-consumer", "constant-threshold-detector")
   protected var anomalyTopicConsumerConfig = consumerConfig("anomalies-consumer","anomaly")
@@ -108,7 +108,7 @@ class ConstantThresholdBasedE2ETestSpec extends IntegrationTestSpec {
   }
 
   private def metricRouterStreamRunner = {
-    new MetricRouterStreamBuilder().build(appConfig("metricrouter"))
+    new MetricRouterStreamBuilder().build(appConfig("metric-router"))
   }
 
   private def constantThresholdDetectorStreamRunner = {

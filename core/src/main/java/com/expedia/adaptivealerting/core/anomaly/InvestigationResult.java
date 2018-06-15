@@ -13,15 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.router;
+package com.expedia.adaptivealerting.core.anomaly;
 
-import com.expedia.adaptivealerting.kafka.util.AppUtil;
-import com.typesafe.config.Config;
+import java.util.Map;
 
-public class MetricRouter {
+public class InvestigationResult {
+    private boolean result; //TODO: review this name.
+    private Map<String, Object> details; // TODO: think about structure.
 
-    public static void main(String[] args) {
-        Config appConfig = AppUtil.getAppConfig("metric-router");
-        AppUtil.launchStreamRunner(new MetricRouterStreamBuilder().build(appConfig));
+    public boolean isResult() {
+        return result;
+    }
+
+    public void setResult(boolean result) {
+        this.result = result;
+    }
+
+    public Map<String, Object> getDetails() {
+        return details;
+    }
+
+    public void setDetails(Map<String, Object> details) {
+        this.details = details;
     }
 }
