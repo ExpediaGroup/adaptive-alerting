@@ -15,17 +15,20 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.source;
 
+import com.expedia.www.haystack.commons.entities.MetricPoint;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Willie Wheeler
  */
 public final class WhiteNoiseMetricSourceTest {
-    private final MetricSourceTestSupport support = new MetricSourceTestSupport();
     
     @Test
     public void testStartAndStop() {
         final MetricSource metricSource = new WhiteNoiseMetricSource("white-noise", 100L, 0.0, 1.0);
-        support.testStartAndStop(metricSource, 1000L);
+        final MetricPoint result = metricSource.next();
+        assertNotNull(result);
     }
 }
