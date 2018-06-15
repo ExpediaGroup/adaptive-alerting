@@ -31,7 +31,6 @@ public class MetricRouterStreamBuilder implements StreamRunnerBuilder {
 
   // TODO: add real routing conditions
   private static boolean isConstant(String key, MetricPoint metricPoint) {
-    System.out.println("READ");
     return Arrays.asList("latency", "duration").contains(metricPoint.metric());
   }
 
