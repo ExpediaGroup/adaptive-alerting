@@ -47,10 +47,21 @@ public final class CsvMetricSource extends AbstractMetricSource {
      * @param period Timer period in milliseconds.
      */
     public CsvMetricSource(InputStream csvIn, String name, long period) {
+        this(csvIn, false, name, period);
+    }
+    
+    /**
+     * Creates a metric source backed by the given CSV source. We assume a single numeric column.
+     *
+     * @param csvIn  CSV input stream.
+     * @param header Indicates whether the CSV source includes a header.
+     * @param name   Metric name.
+     * @param period Timer period in milliseconds.
+     */
+    public CsvMetricSource(InputStream csvIn, boolean header, String name, long period) {
         super(name, period);
-        
         try {
-            this.data = readData(csvIn);
+            this.data = readData(csvIn, header);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -61,11 +72,16 @@ public final class CsvMetricSource extends AbstractMetricSource {
         return data.hasNext() ? metricPoint(getMetricName(), Instant.now(), data.next().floatValue()) : null;
     }
     
-    private ListIterator<Double> readData(InputStream csvIn) throws IOException {
+    private ListIterator<Double> readData(InputStream csvIn, boolean header) throws IOException {
         try (final BufferedReader br = new BufferedReader(new InputStreamReader(csvIn, StandardCharsets.UTF_8))) {
             final CSVReaderBuilder builder = new CSVReaderBuilder(br);
             final CSVReader reader = builder.build();
-            final List<String[]> rows = reader.readAll();
+            
+            List<String[]> rows = reader.readAll();
+            
+            if (header) {
+                rows = rows.subList(1, rows.size());
+            }
             
             return rows.stream()
                     .map(row -> Double.parseDouble(row[0]))
