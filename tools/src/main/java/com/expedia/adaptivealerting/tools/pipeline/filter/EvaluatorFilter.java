@@ -18,21 +18,21 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.filter;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
-import java.util.LinkedList;
-import java.util.List;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.evaluator.Evaluator;
 import com.expedia.adaptivealerting.core.evaluator.ModelEvaluation;
 import com.expedia.adaptivealerting.tools.pipeline.util.AnomalyResultSubscriber;
 import com.expedia.adaptivealerting.tools.pipeline.util.ModelEvaluationSubscriber;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * Stream filter that applies model evaluator to metrics and publishes the score.
  * 
  * @author kashah
- *
  */
 public class EvaluatorFilter implements AnomalyResultSubscriber {
 
@@ -46,7 +46,7 @@ public class EvaluatorFilter implements AnomalyResultSubscriber {
 
     @Override
     public void next(AnomalyResult anomalyResult) {
-        notNull(anomalyResult, "anamolyResult can't be null");
+        notNull(anomalyResult, "anomalyResult can't be null");
         evaluator.update(anomalyResult.getObserved(), anomalyResult.getPredicted());
         publish(evaluator.evaluate());
     }
