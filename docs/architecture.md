@@ -106,7 +106,7 @@ Note AWS SageMaker in the diagram. This is just one example--the intent is that
 we can use external ML platforms and frameworks (e.g., TensorFlow, MXNet, Keras)
 to train models as well as using trainers that ship with Adaptive Alerting.
 
-Users can also train [custom anomaly detection models](custom-od-models.md).
+Users can also train [custom anomaly detection models](custom-anom-models.md).
 
 ## Model Selection and Hyperparameter Optimization
 
