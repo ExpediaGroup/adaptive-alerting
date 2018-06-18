@@ -32,7 +32,7 @@ in the data.
 
 Simpler anomaly detectors like constant threshold, EWMA or PEWMA generally don't require offline training. But more
 complex ones often do. For example, neural network detectors like LSTM involve offline training. To support these, you
-can deploy Docker containers that know how to handle [custom anomaly detection models](custom-od-models.md) of a given
+can deploy Docker containers that know how to handle [custom anomaly detection models](custom-anom-models.md) of a given
 type. Your detectors can use these models to perform anomaly detection. The container pulls trained models down from a
 model store, such as S3.
 
