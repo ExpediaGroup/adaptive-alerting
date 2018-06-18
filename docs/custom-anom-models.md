@@ -1,6 +1,6 @@
-# Custom outlier detection models
+# Custom anomaly detection models
 
-One goal for Adaptive Alerting is to support the training and deployment of custom outlier detection models for time
+One goal for Adaptive Alerting is to support the training and deployment of custom anomaly detection models for time
 series.
 
 The following diagram shows an example of what this looks like for one such model that we developed at Expedia, called
@@ -47,11 +47,11 @@ roughly an estimate of the standard deviation, and it's up to the user to provid
 warning and critical thresholds. This user-provided sensitivity is not part of the model itself. We store it separately
 in the Model Service (not shown).
 
-## Outlier detection
+## Anomaly detection
 
-**Overview.** This is the runtime system for outlier detection. It applies outlier detectors to incoming metric streams
-to generate a fast, initial classification (normal, weak outlier, strong outlier) before passing the classified metric
-points to the Anomaly Detection model for further analysis.
+**Overview.** This is the runtime system for anomaly detection. It applies anomaly detectors to incoming metric streams
+to generate a fast, initial classification (normal, weak anomaly, strong anomaly) before passing the classified metric
+points to the Anomaly Validation model for further analysis.
 
 **Metric topic.** Incoming metrics arrive here.
 
