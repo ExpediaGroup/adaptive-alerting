@@ -59,7 +59,7 @@ public class DetectorUtil {
         return builder;
     }
 
-    static AnomalyResult classify(
+    private static AnomalyResult classify(
             MetricPoint metricPoint,
             Map<String, AnomalyDetector> detectors,
             Function<String, AnomalyDetector> detectorFactory
@@ -77,7 +77,7 @@ public class DetectorUtil {
         return detector.classify(metricPoint);
     }
 
-    static String extractMetricId(MetricPoint metricPoint) {
+    private static String extractMetricId(MetricPoint metricPoint) {
         return metricPoint.getMetricPointKey(ENCODER); // TODO: find out how we'll be getting the ids.
     }
 }

@@ -15,8 +15,13 @@
  */
 package com.expedia.adaptivealerting.kafka.detector;
 
+import com.expedia.adaptivealerting.anomdetect.PewmaAnomalyDetector;
 import com.expedia.adaptivealerting.kafka.util.AppUtil;
+import com.expedia.adaptivealerting.kafka.util.BaseStreamRunnerBuilder;
+import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
+import com.expedia.www.haystack.commons.kstreams.app.StreamsRunner;
 import com.typesafe.config.Config;
+import org.apache.kafka.streams.StreamsBuilder;
 
 /**
  * Kafka Streams application for the PEWMA outlier detector.
@@ -24,9 +29,21 @@ import com.typesafe.config.Config;
  * @author David Sutherland
  */
 public class KafkaPewmaOutlierDetector {
-    
+
     public static void main(String[] args) {
         Config appConfig = AppUtil.getAppConfig("pewma-detector");
-        AppUtil.launchStreamRunner(new PewmaOutlierDetectorStreamRunnerBuilder().build(appConfig));
+        AppUtil.launchStreamRunner(new StreamRunnerBuilder().build(appConfig));
+    }
+
+    public static class StreamRunnerBuilder extends BaseStreamRunnerBuilder {
+        @Override
+        public StreamsRunner build(Config appConfig) {
+            final StreamsBuilder builder = DetectorUtil.createDetectorStreamsBuilder(
+                appConfig.getString("topic"),
+                id -> new PewmaAnomalyDetector(0.05, 1.0, 2.0, 3.0, 100.0)
+            );
+
+            return createStreamsRunner(appConfig, builder);
+        }
     }
 }
