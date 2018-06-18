@@ -28,15 +28,49 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 public class MetricFrame {
     private Mpoint[] mpoints;
     
+    /**
+     * Creates a new metric frame from an array of {@link Mpoint}s.
+     *
+     * @param mpoints Metric point array.
+     */
     public MetricFrame(Mpoint[] mpoints) {
         notNull(mpoints, "mpoints can't be null");
         this.mpoints = mpoints;
     }
     
+    /**
+     * Returns the number of metric points in the frame.
+     *
+     * @return Number of metric points in the frame.
+     */
+    public int getNumRows() {
+        return mpoints.length;
+    }
+    
+    /**
+     * Returns the {@link Mpoint} at the given row index.
+     *
+     * @param index Row index.
+     * @return The corresponding metric point.
+     */
+    public Mpoint getMetricPoint(int index) {
+        return mpoints[index];
+    }
+    
+    /**
+     * Returns the backing array of {@link Mpoint}s.
+     *
+     * @return Backing array of metric points.
+     */
     public Mpoint[] getMpoints() {
         return mpoints;
     }
     
+    /**
+     * Returns a list iterator for this frame. Intended to support data streaming.
+     *
+     * @return List iterator for this frame.
+     */
     public ListIterator<Mpoint> listIterator() {
         return Arrays.asList(mpoints).listIterator();
     }
