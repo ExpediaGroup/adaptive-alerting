@@ -13,12 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.tools.pipeline.source;
+package com.expedia.adaptivealerting.core.data;
+
+import java.time.Instant;
 
 /**
+ * Metric point.
+ *
  * @author Willie Wheeler
  */
-public final class CsvMetricSourceTest {
+public final class Mpoint {
+    private Metric metric;
+    private Instant instant;
+    private Double value;
     
-    // TODO
+    public Mpoint(Metric metric, Instant instant, Double value) {
+        this.metric = metric;
+        this.instant = instant;
+        this.value = value;
+    }
+    
+    public Metric getMetric() {
+        return metric;
+    }
+    
+    public Instant getInstant() {
+        return instant;
+    }
+    
+    public Double getValue() {
+        return value;
+    }
 }

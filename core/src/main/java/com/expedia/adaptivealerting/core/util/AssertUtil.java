@@ -38,6 +38,14 @@ public class AssertUtil {
         isTrue(o != null, message);
     }
     
+    public static void isEqual(int v1, int v2, String message) {
+        isTrue(v1 == v2, message);
+    }
+    
+    public static void isEqual(Object o1, Object o2, String message) {
+        isTrue(o1.equals(o2), message);
+    }
+    
     public static void isBetween(double value, double lowerBd, double upperBd, String message) {
         isTrue(lowerBd <= value && value <= upperBd, message);
     }
