@@ -9,20 +9,20 @@ deeper understanding of the domain.
 Adaptive Alerting has five modules, which appear as larger gray boxes in the
 diagram. Below I describe their role in the overall system.
 
-## Outlier Detection
+## anomaly detection
 
-The _Outlier Detection_ module is the heart of the system. It accepts incoming
+The _anomaly detection_ module is the heart of the system. It accepts incoming
 metric points and classifies them as normal, weak outliers or strong outliers.
 This classification is an initial signal indicating a possible anomaly. Outliers
 (whether weak or strong) feed into the Anomaly Detection module for further
 analysis. (See [Uber's blog post on Argos](https://eng.uber.com/argos/),
 describing an anomaly detection system with the same sort of split.)
 
-The emphasis for outlier detection is _speed_. Most incoming metric points are
+The emphasis for anomaly detection is _speed_. Most incoming metric points are
 normal, and we want to filter them out to avoid unnecessary processing, which
 helps us scale the number of metrics we can process.
 
-Within the outlier detection module, the primary abstraction is an outlier
+Within the anomaly detection module, the primary abstraction is an outlier
 detector. This is a component that accepts a metric point and classifies it in
 the manner described above. Different outlier detectors use different approaches
 to performing the classification. One kind of outlier detector is a constant
@@ -32,8 +32,8 @@ in the data.
 
 Simpler outlier detectors like constant threshold, EWMA or PEWMA generally don't require offline training. But more
 complex ones often do. For example, neural network detectors like LSTM involve offline training. To support these, you
-can deploy Docker containers that know how to handle [custom outlier detection models](custom-od-models.md) of a given
-type. Your detectors can use these models to perform outlier detection. The container pulls trained models down from a
+can deploy Docker containers that know how to handle [custom anomaly detection models](custom-od-models.md) of a given
+type. Your detectors can use these models to perform anomaly detection. The container pulls trained models down from a
 model store, such as S3.
 
 When a metric point comes in, we need to route it to the right detector type.
@@ -51,7 +51,7 @@ concerns:
   If the model fit is poor, the Performance Monitor can schedule a model rebuild
   with the model training module, or else simply log the issue for further
   remediation.
-- For outlier classifications, since the Outlier Detection module provides a
+- For outlier classifications, since the anomaly detection module provides a
   pre-filter into Anomaly Detection, we would track classification
   [precision and recall](https://en.wikipedia.org/wiki/Precision_and_recall);
   i.e., the extent to which the outlier detector captures all and only ground
@@ -60,9 +60,9 @@ concerns:
   rough proxy here. Other possibilities include simulation and user feedback
   loops.
 
-## Anomaly Detection
+## Anomaly Validation
 
-The _Anomaly Detection_ module is the second phase of the metric processing
+The _Anomaly Validation_ module is the second phase of the metric processing
 pipeline. Its purpose is to decide for any given outlier whether that outlier
 represents an anomaly (roughly, an interesting change to the underlying
 data-generating process), and if so, whether the anomaly is weak or strong.
@@ -77,9 +77,9 @@ boundary between noise and anomaly usually isn't crisp:
 
 (Figure adapted from one in _Outlier Analysis_ by Charu C. Aggarwal.)
 
-The emphasis for anomaly detection is on _correctness_. Specifically, we are
+The emphasis for anomaly validation is on _correctness_. Specifically, we are
 trying to avoid false positives. This is more computationally expensive than
-outlier detection, which is why we divide the overall process into a faster
+anomaly detection, which is why we divide the overall process into a faster
 filtering process and a slower but more careful verification process.
 
 The design of this module is TBD, but I envision some kind of provider-based
@@ -91,8 +91,7 @@ involved, and various ML-based providers (naive Bayes classifiers, multiple
 logistic regression, neural network classifiers, etc.) to help decide whether an
 outlier represents an anomaly.
 
-We will also need to evaluate the anomaly detection classifications. Precision,
-recall and F measure make sense here too.
+We will also need to evaluate the anomaly validation classifications. Precision, recall and F measure make sense here too.
 
 ## Model Training
 
@@ -107,7 +106,7 @@ Note AWS SageMaker in the diagram. This is just one example--the intent is that
 we can use external ML platforms and frameworks (e.g., TensorFlow, MXNet, Keras)
 to train models as well as using trainers that ship with Adaptive Alerting.
 
-Users can also train [custom outlier detection models](custom-od-models.md).
+Users can also train [custom anomaly detection models](custom-od-models.md).
 
 ## Model Selection and Hyperparameter Optimization
 
