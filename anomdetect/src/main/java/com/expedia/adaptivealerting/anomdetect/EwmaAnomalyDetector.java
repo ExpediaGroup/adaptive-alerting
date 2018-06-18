@@ -20,6 +20,8 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
+import static com.expedia.adaptivealerting.anomdetect.NSigmasClassifier.DEFAULT_STRONG_SIGMAS;
+import static com.expedia.adaptivealerting.anomdetect.NSigmasClassifier.DEFAULT_WEAK_SIGMAS;
 import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.*;
 import static java.lang.Math.abs;
 import static java.lang.Math.sqrt;
@@ -68,25 +70,25 @@ public class EwmaAnomalyDetector implements AnomalyDetector {
     private double variance;
     
     /**
-     * Creates a new EWMA outlier detector with alpha = 0.15, weakThresholdSigmas = 2.0, strongThresholdSigmas = 3.0 and
+     * Creates a new EWMA outlier detector with alpha = 0.15, weakThresholdSigmas = 3.0, strongThresholdSigmas = 4.0 and
      * initValue = 0.0.
      */
     public EwmaAnomalyDetector() {
-        this(0.15, 3.0, 2.0, 0.0);
+        this(0.15, DEFAULT_WEAK_SIGMAS, DEFAULT_STRONG_SIGMAS, 0.0);
     }
     
     /**
      * Creates a new EWMA outlier detector. Initial mean is given by initValue and initial variance is 0.
      *
      * @param alpha                 Smoothing parameter.
-     * @param strongThresholdSigmas Strong outlier threshold, in sigmas.
      * @param weakThresholdSigmas   Weak outlier threshold, in sigmas.
+     * @param strongThresholdSigmas Strong outlier threshold, in sigmas.
      * @param initValue             Initial observation, used to set the first mean estimate.
      */
     public EwmaAnomalyDetector(
             double alpha,
-            double strongThresholdSigmas,
             double weakThresholdSigmas,
+            double strongThresholdSigmas,
             double initValue) {
         
         AssertUtil.isBetween(alpha, 0.0, 1.0, "alpha must be in the range [0, 1]");

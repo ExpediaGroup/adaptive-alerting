@@ -16,11 +16,14 @@
 package com.expedia.adaptivealerting.samples;
 
 import com.expedia.adaptivealerting.anomdetect.PewmaAnomalyDetector;
+import com.expedia.adaptivealerting.core.data.Metric;
+import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
+import com.expedia.adaptivealerting.core.io.MetricFrameLoader;
 import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartSink;
-import com.expedia.adaptivealerting.tools.pipeline.source.CsvMetricSource;
+import com.expedia.adaptivealerting.tools.pipeline.source.MetricFrameMetricSource;
 import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
 
 import java.io.InputStream;
@@ -33,22 +36,21 @@ import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showCha
  */
 public final class CsvTrafficPewma {
     
-    public static void main(String[] args) {
-        final InputStream is = ClassLoader.getSystemResourceAsStream("samples/sample001.csv");
-        final CsvMetricSource source = new CsvMetricSource(is, "data", 1000L);
+    public static void main(String[] args) throws Exception {
+        final InputStream is = ClassLoader.getSystemResourceAsStream("samples/cal-inflow.csv");
+        final MetricFrame frame = MetricFrameLoader.loadCsv(new Metric(), is, true);
+        final MetricFrameMetricSource source = new MetricFrameMetricSource(frame, "data", 200L);
         
-        final AnomalyDetectorFilter pewmaAD = new AnomalyDetectorFilter(new PewmaAnomalyDetector());
+        final AnomalyDetectorFilter detector = new AnomalyDetectorFilter(new PewmaAnomalyDetector());
+        final EvaluatorFilter evaluator = new EvaluatorFilter(new RmseEvaluator());
+        final AnomalyChartSink chartWrapper = PipelineFactory.createChartSink("PEWMA");
         
-        final EvaluatorFilter pewmaEval = new EvaluatorFilter(new RmseEvaluator());
+        source.addSubscriber(detector);
+        detector.addSubscriber(evaluator);
+        detector.addSubscriber(chartWrapper);
+        evaluator.addSubscriber(chartWrapper);
         
-        final AnomalyChartSink pewmaChart = PipelineFactory.createChartSink("PEWMA");
-        
-        source.addSubscriber(pewmaAD);
-        pewmaAD.addSubscriber(pewmaEval);
-        pewmaAD.addSubscriber(pewmaChart);
-        pewmaEval.addSubscriber(pewmaChart);
-        
-        showChartFrame(createChartFrame("Cal Inflow", pewmaChart.getChart()));
+        showChartFrame(createChartFrame("Cal Inflow", chartWrapper.getChart()));
         source.start();
     }
 }

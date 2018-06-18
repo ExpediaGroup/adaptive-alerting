@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.tools.visualization;
 
-import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartSink;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -68,7 +67,7 @@ public class ChartUtil {
         
         final JFreeChart chart = ChartFactory.createTimeSeriesChart(
                 title,
-                "Seconds",
+                "Time",
                 "Value",
                 strongOutlier,
                 false,

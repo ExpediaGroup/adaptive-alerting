@@ -94,11 +94,11 @@ public class PewmaAnomalyDetector implements AnomalyDetector {
     private double stdDev;
     
     /**
-     * Creates a new PEWMA outlier detector with initialAlpha = 0.15, beta = 1.0, weakThresholdSigmas = 2.0,
-     * strongThresholdSigmas = 3.0 and initValue = 0.0.
+     * Creates a new PEWMA outlier detector with initialAlpha = 0.15, beta = 1.0, weakThresholdSigmas = 3.0,
+     * strongThresholdSigmas = 4.0 and initValue = 0.0.
      */
     public PewmaAnomalyDetector() {
-        this(0.15, 1.0, 2.0, 3.0, 0.0);
+        this(0.15, 1.0, 3.0, 4.0, 0.0);
     }
     
     // FIXME "initialAlpha" is a confusing name for this parameter as it suggests that the value evolves over time.
