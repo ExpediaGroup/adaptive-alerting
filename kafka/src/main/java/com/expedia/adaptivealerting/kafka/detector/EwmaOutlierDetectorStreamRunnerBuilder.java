@@ -28,7 +28,7 @@ public class EwmaOutlierDetectorStreamRunnerBuilder implements StreamRunnerBuild
   public StreamsRunner build(Config appConfig) {
     final StreamsBuilder builder = DetectorUtil.createDetectorStreamsBuilder(
             appConfig.getString("topic"),
-            id -> new EwmaAnomalyDetector(0.8, 3.0, 2.0, 100.0)
+            id -> new EwmaAnomalyDetector(0.8, 2.0, 3.0, 100.0)
     );
     return AppUtil.createStreamsRunner(appConfig, builder);
   }

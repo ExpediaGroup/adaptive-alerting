@@ -57,7 +57,7 @@ public class PewmaAnomalyDetectorTest {
         final PewmaAnomalyDetector pewmaOutlierDetector = new PewmaAnomalyDetector(
                 DEFAULT_ALPHA, beta, WEAK_THRESHOLD, STRONG_THRESHOLD, initialValue);
         final EwmaAnomalyDetector ewmaOutlierDetector = new EwmaAnomalyDetector(
-                DEFAULT_ALPHA, STRONG_THRESHOLD, WEAK_THRESHOLD, initialValue);
+                DEFAULT_ALPHA, WEAK_THRESHOLD, STRONG_THRESHOLD, initialValue);
         
         int rowCount = 1;
         while (testRows.hasNext()) {

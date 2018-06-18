@@ -29,12 +29,16 @@ import java.time.Instant;
 import java.util.List;
 import java.util.ListIterator;
 
+import static com.expedia.adaptivealerting.anomdetect.NSigmasClassifier.DEFAULT_STRONG_SIGMAS;
+import static com.expedia.adaptivealerting.anomdetect.NSigmasClassifier.DEFAULT_WEAK_SIGMAS;
 import static junit.framework.TestCase.assertEquals;
 
 /**
  * @author Willie Wheeler
  */
 public class EwmaAnomalyDetectorTest {
+    private static final double WEAK_SIGMAS = DEFAULT_WEAK_SIGMAS;
+    private static final double STRONG_SIGMAS = DEFAULT_STRONG_SIGMAS;
     private static final double TOLERANCE = 0.001;
     
     private static List<EwmaTestRow> data;
@@ -48,13 +52,13 @@ public class EwmaAnomalyDetectorTest {
     public void testDefaultConstructor() {
         final EwmaAnomalyDetector detector = new EwmaAnomalyDetector();
         assertEquals(0.15, detector.getAlpha());
-        assertEquals(2.0, detector.getWeakThresholdSigmas());
-        assertEquals(3.0, detector.getStrongThresholdSigmas());
+        assertEquals(WEAK_SIGMAS, detector.getWeakThresholdSigmas());
+        assertEquals(STRONG_SIGMAS, detector.getStrongThresholdSigmas());
     }
     
     @Test(expected = IllegalArgumentException.class)
     public void testConstructor_alphaOutOfRange() {
-        new EwmaAnomalyDetector(2.0, 150.0, 100.0, 0.0);
+        new EwmaAnomalyDetector(2.0, 100.0, 150.0, 0.0);
     }
     
     @Test
@@ -62,18 +66,17 @@ public class EwmaAnomalyDetectorTest {
         
         // Params
         final double alpha = 0.05;
-        final double weakThreshold = 2.0;
-        final double strongThreshold = 3.0;
         
         final ListIterator<EwmaTestRow> testRows = data.listIterator();
         final EwmaTestRow testRow0 = testRows.next();
         final double observed0 = testRow0.getObserved();
-        final EwmaAnomalyDetector detector = new EwmaAnomalyDetector(alpha, strongThreshold, weakThreshold, observed0);
+        final EwmaAnomalyDetector detector =
+                new EwmaAnomalyDetector(alpha, WEAK_SIGMAS, STRONG_SIGMAS, observed0);
     
         // Params
         assertEquals(alpha, detector.getAlpha());
-        assertEquals(weakThreshold, detector.getWeakThresholdSigmas());
-        assertEquals(strongThreshold, detector.getStrongThresholdSigmas());
+        assertEquals(WEAK_SIGMAS, detector.getWeakThresholdSigmas());
+        assertEquals(STRONG_SIGMAS, detector.getStrongThresholdSigmas());
         
         // Seed observation
         assertEquals(observed0, detector.getMean());
