@@ -11,9 +11,9 @@ diagram. Below I describe their role in the overall system.
 
 ## anomaly detection
 
-The _anomaly detection_ module is the heart of the system. It accepts incoming
-metric points and classifies them as normal, weak outliers or strong outliers.
-This classification is an initial signal indicating a possible anomaly. Outliers
+The _Anomaly Detection_ module is the heart of the system. It accepts incoming
+metric points and classifies them as normal, weak anomalies or strong anomalies.
+This classification is an initial signal indicating a possible anomaly. Anomalies
 (whether weak or strong) feed into the Anomaly Detection module for further
 analysis. (See [Uber's blog post on Argos](https://eng.uber.com/argos/),
 describing an anomaly detection system with the same sort of split.)
@@ -22,15 +22,15 @@ The emphasis for anomaly detection is _speed_. Most incoming metric points are
 normal, and we want to filter them out to avoid unnecessary processing, which
 helps us scale the number of metrics we can process.
 
-Within the anomaly detection module, the primary abstraction is an outlier
+Within the anomaly detection module, the primary abstraction is an anomaly
 detector. This is a component that accepts a metric point and classifies it in
-the manner described above. Different outlier detectors use different approaches
-to performing the classification. One kind of outlier detector is a constant
+the manner described above. Different anomaly detectors use different approaches
+to performing the classification. One kind of anomaly detector is a constant
 threshold detector, which simply checks to see whether the metric point exceeds
-a fixed threshold. Other outlier detectors account for seasonalities and trends
+a fixed threshold. Other anomaly detectors account for seasonalities and trends
 in the data.
 
-Simpler outlier detectors like constant threshold, EWMA or PEWMA generally don't require offline training. But more
+Simpler anomaly detectors like constant threshold, EWMA or PEWMA generally don't require offline training. But more
 complex ones often do. For example, neural network detectors like LSTM involve offline training. To support these, you
 can deploy Docker containers that know how to handle [custom anomaly detection models](custom-od-models.md) of a given
 type. Your detectors can use these models to perform anomaly detection. The container pulls trained models down from a
@@ -44,17 +44,17 @@ seasonality and trend. This is where the _Metric Router_ comes in. It inspects
 the metric point and then routes it to the correct detector.
 
 Finally, we need to ensure that models are producing good time series
-predictions and outlier classifications. The _Performance Monitor_ tracks these
+predictions and anomaly classifications. The _Performance Monitor_ tracks these
 concerns:
 
 - For time series model fit we will use standard measures such as RMSE or sMAPE.
   If the model fit is poor, the Performance Monitor can schedule a model rebuild
   with the model training module, or else simply log the issue for further
   remediation.
-- For outlier classifications, since the anomaly detection module provides a
+- For anomaly classifications, since the anomaly detection module provides a
   pre-filter into Anomaly Detection, we would track classification
   [precision and recall](https://en.wikipedia.org/wiki/Precision_and_recall);
-  i.e., the extent to which the outlier detector captures all and only ground
+  i.e., the extent to which the anomaly detector captures all and only ground
   truth anomalies. It is an open problem how we will establish ground truth
   here. We can probably use outputs from the Anomaly Detection module as a
   rough proxy here. Other possibilities include simulation and user feedback
@@ -63,11 +63,11 @@ concerns:
 ## Anomaly Validation
 
 The _Anomaly Validation_ module is the second phase of the metric processing
-pipeline. Its purpose is to decide for any given outlier whether that outlier
+pipeline. Its purpose is to decide for any given anomaly whether that anomaly
 represents an anomaly (roughly, an interesting change to the underlying
 data-generating process), and if so, whether the anomaly is weak or strong.
 
-It may sound funny that an outlier can come in but not represent an anomaly.
+It may sound funny that an anomaly can come in but not represent an anomaly.
 This is both possible and common. Most data-generating processes involve some
 level of noise, and random sampling itself introduces additional noise in the
 form of [sampling error](https://en.wikipedia.org/wiki/Sampling_error). So the
@@ -83,7 +83,7 @@ anomaly detection, which is why we divide the overall process into a faster
 filtering process and a slower but more careful verification process.
 
 The design of this module is TBD, but I envision some kind of provider-based
-design where we have different strategies for deciding whether outliers
+design where we have different strategies for deciding whether anomalies
 represent true anomalies, and then perhaps an aggregation layer on top to
 create an ensemble-based approach. For example, we can imagine having a
 rules-based provider that makes certain Splunk queries depending on the metric
@@ -95,11 +95,11 @@ We will also need to evaluate the anomaly validation classifications. Precision,
 
 ## Model Training
 
-Above we noted that some outlier detectors require offline training. The _Model
+Above we noted that some anomaly detectors require offline training. The _Model
 Training_ module is where we do this. We siphon data off of the metric topic
 using Haystack Pipes and dump that into S3. Then we run model training
 algorithms on the training data, generally at regular intervals to ensure that
-models stay fresh. We store the trained models in S3 for use by the Outlier
+models stay fresh. We store the trained models in S3 for use by the Anomaly
 Detector module.
 
 Note AWS SageMaker in the diagram. This is just one example--the intent is that
