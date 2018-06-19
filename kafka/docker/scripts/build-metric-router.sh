@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-APP_NAME="metric-router"
+APP_NAME="haystack-adaptive-alerting-metric-router"
 DOTTED_APP_NAME="metric.router"
 MAIN_CLASS="com.expedia.adaptivealerting.kafka.router.MetricRouter"
 
