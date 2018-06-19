@@ -20,8 +20,8 @@ import java.time.Instant
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult
 import com.expedia.adaptivealerting.core.util.MetricPointUtil.metricPoint
-import com.expedia.adaptivealerting.kafka.detector.ConstantThresholdOutlierDetectorStreamRunnerBuilder
-import com.expedia.adaptivealerting.kafka.router.MetricRouterStreamBuilder
+import com.expedia.adaptivealerting.kafka.detector.KafkaConstantThresholdOutlierDetector
+import com.expedia.adaptivealerting.kafka.router.MetricRouter
 import com.expedia.adaptivealerting.pipeline.integration.{EmbeddedKafka, IntegrationTestSpec}
 import com.expedia.www.haystack.commons.entities.MetricPoint
 import org.apache.kafka.clients.admin.AdminClient
@@ -108,11 +108,11 @@ class ConstantThresholdBasedE2ETestSpec extends IntegrationTestSpec {
   }
 
   private def metricRouterStreamRunner = {
-    new MetricRouterStreamBuilder().build(appConfig("metric-router"))
+    new MetricRouter.StreamRunnerBuilder().build(appConfig("metric-router"))
   }
 
   private def constantThresholdDetectorStreamRunner = {
-    new ConstantThresholdOutlierDetectorStreamRunnerBuilder().build(appConfig("constant-detector"))
+    new KafkaConstantThresholdOutlierDetector.StreamRunnerBuilder().build(appConfig("constant-detector"))
   }
 
   private def generateAnomalousMetrics() : List[MetricPoint] = {

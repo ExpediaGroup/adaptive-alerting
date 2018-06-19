@@ -61,7 +61,7 @@ public class RmseEvaluatorTest {
     }
 
     private static void readData_calInflow() {
-        final InputStream is = ClassLoader.getSystemResourceAsStream("tests/cal-inflow-tests-rmse.csv");
+        final InputStream is = ClassLoader.getSystemResourceAsStream("datasets/cal-inflow-tests-rmse.csv");
         calInflowTestRows = new CsvToBeanBuilder<RmseTestRow>(new InputStreamReader(is)).withType(RmseTestRow.class)
                 .build().parse();
     }

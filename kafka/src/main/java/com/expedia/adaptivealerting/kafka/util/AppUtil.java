@@ -17,18 +17,10 @@ package com.expedia.adaptivealerting.kafka.util;
 
 import com.codahale.metrics.JmxReporter;
 import com.expedia.www.haystack.commons.config.ConfigurationLoader;
-import com.expedia.www.haystack.commons.health.HealthStatusController;
-import com.expedia.www.haystack.commons.health.UpdateHealthStatusFile;
 import com.expedia.www.haystack.commons.kstreams.app.Application;
-import com.expedia.www.haystack.commons.kstreams.app.StateChangeListener;
-import com.expedia.www.haystack.commons.kstreams.app.StreamsFactory;
 import com.expedia.www.haystack.commons.kstreams.app.StreamsRunner;
 import com.expedia.www.haystack.commons.metrics.MetricsRegistries;
 import com.typesafe.config.Config;
-import org.apache.kafka.streams.StreamsBuilder;
-import org.apache.kafka.streams.StreamsConfig;
-
-import java.util.Properties;
 
 public class AppUtil {
     /**
@@ -52,31 +44,5 @@ public class AppUtil {
 
         //add a shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
-    }
-
-    public static StreamsRunner createStreamsRunner(Config appConfig, StreamsBuilder builder) {
-        String healthStatusPath = appConfig.getString("health.status.path");
-        String topic = appConfig.getString("topic");
-
-        HealthStatusController healthStatusController = new HealthStatusController();
-        healthStatusController.addListener(new UpdateHealthStatusFile(healthStatusPath));
-
-        StateChangeListener stateChangeListener = new StateChangeListener(healthStatusController);
-
-
-        StreamsConfig streamsConfig = new StreamsConfig(configToProps(appConfig.getConfig("streams")));
-
-
-        StreamsFactory streamsFactory = new StreamsFactory(builder::build, streamsConfig, topic);
-
-        return new StreamsRunner(streamsFactory, stateChangeListener);
-    }
-
-    private static Properties configToProps(Config config) {
-        Properties props = new Properties();
-        config.entrySet().forEach((entry) -> {
-            props.setProperty(entry.getKey(), entry.getValue().unwrapped().toString());
-        });
-        return props;
     }
 }

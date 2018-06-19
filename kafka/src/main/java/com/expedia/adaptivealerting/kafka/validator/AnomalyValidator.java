@@ -22,38 +22,44 @@ import com.expedia.adaptivealerting.anomvalidate.investigation.InvestigationMana
 import com.expedia.adaptivealerting.anomvalidate.investigation.InvestigatorLookupService;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.kafka.util.AppUtil;
+import com.expedia.adaptivealerting.kafka.util.BaseStreamRunnerBuilder;
 import com.expedia.www.haystack.commons.kstreams.app.StreamsRunner;
 import com.typesafe.config.Config;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.KStream;
 
+
 public class AnomalyValidator {
 
     public static void main(String[] args) {
         Config appConfig = AppUtil.getAppConfig("anomaly-validator");
-
-        final StreamsBuilder builder = createStreamsBuilder(appConfig);
-
-        StreamsRunner streamsRunner = AppUtil.createStreamsRunner(appConfig, builder);
-        AppUtil.launchStreamRunner(streamsRunner);
+        AppUtil.launchStreamRunner(new StreamRunnerBuilder().build(appConfig));
     }
 
-    private static StreamsBuilder createStreamsBuilder(Config appConfig) {
-        final StreamsBuilder builder = new StreamsBuilder();
-        final KStream<String, AnomalyResult> anomalies = builder.stream(appConfig.getString("topic"));
+    public static class StreamRunnerBuilder extends BaseStreamRunnerBuilder {
+        @Override
+        public StreamsRunner build(Config appConfig) {
+            final StreamsBuilder builder = createStreamsBuilder(appConfig);
 
-        InvestigatorLookupService ils = new InvestigatorLookupService();
-        InvestigationFilter preInvestigationFilter = new PreInvestigationFilter();
-        InvestigationFilter postInvestigationFilter = new PostInvestigationFilter();
-        InvestigationManager investigationManager = new InvestigationManager(ils);
+            return createStreamsRunner(appConfig, builder);
+        }
 
-        anomalies
-                .filter(preInvestigationFilter::keep)
-                .mapValues(investigationManager::investigate)
-                .filter(postInvestigationFilter::keep)
-                .to("alerts");
+        private static StreamsBuilder createStreamsBuilder(Config appConfig) {
+            final StreamsBuilder builder = new StreamsBuilder();
+            final KStream<String, AnomalyResult> anomalies = builder.stream(appConfig.getString("topic"));
 
-        return builder;
+            InvestigatorLookupService ils = new InvestigatorLookupService();
+            InvestigationFilter preInvestigationFilter = new PreInvestigationFilter();
+            InvestigationFilter postInvestigationFilter = new PostInvestigationFilter();
+            InvestigationManager investigationManager = new InvestigationManager(ils);
+
+            anomalies
+                    .filter(preInvestigationFilter::keep)
+                    .mapValues(investigationManager::investigate)
+                    .filter(postInvestigationFilter::keep)
+                    .to("alerts");
+
+            return builder;
+        }
     }
 }
-

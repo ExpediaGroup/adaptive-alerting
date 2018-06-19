@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.util;
+package com.expedia.adaptivealerting.core.data;
 
-import com.expedia.www.haystack.commons.kstreams.app.StreamsRunner;
-import com.typesafe.config.Config;
-
-public interface StreamRunnerBuilder {
-  StreamsRunner build(Config config);
+/**
+ * Metrics 2.0 metric/
+ *
+ * @author Willie Wheeler
+ */
+public final class Metric {
+    // TODO Add various tags
 }
