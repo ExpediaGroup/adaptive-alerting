@@ -21,6 +21,7 @@
  */
 package com.expedia.adaptivealerting.kafka.serde;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.Deserializer;
@@ -36,12 +37,22 @@ public class JsonPojoDeserializer<T> implements Deserializer<T> {
      * Default constructor needed by Kafka
      */
     public JsonPojoDeserializer() {
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public void configure(Map<String, ?> props, boolean isKey) {
-        tClass = (Class<T>) props.get("JsonPOJOClass");
+        Object propClass = props.get("JsonPojoClass");
+        if (propClass instanceof Class) {
+            tClass = (Class<T>) propClass;
+        } else {
+            try {
+                tClass = (Class<T>) Class.forName(propClass.toString());
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override

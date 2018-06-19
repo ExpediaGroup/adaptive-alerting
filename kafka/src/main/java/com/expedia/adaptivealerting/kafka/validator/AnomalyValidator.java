@@ -13,23 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.router;
+package com.expedia.adaptivealerting.kafka.validator;
 
+import com.expedia.adaptivealerting.anomvalidate.filter.InvestigationFilter;
+import com.expedia.adaptivealerting.anomvalidate.filter.PostInvestigationFilter;
+import com.expedia.adaptivealerting.anomvalidate.filter.PreInvestigationFilter;
+import com.expedia.adaptivealerting.anomvalidate.investigation.InvestigationManager;
+import com.expedia.adaptivealerting.anomvalidate.investigation.InvestigatorLookupService;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.kafka.util.AppUtil;
 import com.expedia.adaptivealerting.kafka.util.BaseStreamRunnerBuilder;
-import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.kstreams.app.StreamsRunner;
 import com.typesafe.config.Config;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.KStream;
 
-import java.util.Arrays;
-import java.util.Collections;
 
-public class MetricRouter {
+public class AnomalyValidator {
 
     public static void main(String[] args) {
-        Config appConfig = AppUtil.getAppConfig("metric-router");
+        Config appConfig = AppUtil.getAppConfig("anomaly-validator");
         AppUtil.launchStreamRunner(new StreamRunnerBuilder().build(appConfig));
     }
 
@@ -43,25 +46,20 @@ public class MetricRouter {
 
         private static StreamsBuilder createStreamsBuilder(Config appConfig) {
             final StreamsBuilder builder = new StreamsBuilder();
-            final KStream<String, MetricPoint> metrics = builder.stream(appConfig.getString("topic"));
+            final KStream<String, AnomalyResult> anomalies = builder.stream(appConfig.getString("topic"));
 
-            metrics.filter(StreamRunnerBuilder::isConstant).to("constant-metrics");
-            metrics.filter(StreamRunnerBuilder::isEwma).to("ewma-metrics");
-            metrics.filter(StreamRunnerBuilder::isPewma).to("pewma-metrics");
+            InvestigatorLookupService ils = new InvestigatorLookupService();
+            InvestigationFilter preInvestigationFilter = new PreInvestigationFilter();
+            InvestigationFilter postInvestigationFilter = new PostInvestigationFilter();
+            InvestigationManager investigationManager = new InvestigationManager(ils);
+
+            anomalies
+                    .filter(preInvestigationFilter::keep)
+                    .mapValues(investigationManager::investigate)
+                    .filter(postInvestigationFilter::keep)
+                    .to("alerts");
+
             return builder;
-        }
-
-        // TODO: add real routing conditions
-        private static boolean isConstant(String key, MetricPoint metricPoint) {
-            return Arrays.asList("latency", "duration").contains(metricPoint.metric());
-        }
-
-        private static boolean isEwma(String key, MetricPoint metricPoint) {
-            return Collections.singletonList("ewma").contains(metricPoint.metric());
-        }
-
-        private static boolean isPewma(String key, MetricPoint metricPoint) {
-            return Collections.singletonList("pewma").contains(metricPoint.metric());
         }
     }
 }

@@ -43,9 +43,4 @@ public class KafkaConstantThresholdOutlierDetector {
             return createStreamsRunner(appConfig, builder);
         }
     }
-
-
-
-
-
 }

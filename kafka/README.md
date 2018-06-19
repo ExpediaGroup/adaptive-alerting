@@ -69,7 +69,8 @@ docker/scripts/build-{APP_NAME}.sh -p -r
     kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic pewma-metrics
     kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic constant-metrics
     kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic anomalies
-    
+    kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic alerts
+
     kafka-topics --list --zookeeper localhost:2181
     ```
     
