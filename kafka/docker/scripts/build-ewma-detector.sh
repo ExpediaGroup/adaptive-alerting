@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-APP_NAME="ewma-detector"
+APP_NAME="haystack-adaptive-alerting-ewma-detector"
 DOTTED_APP_NAME="ewma.detector"
 MAIN_CLASS="com.expedia.adaptivealerting.kafka.detector.KafkaEwmaOutlierDetector"
 

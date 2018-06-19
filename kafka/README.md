@@ -26,7 +26,7 @@ mvn clean package
 Build the docker image (use the appropriate script for the app):
 
 ```bash
-docker/scripts/build-{APP_NAME e.g. constant-detector}.sh
+docker/scripts/build-{APP_NAME e.g. constant-detector}.sh -b
 ```
 
 Run pre-built docker image:
@@ -38,7 +38,7 @@ docker run {APP_NAME}
 To do all these steps: run maven package, build the docker image and run it (use the appropriate script for the app):
    
 ```bash
-docker/scripts/build-{APP_NAME}.sh -p -r
+docker/scripts/build-{APP_NAME}.sh -p -b -r
 ```
 
 ### Troubleshooting
