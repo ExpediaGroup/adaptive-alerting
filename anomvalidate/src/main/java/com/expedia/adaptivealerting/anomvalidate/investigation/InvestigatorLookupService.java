@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomvalidate.investigation;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.core.data.Metric;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,14 +23,14 @@ import java.util.List;
 import java.util.Map;
 
 public class InvestigatorLookupService {
-    private Map<String, List<AnomalyInvestigator>> investigatorMap = new HashMap<>();
+    private Map<Metric, List<AnomalyInvestigator>> investigatorMap = new HashMap<>();
 
-    public List<AnomalyInvestigator> getInvestigators(AnomalyResult anomalyResult) {
-        if (anomalyResult == null) {
+    public List<AnomalyInvestigator> getInvestigators(Metric metric) {
+        if (metric == null) {
             return Collections.emptyList();
         }
 
         // TODO: an actual lookup
-        return investigatorMap.getOrDefault(anomalyResult.getDetectorLabel(), Collections.emptyList());
+        return investigatorMap.getOrDefault(metric, Collections.emptyList());
     }
 }

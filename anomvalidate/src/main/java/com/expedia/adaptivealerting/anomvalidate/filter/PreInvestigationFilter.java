@@ -25,8 +25,7 @@ public class PreInvestigationFilter implements InvestigationFilter {
     private static final List<AnomalyLevel> KEEP_LEVELS = Arrays.asList(AnomalyLevel.WEAK, AnomalyLevel.STRONG);
 
     // TODO: make configurable
-    @Override
-    public boolean keep(String key, AnomalyResult anomalyResult) {
+    public boolean keep(AnomalyResult anomalyResult) {
         return anomalyResult != null && KEEP_LEVELS.contains(anomalyResult.getAnomalyLevel());
     }
 }

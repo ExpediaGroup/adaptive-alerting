@@ -33,4 +33,8 @@ public interface AnomalyDetector {
      * thresholds.
      */
     AnomalyResult classify(MetricPoint metricPoint);
+
+    default String getId() {
+        return this.toString(); // TODO: come up with an actual ID for detectors.
+    }
 }

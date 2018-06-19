@@ -54,9 +54,9 @@ public class AnomalyValidator {
             InvestigationManager investigationManager = new InvestigationManager(ils);
 
             anomalies
-                    .filter(preInvestigationFilter::keep)
+                    .filter((k, anomalyResult) -> preInvestigationFilter.keep(anomalyResult))
                     .mapValues(investigationManager::investigate)
-                    .filter(postInvestigationFilter::keep)
+                    .filter((k, anomalyResult) -> postInvestigationFilter.keep(anomalyResult))
                     .to("alerts");
 
             return builder;

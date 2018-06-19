@@ -28,7 +28,7 @@ public class InvestigationManager {
         this.investigatorLookupService = investigatorLookupService;
     }
     public AnomalyResult investigate(AnomalyResult anomalyResult) {
-        List<AnomalyInvestigator> investigators = investigatorLookupService.getInvestigators(anomalyResult);
+        List<AnomalyInvestigator> investigators = investigatorLookupService.getInvestigators(anomalyResult.getMetric());
         List<InvestigationResult> results = new Vector<>();
         for (AnomalyInvestigator investigator : investigators) { // TODO: should be able to operate concurrently
             results.addAll(investigator.investigate(anomalyResult));

@@ -15,8 +15,7 @@
  */
 package com.expedia.adaptivealerting.core.anomaly;
 
-import com.expedia.adaptivealerting.core.metric.Metric;
-import com.expedia.www.haystack.commons.entities.MetricPoint;
+import com.expedia.adaptivealerting.core.data.Metric;
 
 import java.util.List;
 
@@ -39,26 +38,9 @@ public class AnomalyResult {
     private List<InvestigationResult> investigationResults;
 
     /**
-     * Param that is used for differentiating AnomalyResults. This will likely be expanded in future to provide more
-     * information so it shouldn't be relied upon to contain stable information.
+     * Param that is used for identifying the AnomalyDetector that created this AnomalyResult.
      */
-    private String detectorLabel;
-
-    public  AnomalyResult() {
-        // For jackson
-    }
-
-
-    /**
-     * Convenience constructor for assigning a detector label based on the Class of the detector and Metric from a
-     * MetricPoint.
-     *
-     * @param detector The AnomalyDetector that created this AnomalyResult
-     */
-    public AnomalyResult(Class detector, MetricPoint metricPoint) {
-        this.detectorLabel = detector.getSimpleName();
-        this.metric = new Metric(metricPoint);
-    }
+    private String detectorId;
     
     public Long getEpochSecond() {
         return epochSecond;
@@ -132,12 +114,12 @@ public class AnomalyResult {
         this.anomalyLevel = anomalyLevel;
     }
 
-    public String getDetectorLabel() {
-        return detectorLabel;
+    public String getDetectorId() {
+        return detectorId;
     }
 
-    public void setDetectorLabel(String detectorLabel) {
-        this.detectorLabel = detectorLabel;
+    public void setDetectorId(String detectorId) {
+        this.detectorId = detectorId;
     }
 
     public Metric getMetric() {
@@ -168,8 +150,7 @@ public class AnomalyResult {
                 ", strongThresholdLower=" + strongThresholdLower +
                 ", anomalyScore=" + anomalyScore +
                 ", anomalyLevel=" + anomalyLevel +
-                ", detectorLabel=" + detectorLabel +
-                ", metric=" + (metric == null ? "null" : metric.getName()) +
+                ", detectorId=" + detectorId +
                 '}';
     }
 }

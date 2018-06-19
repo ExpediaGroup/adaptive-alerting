@@ -17,7 +17,9 @@ package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.core.data.Mpoint;
 import com.expedia.adaptivealerting.core.util.AssertUtil;
+import com.expedia.adaptivealerting.core.util.MetricPointUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
 import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.*;
@@ -101,9 +103,12 @@ public class ConstantThresholdAnomalyDetector implements AnomalyDetector {
         } else {
             throw new IllegalStateException("Illegal tail: " + tail);
         }
-        
-        final AnomalyResult result = new AnomalyResult(this.getClass(), metricPoint);
-        result.setEpochSecond(metricPoint.epochTimeInSeconds());
+
+        final Mpoint mpoint = MetricPointUtil.toMpoint(metricPoint);
+        final AnomalyResult result = new AnomalyResult();
+        result.setMetric(mpoint.getMetric());
+        result.setDetectorId(this.getId());
+        result.setEpochSecond(mpoint.getInstant().getEpochSecond());
         result.setObserved(observed);
         result.setWeakThresholdUpper(weakThresholdUpper);
         result.setWeakThresholdLower(weakThresholdLower);
@@ -111,5 +116,14 @@ public class ConstantThresholdAnomalyDetector implements AnomalyDetector {
         result.setStrongThresholdLower(strongThresholdLower);
         result.setAnomalyLevel(anomalyLevel);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "ConstantThresholdAnomalyDetector{" +
+                "tail=" + tail +
+                ", weakThreshold=" + weakThreshold +
+                ", strongThreshold=" + strongThreshold +
+                '}';
     }
 }

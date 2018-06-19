@@ -22,6 +22,7 @@
 package com.expedia.adaptivealerting.kafka.serde;
 
 
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.Serializer;
@@ -35,6 +36,7 @@ public class JsonPojoSerializer<T> implements Serializer<T> {
      * Default constructor needed by Kafka
      */
     public JsonPojoSerializer() {
+        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
     }
 
     @Override

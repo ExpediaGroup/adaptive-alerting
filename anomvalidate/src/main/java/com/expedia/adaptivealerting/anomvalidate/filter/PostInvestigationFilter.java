@@ -25,7 +25,7 @@ public class PostInvestigationFilter  implements InvestigationFilter {
 
     // TODO: make configurable
     @Override
-    public boolean keep(String key, AnomalyResult anomalyResult) {
+    public boolean keep(AnomalyResult anomalyResult) {
         if (anomalyResult == null) {
             return false;
         }
