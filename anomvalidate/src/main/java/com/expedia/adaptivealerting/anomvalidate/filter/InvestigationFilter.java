@@ -18,5 +18,11 @@ package com.expedia.adaptivealerting.anomvalidate.filter;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 
 public interface InvestigationFilter {
-    boolean keep(String key, AnomalyResult anomalyResult);
+
+    /**
+     *
+     * @param anomalyResult The AnomalyResult to perform filtering on.
+     * @return whether to keep the anomalyResult in the output.
+     */
+    boolean keep(AnomalyResult anomalyResult);
 }

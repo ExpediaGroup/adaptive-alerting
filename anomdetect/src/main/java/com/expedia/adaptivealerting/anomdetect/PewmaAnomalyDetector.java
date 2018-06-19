@@ -17,7 +17,9 @@ package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.core.data.Mpoint;
 import com.expedia.adaptivealerting.core.util.AssertUtil;
+import com.expedia.adaptivealerting.core.util.MetricPointUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
 import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.*;
@@ -183,9 +185,12 @@ public class PewmaAnomalyDetector implements AnomalyDetector {
         } else if (dist > weakThreshold) {
             anomalyLevel = WEAK;
         }
-    
-        final AnomalyResult result = new AnomalyResult(this.getClass(), metricPoint);
-        result.setEpochSecond(metricPoint.epochTimeInSeconds());
+
+        final Mpoint mpoint = MetricPointUtil.toMpoint(metricPoint);
+        final AnomalyResult result = new AnomalyResult();
+        result.setMetric(mpoint.getMetric());
+        result.setDetectorId(this.getId());
+        result.setEpochSecond(mpoint.getInstant().getEpochSecond());
         result.setObserved(observed);
         result.setPredicted(mean);
         result.setWeakThresholdUpper(mean + weakThreshold);
@@ -228,5 +233,16 @@ public class PewmaAnomalyDetector implements AnomalyDetector {
     
     public double getStdDev() {
         return stdDev;
+    }
+
+    @Override
+    public String toString() {
+        return "PewmaAnomalyDetector{" +
+                "alpha0=" + alpha0 +
+                ", beta=" + beta +
+                ", trainingLength=" + trainingLength +
+                ", weakThresholdSigmas=" + weakThresholdSigmas +
+                ", strongThresholdSigmas=" + strongThresholdSigmas +
+                '}';
     }
 }

@@ -17,7 +17,9 @@ package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.core.data.Mpoint;
 import com.expedia.adaptivealerting.core.util.AssertUtil;
+import com.expedia.adaptivealerting.core.util.MetricPointUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
 import static com.expedia.adaptivealerting.anomdetect.NSigmasClassifier.DEFAULT_STRONG_SIGMAS;
@@ -136,9 +138,12 @@ public class EwmaAnomalyDetector implements AnomalyDetector {
         } else if (dist > weakThreshold) {
             anomalyLevel = WEAK;
         }
-    
-        final AnomalyResult result = new AnomalyResult(this.getClass(), metricPoint);
-        result.setEpochSecond(metricPoint.epochTimeInSeconds());
+
+        final Mpoint mpoint = MetricPointUtil.toMpoint(metricPoint);
+        final AnomalyResult result = new AnomalyResult();
+        result.setMetric(mpoint.getMetric());
+        result.setDetectorId(this.getId());
+        result.setEpochSecond(mpoint.getInstant().getEpochSecond());
         result.setObserved(observed);
         result.setPredicted(mean);
         result.setWeakThresholdUpper(mean + weakThreshold);
@@ -165,5 +170,14 @@ public class EwmaAnomalyDetector implements AnomalyDetector {
         // https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Online_algorithm
         // https://www.johndcook.com/blog/2008/09/26/comparing-three-methods-of-computing-standard-deviation/
         this.variance = (1.0 - alpha) * (variance + diff * incr);
+    }
+
+    @Override
+    public String toString() {
+        return "PewmaAnomalyDetector{" +
+                "alpha=" + alpha +
+                ", weakThresholdSigmas=" + weakThresholdSigmas +
+                ", strongThresholdSigmas=" + strongThresholdSigmas +
+                '}';
     }
 }
