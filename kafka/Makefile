@@ -3,7 +3,7 @@
 MAVEN := ../mvnw
 
 docker_build:
-	./docker/scripts/build-metric-router.sh -b	
+	./docker/scripts/build-metric-router.sh -b
 	./docker/scripts/build-constant-detector.sh -b
 	./docker/scripts/build-ewma-detector.sh -b
 	./docker/scripts/build-pewma-detector.sh -b

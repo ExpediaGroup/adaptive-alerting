@@ -6,10 +6,10 @@ MAVEN := ./mvnw
 clean:
 	${MAVEN} clean
 
-build: clean
+build:
 	${MAVEN} install package
 
-all: clean
+all: clean build
 
 # build all and release
 release: all

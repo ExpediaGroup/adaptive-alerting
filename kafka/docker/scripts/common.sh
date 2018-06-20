@@ -26,6 +26,9 @@ EOF
 
 package=0
 run=0
+release=0
+build=0
+
 while :; do
     case $1 in
         -h|-\?|--help)
