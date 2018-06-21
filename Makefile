@@ -14,7 +14,7 @@ all: clean build
 # build all and release
 release: all
 	cd kafka && $(MAKE) release
-	./.travis/deploy.sh
+
 
 
 
