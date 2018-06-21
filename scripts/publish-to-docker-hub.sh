@@ -7,6 +7,7 @@ echo "DOCKER_ORG=$DOCKER_ORG, DOCKER_IMAGE_NAME=$DOCKER_IMAGE_NAME, QUALIFIED_DO
 echo "BRANCH=$BRANCH, TAG=$TAG, SHA=$SHA"
 
 # login
+[[ -z $DOCKER_PASSWORD ]] && printf "\nPlease enter your docker.io password\n"
 docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
 
 # Add tags
