@@ -47,6 +47,11 @@ public final class Metric {
         notNull(name, "name can't be null");
         tags.put(name, value);
     }
+
+    public void addTags(Map<String, String> tags) {
+        notNull(tags, "tags can't be null");
+        tags.entrySet().forEach(tag -> putTag(tag.getKey(), tag.getValue()));
+    }
     
     public int getNumMetas() {
         return meta.size();
