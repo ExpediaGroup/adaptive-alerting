@@ -24,7 +24,7 @@ import java.time.Instant;
 import java.util.ListIterator;
 
 /**
- * Metric source backed by a {@MetricFrame}.
+ * Metric source backed by a {@link MetricFrame}.
  *
  * @author Willie Wheeler
  */

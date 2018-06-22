@@ -15,11 +15,54 @@
  */
 package com.expedia.adaptivealerting.core.data;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+
 /**
- * Metrics 2.0 metric/
+ * Metrics 2.0 metric.
  *
  * @author Willie Wheeler
  */
 public final class Metric {
-    // TODO Add various tags
+    private final Map<String, String> tags = new HashMap<>();
+    private final Map<String, String> meta = new HashMap<>();
+    
+    public int getNumTags() {
+        return tags.size();
+    }
+    
+    public Set<String> getTagNames() {
+        return tags.keySet();
+    }
+    
+    public String getTag(String name) {
+        notNull(name, "name can't be null");
+        return tags.get(name);
+    }
+    
+    public void putTag(String name, String value) {
+        notNull(name, "name can't be null");
+        tags.put(name, value);
+    }
+    
+    public int getNumMetas() {
+        return meta.size();
+    }
+    
+    public Set<String> getMetaNames() {
+        return meta.keySet();
+    }
+    
+    public String getMeta(String name) {
+        notNull(name, "name can't be null");
+        return meta.get(name);
+    }
+    
+    public void putMeta(String name, String value) {
+        notNull(name, "name can't be null");
+        meta.put(name, value);
+    }
 }
