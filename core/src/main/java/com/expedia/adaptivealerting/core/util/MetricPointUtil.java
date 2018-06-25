@@ -80,8 +80,8 @@ public final class MetricPointUtil {
 
     private static Metric toMetric(MetricPoint metricPoint) {
         Metric metric = new Metric();
-
-        // TODO: copy data when Metric is more defined.
+        metric.addTags(scala.collection.JavaConverters
+            .mapAsJavaMapConverter(metricPoint.tags()).asJava());
         return metric;
     }
 }
