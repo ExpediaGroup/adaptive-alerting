@@ -15,21 +15,18 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.util.MathUtil;
 import com.expedia.adaptivealerting.core.util.MetricPointUtil;
 import com.opencsv.bean.CsvToBeanBuilder;
 import junit.framework.TestCase;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.time.Instant;
 import java.util.List;
 import java.util.ListIterator;
-
 import static com.expedia.adaptivealerting.anomdetect.NSigmasClassifier.DEFAULT_STRONG_SIGMAS;
 import static com.expedia.adaptivealerting.anomdetect.NSigmasClassifier.DEFAULT_WEAK_SIGMAS;
 import static junit.framework.TestCase.assertEquals;

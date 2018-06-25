@@ -95,7 +95,7 @@ public class CusumAnomalyDetector implements AnomalyDetector {
     /**
      * Creates a new CUSUM detector. Initial mean is given by initValue and initial variance is 0.
      *
-     *@param tail
+     * @param tail
      *            Either LEFT_TAILED, RIGHT_TAILED or TWO_TAILED
      * @param alpha
      *            Smoothing parameter.
@@ -162,18 +162,18 @@ public class CusumAnomalyDetector implements AnomalyDetector {
     public AnomalyResult classify(MetricPoint metricPoint) {
         AssertUtil.notNull(metricPoint, "metricPoint can't be null");
 
-        final double observed = metricPoint.value();   
+        final double observed = metricPoint.value();
         setTargetValue(mean);
-     
+
         final double dist = abs(observed - targetValue);
         final double stdDev = sqrt(variance);
         final double slackValue = 0.5 * stdDev;
         final double weakThreshold = weakThresholdSigmas * stdDev;
         final double strongThreshold = strongThresholdSigmas * stdDev;
-        
+
         this.highCusum = Math.max(0, highCusum + observed - (targetValue + slackValue));
         this.lowCusum = Math.min(0, lowCusum + observed - (targetValue - slackValue));
-        
+
         Double weakThresholdUpper = null;
         Double weakThresholdLower = null;
         Double strongThresholdUpper = null;
@@ -204,16 +204,16 @@ public class CusumAnomalyDetector implements AnomalyDetector {
             strongThresholdLower = -strongThreshold;
             weakThresholdUpper = weakThreshold;
             strongThresholdUpper = strongThreshold;
-            if (highCusum >= strongThreshold && lowCusum <= strongThreshold) {
+            if (highCusum >= strongThreshold || lowCusum <= strongThreshold) {
                 anomalyLevel = STRONG;
-            } else if (highCusum > weakThreshold && lowCusum <= weakThreshold) {
+            } else if (highCusum > weakThreshold || lowCusum <= weakThreshold) {
                 anomalyLevel = WEAK;
             }
             break;
         default:
             throw new IllegalStateException("Illegal tail: " + tail);
         }
-        
+
         final Mpoint mpoint = MetricPointUtil.toMpoint(metricPoint);
         final AnomalyResult result = new AnomalyResult();
         result.setMetric(mpoint.getMetric());
@@ -228,7 +228,7 @@ public class CusumAnomalyDetector implements AnomalyDetector {
         result.setAnomalyScore(dist);
         result.setAnomalyLevel(anomalyLevel);
 
-        updateMeanAndStdDev(observed);
+        updateMeanAndVariance(observed);
 
         return result;
     }
@@ -239,7 +239,7 @@ public class CusumAnomalyDetector implements AnomalyDetector {
         }
     }
 
-    private void updateMeanAndStdDev(double value) {
+    private void updateMeanAndVariance(double value) {
 
         // https://en.wikipedia.org/wiki/Moving_average#Exponentially_weighted_moving_variance_and_standard_deviation
         // http://people.ds.cam.ac.uk/fanf2/hermes/doc/antiforgery/stats.pdf
