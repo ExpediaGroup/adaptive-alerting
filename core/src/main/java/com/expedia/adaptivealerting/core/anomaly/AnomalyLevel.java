@@ -38,7 +38,7 @@ public enum AnomalyLevel {
     STRONG,
 
     /**
-     * Unkown outlier. Should be used when we are not sure about the anomaly level. e.g. during the warm up period.
+     * Unknown outlier. Should be used when we are not sure about the anomaly level. e.g. during the warm up period.
      */
     UNKNOWN
 }
