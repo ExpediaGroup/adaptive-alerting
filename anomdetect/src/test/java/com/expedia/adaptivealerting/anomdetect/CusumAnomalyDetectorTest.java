@@ -54,6 +54,7 @@ public class CusumAnomalyDetectorTest {
         final CusumAnomalyDetector detector = new CusumAnomalyDetector();
         assertEquals(WEAK_SIGMAS, detector.getWeakThresholdSigmas());
         assertEquals(STRONG_SIGMAS, detector.getStrongThresholdSigmas());
+        assertEquals(WARMUP_PERIOD, detector.getWarmUpPeriod());
     }
 
     @Test
@@ -83,7 +84,7 @@ public class CusumAnomalyDetectorTest {
                 assertApproxEqual(testRow.getSl(), detector.getSumLow());
                 assertEquals(AnomalyLevel.valueOf(testRow.getLevel()), result.getAnomalyLevel());
             }
-            noOfDataPoints = noOfDataPoints + 1;
+            noOfDataPoints += 1;
         }
     }
 
