@@ -41,6 +41,8 @@ public class CusumAnomalyDetector implements AnomalyDetector {
     public static final int LEFT_TAILED = 0;
     public static final int RIGHT_TAILED = 1;
     public static final int TWO_TAILED = 2;
+    public static final double SLACK_PARAM = 0.5;
+    public static final double STD_DEV_PARAM = 1.128;
 
     private final int tail;
 
@@ -177,8 +179,8 @@ public class CusumAnomalyDetector implements AnomalyDetector {
         this.movingRange += abs(prevValue - observed);
         double averageMovingRange = getAverageMovingRange();
         final double dist = abs(observed - targetValue);
-        final double stdDev = averageMovingRange / 1.128;
-        final double slack = 0.5 * stdDev;
+        final double stdDev = averageMovingRange / STD_DEV_PARAM;
+        final double slack = SLACK_PARAM * stdDev;
         final double weakThreshold = weakThresholdSigmas * stdDev;
         final double strongThreshold = strongThresholdSigmas * stdDev;
 
