@@ -39,7 +39,7 @@ import static junit.framework.TestCase.assertEquals;
 public class CusumAnomalyDetectorTest {
     private static final double WEAK_SIGMAS = DEFAULT_WEAK_SIGMAS;
     private static final double STRONG_SIGMAS = DEFAULT_STRONG_SIGMAS;
-    private static final double TOLERANCE = 0.02;
+    private static final double TOLERANCE = 0.01;
     private static final int WARMUP_PERIOD = 25;
 
     private static List<CusumTestRow> data;
