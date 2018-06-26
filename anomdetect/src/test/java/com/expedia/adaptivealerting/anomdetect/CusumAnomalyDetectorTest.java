@@ -57,6 +57,15 @@ public class CusumAnomalyDetectorTest {
         assertEquals(WARMUP_PERIOD, detector.getWarmUpPeriod());
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void testIllegalTailException() {
+        int tail = 4;
+        double observed = 4.0;
+        int warmUpPeriod = 0;
+        new CusumAnomalyDetector(tail, 10, warmUpPeriod, WEAK_SIGMAS, STRONG_SIGMAS, 0.16)
+                .classify(MetricPointUtil.metricPoint(Instant.now(), observed));
+    }
+
     @Test
     public void testEvaluate() {
 
