@@ -177,7 +177,7 @@ public class CusumAnomalyDetector implements AnomalyDetector {
 
         final double observed = metricPoint.value();
         this.movingRange += abs(prevValue - observed);
-        double averageMovingRange = getAverageMovingRange();
+        final double averageMovingRange = getAverageMovingRange();
         final double dist = abs(observed - targetValue);
         final double stdDev = averageMovingRange / STD_DEV_PARAM;
         final double slack = SLACK_PARAM * stdDev;
