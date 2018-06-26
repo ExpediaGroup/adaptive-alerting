@@ -41,6 +41,9 @@ public class CusumTestRow {
     @CsvBindByName(column = "stdev")
     private double stdDev;
 
+    @CsvBindByName
+    private String level;
+
     /**
      * @return the sample
      */
@@ -114,6 +117,21 @@ public class CusumTestRow {
      */
     public void setStdDev(double stdDev) {
         this.stdDev = stdDev;
+    }
+
+    /**
+     * @return the level
+     */
+    public String getLevel() {
+        return level;
+    }
+
+    /**
+     * @param level
+     *            the level to set
+     */
+    public void setLevel(String level) {
+        this.level = level;
     }
 
 }

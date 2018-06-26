@@ -21,19 +21,24 @@ package com.expedia.adaptivealerting.core.anomaly;
  * @author Willie Wheeler
  */
 public enum AnomalyLevel {
-    
+
     /**
      * Normal data point (not an anomaly).
      */
     NORMAL,
-    
+
     /**
      * Weak outlier.
      */
     WEAK,
-    
+
     /**
      * Strong outlier.
      */
-    STRONG
+    STRONG,
+
+    /**
+     * Unkown outlier. Used when we don't know the anomaly level like during the warm up period.
+     */
+    UNKNOWN
 }

@@ -15,6 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
+import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.util.MathUtil;
 import com.expedia.adaptivealerting.core.util.MetricPointUtil;
 import com.opencsv.bean.CsvToBeanBuilder;
@@ -37,7 +39,8 @@ import static junit.framework.TestCase.assertEquals;
 public class CusumAnomalyDetectorTest {
     private static final double WEAK_SIGMAS = DEFAULT_WEAK_SIGMAS;
     private static final double STRONG_SIGMAS = DEFAULT_STRONG_SIGMAS;
-    private static final double TOLERANCE = 0.1;
+    private static final double TOLERANCE = 0.02;
+    private static final int WARMUP_PERIOD = 25;
 
     private static List<CusumTestRow> data;
 
@@ -49,7 +52,6 @@ public class CusumAnomalyDetectorTest {
     @Test
     public void testDefaultConstructor() {
         final CusumAnomalyDetector detector = new CusumAnomalyDetector();
-        assertEquals(0.15, detector.getAlpha());
         assertEquals(WEAK_SIGMAS, detector.getWeakThresholdSigmas());
         assertEquals(STRONG_SIGMAS, detector.getStrongThresholdSigmas());
     }
@@ -57,31 +59,31 @@ public class CusumAnomalyDetectorTest {
     @Test
     public void testEvaluate() {
 
-        // Params
-        final double alpha = 0.05;
-
         final ListIterator<CusumTestRow> testRows = data.listIterator();
         final CusumTestRow testRow0 = testRows.next();
         final double observed0 = testRow0.getObserved();
-        final CusumAnomalyDetector detector = new CusumAnomalyDetector(0, alpha, observed0, WEAK_SIGMAS, STRONG_SIGMAS,
-                0.16);
+        final CusumAnomalyDetector detector = new CusumAnomalyDetector(1, observed0, WARMUP_PERIOD, WEAK_SIGMAS,
+                STRONG_SIGMAS, 0.16);
+        int noOfDataPoints = 1;
 
         // Params
-        assertEquals(alpha, detector.getAlpha());
         assertEquals(WEAK_SIGMAS, detector.getWeakThresholdSigmas());
         assertEquals(STRONG_SIGMAS, detector.getStrongThresholdSigmas());
-
-        // Seed observation
-        assertEquals(observed0, detector.getMean());
-        assertEquals(0.0, detector.getVariance());
+        assertEquals(WARMUP_PERIOD, detector.getWarmUpPeriod());
 
         while (testRows.hasNext()) {
             final CusumTestRow testRow = testRows.next();
             final double observed = testRow.getObserved();
-            detector.classify(MetricPointUtil.metricPoint(Instant.now(), observed));
-            assertApproxEqual(testRow.getSh(), detector.getHighCusum());
-            assertApproxEqual(testRow.getSl(), detector.getLowCusum());
-            assertApproxEqual(testRow.getStdDev(), Math.sqrt(detector.getVariance()));
+            AnomalyResult result = detector.classify(MetricPointUtil.metricPoint(Instant.now(), observed));
+
+            if (noOfDataPoints < WARMUP_PERIOD) {
+                assertEquals(AnomalyLevel.valueOf("UNKNOWN"), result.getAnomalyLevel());
+            } else {
+                assertApproxEqual(testRow.getSh(), detector.getSumHigh());
+                assertApproxEqual(testRow.getSl(), detector.getSumLow());
+                assertEquals(AnomalyLevel.valueOf(testRow.getLevel()), result.getAnomalyLevel());
+            }
+            noOfDataPoints = noOfDataPoints + 1;
         }
     }
 

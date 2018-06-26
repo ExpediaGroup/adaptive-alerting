@@ -18,8 +18,8 @@ package com.expedia.adaptivealerting.anomdetect;
 import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.NORMAL;
 import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.STRONG;
 import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.WEAK;
+import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.UNKNOWN;
 import static java.lang.Math.abs;
-import static java.lang.Math.sqrt;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.Mpoint;
@@ -45,24 +45,35 @@ public class CusumAnomalyDetector implements AnomalyDetector {
     private final int tail;
 
     /**
-     * Smoothing param.
+     * Local Moving range. Used to calculate standard deviation.
      */
-    private double alpha;
+    private double movingRange;
 
     /**
-     * Local mean estimate. If user doesn't specify the target then this becomes the target value.
+     * Local previous value.
      */
-    private double mean;
+    private double prevValue;
+
+    /**
+     * Local total no of received data points.
+     */
+    private int totalDataPoints;
+
+    /**
+     * Local warm up period value. Minimum no of data points required before it can be used for actual anomaly
+     * detection.
+     */
+    private int warmUpPeriod;
 
     /**
      * Local cumulative sum on the high side. SH
      */
-    private double highCusum;
+    private double sumHigh;
 
     /**
      * Local cumulative sum on the low side. SL
      */
-    private double lowCusum;
+    private double sumLow;
 
     /**
      * Strong outlier threshold, in sigmas.
@@ -80,16 +91,11 @@ public class CusumAnomalyDetector implements AnomalyDetector {
     private double targetValue;
 
     /**
-     * Local variance estimate.
-     */
-    private double variance;
-
-    /**
-     * Creates a new CUSUM detector with left tail (tail=0), alpha = 0.15, initValue = 0.0, weakThresholdSigmas = 3.0,
-     * strongThresholdSigmas = 4.0 and targetValue = 0.0
+     * Creates a new CUSUM detector with left tail (tail=0), initValue = 0.0, warmUpPeriod = 15, weakThresholdSigmas =
+     * 3.0, strongThresholdSigmas = 4.0 and targetValue = 0.0
      */
     public CusumAnomalyDetector() {
-        this(0, 0.15, 0.0, 3.0, 4.0, 0.0);
+        this(0, 0.0, 25, 3.0, 4.0, 0.0);
     }
 
     /**
@@ -97,53 +103,46 @@ public class CusumAnomalyDetector implements AnomalyDetector {
      *
      * @param tail
      *            Either LEFT_TAILED, RIGHT_TAILED or TWO_TAILED
-     * @param alpha
-     *            Smoothing parameter.
      * @param initValue
      *            Initial observation, used to set the first mean estimate.
+     * @param warmUpPeriod
+     *            Warm up period value. Minimum no of data points required before it can be used for actual anomaly
+     *            detection.
+     * @param weakThresholdSigmas
+     *            Weak outlier threshold, in sigmas.
+     * @param strongThresholdSigmas
+     *            Strong outlier threshold, in sigmas.
      * @param targetValue
      *            User defined target value
      */
-    public CusumAnomalyDetector(
-            int tail,
-            double alpha,
-            double initValue,
-            double weakThresholdSigmas,
-            double strongThresholdSigmas,
-            double targetValue) {
+    public CusumAnomalyDetector(int tail, double initValue, int warmUpPeriod, double weakThresholdSigmas,
+            double strongThresholdSigmas, double targetValue) {
         this.tail = tail;
-        this.alpha = alpha;
-        this.mean = initValue;
-        this.variance = 0.0;
-        this.highCusum = 0.0;
-        this.lowCusum = 0.0;
+        this.warmUpPeriod = warmUpPeriod;
+        this.movingRange = 0.0;
+        this.prevValue = initValue;
+        this.totalDataPoints = 1;
+        this.sumHigh = 0.0;
+        this.sumLow = 0.0;
         this.weakThresholdSigmas = weakThresholdSigmas;
         this.strongThresholdSigmas = strongThresholdSigmas;
         this.targetValue = targetValue;
     }
 
-    public double getAlpha() {
-        return alpha;
+    public double getMovingRange() {
+        return movingRange;
     }
 
     public double getTargetValue() {
         return targetValue;
     }
 
-    public double getMean() {
-        return mean;
+    public double getSumHigh() {
+        return sumHigh;
     }
 
-    public double getVariance() {
-        return variance;
-    }
-
-    public double getHighCusum() {
-        return highCusum;
-    }
-
-    public double getLowCusum() {
-        return lowCusum;
+    public double getSumLow() {
+        return sumLow;
     }
 
     public double getWeakThresholdSigmas() {
@@ -158,62 +157,83 @@ public class CusumAnomalyDetector implements AnomalyDetector {
         return tail;
     }
 
+    public int getWarmUpPeriod() {
+        return warmUpPeriod;
+    }
+
+    public int getTotalDataPoints() {
+        return totalDataPoints;
+    }
+
+    public double getPrevValue() {
+        return prevValue;
+    }
+
     @Override
     public AnomalyResult classify(MetricPoint metricPoint) {
         AssertUtil.notNull(metricPoint, "metricPoint can't be null");
 
         final double observed = metricPoint.value();
-        setTargetValue(mean);
-
+        this.movingRange += abs(prevValue - observed);
+        double averageMovingRange = getAverageMovingRange();
         final double dist = abs(observed - targetValue);
-        final double stdDev = sqrt(variance);
-        final double slackValue = 0.5 * stdDev;
+        final double stdDev = averageMovingRange / 1.128;
+        final double slack = 0.5 * stdDev;
         final double weakThreshold = weakThresholdSigmas * stdDev;
         final double strongThreshold = strongThresholdSigmas * stdDev;
 
-        this.highCusum = Math.max(0, highCusum + observed - (targetValue + slackValue));
-        this.lowCusum = Math.min(0, lowCusum + observed - (targetValue - slackValue));
+        this.sumHigh = Math.max(0, sumHigh + observed - (targetValue + slack));
+        this.sumLow = Math.min(0, sumLow + observed - (targetValue - slack));
+        this.prevValue = observed;
+        this.totalDataPoints++;
 
         Double weakThresholdUpper = null;
         Double weakThresholdLower = null;
         Double strongThresholdUpper = null;
         Double strongThresholdLower = null;
+        AnomalyLevel anomalyLevel = null;
 
-        AnomalyLevel anomalyLevel = NORMAL;
-        switch (tail) {
-        case LEFT_TAILED:
-            weakThresholdLower = -weakThreshold;
-            strongThresholdLower = -strongThreshold;
-            if (lowCusum <= strongThresholdLower) {
-                anomalyLevel = STRONG;
-            } else if (lowCusum <= weakThresholdLower) {
-                anomalyLevel = WEAK;
+        if (totalDataPoints <= warmUpPeriod) {
+            anomalyLevel = UNKNOWN;
+        } else {
+            anomalyLevel = NORMAL;
+            switch (tail) {
+            case LEFT_TAILED:
+                weakThresholdLower = -weakThreshold;
+                strongThresholdLower = -strongThreshold;
+                if (sumLow <= strongThresholdLower) {
+                    anomalyLevel = STRONG;
+                    resetSums();
+                } else if (sumLow <= weakThresholdLower) {
+                    anomalyLevel = WEAK;
+                }
+                break;
+            case RIGHT_TAILED:
+                weakThresholdUpper = weakThreshold;
+                strongThresholdUpper = strongThreshold;
+                if (sumHigh >= strongThresholdUpper) {
+                    anomalyLevel = STRONG;
+                    resetSums();
+                } else if (sumHigh > weakThresholdUpper) {
+                    anomalyLevel = WEAK;
+                }
+                break;
+            case TWO_TAILED:
+                weakThresholdLower = -weakThreshold;
+                strongThresholdLower = -strongThreshold;
+                weakThresholdUpper = weakThreshold;
+                strongThresholdUpper = strongThreshold;
+                if (sumHigh >= strongThreshold || sumLow <= strongThreshold) {
+                    anomalyLevel = STRONG;
+                    resetSums();
+                } else if (sumHigh > weakThreshold || sumLow <= weakThreshold) {
+                    anomalyLevel = WEAK;
+                }
+                break;
+            default:
+                throw new IllegalStateException("Illegal tail: " + tail);
             }
-            break;
-        case RIGHT_TAILED:
-            weakThresholdUpper = weakThreshold;
-            strongThresholdUpper = strongThreshold;
-            if (highCusum >= strongThresholdUpper) {
-                anomalyLevel = STRONG;
-            } else if (highCusum > weakThresholdUpper) {
-                anomalyLevel = WEAK;
-            }
-            break;
-        case TWO_TAILED:
-            weakThresholdLower = -weakThreshold;
-            strongThresholdLower = -strongThreshold;
-            weakThresholdUpper = weakThreshold;
-            strongThresholdUpper = strongThreshold;
-            if (highCusum >= strongThreshold || lowCusum <= strongThreshold) {
-                anomalyLevel = STRONG;
-            } else if (highCusum > weakThreshold || lowCusum <= weakThreshold) {
-                anomalyLevel = WEAK;
-            }
-            break;
-        default:
-            throw new IllegalStateException("Illegal tail: " + tail);
         }
-
         final Mpoint mpoint = MetricPointUtil.toMpoint(metricPoint);
         final AnomalyResult result = new AnomalyResult();
         result.setMetric(mpoint.getMetric());
@@ -227,31 +247,19 @@ public class CusumAnomalyDetector implements AnomalyDetector {
         result.setStrongThresholdLower(strongThresholdLower);
         result.setAnomalyScore(dist);
         result.setAnomalyLevel(anomalyLevel);
-
-        updateMeanAndVariance(observed);
-
         return result;
     }
 
-    private void setTargetValue(double mean) {
-        if (targetValue == 0.0) {
-            this.targetValue = mean;
+    private double getAverageMovingRange() {
+        if (totalDataPoints > 1) {
+            return movingRange / (totalDataPoints - 1);
         }
+        return movingRange;
     }
 
-    private void updateMeanAndVariance(double value) {
-
-        // https://en.wikipedia.org/wiki/Moving_average#Exponentially_weighted_moving_variance_and_standard_deviation
-        // http://people.ds.cam.ac.uk/fanf2/hermes/doc/antiforgery/stats.pdf
-        final double diff = value - mean;
-        final double incr = alpha * diff;
-
-        this.mean = mean + incr;
-
-        // Welford's algorithm for computing the variance online
-        // https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Online_algorithm
-        // https://www.johndcook.com/blog/2008/09/26/comparing-three-methods-of-computing-standard-deviation/
-        this.variance = (1.0 - alpha) * (variance + diff * incr);
+    private void resetSums() {
+        this.sumHigh = 0.0;
+        this.sumLow = 0.0;
     }
 
 }
