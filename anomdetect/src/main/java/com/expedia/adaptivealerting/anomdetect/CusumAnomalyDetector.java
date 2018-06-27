@@ -41,8 +41,7 @@ public class CusumAnomalyDetector implements AnomalyDetector {
     public static final int LEFT_TAILED = 0;
     public static final int RIGHT_TAILED = 1;
     public static final int TWO_TAILED = 2;
-    public static final double SLACK_PARAM = 0.5;
-    public static final double STD_DEV_PARAM = 1.128;
+    public static final double STD_DEV_DIVISOR = 1.128;
 
     private final int tail;
 
@@ -91,13 +90,18 @@ public class CusumAnomalyDetector implements AnomalyDetector {
      * Local target value.
      */
     private double targetValue;
+    
+    /**
+     * Local slack param value.
+     */
+    private double slackParam;
 
     /**
-     * Creates a new CUSUM detector with left tail (tail=0), initValue = 0.0, warmUpPeriod = 15, weakThresholdSigmas =
-     * 3.0, strongThresholdSigmas = 4.0 and targetValue = 0.0
+     * Creates a new CUSUM detector with left tail (tail=0), initValue = 0.0, slackParam = 0.5, warmUpPeriod = 25,
+     * weakThresholdSigmas = 3.0, strongThresholdSigmas = 4.0 and targetValue = 0.0
      */
     public CusumAnomalyDetector() {
-        this(0, 0.0, 25, 3.0, 4.0, 0.0);
+        this(0, 0.0, 0.5, 25, 3.0, 4.0, 0.0);
     }
 
     /**
@@ -107,6 +111,8 @@ public class CusumAnomalyDetector implements AnomalyDetector {
      *            Either LEFT_TAILED, RIGHT_TAILED or TWO_TAILED
      * @param initValue
      *            Initial observation, used to set the first mean estimate.
+     * @param slackParam
+     *            Slack param to calculate slack value k where k = slack param * stdev
      * @param warmUpPeriod
      *            Warm up period value. Minimum no of data points required before it can be used for actual anomaly
      *            detection.
@@ -117,22 +123,25 @@ public class CusumAnomalyDetector implements AnomalyDetector {
      * @param targetValue
      *            User defined target value
      */
-    public CusumAnomalyDetector(int tail, double initValue, int warmUpPeriod, double weakThresholdSigmas,
-            double strongThresholdSigmas, double targetValue) {
+    public CusumAnomalyDetector(
+            int tail,
+            double initValue,
+            double slackParam,
+            int warmUpPeriod,
+            double weakThresholdSigmas,
+            double strongThresholdSigmas,
+            double targetValue) {
         this.tail = tail;
+        this.prevValue = initValue;
+        this.slackParam = slackParam;
         this.warmUpPeriod = warmUpPeriod;
         this.movingRange = 0.0;
-        this.prevValue = initValue;
         this.totalDataPoints = 1;
         this.sumHigh = 0.0;
         this.sumLow = 0.0;
         this.weakThresholdSigmas = weakThresholdSigmas;
         this.strongThresholdSigmas = strongThresholdSigmas;
         this.targetValue = targetValue;
-    }
-
-    public double getMovingRange() {
-        return movingRange;
     }
 
     public double getTargetValue() {
@@ -155,20 +164,12 @@ public class CusumAnomalyDetector implements AnomalyDetector {
         return strongThresholdSigmas;
     }
 
-    public int getTail() {
-        return tail;
-    }
-
     public int getWarmUpPeriod() {
         return warmUpPeriod;
     }
 
-    public int getTotalDataPoints() {
-        return totalDataPoints;
-    }
-
-    public double getPrevValue() {
-        return prevValue;
+    public double getSlackParam() {
+        return slackParam;
     }
 
     @Override
@@ -179,8 +180,8 @@ public class CusumAnomalyDetector implements AnomalyDetector {
         this.movingRange += abs(prevValue - observed);
         final double averageMovingRange = getAverageMovingRange();
         final double dist = abs(observed - targetValue);
-        final double stdDev = averageMovingRange / STD_DEV_PARAM;
-        final double slack = SLACK_PARAM * stdDev;
+        final double stdDev = averageMovingRange / STD_DEV_DIVISOR;
+        final double slack = slackParam * stdDev;
         final double weakThreshold = weakThresholdSigmas * stdDev;
         final double strongThreshold = strongThresholdSigmas * stdDev;
 

@@ -46,7 +46,7 @@ public class CusumAnomalyDetectorTest {
 
     @BeforeClass
     public static void setUpClass() throws IOException {
-        readData_calInflow();
+        readDataFromCsv();
     }
 
     @Test
@@ -59,10 +59,11 @@ public class CusumAnomalyDetectorTest {
 
     @Test(expected = IllegalStateException.class)
     public void testIllegalTailException() {
-        int tail = 4;
-        double observed = 4.0;
-        int warmUpPeriod = 0;
-        new CusumAnomalyDetector(tail, 10, warmUpPeriod, WEAK_SIGMAS, STRONG_SIGMAS, 0.16)
+        final int tail = 4;
+        final double observed = 4.0;
+        final int warmUpPeriod = 0;
+        final double slackParam = 0.5;
+        new CusumAnomalyDetector(tail, 10, slackParam, warmUpPeriod, WEAK_SIGMAS, STRONG_SIGMAS, 0.16)
                 .classify(MetricPointUtil.metricPoint(Instant.now(), observed));
     }
 
@@ -72,8 +73,10 @@ public class CusumAnomalyDetectorTest {
         final ListIterator<CusumTestRow> testRows = data.listIterator();
         final CusumTestRow testRow0 = testRows.next();
         final double observed0 = testRow0.getObserved();
-        final CusumAnomalyDetector detector = new CusumAnomalyDetector(1, observed0, WARMUP_PERIOD, WEAK_SIGMAS,
-                STRONG_SIGMAS, 0.16);
+        final double slackParam = 0.5;
+
+        final CusumAnomalyDetector detector = new CusumAnomalyDetector(1, observed0, slackParam, WARMUP_PERIOD,
+                WEAK_SIGMAS, STRONG_SIGMAS, 0.16);
         int noOfDataPoints = 1;
 
         // Params
@@ -97,7 +100,7 @@ public class CusumAnomalyDetectorTest {
         }
     }
 
-    private static void readData_calInflow() {
+    private static void readDataFromCsv() {
         final InputStream is = ClassLoader.getSystemResourceAsStream("tests/cusum-sample-input.csv");
         data = new CsvToBeanBuilder<CusumTestRow>(new InputStreamReader(is)).withType(CusumTestRow.class).build()
                 .parse();
