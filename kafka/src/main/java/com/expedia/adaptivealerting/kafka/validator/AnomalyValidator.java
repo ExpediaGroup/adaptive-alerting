@@ -19,7 +19,6 @@ import com.expedia.adaptivealerting.anomvalidate.filter.InvestigationFilter;
 import com.expedia.adaptivealerting.anomvalidate.filter.PostInvestigationFilter;
 import com.expedia.adaptivealerting.anomvalidate.filter.PreInvestigationFilter;
 import com.expedia.adaptivealerting.anomvalidate.investigation.InvestigationManager;
-import com.expedia.adaptivealerting.anomvalidate.investigation.InvestigatorLookupService;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.kafka.util.AppUtil;
 import com.expedia.adaptivealerting.kafka.util.BaseStreamRunnerBuilder;
@@ -48,10 +47,14 @@ public class AnomalyValidator {
             final StreamsBuilder builder = new StreamsBuilder();
             final KStream<String, AnomalyResult> anomalies = builder.stream(appConfig.getString("topic"));
 
-            InvestigatorLookupService ils = new InvestigatorLookupService();
             InvestigationFilter preInvestigationFilter = new PreInvestigationFilter();
             InvestigationFilter postInvestigationFilter = new PostInvestigationFilter();
-            InvestigationManager investigationManager = new InvestigationManager(ils);
+
+            String endpoint = appConfig.hasPath("investigation.endpoint")
+                    ? appConfig.getString("investigation.endpoint") : null;
+            Integer timeoutMs = appConfig.hasPath("investigation.timeoutMs")
+                    ? appConfig.getInt("investigation.timeoutMs") : null;
+            InvestigationManager investigationManager = new InvestigationManager(endpoint, timeoutMs);
 
             anomalies
                     .filter((k, anomalyResult) -> preInvestigationFilter.keep(anomalyResult))

@@ -17,23 +17,57 @@ package com.expedia.adaptivealerting.anomvalidate.investigation;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.InvestigationResult;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.fluent.Request;
+import org.apache.http.entity.ContentType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
-import java.util.Vector;
 
 public class InvestigationManager {
-    private InvestigatorLookupService investigatorLookupService;
+    private static final Logger LOGGER = LoggerFactory.getLogger(InvestigationManager.class);
+    private static final int DEFAULT_TIMEOUT_MS = 30000;
+    private String endpoint;
+    private int timeoutMs;
+    private final ObjectReader reader = new ObjectMapper().readerFor(new TypeReference<List<InvestigationResult>>() {});
+    private final ObjectWriter writer = new ObjectMapper().writerFor(AnomalyResult.class);
 
-    public InvestigationManager(InvestigatorLookupService investigatorLookupService) {
-        this.investigatorLookupService = investigatorLookupService;
+    public InvestigationManager(String endpoint, Integer timeoutMs) {
+        this.endpoint = endpoint;
+        this.timeoutMs = timeoutMs == null ? DEFAULT_TIMEOUT_MS : timeoutMs;
     }
+
     public AnomalyResult investigate(AnomalyResult anomalyResult) {
-        List<AnomalyInvestigator> investigators = investigatorLookupService.getInvestigators(anomalyResult.getMetric());
-        List<InvestigationResult> results = new Vector<>();
-        for (AnomalyInvestigator investigator : investigators) { // TODO: should be able to operate concurrently
-            results.addAll(investigator.investigate(anomalyResult));
+        if (anomalyResult != null) {
+            anomalyResult.setInvestigationResults(requestInvestigation(anomalyResult));
         }
-        anomalyResult.setInvestigationResults(results);
         return anomalyResult;
+    }
+
+    private List<InvestigationResult> requestInvestigation(AnomalyResult result) {
+        if (StringUtils.isEmpty(endpoint)) {
+            return Collections.emptyList();
+        }
+        try {
+            String response = Request.Post(endpoint)
+                    .bodyString(writer.writeValueAsString(result), ContentType.APPLICATION_JSON)
+                    .socketTimeout(timeoutMs)
+                    .connectTimeout(timeoutMs) // TODO: have separate timeouts or a total timeout for connection.
+                    .execute()
+                    .returnContent()
+                    .asString();
+
+            return reader.readValue(response);
+        } catch (IOException e) {
+            LOGGER.error("Error while investigating.", e);
+            return Collections.emptyList();
+        }
     }
 }
