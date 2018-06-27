@@ -29,12 +29,20 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 public final class Metric {
     private final Map<String, String> tags = new HashMap<>();
     private final Map<String, String> meta = new HashMap<>();
-    
-    public int getNumTags() {
+
+    public Map<String, String> getTags() {
+        return tags;
+    }
+
+    public Map<String, String> getMeta() {
+        return meta;
+    }
+
+    public int tagsSize() {
         return tags.size();
     }
-    
-    public Set<String> getTagNames() {
+
+    public Set<String> tagNames() {
         return tags.keySet();
     }
     
@@ -52,12 +60,12 @@ public final class Metric {
         notNull(tags, "tags can't be null");
         tags.entrySet().forEach(tag -> putTag(tag.getKey(), tag.getValue()));
     }
-    
-    public int getNumMetas() {
+
+    public int metasSize() {
         return meta.size();
     }
     
-    public Set<String> getMetaNames() {
+    public Set<String> metaNames() {
         return meta.keySet();
     }
     
