@@ -74,7 +74,6 @@ public class CusumAnomalyDetectorTest {
         final CusumTestRow testRow0 = testRows.next();
         final double observed0 = testRow0.getObserved();
         final double slackParam = 0.5;
-
         final CusumAnomalyDetector detector = new CusumAnomalyDetector(1, observed0, slackParam, WARMUP_PERIOD,
                 WEAK_SIGMAS, STRONG_SIGMAS, 0.16);
         int noOfDataPoints = 1;
