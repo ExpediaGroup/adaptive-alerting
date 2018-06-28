@@ -88,7 +88,7 @@ public class RandomCutForestAnomalyDetector implements AnomalyDetector {
 
         this.shingle.offer(metricPoint);
 
-        final AnomalyResult result = new AnomalyResult(this.getClass());
+        final AnomalyResult result = new AnomalyResult();
         if (this.shingle.isReady()) {
             final double anomalyScore = getAnomalyScore();
             result.setEpochSecond(metricPoint.epochTimeInSeconds());
