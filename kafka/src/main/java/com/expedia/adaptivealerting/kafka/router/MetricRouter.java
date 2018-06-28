@@ -53,7 +53,7 @@ public class MetricRouter {
 
         // TODO: add real routing conditions
         private static boolean isConstant(String key, MetricPoint metricPoint) {
-            return Arrays.asList("latency", "duration").contains(metricPoint.metric());
+            return Arrays.asList("latency").contains(metricPoint.metric());
         }
 
         private static boolean isEwma(String key, MetricPoint metricPoint) {
@@ -61,7 +61,7 @@ public class MetricRouter {
         }
 
         private static boolean isPewma(String key, MetricPoint metricPoint) {
-            return Collections.singletonList("pewma").contains(metricPoint.metric());
+            return Collections.singletonList("duration").contains(metricPoint.metric());
         }
     }
 }

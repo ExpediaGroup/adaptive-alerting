@@ -73,8 +73,8 @@ class ConstantThresholdBasedE2ETestSpec extends IntegrationTestSpec {
       val intermediateRecords: List[KeyValue[String, MetricPoint]] =
         IntegrationTestUtils.waitUntilMinKeyValueRecordsReceived[String, MetricPoint](
           configToProps(constantThresholdTopicConsumerConfig.getConfig(STREAM)),
-          INTERMEDIATE_TOPIC, 2, 15000).asScala.toList // get metricPoints from Kafka's output topic
-      intermediateRecords.size shouldEqual 2
+          INTERMEDIATE_TOPIC, 1, 15000).asScala.toList // get metricPoints from Kafka's output topic
+      intermediateRecords.size shouldEqual 1
       intermediateRecords.foreach(record => {
         record.value.metric match {
           case "duration" => "success"
@@ -91,8 +91,8 @@ class ConstantThresholdBasedE2ETestSpec extends IntegrationTestSpec {
       val outputRecords: List[KeyValue[String, AnomalyResult]] =
         IntegrationTestUtils.waitUntilMinKeyValueRecordsReceived[String, AnomalyResult](
           consumerPropAnomalyTopic,
-          OUTPUT_TOPIC, 2, 35000).asScala.toList // get metricPoints from Kafka's output topic
-      outputRecords.size shouldEqual 2
+          OUTPUT_TOPIC, 1, 35000).asScala.toList // get metricPoints from Kafka's output topic
+      outputRecords.size shouldEqual 1
 
       Then("no other intermediate partitions are created after as a result of topology")
       val adminClient: AdminClient = AdminClient.create(metricRouterStreamConfig)
@@ -118,7 +118,7 @@ class ConstantThresholdBasedE2ETestSpec extends IntegrationTestSpec {
   private def generateAnomalousMetrics() : List[MetricPoint] = {
     List(
       metricPoint("latency", Instant.now(), 2),
-      metricPoint("duration", Instant.now(), 3)
+      metricPoint("failureCount", Instant.now(), 3)
     )
   }
 }
