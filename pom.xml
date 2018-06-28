@@ -51,6 +51,7 @@
         <opencsv.version>4.1</opencsv.version>
         <slf4j.version>1.7.25</slf4j.version>
         <spring.boot.version>2.0.2.RELEASE</spring.boot.version>
+        <amazonaws.version>1.11.349</amazonaws.version>
 
         <!-- Maven plugins -->
         <maven.compiler.plugin.version>3.7.0</maven.compiler.plugin.version>
@@ -93,6 +94,16 @@
             </dependency>
 
             <!-- Third-party -->
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-core</artifactId>
+                <version>${amazonaws.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-sagemakerruntime</artifactId>
+                <version>${amazonaws.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.opencsv</groupId>
                 <artifactId>opencsv</artifactId>
