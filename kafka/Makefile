@@ -7,6 +7,7 @@ docker_build:
 	./docker/scripts/build-constant-detector.sh -b
 	./docker/scripts/build-ewma-detector.sh -b
 	./docker/scripts/build-pewma-detector.sh -b
+	./docker/scripts/build-anomaly-validator.sh -b
 
 integration_test:
 	${MAVEN} test
@@ -20,4 +21,5 @@ release: docker_build
 	./docker/scripts/build-constant-detector.sh --release
 	./docker/scripts/build-ewma-detector.sh --release
 	./docker/scripts/build-pewma-detector.sh --release
+	./docker/scripts/build-anomaly-validator.sh --release
 
