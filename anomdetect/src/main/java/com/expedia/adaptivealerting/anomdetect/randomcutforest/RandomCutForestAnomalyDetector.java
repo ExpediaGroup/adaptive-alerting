@@ -63,7 +63,8 @@ public class RandomCutForestAnomalyDetector implements AnomalyDetector {
     private static final String AWS_REGION = PropertiesCache.getInstance().get("aws_region");
     private static final String ENDPOINT = PropertiesCache.getInstance().get("sagemaker_endpoint");
     private static final int SHINGLE_SIZE = Integer.valueOf(PropertiesCache.getInstance().get("shingle_size"));
-    private static final double SCORE_CUTOFF = Double.valueOf(PropertiesCache.getInstance().get("score_cutoff"));
+    private static final double STRONG_SCORE_CUTOFF = Double.valueOf(PropertiesCache.getInstance().get("strong_score_cutoff"));
+    private static final double WEAK_SCORE_CUTOFF = Double.valueOf(PropertiesCache.getInstance().get("weak_score_cutoff"));
 
     private final Shingle shingle;
     private final AmazonSageMakerRuntime amazonSageMaker;
@@ -94,8 +95,10 @@ public class RandomCutForestAnomalyDetector implements AnomalyDetector {
             final double anomalyScore = getAnomalyScore();
             result.setEpochSecond(metricPoint.epochTimeInSeconds());
             result.setAnomalyScore(anomalyScore);
-            if (anomalyScore < SCORE_CUTOFF) {
+            if (anomalyScore < WEAK_SCORE_CUTOFF) {
                 result.setAnomalyLevel(AnomalyLevel.NORMAL);
+            } else if (anomalyScore < STRONG_SCORE_CUTOFF) {
+                result.setAnomalyLevel(AnomalyLevel.WEAK);
             } else {
                 result.setAnomalyLevel(AnomalyLevel.STRONG);
             }
