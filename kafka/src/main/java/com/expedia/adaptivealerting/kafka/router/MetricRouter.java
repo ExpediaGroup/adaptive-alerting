@@ -58,11 +58,11 @@ public class MetricRouter {
         }
 
         private static boolean isEwma(String key, MetricPoint metricPoint) {
-            return "ewma".equals(metricPoint.metric());
+            return "duration".equals(metricPoint.metric());
         }
 
         private static boolean isPewma(String key, MetricPoint metricPoint) {
-            return "duration".equals(metricPoint.metric());
+            return "pewma".equals(metricPoint.metric());
         }
         
         private static boolean isAquila(String key, MetricPoint metricPoint) {
