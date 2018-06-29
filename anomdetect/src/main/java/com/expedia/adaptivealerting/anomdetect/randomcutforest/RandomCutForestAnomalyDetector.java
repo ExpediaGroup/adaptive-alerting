@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.randomcutforest;
 
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sagemakerruntime.AmazonSageMakerRuntime;
 import com.amazonaws.services.sagemakerruntime.AmazonSageMakerRuntimeClientBuilder;
 import com.amazonaws.services.sagemakerruntime.model.InvokeEndpointRequest;
@@ -60,6 +61,7 @@ public class RandomCutForestAnomalyDetector implements AnomalyDetector {
     private static final String TEXT_CSV_CONTENT_TYPE = "text/csv";
     private static final String APPLICATION_JSON_ACCEPT = "application/json";
 
+    private static final String AWS_REGION = PropertiesCache.getInstance().get("aws_region");
     private static final String ENDPOINT = PropertiesCache.getInstance().get("sagemaker_endpoint");
     private static final int SHINGLE_SIZE = Integer.valueOf(PropertiesCache.getInstance().get("shingle_size"));
     private static final double SCORE_CUTOFF = Double.valueOf(PropertiesCache.getInstance().get("score_cutoff"));
@@ -72,7 +74,7 @@ public class RandomCutForestAnomalyDetector implements AnomalyDetector {
     //TODO Consider passing endpoint, shingle size and score cutoff to constructor
     public RandomCutForestAnomalyDetector() {
         this.shingle = new MetricPointQueue(SHINGLE_SIZE);
-        this.amazonSageMaker = AmazonSageMakerRuntimeClientBuilder.defaultClient();
+        this.amazonSageMaker = AmazonSageMakerRuntimeClientBuilder.standard().withRegion(AWS_REGION).build();
         this.invokeEndpointRequest = new InvokeEndpointRequest();
         this.invokeEndpointRequest.setContentType(TEXT_CSV_CONTENT_TYPE);
     }
