@@ -23,8 +23,7 @@ import com.typesafe.config.Config;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.KStream;
 
-import java.util.Arrays;
-import java.util.Collections;
+// TODO Isolate the infrastructure-independent logic and move it to the core package. [WLW]
 
 public class MetricRouter {
 
@@ -44,24 +43,30 @@ public class MetricRouter {
         private static StreamsBuilder createStreamsBuilder(Config appConfig) {
             final StreamsBuilder builder = new StreamsBuilder();
             final KStream<String, MetricPoint> metrics = builder.stream(appConfig.getString("topic"));
-
+    
+            // TODO These are all hardcoded. Replace with data-driven routing. [WLW]
             metrics.filter(StreamRunnerBuilder::isConstant).to("constant-metrics");
             metrics.filter(StreamRunnerBuilder::isEwma).to("ewma-metrics");
             metrics.filter(StreamRunnerBuilder::isPewma).to("pewma-metrics");
+            metrics.filter(StreamRunnerBuilder::isAquila).to("aquila-metrics");
+            
             return builder;
         }
-
-        // TODO: add real routing conditions
+        
         private static boolean isConstant(String key, MetricPoint metricPoint) {
-            return Arrays.asList("latency").contains(metricPoint.metric());
+            return "latency".equals(metricPoint.metric());
         }
 
         private static boolean isEwma(String key, MetricPoint metricPoint) {
-            return Collections.singletonList("ewma").contains(metricPoint.metric());
+            return "ewma".equals(metricPoint.metric());
         }
 
         private static boolean isPewma(String key, MetricPoint metricPoint) {
-            return Collections.singletonList("duration").contains(metricPoint.metric());
+            return "duration".equals(metricPoint.metric());
+        }
+        
+        private static boolean isAquila(String key, MetricPoint metricPoint) {
+            return "booking-series".equals(metricPoint.metric());
         }
     }
 }
