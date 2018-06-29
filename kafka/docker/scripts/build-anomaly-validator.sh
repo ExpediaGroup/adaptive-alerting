@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-APP_NAME="anomaly-validator"
+APP_NAME="haystack-adaptive-alerting-anomaly-validator"
 DOTTED_APP_NAME="anomaly.validator"
 MAIN_CLASS="com.expedia.adaptivealerting.kafka.validator.AnomalyValidator"
 
