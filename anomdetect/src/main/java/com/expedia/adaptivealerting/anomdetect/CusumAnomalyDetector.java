@@ -15,17 +15,15 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.NORMAL;
-import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.STRONG;
-import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.WEAK;
-import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.UNKNOWN;
-import static java.lang.Math.abs;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.Mpoint;
 import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.adaptivealerting.core.util.MetricPointUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
+
+import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.*;
+import static java.lang.Math.abs;
 
 /**
  * <p>
@@ -238,6 +236,10 @@ public class CusumAnomalyDetector implements AnomalyDetector {
             }
         }
         final Mpoint mpoint = MetricPointUtil.toMpoint(metricPoint);
+        
+        // FIXME These settings aren't consistent with the current visualization approach.
+        // We probably need to make fewer assumptions about the algo in the AnomalyResult class, and support different
+        // result approaches. [WLW]
         final AnomalyResult result = new AnomalyResult();
         result.setMetric(mpoint.getMetric());
         result.setDetectorId(this.getId());
