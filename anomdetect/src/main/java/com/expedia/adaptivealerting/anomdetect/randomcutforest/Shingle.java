@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
  * @author Tatjana Kamenov
  */
 
-public class MetricPointQueue {
+public class Shingle {
 
     private static final int DEFAULT_SIZE = 10;
 
@@ -38,7 +38,7 @@ public class MetricPointQueue {
     /**
      * Creates a shingles queue having DEFAULT_SIZE for size.
      */
-    public MetricPointQueue() {
+    public Shingle() {
         this(DEFAULT_SIZE);
     }
 
@@ -46,7 +46,7 @@ public class MetricPointQueue {
      * Creates a shingles queue.
      * @param maxSize the maximum size of the queue (shingle size)
      */
-    public MetricPointQueue(int maxSize) {
+    public Shingle(int maxSize) {
         this.lifo = new LinkedList<>();
         this.maxSize = maxSize;
     }

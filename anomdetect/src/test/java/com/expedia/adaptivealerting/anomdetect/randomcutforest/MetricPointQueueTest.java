@@ -12,7 +12,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class MetricPointQueueTest {
-    private MetricPointQueue queue;
+    private Shingle queue;
     private Iterator<String> iterator;
 
      @Before
@@ -23,7 +23,7 @@ public class MetricPointQueueTest {
 
     @Test
     public void emptyConstructorTest() {
-        queue = new MetricPointQueue();
+        queue = new Shingle();
 
         assertFalse(queue.toValues().isPresent());
         assertFalse(queue.isReady());
@@ -31,7 +31,7 @@ public class MetricPointQueueTest {
 
     @Test
     public void isReadyTest() {
-        queue = new MetricPointQueue();
+        queue = new Shingle();
 
         queue.offer(MetricPointUtil.metricPoint(Instant.now(), Double.valueOf(1)));
         assertFalse(queue.isReady());
@@ -47,7 +47,7 @@ public class MetricPointQueueTest {
 
     @Test
     public void toOutputFormatTest() {
-        queue = new MetricPointQueue();
+        queue = new Shingle();
 
         for (int i = 1; i <= 10; i++) {
             queue.offer(MetricPointUtil.metricPoint(Instant.now(), Double.valueOf(i)));
