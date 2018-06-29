@@ -30,18 +30,19 @@ import static java.lang.Math.sqrt;
 
 /**
  * <p>
- * Anomaly detector based on the exponential weighted moving average. This is an online algorithm, meaning that it
- * updates the thresholds incrementally as new data comes in.
+ * Anomaly detector based on the exponential weighted moving average (EWMA) chart, a type of control chart used in
+ * statistical quality control. This is an online algorithm, meaning that it updates the thresholds incrementally as new
+ * data comes in.
  * </p>
  * <p>
  * It takes a little while before the internal mean and variance estimates converge to something that makes sense. As a
  * rule of thumb, feed the detector 10 data points or so before using it for actual anomaly detection.
  * </p>
- * <p>
- * See https://en.wikipedia.org/wiki/Moving_average#Exponentially_weighted_moving_variance_and_standard_deviation.
- * </p>
  *
  * @author Willie Wheeler
+ * @see <a href="https://en.wikipedia.org/wiki/EWMA_chart">EWMA chart</a>
+ * @see <a href="https://en.wikipedia.org/wiki/Moving_average#Exponentially_weighted_moving_variance_and_standard_deviation">Exponentially weighted moving average and standard deviation</a>
+ * @see <a href="https://www.itl.nist.gov/div898/handbook/pmc/section3/pmc324.htm">EWMA Control Charts</a>
  */
 public class EwmaAnomalyDetector implements AnomalyDetector {
     
@@ -125,20 +126,20 @@ public class EwmaAnomalyDetector implements AnomalyDetector {
     @Override
     public AnomalyResult classify(MetricPoint metricPoint) {
         AssertUtil.notNull(metricPoint, "metricPoint can't be null");
-    
+        
         final double observed = metricPoint.value();
         final double dist = abs(observed - mean);
         final double stdDev = sqrt(variance);
         final double weakThreshold = weakThresholdSigmas * stdDev;
         final double strongThreshold = strongThresholdSigmas * stdDev;
-    
+        
         AnomalyLevel anomalyLevel = NORMAL;
         if (dist > strongThreshold) {
             anomalyLevel = STRONG;
         } else if (dist > weakThreshold) {
             anomalyLevel = WEAK;
         }
-
+        
         final Mpoint mpoint = MetricPointUtil.toMpoint(metricPoint);
         final AnomalyResult result = new AnomalyResult();
         result.setMetric(mpoint.getMetric());
@@ -152,7 +153,7 @@ public class EwmaAnomalyDetector implements AnomalyDetector {
         result.setStrongThresholdLower(mean - strongThreshold);
         result.setAnomalyScore(dist);
         result.setAnomalyLevel(anomalyLevel);
-    
+        
         updateEstimates(observed);
         
         return result;
@@ -171,7 +172,7 @@ public class EwmaAnomalyDetector implements AnomalyDetector {
         // https://www.johndcook.com/blog/2008/09/26/comparing-three-methods-of-computing-standard-deviation/
         this.variance = (1.0 - alpha) * (variance + diff * incr);
     }
-
+    
     @Override
     public String toString() {
         return "PewmaAnomalyDetector{" +
