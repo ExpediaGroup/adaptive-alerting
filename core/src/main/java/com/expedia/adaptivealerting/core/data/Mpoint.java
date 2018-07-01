@@ -15,8 +15,6 @@
  */
 package com.expedia.adaptivealerting.core.data;
 
-import java.time.Instant;
-
 /**
  * Metric point.
  *
@@ -24,24 +22,32 @@ import java.time.Instant;
  */
 public final class Mpoint {
     private Metric metric;
-    private Instant instant;
-    private Double value;
     
-    public Mpoint(Metric metric, Instant instant, Double value) {
-        this.metric = metric;
-        this.instant = instant;
-        this.value = value;
-    }
+    // TODO Prefer Instant and Double, but trying not to diverge much from Haystack's MetricPoint for now. [WLW]
+    private long epochTimeInSeconds;
+    private Float value;
     
     public Metric getMetric() {
         return metric;
     }
     
-    public Instant getInstant() {
-        return instant;
+    public void setMetric(Metric metric) {
+        this.metric = metric;
     }
     
-    public Double getValue() {
+    public long getEpochTimeInSeconds() {
+        return epochTimeInSeconds;
+    }
+    
+    public void setEpochTimeInSeconds(long epochTimeInSeconds) {
+        this.epochTimeInSeconds = epochTimeInSeconds;
+    }
+    
+    public Float getValue() {
         return value;
+    }
+    
+    public void setValue(Float value) {
+        this.value = value;
     }
 }

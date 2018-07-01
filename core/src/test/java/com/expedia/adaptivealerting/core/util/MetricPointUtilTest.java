@@ -36,7 +36,7 @@ public class MetricPointUtilTest {
     
     @Test
     public void testMetricPoint() {
-        final MetricPoint actual = metricPoint(Instant.now(), 1.414f);
+        final MetricPoint actual = metricPoint(Instant.now().getEpochSecond(), 1.414f);
         assertEquals("data", actual.metric());
     }
 

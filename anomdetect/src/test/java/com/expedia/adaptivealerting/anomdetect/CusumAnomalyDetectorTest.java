@@ -64,7 +64,7 @@ public class CusumAnomalyDetectorTest {
         final int warmUpPeriod = 0;
         final double slackParam = 0.5;
         new CusumAnomalyDetector(tail, 10, slackParam, warmUpPeriod, WEAK_SIGMAS, STRONG_SIGMAS, 0.16)
-                .classify(MetricPointUtil.metricPoint(Instant.now(), observed));
+                .classify(MetricPointUtil.metricPoint(Instant.now().getEpochSecond(), observed));
     }
 
     @Test
@@ -86,7 +86,8 @@ public class CusumAnomalyDetectorTest {
         while (testRows.hasNext()) {
             final CusumTestRow testRow = testRows.next();
             final double observed = testRow.getObserved();
-            AnomalyResult result = detector.classify(MetricPointUtil.metricPoint(Instant.now(), observed));
+            AnomalyResult result =
+                    detector.classify(MetricPointUtil.metricPoint(Instant.now().getEpochSecond(), observed));
 
             if (noOfDataPoints < WARMUP_PERIOD) {
                 assertEquals(AnomalyLevel.valueOf("UNKNOWN"), result.getAnomalyLevel());

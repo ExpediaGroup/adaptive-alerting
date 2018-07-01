@@ -33,15 +33,15 @@ public class MetricPointQueueTest {
     public void isReadyTest() {
         queue = new Shingle();
 
-        queue.offer(MetricPointUtil.metricPoint(Instant.now(), Double.valueOf(1)));
+        queue.offer(MetricPointUtil.metricPoint(Instant.now().getEpochSecond(), Double.valueOf(1)));
         assertFalse(queue.isReady());
 
         for (int i = 2; i <= 10; i++) {
-            queue.offer(MetricPointUtil.metricPoint(Instant.now(), Double.valueOf(i)));
+            queue.offer(MetricPointUtil.metricPoint(Instant.now().getEpochSecond(), Double.valueOf(i)));
         }
         assertTrue(queue.isReady());
 
-        queue.offer(MetricPointUtil.metricPoint(Instant.now(), Double.valueOf(11)));
+        queue.offer(MetricPointUtil.metricPoint(Instant.now().getEpochSecond(), Double.valueOf(11)));
         assertTrue(queue.isReady());
     }
 
@@ -50,7 +50,7 @@ public class MetricPointQueueTest {
         queue = new Shingle();
 
         for (int i = 1; i <= 10; i++) {
-            queue.offer(MetricPointUtil.metricPoint(Instant.now(), Double.valueOf(i)));
+            queue.offer(MetricPointUtil.metricPoint(Instant.now().getEpochSecond(), Double.valueOf(i)));
         }
         assertTrue(queue.isReady());
         String out = queue.toCsv().get();

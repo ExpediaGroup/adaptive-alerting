@@ -243,7 +243,7 @@ public class CusumAnomalyDetector implements AnomalyDetector {
         final AnomalyResult result = new AnomalyResult();
         result.setMetric(mpoint.getMetric());
         result.setDetectorId(this.getId());
-        result.setEpochSecond(mpoint.getInstant().getEpochSecond());
+        result.setEpochSecond(mpoint.getEpochTimeInSeconds());
         result.setObserved(observed);
         result.setPredicted(targetValue);
         result.setWeakThresholdUpper(weakThresholdUpper);

@@ -45,7 +45,7 @@ public final class RandomWalkMetricSource extends AbstractMetricSource {
     
     @Override
     public MetricPoint next() {
-        final MetricPoint result = metricPoint(getMetricName(), Instant.now(), currentValue);
+        final MetricPoint result = metricPoint(getMetricName(), Instant.now().getEpochSecond(), currentValue);
         final int movement = 1 - random.nextInt(3);
         this.currentValue += movement;
         return result;

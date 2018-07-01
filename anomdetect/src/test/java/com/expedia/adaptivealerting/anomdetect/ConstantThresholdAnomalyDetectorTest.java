@@ -100,6 +100,6 @@ public class ConstantThresholdAnomalyDetectorTest {
     }
     
     private AnomalyLevel level(AnomalyDetector detector, Instant instant, float value) {
-        return detector.classify(MetricPointUtil.metricPoint(instant, value)).getAnomalyLevel();
+        return detector.classify(MetricPointUtil.metricPoint(instant.getEpochSecond(), value)).getAnomalyLevel();
     }
 }
