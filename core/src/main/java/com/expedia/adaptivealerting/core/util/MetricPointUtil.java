@@ -23,8 +23,6 @@ import scala.Enumeration;
 import scala.collection.immutable.Map;
 import scala.collection.immutable.Map$;
 
-import java.time.Instant;
-
 /**
  * {@link MetricPoint} utilities.
  *
@@ -43,27 +41,26 @@ public final class MetricPointUtil {
     /**
      * {@link MetricPoint} factory method. Metric points have name "data", type gauge and no tags.
      *
-     * @param instant Metric instant.
-     * @param value   Metric value.
+     * @param epochSecond Epoch time in seconds.
+     * @param value       Metric value.
      * @return Metric point.
      */
-    public static MetricPoint metricPoint(Instant instant, double value) {
-        return metricPoint("data", instant, value);
+    public static MetricPoint metricPoint(long epochSecond, double value) {
+        return metricPoint("data", epochSecond, value);
     }
     
     /**
      * {@link MetricPoint} factory method. Metric points have type gauge and no tags.
      *
-     * @param name    Metric name.
-     * @param instant Metric instant.
-     * @param value   Metric value.
+     * @param name        Metric name.
+     * @param epochSecond Epoch time in seconds.
+     * @param value       Metric value.
      * @return Metric point.
      */
-    public static MetricPoint metricPoint(String name, Instant instant, double value) {
-        long epochSecond = instant.getEpochSecond();
+    public static MetricPoint metricPoint(String name, long epochSecond, double value) {
         return new MetricPoint(name, DEFAULT_TYPE, DEFAULT_TAGS, (float) value, epochSecond);
     }
-
+    
     /**
      * Convert {@link MetricPoint} to a {@link Mpoint}.
      *
@@ -71,17 +68,17 @@ public final class MetricPointUtil {
      * @return an Mpoint.
      */
     public static Mpoint toMpoint(MetricPoint metricPoint) {
-        return new Mpoint(
-                toMetric(metricPoint),
-                Instant.ofEpochSecond(metricPoint.epochTimeInSeconds()),
-                (double) metricPoint.value()
-        );
+        final Mpoint mpoint = new Mpoint();
+        mpoint.setMetric(toMetric(metricPoint));
+        mpoint.setEpochTimeInSeconds(metricPoint.epochTimeInSeconds());
+        mpoint.setValue(metricPoint.value());
+        return mpoint;
     }
-
+    
     private static Metric toMetric(MetricPoint metricPoint) {
         Metric metric = new Metric();
         metric.addTags(scala.collection.JavaConverters
-            .mapAsJavaMapConverter(metricPoint.tags()).asJava());
+                .mapAsJavaMapConverter(metricPoint.tags()).asJava());
         return metric;
     }
 }

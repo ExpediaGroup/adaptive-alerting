@@ -69,8 +69,10 @@ public class PewmaAnomalyDetectorTest {
             assertApproxEqual(ewmaOutlierDetector.getMean(), pewmaOutlierDetector.getMean(), threshold);
             assertApproxEqual(ewmaStdDev, pewmaOutlierDetector.getStdDev(), threshold);
             
-            final AnomalyResult pewmaResult = pewmaOutlierDetector.classify(MetricPointUtil.metricPoint(Instant.now(), value));
-            final AnomalyResult ewmaResult = ewmaOutlierDetector.classify(MetricPointUtil.metricPoint(Instant.now(), value));
+            final AnomalyResult pewmaResult =
+                    pewmaOutlierDetector.classify(MetricPointUtil.metricPoint(Instant.now().getEpochSecond(), value));
+            final AnomalyResult ewmaResult =
+                    ewmaOutlierDetector.classify(MetricPointUtil.metricPoint(Instant.now().getEpochSecond(), value));
             
             AnomalyLevel pOL = pewmaResult.getAnomalyLevel();
             AnomalyLevel eOL = ewmaResult.getAnomalyLevel();
@@ -97,7 +99,8 @@ public class PewmaAnomalyDetectorTest {
             
             // This detector doesn't currently do anything with the instant, so we can just pass now().
             // This may change in the future.
-            final AnomalyResult result = detector.classify(MetricPointUtil.metricPoint(Instant.now(), (float) observed));
+            final AnomalyResult result =
+                    detector.classify(MetricPointUtil.metricPoint(Instant.now().getEpochSecond(), (float) observed));
             
             final AnomalyLevel level = result.getAnomalyLevel();
             assertApproxEqual(testRow.getMean(), detector.getMean(), 0.00001);

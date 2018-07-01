@@ -73,12 +73,16 @@ public final class MetricFrameLoader {
         final int numRows = rows.size();
         final Mpoint[] mpoints = new Mpoint[numRows];
         for (int i = 0; i < numRows; i++) {
-            final String[] row = rows.get(i);
-            final Instant instant = Instant.parse(row[0]);
-            final Double value = Double.parseDouble(row[1]);
-            mpoints[i] = new Mpoint(metric, instant, value);
+            mpoints[i] = toMpoint(metric, rows.get(i));
         }
-        
         return new MetricFrame(mpoints);
+    }
+    
+    private static Mpoint toMpoint(Metric metric, String[] row) {
+        final Mpoint mpoint = new Mpoint();
+        mpoint.setMetric(metric);
+        mpoint.setEpochTimeInSeconds(Instant.parse(row[0]).getEpochSecond());
+        mpoint.setValue(Float.parseFloat(row[1]));
+        return mpoint;
     }
 }

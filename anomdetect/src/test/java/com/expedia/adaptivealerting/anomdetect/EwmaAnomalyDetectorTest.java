@@ -88,7 +88,7 @@ public class EwmaAnomalyDetectorTest {
             
             // This detector doesn't currently do anything with the instant, so we can just pass now().
             // This may change in the future.
-            detector.classify(MetricPointUtil.metricPoint(Instant.now(), observed));
+            detector.classify(MetricPointUtil.metricPoint(Instant.now().getEpochSecond(), observed));
             
             assertApproxEqual(testRow.getKnownMean(), testRow.getMean());
             assertApproxEqual(testRow.getMean(), detector.getMean());

@@ -117,8 +117,8 @@ class ConstantThresholdBasedE2ETestSpec extends IntegrationTestSpec {
 
   private def generateAnomalousMetrics() : List[MetricPoint] = {
     List(
-      metricPoint("latency", Instant.now(), 2),
-      metricPoint("failureCount", Instant.now(), 3)
+      metricPoint("latency", Instant.now().getEpochSecond, 2),
+      metricPoint("failureCount", Instant.now().getEpochSecond, 3)
     )
   }
 }

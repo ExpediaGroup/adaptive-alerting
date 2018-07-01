@@ -20,7 +20,6 @@ import com.expedia.adaptivealerting.core.data.Mpoint;
 import com.expedia.adaptivealerting.core.util.MetricPointUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
-import java.time.Instant;
 import java.util.ListIterator;
 
 /**
@@ -40,9 +39,9 @@ public final class MetricFrameMetricSource extends AbstractMetricSource {
     public MetricPoint next() {
         if (mpoints.hasNext()) {
             final Mpoint mpoint = mpoints.next();
-            final Instant instant = mpoint.getInstant();
+            final long epochSecond = mpoint.getEpochTimeInSeconds();
             final float value = mpoint.getValue().floatValue();
-            return MetricPointUtil.metricPoint(instant, value);
+            return MetricPointUtil.metricPoint(epochSecond, value);
         } else {
             return null;
         }
