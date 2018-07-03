@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.core.data.MappedMpoint;
 import com.expedia.adaptivealerting.core.data.Mpoint;
 import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.adaptivealerting.core.util.MetricPointUtil;
@@ -157,6 +158,11 @@ public class EwmaAnomalyDetector implements AnomalyDetector {
         updateEstimates(observed);
         
         return result;
+    }
+    
+    @Override
+    public MappedMpoint classify(MappedMpoint mappedMpoint) {
+        throw new UnsupportedOperationException("Not yet implemented");
     }
     
     private void updateEstimates(double value) {

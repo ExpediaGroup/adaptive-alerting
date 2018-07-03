@@ -25,6 +25,8 @@ import org.apache.kafka.streams.StreamsBuilder;
 
 import static com.expedia.adaptivealerting.anomdetect.ConstantThresholdAnomalyDetector.RIGHT_TAILED;
 
+// TODO Rename to KafkaConstantThresholdAnomalyDetector. [WLW]
+
 public class KafkaConstantThresholdOutlierDetector {
 
     public static void main(String[] args) {

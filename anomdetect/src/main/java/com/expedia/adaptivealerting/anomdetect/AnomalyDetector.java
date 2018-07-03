@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.core.data.MappedMpoint;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
 /**
@@ -31,9 +32,13 @@ public interface AnomalyDetector {
      * @param metricPoint Metric point.
      * @return Anomaly classification result, with supporting data such as the prediction, anomaly score and various
      * thresholds.
+     * @deprecated Deprecated in favor of {@link #classify(MappedMpoint)}.
      */
+    @Deprecated
     AnomalyResult classify(MetricPoint metricPoint);
-
+    
+    MappedMpoint classify(MappedMpoint mappedMpoint);
+    
     default String getId() {
         return this.toString(); // TODO: come up with an actual ID for detectors.
     }

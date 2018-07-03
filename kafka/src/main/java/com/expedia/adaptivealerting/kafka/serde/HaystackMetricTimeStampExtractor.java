@@ -25,9 +25,11 @@ import org.slf4j.LoggerFactory;
  * Timestamp extractor for MetricPoints
  * similar to class {@link org.apache.kafka.streams.processor.LogAndSkipOnInvalidTimestamp}
  * adding this as com.expedia.www.haystack.commons.kstreams.MetricPointTimestampExtractor doesn't handle this
-
+ *
  * @author shsethi
+ * @deprecated Deprecated in favor of {@link MpointTimestampExtractor}.
  */
+@Deprecated
 public class HaystackMetricTimeStampExtractor implements TimestampExtractor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HaystackMetricTimeStampExtractor.class);
