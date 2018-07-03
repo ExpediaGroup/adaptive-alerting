@@ -36,8 +36,9 @@
     <url>https://github.com/ExpediaDotCom/haystack-adaptive-alerting</url>
 
     <properties>
-        <maven-scalatest-plugin.version>1.0</maven-scalatest-plugin.version>
-        <maven-scala-plugin.version>3.2.1</maven-scala-plugin.version>
+        <maven.scalatest.plugin.version>1.0</maven.scalatest.plugin.version>
+        <maven.scala.plugin.version>3.2.1</maven.scala.plugin.version>
+        <maven.build.helper.plugin.version>1.9.1</maven.build.helper.plugin.version>
     </properties>
 
     <dependencies>
@@ -86,14 +87,13 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
         </dependency>
         <dependency>
             <groupId>org.scalatest</groupId>
-            <artifactId>scalatest_${scala.major.minor.version}</artifactId>
+            <artifactId>scalatest_${scala.version}</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -115,7 +115,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka_${scala.major.minor.version}</artifactId>
+            <artifactId>kafka_${scala.version}</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -126,7 +126,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka_${scala.major.minor.version}</artifactId>
+            <artifactId>kafka_${scala.version}</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -141,6 +141,24 @@
     <build>
         <testSourceDirectory>src/test/scala</testSourceDirectory>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>${maven.build.helper.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/test/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
@@ -160,7 +178,7 @@
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
-                <version>${maven-scala-plugin.version}</version>
+                <version>${maven.scala.plugin.version}</version>
                 <executions>
                     <execution>
                         <id>scala-compile-first</id>
@@ -182,7 +200,7 @@
             <plugin>
                 <groupId>org.scalatest</groupId>
                 <artifactId>scalatest-maven-plugin</artifactId>
-                <version>${maven-scalatest-plugin.version}</version>
+                <version>${maven.scalatest.plugin.version}</version>
                 <executions>
                     <execution>
                         <id>test</id>
