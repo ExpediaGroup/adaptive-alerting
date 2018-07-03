@@ -19,13 +19,12 @@ import com.amazonaws.services.sagemakerruntime.AmazonSageMakerRuntime;
 import com.amazonaws.services.sagemakerruntime.AmazonSageMakerRuntimeClientBuilder;
 import com.amazonaws.services.sagemakerruntime.model.InvokeEndpointRequest;
 import com.amazonaws.services.sagemakerruntime.model.InvokeEndpointResult;
-
-
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.randomcutforest.beans.Scores;
 import com.expedia.adaptivealerting.anomdetect.randomcutforest.util.PropertiesCache;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.core.data.MappedMpoint;
 import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -104,6 +103,11 @@ public class RandomCutForestAnomalyDetector implements AnomalyDetector {
             }
         }
         return result;
+    }
+    
+    @Override
+    public MappedMpoint classify(MappedMpoint mappedMpoint) {
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 
     /**

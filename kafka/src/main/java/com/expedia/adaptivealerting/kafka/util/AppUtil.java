@@ -22,7 +22,8 @@ import com.expedia.www.haystack.commons.kstreams.app.StreamsRunner;
 import com.expedia.www.haystack.commons.metrics.MetricsRegistries;
 import com.typesafe.config.Config;
 
-public class AppUtil {
+public final class AppUtil {
+    
     /**
      * Prevent instantiation.
      */
@@ -30,19 +31,19 @@ public class AppUtil {
     }
 
     public static Config getAppConfig(String configKey) {
+        // TODO Remove Haystack-specific references. [WLW]
         Config config = ConfigurationLoader.loadConfigFileWithEnvOverrides("config/base.conf", "HAYSTACK_PROP_");
         return config.getConfig(configKey).withFallback(config.getConfig("kstream.app.default"));
     }
-
+    
+    /**
+     * @deprecated Deprecated in favor of {@link com.expedia.adaptivealerting.kafka.AbstractKafkaApp}.
+     */
+    @Deprecated
     public static void launchStreamRunner(StreamsRunner streamsRunner) {
-        //create an instance of the application
         JmxReporter jmxReporter = JmxReporter.forRegistry(MetricsRegistries.metricRegistry()).build();
         Application app = new Application(streamsRunner, jmxReporter);
-
-        //start the application
-        app.start();
-
-        //add a shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
+        app.start();
     }
 }

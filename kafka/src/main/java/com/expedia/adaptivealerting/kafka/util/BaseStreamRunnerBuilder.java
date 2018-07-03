@@ -26,6 +26,10 @@ import org.apache.kafka.streams.StreamsConfig;
 
 import java.util.Properties;
 
+/**
+ * @deprecated Deprecated in favor of {@link com.expedia.adaptivealerting.kafka.AbstractKafkaApp}.
+ */
+@Deprecated
 public abstract class BaseStreamRunnerBuilder {
     public abstract StreamsRunner build(Config config);
 

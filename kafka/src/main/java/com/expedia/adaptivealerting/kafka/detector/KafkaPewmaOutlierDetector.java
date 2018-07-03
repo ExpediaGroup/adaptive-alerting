@@ -23,6 +23,8 @@ import com.expedia.www.haystack.commons.kstreams.app.StreamsRunner;
 import com.typesafe.config.Config;
 import org.apache.kafka.streams.StreamsBuilder;
 
+// TODO Rename to KafkaPewmaAnomalyDetector. [WLW]
+
 /**
  * Kafka Streams application for the PEWMA outlier detector.
  *

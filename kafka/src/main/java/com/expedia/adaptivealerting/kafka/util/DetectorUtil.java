@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.kafka.util;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.kafka.detector.KafkaAnomalyDetectorManager;
 import com.expedia.adaptivealerting.kafka.serde.JsonPojoSerializer;
 import com.expedia.adaptivealerting.kafka.serde.JsonPojoDeserializer;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
@@ -34,8 +35,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * @deprecated Deprecated in favor of {@link KafkaAnomalyDetectorManager}.
+ */
+@Deprecated
 public class DetectorUtil {
-    static final String OUTLIER_LEVEL_TAG = "outlierLevel";
 
     // FIXME Hack because I'm not sure how to handle null MetricPoints below.
     // But definitely don't want to keep this as it messes up the model.
@@ -78,6 +82,7 @@ public class DetectorUtil {
     }
 
     static String extractMetricId(MetricPoint metricPoint) {
-        return metricPoint.getMetricPointKey(ENCODER); // TODO: find out how we'll be getting the ids.
+        // TODO: find out how we'll be getting the ids.
+        return metricPoint.getMetricPointKey(ENCODER);
     }
 }

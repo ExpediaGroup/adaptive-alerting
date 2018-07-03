@@ -33,6 +33,7 @@ public class MetricRouter {
     }
 
     public static class StreamRunnerBuilder extends BaseStreamRunnerBuilder {
+        
         @Override
         public StreamsRunner build(Config appConfig) {
             final StreamsBuilder builder = createStreamsBuilder(appConfig);
