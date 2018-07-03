@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
@@ -55,9 +56,11 @@ public class InvestigationManager {
         if (StringUtils.isEmpty(endpoint)) {
             return Collections.emptyList();
         }
+        String postData = "";
         try {
+            postData = writer.writeValueAsString(result);
             String response = Request.Post(endpoint)
-                    .bodyString(writer.writeValueAsString(result), ContentType.APPLICATION_JSON)
+                    .bodyString(postData, ContentType.APPLICATION_JSON)
                     .socketTimeout(timeoutMs)
                     .connectTimeout(timeoutMs) // TODO: have separate timeouts or a total timeout for connection.
                     .execute()
@@ -67,6 +70,11 @@ public class InvestigationManager {
             return reader.readValue(response);
         } catch (IOException e) {
             LOGGER.error("Error while investigating.", e);
+            LOGGER.error("Trying to Post to: " + endpoint);
+            LOGGER.error("Data posted: " + postData);
+            if (e instanceof HttpResponseException) {
+                LOGGER.error("Status Code: " + ((HttpResponseException) e).getStatusCode());
+            }
             return Collections.emptyList();
         }
     }
