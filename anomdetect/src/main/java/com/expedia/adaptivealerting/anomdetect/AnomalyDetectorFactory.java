@@ -26,7 +26,7 @@ import java.util.UUID;
  */
 public interface AnomalyDetectorFactory<T extends AnomalyDetector> {
     
-    void init(Config config);
+    void init(Config appConfig);
     
     /**
      * Creates an anomaly detector. This would usually involve looking up at least the model parameters from persistent

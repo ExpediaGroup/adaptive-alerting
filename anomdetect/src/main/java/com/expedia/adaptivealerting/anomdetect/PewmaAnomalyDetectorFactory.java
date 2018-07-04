@@ -26,8 +26,8 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  */
 public final class PewmaAnomalyDetectorFactory implements AnomalyDetectorFactory<PewmaAnomalyDetector> {
     
-    public void init(Config config) {
-        notNull(config, "config can't be null");
+    public void init(Config appConfig) {
+        notNull(appConfig, "appConfig can't be null");
         // TODO
     }
     

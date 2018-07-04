@@ -27,8 +27,8 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 public class ConstantThresholdAnomalyDetectorFactory implements AnomalyDetectorFactory<CusumAnomalyDetector> {
     
     @Override
-    public void init(Config config) {
-        notNull(config, "config can't be null");
+    public void init(Config appConfig) {
+        notNull(appConfig, "appConfig can't be null");
     }
     
     @Override

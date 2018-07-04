@@ -29,8 +29,8 @@ public final class RandomCutForestAnomalyDetectorFactory
         implements AnomalyDetectorFactory<RandomCutForestAnomalyDetector> {
     
     @Override
-    public void init(Config config) {
-        notNull(config, "config can't be null");
+    public void init(Config appConfig) {
+        notNull(appConfig, "appConfig can't be null");
         // TODO
     }
     

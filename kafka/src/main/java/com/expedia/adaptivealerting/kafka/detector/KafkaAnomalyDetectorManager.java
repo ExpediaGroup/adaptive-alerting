@@ -76,8 +76,10 @@ public final class KafkaAnomalyDetectorManager extends AbstractKafkaApp {
     private static Map<String, AnomalyDetectorFactory> detectorFactories(Config appConfig) {
         final Map<String, AnomalyDetectorFactory> factories = new HashMap<>();
         appConfig.entrySet().forEach(entry -> {
-            final String factoryClassName = entry.getValue().unwrapped().toString();
-            factories.put(entry.getKey(), (AnomalyDetectorFactory) ReflectionUtil.newInstance(factoryClassName));
+            final String className = entry.getValue().unwrapped().toString();
+            final AnomalyDetectorFactory factory = (AnomalyDetectorFactory) ReflectionUtil.newInstance(className);
+            factory.init(appConfig);
+            factories.put(entry.getKey(), factory);
         });
         return factories;
     }
