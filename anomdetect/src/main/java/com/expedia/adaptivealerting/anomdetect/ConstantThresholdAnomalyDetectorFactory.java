@@ -24,7 +24,8 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 /**
  * @author Willie Wheeler
  */
-public class ConstantThresholdAnomalyDetectorFactory implements AnomalyDetectorFactory<CusumAnomalyDetector> {
+public class ConstantThresholdAnomalyDetectorFactory
+        implements AnomalyDetectorFactory<ConstantThresholdAnomalyDetector> {
     
     @Override
     public void init(Config appConfig) {
@@ -32,7 +33,7 @@ public class ConstantThresholdAnomalyDetectorFactory implements AnomalyDetectorF
     }
     
     @Override
-    public CusumAnomalyDetector create(UUID uuid) {
+    public ConstantThresholdAnomalyDetector create(UUID uuid) {
         notNull(uuid, "uuid can't be null");
         // TODO Look up bounds based on UUID.
         return null;
