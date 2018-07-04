@@ -62,7 +62,6 @@ public class PerformanceMonitor {
     }
 
     public boolean rebuildModel(AnomalyResult result) {
-
         double observed = result.getObserved();
         double predicted = result.getPredicted();
         evaluator.update(observed, predicted);
