@@ -35,7 +35,7 @@ public class PerformanceMonitor {
     /**
      * Local tick counter.
      */
-    private int tickCounter = 0;
+    private int tickCounter;
 
     /**
      * Local RMSE evaluator.
@@ -59,6 +59,7 @@ public class PerformanceMonitor {
         this.evaluator = new RmseEvaluator();
         this.perfLookup = new LinkedHashMap<String, Double>();
         perfLookup.put("rmse", RMSE_THRESHOLD);
+        resetCounter();
     }
 
     public boolean rebuildModel(AnomalyResult result) {
@@ -73,14 +74,14 @@ public class PerformanceMonitor {
                 return true;
             }
             evaluator.reset();
-            reset();
+            resetCounter();
             return false;
         }
         this.tickCounter++;
         return false;
     }
 
-    private void reset() {
+    private void resetCounter() {
         this.tickCounter = 0;
     }
 
