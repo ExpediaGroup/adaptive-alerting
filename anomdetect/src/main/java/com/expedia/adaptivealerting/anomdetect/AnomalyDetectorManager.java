@@ -66,6 +66,9 @@ public final class AnomalyDetectorManager {
             detector = factory.create(detectorUuid);
             detectors.put(detectorUuid, detector);
         }
+        PerformanceMonitor perfMonitor = new PerformanceMonitor();
+        MonitorDetector monitorDetector = new MonitorDetector(detector, perfMonitor);
+        monitorDetector.classify(mappedMpoint);
         return detector;
     }
     
