@@ -51,8 +51,7 @@ public class MonitorDetector {
         // FIXME Check if we need classify the mapped point again here. [KS]
         MappedMpoint mappedPoint = detector.classify(mappedMpoint);
         AnomalyResult result = mappedPoint.getAnomalyResult();
-        perfMonitor.update(result);
-        boolean rebuildModel = perfMonitor.rebuildModel();
+        boolean rebuildModel = perfMonitor.rebuildModel(result);
         if (rebuildModel) {
             LOGGER.info("Rebuild model. Sending info to model-builder kafka topic:{}",
                     mappedPoint.getAnomalyResult().getMetric());

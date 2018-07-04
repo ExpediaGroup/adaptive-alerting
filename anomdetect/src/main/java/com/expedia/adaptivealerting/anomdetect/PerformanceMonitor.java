@@ -61,24 +61,23 @@ public class PerformanceMonitor {
         perfLookup.put("rmse", RMSE_THRESHOLD);
     }
 
-    public void update(AnomalyResult result) {
+    public boolean rebuildModel(AnomalyResult result) {
+
         double observed = result.getObserved();
         double predicted = result.getPredicted();
         evaluator.update(observed, predicted);
-        this.tickCounter++;
-    }
-
-    public boolean rebuildModel() {
-        double evaluatorScore = evaluator.evaluate().getEvaluatorScore();
         if (tickCounter >= MAX_TICKS) {
-            double lookupEvaluatorScore = perfLookup.get("rmse").doubleValue();
-            if (evaluatorScore > lookupEvaluatorScore) {
+            double evaluatorScore = evaluator.evaluate().getEvaluatorScore();
+            double lookupScore = perfLookup.get("rmse").doubleValue();
+            if (evaluatorScore > lookupScore) {
                 LOGGER.info("Need to rebuild this model");
                 return true;
             }
             evaluator.reset();
             reset();
+            return false;
         }
+        this.tickCounter++;
         return false;
     }
 
