@@ -17,7 +17,6 @@ package com.expedia.adaptivealerting.anomdetect;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMpoint;
 
@@ -30,9 +29,17 @@ import com.expedia.adaptivealerting.core.data.MappedMpoint;
  */
 public class MonitorDetector {
 
-    private Logger LOGGER = LoggerFactory.getLogger(MonitorDetector.class);
+    /**
+     * Local Anomaly detector.
+     */
     private AnomalyDetector detector;
+
+    /**
+     * Local Performance monitor.
+     */
     private PerformanceMonitor perfMonitor;
+
+    private Logger LOGGER = LoggerFactory.getLogger(MonitorDetector.class);
 
     public MonitorDetector(AnomalyDetector detector, PerformanceMonitor perfMonitor) {
         this.detector = detector;

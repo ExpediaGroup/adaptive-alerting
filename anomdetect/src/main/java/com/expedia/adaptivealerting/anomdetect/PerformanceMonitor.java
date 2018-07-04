@@ -32,10 +32,23 @@ import org.slf4j.LoggerFactory;
  */
 public class PerformanceMonitor {
 
-    private Logger LOGGER = LoggerFactory.getLogger(PerformanceMonitor.class);
+    /**
+     * Local tick counter.
+     */
     private int tickCounter = 0;
+
+    /**
+     * Local RMSE evaluator.
+     */
     private RmseEvaluator evaluator;
+
+    /**
+     * Local threshold lookup where we maintain thresholds for different evaluators.
+     */
     private Map<String, Double> perfLookup;
+
+    private Logger LOGGER = LoggerFactory.getLogger(PerformanceMonitor.class);
+
     public static final int MAX_TICKS = 100;
     public static final double RMSE_THRESHOLD = 3.0;
 
@@ -72,5 +85,5 @@ public class PerformanceMonitor {
     private void reset() {
         this.tickCounter = 0;
     }
- 
+
 }
