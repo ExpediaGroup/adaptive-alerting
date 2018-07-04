@@ -19,19 +19,12 @@ import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorFactory;
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorManager;
 import com.expedia.adaptivealerting.core.data.MappedMpoint;
 import com.expedia.adaptivealerting.kafka.AbstractKafkaApp;
-import com.expedia.adaptivealerting.kafka.serde.JsonPojoDeserializer;
-import com.expedia.adaptivealerting.kafka.serde.JsonPojoSerializer;
-import com.expedia.adaptivealerting.kafka.serde.MpointTimestampExtractor;
 import com.expedia.adaptivealerting.kafka.util.AppUtil;
 import com.expedia.adaptivealerting.kafka.util.ReflectionUtil;
 import com.typesafe.config.Config;
-import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.streams.Consumed;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
-import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.KStream;
-import org.apache.kafka.streams.kstream.Produced;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -66,10 +59,10 @@ public final class KafkaAnomalyDetectorManager extends AbstractKafkaApp {
         final StreamsBuilder builder = new StreamsBuilder();
         final String inboundTopic = getAppConfig().getString(INBOUND_TOPIC);
         final String outboundTopic = getAppConfig().getString(OUTBOUND_TOPIC);
-        final KStream<String, MappedMpoint> stream = builder.stream(inboundTopic, jsonMpointSerde());
+        final KStream<String, MappedMpoint> stream = builder.stream(inboundTopic);
         stream
                 .map((key, mappedMpoint) -> KeyValue.pair(key, manager.classify(mappedMpoint)))
-                .to(outboundTopic, jsonAnomalySerde());
+                .to(outboundTopic);
         return builder;
     }
     
@@ -82,25 +75,5 @@ public final class KafkaAnomalyDetectorManager extends AbstractKafkaApp {
             factories.put(entry.getKey(), factory);
         });
         return factories;
-    }
-    
-    private Consumed<String, MappedMpoint> jsonMpointSerde() {
-        final JsonPojoDeserializer<MappedMpoint> deserializer = new JsonPojoDeserializer<>();
-        final Map<String, Object> props = new HashMap<>();
-        props.put(JSON_POJO_CLASS, MappedMpoint.class);
-        deserializer.configure(props, false);
-        
-        return Consumed.with(
-                new Serdes.StringSerde(),
-                Serdes.serdeFrom(new JsonPojoSerializer<>(), deserializer),
-                new MpointTimestampExtractor(),
-                Topology.AutoOffsetReset.LATEST);
-    }
-    
-    private Produced<String, MappedMpoint> jsonAnomalySerde() {
-        // TODO Add StreamPartitioner
-        return Produced.with(
-                new Serdes.StringSerde(),
-                Serdes.serdeFrom(new JsonPojoSerializer<>(), new JsonPojoDeserializer<>()));
     }
 }

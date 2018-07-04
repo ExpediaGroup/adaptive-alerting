@@ -20,7 +20,12 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import java.util.UUID;
 
 /**
+ * <p>
  * Wraps an endpoint with a representation that includes anomaly detection information.
+ * </p>
+ * <p>
+ * By contract the {@link Mpoint} must be set.
+ * </p>
  *
  * @author Willie Wheeler
  */

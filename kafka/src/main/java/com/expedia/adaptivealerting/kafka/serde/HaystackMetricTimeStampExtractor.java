@@ -25,7 +25,7 @@ import org.apache.kafka.streams.processor.TimestampExtractor;
  * adding this as com.expedia.www.haystack.commons.kstreams.MetricPointTimestampExtractor doesn't handle this
  *
  * @author shsethi
- * @deprecated Deprecated in favor of {@link MpointTimestampExtractor}.
+ * @deprecated Deprecated in favor of {@link MappedMpointTimestampExtractor}.
  */
 @Deprecated
 public class HaystackMetricTimeStampExtractor implements TimestampExtractor {
