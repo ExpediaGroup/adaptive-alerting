@@ -18,7 +18,7 @@ package com.expedia.adaptivealerting.anomdetect;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import java.util.Map;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,8 +57,7 @@ public class PerformanceMonitor {
      */
     public PerformanceMonitor() {
         this.evaluator = new RmseEvaluator();
-        this.perfLookup = new LinkedHashMap<String, Double>();
-        perfLookup.put("rmse", RMSE_THRESHOLD);
+        setPerfThresholdLookup();
         resetCounter();
     }
 
@@ -79,6 +78,11 @@ public class PerformanceMonitor {
         }
         this.tickCounter++;
         return false;
+    }
+
+    private void setPerfThresholdLookup() {
+        this.perfLookup = new HashMap<String, Double>();
+        perfLookup.put("rmse", RMSE_THRESHOLD);
     }
 
     private void resetCounter() {
