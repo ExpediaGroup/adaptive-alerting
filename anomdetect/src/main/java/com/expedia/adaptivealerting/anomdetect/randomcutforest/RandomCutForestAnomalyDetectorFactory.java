@@ -13,28 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect;
+package com.expedia.adaptivealerting.anomdetect.randomcutforest;
 
+import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorFactory;
 import com.typesafe.config.Config;
 
 import java.util.UUID;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+
 /**
- * Anomaly detector factory.
- *
  * @author Willie Wheeler
  */
-public interface AnomalyDetectorFactory<T extends AnomalyDetector> {
+public final class RandomCutForestAnomalyDetectorFactory
+        implements AnomalyDetectorFactory<RandomCutForestAnomalyDetector> {
     
-    void init(Config appConfig);
+    @Override
+    public void init(Config appConfig) {
+        notNull(appConfig, "appConfig can't be null");
+        // TODO
+    }
     
-    /**
-     * Creates an anomaly detector. This would usually involve looking up at least the model parameters from persistent
-     * storages, based on automated model selection and autotuning. In many cases it would involve looking up a
-     * pretrained model.
-     *
-     * @param uuid Detector UUID.
-     * @return Anomaly detector.
-     */
-    T create(UUID uuid);
+    @Override
+    public RandomCutForestAnomalyDetector create(UUID uuid) {
+        notNull(uuid, "uuid can't be null");
+        // TODO Look up model
+        return null;
+    }
 }

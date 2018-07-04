@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.kafka.serde;
 
+import com.expedia.adaptivealerting.core.data.MappedMpoint;
 import com.expedia.adaptivealerting.core.data.Mpoint;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.streams.processor.TimestampExtractor;
@@ -29,18 +30,21 @@ import org.slf4j.LoggerFactory;
  * @author Shubham Sethi
  * @author Willie Wheeler
  */
-public class MpointTimestampExtractor implements TimestampExtractor {
-    private static final Logger log = LoggerFactory.getLogger(MpointTimestampExtractor.class);
+public class MappedMpointTimestampExtractor implements TimestampExtractor {
+    private static final Logger log = LoggerFactory.getLogger(MappedMpointTimestampExtractor.class);
     
     @Override
     public long extract(ConsumerRecord<Object, Object> record, long previousTimestamp) {
-        Mpoint mpoint = (Mpoint) record.value();
-        if (mpoint == null) {
+        final MappedMpoint mappedMpoint = (MappedMpoint) record.value();
+        if (mappedMpoint == null || mappedMpoint.getMpoint() == null) {
+            
+            // We don't want to log this because sometimes it fills up the logs.
+            // TODO Figure out what to do instead. Maybe a counter.
+//            log.warn("Skipping null MappedMpoint");
+            
             // -1 skips the record.
-            log.warn("Skipping null Mpoint");
             return -1L;
         }
-        
-        return mpoint.getEpochTimeInSeconds() * 1000L;
+        return mappedMpoint.getMpoint().getEpochTimeInSeconds() * 1000L;
     }
 }

@@ -27,11 +27,15 @@ import com.typesafe.config.Config;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.KStream;
 
+import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.ANOMALY_VALIDATOR;
+import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.INBOUND_TOPIC;
+import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.OUTBOUND_TOPIC;
 
-public class AnomalyValidator {
+// TODO Isolate the infrastructure-independent logic. [WLW]
+public final class AnomalyValidator {
 
     public static void main(String[] args) {
-        Config appConfig = AppUtil.getAppConfig("anomaly-validator");
+        Config appConfig = AppUtil.getAppConfig(ANOMALY_VALIDATOR);
         AppUtil.launchStreamRunner(new StreamRunnerBuilder().build(appConfig));
     }
 
@@ -44,8 +48,11 @@ public class AnomalyValidator {
         }
 
         private static StreamsBuilder createStreamsBuilder(Config appConfig) {
+            final String inboundTopic = appConfig.getString(INBOUND_TOPIC);
+            final String outboundTopic = appConfig.getString(OUTBOUND_TOPIC);
+            
             final StreamsBuilder builder = new StreamsBuilder();
-            final KStream<String, AnomalyResult> anomalies = builder.stream(appConfig.getString("topic"));
+            final KStream<String, AnomalyResult> anomalies = builder.stream(inboundTopic);
 
             InvestigationFilter preInvestigationFilter = new PreInvestigationFilter();
             InvestigationFilter postInvestigationFilter = new PostInvestigationFilter();
@@ -60,7 +67,7 @@ public class AnomalyValidator {
                     .filter((k, anomalyResult) -> preInvestigationFilter.keep(anomalyResult))
                     .mapValues(investigationManager::investigate)
                     .filter((k, anomalyResult) -> postInvestigationFilter.keep(anomalyResult))
-                    .to("alerts");
+                    .to(outboundTopic);
 
             return builder;
         }

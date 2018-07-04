@@ -13,28 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect;
+package com.expedia.adaptivealerting.kafka.util;
 
-import com.typesafe.config.Config;
-
-import java.util.UUID;
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
- * Anomaly detector factory.
- *
  * @author Willie Wheeler
  */
-public interface AnomalyDetectorFactory<T extends AnomalyDetector> {
-    
-    void init(Config appConfig);
+public final class ReflectionUtil {
     
     /**
-     * Creates an anomaly detector. This would usually involve looking up at least the model parameters from persistent
-     * storages, based on automated model selection and autotuning. In many cases it would involve looking up a
-     * pretrained model.
-     *
-     * @param uuid Detector UUID.
-     * @return Anomaly detector.
+     * Prevent instantiation.
      */
-    T create(UUID uuid);
+    private ReflectionUtil() {
+    }
+    
+    public static Object newInstance(String className) {
+        notNull(className, "className can't be null");
+        try {
+            return Class.forName(className).newInstance();
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
