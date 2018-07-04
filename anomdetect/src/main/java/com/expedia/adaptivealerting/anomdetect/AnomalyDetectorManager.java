@@ -24,7 +24,8 @@ import java.util.UUID;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
- * Component that manages a given set of anomaly detectors
+ * Component that manages a given set of anomaly detectors.
+ *
  * @author David Sutherland
  * @author Willie Wheeler
  */

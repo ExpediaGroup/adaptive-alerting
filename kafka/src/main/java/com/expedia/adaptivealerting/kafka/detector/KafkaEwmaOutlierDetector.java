@@ -23,14 +23,18 @@ import com.expedia.www.haystack.commons.kstreams.app.StreamsRunner;
 import com.typesafe.config.Config;
 import org.apache.kafka.streams.StreamsBuilder;
 
+import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.INBOUND_TOPIC;
+
 // TODO Rename to KafkaEwmaAnomalyDetector. [WLW]
 
 /**
  * Kafka Streams application for the EWMA outlier detector.
  *
  * @author Willie Wheeler
+ * @deprecated Use KafkaAnomalyDetectorManager instead.
  */
-public class KafkaEwmaOutlierDetector {
+@Deprecated
+public final class KafkaEwmaOutlierDetector {
 
     public static void main(String[] args) {
         Config appConfig = AppUtil.getAppConfig("ewma-detector");
@@ -41,8 +45,8 @@ public class KafkaEwmaOutlierDetector {
         @Override
         public StreamsRunner build(Config appConfig) {
             final StreamsBuilder builder = DetectorUtil.createDetectorStreamsBuilder(
-                appConfig.getString("topic"),
-                id -> new EwmaAnomalyDetector(0.8, 3.0, 2.0, 100.0)
+                appConfig.getString(INBOUND_TOPIC),
+                id -> new EwmaAnomalyDetector(0.8, 3.0, 4.0, 100.0)
             );
             return createStreamsRunner(appConfig, builder);
         }

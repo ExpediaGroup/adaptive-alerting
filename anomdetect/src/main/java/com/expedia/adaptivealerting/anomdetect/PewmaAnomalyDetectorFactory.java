@@ -19,22 +19,22 @@ import com.typesafe.config.Config;
 
 import java.util.UUID;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+
 /**
- * Anomaly detector factory.
- *
  * @author Willie Wheeler
  */
-public interface AnomalyDetectorFactory<T extends AnomalyDetector> {
+public final class PewmaAnomalyDetectorFactory implements AnomalyDetectorFactory<PewmaAnomalyDetector> {
     
-    void init(Config config);
+    public void init(Config config) {
+        notNull(config, "config can't be null");
+        // TODO
+    }
     
-    /**
-     * Creates an anomaly detector. This would usually involve looking up at least the model parameters from persistent
-     * storages, based on automated model selection and autotuning. In many cases it would involve looking up a
-     * pretrained model.
-     *
-     * @param uuid Detector UUID.
-     * @return Anomaly detector.
-     */
-    T create(UUID uuid);
+    @Override
+    public PewmaAnomalyDetector create(UUID uuid) {
+        notNull(uuid, "uuid can't be null");
+        // TODO Look up params
+        return null;
+    }
 }

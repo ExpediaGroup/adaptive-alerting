@@ -23,12 +23,15 @@ import com.typesafe.config.Config;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.KStream;
 
-// TODO Isolate the infrastructure-independent logic and move it to the core package. [WLW]
+import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.INBOUND_TOPIC;
+import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.METRIC_ROUTER;
+import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.OUTBOUND_TOPIC;
 
-public class MetricRouter {
+// TODO Isolate the infrastructure-independent logic. [WLW]
+public final class MetricRouter {
 
     public static void main(String[] args) {
-        Config appConfig = AppUtil.getAppConfig("metric-router");
+        Config appConfig = AppUtil.getAppConfig(METRIC_ROUTER);
         AppUtil.launchStreamRunner(new StreamRunnerBuilder().build(appConfig));
     }
 
@@ -42,10 +45,16 @@ public class MetricRouter {
         }
 
         private static StreamsBuilder createStreamsBuilder(Config appConfig) {
+            final String inboundTopic = appConfig.getString(INBOUND_TOPIC);
+            final String outboundTopic = appConfig.getString(OUTBOUND_TOPIC);
+            
             final StreamsBuilder builder = new StreamsBuilder();
-            final KStream<String, MetricPoint> metrics = builder.stream(appConfig.getString("topic"));
+            final KStream<String, MetricPoint> metrics = builder.stream(inboundTopic);
     
-            // TODO These are all hardcoded. Replace with data-driven routing. [WLW]
+            // TODO Create MappedMpoints and push them to the single outbound topic. [WLW]
+//            metrics.map(mpoint -> enrichWithDetectorInfo(mpoint)).to(outboundTopic);
+            
+            // TODO Get rid of these once we have the single outbound topic. [WLW]
             metrics.filter(StreamRunnerBuilder::isConstant).to("constant-metrics");
             metrics.filter(StreamRunnerBuilder::isEwma).to("ewma-metrics");
             metrics.filter(StreamRunnerBuilder::isPewma).to("pewma-metrics");

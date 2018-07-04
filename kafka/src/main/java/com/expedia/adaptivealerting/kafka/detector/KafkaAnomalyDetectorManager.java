@@ -15,12 +15,15 @@
  */
 package com.expedia.adaptivealerting.kafka.detector;
 
+import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorFactory;
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorManager;
 import com.expedia.adaptivealerting.core.data.MappedMpoint;
 import com.expedia.adaptivealerting.kafka.AbstractKafkaApp;
 import com.expedia.adaptivealerting.kafka.serde.JsonPojoDeserializer;
 import com.expedia.adaptivealerting.kafka.serde.JsonPojoSerializer;
 import com.expedia.adaptivealerting.kafka.serde.MpointTimestampExtractor;
+import com.expedia.adaptivealerting.kafka.util.AppUtil;
+import com.expedia.adaptivealerting.kafka.util.ReflectionUtil;
 import com.typesafe.config.Config;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.Consumed;
@@ -34,6 +37,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.*;
 
 /**
  * Kafka wrapper around {@link AnomalyDetectorManager}.
@@ -42,14 +46,17 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author Willie Wheeler
  */
 public final class KafkaAnomalyDetectorManager extends AbstractKafkaApp {
-    
-    // TODO Externalize this to the Kafka config. [WLW]
-    private static final String ANOMALY_TOPIC = "anomalies";
-    
     private AnomalyDetectorManager manager;
     
-    public KafkaAnomalyDetectorManager(Config kafkaConfig, AnomalyDetectorManager manager) {
-        super(kafkaConfig);
+    public static void main(String[] args) {
+        final Config appConfig = AppUtil.getAppConfig(ANOMALY_DETECTOR_MANAGER);
+        final AnomalyDetectorManager manager =
+                new AnomalyDetectorManager(detectorFactories(appConfig.getConfig(FACTORIES)));
+        new KafkaAnomalyDetectorManager(appConfig, manager).start();
+    }
+    
+    public KafkaAnomalyDetectorManager(Config appConfig, AnomalyDetectorManager manager) {
+        super(appConfig);
         notNull(manager, "manager can't be null");
         this.manager = manager;
     }
@@ -57,18 +64,28 @@ public final class KafkaAnomalyDetectorManager extends AbstractKafkaApp {
     @Override
     protected StreamsBuilder streamsBuilder() {
         final StreamsBuilder builder = new StreamsBuilder();
-        final String topic = getKafkaConfig().getString("topic");
-        final KStream<String, MappedMpoint> stream = builder.stream(topic, jsonMpointSerde());
+        final String inboundTopic = getAppConfig().getString(INBOUND_TOPIC);
+        final String outboundTopic = getAppConfig().getString(OUTBOUND_TOPIC);
+        final KStream<String, MappedMpoint> stream = builder.stream(inboundTopic, jsonMpointSerde());
         stream
                 .map((key, mappedMpoint) -> KeyValue.pair(key, manager.classify(mappedMpoint)))
-                .to(ANOMALY_TOPIC, jsonAnomalySerde());
+                .to(outboundTopic, jsonAnomalySerde());
         return builder;
+    }
+    
+    private static Map<String, AnomalyDetectorFactory> detectorFactories(Config appConfig) {
+        final Map<String, AnomalyDetectorFactory> factories = new HashMap<>();
+        appConfig.entrySet().forEach(entry -> {
+            final String factoryClassName = entry.getValue().unwrapped().toString();
+            factories.put(entry.getKey(), (AnomalyDetectorFactory) ReflectionUtil.newInstance(factoryClassName));
+        });
+        return factories;
     }
     
     private Consumed<String, MappedMpoint> jsonMpointSerde() {
         final JsonPojoDeserializer<MappedMpoint> deserializer = new JsonPojoDeserializer<>();
         final Map<String, Object> props = new HashMap<>();
-        props.put("JsonPojoClass", MappedMpoint.class);
+        props.put(JSON_POJO_CLASS, MappedMpoint.class);
         deserializer.configure(props, false);
         
         return Consumed.with(
