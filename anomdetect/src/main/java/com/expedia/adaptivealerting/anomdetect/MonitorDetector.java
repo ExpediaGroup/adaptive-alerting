@@ -48,6 +48,7 @@ public class MonitorDetector {
 
     // FIXME Do we need to return a mapped point here? [KS]
     public void classify(MappedMpoint mappedMpoint) {
+        // FIXME Check if we need classify the mapped point again here. [KS]
         MappedMpoint mappedPoint = detector.classify(mappedMpoint);
         AnomalyResult result = mappedPoint.getAnomalyResult();
         perfMonitor.update(result);

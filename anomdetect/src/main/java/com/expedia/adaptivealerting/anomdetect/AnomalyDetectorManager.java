@@ -68,6 +68,7 @@ public final class AnomalyDetectorManager {
         }
         PerformanceMonitor perfMonitor = new PerformanceMonitor();
         MonitorDetector monitorDetector = new MonitorDetector(detector, perfMonitor);
+        // FIXME Should this be part of below classify method? [KS]
         monitorDetector.classify(mappedMpoint);
         return detector;
     }
