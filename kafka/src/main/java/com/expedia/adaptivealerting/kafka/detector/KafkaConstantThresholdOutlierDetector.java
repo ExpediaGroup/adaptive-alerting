@@ -24,10 +24,13 @@ import com.typesafe.config.Config;
 import org.apache.kafka.streams.StreamsBuilder;
 
 import static com.expedia.adaptivealerting.anomdetect.ConstantThresholdAnomalyDetector.RIGHT_TAILED;
+import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.INBOUND_TOPIC;
 
-// TODO Rename to KafkaConstantThresholdAnomalyDetector. [WLW]
-
-public class KafkaConstantThresholdOutlierDetector {
+/**
+ * @deprecated Use KafkaAnomalyDetectorManager instead.
+ */
+@Deprecated
+public final class KafkaConstantThresholdOutlierDetector {
 
     public static void main(String[] args) {
         Config appConfig = AppUtil.getAppConfig("constant-detector");
@@ -38,7 +41,7 @@ public class KafkaConstantThresholdOutlierDetector {
         @Override
         public StreamsRunner build(Config appConfig) {
             final StreamsBuilder builder = DetectorUtil.createDetectorStreamsBuilder(
-                appConfig.getString("topic"),
+                appConfig.getString(INBOUND_TOPIC),
                 id -> new ConstantThresholdAnomalyDetector(RIGHT_TAILED, 0.99f, 0.95f)
             );
 

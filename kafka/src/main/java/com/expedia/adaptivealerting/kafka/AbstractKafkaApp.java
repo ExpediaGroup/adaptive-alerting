@@ -31,6 +31,9 @@ import org.apache.kafka.streams.StreamsConfig;
 import java.util.Properties;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.HEALTH_STATUS_PATH;
+import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.INBOUND_TOPIC;
+import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.STREAMS;
 
 /**
  * Abstract base class for creating Kafka apps.
@@ -39,17 +42,17 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author Willie Wheeler
  */
 public abstract class AbstractKafkaApp {
-    private final Config kafkaConfig;
+    private final Config appConfig;
     private final Application application;
     
-    public AbstractKafkaApp(Config kafkaConfig) {
-        notNull(kafkaConfig, "kafkaConfig can't be null");
-        this.kafkaConfig = kafkaConfig;
+    public AbstractKafkaApp(Config appConfig) {
+        notNull(appConfig, "appConfig can't be null");
+        this.appConfig = appConfig;
         this.application = application();
     }
     
-    public Config getKafkaConfig() {
-        return kafkaConfig;
+    public Config getAppConfig() {
+        return appConfig;
     }
     
     public void start() {
@@ -75,15 +78,15 @@ public abstract class AbstractKafkaApp {
     
     private StreamsFactory streamsFactory() {
         final StreamsBuilder builder = streamsBuilder();
-        final Properties props = ConfigUtil.toProperties(kafkaConfig.getConfig("streams"));
+        final Properties props = ConfigUtil.toProperties(appConfig.getConfig(STREAMS));
         final StreamsConfig streamsConfig = new StreamsConfig(props);
-        final String topic = kafkaConfig.getString("topic");
-        return new StreamsFactory(builder::build, streamsConfig, topic);
+        final String inboundTopic = appConfig.getString(INBOUND_TOPIC);
+        return new StreamsFactory(builder::build, streamsConfig, inboundTopic);
     }
     
     private StateChangeListener healthListener() {
         final HealthStatusController controller = new HealthStatusController();
-        final String path = kafkaConfig.getString("health.status.path");
+        final String path = appConfig.getString(HEALTH_STATUS_PATH);
         controller.addListener(new UpdateHealthStatusFile(path));
         return new StateChangeListener(controller);
     }

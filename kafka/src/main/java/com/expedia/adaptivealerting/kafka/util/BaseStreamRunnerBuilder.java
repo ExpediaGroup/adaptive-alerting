@@ -26,6 +26,10 @@ import org.apache.kafka.streams.StreamsConfig;
 
 import java.util.Properties;
 
+import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.HEALTH_STATUS_PATH;
+import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.INBOUND_TOPIC;
+import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.STREAMS;
+
 /**
  * @deprecated Deprecated in favor of {@link com.expedia.adaptivealerting.kafka.AbstractKafkaApp}.
  */
@@ -34,15 +38,15 @@ public abstract class BaseStreamRunnerBuilder {
     public abstract StreamsRunner build(Config config);
 
     protected StreamsRunner createStreamsRunner(Config appConfig, StreamsBuilder builder) {
-        String healthStatusPath = appConfig.getString("health.status.path");
-        String topic = appConfig.getString("topic");
+        String healthStatusPath = appConfig.getString(HEALTH_STATUS_PATH);
+        String topic = appConfig.getString(INBOUND_TOPIC);
 
         HealthStatusController healthStatusController = new HealthStatusController();
         healthStatusController.addListener(new UpdateHealthStatusFile(healthStatusPath));
 
         StateChangeListener stateChangeListener = new StateChangeListener(healthStatusController);
 
-        StreamsConfig streamsConfig = new StreamsConfig(configToProp(appConfig.getConfig("streams")));
+        StreamsConfig streamsConfig = new StreamsConfig(configToProp(appConfig.getConfig(STREAMS)));
 
         StreamsFactory streamsFactory = new StreamsFactory(builder::build, streamsConfig, topic);
 
