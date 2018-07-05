@@ -17,7 +17,6 @@ package com.expedia.adaptivealerting.anomdetect;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.expedia.adaptivealerting.anomdetect.PerformanceMonitor.Performance;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMpoint;
 
@@ -52,11 +51,9 @@ public class MonitorDetector {
         // FIXME Check if we need classify the mapped point again here. [KS]
         MappedMpoint mappedPoint = detector.classify(mappedMpoint);
         AnomalyResult result = mappedPoint.getAnomalyResult();
-        Performance performance = perfMonitor.evaluatePerformance(result);
-        if (performance != Performance.GOOD) {
-            LOGGER.info("Rebuild model. Sending info to model-builder kafka topic:{}",
-                    mappedPoint.getAnomalyResult().getMetric());
+        double perfScore = perfMonitor.evaluatePerformance(result);
+        if (perfScore != 0.0) {
+            LOGGER.info("Performance score:{} for metric:{}", perfScore, mappedPoint.getAnomalyResult().getMetric());
         }
     }
-
 }

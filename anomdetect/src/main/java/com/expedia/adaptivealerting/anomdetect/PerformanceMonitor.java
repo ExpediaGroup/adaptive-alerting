@@ -17,10 +17,6 @@ package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
-import java.util.Map;
-import java.util.HashMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -46,14 +42,6 @@ public class PerformanceMonitor {
      * Local threshold lookup where we maintain thresholds for different evaluators.
      */
 
-    private Map<String, Double> perfLookup;
-
-    private Logger LOGGER = LoggerFactory.getLogger(PerformanceMonitor.class);
-
-    public enum Performance {
-        GOOD, BAD
-    };
-
     public static final int MAX_TICKS = 100;
     public static final double RMSE_THRESHOLD = 3.0;
 
@@ -62,32 +50,22 @@ public class PerformanceMonitor {
      */
     public PerformanceMonitor() {
         this.evaluator = new RmseEvaluator();
-        setPerfThresholdLookup();
         resetCounter();
     }
 
-    public Performance evaluatePerformance(AnomalyResult result) {
+    public double evaluatePerformance(AnomalyResult result) {
         double observed = result.getObserved();
         double predicted = result.getPredicted();
+        double evaluatorScore = 0.0;
         evaluator.update(observed, predicted);
+
         if (tickCounter >= MAX_TICKS) {
-            double evaluatorScore = evaluator.evaluate().getEvaluatorScore();
-            double lookupScore = perfLookup.get("rmse").doubleValue();
-            if (evaluatorScore > lookupScore) {
-                LOGGER.info("Need to rebuild this model");
-                return Performance.BAD;
-            }
+            evaluatorScore = evaluator.evaluate().getEvaluatorScore();
             evaluator.reset();
             resetCounter();
-            return Performance.GOOD;
         }
         this.tickCounter++;
-        return Performance.GOOD;
-    }
-
-    private void setPerfThresholdLookup() {
-        this.perfLookup = new HashMap<String, Double>();
-        perfLookup.put("rmse", RMSE_THRESHOLD);
+        return evaluatorScore;
     }
 
     private void resetCounter() {
