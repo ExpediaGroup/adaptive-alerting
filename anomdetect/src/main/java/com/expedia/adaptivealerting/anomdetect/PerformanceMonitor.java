@@ -45,9 +45,14 @@ public class PerformanceMonitor {
     /**
      * Local threshold lookup where we maintain thresholds for different evaluators.
      */
+
     private Map<String, Double> perfLookup;
 
     private Logger LOGGER = LoggerFactory.getLogger(PerformanceMonitor.class);
+
+    public enum Performance {
+        GOOD, BAD
+    };
 
     public static final int MAX_TICKS = 100;
     public static final double RMSE_THRESHOLD = 3.0;
@@ -61,7 +66,7 @@ public class PerformanceMonitor {
         resetCounter();
     }
 
-    public boolean rebuildModel(AnomalyResult result) {
+    public Performance evaluatePerformance(AnomalyResult result) {
         double observed = result.getObserved();
         double predicted = result.getPredicted();
         evaluator.update(observed, predicted);
@@ -70,14 +75,14 @@ public class PerformanceMonitor {
             double lookupScore = perfLookup.get("rmse").doubleValue();
             if (evaluatorScore > lookupScore) {
                 LOGGER.info("Need to rebuild this model");
-                return true;
+                return Performance.BAD;
             }
             evaluator.reset();
             resetCounter();
-            return false;
+            return Performance.GOOD;
         }
         this.tickCounter++;
-        return false;
+        return Performance.GOOD;
     }
 
     private void setPerfThresholdLookup() {
