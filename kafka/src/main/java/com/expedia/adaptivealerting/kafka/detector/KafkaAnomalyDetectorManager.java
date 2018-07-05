@@ -22,7 +22,6 @@ import com.expedia.adaptivealerting.kafka.AbstractKafkaApp;
 import com.expedia.adaptivealerting.kafka.util.AppUtil;
 import com.expedia.adaptivealerting.kafka.util.ReflectionUtil;
 import com.typesafe.config.Config;
-import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.KStream;
 
@@ -61,7 +60,7 @@ public final class KafkaAnomalyDetectorManager extends AbstractKafkaApp {
         final String outboundTopic = getAppConfig().getString(OUTBOUND_TOPIC);
         final KStream<String, MappedMpoint> stream = builder.stream(inboundTopic);
         stream
-                .map((key, mappedMpoint) -> KeyValue.pair(key, manager.classify(mappedMpoint)))
+                .mapValues(mappedMpoint -> manager.classify(mappedMpoint))
                 .to(outboundTopic);
         return builder;
     }

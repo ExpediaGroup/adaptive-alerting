@@ -27,7 +27,10 @@ import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.INBOUND_TOPIC;
 import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.METRIC_ROUTER;
 import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.OUTBOUND_TOPIC;
 
-// TODO Isolate the infrastructure-independent logic. [WLW]
+/**
+ * @deprecated Use {@link com.expedia.adaptivealerting.kafka.mapper.KafkaAnomalyDetectorMapper} instead.
+ */
+@Deprecated
 public final class MetricRouter {
 
     public static void main(String[] args) {
