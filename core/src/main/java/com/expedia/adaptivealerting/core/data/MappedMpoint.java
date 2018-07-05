@@ -19,6 +19,8 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 
 import java.util.UUID;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+
 /**
  * <p>
  * Wraps an endpoint with a representation that includes anomaly detection information.
@@ -34,6 +36,21 @@ public final class MappedMpoint {
     private UUID detectorUuid;
     private String detectorType;
     private AnomalyResult anomalyResult;
+    
+    /**
+     * To support serialization.
+     */
+    public MappedMpoint() {
+    }
+    
+    public MappedMpoint(Mpoint mpoint, UUID detectorUuid, String detectorType) {
+        notNull(mpoint, "mpoint can't be null");
+        notNull(detectorUuid, "detectorUuid can't be null");
+        notNull(detectorType, "detectorType can't be null");
+        this.mpoint = mpoint;
+        this.detectorUuid = detectorUuid;
+        this.detectorType = detectorType;
+    }
     
     public Mpoint getMpoint() {
         return mpoint;

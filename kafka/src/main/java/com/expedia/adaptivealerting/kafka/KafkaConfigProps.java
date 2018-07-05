@@ -29,8 +29,14 @@ public interface KafkaConfigProps {
     // ================================================================================
     
     /**
+     * Anomaly Detector Mapper KStreams app name.
+     */
+    public static final String ANOMALY_DETECTOR_MAPPER = "anomaly-detector-mapper";
+    
+    /**
      * Metric Router KStreams app name.
      */
+    @Deprecated
     public static final String METRIC_ROUTER = "metric-router";
     
     /**
