@@ -35,6 +35,8 @@ public interface KafkaConfigProps {
     
     /**
      * Metric Router KStreams app name.
+     *
+     * @deprecated MetricRouter is going away in favor of AnomalyDetectorMapper
      */
     @Deprecated
     public static final String METRIC_ROUTER = "metric-router";

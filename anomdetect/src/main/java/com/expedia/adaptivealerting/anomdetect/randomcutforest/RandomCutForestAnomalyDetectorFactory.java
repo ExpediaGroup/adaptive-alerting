@@ -31,13 +31,13 @@ public final class RandomCutForestAnomalyDetectorFactory
     @Override
     public void init(Config appConfig) {
         notNull(appConfig, "appConfig can't be null");
-        // TODO
     }
     
     @Override
     public RandomCutForestAnomalyDetector create(UUID uuid) {
         notNull(uuid, "uuid can't be null");
-        // TODO Look up model
-        return null;
+        
+        // TODO Return different models for different metrics. [WLW]
+        return new RandomCutForestAnomalyDetector();
     }
 }

@@ -55,6 +55,7 @@ public final class AnomalyDetectorMapper {
         final Set<DetectorMeta> results = new HashSet<>();
         if ("bookings".equals(tags.get("what"))) {
             results.add(new DetectorMeta(UUID.fromString("636e13ed-6882-48cc-be75-56986a3b0179"), "aquila-detector"));
+            results.add(new DetectorMeta(UUID.fromString("fac1a330-e5ad-4902-b17a-3d6068596a95"), "rcf-detector"));
         }
         return results;
     }
