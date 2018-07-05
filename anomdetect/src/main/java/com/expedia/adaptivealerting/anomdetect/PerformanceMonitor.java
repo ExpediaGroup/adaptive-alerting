@@ -43,7 +43,6 @@ public class PerformanceMonitor {
      */
 
     public static final int MAX_TICKS = 100;
-    public static final double RMSE_THRESHOLD = 3.0;
 
     /**
      * Creates a new performance monitor and sets evaluator as RMSE evaluator
