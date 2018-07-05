@@ -15,18 +15,13 @@
  */
 package com.expedia.adaptivealerting.kafka.detector;
 
-import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorFactory;
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorManager;
 import com.expedia.adaptivealerting.core.data.MappedMpoint;
 import com.expedia.adaptivealerting.kafka.AbstractKafkaApp;
 import com.expedia.adaptivealerting.kafka.util.AppUtil;
-import com.expedia.adaptivealerting.kafka.util.ReflectionUtil;
 import com.typesafe.config.Config;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.KStream;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.*;
@@ -42,8 +37,7 @@ public final class KafkaAnomalyDetectorManager extends AbstractKafkaApp {
     
     public static void main(String[] args) {
         final Config appConfig = AppUtil.getAppConfig(ANOMALY_DETECTOR_MANAGER);
-        final AnomalyDetectorManager manager =
-                new AnomalyDetectorManager(detectorFactories(appConfig.getConfig(FACTORIES)));
+        final AnomalyDetectorManager manager = new AnomalyDetectorManager(appConfig.getConfig(FACTORIES));
         new KafkaAnomalyDetectorManager(appConfig, manager).start();
     }
     
@@ -55,24 +49,14 @@ public final class KafkaAnomalyDetectorManager extends AbstractKafkaApp {
     
     @Override
     protected StreamsBuilder streamsBuilder() {
-        final StreamsBuilder builder = new StreamsBuilder();
         final String inboundTopic = getAppConfig().getString(INBOUND_TOPIC);
         final String outboundTopic = getAppConfig().getString(OUTBOUND_TOPIC);
+        final StreamsBuilder builder = new StreamsBuilder();
         final KStream<String, MappedMpoint> stream = builder.stream(inboundTopic);
         stream
                 .mapValues(mappedMpoint -> manager.classify(mappedMpoint))
+                .filter((key, mappedMpoint) -> mappedMpoint != null)
                 .to(outboundTopic);
         return builder;
-    }
-    
-    private static Map<String, AnomalyDetectorFactory> detectorFactories(Config appConfig) {
-        final Map<String, AnomalyDetectorFactory> factories = new HashMap<>();
-        appConfig.entrySet().forEach(entry -> {
-            final String className = entry.getValue().unwrapped().toString();
-            final AnomalyDetectorFactory factory = (AnomalyDetectorFactory) ReflectionUtil.newInstance(className);
-            factory.init(appConfig);
-            factories.put(entry.getKey(), factory);
-        });
-        return factories;
     }
 }
