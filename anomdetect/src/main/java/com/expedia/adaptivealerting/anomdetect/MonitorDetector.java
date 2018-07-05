@@ -52,7 +52,7 @@ public class MonitorDetector {
         MappedMpoint mappedPoint = detector.classify(mappedMpoint);
         AnomalyResult result = mappedPoint.getAnomalyResult();
         double perfScore = perfMonitor.evaluatePerformance(result);
-        if (perfScore != 0.0) {
+        if (perfScore != 0) {
             LOGGER.info("Performance score:{} for metric:{}", perfScore, mappedPoint.getAnomalyResult().getMetric());
         }
     }

@@ -56,7 +56,7 @@ public class PerformanceMonitor {
     public double evaluatePerformance(AnomalyResult result) {
         double observed = result.getObserved();
         double predicted = result.getPredicted();
-        double evaluatorScore = 0.0;
+        double evaluatorScore = 0;
         evaluator.update(observed, predicted);
 
         if (tickCounter >= MAX_TICKS) {
