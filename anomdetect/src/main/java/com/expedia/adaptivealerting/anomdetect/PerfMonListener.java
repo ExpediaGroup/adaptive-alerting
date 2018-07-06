@@ -16,7 +16,8 @@
 package com.expedia.adaptivealerting.anomdetect;
 
 /**
- * Performance monitor listener interface.
+ * Performance monitor listener interface. An interface to be implemented by everyone interested when performance
+ * monitor resets an evaluator
  * 
  * @author kashah
  */

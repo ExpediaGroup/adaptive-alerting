@@ -60,6 +60,7 @@ public class MonitoredDetector implements AnomalyDetector {
     }
 
     public static class PerfMonHandler implements PerfMonListener {
+        @Override
         public void readyForFlush(double score) {
             LOGGER.info("Performance score:{}", score);
         }
