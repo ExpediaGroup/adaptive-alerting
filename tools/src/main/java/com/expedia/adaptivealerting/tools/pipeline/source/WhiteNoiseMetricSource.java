@@ -20,7 +20,7 @@ import com.expedia.www.haystack.commons.entities.MetricPoint;
 import java.time.Instant;
 import java.util.Random;
 
-import static com.expedia.adaptivealerting.core.util.MetricPointUtil.metricPoint;
+import static com.expedia.adaptivealerting.core.util.MetricUtil.metricPoint;
 import static java.lang.Math.sqrt;
 
 /**

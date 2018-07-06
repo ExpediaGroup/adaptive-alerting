@@ -19,7 +19,7 @@ package com.expedia.adaptivealerting.pipeline.integration.test
 import java.time.Instant
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult
-import com.expedia.adaptivealerting.core.util.MetricPointUtil.metricPoint
+import com.expedia.adaptivealerting.core.util.MetricUtil.metricPoint
 import com.expedia.adaptivealerting.kafka.detector.KafkaConstantThresholdOutlierDetector
 import com.expedia.adaptivealerting.kafka.router.MetricRouter
 import com.expedia.adaptivealerting.pipeline.integration.{EmbeddedKafka, IntegrationTestSpec}

@@ -25,7 +25,9 @@ import com.expedia.adaptivealerting.anomdetect.randomcutforest.util.PropertiesCa
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMpoint;
+import com.expedia.adaptivealerting.core.data.Mpoint;
 import com.expedia.adaptivealerting.core.util.AssertUtil;
+import com.expedia.adaptivealerting.core.util.MetricUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -84,30 +86,39 @@ public class RandomCutForestAnomalyDetector implements AnomalyDetector {
      * @return AnomalyResult based on score received from Sagemaker
      */
     @Override
+    @Deprecated
     public AnomalyResult classify(MetricPoint metricPoint) {
-        AssertUtil.notNull(metricPoint, "metricPoint can't be null");
-
-        this.shingle.offer(metricPoint);
-
-        final AnomalyResult result = new AnomalyResult();
-        if (this.shingle.isReady()) {
-            final double anomalyScore = getAnomalyScore();
-            result.setEpochSecond(metricPoint.epochTimeInSeconds());
-            result.setAnomalyScore(anomalyScore);
-            if (anomalyScore < WEAK_SCORE_CUTOFF) {
-                result.setAnomalyLevel(AnomalyLevel.NORMAL);
-            } else if (anomalyScore < STRONG_SCORE_CUTOFF) {
-                result.setAnomalyLevel(AnomalyLevel.WEAK);
-            } else {
-                result.setAnomalyLevel(AnomalyLevel.STRONG);
-            }
-        }
-        return result;
+        final MappedMpoint mappedMpoint = new MappedMpoint();
+        mappedMpoint.setMpoint(MetricUtil.toMpoint(metricPoint));
+        return classify(mappedMpoint).getAnomalyResult();
     }
     
     @Override
     public MappedMpoint classify(MappedMpoint mappedMpoint) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        AssertUtil.notNull(mappedMpoint, "metricPoint can't be null");
+
+        this.shingle.offer(mappedMpoint);
+
+        final AnomalyResult anomalyResult = new AnomalyResult();
+        if (this.shingle.isReady()) {
+            final double anomalyScore = getAnomalyScore();
+            anomalyResult.setEpochSecond(mappedMpoint.getMpoint().getEpochTimeInSeconds());
+            anomalyResult.setAnomalyScore(anomalyScore);
+            if (anomalyScore < WEAK_SCORE_CUTOFF) {
+                anomalyResult.setAnomalyLevel(AnomalyLevel.NORMAL);
+            } else if (anomalyScore < STRONG_SCORE_CUTOFF) {
+                anomalyResult.setAnomalyLevel(AnomalyLevel.WEAK);
+            } else {
+                anomalyResult.setAnomalyLevel(AnomalyLevel.STRONG);
+            }
+        }
+        final MappedMpoint result = new MappedMpoint();
+        result.setAnomalyResult(anomalyResult);
+        result.setDetectorType(mappedMpoint.getDetectorType());
+        result.setDetectorUuid(mappedMpoint.getDetectorUuid());
+        result.setMpoint(mappedMpoint.getMpoint());
+
+        return result;
     }
 
     /**
