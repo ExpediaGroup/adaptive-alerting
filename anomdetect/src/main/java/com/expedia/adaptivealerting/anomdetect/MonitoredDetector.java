@@ -47,8 +47,7 @@ public class MonitoredDetector implements AnomalyDetector {
     @Override
     public MappedMpoint classify(MappedMpoint mappedMpoint) {
         MappedMpoint mappedPoint = detector.classify(mappedMpoint);
-        PerfMonListener listener = new PerfMonHandler();
-        PerformanceMonitor perfMonitor = new PerformanceMonitor(listener, new RmseEvaluator(), MAX_TICKS);
+        PerformanceMonitor perfMonitor = new PerformanceMonitor(new PerfMonHandler(), new RmseEvaluator(), MAX_TICKS);
         AnomalyResult result = mappedPoint.getAnomalyResult();
         perfMonitor.evaluatePerformance(result);
         return mappedPoint;
