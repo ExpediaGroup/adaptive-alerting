@@ -26,5 +26,5 @@ public interface PerfMonListener {
     /**
      * Keeps a track of when performance monitor resets the evaluator.
      */
-    public void readyForFlush(double score);
+    void processScore(double score);
 }

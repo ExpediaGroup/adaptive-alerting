@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.anomdetect;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.evaluator.Evaluator;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
+import com.expedia.adaptivealerting.core.util.AssertUtil;
 
 /**
  * <p>
@@ -54,6 +55,10 @@ public class PerformanceMonitor {
      * Creates a new performance monitor and sets evaluator as RMSE evaluator
      */
     public PerformanceMonitor(PerfMonListener listener, Evaluator evaluator, int maxTicks) {
+        AssertUtil.notNull(listener, "Listener can't be null");
+        AssertUtil.notNull(evaluator, "Evaluator can't be null");
+        AssertUtil.isTrue(maxTicks > 0, "Max ticks should be greather than 0");
+
         this.listener = listener;
         this.evaluator = new RmseEvaluator();
         this.maxTicks = maxTicks;
@@ -67,7 +72,7 @@ public class PerformanceMonitor {
         double evaluatorScore = evaluator.evaluate().getEvaluatorScore();
 
         if (tickCounter >= maxTicks) {
-            listener.readyForFlush(evaluatorScore);
+            listener.processScore(evaluatorScore);
             evaluator.reset();
             resetCounter();
             return evaluatorScore;

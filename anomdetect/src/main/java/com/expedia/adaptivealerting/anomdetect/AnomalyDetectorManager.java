@@ -107,8 +107,9 @@ public final class AnomalyDetectorManager {
     public MappedMpoint classify(MappedMpoint mappedMpoint) {
         notNull(mappedMpoint, "mappedMpoint can't be null");
         final AnomalyDetector detector = detectorFor(mappedMpoint);
+        MappedMpoint newMappedMpoint = detector == null ? null : detector.classify(mappedMpoint);
         MonitoredDetector monitorDetector = new MonitoredDetector(detector);
-        monitorDetector.classify(mappedMpoint);
-        return detector == null ? null : detector.classify(mappedMpoint);
+        monitorDetector.classify(newMappedMpoint);
+        return newMappedMpoint;
     }
 }

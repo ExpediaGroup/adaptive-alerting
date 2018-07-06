@@ -46,11 +46,10 @@ public class MonitoredDetector implements AnomalyDetector {
 
     @Override
     public MappedMpoint classify(MappedMpoint mappedMpoint) {
-        MappedMpoint mappedPoint = detector.classify(mappedMpoint);
         PerformanceMonitor perfMonitor = new PerformanceMonitor(new PerfMonHandler(), new RmseEvaluator(), MAX_TICKS);
-        AnomalyResult result = mappedPoint.getAnomalyResult();
+        AnomalyResult result = mappedMpoint.getAnomalyResult();
         perfMonitor.evaluatePerformance(result);
-        return mappedPoint;
+        return mappedMpoint;
     }
 
     @Override
@@ -60,7 +59,7 @@ public class MonitoredDetector implements AnomalyDetector {
 
     public static class PerfMonHandler implements PerfMonListener {
         @Override
-        public void readyForFlush(double score) {
+        public void processScore(double score) {
             LOGGER.info("Performance score:{}", score);
         }
     }
