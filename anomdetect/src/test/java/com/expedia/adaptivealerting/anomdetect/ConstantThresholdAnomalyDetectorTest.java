@@ -17,7 +17,7 @@
 package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
-import com.expedia.adaptivealerting.core.util.MetricPointUtil;
+import com.expedia.adaptivealerting.core.util.MetricUtil;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -100,6 +100,6 @@ public class ConstantThresholdAnomalyDetectorTest {
     }
     
     private AnomalyLevel level(AnomalyDetector detector, Instant instant, float value) {
-        return detector.classify(MetricPointUtil.metricPoint(instant.getEpochSecond(), value)).getAnomalyLevel();
+        return detector.classify(MetricUtil.metricPoint(instant.getEpochSecond(), value)).getAnomalyLevel();
     }
 }

@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.randomcutforest;
 
-import com.expedia.www.haystack.commons.entities.MetricPoint;
+import com.expedia.adaptivealerting.core.data.MappedMpoint;
 
 import java.util.LinkedList;
 import java.util.Optional;
@@ -32,7 +32,7 @@ public class Shingle {
 
     private static final int DEFAULT_SIZE = 10;
 
-    private final LinkedList<MetricPoint> lifo;
+    private final LinkedList<MappedMpoint> fifo;
     private final int maxSize;
 
     /**
@@ -47,7 +47,7 @@ public class Shingle {
      * @param maxSize the maximum size of the queue (shingle size)
      */
     public Shingle(int maxSize) {
-        this.lifo = new LinkedList<>();
+        this.fifo = new LinkedList<>();
         this.maxSize = maxSize;
     }
 
@@ -55,11 +55,11 @@ public class Shingle {
      * Puts a new MetricPoint to the FIFO list. If list is full, it first removes the least recent Metric point.
      * @param metricPoint
      */
-    public void offer(MetricPoint metricPoint) {
+    public void offer(MappedMpoint metricPoint) {
         if (isReady()) {
-            this.lifo.remove();
+            this.fifo.remove();
         }
-        this.lifo.add(metricPoint);
+        this.fifo.add(metricPoint);
     }
 
     /**
@@ -71,9 +71,9 @@ public class Shingle {
         if (!isReady()) {
             return Optional.empty();
         } else {
-            return Optional.of(this.lifo
+            return Optional.of(this.fifo
                     .stream()
-                    .map(mp -> mp.value())   // get values only from MetricPoint
+                    .map(mp -> mp.getMpoint().getValue())   // get values only from MetricPoint
                     .mapToDouble(f -> f != null ? f : Float.NaN) // convert list to array of doubles
                     .toArray());
         }
@@ -87,9 +87,9 @@ public class Shingle {
         if (!isReady()) {
             return Optional.empty();
         } else {
-            return Optional.of(this.lifo
+            return Optional.of(this.fifo
                     .stream()
-                    .map( mp -> Float.toString(mp.value()) ) // get values from MetricPoints
+                    .map( mp -> Float.toString(mp.getMpoint().getValue()) ) // get values from MetricPoints
                     .collect( Collectors.joining( "," ) ));
         }
     }
@@ -100,7 +100,7 @@ public class Shingle {
      * @return true if shingle is full sized and is ready to be sent to Sagemaker inference RCF endpoint
      */
     public boolean isReady() {
-        return lifo.size() == this.maxSize;
+        return fifo.size() == this.maxSize;
     }
 }
 

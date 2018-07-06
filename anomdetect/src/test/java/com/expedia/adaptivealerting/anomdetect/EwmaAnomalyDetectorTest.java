@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.core.util.MathUtil;
-import com.expedia.adaptivealerting.core.util.MetricPointUtil;
+import com.expedia.adaptivealerting.core.util.MetricUtil;
 import com.opencsv.bean.CsvToBeanBuilder;
 import junit.framework.TestCase;
 import org.junit.BeforeClass;
@@ -88,7 +88,7 @@ public class EwmaAnomalyDetectorTest {
             
             // This detector doesn't currently do anything with the instant, so we can just pass now().
             // This may change in the future.
-            detector.classify(MetricPointUtil.metricPoint(Instant.now().getEpochSecond(), observed));
+            detector.classify(MetricUtil.metricPoint(Instant.now().getEpochSecond(), observed));
             
             assertApproxEqual(testRow.getKnownMean(), testRow.getMean());
             assertApproxEqual(testRow.getMean(), detector.getMean());

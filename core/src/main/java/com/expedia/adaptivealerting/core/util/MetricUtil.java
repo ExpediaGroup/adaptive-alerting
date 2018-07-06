@@ -28,14 +28,14 @@ import scala.collection.immutable.Map$;
  *
  * @author Willie Wheeler
  */
-public final class MetricPointUtil {
+public final class MetricUtil {
     private static final Enumeration.Value DEFAULT_TYPE = MetricType.Gauge();
     private static final Map<String, String> DEFAULT_TAGS = Map$.MODULE$.<String, String>empty();
     
     /**
      * Prevent instantiation.
      */
-    private MetricPointUtil() {
+    private MetricUtil() {
     }
     
     /**
