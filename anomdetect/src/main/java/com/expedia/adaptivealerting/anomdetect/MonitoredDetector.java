@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMpoint;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
+import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
 /**
@@ -41,15 +42,17 @@ public class MonitoredDetector implements AnomalyDetector {
     private static Logger LOGGER = LoggerFactory.getLogger(MonitoredDetector.class);
 
     public MonitoredDetector(AnomalyDetector detector) {
+        AssertUtil.notNull(detector, "detector can't be null");
         this.detector = detector;
     }
 
     @Override
     public MappedMpoint classify(MappedMpoint mappedMpoint) {
+        MappedMpoint mappedPoint = detector.classify(mappedMpoint);
         PerformanceMonitor perfMonitor = new PerformanceMonitor(new PerfMonHandler(), new RmseEvaluator(), MAX_TICKS);
         AnomalyResult result = mappedMpoint.getAnomalyResult();
         perfMonitor.evaluatePerformance(result);
-        return mappedMpoint;
+        return mappedPoint;
     }
 
     @Override
