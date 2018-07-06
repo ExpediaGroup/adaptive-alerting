@@ -47,8 +47,11 @@ public final class AnomalyDetectorManager {
      * The managed detectors.
      */
     private final Map<UUID, AnomalyDetector> detectors = new HashMap<>();
-    
-    private static final int MAX_TICKS_TO_EVAL_PERF = 100;
+
+    /**
+     * Max samples required to evaluate performance
+     */
+    private static final int PERFMON_SAMPLE_SIZE = 100;
 
     public AnomalyDetectorManager(Config factoryConfig) {
         notNull(factoryConfig, "factoryConfig can't be null");
@@ -90,7 +93,7 @@ public final class AnomalyDetectorManager {
                 log.warn("No AnomalyDetectorFactory registered for detectorType={}", detectorType);
             } else {
                 final AnomalyDetector innerDetector = factory.create(detectorUuid);
-                final PerformanceMonitor perfMonitor = new PerformanceMonitor(new PerfMonHandler(), new RmseEvaluator(), MAX_TICKS_TO_EVAL_PERF);
+                final PerformanceMonitor perfMonitor = new PerformanceMonitor(new PerfMonHandler(), new RmseEvaluator(), PERFMON_SAMPLE_SIZE);
                 detector = new MonitoredDetector(innerDetector, perfMonitor);
                 detectors.put(detectorUuid, detector);
             }

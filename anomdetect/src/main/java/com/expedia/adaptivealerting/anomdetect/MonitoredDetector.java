@@ -48,6 +48,7 @@ public class MonitoredDetector implements AnomalyDetector {
 
     public MonitoredDetector(AnomalyDetector detector, PerformanceMonitor perfMonitor) {
         AssertUtil.notNull(detector, "detector can't be null");
+        AssertUtil.notNull(perfMonitor, "perfMonitor can't be null");
         this.detector = detector;
         this.perfMonitor = perfMonitor;
     }
