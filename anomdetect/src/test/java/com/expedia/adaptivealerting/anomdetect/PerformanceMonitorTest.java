@@ -23,7 +23,9 @@ import java.util.ListIterator;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import com.expedia.adaptivealerting.anomdetect.MonitoredDetector.PerfMonHandler;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.opencsv.bean.CsvToBeanBuilder;
 import static org.junit.Assert.assertEquals;
 
@@ -38,6 +40,10 @@ public class PerformanceMonitorTest {
     // Class under test
     private PerformanceMonitor perfMonitor;
 
+    private static final double TOLERANCE = 0.01;
+
+    private static final int MAX_TICKS = 100;
+
     @BeforeClass
     public static void setUpClass() throws IOException {
         readDataFromCsv();
@@ -45,13 +51,12 @@ public class PerformanceMonitorTest {
 
     @Before
     public void setUp() {
-        this.perfMonitor = new PerformanceMonitor();
+        this.perfMonitor = new PerformanceMonitor(new PerfMonHandler(), new RmseEvaluator(), MAX_TICKS);
     }
 
     @Test
     public void testScore() {
         final ListIterator<PerfMonitorTestRow> testRows = data.listIterator();
-        int count = 0;
         while (testRows.hasNext()) {
             final PerfMonitorTestRow testRow = testRows.next();
             final double observed = testRow.getObserved();
@@ -61,12 +66,7 @@ public class PerformanceMonitorTest {
             result.setObserved(observed);
             result.setPredicted(predicted);
             double performanceScore = perfMonitor.evaluatePerformance(result);
-            if (count < 100) {
-                assertEquals(testRow.getScore(), performanceScore, 0);
-            } else {
-                assertEquals(testRow.getScore(), performanceScore, 0.2);
-            }
-            count++;
+            assertEquals(testRow.getScore(), performanceScore, TOLERANCE);
         }
     }
 

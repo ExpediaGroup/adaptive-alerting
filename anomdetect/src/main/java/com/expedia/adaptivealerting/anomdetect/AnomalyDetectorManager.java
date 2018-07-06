@@ -67,10 +67,6 @@ public final class AnomalyDetectorManager {
             detector = factory.create(detectorUuid);
             detectors.put(detectorUuid, detector);
         }
-        PerformanceMonitor perfMonitor = new PerformanceMonitor();
-        MonitorDetector monitorDetector = new MonitorDetector(detector, perfMonitor);
-        // FIXME Should this be part of below classify method? [KS]
-        monitorDetector.classify(mappedMpoint);
         return detector;
     }
     
@@ -83,6 +79,9 @@ public final class AnomalyDetectorManager {
      */
     public MappedMpoint classify(MappedMpoint mappedMpoint) {
         notNull(mappedMpoint, "mappedMpoint can't be null");
+        AnomalyDetector detector = detectorFor(mappedMpoint);
+        MonitoredDetector monitorDetector = new MonitoredDetector(detector);
+        monitorDetector.classify(mappedMpoint);
         return detectorFor(mappedMpoint).classify(mappedMpoint);
     }
 }

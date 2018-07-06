@@ -16,12 +16,13 @@
 package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.core.evaluator.Evaluator;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 
 /**
  * <p>
- * Performance monitor which generates a result every 100 ticks and resets evaluator. Currently it uses only RMSE
- * evaluator.
+ * Performance monitor to track performance of a given series. Returns a performance score and resets the evaluator
+ * every nth ticks where n is a user defined value.
  * </p>
  * 
  * @author kashah
@@ -34,37 +35,46 @@ public class PerformanceMonitor {
     private int tickCounter;
 
     /**
-     * Local RMSE evaluator.
+     * Local evaluator.
      */
-    private RmseEvaluator evaluator;
+    private Evaluator evaluator;
 
     /**
-     * Local threshold lookup where we maintain thresholds for different evaluators.
+     * Local performance monitor listener.
+     */
+    private PerfMonListener listener;
+
+    /**
+     * Local max no ticks where performance monitor resets evaluator.
      */
 
-    public static final int MAX_TICKS = 100;
+    private int maxTicks;
 
     /**
      * Creates a new performance monitor and sets evaluator as RMSE evaluator
      */
-    public PerformanceMonitor() {
+    public PerformanceMonitor(PerfMonListener listener, Evaluator evaluator, int maxTicks) {
         this.evaluator = new RmseEvaluator();
+        this.listener = listener;
+        this.maxTicks = maxTicks;
         resetCounter();
     }
 
     public double evaluatePerformance(AnomalyResult result) {
         double observed = result.getObserved();
         double predicted = result.getPredicted();
-        double evaluatorScore = 0;
         evaluator.update(observed, predicted);
+        double evaluatorScore = evaluator.evaluate().getEvaluatorScore();
 
-        if (tickCounter >= MAX_TICKS) {
-            evaluatorScore = evaluator.evaluate().getEvaluatorScore();
+        if (tickCounter >= maxTicks) {
+            listener.readyForFlush(evaluatorScore);
             evaluator.reset();
             resetCounter();
+            return evaluatorScore;
+        } else {
+            this.tickCounter++;
+            return evaluatorScore;
         }
-        this.tickCounter++;
-        return evaluatorScore;
     }
 
     private void resetCounter() {
