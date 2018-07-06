@@ -53,6 +53,21 @@ public class PerformanceMonitorTest {
         this.perfMonitor = new PerformanceMonitor(new PerfMonHandler(), new RmseEvaluator(), MAX_TICKS);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructor_nullListener() {
+        new PerformanceMonitor(null, new RmseEvaluator(), 100);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructor_nullEvaluator() {
+        new PerformanceMonitor(new PerfMonHandler(), null, 100);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructor_maxTicks() {
+        new PerformanceMonitor(new PerfMonHandler(), new RmseEvaluator(), 0);
+    }
+
     @Test
     public void testScore() {
         final ListIterator<PerfMonitorTestRow> testRows = data.listIterator();
