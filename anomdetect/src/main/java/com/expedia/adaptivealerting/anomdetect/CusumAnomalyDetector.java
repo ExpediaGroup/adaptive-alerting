@@ -20,7 +20,7 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMpoint;
 import com.expedia.adaptivealerting.core.data.Mpoint;
 import com.expedia.adaptivealerting.core.util.AssertUtil;
-import com.expedia.adaptivealerting.core.util.MetricPointUtil;
+import com.expedia.adaptivealerting.core.util.MetricUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
 import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.*;
@@ -236,7 +236,7 @@ public class CusumAnomalyDetector implements AnomalyDetector {
                 throw new IllegalStateException("Illegal tail: " + tail);
             }
         }
-        final Mpoint mpoint = MetricPointUtil.toMpoint(metricPoint);
+        final Mpoint mpoint = MetricUtil.toMpoint(metricPoint);
         
         // FIXME These settings aren't consistent with the current visualization approach.
         // We probably need to make fewer assumptions about the algo in the AnomalyResult class, and support different

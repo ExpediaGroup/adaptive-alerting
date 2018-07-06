@@ -18,7 +18,7 @@ package com.expedia.adaptivealerting.anomdetect;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.util.MathUtil;
-import com.expedia.adaptivealerting.core.util.MetricPointUtil;
+import com.expedia.adaptivealerting.core.util.MetricUtil;
 import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBeanBuilder;
 import junit.framework.TestCase;
@@ -70,9 +70,9 @@ public class PewmaAnomalyDetectorTest {
             assertApproxEqual(ewmaStdDev, pewmaOutlierDetector.getStdDev(), threshold);
             
             final AnomalyResult pewmaResult =
-                    pewmaOutlierDetector.classify(MetricPointUtil.metricPoint(Instant.now().getEpochSecond(), value));
+                    pewmaOutlierDetector.classify(MetricUtil.metricPoint(Instant.now().getEpochSecond(), value));
             final AnomalyResult ewmaResult =
-                    ewmaOutlierDetector.classify(MetricPointUtil.metricPoint(Instant.now().getEpochSecond(), value));
+                    ewmaOutlierDetector.classify(MetricUtil.metricPoint(Instant.now().getEpochSecond(), value));
             
             AnomalyLevel pOL = pewmaResult.getAnomalyLevel();
             AnomalyLevel eOL = ewmaResult.getAnomalyLevel();
@@ -100,7 +100,7 @@ public class PewmaAnomalyDetectorTest {
             // This detector doesn't currently do anything with the instant, so we can just pass now().
             // This may change in the future.
             final AnomalyResult result =
-                    detector.classify(MetricPointUtil.metricPoint(Instant.now().getEpochSecond(), (float) observed));
+                    detector.classify(MetricUtil.metricPoint(Instant.now().getEpochSecond(), (float) observed));
             
             final AnomalyLevel level = result.getAnomalyLevel();
             assertApproxEqual(testRow.getMean(), detector.getMean(), 0.00001);

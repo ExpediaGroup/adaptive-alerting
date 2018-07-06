@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.util;
+package com.expedia.adaptivealerting.core.util;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 

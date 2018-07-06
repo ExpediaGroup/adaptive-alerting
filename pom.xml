@@ -59,6 +59,7 @@
 
         <!-- Maven plugins -->
         <maven.compiler.plugin.version>3.7.0</maven.compiler.plugin.version>
+        <maven.exec.plugin.version>1.6.0</maven.exec.plugin.version>
         <maven.jar.plugin.version>3.1.0</maven.jar.plugin.version>
     </properties>
 
@@ -232,7 +233,20 @@
                     </archive>
                 </configuration>
             </plugin>
-            <!--Plugins requried for pushing jars to public maven repository-->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>${maven.exec.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Plugins required for pushing jars to public maven repository -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>

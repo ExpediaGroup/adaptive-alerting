@@ -28,8 +28,8 @@ import scala.collection.mutable.WrappedArray;
 
 import java.time.Instant;
 
-import static com.expedia.adaptivealerting.core.util.MetricPointUtil.metricPoint;
-import static com.expedia.adaptivealerting.core.util.MetricPointUtil.toMpoint;
+import static com.expedia.adaptivealerting.core.util.MetricUtil.metricPoint;
+import static com.expedia.adaptivealerting.core.util.MetricUtil.toMpoint;
 import static org.junit.Assert.assertEquals;
 
 public class MetricPointUtilTest {
