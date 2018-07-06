@@ -54,8 +54,8 @@ public class PerformanceMonitor {
      * Creates a new performance monitor and sets evaluator as RMSE evaluator
      */
     public PerformanceMonitor(PerfMonListener listener, Evaluator evaluator, int maxTicks) {
-        this.evaluator = new RmseEvaluator();
         this.listener = listener;
+        this.evaluator = new RmseEvaluator();
         this.maxTicks = maxTicks;
         resetCounter();
     }

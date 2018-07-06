@@ -41,7 +41,6 @@ public class PerformanceMonitorTest {
     private PerformanceMonitor perfMonitor;
 
     private static final double TOLERANCE = 0.01;
-
     private static final int MAX_TICKS = 100;
 
     @BeforeClass
