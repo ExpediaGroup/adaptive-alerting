@@ -37,19 +37,24 @@ public class MonitoredDetector implements AnomalyDetector {
      * Local Anomaly detector.
      */
     private AnomalyDetector detector;
+    
 
-    private static final int MAX_TICKS = 100;
+    /**
+     * Local Performance monitor.
+     */
+    private PerformanceMonitor perfMonitor;
+
     private static Logger LOGGER = LoggerFactory.getLogger(MonitoredDetector.class);
 
-    public MonitoredDetector(AnomalyDetector detector) {
+    public MonitoredDetector(AnomalyDetector detector, PerformanceMonitor perfMonitor) {
         AssertUtil.notNull(detector, "detector can't be null");
         this.detector = detector;
+        this.perfMonitor = perfMonitor;
     }
 
     @Override
     public MappedMpoint classify(MappedMpoint mappedMpoint) {
         MappedMpoint mappedPoint = detector.classify(mappedMpoint);
-        PerformanceMonitor perfMonitor = new PerformanceMonitor(new PerfMonHandler(), new RmseEvaluator(), MAX_TICKS);
         AnomalyResult result = mappedMpoint.getAnomalyResult();
         perfMonitor.evaluatePerformance(result);
         return mappedPoint;

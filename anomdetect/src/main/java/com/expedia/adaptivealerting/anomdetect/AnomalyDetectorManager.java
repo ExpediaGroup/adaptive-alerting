@@ -15,7 +15,9 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
+import com.expedia.adaptivealerting.anomdetect.MonitoredDetector.PerfMonHandler;
 import com.expedia.adaptivealerting.core.data.MappedMpoint;
+import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
 import com.typesafe.config.Config;
 import org.slf4j.Logger;
@@ -46,6 +48,8 @@ public final class AnomalyDetectorManager {
      */
     private final Map<UUID, AnomalyDetector> detectors = new HashMap<>();
     
+    private static final int MAX_TICKS_TO_EVAL_PERF = 100;
+
     public AnomalyDetectorManager(Config factoryConfig) {
         notNull(factoryConfig, "factoryConfig can't be null");
         this.detectorFactories = new HashMap<>();
@@ -85,7 +89,9 @@ public final class AnomalyDetectorManager {
             if (factory == null) {
                 log.warn("No AnomalyDetectorFactory registered for detectorType={}", detectorType);
             } else {
-                detector = factory.create(detectorUuid);
+                final AnomalyDetector innerDetector = factory.create(detectorUuid);
+                final PerformanceMonitor perfMonitor = new PerformanceMonitor(new PerfMonHandler(), new RmseEvaluator(), MAX_TICKS_TO_EVAL_PERF);
+                detector = new MonitoredDetector(innerDetector, perfMonitor);
                 detectors.put(detectorUuid, detector);
             }
         }
@@ -107,12 +113,6 @@ public final class AnomalyDetectorManager {
     public MappedMpoint classify(MappedMpoint mappedMpoint) {
         notNull(mappedMpoint, "mappedMpoint can't be null");
         final AnomalyDetector detector = detectorFor(mappedMpoint);
-        if (detector == null) {
-            return null;
-        } else {
-            MonitoredDetector monitorDetector = new MonitoredDetector(detector);
-            monitorDetector.classify(mappedMpoint);
-            return detector.classify(mappedMpoint);
-        }
+        return detector == null ? null : detector.classify(mappedMpoint);
     }
 }
