@@ -38,7 +38,6 @@ public class MonitoredDetector implements AnomalyDetector {
      */
     private AnomalyDetector detector;
     
-
     /**
      * Local Performance monitor.
      */
