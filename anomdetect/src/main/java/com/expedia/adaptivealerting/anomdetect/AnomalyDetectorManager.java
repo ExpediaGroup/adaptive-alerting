@@ -15,7 +15,9 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
+import com.expedia.adaptivealerting.anomdetect.MonitoredDetector.PerfMonHandler;
 import com.expedia.adaptivealerting.core.data.MappedMpoint;
+import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
 import com.typesafe.config.Config;
 import org.slf4j.Logger;
@@ -45,7 +47,12 @@ public final class AnomalyDetectorManager {
      * The managed detectors.
      */
     private final Map<UUID, AnomalyDetector> detectors = new HashMap<>();
-    
+
+    /**
+     * Max samples required to evaluate performance
+     */
+    private static final int PERFMON_SAMPLE_SIZE = 100;
+
     public AnomalyDetectorManager(Config factoryConfig) {
         notNull(factoryConfig, "factoryConfig can't be null");
         this.detectorFactories = new HashMap<>();
@@ -85,7 +92,9 @@ public final class AnomalyDetectorManager {
             if (factory == null) {
                 log.warn("No AnomalyDetectorFactory registered for detectorType={}", detectorType);
             } else {
-                detector = factory.create(detectorUuid);
+                final AnomalyDetector innerDetector = factory.create(detectorUuid);
+                final PerformanceMonitor perfMonitor = new PerformanceMonitor(new PerfMonHandler(), new RmseEvaluator(), PERFMON_SAMPLE_SIZE);
+                detector = new MonitoredDetector(innerDetector, perfMonitor);
                 detectors.put(detectorUuid, detector);
             }
         }
