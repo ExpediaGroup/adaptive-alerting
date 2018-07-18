@@ -34,7 +34,7 @@ import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.*;
  */
 public final class KafkaAnomalyDetectorManager extends AbstractKafkaApp {
     private AnomalyDetectorManager manager;
-    
+
     public static void main(String[] args) {
         final Config appConfig = AppUtil.getAppConfig(ANOMALY_DETECTOR_MANAGER);
         final AnomalyDetectorManager manager = new AnomalyDetectorManager(appConfig.getConfig(FACTORIES));

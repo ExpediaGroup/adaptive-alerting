@@ -50,6 +50,11 @@ public interface KafkaConfigProps {
      * Anomaly Validator KStreams app name.
      */
     public static final String ANOMALY_VALIDATOR = "anomaly-validator";
+
+    /**
+     * Performance monitor app name.
+     */
+    public static final String PERFORMANCE_MONITOR = "performance-monitor";
     
     
     // ================================================================================
@@ -85,4 +90,5 @@ public interface KafkaConfigProps {
      * JSON POJO class property name.
      */
     public static final String JSON_POJO_CLASS = "JsonPojoClass";
+
 }

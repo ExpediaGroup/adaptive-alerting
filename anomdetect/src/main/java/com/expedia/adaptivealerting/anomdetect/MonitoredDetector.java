@@ -19,9 +19,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMpoint;
-import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
+import com.expedia.adaptivealerting.kafka.handler.KafkaAnomalyDetectorHandler;
 
 /**
  * <p>
@@ -37,7 +37,7 @@ public class MonitoredDetector implements AnomalyDetector {
      * Local Anomaly detector.
      */
     private AnomalyDetector detector;
-    
+
     /**
      * Local Performance monitor.
      */
@@ -69,6 +69,7 @@ public class MonitoredDetector implements AnomalyDetector {
         @Override
         public void processScore(double score) {
             LOGGER.info("Performance score:{}", score);
+            KafkaAnomalyDetectorHandler.sendToKafka(score);
         }
     }
 }
