@@ -28,7 +28,7 @@ public class KafkaAnomalyDetectorHandler extends AbstractKafkaApp {
         final StreamsBuilder builder = new StreamsBuilder();
         final KStream<String, Double> stream = builder.stream(inboundTopic);
         stream
-                .mapValues(Long -> perfScore)
+                .mapValues(Double -> perfScore)
                 .filter((key, perfScore) -> perfScore != null)
                 .to(outboundTopic);
         return builder;
