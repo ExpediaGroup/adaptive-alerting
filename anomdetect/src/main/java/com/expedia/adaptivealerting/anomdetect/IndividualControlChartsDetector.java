@@ -28,14 +28,20 @@ import static java.lang.Math.abs;
 
 /**
  * <p>
+ *     Anomaly detector implementation of  <a href="https://en.wikipedia.org/wiki/Shewhart_individuals_control_chart"> Shewhart individuals control chart </a>
+ *     It uses the moving range (R) and the individual samples (X) to observe long-term and short-term variation in input stream of data
+ *     @see <a href="https://www.spcforexcel.com/knowledge/variable-control-charts/individuals-control-charts">https://www.spcforexcel.com/knowledge/variable-control-charts/individuals-control-charts</a>
  * </p>
  *
  * @author shsethi
  */
-public class ShewhartIndividuals implements AnomalyDetector {
+public class IndividualControlChartsDetector implements AnomalyDetector {
 
     private static final double R_CONTROL_CHART_CONSTANT_D4 = 3.267;
-    private static final int RECOMPUTE_LIMITS_PERIOD = 25;
+    /**
+     * Number of points after which limits will be recomputed
+     */
+    private static final int RECOMPUTE_LIMITS_PERIOD = 100;
 
     /**
      * Local Aggregate Moving range. Used to calculate avg. moving range.
@@ -63,6 +69,22 @@ public class ShewhartIndividuals implements AnomalyDetector {
      */
     private int warmUpPeriod;
 
+    public double getTarget() {
+        return target;
+    }
+
+    public double getUpperControlLimit_R() {
+        return upperControlLimit_R;
+    }
+
+    public double getUpperControlLimit_X() {
+        return upperControlLimit_X;
+    }
+
+    public double getLowerControlLimit_X() {
+        return lowerControlLimit_X;
+    }
+
     /**
      * Upper limit for R chart
      */
@@ -78,14 +100,14 @@ public class ShewhartIndividuals implements AnomalyDetector {
      */
     private double lowerControlLimit_X;
     /**
-     * Local target
+     * Local mean
      */
-    private double runningMean;
+    private double mean;
 
     /**
-     * Creates a new MovingRangeChart detector initValue = 0.0, warmUpPeriod = 25
+     * Creates a new Individual Control Charts detector with initValue = 0.0, warmUpPeriod = 25
      */
-    public ShewhartIndividuals() {
+    public IndividualControlChartsDetector() {
         this(0.0, 25);
     }
 
@@ -96,7 +118,7 @@ public class ShewhartIndividuals implements AnomalyDetector {
      * @param warmUpPeriod Warm up period value. Minimum no of data points required before it can be used for actual anomaly
      *                     detection.
      */
-    public ShewhartIndividuals(
+    public IndividualControlChartsDetector(
             double initValue,
             int warmUpPeriod
     ) {
@@ -118,25 +140,12 @@ public class ShewhartIndividuals implements AnomalyDetector {
 
         final double observed = metricPoint.value();
         double currentRange = abs(prevValue - observed);
-        this.movingRangeSum += abs(currentRange);
-        this.runningMean = getRunningMean(observed);
-
         final double dist = abs(observed - target);
-        this.totalDataPoints++;
 
         AnomalyLevel anomalyLevel = UNKNOWN;
-        if (totalDataPoints <= warmUpPeriod || ((totalDataPoints-warmUpPeriod) % RECOMPUTE_LIMITS_PERIOD )==0) {
 
-            double averageMovingRange = getAverageMovingRange();
-            this.target = this.runningMean;
-
-            upperControlLimit_R = R_CONTROL_CHART_CONSTANT_D4 * averageMovingRange;
-            upperControlLimit_X = this.target + 2.66 * averageMovingRange;
-            lowerControlLimit_X = this.target - 2.66 * averageMovingRange;
-
-        } else {
+        if (totalDataPoints > warmUpPeriod){
             anomalyLevel = NORMAL;
-
             if (currentRange > upperControlLimit_R) {
                 anomalyLevel = STRONG;
             } else {
@@ -146,6 +155,21 @@ public class ShewhartIndividuals implements AnomalyDetector {
             }
         }
 
+        if(anomalyLevel == NORMAL || anomalyLevel == UNKNOWN){
+            this.movingRangeSum += abs(currentRange);
+            this.mean = getRunningMean(observed);
+            this.totalDataPoints++;
+        }
+
+        if(((totalDataPoints - warmUpPeriod) % RECOMPUTE_LIMITS_PERIOD) == 0) {
+
+            double averageMovingRange = getAverageMovingRange();
+            this.target = this.mean;
+
+            upperControlLimit_R = R_CONTROL_CHART_CONSTANT_D4 * averageMovingRange;
+            upperControlLimit_X = this.target + 2.66 * averageMovingRange;
+            lowerControlLimit_X = this.target - 2.66 * averageMovingRange;
+        }
         this.prevValue = observed;
 
         final Mpoint mpoint = MetricUtil.toMpoint(metricPoint);
@@ -166,7 +190,7 @@ public class ShewhartIndividuals implements AnomalyDetector {
     }
 
     private double getRunningMean(double observed) {
-        return ( (this.runningMean * this.totalDataPoints) + observed) / (this.totalDataPoints + 1);
+        return this.mean + ((observed - this.mean)/(this.totalDataPoints + 1));
     }
 
     @Override
@@ -180,6 +204,5 @@ public class ShewhartIndividuals implements AnomalyDetector {
         }
         return movingRangeSum;
     }
-
 
 }
