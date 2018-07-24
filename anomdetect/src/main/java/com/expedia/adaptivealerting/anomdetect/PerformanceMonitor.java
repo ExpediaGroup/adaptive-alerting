@@ -60,7 +60,7 @@ public class PerformanceMonitor {
         AssertUtil.isTrue(maxTicks > 0, "Max ticks should be greather than 0");
 
         this.listener = listener;
-        this.evaluator = new RmseEvaluator();
+        this.evaluator = evaluator;
         this.maxTicks = maxTicks;
         resetCounter();
     }
