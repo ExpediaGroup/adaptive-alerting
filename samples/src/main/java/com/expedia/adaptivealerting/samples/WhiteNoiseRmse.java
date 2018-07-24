@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.samples;
 import com.expedia.adaptivealerting.anomdetect.CusumAnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.EwmaAnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.PewmaAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.IndividualControlChartsDetector;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
@@ -41,14 +42,17 @@ public class WhiteNoiseRmse {
         final AnomalyDetectorFilter ewmaFilter = new AnomalyDetectorFilter(new EwmaAnomalyDetector());
         final AnomalyDetectorFilter pewmaFilter = new AnomalyDetectorFilter(new PewmaAnomalyDetector());
         final AnomalyDetectorFilter cusumFilter = new AnomalyDetectorFilter(new CusumAnomalyDetector());
+        final AnomalyDetectorFilter shewhartIndividualsFilter = new AnomalyDetectorFilter(new IndividualControlChartsDetector());
 
         final EvaluatorFilter ewmaEval = new EvaluatorFilter(new RmseEvaluator());
         final EvaluatorFilter pewmaEval = new EvaluatorFilter(new RmseEvaluator());
         final EvaluatorFilter cusumEval = new EvaluatorFilter(new RmseEvaluator());
+        final EvaluatorFilter individualChartEval = new EvaluatorFilter(new RmseEvaluator());
 
         final AnomalyChartSink ewmaChart = PipelineFactory.createChartSink("EWMA");
         final AnomalyChartSink pewmaChart = PipelineFactory.createChartSink("PEWMA");
         final AnomalyChartSink cusumChart = PipelineFactory.createChartSink("CUSUM");
+        final AnomalyChartSink individualsChart = PipelineFactory.createChartSink("Shewhart Individuals");
 
         source.addSubscriber(ewmaFilter);
         ewmaFilter.addSubscriber(ewmaEval);
@@ -65,11 +69,18 @@ public class WhiteNoiseRmse {
         cusumFilter.addSubscriber(cusumChart);
         cusumEval.addSubscriber(cusumChart);
 
+        source.addSubscriber(shewhartIndividualsFilter);
+        shewhartIndividualsFilter.addSubscriber(individualChartEval);
+        shewhartIndividualsFilter.addSubscriber(individualsChart);
+        individualChartEval.addSubscriber(individualsChart);
+
         showChartFrame(createChartFrame(
                 "White Noise RMSE",
                 ewmaChart.getChart(),
                 pewmaChart.getChart(),
-                cusumChart.getChart()));
+                cusumChart.getChart(),
+                individualsChart.getChart()
+        ));
         source.start();
     }
 }
