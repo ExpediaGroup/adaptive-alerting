@@ -127,8 +127,11 @@ public class EwmaAnomalyDetector implements AnomalyDetector {
     @Override
     public AnomalyResult classify(MetricPoint metricPoint) {
         AssertUtil.notNull(metricPoint, "metricPoint can't be null");
-        
-        final double observed = metricPoint.value();
+        return classify(MetricUtil.toMpoint(metricPoint));
+    }
+
+    private AnomalyResult classify(Mpoint mpoint) {
+        final double observed = mpoint.getValue();
         final double dist = abs(observed - mean);
         final double stdDev = sqrt(variance);
         final double weakThreshold = weakThresholdSigmas * stdDev;
@@ -140,8 +143,6 @@ public class EwmaAnomalyDetector implements AnomalyDetector {
         } else if (dist > weakThreshold) {
             anomalyLevel = WEAK;
         }
-        
-        final Mpoint mpoint = MetricUtil.toMpoint(metricPoint);
         final AnomalyResult result = new AnomalyResult();
         result.setMetric(mpoint.getMetric());
         result.setDetectorId(this.getId());
@@ -162,7 +163,16 @@ public class EwmaAnomalyDetector implements AnomalyDetector {
     
     @Override
     public MappedMpoint classify(MappedMpoint mappedMpoint) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        AssertUtil.notNull(mappedMpoint, "mappedMpoint can't be null");
+        AnomalyResult anomalyResult = classify(mappedMpoint.getMpoint());
+
+        final MappedMpoint result = new MappedMpoint();
+        result.setAnomalyResult(anomalyResult);
+        result.setDetectorType(mappedMpoint.getDetectorType());
+        result.setDetectorUuid(mappedMpoint.getDetectorUuid());
+        result.setMpoint(mappedMpoint.getMpoint());
+
+        return result;
     }
     
     private void updateEstimates(double value) {
@@ -181,7 +191,7 @@ public class EwmaAnomalyDetector implements AnomalyDetector {
     
     @Override
     public String toString() {
-        return "PewmaAnomalyDetector{" +
+        return "EwmaAnomalyDetector{" +
                 "alpha=" + alpha +
                 ", weakThresholdSigmas=" + weakThresholdSigmas +
                 ", strongThresholdSigmas=" + strongThresholdSigmas +
