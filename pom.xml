@@ -37,6 +37,9 @@
         <module>kafka</module>
         <module>samples</module>
         <module>tools</module>
+
+        <!-- FIXME Temporary until we figure out how to pull in external models [WLW] -->
+        <module>aquila-temp</module>
     </modules>
 
     <properties>
