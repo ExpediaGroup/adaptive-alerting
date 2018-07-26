@@ -21,19 +21,19 @@ import java.io.InputStreamReader;
 import java.util.List;
 import java.util.ListIterator;
 
-import com.expedia.adaptivealerting.kafka.handler.KafkaAnomalyDetectorHandler;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import mockit.Mock;
+import mockit.MockUp;
+
+import com.opencsv.bean.CsvToBeanBuilder;
+import com.expedia.adaptivealerting.kafka.handler.KafkaAnomalyDetectorHandler;
 import com.expedia.adaptivealerting.anomdetect.MonitoredDetector.PerfMonHandler;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
-import com.opencsv.bean.CsvToBeanBuilder;
 
 import static org.junit.Assert.assertEquals;
-
-import mockit.Mock;
-import mockit.MockUp;
 
 /**
  * @author kashah
