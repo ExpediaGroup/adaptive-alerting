@@ -20,6 +20,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.ListIterator;
+
+import com.expedia.adaptivealerting.kafka.handler.KafkaAnomalyDetectorHandler;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -27,11 +29,14 @@ import com.expedia.adaptivealerting.anomdetect.MonitoredDetector.PerfMonHandler;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.opencsv.bean.CsvToBeanBuilder;
+
 import static org.junit.Assert.assertEquals;
+
+import mockit.Mock;
+import mockit.MockUp;
 
 /**
  * @author kashah
- *
  */
 public class PerformanceMonitorTest {
 
@@ -51,6 +56,7 @@ public class PerformanceMonitorTest {
     @Before
     public void setUp() {
         this.perfMonitor = new PerformanceMonitor(new PerfMonHandler(), new RmseEvaluator(), MAX_TICKS);
+        initDependencies();
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -88,6 +94,15 @@ public class PerformanceMonitorTest {
         final InputStream is = ClassLoader.getSystemResourceAsStream("tests/perf-monitor-sample-input.csv");
         data = new CsvToBeanBuilder<PerfMonitorTestRow>(new InputStreamReader(is)).withType(PerfMonitorTestRow.class)
                 .build().parse();
+    }
+
+    private void initDependencies() {
+        new MockUp<KafkaAnomalyDetectorHandler>() {
+            @Mock
+            void sendToKafka(Double score) // no access modifier required
+            {
+            }
+        };
     }
 
 }
