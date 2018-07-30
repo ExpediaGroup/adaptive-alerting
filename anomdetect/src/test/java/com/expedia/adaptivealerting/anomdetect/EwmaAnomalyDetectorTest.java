@@ -15,6 +15,12 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
+import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.core.data.MappedMpoint;
+import com.expedia.adaptivealerting.core.data.Mpoint;
+import com.expedia.adaptivealerting.core.evaluator.Evaluator;
+import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.core.util.MathUtil;
 import com.expedia.adaptivealerting.core.util.MetricUtil;
 import com.opencsv.bean.CsvToBeanBuilder;
@@ -26,8 +32,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.UUID;
+import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static com.expedia.adaptivealerting.anomdetect.NSigmasClassifier.DEFAULT_STRONG_SIGMAS;
 import static com.expedia.adaptivealerting.anomdetect.NSigmasClassifier.DEFAULT_WEAK_SIGMAS;
@@ -95,6 +106,63 @@ public class EwmaAnomalyDetectorTest {
             assertApproxEqual(testRow.getVar(), detector.getVariance());
             // TODO Assert AnomalyLevel
         }
+    }
+
+    @Test
+    public void testHpo() {
+        Double bestAlpha = null;
+        Double lowWeakAlpha = null;
+        Double lowStrongAlpha = null;
+        Double lowAnonAlpha = null;
+        long minWeak = Long.MAX_VALUE;
+        long minStrong = Long.MAX_VALUE;
+        long minAnon = Long.MAX_VALUE;
+        double bestRmse = Double.MAX_VALUE;
+        int numAlphas = 1000;
+        DoubleStream alphas = IntStream.rangeClosed(0, numAlphas).asDoubleStream().map(i -> i/numAlphas);
+        for (double alpha : alphas.toArray()) {
+            Evaluator evaluator = new RmseEvaluator();
+            AnomalyDetector detector = new EwmaAnomalyDetector(
+                    alpha, DEFAULT_WEAK_SIGMAS, DEFAULT_STRONG_SIGMAS, data.get(0).getObserved());
+            long epochSecond = 0;
+            long weak = 0;
+            long strong = 0;
+            for (EwmaTestRow row : data) {
+                Mpoint mpoint = MetricUtil.toMpoint(MetricUtil.metricPoint(epochSecond, row.getObserved()));
+                AnomalyResult result = detector.classify(
+                        new MappedMpoint(mpoint, UUID.randomUUID(), "")).getAnomalyResult();
+                evaluator.update(result.getObserved(), result.getPredicted());
+                epochSecond++;
+                if (AnomalyLevel.WEAK == result.getAnomalyLevel()) {
+                    weak++;
+                }
+                if (AnomalyLevel.STRONG == result.getAnomalyLevel()) {
+                    strong++;
+                }
+            }
+            double rmse = evaluator.evaluate().getEvaluatorScore();
+            if (rmse < bestRmse) {
+                bestAlpha = alpha;
+                bestRmse = rmse;
+            }
+            if (weak < minWeak) {
+                lowWeakAlpha = alpha;
+                minWeak = weak;
+            }
+            if (strong < minStrong) {
+                lowStrongAlpha = alpha;
+                minStrong = strong;
+            }
+            if ((weak + strong) < minAnon) {
+                lowAnonAlpha = alpha;
+                minAnon = weak + strong;
+            }
+            System.out.printf("Alpha=%s, RMSE=%s, Weak=%s, Strong=%s\n", alpha, rmse, weak, strong);
+        }
+        System.out.printf("Best Alpha=%s, RMSE=%s\n", bestAlpha, bestRmse);
+        System.out.printf("Low Weak Alpha=%s, Weak=%s\n", lowWeakAlpha, minWeak);
+        System.out.printf("Low Strong Alpha=%s, Strong=%s\n", lowStrongAlpha, minStrong);
+        System.out.printf("Low Anon Alpha=%s, Anon=%s\n", lowAnonAlpha, minAnon);
     }
     
     private static void readData_calInflow() {
