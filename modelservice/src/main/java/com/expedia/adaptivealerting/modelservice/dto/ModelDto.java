@@ -16,7 +16,8 @@
 
 package com.expedia.adaptivealerting.modelservice.dto;
 
-import java.util.Date;
+import java.time.Instant;
+import java.util.Map;
 
 /**
  * @author kashah
@@ -25,12 +26,46 @@ import java.util.Date;
 public class ModelDto {
 
     private String modelUUID;
-    private boolean toRebuild;
-    private Date buildTimestamp;
+    /**
+     * @return the hyperParams
+     */
+    public Object getHyperParams() {
+        return hyperParams;
+    }
 
-    public ModelDto(String modelUUID, boolean toRebuild) {
+    /**
+     * @param hyperParams the hyperParams to set
+     */
+    public void setHyperParams(Object hyperParams) {
+        this.hyperParams = hyperParams;
+    }
+
+    /**
+     * @return the thresholds
+     */
+    public Object getThresholds() {
+        return thresholds;
+    }
+
+    /**
+     * @param thresholds the thresholds to set
+     */
+    public void setThresholds(Object thresholds) {
+        this.thresholds = thresholds;
+    }
+
+    private Object hyperParams;
+    private Object thresholds;
+    private boolean toRebuild;
+    private Instant buildTimestamp;
+
+    public ModelDto(String modelUUID, Object hyperParams, Object thresholds,
+            boolean toRebuild, Instant buildTimestamp) {
         this.modelUUID = modelUUID;
+        this.hyperParams = hyperParams;
+        this.thresholds = thresholds;
         this.toRebuild = toRebuild;
+        this.buildTimestamp = buildTimestamp;
     }
 
     /**
@@ -66,7 +101,7 @@ public class ModelDto {
     /**
      * @return the buildTimestamp
      */
-    public Date getBuildTimestamp() {
+    public Instant getBuildTimestamp() {
         return buildTimestamp;
     }
 
@@ -74,7 +109,7 @@ public class ModelDto {
      * @param buildTimestamp
      *            the buildTimestamp to set
      */
-    public void setBuildTimestamp(Date buildTimestamp) {
+    public void setBuildTimestamp(Instant buildTimestamp) {
         this.buildTimestamp = buildTimestamp;
     }
 }

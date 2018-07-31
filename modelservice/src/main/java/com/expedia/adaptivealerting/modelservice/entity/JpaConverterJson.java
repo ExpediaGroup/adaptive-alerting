@@ -23,6 +23,7 @@ import javax.persistence.AttributeConverter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.HibernateException;
+import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,6 +32,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author kashah
  *
  */
+
+@Component
 public class JpaConverterJson implements AttributeConverter<Object, String> {
 
     private final static ObjectMapper objectMapper = new ObjectMapper();
