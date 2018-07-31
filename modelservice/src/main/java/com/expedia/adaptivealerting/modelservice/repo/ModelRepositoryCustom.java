@@ -13,16 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.web;
+/**
+ * 
+ */
+package com.expedia.adaptivealerting.modelservice.repo;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+import com.expedia.adaptivealerting.modelservice.dto.ModelDto;
 
-@RestController
-public class HelloController {
-    
-    @RequestMapping("/hello")
-    public String hello() {
-        return "hello";
-    }
+/**
+ * @author kashah
+ *
+ */
+public interface ModelRepositoryCustom {
+
+    List<ModelDto> findModels(String metricKey);
 }
