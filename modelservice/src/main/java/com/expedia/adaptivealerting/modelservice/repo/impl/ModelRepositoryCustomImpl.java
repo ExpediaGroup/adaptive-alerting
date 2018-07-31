@@ -54,7 +54,7 @@ public class ModelRepositoryCustomImpl implements ModelRepositoryCustom {
             + "    `metric_model` as data "
             + "  JOIN model ON data.`model_id` = model.id"
             + "  where "
-            + "    data.`metric_id` = (select id from metric m where m.metric_key = :metricKey) ";
+            + "    data.`metric_id` = (select id from metric as m where m.metric_key = :metricKey) ";
            
     // @formatter:on
 
