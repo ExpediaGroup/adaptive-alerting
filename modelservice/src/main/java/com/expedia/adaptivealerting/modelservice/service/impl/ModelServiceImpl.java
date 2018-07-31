@@ -27,15 +27,15 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author kashah
- *
  */
 
 @Service
-public class ModelServiceImpl implements ModelService{
-    
+public class ModelServiceImpl implements ModelService {
+
     @Autowired
     private
     ModelRepositoryCustom modelRepositoryCustom;
@@ -43,13 +43,13 @@ public class ModelServiceImpl implements ModelService{
     @Autowired
     private
     ModelRepository modelRepository;
-    
+
     @Override
-    public List<ModelDto> getModels(String metricKey){
-        return modelRepositoryCustom.findModels(metricKey);   
+    public List<ModelDto> getModels(String metricKey) {
+        return modelRepositoryCustom.findModels(metricKey);
     }
 
-    public void addModelParams(ModelParams modelParams){
+    public void addModelParams(ModelParams modelParams) {
 
         modelRepository.save(
                 new Model(modelParams.getModelUUID(),
@@ -58,4 +58,22 @@ public class ModelServiceImpl implements ModelService{
                 ));
     }
 
+    @Override
+    public void markToRebuild(String modelUUID, String metricKey, Boolean toRebuild) {
+
+        Integer metricID = modelRepositoryCustom.getModelID(metricKey, modelUUID);
+        Model model = modelRepository.getModelById(metricID);
+        model.setToRebuild(toRebuild);
+        modelRepository.save(model);
+
+    }
+
+    @Override
+    public void updateThresholds(String modelUUID, String metricKey, Map<String,Object> thresholds) {
+
+        Integer metricID = modelRepositoryCustom.getModelID(metricKey, modelUUID);
+        Model model = modelRepository.getModelById(metricID);
+        model.setThresholds(thresholds);
+        modelRepository.save(model);
+    }
 }

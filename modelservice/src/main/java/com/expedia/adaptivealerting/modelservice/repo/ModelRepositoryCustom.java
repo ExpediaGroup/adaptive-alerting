@@ -18,14 +18,16 @@
  */
 package com.expedia.adaptivealerting.modelservice.repo;
 
-import java.util.List;
 import com.expedia.adaptivealerting.modelservice.dto.ModelDto;
+
+import java.util.List;
 
 /**
  * @author kashah
  *
  */
 public interface ModelRepositoryCustom {
-
     List<ModelDto> findModels(String metricKey);
+
+    Integer getModelID(String metricKey, String modelUUID);
 }

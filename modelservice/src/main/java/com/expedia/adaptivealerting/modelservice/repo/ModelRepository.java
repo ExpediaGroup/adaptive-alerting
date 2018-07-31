@@ -15,12 +15,15 @@
  */
 package com.expedia.adaptivealerting.modelservice.repo;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import com.expedia.adaptivealerting.modelservice.entity.Model;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  * @author kashah
  *
  */
 public interface ModelRepository extends JpaRepository<Model, Integer> {
+
+    Model getModelById(Integer id);
+
 }

@@ -19,6 +19,7 @@ import com.expedia.adaptivealerting.modelservice.dto.ModelDto;
 import com.expedia.adaptivealerting.modelservice.entity.ModelParams;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author kashah
@@ -28,5 +29,9 @@ public interface ModelService {
     List<ModelDto> getModels(String metricKey);
 
     void addModelParams(ModelParams modelParams);
+
+    void markToRebuild(String modelUUID, String metricKey, Boolean toRebuild);
+
+    void updateThresholds(String modelUUID, String metricKey, Map<String,Object> thresholds);
 
 }

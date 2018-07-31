@@ -15,22 +15,20 @@
  */
 package com.expedia.adaptivealerting.modelservice.repo.impl;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.time.Instant;
-import java.util.List;
+import com.expedia.adaptivealerting.modelservice.dto.ModelDto;
+import com.expedia.adaptivealerting.modelservice.entity.JpaConverterJson;
+import com.expedia.adaptivealerting.modelservice.repo.ModelRepositoryCustom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
-import com.expedia.adaptivealerting.modelservice.dto.ModelDto;
-import com.expedia.adaptivealerting.modelservice.entity.JpaConverterJson;
-import com.expedia.adaptivealerting.modelservice.repo.ModelRepositoryCustom;
+
+import java.time.Instant;
+import java.util.List;
 
 /**
  * @author kashah
- *
  */
 
 @Service
@@ -45,17 +43,26 @@ public class ModelRepositoryCustomImpl implements ModelRepositoryCustom {
     // @formatter:off
     private static final String MODELS_SQL =
             "select "
-            + "  `model_uuid` as modelUUID, "
-            + "  `hyperparams` as hyperParams, "
-            + "  `thresholds` as thresholds, "    
-            + "  `to_rebuild` as toRebuild, "
-            + "  `last_build_ts` as buildTimestamp "
-            + "  from "
-            + "    `metric_model` as data "
-            + "  JOIN model ON data.`model_id` = model.id"
-            + "  where "
-            + "    data.`metric_id` = (select id from metric as m where m.metric_key = :metricKey) ";
-           
+                    + "  `model_uuid` as modelUUID, "
+                    + "  `hyperparams` as hyperParams, "
+                    + "  `thresholds` as thresholds, "
+                    + "  `to_rebuild` as toRebuild, "
+                    + "  `last_build_ts` as buildTimestamp "
+                    + "  from "
+                    + "    `metric_model` as data "
+                    + "  join model on data.`model_id` = model.id"
+                    + "  where "
+                    + "    data.`metric_id` = (select id from metric as m where m.metric_key = :metricKey) ";
+
+
+    private static final String MODEL_ID_SQL =
+            "select model.id "
+                    + "from `metric_model`"
+                    + " join model on model_id = model.id"
+                    + " where `model_uuid` = :modelUUID and metric_id = (select id"
+                    + " from metric"
+                    +  " where `metric_key` = :metricKey) ";
+
     // @formatter:on
 
     @Override
@@ -64,20 +71,24 @@ public class ModelRepositoryCustomImpl implements ModelRepositoryCustom {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("metricKey", metricKey);
 
-        RowMapper<ModelDto> mapper = new RowMapper<ModelDto>() {
-
-            @Override
-            public ModelDto mapRow(ResultSet rs, int rowNum) throws SQLException {
-                String modelUUID = rs.getString("modelUUID");
-                boolean toRebuild = rs.getBoolean("toRebuild");
-                Instant buildTimestamp = rs.getTimestamp("buildTimestamp").toInstant();
-                Object hyperParams = convertor.convertToEntityAttribute(rs.getString("hyperParams"));
-                Object thresholds = convertor.convertToEntityAttribute(rs.getString("thresholds"));
-                return new ModelDto(modelUUID, hyperParams, thresholds, toRebuild, buildTimestamp);
-            }
+        RowMapper<ModelDto> mapper = (rs, rowNum) -> {
+            String modelUUID = rs.getString("modelUUID");
+            boolean toRebuild = rs.getBoolean("toRebuild");
+            Instant buildTimestamp = rs.getTimestamp("buildTimestamp").toInstant();
+            Object hyperParams = convertor.convertToEntityAttribute(rs.getString("hyperParams"));
+            Object thresholds = convertor.convertToEntityAttribute(rs.getString("thresholds"));
+            return new ModelDto(modelUUID, hyperParams, thresholds, toRebuild, buildTimestamp);
         };
 
-        List<ModelDto> modelDtos = namedParameterJdbcTemplate.query(MODELS_SQL, params, mapper);
-        return modelDtos;
+        return namedParameterJdbcTemplate.query(MODELS_SQL, params, mapper);
+    }
+
+    @Override
+    public Integer getModelID(String metricKey, String modelUUID) {
+
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("metricKey", metricKey);
+        params.addValue("modelUUID", modelUUID);
+        return namedParameterJdbcTemplate.queryForObject(MODEL_ID_SQL, params, (resultSet, i) -> resultSet.getInt("id"));
     }
 }

@@ -17,18 +17,19 @@ package com.expedia.adaptivealerting.modelservice.web;
 
 import com.expedia.adaptivealerting.modelservice.dto.ModelDto;
 import com.expedia.adaptivealerting.modelservice.entity.ModelParams;
+import com.expedia.adaptivealerting.modelservice.entity.RebuildParams;
+import com.expedia.adaptivealerting.modelservice.entity.ThresholdParams;
 import com.expedia.adaptivealerting.modelservice.service.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 
 /**
  * @author kashah
- *
  */
 @RestController
 public class ModelController {
@@ -43,14 +44,22 @@ public class ModelController {
     }
 
     @RequestMapping(value = "/api/addModelParams", method = RequestMethod.POST)
-    public Map<String, Object> greeting(@RequestBody ModelParams modelParams) {
+    public HttpStatus addModelParams(@RequestBody ModelParams modelParams) {
         modelService.addModelParams(modelParams);
-        return modelParams.getHyperParams();
+        return HttpStatus.OK;
     }
 
-    // set to_rebuild
+    @RequestMapping(value = "/api/markToRebuild", method = RequestMethod.PUT)
+    public HttpStatus markToRebuild(@RequestBody RebuildParams rebuildParams) {
+        modelService.markToRebuild(rebuildParams.getModelUUID(), rebuildParams.getMetricKey(), rebuildParams.getToRebuild());
+        return HttpStatus.OK;
+    }
 
-    // update thresholds
+    @RequestMapping(value = "/api/updateThreshold", method = RequestMethod.PUT)
+    public HttpStatus updateThresholds(@RequestBody ThresholdParams thresholdParams) {
+        modelService.updateThresholds(thresholdParams.getModelUUID(), thresholdParams.getMetricKey(), thresholdParams.getThresholds());
+        return HttpStatus.OK;
+    }
 
 
 }
