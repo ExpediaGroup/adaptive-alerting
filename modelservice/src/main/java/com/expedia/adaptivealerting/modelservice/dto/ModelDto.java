@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.expedia.adaptivealerting.modelservice.dto;
 
 import java.time.Instant;
-import java.util.Map;
 
 /**
  * @author kashah
@@ -26,41 +24,13 @@ import java.util.Map;
 public class ModelDto {
 
     private String modelUUID;
-    /**
-     * @return the hyperParams
-     */
-    public Object getHyperParams() {
-        return hyperParams;
-    }
-
-    /**
-     * @param hyperParams the hyperParams to set
-     */
-    public void setHyperParams(Object hyperParams) {
-        this.hyperParams = hyperParams;
-    }
-
-    /**
-     * @return the thresholds
-     */
-    public Object getThresholds() {
-        return thresholds;
-    }
-
-    /**
-     * @param thresholds the thresholds to set
-     */
-    public void setThresholds(Object thresholds) {
-        this.thresholds = thresholds;
-    }
-
     private Object hyperParams;
     private Object thresholds;
     private boolean toRebuild;
     private Instant buildTimestamp;
 
-    public ModelDto(String modelUUID, Object hyperParams, Object thresholds,
-            boolean toRebuild, Instant buildTimestamp) {
+    public ModelDto(String modelUUID, Object hyperParams, Object thresholds, boolean toRebuild,
+            Instant buildTimestamp) {
         this.modelUUID = modelUUID;
         this.hyperParams = hyperParams;
         this.thresholds = thresholds;
@@ -81,6 +51,36 @@ public class ModelDto {
      */
     public void setModelUUID(String modelUUID) {
         this.modelUUID = modelUUID;
+    }
+
+    /**
+     * @return the hyperParams
+     */
+    public Object getHyperParams() {
+        return hyperParams;
+    }
+
+    /**
+     * @param hyperParams
+     *            the hyperParams to set
+     */
+    public void setHyperParams(Object hyperParams) {
+        this.hyperParams = hyperParams;
+    }
+
+    /**
+     * @return the thresholds
+     */
+    public Object getThresholds() {
+        return thresholds;
+    }
+
+    /**
+     * @param thresholds
+     *            the thresholds to set
+     */
+    public void setThresholds(Object thresholds) {
+        this.thresholds = thresholds;
     }
 
     /**
