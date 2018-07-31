@@ -15,14 +15,18 @@
  */
 package com.expedia.adaptivealerting.modelservice.service.impl;
 
-import java.util.List;
-
+import com.expedia.adaptivealerting.modelservice.dto.ModelDto;
+import com.expedia.adaptivealerting.modelservice.entity.Metric;
+import com.expedia.adaptivealerting.modelservice.entity.Model;
+import com.expedia.adaptivealerting.modelservice.entity.ModelParams;
+import com.expedia.adaptivealerting.modelservice.repo.ModelRepository;
+import com.expedia.adaptivealerting.modelservice.repo.ModelRepositoryCustom;
+import com.expedia.adaptivealerting.modelservice.service.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.expedia.adaptivealerting.modelservice.dto.ModelDto;
-import com.expedia.adaptivealerting.modelservice.repo.ModelRepositoryCustom;
-import com.expedia.adaptivealerting.modelservice.service.ModelService;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author kashah
@@ -33,11 +37,25 @@ import com.expedia.adaptivealerting.modelservice.service.ModelService;
 public class ModelServiceImpl implements ModelService{
     
     @Autowired
+    private
     ModelRepositoryCustom modelRepositoryCustom;
+
+    @Autowired
+    private
+    ModelRepository modelRepository;
     
     @Override
     public List<ModelDto> getModels(String metricKey){
         return modelRepositoryCustom.findModels(metricKey);   
+    }
+
+    public void addModelParams(ModelParams modelParams){
+
+        modelRepository.save(
+                new Model(modelParams.getModelUUID(),
+                        modelParams.getHyperParams(),
+                        Collections.singletonList(new Metric(modelParams.getMetricKey()))
+                ));
     }
 
 }

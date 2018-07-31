@@ -15,18 +15,14 @@
  */
 package com.expedia.adaptivealerting.modelservice.entity;
 
+import lombok.Data;
+
+import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 
+@Data
 @Entity
 public class Model {
 
@@ -50,6 +46,9 @@ public class Model {
     @Column(name = "last_build_ts")
     private Date buildTimestamp;
 
+    @Column(name = "training_location")
+    private Date trainingLocation;
+
     @ManyToMany(mappedBy = "models", cascade = CascadeType.ALL)
     private List<Metric> metrics;
 
@@ -58,7 +57,7 @@ public class Model {
     }
 
     public Model(String uuid, Map<String, Object> hyperParams, Map<String, Object> thresholds, boolean toRebuild,
-            Date buildTimestamp) {
+                 Date buildTimestamp) {
         this.modelUUID = uuid;
         this.hyperParams = hyperParams;
         this.thresholds = thresholds;
@@ -67,7 +66,7 @@ public class Model {
     }
 
     public Model(String uuid, Map<String, Object> hyperParams, Map<String, Object> thresholds, boolean toRebuild,
-            Date buildTimestamp, List<Metric> metrics) {
+                 Date buildTimestamp, List<Metric> metrics) {
         this.modelUUID = uuid;
         this.hyperParams = hyperParams;
         this.thresholds = thresholds;
@@ -76,108 +75,9 @@ public class Model {
         this.metrics = metrics;
     }
 
-    /**
-     * @return the id
-     */
-    public Integer getId() {
-        return id;
-    }
-
-    /**
-     * @param id
-     *            the id to set
-     */
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    /**
-     * @return the modelUUID
-     */
-    public String getModelUUID() {
-        return modelUUID;
-    }
-
-    /**
-     * @param modelUUID
-     *            the modelUUID to set
-     */
-    public void setModelUUID(String modelUUID) {
-        this.modelUUID = modelUUID;
-    }
-
-    /**
-     * @return the hyperParams
-     */
-    public Map<String, Object> getHyperParams() {
-        return hyperParams;
-    }
-
-    /**
-     * @param hyperParams
-     *            the hyperParams to set
-     */
-    public void setHyperParams(Map<String, Object> hyperParams) {
+    public Model(String uuid, Map<String, Object> hyperParams, List<Metric> metrics) {
+        this.modelUUID = uuid;
         this.hyperParams = hyperParams;
-    }
-
-    /**
-     * @return the thresholds
-     */
-    public Map<String, Object> getThresholds() {
-        return thresholds;
-    }
-
-    /**
-     * @param thresholds
-     *            the thresholds to set
-     */
-    public void setThresholds(Map<String, Object> thresholds) {
-        this.thresholds = thresholds;
-    }
-
-    /**
-     * @return the toRebuild
-     */
-    public boolean isToRebuild() {
-        return toRebuild;
-    }
-
-    /**
-     * @param toRebuild
-     *            the toRebuild to set
-     */
-    public void setToRebuild(boolean toRebuild) {
-        this.toRebuild = toRebuild;
-    }
-
-    /**
-     * @return the buildTimestamp
-     */
-    public Date getBuildTimestamp() {
-        return buildTimestamp;
-    }
-
-    /**
-     * @param buildTimestamp
-     *            the buildTimestamp to set
-     */
-    public void setBuildTimestamp(Date buildTimestamp) {
-        this.buildTimestamp = buildTimestamp;
-    }
-
-    /**
-     * @return the metrics
-     */
-    public List<Metric> getMetrics() {
-        return metrics;
-    }
-
-    /**
-     * @param metrics
-     *            the metrics to set
-     */
-    public void setMetrics(List<Metric> metrics) {
         this.metrics = metrics;
     }
 }

@@ -15,15 +15,18 @@
  */
 package com.expedia.adaptivealerting.modelservice.service;
 
-import java.util.List;
-
 import com.expedia.adaptivealerting.modelservice.dto.ModelDto;
+import com.expedia.adaptivealerting.modelservice.entity.ModelParams;
+
+import java.util.List;
 
 /**
  * @author kashah
- *
  */
 public interface ModelService {
 
     List<ModelDto> getModels(String metricKey);
+
+    void addModelParams(ModelParams modelParams);
+
 }

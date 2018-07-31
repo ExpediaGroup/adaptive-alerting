@@ -15,19 +15,16 @@
  */
 package com.expedia.adaptivealerting.modelservice.web;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.expedia.adaptivealerting.modelservice.dto.ModelDto;
+import com.expedia.adaptivealerting.modelservice.entity.ModelParams;
 import com.expedia.adaptivealerting.modelservice.service.ModelService;
-
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+
 
 /**
  * @author kashah
@@ -37,10 +34,23 @@ import org.springframework.http.MediaType;
 public class ModelController {
 
     @Autowired
+    private
     ModelService modelService;
 
     @RequestMapping(value = "/api/model", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ModelDto> getModel(@RequestParam("metricKey") String metricKey) {
         return modelService.getModels(metricKey);
     }
+
+    @RequestMapping(value = "/api/addModelParams", method = RequestMethod.POST)
+    public Map<String, Object> greeting(@RequestBody ModelParams modelParams) {
+        modelService.addModelParams(modelParams);
+        return modelParams.getHyperParams();
+    }
+
+    // set to_rebuild
+
+    // update thresholds
+
+
 }
