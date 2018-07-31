@@ -51,6 +51,7 @@
         <junit.version>4.12</junit.version>
         <kafka.streams.version>1.1.0</kafka.streams.version>
         <msgpack.version>0.8.13</msgpack.version>
+        <mysql.connector.version>8.0.11</mysql.connector.version>
         <opencsv.version>4.1</opencsv.version>
         <slf4j.version>1.7.25</slf4j.version>
         <spring.boot.version>2.0.2.RELEASE</spring.boot.version>
@@ -75,11 +76,21 @@
                 <artifactId>haystack-commons</artifactId>
                 <version>1.0.19</version>
             </dependency>
-
+ 			<!-- Mysql -->
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql.connector.version}</version>
+            </dependency>
             <!-- Spring -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot</artifactId>
+                <version>${spring.boot.version}</version>
+            </dependency>
+                <dependency>
+                <groupId>org.springframework.boot</groupId>
+            	    <artifactId>spring-boot-starter</artifactId>
                 <version>${spring.boot.version}</version>
             </dependency>
             <dependency>
@@ -90,6 +101,11 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-web</artifactId>
+                <version>${spring.boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-jpa</artifactId>
                 <version>${spring.boot.version}</version>
             </dependency>
 

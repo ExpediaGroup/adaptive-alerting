@@ -13,15 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice;
+package com.expedia.adaptivealerting.modelservice.repo;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import com.expedia.adaptivealerting.modelservice.entity.Metric;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-@SpringBootApplication
-public class ModelServiceApp {
-
-    public static void main(String[] args) {
-        SpringApplication.run(ModelServiceApp.class, args);
-    }
+/**
+ * @author kashah
+ *
+ */
+public interface MetricRepository extends JpaRepository<Metric, Integer> {
 }
