@@ -47,7 +47,10 @@ public class DetectorModelFileRepo implements DetectorModelRepo {
     @Override
     public AquilaAnomalyDetector load(UUID uuid) {
         notNull(uuid, "uuid can't be null");
-        return new AquilaAnomalyDetector(predModelRepo.load(uuid));
+        final AquilaAnomalyDetector detector = new AquilaAnomalyDetector(predModelRepo.load(uuid));
+        // TODO Shouldn't have to handle this ourselves. [WLW]
+        detector.setUuid(uuid);
+        return detector;
     }
     
     private UUID getOrCreateUuid(AquilaAnomalyDetector detector) {

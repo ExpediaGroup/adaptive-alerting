@@ -83,4 +83,14 @@ public final class MappedMpoint {
     public void setAnomalyResult(AnomalyResult anomalyResult) {
         this.anomalyResult = anomalyResult;
     }
+    
+    @Override
+    public String toString() {
+        return "MappedMpoint{" +
+                "mpoint=" + mpoint +
+                ", detectorUuid=" + detectorUuid +
+                ", detectorType='" + detectorType + '\'' +
+                ", anomalyResult=" + anomalyResult +
+                '}';
+    }
 }

@@ -57,9 +57,9 @@ public final class MathUtil {
     }
     
     /**
-     * @param data
+     * @param data Data series.
      * @param windowSize WMA window size.
-     * @return
+     * @return Weighted moving average.
      */
     public static double[] weightedMovingAverage(double[] data, int windowSize) {
         if (windowSize % 2 == 0) {

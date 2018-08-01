@@ -106,7 +106,8 @@ public final class TrainingParams {
      * Sets the WMA window size, adjusting upward to the next odd size if the size isn't already odd. For example,
      * providing 20 as an argument results in the actual value being set to 21.
      *
-     * @param wmaWindowSize
+     * @param wmaWindowSize Weighted moving average window size. Rounded up to the next odd number if it's not already
+     *                      odd.
      * @return {@code this} params instance.
      */
     public TrainingParams wmaWindowSize(int wmaWindowSize) {

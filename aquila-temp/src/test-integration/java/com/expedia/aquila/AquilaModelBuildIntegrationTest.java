@@ -15,17 +15,22 @@
  */
 package com.expedia.aquila;
 
+import com.expedia.adaptivealerting.core.data.MappedMpoint;
+import com.expedia.adaptivealerting.core.data.Metric;
 import com.expedia.adaptivealerting.core.data.MetricFrame;
-import com.expedia.adaptivealerting.core.data.repo.MetricDataFileRepo;
-import com.expedia.adaptivealerting.core.data.repo.MetricDataRepo;
-import com.expedia.aquila.repo.DetectorModelRepo;
-import com.expedia.aquila.repo.file.DetectorModelFileRepo;
+import com.expedia.adaptivealerting.core.data.Mpoint;
+import com.expedia.aquila.train.AquilaTrainer;
+import com.expedia.aquila.train.TrainingParams;
+import com.expedia.aquila.train.TrainingTask;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.ListIterator;
 import java.util.UUID;
 
 /**
@@ -43,30 +48,34 @@ import java.util.UUID;
  * @author Willie Wheeler
  */
 public class AquilaModelBuildIntegrationTest {
-    private static MetricDataRepo metricDataRepo;
-    private static DetectorModelRepo detectorModelRepo;
+    private static final Logger log = LoggerFactory.getLogger(AquilaModelBuildIntegrationTest.class);
+    
+    private static final String TRAINING_DATA_PATH = "cal-inflow-train.csv";
+    private static final String TEST_DATA_PATH = "cal-inflow-test.csv";
+    
+    private static AppContext appContext;
+    
+    private Metric metric;
     
     @BeforeClass
     public static void setUpClass() {
+        log.trace("Setting up class");
         final Config appConfig = ConfigFactory.load("application-file.conf");
         final Config aquilaConfig = appConfig.getConfig("aquila-detector");
-        final Config reposConfig = aquilaConfig.getConfig("repositories");
-        final Config dataRepoConfig = reposConfig.getConfig("metric-data.repo");
-        final Config modelRepoConfig = reposConfig.getConfig("detector-model.repo");
-        
-        metricDataRepo = new MetricDataFileRepo();
-        metricDataRepo.init(dataRepoConfig);
-        
-        detectorModelRepo = new DetectorModelFileRepo();
-        detectorModelRepo.init(modelRepoConfig);
+        appContext = new AppContext(aquilaConfig);
     }
     
     @Before
     public void setUp() {
+        this.metric = new Metric();
+        metric.putTag("what", "cal-inflow");
+        metric.putTag("mtype", "count");
+        metric.putTag("unit", "");
     }
     
     @Test
     public void testModelBuild() {
+        log.trace("Testing model build");
         final MetricFrame trainingData = loadTrainingData();
         final AquilaAnomalyDetector trainedModel = trainModel(trainingData);
         final UUID uuid = storeModel(trainedModel);
@@ -77,26 +86,48 @@ public class AquilaModelBuildIntegrationTest {
     }
     
     private MetricFrame loadTrainingData() {
-        throw new UnsupportedOperationException("Not yet implemented");
+        log.trace("Loading training data");
+        final MetricFrame data = appContext.metricDataRepo().load(metric, TRAINING_DATA_PATH);
+        log.trace("Loaded {} rows", data.getNumRows());
+        return data;
     }
     
     private AquilaAnomalyDetector trainModel(MetricFrame data) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        log.trace("Training model");
+        final AquilaTrainer trainer = new AquilaTrainer(appContext);
+        final TrainingParams params = new TrainingParams();
+        final TrainingTask task = new TrainingTask(metric, params);
+        return trainer.train(task, data);
     }
     
     private UUID storeModel(AquilaAnomalyDetector model) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        log.trace("Storing model");
+        appContext.aquilaAnomalyDetectorRepo().save(model);
+        final UUID uuid = model.getUuid();
+        log.trace("Stored model: uuid={}", uuid);
+        return uuid;
     }
     
     private AquilaAnomalyDetector loadModel(UUID uuid) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        log.trace("Loading model: uuid={}", uuid);
+        return appContext.aquilaAnomalyDetectorRepo().load(uuid);
     }
     
     private MetricFrame loadTestData() {
-        throw new UnsupportedOperationException("Not yet implemented");
+        log.trace("Loading test data");
+        final MetricFrame data = appContext.metricDataRepo().load(metric, TEST_DATA_PATH);
+        log.trace("Loaded {} rows", data.getNumRows());
+        return data;
     }
     
     private void processTestData(AquilaAnomalyDetector model, MetricFrame data) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        final UUID uuid = model.getUuid();
+        final ListIterator<Mpoint> mpoints = data.listIterator();
+        while (mpoints.hasNext()) {
+            final Mpoint mpoint = mpoints.next();
+            final MappedMpoint mappedMpoint = new MappedMpoint(mpoint, uuid, "aquila");
+            final MappedMpoint classifiedMpoint = model.classify(mappedMpoint);
+            log.trace("classifiedMpoint={}", classifiedMpoint);
+        }
     }
 }
