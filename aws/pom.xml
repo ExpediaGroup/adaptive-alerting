@@ -27,12 +27,12 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.expedia.adaptivealerting</groupId>
-    <artifactId>adaptive-alerting-tools</artifactId>
+    <artifactId>adaptive-alerting-aws</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
-    <description>Model development tools.</description>
+    <description>AWS interface for Adaptive Alerting.</description>
     <url>https://github.com/ExpediaDotCom/haystack-adaptive-alerting</url>
 
     <dependencies>
@@ -40,35 +40,11 @@
         <!-- Compile -->
         <dependency>
             <groupId>com.expedia.adaptivealerting</groupId>
-            <artifactId>adaptive-alerting-anomdetect</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.expedia.adaptivealerting</groupId>
             <artifactId>adaptive-alerting-core</artifactId>
         </dependency>
         <dependency>
             <groupId>com.expedia.adaptivealerting</groupId>
-            <artifactId>adaptive-alerting-kafka</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.expedia.www</groupId>
-            <artifactId>haystack-commons</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.opencsv</groupId>
-            <artifactId>opencsv</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka-streams</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jfree</groupId>
-            <artifactId>jfreechart</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.msgpack</groupId>
-            <artifactId>msgpack-core</artifactId>
+            <artifactId>adaptive-alerting-anomdetect</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

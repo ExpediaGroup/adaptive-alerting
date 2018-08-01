@@ -58,26 +58,6 @@
 
             <!-- Compile -->
             <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk</artifactId>
-                <version>${aws.sdk.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.expedia.adaptivealerting</groupId>
-                <artifactId>adaptive-alerting-anomdetect</artifactId>
-                <version>${aa.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.expedia.adaptivealerting</groupId>
-                <artifactId>adaptive-alerting-core</artifactId>
-                <version>${aa.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.expedia.adaptivealerting</groupId>
-                <artifactId>adaptive-alerting-tools</artifactId>
-                <version>${aa.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
                 <version>${jackson.version}</version>
@@ -86,19 +66,6 @@
                 <groupId>com.github.servicenow.stl4j</groupId>
                 <artifactId>stl-decomp-4j</artifactId>
                 <version>${stl.decomp.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.opencsv</groupId>
-                <artifactId>opencsv</artifactId>
-                <version>${opencsv.version}</version>
-            </dependency>
-
-            <!-- Test -->
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>${junit.version}</version>
-                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -109,6 +76,10 @@
         <dependency>
             <groupId>com.expedia.adaptivealerting</groupId>
             <artifactId>adaptive-alerting-anomdetect</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.expedia.adaptivealerting</groupId>
+            <artifactId>adaptive-alerting-aws</artifactId>
         </dependency>
         <dependency>
             <groupId>com.expedia.adaptivealerting</groupId>
@@ -125,10 +96,6 @@
         <dependency>
             <groupId>com.github.servicenow.stl4j</groupId>
             <artifactId>stl-decomp-4j</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.opencsv</groupId>
-            <artifactId>opencsv</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.kafka</groupId>

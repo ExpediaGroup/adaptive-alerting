@@ -16,7 +16,7 @@
 package com.expedia.aquila;
 
 import com.expedia.aquila.repo.DetectorModelRepo;
-import com.expedia.aquila.repo.MetricDataRepo;
+import com.expedia.adaptivealerting.core.data.repo.MetricDataRepo;
 import com.expedia.aquila.util.ReflectionUtil;
 import com.typesafe.config.Config;
 

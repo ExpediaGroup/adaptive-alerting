@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.core.io;
 
 import com.expedia.adaptivealerting.core.data.Metric;
 import com.expedia.adaptivealerting.core.data.MetricFrame;
+import com.expedia.adaptivealerting.core.data.repo.MetricFrameLoader;
 import org.junit.Test;
 
 import java.io.InputStream;

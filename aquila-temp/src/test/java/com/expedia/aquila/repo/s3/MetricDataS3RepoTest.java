@@ -15,8 +15,8 @@
  */
 package com.expedia.aquila.repo.s3;
 
+import com.expedia.adaptivealerting.aws.core.data.repo.MetricDataS3Repo;
 import com.expedia.adaptivealerting.core.data.Metric;
-import com.expedia.aquila.repo.s3.MetricDataS3Repo;
 import org.junit.Before;
 import org.junit.Test;
 

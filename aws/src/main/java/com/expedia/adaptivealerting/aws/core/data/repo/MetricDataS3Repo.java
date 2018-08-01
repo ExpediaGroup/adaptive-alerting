@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.aquila.repo.s3;
+package com.expedia.adaptivealerting.aws.core.data.repo;
 
 import com.expedia.adaptivealerting.core.data.Metric;
 import com.expedia.adaptivealerting.core.data.MetricFrame;
-import com.expedia.aquila.repo.MetricDataRepo;
+import com.expedia.adaptivealerting.core.data.repo.MetricDataRepo;
 import com.typesafe.config.Config;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;

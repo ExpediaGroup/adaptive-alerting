@@ -34,9 +34,12 @@
         <module>anomvalidate</module>
         <module>core</module>
         <module>modelservice</module>
-        <module>kafka</module>
         <module>samples</module>
         <module>tools</module>
+
+        <!-- Adapters and providers -->
+        <module>aws</module>
+        <module>kafka</module>
 
         <!-- FIXME Temporary until we figure out how to pull in external models [WLW] -->
         <module>aquila-temp</module>
@@ -47,18 +50,20 @@
         <project.jdk.version>1.8</project.jdk.version>
 
         <!-- Dependencies -->
+        <aa.version>${project.version}</aa.version>
+        <amazonaws.version>1.11.349</amazonaws.version>
+        <haystack.commons.version>1.0.19</haystack.commons.version>
         <jfreechart.version>1.0.19</jfreechart.version>
         <junit.version>4.12</junit.version>
         <kafka.streams.version>1.1.0</kafka.streams.version>
         <msgpack.version>0.8.13</msgpack.version>
         <opencsv.version>4.1</opencsv.version>
-        <slf4j.version>1.7.25</slf4j.version>
-        <spring.boot.version>2.0.2.RELEASE</spring.boot.version>
-        <amazonaws.version>1.11.349</amazonaws.version>
+        <pegdown.version>1.4.2</pegdown.version>
         <scalatest.version>3.0.3</scalatest.version>
         <scala.version>2.12</scala.version>
         <scala.library.version>2.12.2</scala.library.version>
-        <pegdown.version>1.4.2</pegdown.version>
+        <slf4j.version>1.7.25</slf4j.version>
+        <spring.boot.version>2.0.2.RELEASE</spring.boot.version>
 
         <!-- Maven plugins -->
         <maven.compiler.plugin.version>3.7.0</maven.compiler.plugin.version>
@@ -69,31 +74,7 @@
     <dependencyManagement>
         <dependencies>
 
-            <!-- Haystack -->
-            <dependency>
-                <groupId>com.expedia.www</groupId>
-                <artifactId>haystack-commons</artifactId>
-                <version>1.0.19</version>
-            </dependency>
-
-            <!-- Spring -->
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot</artifactId>
-                <version>${spring.boot.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-data-rest</artifactId>
-                <version>${spring.boot.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-web</artifactId>
-                <version>${spring.boot.version}</version>
-            </dependency>
-
-            <!-- Third-party -->
+            <!-- Compile -->
             <dependency>
                 <groupId>com.amazonaws</groupId>
                 <artifactId>aws-java-sdk-core</artifactId>
@@ -105,15 +86,39 @@
                 <version>${amazonaws.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.opencsv</groupId>
-                <artifactId>opencsv</artifactId>
-                <version>${opencsv.version}</version>
+                <groupId>com.expedia.adaptivealerting</groupId>
+                <artifactId>adaptive-alerting-aws</artifactId>
+                <version>${aa.version}</version>
             </dependency>
             <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>${junit.version}</version>
-                <scope>test</scope>
+                <groupId>com.expedia.adaptivealerting</groupId>
+                <artifactId>adaptive-alerting-core</artifactId>
+                <version>${aa.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.expedia.adaptivealerting</groupId>
+                <artifactId>adaptive-alerting-anomdetect</artifactId>
+                <version>${aa.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.expedia.adaptivealerting</groupId>
+                <artifactId>adaptive-alerting-anomvalidate</artifactId>
+                <version>${aa.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.expedia.adaptivealerting</groupId>
+                <artifactId>adaptive-alerting-kafka</artifactId>
+                <version>${aa.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.expedia.adaptivealerting</groupId>
+                <artifactId>adaptive-alerting-tools</artifactId>
+                <version>${aa.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.expedia.www</groupId>
+                <artifactId>haystack-commons</artifactId>
+                <version>${haystack.commons.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.kafka</groupId>
@@ -131,15 +136,24 @@
                 <version>${msgpack.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4j.version}</version>
+                <groupId>com.opencsv</groupId>
+                <artifactId>opencsv</artifactId>
+                <version>${opencsv.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4j.version}</version>
-                <scope>runtime</scope>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka_${scala.version}</artifactId>
+                <version>${kafka.streams.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka-clients</artifactId>
+                <version>${kafka.streams.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka-streams</artifactId>
+                <version>${kafka.streams.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.scala-lang</groupId>
@@ -147,20 +161,52 @@
                 <version>${scala.library.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.scalatest</groupId>
-                <artifactId>scalatest_${scala.version}</artifactId>
-                <version>${scalatest.version}</version>
-                <scope>test</scope>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.pegdown</groupId>
-                <artifactId>pegdown</artifactId>
-                <version>${pegdown.version}</version>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot</artifactId>
+                <version>${spring.boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-rest</artifactId>
+                <version>${spring.boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+                <version>${spring.boot.version}</version>
+            </dependency>
+
+            <!-- Runtime -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>${slf4j.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+
+            <!-- Test -->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
                 <scope>test</scope>
             </dependency>
+            <!--
             <dependency>
                 <groupId>org.apache.kafka</groupId>
-                <artifactId>kafka-streams</artifactId>
+                <artifactId>kafka_${scala.version}</artifactId>
+                <version>${kafka.streams.version}</version>
+                <scope>test</scope>
+            </dependency>
+            -->
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka_${scala.version}</artifactId>
                 <version>${kafka.streams.version}</version>
                 <classifier>test</classifier>
                 <scope>test</scope>
@@ -174,15 +220,21 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.kafka</groupId>
-                <artifactId>kafka_${scala.version}</artifactId>
+                <artifactId>kafka-streams</artifactId>
                 <version>${kafka.streams.version}</version>
+                <classifier>test</classifier>
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>org.apache.kafka</groupId>
-                <artifactId>kafka_${scala.version}</artifactId>
-                <version>${kafka.streams.version}</version>
-                <classifier>test</classifier>
+                <groupId>org.pegdown</groupId>
+                <artifactId>pegdown</artifactId>
+                <version>${pegdown.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.scalatest</groupId>
+                <artifactId>scalatest_${scala.version}</artifactId>
+                <version>${scalatest.version}</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>

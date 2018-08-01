@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.aquila.repo;
+package com.expedia.adaptivealerting.core.data.repo;
 
 import com.expedia.adaptivealerting.core.data.Metric;
 import com.expedia.adaptivealerting.core.data.MetricFrame;
@@ -28,9 +28,9 @@ import com.typesafe.config.Config;
 public interface MetricDataRepo {
     
     /**
-     * Configure the repository.
+     * Initialize the repository.
      *
-     * @param config Repository configuration.
+     * @param config
      */
     void init(Config config);
     
