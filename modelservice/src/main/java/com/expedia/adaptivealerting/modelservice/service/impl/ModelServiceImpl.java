@@ -25,12 +25,12 @@ import com.expedia.adaptivealerting.modelservice.service.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 /**
  * @author kashah
+ * @author shsethi
  */
 
 @Service
@@ -51,11 +51,11 @@ public class ModelServiceImpl implements ModelService {
 
     public void addModelParams(ModelParams modelParams) {
 
-        modelRepository.save(
-                new Model(modelParams.getModelUUID(),
-                        modelParams.getHyperParams(),
-                        Collections.singletonList(new Metric(modelParams.getMetricKey()))
-                ));
+        Model model = new Model(modelParams.getModelUUID(),modelParams.getHyperParams());
+        Metric metric = new Metric(modelParams.getMetricKey());
+        model.getMetrics().add(metric);
+        metric.getModels().add(model);
+        modelRepository.save(model);
     }
 
     @Override

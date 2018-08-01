@@ -15,10 +15,15 @@
  */
 package com.expedia.adaptivealerting.modelservice.entity;
 
+import lombok.Data;
+
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
+@Data
 @Entity
+@Table(name = "metric")
 public class Metric {
 
     @Id
@@ -31,7 +36,7 @@ public class Metric {
     @ManyToMany(targetEntity = Model.class, cascade = { CascadeType.ALL })
     @JoinTable(name = "metric_model", joinColumns = { @JoinColumn(name = "metric_id") }, inverseJoinColumns = {
             @JoinColumn(name = "model_id") })
-    private List<Model> models;
+    private List<Model> models = new ArrayList<>();
 
     public Metric() {
 
@@ -41,53 +46,4 @@ public class Metric {
         this.metricKey = key;
     }
 
-    public Metric(String key, List<Model> models) {
-        this.metricKey = key;
-        this.models = models;
-    }
-
-    /**
-     * @return the id
-     */
-    public Integer getId() {
-        return id;
-    }
-
-    /**
-     * @param id
-     *            the id to set
-     */
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    /**
-     * @return the metricUUID
-     */
-    public String getMetricKey() {
-        return metricKey;
-    }
-
-    /**
-     * @param metricKey
-     *            the metricUUID to set
-     */
-    public void setMetricKey(String metricKey) {
-        this.metricKey = metricKey;
-    }
-
-    /**
-     * @return the models
-     */
-    public List<Model> getModels() {
-        return models;
-    }
-
-    /**
-     * @param models
-     *            the models to set
-     */
-    public void setModels(List<Model> models) {
-        this.models = models;
-    }
 }

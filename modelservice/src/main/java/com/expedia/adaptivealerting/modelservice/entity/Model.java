@@ -18,12 +18,14 @@ package com.expedia.adaptivealerting.modelservice.entity;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 @Data
 @Entity
+@Table(name = "model")
 public class Model {
 
     @Id
@@ -50,7 +52,7 @@ public class Model {
     private Date trainingLocation;
 
     @ManyToMany(mappedBy = "models", cascade = CascadeType.ALL)
-    private List<Metric> metrics;
+    private List<Metric> metrics = new ArrayList<>();
 
     public Model() {
 
@@ -65,19 +67,8 @@ public class Model {
         this.buildTimestamp = buildTimestamp;
     }
 
-    public Model(String uuid, Map<String, Object> hyperParams, Map<String, Object> thresholds, boolean toRebuild,
-                 Date buildTimestamp, List<Metric> metrics) {
+    public Model(String uuid, Map<String, Object> hyperParams) {
         this.modelUUID = uuid;
         this.hyperParams = hyperParams;
-        this.thresholds = thresholds;
-        this.toRebuild = toRebuild;
-        this.buildTimestamp = buildTimestamp;
-        this.metrics = metrics;
-    }
-
-    public Model(String uuid, Map<String, Object> hyperParams, List<Metric> metrics) {
-        this.modelUUID = uuid;
-        this.hyperParams = hyperParams;
-        this.metrics = metrics;
     }
 }
