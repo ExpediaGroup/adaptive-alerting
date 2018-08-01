@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.aquila.repo.file;
+package com.expedia.aquila.repo;
 
 import com.expedia.aquila.AquilaAnomalyDetector;
-import com.expedia.aquila.repo.DetectorModelRepo;
-import com.typesafe.config.Config;
+import com.expedia.aquila.model.PredictionModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -27,33 +27,31 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 /**
  * @author Willie Wheeler
  */
-public class DetectorModelFileRepo implements DetectorModelRepo {
-    private PredictionModelFileRepo predModelRepo;
-    
-    @Override
-    public void init(Config config) {
-        notNull(config, "config can't be null");
-        final File baseDir = new File(config.getString("base.dir"));
-        this.predModelRepo = new PredictionModelFileRepo(baseDir);
-    }
+public abstract class AbstractDetectorModelRepo implements DetectorModelRepo {
+    private static final Logger log = LoggerFactory.getLogger(AbstractDetectorModelRepo.class);
     
     @Override
     public void save(AquilaAnomalyDetector detector) {
         notNull(detector, "detector can't be null");
         final UUID uuid = getOrCreateUuid(detector);
-        predModelRepo.save(uuid, detector.getPredictionModel());
+        log.info("Saving AquilaAnomalyDetector: uuid={}", uuid);
+        getPredictionModelRepo().save(uuid, detector.getPredictionModel());
     }
     
     @Override
     public AquilaAnomalyDetector load(UUID uuid) {
         notNull(uuid, "uuid can't be null");
-        final AquilaAnomalyDetector detector = new AquilaAnomalyDetector(predModelRepo.load(uuid));
+        log.info("Loading AquilaAnomalyDetector: uuid={}", uuid);
+        final PredictionModel predModel = getPredictionModelRepo().load(uuid);
+        final AquilaAnomalyDetector detector = new AquilaAnomalyDetector(predModel);
         // TODO Shouldn't have to handle this ourselves. [WLW]
         detector.setUuid(uuid);
         return detector;
     }
     
-    private UUID getOrCreateUuid(AquilaAnomalyDetector detector) {
+    protected abstract PredictionModelRepo getPredictionModelRepo();
+    
+    protected UUID getOrCreateUuid(AquilaAnomalyDetector detector) {
         UUID uuid = detector.getUuid();
         if (uuid == null) {
             uuid = UUID.randomUUID();

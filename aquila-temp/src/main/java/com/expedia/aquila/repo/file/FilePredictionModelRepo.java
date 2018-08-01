@@ -27,15 +27,15 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
- * File-based repository for prediction models.
+ * File-based repository for Aquila prediction models.
  *
  * @author Willie Wheeler
  */
-public final class PredictionModelFileRepo implements PredictionModelRepo {
+public final class FilePredictionModelRepo implements PredictionModelRepo {
     private File baseDir;
     private ObjectMapper mapper;
     
-    public PredictionModelFileRepo(File baseDir) {
+    public FilePredictionModelRepo(File baseDir) {
         notNull(baseDir, "baseDir can't be null");
         isTrue(baseDir.isDirectory(), "baseDir must be a directory");
         this.baseDir = baseDir;
@@ -51,7 +51,7 @@ public final class PredictionModelFileRepo implements PredictionModelRepo {
         notNull(detectorUuid, "detectorUuid can't be null");
         notNull(predModel, "predModel can't be null");
         
-        final File file = getPredicitionModelFile(detectorUuid);
+        final File file = getPredictionModelFile(detectorUuid);
         try {
             mapper.writerWithDefaultPrettyPrinter().writeValue(file, predModel);
         } catch (IOException e) {
@@ -63,7 +63,7 @@ public final class PredictionModelFileRepo implements PredictionModelRepo {
     public PredictionModel load(UUID detectorUuid) {
         notNull(detectorUuid, "detectorUuid can't be null");
         
-        final File file = getPredicitionModelFile(detectorUuid);
+        final File file = getPredictionModelFile(detectorUuid);
         try {
             return mapper.readValue(file, PredictionModel.class);
         } catch (IOException e) {
@@ -71,7 +71,7 @@ public final class PredictionModelFileRepo implements PredictionModelRepo {
         }
     }
     
-    private File getPredicitionModelFile(UUID uuid) {
-        return new File(baseDir, "aquila-" + uuid + ".json");
+    private File getPredictionModelFile(UUID detectorUuid) {
+        return new File(baseDir, "aquila-" + detectorUuid + ".json");
     }
 }

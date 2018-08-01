@@ -15,10 +15,18 @@
  */
 package com.expedia.adaptivealerting.aws.core.data.repo;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.S3Object;
 import com.expedia.adaptivealerting.core.data.Metric;
 import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.adaptivealerting.core.data.repo.MetricDataRepo;
+import com.expedia.adaptivealerting.core.data.repo.MetricFrameLoader;
 import com.typesafe.config.Config;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
@@ -27,11 +35,17 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author Karan Shah
  */
 public final class MetricDataS3Repo implements MetricDataRepo {
+    private static final Logger log = LoggerFactory.getLogger(MetricDataS3Repo.class);
+    
+    private AmazonS3 s3;
     private String bucketName;
     
     @Override
     public void init(Config config) {
         notNull(config, "config can't be null");
+        this.s3 = AmazonS3ClientBuilder.standard()
+                .withRegion(config.getString("region"))
+                .build();
         this.bucketName = config.getString("bucket.name");
     }
     
@@ -41,6 +55,15 @@ public final class MetricDataS3Repo implements MetricDataRepo {
     
     @Override
     public MetricFrame load(Metric metric, String path) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        notNull(metric, "metric can't be null");
+        notNull(path, "path can't be null");
+        
+        final S3Object s3Obj = s3.getObject(bucketName, path);
+        
+        try {
+            return MetricFrameLoader.loadCsv(metric, s3Obj.getObjectContent(), true);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

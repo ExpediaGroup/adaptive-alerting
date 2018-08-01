@@ -18,13 +18,11 @@ package com.expedia.aquila.repo.s3;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.S3Object;
-import com.expedia.aquila.AquilaAnomalyDetector;
 import com.expedia.aquila.model.PredictionModel;
-import com.expedia.aquila.repo.DetectorModelRepo;
+import com.expedia.aquila.repo.PredictionModelRepo;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -33,19 +31,18 @@ import java.util.UUID;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
+ * S3-based repository for Aquila prediction models.
+ *
  * @author Willie Wheeler
- * @author Karan Shah
  */
-public class DetectorModelS3Repo implements DetectorModelRepo {
-    private static final Logger log = LoggerFactory.getLogger(DetectorModelS3Repo.class);
-    
+public class S3PredictionModelRepo implements PredictionModelRepo {
     private AmazonS3 s3;
     private String bucketName;
     private ObjectMapper objectMapper;
     
-    @Override
-    public void init(Config config) {
+    public S3PredictionModelRepo(Config config) {
         notNull(config, "config can't be null");
+        
         this.s3 = AmazonS3ClientBuilder.standard()
                 .withRegion(config.getString("region"))
                 .build();
@@ -58,26 +55,36 @@ public class DetectorModelS3Repo implements DetectorModelRepo {
     }
     
     @Override
-    public void save(AquilaAnomalyDetector detector) {
-        // TODO
-        throw new UnsupportedOperationException("Not yet implemented");
+    public void save(UUID detectorUuid, PredictionModel predModel) {
+        notNull(detectorUuid, "detectorUuid can't be null");
+        notNull(predModel, "predModel can't be null");
+        
+        final String objPath = getObjectPath(detectorUuid);
+        
+        // TODO Add metadata.
+        // See https://docs.aws.amazon.com/AmazonS3/latest/dev/UploadObjSingleOpJava.html
+        try {
+            final String predModelStr = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(predModel);
+            s3.putObject(bucketName, objPath, predModelStr);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
     
     @Override
-    public AquilaAnomalyDetector load(UUID uuid) {
-        notNull(uuid, "uuid can't be null");
-        log.info("Loading AquilaAnomalyDetector: uuid={}", uuid);
-        final String path = uuid.toString() + ".json";
-        final S3Object s3Obj = s3.getObject(bucketName, path);
-        final PredictionModel predModel = toPredictionModel(s3Obj);
-        return new AquilaAnomalyDetector(predModel);
-    }
-    
-    private PredictionModel toPredictionModel(S3Object s3Obj) {
+    public PredictionModel load(UUID detectorUuid) {
+        notNull(detectorUuid, "detectorUuid can't be null");
+        
+        final String objPath = getObjectPath(detectorUuid);
+        final S3Object s3Obj = s3.getObject(bucketName, objPath);
         try {
             return objectMapper.readValue(new BufferedInputStream(s3Obj.getObjectContent()), PredictionModel.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+    
+    private String getObjectPath(UUID detectorUuid) {
+        return detectorUuid.toString() + "/model.json";
     }
 }

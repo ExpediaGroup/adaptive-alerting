@@ -34,8 +34,8 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author Willie Wheeler
  * @author Karan Shah
  */
-public final class MetricDataFileRepo implements MetricDataRepo {
-    private static final Logger log = LoggerFactory.getLogger(MetricDataFileRepo.class);
+public final class FileMetricDataRepo implements MetricDataRepo {
+    private static final Logger log = LoggerFactory.getLogger(FileMetricDataRepo.class);
     
     private File baseDir;
     
@@ -50,7 +50,7 @@ public final class MetricDataFileRepo implements MetricDataRepo {
         isTrue(baseDir.isDirectory(), "Property base.dir must point to a directory");
         
         this.baseDir = baseDir;
-        log.info("Initialized MetricDataFileRepo with baseDir={}", this.baseDir);
+        log.info("Initialized FileMetricDataRepo with baseDir={}", this.baseDir);
     }
     
     public File getBaseDir() {

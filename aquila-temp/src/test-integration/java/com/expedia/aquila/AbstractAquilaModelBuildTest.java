@@ -24,8 +24,6 @@ import com.expedia.aquila.train.TrainingParams;
 import com.expedia.aquila.train.TrainingTask;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,40 +31,28 @@ import org.slf4j.LoggerFactory;
 import java.util.ListIterator;
 import java.util.UUID;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+
 /**
- * Integration test for Aquila model builds. This includes the following
- *
- * <ul>
- * <li>Load training data from the file system</li>
- * <li>Train an Aquila model</li>
- * <li>Store the model to the file system</li>
- * <li>Load the model into an anomaly detector</li>
- * <li>Load test data from the file system</li>
- * <li>Run the test data through the model</li>
- * </ul>
- *
  * @author Willie Wheeler
  */
-public class AquilaModelBuildIntegrationTest {
-    private static final Logger log = LoggerFactory.getLogger(AquilaModelBuildIntegrationTest.class);
+public abstract class AbstractAquilaModelBuildTest {
+    private static final Logger log = LoggerFactory.getLogger(FileBasedAquilaModelBuildTest.class);
     
-    private static final String TRAINING_DATA_PATH = "cal-inflow-train.csv";
-    private static final String TEST_DATA_PATH = "cal-inflow-test.csv";
+    private static final String TRAINING_DATA_PATH = "test-data/cal-inflow-train.csv";
+    private static final String TEST_DATA_PATH = "test-data/cal-inflow-test.csv";
     
-    private static AppContext appContext;
-    
+    private String configPath;
+    private AppContext appContext;
     private Metric metric;
     
-    @BeforeClass
-    public static void setUpClass() {
-        log.trace("Setting up class");
-        final Config appConfig = ConfigFactory.load("application-file.conf");
+    public AbstractAquilaModelBuildTest(String configPath) {
+        notNull(configPath, "configPath can't be null");
+        this.configPath = configPath;
+        final Config appConfig = ConfigFactory.load(configPath);
         final Config aquilaConfig = appConfig.getConfig("aquila-detector");
-        appContext = new AppContext(aquilaConfig);
-    }
-    
-    @Before
-    public void setUp() {
+        this.appContext = new AppContext(aquilaConfig);
+        
         this.metric = new Metric();
         metric.putTag("what", "cal-inflow");
         metric.putTag("mtype", "count");
