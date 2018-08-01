@@ -13,16 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.web;
+package com.expedia.adaptivealerting.modelservice.repo;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.expedia.adaptivealerting.modelservice.entity.Model;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-@RestController
-public class HelloController {
-    
-    @RequestMapping("/hello")
-    public String hello() {
-        return "hello";
-    }
+/**
+ * @author kashah
+ *
+ */
+public interface ModelRepository extends JpaRepository<Model, Integer> {
+
+    Model getModelById(Integer id);
+
 }

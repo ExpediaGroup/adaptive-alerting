@@ -13,15 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice;
+package com.expedia.adaptivealerting.modelservice.service;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import com.expedia.adaptivealerting.modelservice.dto.ModelDto;
+import com.expedia.adaptivealerting.modelservice.entity.ModelParams;
 
-@SpringBootApplication
-public class ModelServiceApp {
+import java.util.List;
+import java.util.Map;
 
-    public static void main(String[] args) {
-        SpringApplication.run(ModelServiceApp.class, args);
-    }
+/**
+ * @author kashah
+ */
+public interface ModelService {
+
+    List<ModelDto> getModels(String metricKey);
+
+    void addModelParams(ModelParams modelParams);
+
+    void markToRebuild(String modelUUID, String metricKey, Boolean toRebuild);
+
+    void updateThresholds(String modelUUID, String metricKey, Map<String,Object> thresholds);
+
 }
