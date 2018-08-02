@@ -15,10 +15,11 @@
  */
 package com.expedia.aquila.repo.s3;
 
-import com.expedia.adaptivealerting.core.data.Metric;
-import com.expedia.adaptivealerting.core.data.MetricFrame;
-import com.expedia.aquila.repo.MetricDataRepo;
+import com.expedia.aquila.repo.AbstractDetectorModelRepo;
+import com.expedia.aquila.repo.PredictionModelRepo;
 import com.typesafe.config.Config;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
@@ -26,21 +27,19 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author Willie Wheeler
  * @author Karan Shah
  */
-public final class MetricDataS3Repo implements MetricDataRepo {
-    private String bucketName;
+public class S3DetectorModelRepo extends AbstractDetectorModelRepo {
+    private static final Logger log = LoggerFactory.getLogger(S3DetectorModelRepo.class);
+    
+    private S3PredictionModelRepo predModelRepo;
     
     @Override
     public void init(Config config) {
         notNull(config, "config can't be null");
-        this.bucketName = config.getString("bucket.name");
-    }
-    
-    public String getBucketName() {
-        return bucketName;
+        this.predModelRepo = new S3PredictionModelRepo(config);
     }
     
     @Override
-    public MetricFrame load(Metric metric, String path) {
-        throw new UnsupportedOperationException("Not yet implemented");
+    protected PredictionModelRepo getPredictionModelRepo() {
+        return predModelRepo;
     }
 }

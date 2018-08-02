@@ -50,4 +50,13 @@ public final class Mpoint {
     public void setValue(Float value) {
         this.value = value;
     }
+    
+    @Override
+    public String toString() {
+        return "Mpoint{" +
+                "metric=" + metric +
+                ", epochTimeInSeconds=" + epochTimeInSeconds +
+                ", value=" + value +
+                '}';
+    }
 }

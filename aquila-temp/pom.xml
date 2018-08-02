@@ -19,16 +19,24 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
+    <!-- FIXME Not sure I want Spring Boot to be the parent here [WLW] -->
+    <!--
     <parent>
         <groupId>com.expedia.adaptivealerting</groupId>
         <artifactId>adaptive-alerting</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
+    -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.0.3.RELEASE</version>
+    </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.expedia.aquila</groupId>
     <artifactId>aquila</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
@@ -58,13 +66,13 @@
 
             <!-- Compile -->
             <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk</artifactId>
-                <version>${aws.sdk.version}</version>
+                <groupId>com.expedia.adaptivealerting</groupId>
+                <artifactId>adaptive-alerting-anomdetect</artifactId>
+                <version>${aa.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.expedia.adaptivealerting</groupId>
-                <artifactId>adaptive-alerting-anomdetect</artifactId>
+                <artifactId>adaptive-alerting-aws</artifactId>
                 <version>${aa.version}</version>
             </dependency>
             <dependency>
@@ -87,19 +95,6 @@
                 <artifactId>stl-decomp-4j</artifactId>
                 <version>${stl.decomp.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.opencsv</groupId>
-                <artifactId>opencsv</artifactId>
-                <version>${opencsv.version}</version>
-            </dependency>
-
-            <!-- Test -->
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>${junit.version}</version>
-                <scope>test</scope>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -109,6 +104,10 @@
         <dependency>
             <groupId>com.expedia.adaptivealerting</groupId>
             <artifactId>adaptive-alerting-anomdetect</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.expedia.adaptivealerting</groupId>
+            <artifactId>adaptive-alerting-aws</artifactId>
         </dependency>
         <dependency>
             <groupId>com.expedia.adaptivealerting</groupId>
@@ -126,13 +125,19 @@
             <groupId>com.github.servicenow.stl4j</groupId>
             <artifactId>stl-decomp-4j</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.opencsv</groupId>
-            <artifactId>opencsv</artifactId>
-        </dependency>
+        <!--
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-streams</artifactId>
+        </dependency>
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
         <!-- Test -->

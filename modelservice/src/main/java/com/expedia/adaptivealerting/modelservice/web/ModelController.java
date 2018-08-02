@@ -36,8 +36,7 @@ import java.util.List;
 public class ModelController {
 
     @Autowired
-    private
-    ModelService modelService;
+    private ModelService modelService;
 
     @RequestMapping(value = "/api/model", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ModelDto> getModel(@RequestParam("metricKey") String metricKey) {

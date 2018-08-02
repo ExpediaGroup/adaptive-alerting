@@ -13,23 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.aquila.util;
-
-import com.typesafe.config.Config;
-
-import java.util.Properties;
+package com.expedia.aquila;
 
 /**
- * @author David Sutherland
+ * Integration test for file-based Aquila model builds. This includes the following
+ *
+ * <ul>
+ * <li>Load training data from the file system</li>
+ * <li>Train an Aquila model</li>
+ * <li>Store the model to the file system</li>
+ * <li>Load the model into an anomaly detector</li>
+ * <li>Load test data from the file system</li>
+ * <li>Run the test data through the model</li>
+ * </ul>
+ *
  * @author Willie Wheeler
  */
-public final class ConfigUtil {
+public class FileBasedAquilaModelBuildTest extends AbstractAquilaModelBuildTest {
     
-    public static Properties toProperties(Config config) {
-        final Properties props = new Properties();
-        config.entrySet().forEach((entry) -> {
-            props.setProperty(entry.getKey(), entry.getValue().unwrapped().toString());
-        });
-        return props;
+    public FileBasedAquilaModelBuildTest() {
+        super("application-file.conf");
     }
 }

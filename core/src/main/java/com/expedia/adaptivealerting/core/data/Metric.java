@@ -78,4 +78,12 @@ public final class Metric {
         notNull(name, "name can't be null");
         meta.put(name, value);
     }
+    
+    @Override
+    public String toString() {
+        return "Metric{" +
+                "tags=" + tags +
+                ", meta=" + meta +
+                '}';
+    }
 }

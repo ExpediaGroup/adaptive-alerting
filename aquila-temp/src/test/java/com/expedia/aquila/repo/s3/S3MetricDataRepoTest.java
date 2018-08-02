@@ -13,33 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.aquila.repo;
+package com.expedia.aquila.repo.s3;
 
+import com.expedia.adaptivealerting.aws.core.data.repo.S3MetricDataRepo;
 import com.expedia.adaptivealerting.core.data.Metric;
-import com.expedia.adaptivealerting.core.data.MetricFrame;
-import com.typesafe.config.Config;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
- * Interface for metric data repositories. This is generally intended to support anomaly detector model training.
- *
  * @author Willie Wheeler
  * @author Karan Shah
  */
-public interface MetricDataRepo {
+public final class S3MetricDataRepoTest {
     
-    /**
-     * Configure the repository.
-     *
-     * @param config Repository configuration.
-     */
-    void init(Config config);
+    // Class under test
+    private S3MetricDataRepo repo;
     
-    /**
-     * Load repository data.
-     *
-     * @param metric Metric.
-     * @param path   Data path.
-     * @return Data.
-     */
-    MetricFrame load(Metric metric, String path);
+    // Test objects
+    private Metric metric;
+    
+    @Before
+    public void setUp() {
+    }
+    
+    @Test
+    public void testLoad() {
+    }
 }

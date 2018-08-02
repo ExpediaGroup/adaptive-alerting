@@ -52,14 +52,11 @@
         <!-- Dependencies -->
         <aa.version>1.0.0-SNAPSHOT</aa.version>
         <amazonaws.version>1.11.349</amazonaws.version>
-        <apache.commons.version>3.7</apache.commons.version>
         <haystack.commons.version>1.0.19</haystack.commons.version>
         <jfreechart.version>1.0.19</jfreechart.version>
         <junit.version>4.12</junit.version>
         <kafka.streams.version>1.1.0</kafka.streams.version>
-        <lombok.version>1.16.18</lombok.version>
         <msgpack.version>0.8.13</msgpack.version>
-        <mysql.connector.version>8.0.11</mysql.connector.version>
         <opencsv.version>4.1</opencsv.version>
         <pegdown.version>1.4.2</pegdown.version>
         <scalatest.version>3.0.3</scalatest.version>
@@ -124,26 +121,6 @@
                 <version>${haystack.commons.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.opencsv</groupId>
-                <artifactId>opencsv</artifactId>
-                <version>${opencsv.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-lang3</artifactId>
-                <version>${apache.commons.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.kafka</groupId>
-                <artifactId>kafka_${scala.version}</artifactId>
-                <version>${kafka.streams.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.kafka</groupId>
-                <artifactId>kafka-clients</artifactId>
-                <version>${kafka.streams.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.apache.kafka</groupId>
                 <artifactId>kafka-streams</artifactId>
                 <version>${kafka.streams.version}</version>
@@ -159,9 +136,24 @@
                 <version>${msgpack.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <version>${lombok.version}</version>
+                <groupId>com.opencsv</groupId>
+                <artifactId>opencsv</artifactId>
+                <version>${opencsv.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka_${scala.version}</artifactId>
+                <version>${kafka.streams.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka-clients</artifactId>
+                <version>${kafka.streams.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka-streams</artifactId>
+                <version>${kafka.streams.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.scala-lang</groupId>
@@ -201,6 +193,11 @@
                 <version>${slf4j.version}</version>
                 <scope>runtime</scope>
             </dependency>
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql.connector.version}</version>
+            </dependency>
 
             <!-- Test -->
             <dependency>
@@ -209,6 +206,14 @@
                 <version>${junit.version}</version>
                 <scope>test</scope>
             </dependency>
+            <!--
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka_${scala.version}</artifactId>
+                <version>${kafka.streams.version}</version>
+                <scope>test</scope>
+            </dependency>
+            -->
             <dependency>
                 <groupId>org.apache.kafka</groupId>
                 <artifactId>kafka_${scala.version}</artifactId>

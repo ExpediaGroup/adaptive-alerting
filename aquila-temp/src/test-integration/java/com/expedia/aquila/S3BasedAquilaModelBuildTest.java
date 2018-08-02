@@ -13,19 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.aquila.util;
-
-import com.expedia.adaptivealerting.core.data.Mpoint;
-
-import java.util.UUID;
+package com.expedia.aquila;
 
 /**
+ * Integration test for file-based Aquila model builds. This includes the following
+ *
+ * <ul>
+ * <li>Load training data from the file system</li>
+ * <li>Train an Aquila model</li>
+ * <li>Store the model to the file system</li>
+ * <li>Load the model into an anomaly detector</li>
+ * <li>Load test data from the file system</li>
+ * <li>Run the test data through the model</li>
+ * </ul>
+ *
  * @author Willie Wheeler
  */
-public final class AnomalyDetectorUtil {
+public class S3BasedAquilaModelBuildTest extends AbstractAquilaModelBuildTest {
     
-    public static final UUID toDetectorUuid(Mpoint mpoint) {
-        // FIXME Hardcoded til MetricRouter can assign detector UUIDs. [WLW]
-        return UUID.fromString("636e13ed-6882-48cc-be75-56986a3b0179");
+    public S3BasedAquilaModelBuildTest() {
+        super("application-s3.conf");
     }
 }
