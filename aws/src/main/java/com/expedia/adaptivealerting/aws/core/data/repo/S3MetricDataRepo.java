@@ -34,8 +34,8 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author Willie Wheeler
  * @author Karan Shah
  */
-public final class MetricDataS3Repo implements MetricDataRepo {
-    private static final Logger log = LoggerFactory.getLogger(MetricDataS3Repo.class);
+public final class S3MetricDataRepo implements MetricDataRepo {
+    private static final Logger log = LoggerFactory.getLogger(S3MetricDataRepo.class);
     
     private AmazonS3 s3;
     private String bucketName;

@@ -48,6 +48,7 @@ public abstract class AbstractAquilaModelBuildTest {
     
     public AbstractAquilaModelBuildTest(String configPath) {
         notNull(configPath, "configPath can't be null");
+        
         this.configPath = configPath;
         final Config appConfig = ConfigFactory.load(configPath);
         final Config aquilaConfig = appConfig.getConfig("aquila-detector");

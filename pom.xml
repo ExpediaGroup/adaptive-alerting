@@ -50,7 +50,7 @@
         <project.jdk.version>1.8</project.jdk.version>
 
         <!-- Dependencies -->
-        <aa.version>${project.version}</aa.version>
+        <aa.version>1.0.0-SNAPSHOT</aa.version>
         <amazonaws.version>1.11.349</amazonaws.version>
         <haystack.commons.version>1.0.19</haystack.commons.version>
         <jfreechart.version>1.0.19</jfreechart.version>
@@ -63,7 +63,7 @@
         <scala.version>2.12</scala.version>
         <scala.library.version>2.12.2</scala.library.version>
         <slf4j.version>1.7.25</slf4j.version>
-        <spring.boot.version>2.0.2.RELEASE</spring.boot.version>
+        <spring.boot.version>2.0.3.RELEASE</spring.boot.version>
 
         <!-- Maven plugins -->
         <maven.compiler.plugin.version>3.7.0</maven.compiler.plugin.version>

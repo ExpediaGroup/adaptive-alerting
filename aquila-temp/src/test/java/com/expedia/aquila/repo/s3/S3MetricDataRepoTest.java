@@ -15,7 +15,7 @@
  */
 package com.expedia.aquila.repo.s3;
 
-import com.expedia.adaptivealerting.aws.core.data.repo.MetricDataS3Repo;
+import com.expedia.adaptivealerting.aws.core.data.repo.S3MetricDataRepo;
 import com.expedia.adaptivealerting.core.data.Metric;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,10 +24,10 @@ import org.junit.Test;
  * @author Willie Wheeler
  * @author Karan Shah
  */
-public final class MetricDataS3RepoTest {
+public final class S3MetricDataRepoTest {
     
     // Class under test
-    private MetricDataS3Repo repo;
+    private S3MetricDataRepo repo;
     
     // Test objects
     private Metric metric;
