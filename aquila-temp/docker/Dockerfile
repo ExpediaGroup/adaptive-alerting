@@ -1,4 +1,3 @@
-#
 # Copyright 2018 Expedia Group, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,16 +11,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
 
-# Packages and classes
-log4j.logger.com.expedia=INFO
+FROM openjdk:8-jre
+MAINTAINER Haystack <haystack@expedia.com>
 
-# Root logger option
-log4j.rootLogger=INFO, stdout
+ENV APP_NAME aquila-trainer
+ENV APP_HOME /app/bin
+ENV JMXTRANS_AGENT jmxtrans-agent-1.2.6
 
-# Direct log messages to stdout
-log4j.appender.stdout=org.apache.log4j.ConsoleAppender
-log4j.appender.stdout.Target=System.out
-log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
-log4j.appender.stdout.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n
+RUN mkdir -p ${APP_HOME}
+
+# TODO Create a training-specific JAR.
+COPY target/aquila-*.jar ${APP_HOME}/aquila.jar
+COPY docker/start-app.sh ${APP_HOME}/
+COPY docker/jmxtrans-agent.xml ${APP_HOME}/
+
+ADD https://github.com/jmxtrans/jmxtrans-agent/releases/download/${JMXTRANS_AGENT}/${JMXTRANS_AGENT}.jar ${APP_HOME}/
+
+WORKDIR ${APP_HOME}
+
+ENTRYPOINT ["./start-app.sh"]

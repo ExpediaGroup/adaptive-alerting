@@ -15,8 +15,8 @@
  */
 package com.expedia.aquila;
 
-import com.expedia.adaptivealerting.kafka.util.AppUtil;
 import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 
 /**
  * @author Willie Wheeler
@@ -24,8 +24,8 @@ import com.typesafe.config.Config;
  */
 public final class AppConfigFactory {
     
-    public static Config create() {
-        // TODO Decouple from Haystack AppUtil. It makes both Haystack- and Kafka-specific assumptions. [WLW]
-        return AppUtil.getAppConfig("aquila-detector");
+    public static Config create(String configPath) {
+        final Config appConfig = ConfigFactory.load(configPath);
+        return appConfig.getConfig("aquila-detector");
     }
 }
