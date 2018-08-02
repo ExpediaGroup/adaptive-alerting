@@ -37,12 +37,10 @@ import java.util.Map;
 public class ModelServiceImpl implements ModelService {
 
     @Autowired
-    private
-    ModelRepositoryCustom modelRepositoryCustom;
+    private ModelRepositoryCustom modelRepositoryCustom;
 
     @Autowired
-    private
-    ModelRepository modelRepository;
+    private ModelRepository modelRepository;
 
     @Override
     public List<ModelDto> getModels(String metricKey) {
@@ -51,7 +49,7 @@ public class ModelServiceImpl implements ModelService {
 
     public void addModelParams(ModelParams modelParams) {
 
-        Model model = new Model(modelParams.getModelUUID(),modelParams.getHyperParams());
+        Model model = new Model(modelParams.getModelUUID(), modelParams.getHyperParams());
         Metric metric = new Metric(modelParams.getMetricKey());
         model.getMetrics().add(metric);
         metric.getModels().add(model);
@@ -69,7 +67,7 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
-    public void updateThresholds(String modelUUID, String metricKey, Map<String,Object> thresholds) {
+    public void updateThresholds(String modelUUID, String metricKey, Map<String, Object> thresholds) {
 
         Integer metricID = modelRepositoryCustom.getModelID(metricKey, modelUUID);
         Model model = modelRepository.getModelById(metricID);

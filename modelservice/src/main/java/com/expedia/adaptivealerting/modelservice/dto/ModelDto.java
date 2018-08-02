@@ -27,15 +27,15 @@ import java.time.Instant;
 public class ModelDto {
 
     private String modelUUID;
-    private Object hyperParams;
+    private Object hyperparms;
     private Object thresholds;
     private boolean toRebuild;
     private Instant buildTimestamp;
 
-    public ModelDto(String modelUUID, Object hyperParams, Object thresholds, boolean toRebuild,
+    public ModelDto(String modelUUID, Object hyperparms, Object thresholds, boolean toRebuild,
             Instant buildTimestamp) {
         this.modelUUID = modelUUID;
-        this.hyperParams = hyperParams;
+        this.hyperparms = hyperparms;
         this.thresholds = thresholds;
         this.toRebuild = toRebuild;
         this.buildTimestamp = buildTimestamp;
