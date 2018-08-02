@@ -23,7 +23,6 @@ import com.expedia.aquila.train.AquilaTrainer;
 import com.expedia.aquila.train.TrainingParams;
 import com.expedia.aquila.train.TrainingTask;
 import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,8 +49,7 @@ public abstract class AbstractAquilaModelBuildTest {
         notNull(configPath, "configPath can't be null");
         
         this.configPath = configPath;
-        final Config appConfig = ConfigFactory.load(configPath);
-        final Config aquilaConfig = appConfig.getConfig("aquila-detector");
+        final Config aquilaConfig = AppConfigFactory.create(configPath);
         this.appContext = new AppContext(aquilaConfig);
         
         this.metric = new Metric();
