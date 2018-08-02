@@ -16,9 +16,9 @@
 package com.expedia.adaptivealerting.modelservice.web;
 
 import com.expedia.adaptivealerting.modelservice.dto.ModelDto;
-import com.expedia.adaptivealerting.modelservice.entity.ModelParams;
-import com.expedia.adaptivealerting.modelservice.entity.RebuildParams;
-import com.expedia.adaptivealerting.modelservice.entity.ThresholdParams;
+import com.expedia.adaptivealerting.modelservice.dto.ModelParams;
+import com.expedia.adaptivealerting.modelservice.dto.RebuildParams;
+import com.expedia.adaptivealerting.modelservice.dto.ThresholdParams;
 import com.expedia.adaptivealerting.modelservice.service.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,7 +26,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
 
 /**
  * @author kashah
@@ -51,15 +50,16 @@ public class ModelController {
 
     @RequestMapping(value = "/api/markToRebuild", method = RequestMethod.PUT)
     public HttpStatus markToRebuild(@RequestBody RebuildParams rebuildParams) {
-        modelService.markToRebuild(rebuildParams.getModelUUID(), rebuildParams.getMetricKey(), rebuildParams.getToRebuild());
+        modelService.markToRebuild(rebuildParams.getModelUUID(), rebuildParams.getMetricKey(),
+                rebuildParams.getToRebuild());
         return HttpStatus.OK;
     }
 
     @RequestMapping(value = "/api/updateThreshold", method = RequestMethod.PUT)
     public HttpStatus updateThresholds(@RequestBody ThresholdParams thresholdParams) {
-        modelService.updateThresholds(thresholdParams.getModelUUID(), thresholdParams.getMetricKey(), thresholdParams.getThresholds());
+        modelService.updateThresholds(thresholdParams.getModelUUID(), thresholdParams.getMetricKey(),
+                thresholdParams.getThresholds());
         return HttpStatus.OK;
     }
-
 
 }

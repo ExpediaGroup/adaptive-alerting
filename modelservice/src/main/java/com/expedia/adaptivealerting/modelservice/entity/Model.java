@@ -16,8 +16,8 @@
 package com.expedia.adaptivealerting.modelservice.entity;
 
 import lombok.Data;
-
 import javax.persistence.*;
+import com.expedia.adaptivealerting.modelservice.util.JpaConverterJson;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -37,7 +37,7 @@ public class Model {
 
     @Column(name = "hyperparams")
     @Convert(converter = JpaConverterJson.class)
-    private Map<String, Object> hyperparms;
+    private Map<String, Object> hyperparams;
 
     @Convert(converter = JpaConverterJson.class)
     private Map<String, Object> thresholds;
@@ -58,17 +58,17 @@ public class Model {
 
     }
 
-    public Model(String uuid, Map<String, Object> hyperparms, Map<String, Object> thresholds, boolean toRebuild,
-                 Date buildTimestamp) {
+    public Model(String uuid, Map<String, Object> hyperparams, Map<String, Object> thresholds, boolean toRebuild,
+            Date buildTimestamp) {
         this.modelUUID = uuid;
-        this.hyperparms = hyperparms;
+        this.hyperparams = hyperparams;
         this.thresholds = thresholds;
         this.toRebuild = toRebuild;
         this.buildTimestamp = buildTimestamp;
     }
 
-    public Model(String uuid, Map<String, Object> hyperparms) {
+    public Model(String uuid, Map<String, Object> hyperparams) {
         this.modelUUID = uuid;
-        this.hyperparms = hyperparms;
+        this.hyperparams = hyperparams;
     }
 }

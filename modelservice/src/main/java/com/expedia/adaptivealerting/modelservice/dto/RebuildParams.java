@@ -13,21 +13,18 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.entity;
+package com.expedia.adaptivealerting.modelservice.dto;
 
 import lombok.Data;
-
-import java.util.Map;
 
 /**
  * @author shsethi
  */
 
 @Data
-public class ThresholdParams {
+public class RebuildParams {
 
     private String modelUUID;
     private String metricKey;
-
-    private Map<String,Object> thresholds;
+    private Boolean toRebuild;
 }

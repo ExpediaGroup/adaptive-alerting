@@ -16,9 +16,9 @@
 package com.expedia.adaptivealerting.modelservice.service.impl;
 
 import com.expedia.adaptivealerting.modelservice.dto.ModelDto;
+import com.expedia.adaptivealerting.modelservice.dto.ModelParams;
 import com.expedia.adaptivealerting.modelservice.entity.Metric;
 import com.expedia.adaptivealerting.modelservice.entity.Model;
-import com.expedia.adaptivealerting.modelservice.entity.ModelParams;
 import com.expedia.adaptivealerting.modelservice.repo.ModelRepository;
 import com.expedia.adaptivealerting.modelservice.repo.ModelRepositoryCustom;
 import com.expedia.adaptivealerting.modelservice.service.ModelService;
@@ -49,7 +49,7 @@ public class ModelServiceImpl implements ModelService {
 
     public void addModelParams(ModelParams modelParams) {
 
-        Model model = new Model(modelParams.getModelUUID(), modelParams.getHyperParams());
+        Model model = new Model(modelParams.getModelUUID(), modelParams.getHyperparams());
         Metric metric = new Metric(modelParams.getMetricKey());
         model.getMetrics().add(metric);
         metric.getModels().add(model);

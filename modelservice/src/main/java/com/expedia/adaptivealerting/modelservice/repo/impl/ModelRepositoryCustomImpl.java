@@ -16,8 +16,8 @@
 package com.expedia.adaptivealerting.modelservice.repo.impl;
 
 import com.expedia.adaptivealerting.modelservice.dto.ModelDto;
-import com.expedia.adaptivealerting.modelservice.entity.JpaConverterJson;
 import com.expedia.adaptivealerting.modelservice.repo.ModelRepositoryCustom;
+import com.expedia.adaptivealerting.modelservice.util.JpaConverterJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -89,6 +89,7 @@ public class ModelRepositoryCustomImpl implements ModelRepositoryCustom {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("metricKey", metricKey);
         params.addValue("modelUUID", modelUUID);
-        return namedParameterJdbcTemplate.queryForObject(MODEL_ID_SQL, params, (resultSet, i) -> resultSet.getInt("id"));
+        return namedParameterJdbcTemplate.queryForObject(MODEL_ID_SQL, params,
+                (resultSet, i) -> resultSet.getInt("id"));
     }
 }
