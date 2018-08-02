@@ -37,7 +37,7 @@ public class Model {
 
     @Column(name = "hyperparams")
     @Convert(converter = JpaConverterJson.class)
-    private Map<String, Object> hyperParams;
+    private Map<String, Object> hyperparms;
 
     @Convert(converter = JpaConverterJson.class)
     private Map<String, Object> thresholds;
@@ -58,17 +58,17 @@ public class Model {
 
     }
 
-    public Model(String uuid, Map<String, Object> hyperParams, Map<String, Object> thresholds, boolean toRebuild,
+    public Model(String uuid, Map<String, Object> hyperparms, Map<String, Object> thresholds, boolean toRebuild,
                  Date buildTimestamp) {
         this.modelUUID = uuid;
-        this.hyperParams = hyperParams;
+        this.hyperparms = hyperparms;
         this.thresholds = thresholds;
         this.toRebuild = toRebuild;
         this.buildTimestamp = buildTimestamp;
     }
 
-    public Model(String uuid, Map<String, Object> hyperParams) {
+    public Model(String uuid, Map<String, Object> hyperparms) {
         this.modelUUID = uuid;
-        this.hyperParams = hyperParams;
+        this.hyperparms = hyperparms;
     }
 }
