@@ -26,4 +26,3 @@ release: docker_build
 	./docker/scripts/build-anomaly-validator.sh --release
 	./docker/scripts/build-ad-mapper.sh --release
 	./docker/scripts/build-ad-manager.sh --release
-
