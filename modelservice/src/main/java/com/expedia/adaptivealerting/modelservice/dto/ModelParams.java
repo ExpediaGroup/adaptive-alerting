@@ -28,5 +28,5 @@ public class ModelParams {
 
     private String modelUUID;
     private String metricKey;
-    private Map<String, Object> hyperParams;
+    private Map<String, Object> hyperparams;
 }

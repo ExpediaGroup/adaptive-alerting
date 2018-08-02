@@ -49,7 +49,7 @@ public class ModelServiceImpl implements ModelService {
 
     public void addModelParams(ModelParams modelParams) {
 
-        Model model = new Model(modelParams.getModelUUID(), modelParams.getHyperParams());
+        Model model = new Model(modelParams.getModelUUID(), modelParams.getHyperparams());
         Metric metric = new Metric(modelParams.getMetricKey());
         model.getMetrics().add(metric);
         metric.getModels().add(model);
