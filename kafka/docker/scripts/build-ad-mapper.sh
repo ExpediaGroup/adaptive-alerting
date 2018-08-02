@@ -14,9 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-APP_NAME="haystack-adaptive-alerting-anomaly-detector-manager"
-DOTTED_APP_NAME="anomaly.detector.manager"
-MAIN_CLASS="com.expedia.adaptivealerting.kafka.detector.KafkaAnomalyDetectorManager"
+APP_NAME="haystack-adaptive-alerting-ad-mapper"
+DOTTED_APP_NAME="ad.mapper"
+MAIN_CLASS="com.expedia.adaptivealerting.kafka.mapper.KafkaAnomalyDetectorMapper"
 
 cd `cd -P -- "$(dirname -- "$0")" && pwd -P`
 

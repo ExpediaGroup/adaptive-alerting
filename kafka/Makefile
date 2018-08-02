@@ -8,8 +8,8 @@ docker_build:
 	./docker/scripts/build-ewma-detector.sh -b
 	./docker/scripts/build-pewma-detector.sh -b
 	./docker/scripts/build-anomaly-validator.sh -b
-	./docker/scripts/build-anomaly-detector-mapper.sh -b
-	./docker/scripts/build-anomaly-detector-manager.sh -b
+	./docker/scripts/build-ad-mapper.sh -b
+	./docker/scripts/build-ad-manager.sh -b
 
 integration_test:
 	${MAVEN} test
@@ -24,6 +24,6 @@ release: docker_build
 	./docker/scripts/build-ewma-detector.sh --release
 	./docker/scripts/build-pewma-detector.sh --release
 	./docker/scripts/build-anomaly-validator.sh --release
-	./docker/scripts/build-anomaly-detector-mapper.sh --release
-	./docker/scripts/build-anomaly-detector-manager.sh --release
+	./docker/scripts/build-ad-mapper.sh --release
+	./docker/scripts/build-ad-manager.sh --release
 
