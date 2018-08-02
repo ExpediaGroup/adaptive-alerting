@@ -8,7 +8,7 @@ echo "BRANCH=$BRANCH, TAG=$TAG, SHA=$SHA"
 
 # login
 [[ -z $DOCKER_PASSWORD ]] && printf "\nPlease enter your docker.io password\n"
-docker login -u $DOCKER_USERNAME --password-stdin $DOCKER_PASSWORD
+docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
 
 # Add tags
 if [[ $TAG =~ ([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
