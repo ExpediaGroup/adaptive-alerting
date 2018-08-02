@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.kafka.router;
 import com.expedia.adaptivealerting.kafka.util.AppUtil;
 import com.expedia.adaptivealerting.kafka.util.BaseStreamRunnerBuilder;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
+import com.expedia.www.haystack.commons.entities.TagKeys;
 import com.expedia.www.haystack.commons.kstreams.app.StreamsRunner;
 import com.typesafe.config.Config;
 import org.apache.kafka.streams.StreamsBuilder;
@@ -71,7 +72,15 @@ public final class MetricRouter {
         }
 
         private static boolean isEwma(String key, MetricPoint metricPoint) {
-            return "duration".equals(metricPoint.metric());
+            return "duration".equals(metricPoint.metric())
+              && "airboss".equals(getTagVal(metricPoint, TagKeys.SERVICE_NAME_KEY()))
+              && "PurchaseV3".equals(getTagVal(metricPoint, TagKeys.OPERATION_NAME_KEY()))
+              && "FiveMinute".equalsIgnoreCase(getTagVal(metricPoint, TagKeys.INTERVAL_KEY()))
+              && "*_99".equalsIgnoreCase(getTagVal(metricPoint, TagKeys.STATS_KEY()));
+        }
+
+        private static String getTagVal(MetricPoint metricPoint, String tagKey) {
+            return metricPoint.tags() != null ? metricPoint.tags().get(tagKey).toString() : "";
         }
 
         private static boolean isPewma(String key, MetricPoint metricPoint) {
