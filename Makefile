@@ -16,5 +16,4 @@ all:
 # build all and release
 release:
 	all
-	cd aquila && $(MAKE) release
 	cd kafka && $(MAKE) release
