@@ -15,13 +15,10 @@ integration_test:
 	${MAVEN} test
 
 # build jar, docker image and run integration tests
-all:
-	docker_build
-	integration_test
+all: docker_build integration_test
 
 # build all and publish docker images
-release:
-	docker_build
+release: docker_build
 	./docker/scripts/build-metric-router.sh --release
 	./docker/scripts/build-constant-detector.sh --release
 	./docker/scripts/build-ewma-detector.sh --release

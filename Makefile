@@ -9,11 +9,9 @@ clean:
 build:
 	${MAVEN} install package
 
-all:
-	clean
-	build
+all: clean build
 
 # build all and release
-release:
-	all
-	cd kafka && $(MAKE) release
+release: all
+	cd kafka && $(MAKE) release && cd ..
+	cd aquila && $(MAKE) release && cd ..
