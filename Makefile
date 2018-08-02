@@ -4,14 +4,14 @@ PWD := $(shell pwd)
 MAVEN := ./mvnw
 
 clean:
-	${MAVEN} clean
+    ${MAVEN} clean
 
 build:
-	${MAVEN} install package
+    ${MAVEN} install package
 
 all: clean build
 
 # build all and release
 release: all
-	cd kafka && $(MAKE) release
+    cd kafka && $(MAKE) release
     cd aquila && $(MAKE) release
