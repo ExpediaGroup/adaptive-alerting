@@ -80,7 +80,8 @@ public final class MetricRouter {
         }
 
         private static String getTagVal(MetricPoint metricPoint, String tagKey) {
-            return metricPoint.tags() != null ? metricPoint.tags().get(tagKey).toString() : "";
+            return metricPoint.tags() != null ? scala.collection.JavaConverters
+              .mapAsJavaMapConverter(metricPoint.tags()).asJava().get(tagKey) : "";
         }
 
         private static boolean isPewma(String key, MetricPoint metricPoint) {
