@@ -16,8 +16,8 @@
 package com.expedia.adaptivealerting.modelservice.repo.impl;
 
 import com.expedia.adaptivealerting.modelservice.dto.ModelDto;
-import com.expedia.adaptivealerting.modelservice.entity.JpaConverterJson;
 import com.expedia.adaptivealerting.modelservice.repo.ModelRepositoryCustom;
+import com.expedia.adaptivealerting.modelservice.util.JpaConverterJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;

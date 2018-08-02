@@ -16,8 +16,8 @@
 package com.expedia.adaptivealerting.modelservice.entity;
 
 import lombok.Data;
-
 import javax.persistence.*;
+import com.expedia.adaptivealerting.modelservice.util.JpaConverterJson;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
