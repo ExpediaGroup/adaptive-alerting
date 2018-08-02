@@ -59,7 +59,7 @@ public class Model {
     }
 
     public Model(String uuid, Map<String, Object> hyperparms, Map<String, Object> thresholds, boolean toRebuild,
-                 Date buildTimestamp) {
+            Date buildTimestamp) {
         this.modelUUID = uuid;
         this.hyperparms = hyperparms;
         this.thresholds = thresholds;

@@ -27,6 +27,7 @@ import java.util.List;
  *
  */
 public interface ModelRepositoryCustom {
+
     List<ModelDto> findModels(String metricKey);
 
     Integer getModelID(String metricKey, String modelUUID);

@@ -89,6 +89,7 @@ public class ModelRepositoryCustomImpl implements ModelRepositoryCustom {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("metricKey", metricKey);
         params.addValue("modelUUID", modelUUID);
-        return namedParameterJdbcTemplate.queryForObject(MODEL_ID_SQL, params, (resultSet, i) -> resultSet.getInt("id"));
+        return namedParameterJdbcTemplate.queryForObject(MODEL_ID_SQL, params,
+                (resultSet, i) -> resultSet.getInt("id"));
     }
 }
