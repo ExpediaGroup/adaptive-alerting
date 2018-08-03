@@ -54,10 +54,10 @@ public class MonitoredDetector implements AnomalyDetector {
 
     @Override
     public MappedMpoint classify(MappedMpoint mappedMpoint) {
-        MappedMpoint mappedPoint = detector.classify(mappedMpoint);
-        AnomalyResult result = mappedMpoint.getAnomalyResult();
+        MappedMpoint classified = detector.classify(mappedMpoint);
+        AnomalyResult result = classified.getAnomalyResult();
         perfMonitor.evaluatePerformance(result);
-        return mappedPoint;
+        return classified;
     }
 
     @Override
