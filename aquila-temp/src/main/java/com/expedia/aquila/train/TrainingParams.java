@@ -15,7 +15,7 @@
  */
 package com.expedia.aquila.train;
 
-import com.expedia.aquila.model.DecompType;
+import com.expedia.aquila.core.model.DecompType;
 
 /**
  * Parameters for the Aquila training algorithm. Provides a fluent interface to make it easy to understand which

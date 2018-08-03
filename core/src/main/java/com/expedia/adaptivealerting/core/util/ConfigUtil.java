@@ -20,6 +20,8 @@ import com.typesafe.config.Config;
 import java.util.Properties;
 
 /**
+ * Configuration utilities.
+ *
  * @author David Sutherland
  * @author Willie Wheeler
  */

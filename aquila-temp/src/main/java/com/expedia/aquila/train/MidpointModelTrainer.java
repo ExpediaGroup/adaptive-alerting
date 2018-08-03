@@ -16,11 +16,11 @@
 package com.expedia.aquila.train;
 
 import com.expedia.adaptivealerting.core.data.MetricFrame;
-import com.expedia.aquila.model.DecompType;
-import com.expedia.aquila.model.MidpointModel;
-import com.expedia.aquila.util.MathUtil;
-import com.expedia.aquila.util.MetricUtil;
-import com.expedia.aquila.util.TimeUtil;
+import com.expedia.aquila.core.model.DecompType;
+import com.expedia.aquila.core.model.MidpointModel;
+import com.expedia.aquila.core.util.MathUtil;
+import com.expedia.aquila.core.util.MetricUtil;
+import com.expedia.aquila.core.util.TimeUtil;
 import com.github.servicenow.ds.stats.stl.SeasonalTrendLoess;
 
 import java.time.Instant;

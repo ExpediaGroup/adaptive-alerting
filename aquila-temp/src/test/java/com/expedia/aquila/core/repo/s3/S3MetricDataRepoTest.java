@@ -13,25 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.aquila;
+package com.expedia.aquila.core.repo.s3;
+
+import com.expedia.adaptivealerting.aws.core.data.repo.S3MetricDataRepo;
+import com.expedia.adaptivealerting.core.data.Metric;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
- * Integration test for file-based Aquila model builds. This includes the following
- *
- * <ul>
- * <li>Load training data from the file system</li>
- * <li>Train an Aquila model</li>
- * <li>Store the model to the file system</li>
- * <li>Load the model into an anomaly detector</li>
- * <li>Load test data from the file system</li>
- * <li>Run the test data through the model</li>
- * </ul>
- *
  * @author Willie Wheeler
+ * @author Karan Shah
  */
-public class FileBasedAquilaModelBuildTest extends AbstractAquilaModelBuildTest {
+public final class S3MetricDataRepoTest {
     
-    public FileBasedAquilaModelBuildTest() {
-        super("trainer/application-file.conf");
+    // Class under test
+    private S3MetricDataRepo repo;
+    
+    // Test objects
+    private Metric metric;
+    
+    @Before
+    public void setUp() {
+    }
+    
+    @Test
+    public void testLoad() {
     }
 }

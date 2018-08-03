@@ -17,8 +17,8 @@ package com.expedia.aquila.train;
 
 
 import com.expedia.adaptivealerting.core.data.MetricFrame;
-import com.expedia.aquila.model.DispersionModel;
-import com.expedia.aquila.model.MidpointModel;
+import com.expedia.aquila.core.model.DispersionModel;
+import com.expedia.aquila.core.model.MidpointModel;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
