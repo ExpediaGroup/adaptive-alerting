@@ -93,9 +93,14 @@ public final class AnomalyDetectorManager {
                 log.warn("No AnomalyDetectorFactory registered for detectorType={}", detectorType);
             } else {
                 final AnomalyDetector innerDetector = factory.create(detectorUuid);
-                final PerformanceMonitor perfMonitor = new PerformanceMonitor(new PerfMonHandler(), new RmseEvaluator(), PERFMON_SAMPLE_SIZE);
-                detector = new MonitoredDetector(innerDetector, perfMonitor);
-                detectors.put(detectorUuid, detector);
+
+                // TODO Temporarily commenting this out because it's causing a problem
+                // for the RandomCutForest detector (NPE). We can reinstate after we
+                // figure out how we want to address this. [WLW]
+//                final PerformanceMonitor perfMonitor = new PerformanceMonitor(new PerfMonHandler(), new RmseEvaluator(), PERFMON_SAMPLE_SIZE);
+//                detector = new MonitoredDetector(innerDetector, perfMonitor);
+//                detectors.put(detectorUuid, detector);
+                detectors.put(detectorUuid, innerDetector);
             }
         }
         return detector;
