@@ -30,6 +30,10 @@ import static org.junit.Assert.assertEquals;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * @author kashah
+ *
+ */
 public class JpaConverterJsonTests {
 
     /* Class under test */

@@ -38,6 +38,10 @@ import java.util.List;
 import org.junit.Test;
 import com.expedia.adaptivealerting.modelservice.dto.ModelParams;
 
+/**
+ * @author kashah
+ *
+ */
 public class ModelServiceImplTests {
 
     /* Class under test */

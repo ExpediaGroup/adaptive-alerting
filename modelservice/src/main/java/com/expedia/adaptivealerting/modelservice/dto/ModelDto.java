@@ -32,7 +32,7 @@ public class ModelDto {
     private boolean toRebuild;
     private Instant buildTimestamp;
 
-    public ModelDto(){
+    public ModelDto() {
 
     }
 

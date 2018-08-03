@@ -38,6 +38,10 @@ import org.springframework.http.HttpStatus;
 
 import static org.junit.Assert.assertSame;
 
+/**
+ * @author kashah
+ *
+ */
 public class ModelControllerTests {
 
     /* Class under test */
