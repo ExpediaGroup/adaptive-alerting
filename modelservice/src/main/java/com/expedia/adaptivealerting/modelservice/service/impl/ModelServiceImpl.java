@@ -47,6 +47,7 @@ public class ModelServiceImpl implements ModelService {
         return modelRepositoryCustom.findModels(metricKey);
     }
 
+    @Override
     public void addModelParams(ModelParams modelParams) {
 
         Model model = new Model(modelParams.getModelUUID(), modelParams.getHyperparams());
@@ -59,8 +60,8 @@ public class ModelServiceImpl implements ModelService {
     @Override
     public void markToRebuild(String modelUUID, String metricKey, Boolean toRebuild) {
 
-        Integer metricID = modelRepositoryCustom.getModelID(metricKey, modelUUID);
-        Model model = modelRepository.getModelById(metricID);
+        Integer modelID = modelRepositoryCustom.getModelID(metricKey, modelUUID);
+        Model model = modelRepository.getModelById(modelID);
         model.setToRebuild(toRebuild);
         modelRepository.save(model);
 
@@ -69,8 +70,8 @@ public class ModelServiceImpl implements ModelService {
     @Override
     public void updateThresholds(String modelUUID, String metricKey, Map<String, Object> thresholds) {
 
-        Integer metricID = modelRepositoryCustom.getModelID(metricKey, modelUUID);
-        Model model = modelRepository.getModelById(metricID);
+        Integer modelID = modelRepositoryCustom.getModelID(metricKey, modelUUID);
+        Model model = modelRepository.getModelById(modelID);
         model.setThresholds(thresholds);
         modelRepository.save(model);
     }

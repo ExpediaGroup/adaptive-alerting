@@ -32,6 +32,10 @@ public class ModelDto {
     private boolean toRebuild;
     private Instant buildTimestamp;
 
+    public ModelDto(){
+
+    }
+
     public ModelDto(String modelUUID, Object hyperparams, Object thresholds, boolean toRebuild,
             Instant buildTimestamp) {
         this.modelUUID = modelUUID;
