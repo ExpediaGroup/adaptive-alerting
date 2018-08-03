@@ -57,6 +57,9 @@ public final class AnomalyDetectorMapper {
             results.add(new DetectorMeta(UUID.fromString("636e13ed-6882-48cc-be75-56986a3b0179"), "aquila-detector"));
             results.add(new DetectorMeta(UUID.fromString("fac1a330-e5ad-4902-b17a-3d6068596a95"), "rcf-detector"));
         }
+        if (tags.hashCode() == 2040828082) { //PPV4 99 dur 1M
+            results.add(new DetectorMeta(UUID.fromString("5159c1b8-94ca-424f-b25c-e9f5bcb2fc51"), "ewma-detector"));
+        }
         return results;
     }
     
