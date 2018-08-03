@@ -56,7 +56,6 @@ public class ModelServiceImplTests {
 
     private List<ModelDto> modelDtoList;
 
-
     @Before
     public void setUp() throws Exception {
         this.service = new ModelServiceImpl();

@@ -32,7 +32,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author kashah
- *
  */
 public class JpaConverterJsonTests {
 
@@ -44,7 +43,6 @@ public class JpaConverterJsonTests {
     private ObjectMapper mapper;
 
     private String expectedString;
-
     private Map expectedObject;
 
     @Before
@@ -53,7 +51,6 @@ public class JpaConverterJsonTests {
         MockitoAnnotations.initMocks(this);
         initTestObjects();
         initDependencies();
-
     }
 
     @Test
@@ -80,6 +77,7 @@ public class JpaConverterJsonTests {
 
     private void initDependencies() {
         ObjectMapper mockObjectMapper = Mockito.mock(ObjectMapper.class);
+
         try {
             Mockito.when(mapper.writeValueAsString(expectedObject)).thenReturn("");
         } catch (IOException e) {
