@@ -32,6 +32,6 @@ package com.expedia.aquila;
 public class S3BasedAquilaModelBuildTest extends AbstractAquilaModelBuildTest {
     
     public S3BasedAquilaModelBuildTest() {
-        super("application-s3.conf");
+        super("trainer/application-s3");
     }
 }

@@ -19,10 +19,13 @@ import com.expedia.adaptivealerting.core.data.MappedMpoint;
 import com.expedia.adaptivealerting.core.data.Metric;
 import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.adaptivealerting.core.data.Mpoint;
+import com.expedia.aquila.detect.AquilaAnomalyDetector;
 import com.expedia.aquila.train.AquilaTrainer;
+import com.expedia.aquila.train.TrainerContext;
 import com.expedia.aquila.train.TrainingParams;
 import com.expedia.aquila.train.TrainingTask;
 import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,27 +33,21 @@ import org.slf4j.LoggerFactory;
 import java.util.ListIterator;
 import java.util.UUID;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
-
 /**
  * @author Willie Wheeler
  */
 public abstract class AbstractAquilaModelBuildTest {
-    private static final Logger log = LoggerFactory.getLogger(FileBasedAquilaModelBuildTest.class);
+    private static final Logger log = LoggerFactory.getLogger(AbstractAquilaModelBuildTest.class);
     
     private static final String TRAINING_DATA_PATH = "test-data/cal-inflow-train.csv";
     private static final String TEST_DATA_PATH = "test-data/cal-inflow-test.csv";
     
-    private String configPath;
-    private AppContext appContext;
+    private TrainerContext trainerContext;
     private Metric metric;
     
-    public AbstractAquilaModelBuildTest(String configPath) {
-        notNull(configPath, "configPath can't be null");
-        
-        this.configPath = configPath;
-        final Config aquilaConfig = AppConfigFactory.create(configPath);
-        this.appContext = new AppContext(aquilaConfig);
+    public AbstractAquilaModelBuildTest(String resourceBaseName) {
+        final Config config = ConfigFactory.load(resourceBaseName);
+        this.trainerContext = new TrainerContext(config);
         
         this.metric = new Metric();
         metric.putTag("what", "cal-inflow");
@@ -72,14 +69,14 @@ public abstract class AbstractAquilaModelBuildTest {
     
     private MetricFrame loadTrainingData() {
         log.trace("Loading training data");
-        final MetricFrame data = appContext.metricDataRepo().load(metric, TRAINING_DATA_PATH);
+        final MetricFrame data = trainerContext.metricDataRepo().load(metric, TRAINING_DATA_PATH);
         log.trace("Loaded {} rows", data.getNumRows());
         return data;
     }
     
     private AquilaAnomalyDetector trainModel(MetricFrame data) {
         log.trace("Training model");
-        final AquilaTrainer trainer = new AquilaTrainer(appContext);
+        final AquilaTrainer trainer = new AquilaTrainer(trainerContext);
         final TrainingParams params = new TrainingParams();
         final TrainingTask task = new TrainingTask(metric, params);
         return trainer.train(task, data);
@@ -87,7 +84,7 @@ public abstract class AbstractAquilaModelBuildTest {
     
     private UUID storeModel(AquilaAnomalyDetector model) {
         log.trace("Storing model");
-        appContext.aquilaAnomalyDetectorRepo().save(model);
+        trainerContext.aquilaAnomalyDetectorRepo().save(model);
         final UUID uuid = model.getUuid();
         log.trace("Stored model: uuid={}", uuid);
         return uuid;
@@ -95,12 +92,12 @@ public abstract class AbstractAquilaModelBuildTest {
     
     private AquilaAnomalyDetector loadModel(UUID uuid) {
         log.trace("Loading model: uuid={}", uuid);
-        return appContext.aquilaAnomalyDetectorRepo().load(uuid);
+        return trainerContext.aquilaAnomalyDetectorRepo().load(uuid);
     }
     
     private MetricFrame loadTestData() {
         log.trace("Loading test data");
-        final MetricFrame data = appContext.metricDataRepo().load(metric, TEST_DATA_PATH);
+        final MetricFrame data = trainerContext.metricDataRepo().load(metric, TEST_DATA_PATH);
         log.trace("Loaded {} rows", data.getNumRows());
         return data;
     }

@@ -16,9 +16,8 @@
 package com.expedia.aquila.train;
 
 import com.expedia.adaptivealerting.core.data.MetricFrame;
-import com.expedia.aquila.AppContext;
-import com.expedia.aquila.AquilaAnomalyDetector;
-import com.expedia.aquila.model.PredictionModel;
+import com.expedia.aquila.detect.AquilaAnomalyDetector;
+import com.expedia.aquila.core.model.PredictionModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,11 +32,11 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 public final class AquilaTrainer {
     private static final Logger log = LoggerFactory.getLogger(AquilaTrainer.class);
     
-    private AppContext appContext;
+    private TrainerContext trainerContext;
     
-    public AquilaTrainer(AppContext appContext) {
-        notNull(appContext, "appContext can't be null");
-        this.appContext = appContext;
+    public AquilaTrainer(TrainerContext trainerContext) {
+        notNull(trainerContext, "trainerContext can't be null");
+        this.trainerContext = trainerContext;
     }
     
     public AquilaAnomalyDetector train(TrainingTask task, MetricFrame data) {
