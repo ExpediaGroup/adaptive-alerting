@@ -13,55 +13,57 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.dataservice.s3;
+package com.expedia.adaptivealerting.dataconnect;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.S3Object;
 import com.expedia.adaptivealerting.core.data.Metric;
 import com.expedia.adaptivealerting.core.data.MetricFrame;
-import com.expedia.adaptivealerting.core.data.repo.MetricDataRepo;
-import com.expedia.adaptivealerting.core.data.repo.MetricFrameLoader;
 import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
+ * File-based {@link DataConnector} implementation.
+ *
  * @author Willie Wheeler
  * @author Karan Shah
  */
-public final class S3MetricDataRepo implements MetricDataRepo {
-    private static final Logger log = LoggerFactory.getLogger(S3MetricDataRepo.class);
+public final class FileDataConnector implements DataConnector {
+    private static final Logger log = LoggerFactory.getLogger(FileDataConnector.class);
     
-    private AmazonS3 s3;
-    private String bucketName;
+    private File baseDir;
     
     @Override
     public void init(Config config) {
         notNull(config, "config can't be null");
-        this.s3 = AmazonS3ClientBuilder.standard()
-                .withRegion(config.getString("region"))
-                .build();
-        this.bucketName = config.getString("bucket.name");
+        
+        final String baseDirStr = config.getString("base.dir");
+        notNull(baseDirStr, "Property base.dir must be defined");
+        
+        final File baseDir = new File(baseDirStr);
+        isTrue(baseDir.isDirectory(), "Property base.dir must point to a directory");
+        
+        this.baseDir = baseDir;
+        log.info("Initialized FileDataConnector with baseDir={}", this.baseDir);
     }
     
-    public String getBucketName() {
-        return bucketName;
+    public File getBaseDir() {
+        return baseDir;
     }
     
     @Override
     public MetricFrame load(Metric metric, String path) {
-        notNull(metric, "metric can't be null");
         notNull(path, "path can't be null");
         
-        final S3Object s3Obj = s3.getObject(bucketName, path);
-        
+        final File file = new File(baseDir, path);
         try {
-            return MetricFrameLoader.loadCsv(metric, s3Obj.getObjectContent(), true);
+            return MetricFrameLoader.loadCsv(metric, new FileInputStream(file), true);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

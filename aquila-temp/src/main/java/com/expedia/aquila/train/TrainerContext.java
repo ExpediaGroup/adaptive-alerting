@@ -15,8 +15,8 @@
  */
 package com.expedia.aquila.train;
 
+import com.expedia.adaptivealerting.dataconnect.DataConnector;
 import com.expedia.aquila.core.repo.DetectorModelRepo;
-import com.expedia.adaptivealerting.core.data.repo.MetricDataRepo;
 import com.expedia.aquila.core.util.ReflectionUtil;
 import com.typesafe.config.Config;
 
@@ -30,7 +30,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  */
 public final class TrainerContext {
     private Config config;
-    private MetricDataRepo datasetRepo;
+    private DataConnector datasetRepo;
     private DetectorModelRepo modelRepo;
     
     public TrainerContext(Config config) {
@@ -40,7 +40,7 @@ public final class TrainerContext {
     
         final Config datasetRepoConfig = config.getConfig("repositories.datasets");
         final String datasetRepoClassName = datasetRepoConfig.getString("class");
-        this.datasetRepo = (MetricDataRepo) ReflectionUtil.newInstance(datasetRepoClassName);
+        this.datasetRepo = (DataConnector) ReflectionUtil.newInstance(datasetRepoClassName);
         datasetRepo.init(datasetRepoConfig);
         
         final Config modelRepoConfig = config.getConfig("repositories.models");
@@ -53,7 +53,7 @@ public final class TrainerContext {
         return config;
     }
     
-    public MetricDataRepo metricDataRepo() {
+    public DataConnector metricDataRepo() {
         return datasetRepo;
     }
     
