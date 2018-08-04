@@ -23,11 +23,10 @@ RUN mkdir -p ${APP_HOME}
 
 # TODO Create a training-specific JAR.
 COPY target/aquila-*.jar ${APP_HOME}/aquila.jar
-COPY docker/start-app.sh ${APP_HOME}/
 COPY docker/jmxtrans-agent.xml ${APP_HOME}/
-
+COPY docker/start-app.sh ${APP_HOME}/
 ADD https://github.com/jmxtrans/jmxtrans-agent/releases/download/${JMXTRANS_AGENT}/${JMXTRANS_AGENT}.jar ${APP_HOME}/
 
+EXPOSE 8080
 WORKDIR ${APP_HOME}
-
-ENTRYPOINT ["./start-app.sh"]
+ENTRYPOINT [ "./start-app.sh" ]

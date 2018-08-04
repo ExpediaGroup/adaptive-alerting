@@ -72,12 +72,12 @@
             </dependency>
             <dependency>
                 <groupId>com.expedia.adaptivealerting</groupId>
-                <artifactId>adaptive-alerting-aws</artifactId>
+                <artifactId>adaptive-alerting-core</artifactId>
                 <version>${aa.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.expedia.adaptivealerting</groupId>
-                <artifactId>adaptive-alerting-core</artifactId>
+                <artifactId>adaptive-alerting-dataservice-s3</artifactId>
                 <version>${aa.version}</version>
             </dependency>
             <dependency>
@@ -102,12 +102,15 @@
         </dependency>
         <dependency>
             <groupId>com.expedia.adaptivealerting</groupId>
-            <artifactId>adaptive-alerting-aws</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.expedia.adaptivealerting</groupId>
             <artifactId>adaptive-alerting-core</artifactId>
         </dependency>
+
+        <!-- TODO For now this is a library integration. Later it will be a web service integration. -->
+        <dependency>
+            <groupId>com.expedia.adaptivealerting</groupId>
+            <artifactId>adaptive-alerting-dataservice-s3</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>

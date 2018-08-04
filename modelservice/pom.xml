@@ -39,12 +39,12 @@
 
         <!-- Compile -->
         <dependency>
-            <groupId>com.expedia.www</groupId>
-            <artifactId>haystack-commons</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.expedia.www</groupId>
+            <artifactId>haystack-commons</artifactId>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
