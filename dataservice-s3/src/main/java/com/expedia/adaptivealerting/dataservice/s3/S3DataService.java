@@ -13,55 +13,57 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.dataconnect;
+package com.expedia.adaptivealerting.dataservice.s3;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.S3Object;
-import com.expedia.adaptivealerting.core.data.Metric;
-import com.expedia.adaptivealerting.core.data.MetricFrame;
+import com.expedia.adaptivealerting.dataservice.AbstractDataService;
+import com.expedia.adaptivealerting.dataservice.DataService;
+import com.expedia.adaptivealerting.core.data.io.MetricFileInfo;
 import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.time.Instant;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
+ * S3-based {@link DataService} implementation.
+ *
  * @author Willie Wheeler
- * @author Karan Shah
  */
-public final class S3DataConnector implements DataConnector {
-    private static final Logger log = LoggerFactory.getLogger(S3DataConnector.class);
+public final class S3DataService extends AbstractDataService {
+    private static final Logger log = LoggerFactory.getLogger(S3DataService.class);
     
     private AmazonS3 s3;
     private String bucketName;
     
     @Override
     public void init(Config config) {
-        notNull(config, "config can't be null");
+        super.init(config);
+        
+        final String region = config.getString("region");
+        final String bucketName = config.getString("bucketName");
+        
+        notNull(region, "Property region must be defined");
+        notNull(bucketName, "Property bucketName must be defined");
+        
         this.s3 = AmazonS3ClientBuilder.standard()
-                .withRegion(config.getString("region"))
+                .withRegion(region)
                 .build();
-        this.bucketName = config.getString("bucket.name");
-    }
-    
-    public String getBucketName() {
-        return bucketName;
+        this.bucketName = bucketName;
+        
+        log.info("Initialized S3DataService with bucketName={}", this.bucketName);
     }
     
     @Override
-    public MetricFrame load(Metric metric, String path) {
-        notNull(metric, "metric can't be null");
-        notNull(path, "path can't be null");
-        
+    protected InputStream toInputStream(MetricFileInfo meta, Instant date) throws IOException {
+        final String path = meta.getLocation().toMetricFilePath(date);
         final S3Object s3Obj = s3.getObject(bucketName, path);
-        
-        try {
-            return MetricFrameLoader.loadCsv(metric, s3Obj.getObjectContent(), true);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return s3Obj.getObjectContent();
     }
 }

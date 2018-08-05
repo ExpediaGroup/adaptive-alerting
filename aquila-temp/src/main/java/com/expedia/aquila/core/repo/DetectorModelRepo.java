@@ -20,6 +20,8 @@ import com.typesafe.config.Config;
 
 import java.util.UUID;
 
+// TODO Apply connector/service pattern as we do with the data case.
+
 /**
  * @author Willie Wheeler
  * @author Karan Shah

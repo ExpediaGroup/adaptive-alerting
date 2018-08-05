@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.expedia.adaptivealerting.core.util;
 
 import org.junit.Test;
@@ -25,7 +24,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 /**
  * @author Willie Wheeler
  */
-public class AssertUtilTest {
+public final class AssertUtilTest {
     
     @Test
     public void testIsTrue_trueValue() {

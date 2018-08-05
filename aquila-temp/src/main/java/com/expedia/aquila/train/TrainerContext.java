@@ -29,35 +29,42 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author Karan Shah
  */
 public final class TrainerContext {
-    private Config config;
-    private DataConnector datasetRepo;
-    private DetectorModelRepo modelRepo;
+    private DataConnector dataConnector;
+    private DetectorModelRepo modelConnector;
     
     public TrainerContext(Config config) {
         notNull(config, "config can't be null");
-        
-        this.config = config;
-    
-        final Config datasetRepoConfig = config.getConfig("repositories.datasets");
-        final String datasetRepoClassName = datasetRepoConfig.getString("class");
-        this.datasetRepo = (DataConnector) ReflectionUtil.newInstance(datasetRepoClassName);
-        datasetRepo.init(datasetRepoConfig);
-        
-        final Config modelRepoConfig = config.getConfig("repositories.models");
-        final String modelRepoClassName = modelRepoConfig.getString("class");
-        this.modelRepo = (DetectorModelRepo) ReflectionUtil.newInstance(modelRepoClassName);
-        modelRepo.init(modelRepoConfig);
+        initDataConnector(config);
+        initModelConnector(config);
     }
     
-    public Config getConfig() {
-        return config;
-    }
-    
-    public DataConnector metricDataRepo() {
-        return datasetRepo;
+    public DataConnector dataConnector() {
+        return dataConnector;
     }
     
     public DetectorModelRepo aquilaAnomalyDetectorRepo() {
-        return modelRepo;
+        return modelConnector;
+    }
+    
+    private void initDataConnector(Config config) {
+        final Config connectorConfig = config.getConfig("connectors.data");
+        notNull(connectorConfig, "Property connectors.data must be defined");
+        
+        final String connectorClassName = connectorConfig.getString("class");
+        notNull(connectorClassName, "Property connectors.data.class must be defined");
+        
+        this.dataConnector = (DataConnector) ReflectionUtil.newInstance(connectorClassName);
+        dataConnector.init(connectorConfig);
+    }
+    
+    private void initModelConnector(Config config) {
+        final Config connectorConfig = config.getConfig("connectors.models");
+        notNull(connectorConfig, "Property connectors.model must be defined");
+        
+        final String connectorClassName = connectorConfig.getString("class");
+        notNull(connectorClassName, "Property connectors.model.class must be defined");
+        
+        this.modelConnector = (DetectorModelRepo) ReflectionUtil.newInstance(connectorClassName);
+        modelConnector.init(connectorConfig);
     }
 }

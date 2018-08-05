@@ -19,8 +19,10 @@ import com.expedia.adaptivealerting.core.data.Metric;
 import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.typesafe.config.Config;
 
+import java.time.Instant;
+
 /**
- * Interface for metric data repositories. This is generally intended to support anomaly detector model training.
+ * Interface for metric data connectors. This is generally intended to support anomaly detector model training.
  *
  * @author Willie Wheeler
  * @author Karan Shah
@@ -28,18 +30,19 @@ import com.typesafe.config.Config;
 public interface DataConnector {
     
     /**
-     * Initialize the repository.
+     * Initializes the connector.
      *
      * @param config
      */
     void init(Config config);
     
     /**
-     * Load repository data.
+     * Loads a metric frame.
      *
-     * @param metric Metric.
-     * @param path   Data path.
-     * @return Data.
+     * @param metric    Metric whose data we want to load.
+     * @param startDate Start date.
+     * @param endDate   End date.
+     * @return Metric frame.
      */
-    MetricFrame load(Metric metric, String path);
+    MetricFrame load(Metric metric, Instant startDate, Instant endDate);
 }

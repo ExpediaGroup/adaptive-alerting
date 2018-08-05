@@ -25,8 +25,6 @@ import com.expedia.aquila.core.model.Prediction;
 import com.expedia.aquila.core.model.PredictionModel;
 import com.expedia.aquila.core.util.MetricUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -40,8 +38,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author Karan Shah
  */
 public final class AquilaAnomalyDetector implements AnomalyDetector {
-    private static final Logger log = LoggerFactory.getLogger(AquilaAnomalyDetector.class);
-    
     private UUID uuid;
     private PredictionModel predictionModel;
     private Classifier classifier;

@@ -69,7 +69,7 @@ public abstract class AbstractAquilaModelBuildTest {
     
     private MetricFrame loadTrainingData() {
         log.trace("Loading training data");
-        final MetricFrame data = trainerContext.metricDataRepo().load(metric, TRAINING_DATA_PATH);
+        final MetricFrame data = trainerContext.dataConnector().load(metric, TRAINING_DATA_PATH);
         log.trace("Loaded {} rows", data.getNumRows());
         return data;
     }
@@ -97,7 +97,7 @@ public abstract class AbstractAquilaModelBuildTest {
     
     private MetricFrame loadTestData() {
         log.trace("Loading test data");
-        final MetricFrame data = trainerContext.metricDataRepo().load(metric, TEST_DATA_PATH);
+        final MetricFrame data = trainerContext.dataConnector().load(metric, TEST_DATA_PATH);
         log.trace("Loaded {} rows", data.getNumRows());
         return data;
     }

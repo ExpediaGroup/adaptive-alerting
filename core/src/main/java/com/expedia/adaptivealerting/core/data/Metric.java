@@ -29,7 +29,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 public final class Metric {
     private final Map<String, String> tags = new HashMap<>();
     private final Map<String, String> meta = new HashMap<>();
-
+    
     public Map<String, String> getTags() {
         return tags;
     }

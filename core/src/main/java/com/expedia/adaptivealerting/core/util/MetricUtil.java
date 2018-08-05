@@ -16,12 +16,18 @@
 package com.expedia.adaptivealerting.core.util;
 
 import com.expedia.adaptivealerting.core.data.Metric;
+import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.adaptivealerting.core.data.Mpoint;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.entities.MetricType;
 import scala.Enumeration;
 import scala.collection.immutable.Map;
 import scala.collection.immutable.Map$;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * {@link MetricPoint} utilities.
@@ -73,6 +79,22 @@ public final class MetricUtil {
         mpoint.setEpochTimeInSeconds(metricPoint.epochTimeInSeconds());
         mpoint.setValue(metricPoint.value());
         return mpoint;
+    }
+    
+    public static MetricFrame merge(List<MetricFrame> frames) {
+        notNull(frames, "frames can't be null");
+        
+        int totalSize = 0;
+        for (final MetricFrame frame : frames) {
+            totalSize += frame.getNumRows();
+        }
+        
+        final List<Mpoint> resultList = new ArrayList<>(totalSize);
+        for (final MetricFrame frame : frames) {
+            resultList.addAll(frame.getMetricPoints());
+        }
+        
+        return new MetricFrame(resultList);
     }
     
     private static Metric toMetric(MetricPoint metricPoint) {
