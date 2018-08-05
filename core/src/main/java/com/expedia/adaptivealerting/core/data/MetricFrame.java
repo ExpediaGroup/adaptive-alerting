@@ -82,4 +82,13 @@ public class MetricFrame {
     public ListIterator<Mpoint> listIterator() {
         return mpoints.listIterator();
     }
+    
+    public double[] toDoubleValues() {
+        final int n = getNumRows();
+        final double[] values = new double[n];
+        for (int i = 0; i < n; i++) {
+            values[i] = getMetricPoint(i).getValue();
+        }
+        return values;
+    }
 }

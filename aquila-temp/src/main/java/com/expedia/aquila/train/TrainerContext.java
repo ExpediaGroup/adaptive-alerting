@@ -15,9 +15,9 @@
  */
 package com.expedia.aquila.train;
 
+import com.expedia.adaptivealerting.core.util.ReflectionUtil;
 import com.expedia.adaptivealerting.dataconnect.DataConnector;
 import com.expedia.aquila.core.repo.DetectorModelRepo;
-import com.expedia.aquila.core.util.ReflectionUtil;
 import com.typesafe.config.Config;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;

@@ -16,11 +16,10 @@
 package com.expedia.aquila.train;
 
 import com.expedia.adaptivealerting.core.data.MetricFrame;
+import com.expedia.adaptivealerting.core.util.DateUtil;
 import com.expedia.aquila.core.model.DecompType;
 import com.expedia.aquila.core.model.MidpointModel;
 import com.expedia.aquila.core.util.MathUtil;
-import com.expedia.aquila.core.util.MetricUtil;
-import com.expedia.aquila.core.util.TimeUtil;
 import com.github.servicenow.ds.stats.stl.SeasonalTrendLoess;
 
 import java.time.Instant;
@@ -49,10 +48,10 @@ public final class MidpointModelTrainer {
         isTrue(metricFrame.getNumRows() > 0, "Required: metricFrame.numRows > 0");
         
         final Instant instant0 = Instant.ofEpochSecond(metricFrame.getMetricPoint(0).getEpochTimeInSeconds());
-        final int tickOffset = TimeUtil.calculateTickOffsetFromSundayMidnightFloor(instant0, params.tickSize());
+        final int tickOffset = DateUtil.tickOffsetFromWeekStart(instant0, params.tickSize());
         isTrue(tickOffset == 0, "Required: metricFrame must start from Sunday at midnight, UTC time");
         
-        final double[] data = MetricUtil.toValues(metricFrame);
+        final double[] data = metricFrame.toDoubleValues();
         switch (params.decompType()) {
             case ADDITIVE:
                 return trainAdditiveMidpointModel(data);

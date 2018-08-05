@@ -18,7 +18,7 @@ package com.expedia.adaptivealerting.core.util;
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
@@ -30,7 +30,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author Willie Wheeler
  */
 public final class DateUtil {
-    public static final ZoneId ZONE_ID_UTC = ZoneId.of("UTC");
+    private static final int MILLIS_PER_MINUTE = 60 * 1000;
     
     /**
      * Prevent instantiation.
@@ -57,7 +57,14 @@ public final class DateUtil {
      */
     public static Instant truncatedToWeek(Instant date) {
         notNull(date, "date can't be null");
-        final DayOfWeek dow = ZonedDateTime.ofInstant(date, ZONE_ID_UTC).getDayOfWeek();
+        final DayOfWeek dow = ZonedDateTime.ofInstant(date, ZoneOffset.UTC).getDayOfWeek();
         return truncatedToDay(date).minus(Duration.ofDays(dow.getValue() % 7));
+    }
+    
+    public static int tickOffsetFromWeekStart(Instant date, int intervalInMinutes) {
+        notNull(date, "instant can't be null");
+        final Instant baseInstant = truncatedToWeek(date);
+        final int offsetInMinutes = (int) (date.toEpochMilli() - baseInstant.toEpochMilli()) / MILLIS_PER_MINUTE;
+        return offsetInMinutes / intervalInMinutes;
     }
 }
