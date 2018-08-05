@@ -32,7 +32,7 @@ public interface DataConnector {
     /**
      * Initializes the connector.
      *
-     * @param config
+     * @param config Configuration object.
      */
     void init(Config config);
     

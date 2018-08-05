@@ -30,7 +30,7 @@ import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.*;
  *
  * @author Willie Wheeler
  */
-public class ConstantThresholdAnomalyDetector implements AnomalyDetector {
+public class ConstantThresholdAnomalyDetector extends AbstractAnomalyDetector {
     public static final int LEFT_TAILED = 0;
     public static final int RIGHT_TAILED = 1;
     

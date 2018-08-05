@@ -35,7 +35,7 @@ import static java.lang.Math.abs;
  *
  * @author kashah
  */
-public class CusumAnomalyDetector implements AnomalyDetector {
+public class CusumAnomalyDetector extends AbstractAnomalyDetector {
 
     public static final int LEFT_TAILED = 0;
     public static final int RIGHT_TAILED = 1;

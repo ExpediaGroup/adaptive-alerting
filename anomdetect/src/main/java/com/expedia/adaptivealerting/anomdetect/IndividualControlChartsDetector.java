@@ -35,9 +35,9 @@ import static java.lang.Math.abs;
  *
  * @author shsethi
  */
-public class IndividualControlChartsDetector implements AnomalyDetector {
-
+public class IndividualControlChartsDetector extends AbstractAnomalyDetector {
     private static final double R_CONTROL_CHART_CONSTANT_D4 = 3.267;
+    
     /**
      * Number of points after which limits will be recomputed
      */

@@ -17,43 +17,32 @@ package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMpoint;
+import com.expedia.adaptivealerting.core.util.MetricUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
 import java.util.UUID;
 
 /**
- * Anomaly detector interface.
+ * Abstract base class implementing {@link AnomalyDetector}.
  *
  * @author Willie Wheeler
  */
-public interface AnomalyDetector {
+public abstract class AbstractAnomalyDetector implements AnomalyDetector {
+    private UUID uuid;
     
-    UUID getUuid();
-    
-    MappedMpoint classify(MappedMpoint mappedMpoint);
-    
-    
-    // ========================================
-    // Deprecated
-    // ========================================
-    
-    /**
-     * @return ID
-     * @deprecated Superseded by {@link #getUuid()}. [WLW]
-     */
-    @Deprecated
-    default String getId() {
-        return this.toString();
+    @Override
+    public UUID getUuid() {
+        return uuid;
     }
     
-    /**
-     * Classifies the given metric point.
-     *
-     * @param metricPoint Metric point.
-     * @return Anomaly classification result, with supporting data such as the prediction, anomaly score and various
-     * thresholds.
-     * @deprecated Deprecated in favor of {@link #classify(MappedMpoint)}.
-     */
-    @Deprecated
-    AnomalyResult classify(MetricPoint metricPoint);
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+    
+    @Override
+    public AnomalyResult classify(MetricPoint metricPoint) {
+        final MappedMpoint mappedMpoint = new MappedMpoint();
+        mappedMpoint.setMpoint(MetricUtil.toMpoint(metricPoint));
+        return classify(mappedMpoint).getAnomalyResult();
+    }
 }

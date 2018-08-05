@@ -18,13 +18,15 @@ package com.expedia.adaptivealerting.anomdetect;
 /**
  * Performance monitor listener interface. An interface to be implemented by everyone interested when performance
  * monitor resets an evaluator
- * 
+ *
  * @author kashah
  */
 public interface PerfMonListener {
-
+    
     /**
      * Keeps a track of when performance monitor resets the evaluator.
+     *
+     * @param score Performance score.
      */
     void processScore(double score);
 }

@@ -82,9 +82,11 @@ public final class MetricFrameLoader {
     /**
      * Loader for CSV files with missing timestamps.
      *
-     * @param metric    The underlying metric.
-     * @param in        CSV input stream.
-     * @param hasHeader Indicates whether the data has a header row.
+     * @param metric            The underlying metric.
+     * @param in                CSV input stream.
+     * @param hasHeader         Indicates whether the data has a header row.
+     * @param startDate         Start date.
+     * @param intervalInMinutes Interval in minutes.
      * @return A data frame containing the CSV data.
      * @throws IOException if there's a problem reading the CSV input stream.
      */

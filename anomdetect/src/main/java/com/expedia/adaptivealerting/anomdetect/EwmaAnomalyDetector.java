@@ -45,7 +45,7 @@ import static java.lang.Math.sqrt;
  * @see <a href="https://en.wikipedia.org/wiki/Moving_average#Exponentially_weighted_moving_variance_and_standard_deviation">Exponentially weighted moving average and standard deviation</a>
  * @see <a href="https://www.itl.nist.gov/div898/handbook/pmc/section3/pmc324.htm">EWMA Control Charts</a>
  */
-public class EwmaAnomalyDetector implements AnomalyDetector {
+public class EwmaAnomalyDetector extends AbstractAnomalyDetector {
     
     /**
      * Smoothing param. Somewhat misnamed because higher values lead to less smoothing, but it's called the smoothing
@@ -125,11 +125,25 @@ public class EwmaAnomalyDetector implements AnomalyDetector {
     }
     
     @Override
+    public MappedMpoint classify(MappedMpoint mappedMpoint) {
+        AssertUtil.notNull(mappedMpoint, "mappedMpoint can't be null");
+        AnomalyResult anomalyResult = classify(mappedMpoint.getMpoint());
+
+        final MappedMpoint result = new MappedMpoint();
+        result.setAnomalyResult(anomalyResult);
+        result.setDetectorType(mappedMpoint.getDetectorType());
+        result.setDetectorUuid(mappedMpoint.getDetectorUuid());
+        result.setMpoint(mappedMpoint.getMpoint());
+
+        return result;
+    }
+    
+    @Override
     public AnomalyResult classify(MetricPoint metricPoint) {
         AssertUtil.notNull(metricPoint, "metricPoint can't be null");
         return classify(MetricUtil.toMpoint(metricPoint));
     }
-
+    
     private AnomalyResult classify(Mpoint mpoint) {
         final double observed = mpoint.getValue();
         final double dist = abs(observed - mean);
@@ -158,20 +172,6 @@ public class EwmaAnomalyDetector implements AnomalyDetector {
         
         updateEstimates(observed);
         
-        return result;
-    }
-    
-    @Override
-    public MappedMpoint classify(MappedMpoint mappedMpoint) {
-        AssertUtil.notNull(mappedMpoint, "mappedMpoint can't be null");
-        AnomalyResult anomalyResult = classify(mappedMpoint.getMpoint());
-
-        final MappedMpoint result = new MappedMpoint();
-        result.setAnomalyResult(anomalyResult);
-        result.setDetectorType(mappedMpoint.getDetectorType());
-        result.setDetectorUuid(mappedMpoint.getDetectorUuid());
-        result.setMpoint(mappedMpoint.getMpoint());
-
         return result;
     }
     

@@ -14,4 +14,3 @@ all: clean build
 # build all and release
 release: all
 	cd kafka && $(MAKE) release && cd ..
-	cd aquila-temp && $(MAKE) release && cd ..
