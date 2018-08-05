@@ -18,6 +18,8 @@ package com.expedia.adaptivealerting.anomdetect;
 import com.expedia.adaptivealerting.core.data.MappedMpoint;
 import com.expedia.adaptivealerting.core.data.Metric;
 import com.expedia.adaptivealerting.core.data.Mpoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -35,6 +37,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author Willie Wheeler
  */
 public final class AnomalyDetectorMapper {
+    private static final Logger log = LoggerFactory.getLogger(AnomalyDetectorMapper.class);
     
     /**
      * Maps an {@link Mpoint} to its corresponding set of {@link MappedMpoint}s.
@@ -60,6 +63,13 @@ public final class AnomalyDetectorMapper {
         if (tags.hashCode() == 2040828082) { //PPV4 99 dur 1M
             results.add(new DetectorMeta(UUID.fromString("5159c1b8-94ca-424f-b25c-e9f5bcb2fc51"), "ewma-detector"));
         }
+
+        log.info(
+                "Mapping: resultsSize={} hashcode={} tags={}",
+                results.size(),
+                metric.getTags().hashCode(),
+                metric.getTags().toString()
+        );
         return results;
     }
     
