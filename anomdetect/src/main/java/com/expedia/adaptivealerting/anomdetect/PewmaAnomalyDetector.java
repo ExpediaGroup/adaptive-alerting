@@ -38,12 +38,11 @@ import static java.lang.Math.*;
  * <p>
  * See https://www.ll.mit.edu/mission/cybersec/publications/publication-files/full_papers/2012_08_05_Carter_IEEESSP_FP.pdf.
  * Implementation based off code from here https://aws.amazon.com/blogs/iot/anomaly-detection-using-aws-iot-and-aws-lambda/.
- *
  * </p>
  *
  * @author David Sutherland
  */
-public class PewmaAnomalyDetector implements AnomalyDetector {
+public class PewmaAnomalyDetector extends AbstractAnomalyDetector {
     static final int DEFAULT_TRAINING_LENGTH = 30;
     
     /**
@@ -172,6 +171,11 @@ public class PewmaAnomalyDetector implements AnomalyDetector {
     }
     
     @Override
+    public MappedMpoint classify(MappedMpoint mappedMpoint) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+    
+    @Override
     public AnomalyResult classify(MetricPoint metricPoint) {
         AssertUtil.notNull(metricPoint, "metricPoint can't be null");
     
@@ -204,11 +208,6 @@ public class PewmaAnomalyDetector implements AnomalyDetector {
         updateEstimates(observed);
     
         return result;
-    }
-    
-    @Override
-    public MappedMpoint classify(MappedMpoint mappedMpoint) {
-        throw new UnsupportedOperationException("Not yet implemented");
     }
     
     private void updateEstimates(double value) {

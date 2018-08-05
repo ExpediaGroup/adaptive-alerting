@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
  *
  * @author Tatjana Kamenov
  */
-
 public class Shingle {
 
     private static final int DEFAULT_SIZE = 10;
@@ -53,7 +52,7 @@ public class Shingle {
 
     /**
      * Puts a new MetricPoint to the FIFO list. If list is full, it first removes the least recent Metric point.
-     * @param metricPoint
+     * @param metricPoint metric point
      */
     public void offer(MappedMpoint metricPoint) {
         if (isReady()) {

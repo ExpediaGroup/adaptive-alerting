@@ -24,52 +24,43 @@ import com.expedia.adaptivealerting.core.util.AssertUtil;
  * Performance monitor to track performance of a given series. Returns a performance score and resets the evaluator
  * every nth ticks where n is a user defined value.
  * </p>
- * 
+ *
  * @author kashah
  */
 public class PerformanceMonitor {
-
-    /**
-     * Local tick counter.
-     */
     private int tickCounter;
-
-    /**
-     * Local evaluator.
-     */
     private Evaluator evaluator;
-
-    /**
-     * Local performance monitor listener.
-     */
     private PerfMonListener listener;
-
+    
     /**
-     * Local max no ticks where performance monitor resets evaluator.
+     * Maximum number of ticks where performance monitor resets evaluator.
      */
-
     private int maxTicks;
-
+    
     /**
-     * Creates a new performance monitor and sets evaluator as RMSE evaluator
+     * Creates a new performance monitor and sets evaluator as RMSE evaluator.
+     *
+     * @param listener  Performance monitor listener.
+     * @param evaluator Performance evaluator.
+     * @param maxTicks  Maximum number of ticks before reset.
      */
     public PerformanceMonitor(PerfMonListener listener, Evaluator evaluator, int maxTicks) {
         AssertUtil.notNull(listener, "Listener can't be null");
         AssertUtil.notNull(evaluator, "Evaluator can't be null");
         AssertUtil.isTrue(maxTicks > 0, "Max ticks should be greather than 0");
-
+        
         this.listener = listener;
         this.evaluator = evaluator;
         this.maxTicks = maxTicks;
         resetCounter();
     }
-
+    
     public double evaluatePerformance(AnomalyResult result) {
         double observed = result.getObserved();
         double predicted = result.getPredicted();
         evaluator.update(observed, predicted);
         double evaluatorScore = evaluator.evaluate().getEvaluatorScore();
-
+        
         if (tickCounter >= maxTicks) {
             listener.processScore(evaluatorScore);
             evaluator.reset();
@@ -80,9 +71,8 @@ public class PerformanceMonitor {
             return evaluatorScore;
         }
     }
-
+    
     private void resetCounter() {
         this.tickCounter = 0;
     }
-
 }

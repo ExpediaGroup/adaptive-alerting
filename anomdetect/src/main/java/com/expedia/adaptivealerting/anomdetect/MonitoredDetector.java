@@ -15,43 +15,38 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMpoint;
-import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.core.util.AssertUtil;
-import com.expedia.www.haystack.commons.entities.MetricPoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.UUID;
 
 /**
- * <p>
- * Wrapper around Anomaly detector. It feeds the performance monitor with a listener and pushes the classification
- * outputs to the perfmon every time a new mappedMpoint comes in.
- * </p>
+ * Wrapper around {@link AnomalyDetector}. It feeds the performance monitor with a listener and pushes the
+ * classification outputs to the perfmon every time a new {@link MappedMpoint} comes in.
  *
  * @author kashah
  */
-public class MonitoredDetector implements AnomalyDetector {
-
-    /**
-     * Local Anomaly detector.
-     */
-    private AnomalyDetector detector;
-    
-    /**
-     * Local Performance monitor.
-     */
-    private PerformanceMonitor perfMonitor;
-
+public class MonitoredDetector extends AbstractAnomalyDetector {
     private static Logger LOGGER = LoggerFactory.getLogger(MonitoredDetector.class);
-
+    
+    private AnomalyDetector detector;
+    private PerformanceMonitor perfMonitor;
+    
     public MonitoredDetector(AnomalyDetector detector, PerformanceMonitor perfMonitor) {
         AssertUtil.notNull(detector, "detector can't be null");
         AssertUtil.notNull(perfMonitor, "perfMonitor can't be null");
         this.detector = detector;
         this.perfMonitor = perfMonitor;
     }
-
+    
+    @Override
+    public UUID getUuid() {
+        return detector.getUuid();
+    }
+    
     @Override
     public MappedMpoint classify(MappedMpoint mappedMpoint) {
         MappedMpoint classified = detector.classify(mappedMpoint);
@@ -60,15 +55,10 @@ public class MonitoredDetector implements AnomalyDetector {
         return classified;
     }
 
-    @Override
-    public AnomalyResult classify(MetricPoint metricPoint) {
-        throw new UnsupportedOperationException("Not valid");
-    }
-
     public static class PerfMonHandler implements PerfMonListener {
         @Override
         public void processScore(double score) {
-            LOGGER.info("Performance score:{}", score);
+            LOGGER.info("Performance score: {}", score);
         }
     }
 }
