@@ -15,7 +15,7 @@
  */
 package com.expedia.aquila.core.model;
 
-import com.expedia.aquila.core.util.TimeUtil;
+import com.expedia.adaptivealerting.core.util.DateUtil;
 
 import java.time.Instant;
 
@@ -70,11 +70,11 @@ public final class MidpointModel {
         this.trend = trend;
     }
     
-    public double predict(Instant instant) {
-        notNull(instant, "instant can't be null");
+    public double predict(Instant date) {
+        notNull(date, "date can't be null");
         
         final int tickSize = MINUTES_PER_WEEK / seasonal.length;
-        final int index = TimeUtil.calculateTickOffsetFromSundayMidnightFloor(instant, tickSize);
+        final int index = DateUtil.tickOffsetFromWeekStart(date, tickSize);
         
         switch (type) {
             case ADDITIVE:

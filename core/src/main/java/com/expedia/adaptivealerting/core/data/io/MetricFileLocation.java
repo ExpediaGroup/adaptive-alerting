@@ -15,9 +15,8 @@
  */
 package com.expedia.adaptivealerting.core.data.io;
 
-import com.expedia.adaptivealerting.core.util.DateUtil;
-
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -38,7 +37,7 @@ public final class MetricFileLocation {
         
         this.dateTimeFormatter = DateTimeFormatter
                 .ofPattern(datePattern)
-                .withZone(DateUtil.ZONE_ID_UTC);
+                .withZone(ZoneOffset.UTC);
     }
     
     public String getMetricDir() {
