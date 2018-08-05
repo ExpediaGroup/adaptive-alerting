@@ -15,9 +15,12 @@
  */
 package com.expedia.adaptivealerting.core.data;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.ListIterator;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
@@ -26,7 +29,11 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author Willie Wheeler
  */
 public class MetricFrame {
-    private Mpoint[] mpoints;
+    private final List<Mpoint> mpoints;
+    
+    public MetricFrame() {
+        this.mpoints = new ArrayList<>();
+    }
     
     /**
      * Creates a new metric frame from an array of {@link Mpoint}s.
@@ -34,6 +41,11 @@ public class MetricFrame {
      * @param mpoints Metric point array.
      */
     public MetricFrame(Mpoint[] mpoints) {
+        notNull(mpoints, "mpoints can't be null");
+        this.mpoints = Arrays.asList(mpoints);
+    }
+    
+    public MetricFrame(List<Mpoint> mpoints) {
         notNull(mpoints, "mpoints can't be null");
         this.mpoints = mpoints;
     }
@@ -44,7 +56,7 @@ public class MetricFrame {
      * @return Number of metric points in the frame.
      */
     public int getNumRows() {
-        return mpoints.length;
+        return mpoints.size();
     }
     
     /**
@@ -54,15 +66,11 @@ public class MetricFrame {
      * @return The corresponding metric point.
      */
     public Mpoint getMetricPoint(int index) {
-        return mpoints[index];
+        isTrue(index >= 0, "Required: index >= 0");
+        return mpoints.get(index);
     }
     
-    /**
-     * Returns the backing array of {@link Mpoint}s.
-     *
-     * @return Backing array of metric points.
-     */
-    public Mpoint[] getMpoints() {
+    public List<Mpoint> getMetricPoints() {
         return mpoints;
     }
     
@@ -72,6 +80,6 @@ public class MetricFrame {
      * @return List iterator for this frame.
      */
     public ListIterator<Mpoint> listIterator() {
-        return Arrays.asList(mpoints).listIterator();
+        return mpoints.listIterator();
     }
 }

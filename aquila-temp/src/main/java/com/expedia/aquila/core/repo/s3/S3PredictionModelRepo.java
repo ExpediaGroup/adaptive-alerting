@@ -46,7 +46,7 @@ public class S3PredictionModelRepo implements PredictionModelRepo {
         this.s3 = AmazonS3ClientBuilder.standard()
                 .withRegion(config.getString("region"))
                 .build();
-        this.bucketName = config.getString("bucket.name");
+        this.bucketName = config.getString("bucketName");
         this.objectMapper = new ObjectMapper();
     }
     

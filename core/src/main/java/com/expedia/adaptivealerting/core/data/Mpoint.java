@@ -27,6 +27,15 @@ public final class Mpoint {
     private long epochTimeInSeconds;
     private Float value;
     
+    public Mpoint() {
+    }
+    
+    public Mpoint(Metric metric, long epochTimeInSeconds, Float value) {
+        this.metric = metric;
+        this.epochTimeInSeconds = epochTimeInSeconds;
+        this.value = value;
+    }
+    
     public Metric getMetric() {
         return metric;
     }

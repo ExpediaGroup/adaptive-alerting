@@ -25,6 +25,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Instant;
+
 /**
  * @author Willie Wheeler
  * @author Karan Shah
@@ -34,7 +36,6 @@ public class AquilaTrainerController {
     private static final Logger log = LoggerFactory.getLogger(AquilaTrainerController.class);
     
     private static final String CONFIG_BASE_RESOURCE_NAME = "trainer/application";
-    private static final String TRAINING_DATA_PATH = "test-data/cal-inflow-train.csv";
     
     private TrainerContext trainerContext;
     private AquilaTrainer trainer;
@@ -49,22 +50,30 @@ public class AquilaTrainerController {
     @RequestMapping("/train")
     public String train() {
         log.trace("Training model");
+        
+        // FIXME Replace hardcoded params [WLW]
         final Metric metric = dummyMetric();
         final TrainingParams params = new TrainingParams();
         final TrainingTask task = new TrainingTask(metric, params);
-        final MetricFrame data = trainerContext.metricDataRepo().load(metric, TRAINING_DATA_PATH);
+        
+        final Instant startDate = Instant.parse("2018-04-29T00:00:00Z");
+        final Instant endDate = Instant.parse("2018-07-22T00:00:00Z");
+        final MetricFrame data = trainerContext.dataConnector().load(metric, startDate, endDate);
+        
         final AquilaAnomalyDetector detector = trainer.train(task, data);
         trainerContext.aquilaAnomalyDetectorRepo().save(detector);
-        return "train";
+        
+        return detector.getUuid().toString();
     }
     
     private Metric dummyMetric() {
         final Metric metric = new Metric();
-        metric.putTag("what", "bookings");
-        metric.putTag("lob", "hotels");
-        metric.putTag("pos", "expedia.com");
         metric.putTag("mtype", "count");
         metric.putTag("unit", "");
+        metric.putTag("what", "bookings");
+        metric.putTag("lob", "hotels");
+        metric.putTag("pos", "expedia-com");
+        metric.putTag("interval", "5m");
         return metric;
     }
 }

@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-[ -z "$JAVA_XMS" ] && JAVA_XMS=2048m
-[ -z "$JAVA_XMX" ] && JAVA_XMX=2048m
+[ -z "$JAVA_XMS" ] && JAVA_XMS=1024m
+[ -z "$JAVA_XMX" ] && JAVA_XMX=1024m
 
 set -e
 JAVA_OPTS="${JAVA_OPTS} \

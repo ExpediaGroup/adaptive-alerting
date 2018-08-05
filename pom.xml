@@ -33,15 +33,19 @@
         <module>anomdetect</module>
         <module>anomvalidate</module>
         <module>core</module>
+
+        <!-- TODO Split this into anomdetect-kafka, anomvalidate-kafka, etc. [WLW] -->
+        <module>kafka</module>
+
+        <module>dataconnect</module>
+        <module>dataservice</module>
+        <module>dataservice-file</module>
+        <module>dataservice-s3</module>
         <module>modelservice</module>
         <module>samples</module>
         <module>tools</module>
 
-        <!-- Adapters and providers -->
-        <module>aws</module>
-        <module>kafka</module>
-
-        <!-- FIXME Temporary until we figure out how to pull in external models [WLW] -->
+        <!-- TODO Move to its own repo, and expose trainer and detector as web services. [WLW] -->
         <module>aquila-temp</module>
     </modules>
 
@@ -67,6 +71,7 @@
         <scala.library.version>2.12.2</scala.library.version>
         <slf4j.version>1.7.25</slf4j.version>
         <spring.boot.version>2.0.3.RELEASE</spring.boot.version>
+        <typesafe.config.version>1.3.3</typesafe.config.version>
 
         <!-- Maven plugins -->
         <maven.compiler.plugin.version>3.7.0</maven.compiler.plugin.version>
@@ -95,11 +100,6 @@
             </dependency>
             <dependency>
                 <groupId>com.expedia.adaptivealerting</groupId>
-                <artifactId>adaptive-alerting-core</artifactId>
-                <version>${aa.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.expedia.adaptivealerting</groupId>
                 <artifactId>adaptive-alerting-anomdetect</artifactId>
                 <version>${aa.version}</version>
             </dependency>
@@ -110,7 +110,37 @@
             </dependency>
             <dependency>
                 <groupId>com.expedia.adaptivealerting</groupId>
+                <artifactId>adaptive-alerting-core</artifactId>
+                <version>${aa.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.expedia.adaptivealerting</groupId>
+                <artifactId>adaptive-alerting-dataconnect</artifactId>
+                <version>${aa.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.expedia.adaptivealerting</groupId>
+                <artifactId>adaptive-alerting-dataservice</artifactId>
+                <version>${aa.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.expedia.adaptivealerting</groupId>
+                <artifactId>adaptive-alerting-dataservice-file</artifactId>
+                <version>${aa.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.expedia.adaptivealerting</groupId>
+                <artifactId>adaptive-alerting-dataservice-s3</artifactId>
+                <version>${aa.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.expedia.adaptivealerting</groupId>
                 <artifactId>adaptive-alerting-kafka</artifactId>
+                <version>${aa.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.expedia.adaptivealerting</groupId>
+                <artifactId>adaptive-alerting-modelservice</artifactId>
                 <version>${aa.version}</version>
             </dependency>
             <dependency>
@@ -118,11 +148,15 @@
                 <artifactId>adaptive-alerting-tools</artifactId>
                 <version>${aa.version}</version>
             </dependency>
+
+            <!-- TODO Remove this dependency. It's Haystack-specific, and there are also too many unwanted child
+                 dependencies (e.g. AWS, Scala, several others). [WLW] -->
             <dependency>
                 <groupId>com.expedia.www</groupId>
                 <artifactId>haystack-commons</artifactId>
                 <version>${haystack.commons.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>com.opencsv</groupId>
                 <artifactId>opencsv</artifactId>
@@ -228,6 +262,12 @@
                         <artifactId>spring-boot-starter-logging</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>com.typesafe</groupId>
+                <artifactId>config</artifactId>
+                <version>${typesafe.config.version}</version>
             </dependency>
 
             <!-- Runtime -->

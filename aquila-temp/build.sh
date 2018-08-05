@@ -15,6 +15,8 @@
 # limitations under the License.
 
 APP_NAME="aquila-trainer"
+HOST_PORT=8080
+GUEST_PORT=8080
 
 cd `cd -P -- "$(dirname -- "$0")" && pwd -P`
 
@@ -37,16 +39,21 @@ do_package() {
 
 do_build() {
     echo 'Building image...'
-    docker build -f docker/Dockerfile -t "$APP_NAME" .
+    docker build -f docker/Dockerfile -t $APP_NAME .
 }
 
 do_run() {
-    echo 'Running...'
-    docker run "$APP_NAME"
+    echo "Running $APP_NAME"
+    echo "HOST_PORT  : $HOST_PORT"
+    echo "GUEST_PORT : $GUEST_PORT"
+    docker run \
+      -p $HOST_PORT:$GUEST_PORT \
+      -v ~/.aws/:/root/.aws/ \
+      $APP_NAME
 }
 
 do_release() {
-    echo "Releasing..."
+    echo 'Releasing...'
     export DOCKER_ORG="expediadotcom"
     export DOCKER_IMAGE_NAME=$APP_NAME
     ../scripts/publish-to-docker-hub.sh

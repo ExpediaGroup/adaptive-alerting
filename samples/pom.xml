@@ -37,42 +37,39 @@
 
     <dependencies>
 
-        <!-- Haystack -->
+        <!-- Compile -->
         <dependency>
-            <groupId>com.expedia.www</groupId>
-            <artifactId>haystack-commons</artifactId>
-        </dependency>
-
-        <!-- Adaptive Alerting -->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>com.expedia.adaptivealerting</groupId>
             <artifactId>adaptive-alerting-anomdetect</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>com.expedia.adaptivealerting</groupId>
             <artifactId>adaptive-alerting-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>com.expedia.adaptivealerting</groupId>
+            <artifactId>adaptive-alerting-dataconnect</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.expedia.adaptivealerting</groupId>
             <artifactId>adaptive-alerting-kafka</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>com.expedia.adaptivealerting</groupId>
             <artifactId>adaptive-alerting-tools</artifactId>
             <version>${project.version}</version>
         </dependency>
-
-        <!-- Third-party -->
+        <dependency>
+            <groupId>com.expedia.www</groupId>
+            <artifactId>haystack-commons</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.kafka</groupId>
@@ -90,9 +87,17 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
+
+        <!-- Runtime -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
+        </dependency>
+
+        <!-- Test -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
         </dependency>
     </dependencies>
 </project>
