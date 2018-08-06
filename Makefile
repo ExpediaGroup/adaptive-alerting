@@ -14,3 +14,4 @@ all: clean build
 # build all and release
 release: all
 	cd kafka && $(MAKE) release && cd ..
+	cd modelservice && $(MAKE) release && cd ..
