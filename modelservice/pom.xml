@@ -27,7 +27,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.expedia.adaptivealerting</groupId>
-    <artifactId>adaptive-alerting-modelservice</artifactId>
+    <artifactId>haystack-adaptive-alerting-modelservice</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
@@ -99,6 +99,23 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin>
         </plugins>
+
     </build>
 </project>

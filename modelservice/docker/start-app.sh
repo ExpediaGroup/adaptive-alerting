@@ -30,4 +30,4 @@ JAVA_OPTS="${JAVA_OPTS} \
     -Dapplication.name=${APP_NAME} \
     -Dapplication.home=${APP_HOME}"
 
-exec java ${JAVA_OPTS} -jar "${APP_HOME}/modelservice.jar" com.expedia.adaptivealerting.modelservice.ModelServiceApp
+exec java ${JAVA_OPTS} -jar "${APP_HOME}/haystack-adaptive-alerting-modelservice.jar" com.expedia.adaptivealerting.modelservice.ModelServiceApp
