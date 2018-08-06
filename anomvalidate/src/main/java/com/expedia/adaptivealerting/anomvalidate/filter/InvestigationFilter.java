@@ -15,14 +15,14 @@
  */
 package com.expedia.adaptivealerting.anomvalidate.filter;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.core.data.MappedMpoint;
 
 public interface InvestigationFilter {
 
     /**
      *
-     * @param anomalyResult The AnomalyResult to perform filtering on.
-     * @return whether to keep the anomalyResult in the output.
+     * @param mappedMpoint The MappedMpoint to perform filtering on.
+     * @return whether to keep the MappedMpoint in the output.
      */
-    boolean keep(AnomalyResult anomalyResult);
+    boolean keep(MappedMpoint mappedMpoint);
 }
