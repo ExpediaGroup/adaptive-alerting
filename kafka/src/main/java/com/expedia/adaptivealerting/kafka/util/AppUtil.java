@@ -37,6 +37,7 @@ public final class AppUtil {
     }
     
     /**
+     * @param streamsRunner Streams runner.
      * @deprecated Deprecated in favor of {@link com.expedia.adaptivealerting.kafka.AbstractKafkaApp}.
      */
     @Deprecated
