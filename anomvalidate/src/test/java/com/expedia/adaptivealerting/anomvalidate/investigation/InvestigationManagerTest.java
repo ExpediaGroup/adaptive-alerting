@@ -2,6 +2,7 @@ package com.expedia.adaptivealerting.anomvalidate.investigation;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.InvestigationResult;
+import com.expedia.adaptivealerting.core.data.MappedMpoint;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -12,7 +13,8 @@ import java.util.List;
 import static com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder.okForJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class InvestigationManagerTest {
     private static final String ENDPOINT_PATH = "/endpoint";
@@ -28,7 +30,7 @@ public class InvestigationManagerTest {
     public void investigateDoesntFailOnNull() {
         InvestigationManager im = new InvestigationManager(getEndpoint(), null);
 
-        AnomalyResult result = im.investigate(null);
+        MappedMpoint result = im.investigate(null);
 
         assertNull(result);
     }
@@ -37,9 +39,11 @@ public class InvestigationManagerTest {
     public void investigateHasEmptyInvestigationWithNoEndpoint() {
         InvestigationManager im = new InvestigationManager(null, null);
 
-        AnomalyResult result = im.investigate(new AnomalyResult());
+        MappedMpoint mappedMpoint = new MappedMpoint();
+        mappedMpoint.setAnomalyResult(new AnomalyResult());
+        MappedMpoint result = im.investigate(mappedMpoint);
 
-        assertEquals(0, result.getInvestigationResults().size());
+        assertEquals(0, result.getAnomalyResult().getInvestigationResults().size());
     }
 
     @Test
@@ -47,9 +51,12 @@ public class InvestigationManagerTest {
         stubFor(post(urlEqualTo(ENDPOINT_PATH)).willReturn(aResponse().withStatus(500)));
         InvestigationManager im = new InvestigationManager(getEndpoint(), null);
 
-        AnomalyResult result = im.investigate(new AnomalyResult());
+        MappedMpoint mappedMpoint = new MappedMpoint();
+        mappedMpoint.setAnomalyResult(new AnomalyResult());
+        MappedMpoint result = im.investigate(mappedMpoint);
 
-        assertEquals(0, result.getInvestigationResults().size());
+
+        assertEquals(0, result.getAnomalyResult().getInvestigationResults().size());
     }
 
     @Test
@@ -57,9 +64,12 @@ public class InvestigationManagerTest {
         stubFor(post(urlEqualTo(ENDPOINT_PATH)).willReturn(okForJson(validJsonResponse())));
         InvestigationManager im = new InvestigationManager(getEndpoint(), null);
 
-        AnomalyResult result = im.investigate(new AnomalyResult());
+        MappedMpoint mappedMpoint = new MappedMpoint();
+        mappedMpoint.setAnomalyResult(new AnomalyResult());
+        MappedMpoint result = im.investigate(mappedMpoint);
 
-        assertEquals(1, result.getInvestigationResults().size());
+
+        assertEquals(1, result.getAnomalyResult().getInvestigationResults().size());
     }
 
     @Test
@@ -67,9 +77,12 @@ public class InvestigationManagerTest {
         stubFor(post(urlEqualTo(ENDPOINT_PATH)).willReturn(okForJson(validJsonResponse()).withFixedDelay(100)));
         InvestigationManager im = new InvestigationManager(getEndpoint(), 1);
 
-        AnomalyResult result = im.investigate(new AnomalyResult());
+        MappedMpoint mappedMpoint = new MappedMpoint();
+        mappedMpoint.setAnomalyResult(new AnomalyResult());
+        MappedMpoint result = im.investigate(mappedMpoint);
 
-        assertEquals(0, result.getInvestigationResults().size());
+
+        assertEquals(0, result.getAnomalyResult().getInvestigationResults().size());
     }
 
     private List<InvestigationResult> validJsonResponse() {

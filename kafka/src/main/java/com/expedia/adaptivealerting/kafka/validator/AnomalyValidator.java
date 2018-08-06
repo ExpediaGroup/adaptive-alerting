@@ -19,7 +19,7 @@ import com.expedia.adaptivealerting.anomvalidate.filter.InvestigationFilter;
 import com.expedia.adaptivealerting.anomvalidate.filter.PostInvestigationFilter;
 import com.expedia.adaptivealerting.anomvalidate.filter.PreInvestigationFilter;
 import com.expedia.adaptivealerting.anomvalidate.investigation.InvestigationManager;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.core.data.MappedMpoint;
 import com.expedia.adaptivealerting.kafka.util.AppUtil;
 import com.expedia.adaptivealerting.kafka.util.BaseStreamRunnerBuilder;
 import com.expedia.www.haystack.commons.kstreams.app.StreamsRunner;
@@ -27,9 +27,7 @@ import com.typesafe.config.Config;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.KStream;
 
-import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.ANOMALY_VALIDATOR;
-import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.INBOUND_TOPIC;
-import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.OUTBOUND_TOPIC;
+import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.*;
 
 // TODO Isolate the infrastructure-independent logic. [WLW]
 public final class AnomalyValidator {
@@ -52,7 +50,7 @@ public final class AnomalyValidator {
             final String outboundTopic = appConfig.getString(OUTBOUND_TOPIC);
             
             final StreamsBuilder builder = new StreamsBuilder();
-            final KStream<String, AnomalyResult> anomalies = builder.stream(inboundTopic);
+            final KStream<String, MappedMpoint> mpointWithAnomalies = builder.stream(inboundTopic);
 
             InvestigationFilter preInvestigationFilter = new PreInvestigationFilter();
             InvestigationFilter postInvestigationFilter = new PostInvestigationFilter();
@@ -63,8 +61,8 @@ public final class AnomalyValidator {
                     ? appConfig.getInt("investigation.timeoutMs") : null;
             InvestigationManager investigationManager = new InvestigationManager(endpoint, timeoutMs);
 
-            anomalies
-                    .filter((k, anomalyResult) -> preInvestigationFilter.keep(anomalyResult))
+            mpointWithAnomalies
+                    .filter((k, mpointWithAnomaly) -> preInvestigationFilter.keep(mpointWithAnomaly))
                     .mapValues(investigationManager::investigate)
                     .filter((k, anomalyResult) -> postInvestigationFilter.keep(anomalyResult))
                     .to(outboundTopic);
