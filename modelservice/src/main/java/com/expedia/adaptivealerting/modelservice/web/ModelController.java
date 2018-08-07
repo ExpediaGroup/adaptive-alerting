@@ -37,6 +37,10 @@ public class ModelController {
     @Autowired
     private ModelService modelService;
 
+    @RequestMapping(value = "/isActive")
+    public Boolean getModel() {
+        return true;
+    }
     @RequestMapping(value = "/api/model", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ModelDto> getModel(@RequestParam("metricKey") String metricKey) {
         return modelService.getModels(metricKey);
