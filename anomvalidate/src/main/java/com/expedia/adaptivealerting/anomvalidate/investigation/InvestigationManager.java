@@ -47,10 +47,18 @@ public class InvestigationManager {
     }
 
     public MappedMpoint investigate(MappedMpoint mappedMpoint) {
-        if(mappedMpoint!=null){
+        if (mappedMpoint != null) {
             AnomalyResult anomalyResult = mappedMpoint.getAnomalyResult();
             if (anomalyResult != null) {
                 anomalyResult.setInvestigationResults(requestInvestigation(anomalyResult));
+                LOGGER.info(
+                        "Investigation: investigationResultsSize={} resultLevel={} hashcode={} tags={}",
+                        anomalyResult.getInvestigationResults() == null
+                                ? 0 : anomalyResult.getInvestigationResults().size(),
+                        anomalyResult.getAnomalyLevel(),
+                        anomalyResult.getMetric().getTags().hashCode(),
+                        anomalyResult.getMetric().getTags().toString()
+                );
             }
         }
         return mappedMpoint;
