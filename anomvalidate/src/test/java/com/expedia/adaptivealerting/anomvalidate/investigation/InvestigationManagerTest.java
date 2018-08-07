@@ -3,6 +3,7 @@ package com.expedia.adaptivealerting.anomvalidate.investigation;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.InvestigationResult;
 import com.expedia.adaptivealerting.core.data.MappedMpoint;
+import com.expedia.adaptivealerting.core.data.Metric;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,8 +40,7 @@ public class InvestigationManagerTest {
     public void investigateHasEmptyInvestigationWithNoEndpoint() {
         InvestigationManager im = new InvestigationManager(null, null);
 
-        MappedMpoint mappedMpoint = new MappedMpoint();
-        mappedMpoint.setAnomalyResult(new AnomalyResult());
+        MappedMpoint mappedMpoint = createMappedMpoint();
         MappedMpoint result = im.investigate(mappedMpoint);
 
         assertEquals(0, result.getAnomalyResult().getInvestigationResults().size());
@@ -51,8 +51,7 @@ public class InvestigationManagerTest {
         stubFor(post(urlEqualTo(ENDPOINT_PATH)).willReturn(aResponse().withStatus(500)));
         InvestigationManager im = new InvestigationManager(getEndpoint(), null);
 
-        MappedMpoint mappedMpoint = new MappedMpoint();
-        mappedMpoint.setAnomalyResult(new AnomalyResult());
+        MappedMpoint mappedMpoint = createMappedMpoint();
         MappedMpoint result = im.investigate(mappedMpoint);
 
 
@@ -64,8 +63,7 @@ public class InvestigationManagerTest {
         stubFor(post(urlEqualTo(ENDPOINT_PATH)).willReturn(okForJson(validJsonResponse())));
         InvestigationManager im = new InvestigationManager(getEndpoint(), null);
 
-        MappedMpoint mappedMpoint = new MappedMpoint();
-        mappedMpoint.setAnomalyResult(new AnomalyResult());
+        MappedMpoint mappedMpoint = createMappedMpoint();
         MappedMpoint result = im.investigate(mappedMpoint);
 
 
@@ -77,8 +75,7 @@ public class InvestigationManagerTest {
         stubFor(post(urlEqualTo(ENDPOINT_PATH)).willReturn(okForJson(validJsonResponse()).withFixedDelay(100)));
         InvestigationManager im = new InvestigationManager(getEndpoint(), 1);
 
-        MappedMpoint mappedMpoint = new MappedMpoint();
-        mappedMpoint.setAnomalyResult(new AnomalyResult());
+        MappedMpoint mappedMpoint = createMappedMpoint();
         MappedMpoint result = im.investigate(mappedMpoint);
 
 
@@ -87,5 +84,13 @@ public class InvestigationManagerTest {
 
     private List<InvestigationResult> validJsonResponse() {
         return Collections.singletonList(new InvestigationResult());
+    }
+
+    private MappedMpoint createMappedMpoint() {
+        AnomalyResult result = new AnomalyResult();
+        result.setMetric(new Metric());
+        MappedMpoint mappedMpoint = new MappedMpoint();
+        mappedMpoint.setAnomalyResult(result);
+        return mappedMpoint;
     }
 }

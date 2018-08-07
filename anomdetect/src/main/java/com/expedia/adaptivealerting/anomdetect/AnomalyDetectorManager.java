@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.anomdetect.MonitoredDetector.PerfMonHandler;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMpoint;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
@@ -121,6 +122,18 @@ public final class AnomalyDetectorManager {
     public MappedMpoint classify(MappedMpoint mappedMpoint) {
         notNull(mappedMpoint, "mappedMpoint can't be null");
         final AnomalyDetector detector = detectorFor(mappedMpoint);
-        return detector == null ? null : detector.classify(mappedMpoint);
+        if (detector == null) {
+            return null;
+        }
+
+        MappedMpoint retVal = detector.classify(mappedMpoint);
+        AnomalyResult result = retVal.getAnomalyResult();
+        log.info(
+                "Result: resultLevel={} hashcode={} tags={}",
+                result.getAnomalyLevel(),
+                result.getMetric().getTags().hashCode(),
+                result.getMetric().getTags().toString()
+        );
+        return retVal;
     }
 }
