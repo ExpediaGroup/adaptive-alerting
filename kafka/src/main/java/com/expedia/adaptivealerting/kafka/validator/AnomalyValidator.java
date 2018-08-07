@@ -64,7 +64,7 @@ public final class AnomalyValidator {
             mpointWithAnomalies
                     .filter((k, mpointWithAnomaly) -> preInvestigationFilter.keep(mpointWithAnomaly))
                     .mapValues(investigationManager::investigate)
-                    .filter((k, anomalyResult) -> postInvestigationFilter.keep(anomalyResult))
+                    .filter((k, mappedMpoint) -> postInvestigationFilter.keep(mappedMpoint))
                     .to(outboundTopic);
 
             return builder;
