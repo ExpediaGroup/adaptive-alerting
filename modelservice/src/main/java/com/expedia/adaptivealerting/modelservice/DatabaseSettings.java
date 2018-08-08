@@ -15,22 +15,21 @@
  */
 package com.expedia.adaptivealerting.modelservice;
 
-import org.apache.tomcat.jdbc.pool.DataSource;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+import lombok.Data;
 
-import com.expedia.adaptivealerting.modelservice.rds.RdsIamAuthDataSource;
+/**
+ * @author kashah
+ *
+ */
+@Data
+@Component
+@ConfigurationProperties(prefix = "db")
+public class DatabaseSettings {
 
-@SpringBootApplication
-public class ModelServiceApp {
-
-    public static void main(String[] args) {
-        SpringApplication.run(ModelServiceApp.class, args);
-    }
-
-    @Bean
-    public DataSource dataSource() {
-        return new RdsIamAuthDataSource();
-    }
+    private String url;
+    private String user;
+    private String driverName;
+    private String region;
 }

@@ -2,14 +2,10 @@ spring:
   main:
     web-environment: true
     show-banner: true
-  datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/model_service?autoReconnect=true
-    username: root
-    password:
-    maximum-pool-size: 8
-    minimum-idle: 0
-    # TODO Add other data source settings here
+    datasource:
+      maximum-pool-size: 8
+      minimum-idle: 0
+      type: com.expedia.adaptivealerting.modelservice.RdsIamAuthDataSource
   jpa:
     openInView: true
     database: MYSQL
@@ -27,6 +23,8 @@ management:
 
 server:
   port: 8080
- 
- 
- 
+  
+db:
+  url: "jdbc:mysql://aa-model-db.c24oooc4uqmr.us-west-2.rds.amazonaws.com:3306/model_service?autoReconnect=true"
+  user: "aa_user"
+  driverName: com.mysql.cj.jdbc.Driver
