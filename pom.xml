@@ -97,6 +97,11 @@
                 <version>${amazonaws.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-rds</artifactId>
+                <version>${amazonaws.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.expedia.adaptivealerting</groupId>
                 <artifactId>adaptive-alerting-aws</artifactId>
                 <version>${aa.version}</version>
