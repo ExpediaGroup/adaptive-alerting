@@ -5,7 +5,7 @@ spring:
     datasource:
       maximum-pool-size: 8
       minimum-idle: 0
-      type: com.expedia.adaptivealerting.modelservice.RdsIamAuthDataSource
+      type: com.expedia.adaptivealerting.modelservice.rds.RdsIamAuthDataSource
   jpa:
     openInView: true
     database: MYSQL
