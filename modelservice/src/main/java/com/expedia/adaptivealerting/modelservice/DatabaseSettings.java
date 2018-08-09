@@ -25,7 +25,7 @@ import lombok.Data;
  */
 @Data
 @Component
-@ConfigurationProperties(prefix = "db")
+@ConfigurationProperties(prefix = "spring.datasource")
 public class DatabaseSettings {
 
     private String url;
