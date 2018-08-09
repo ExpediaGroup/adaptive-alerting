@@ -13,24 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice;
+package com.expedia.adaptivealerting.modelservice.util;
 
-import org.apache.tomcat.jdbc.pool.DataSource;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
+import java.util.concurrent.TimeUnit;
 
-import com.expedia.adaptivealerting.modelservice.rds.RdsIamAuthDataSource;
+public class ThreadUtil {
 
-@SpringBootApplication
-public class ModelServiceApp {
-
-    public static void main(String[] args) {
-        SpringApplication.run(ModelServiceApp.class, args);
-    }
-
-    @Bean
-    public DataSource dataSource() {
-        return new RdsIamAuthDataSource();
+    public static void sleep(int mins) throws InterruptedException {
+        try {
+            TimeUnit.MINUTES.sleep(mins);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 }

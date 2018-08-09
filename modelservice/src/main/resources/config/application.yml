@@ -3,13 +3,11 @@ spring:
     web-environment: true
     show-banner: true
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/model_service?autoReconnect=true
-    username: root
-    password:
+    drivername: com.mysql.cj.jdbc.Driver 
+    url: "jdbc:mysql://127.0.0.1:3306/model_service?autoReconnect=true"
+    username: "aa_user"
     maximum-pool-size: 8
     minimum-idle: 0
-    # TODO Add other data source settings here
   jpa:
     openInView: true
     database: MYSQL
@@ -27,6 +25,3 @@ management:
 
 server:
   port: 8080
- 
- 
- 
