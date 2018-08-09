@@ -48,8 +48,9 @@ public class RdsIamAuthDataSource extends DataSource {
     protected synchronized ConnectionPool createPoolImpl() throws SQLException {
         PoolConfiguration poolProperties = new PoolProperties();
         poolProperties.setUrl(settings.getUrl());
-        poolProperties.setUsername(settings.getUser());
-        poolProperties.setDriverClassName(settings.getDriverName());
+        poolProperties.setUsername(settings.getUsername());
+        poolProperties.setDriverClassName(settings.getDrivername());
+        
         return pool = new RdsIamAuthConnectionPool(poolProperties);
     }
 

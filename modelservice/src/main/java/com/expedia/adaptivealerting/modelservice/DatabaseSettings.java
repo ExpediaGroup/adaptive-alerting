@@ -29,7 +29,7 @@ import lombok.Data;
 public class DatabaseSettings {
 
     private String url;
-    private String user;
-    private String driverName;
+    private String username;
+    private String drivername;
     private String region;
 }

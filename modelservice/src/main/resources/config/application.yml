@@ -3,12 +3,11 @@ spring:
     web-environment: true
     show-banner: true
   datasource:
+    drivername: com.mysql.cj.jdbc.Driver 
     url: "jdbc:mysql://127.0.0.1:3306/model_service?autoReconnect=true"
-    user: "aa_user"
-    driverName: com.mysql.cj.jdbc.Driver 
+    username: "aa_user"
     maximum-pool-size: 8
     minimum-idle: 0
-    type: com.expedia.adaptivealerting.modelservice.RdsIamAuthDataSource
   jpa:
     openInView: true
     database: MYSQL
