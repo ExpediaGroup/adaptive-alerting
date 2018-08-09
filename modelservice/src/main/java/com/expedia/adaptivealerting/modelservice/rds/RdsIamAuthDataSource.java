@@ -18,10 +18,13 @@ package com.expedia.adaptivealerting.modelservice.rds;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolConfiguration;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.services.rds.auth.GetIamAuthTokenRequest;
@@ -39,6 +42,7 @@ public class RdsIamAuthDataSource extends DataSource {
     private DatabaseSettings settings;
 
     private final static String REGION = "us-west-2"; // FIXME Removed hard coded region [KS]
+    private static final Logger LOG = LoggerFactory.getLogger(RdsIamAuthDataSource.class);
 
     @Override
     public ConnectionPool createPool() throws SQLException {
@@ -50,7 +54,7 @@ public class RdsIamAuthDataSource extends DataSource {
         poolProperties.setUrl(settings.getUrl());
         poolProperties.setUsername(settings.getUsername());
         poolProperties.setDriverClassName(settings.getDrivername());
-        
+
         return pool = new RdsIamAuthConnectionPool(poolProperties);
     }
 
@@ -76,7 +80,8 @@ public class RdsIamAuthDataSource extends DataSource {
                 this.rdsIamAuthTokenGenerator = getRdsIamAuthTokenGenerator();
 
                 updatePassword(prop);
-
+                LOG.info("properties:{}", prop);
+               
                 super.init(prop);
                 this.tokenThread = new Thread(this, "RdsIamAuthDataSourceTokenThread");
                 this.tokenThread.setDaemon(true);
@@ -118,6 +123,7 @@ public class RdsIamAuthDataSource extends DataSource {
             GetIamAuthTokenRequest request = GetIamAuthTokenRequest.builder().hostname(host).port(port)
                     .userName(this.username).build();
             String token = rdsIamAuthTokenGenerator.getAuthToken(request);
+            LOG.info("token generated:{}", token);
             props.setPassword(token);
         }
     }
