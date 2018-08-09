@@ -39,8 +39,8 @@
 
         <!-- Compile -->
         <dependency>
-             <groupId>com.amazonaws</groupId>
-             <artifactId>aws-java-sdk-rds</artifactId>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-rds</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
