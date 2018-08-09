@@ -22,8 +22,6 @@ import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolConfiguration;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.services.rds.auth.GetIamAuthTokenRequest;
@@ -40,7 +38,7 @@ public class RdsIamAuthDataSource extends DataSource {
     @Autowired
     private DatabaseSettings settings;
 
-    private static final Logger LOG = LoggerFactory.getLogger(RdsIamAuthDataSource.class);
+    private final static String REGION = "us-west-2"; // FIXME Removed hard coded region [KS]
 
     @Override
     public ConnectionPool createPool() throws SQLException {
@@ -60,7 +58,6 @@ public class RdsIamAuthDataSource extends DataSource {
         private RdsIamAuthTokenGenerator rdsIamAuthTokenGenerator;
         private String host;
         private int port;
-        private String region;
         private String username;
         private Thread tokenThread;
 
@@ -74,10 +71,9 @@ public class RdsIamAuthDataSource extends DataSource {
                 URI uri = new URI(prop.getUrl().substring(5));
                 this.host = uri.getHost();
                 this.port = uri.getPort();
-                this.region = "us-west-2";
                 this.username = prop.getUsername();
-                this.rdsIamAuthTokenGenerator = RdsIamAuthTokenGenerator.builder()
-                        .credentials(new DefaultAWSCredentialsProviderChain()).region(this.region).build();
+                this.rdsIamAuthTokenGenerator = getRdsIamAuthTokenGenerator();
+
                 updatePassword(prop);
 
                 super.init(prop);
@@ -98,7 +94,7 @@ public class RdsIamAuthDataSource extends DataSource {
                     updatePassword(getPoolProperties());
                 }
             } catch (InterruptedException e) {
-                LOG.trace("Background token thread interrupted");
+                throw new RuntimeException(e.getMessage());
             }
         }
 
@@ -112,10 +108,15 @@ public class RdsIamAuthDataSource extends DataSource {
             }
         }
 
+        private RdsIamAuthTokenGenerator getRdsIamAuthTokenGenerator() {
+            return RdsIamAuthTokenGenerator.builder().credentials(new DefaultAWSCredentialsProviderChain())
+                    .region(REGION).build();
+        }
+
         private void updatePassword(PoolConfiguration props) {
-            String token = rdsIamAuthTokenGenerator.getAuthToken(
-                    GetIamAuthTokenRequest.builder().hostname(host).port(port).userName(this.username).build());
-            LOG.trace("Updated IAM token for connection pool");
+            GetIamAuthTokenRequest request = GetIamAuthTokenRequest.builder().hostname(host).port(port)
+                    .userName(this.username).build();
+            String token = rdsIamAuthTokenGenerator.getAuthToken(request);
             props.setPassword(token);
         }
     }
