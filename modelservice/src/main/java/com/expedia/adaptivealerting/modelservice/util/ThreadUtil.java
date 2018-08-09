@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ThreadUtil {
 
-    public static void sleep(long mins) throws InterruptedException {
+    public static void sleep(int mins) throws InterruptedException {
         TimeUnit.MINUTES.sleep(mins);
     }
 }
