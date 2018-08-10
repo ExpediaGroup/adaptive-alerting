@@ -110,6 +110,9 @@ public class RandomCutForestAnomalyDetector extends AbstractAnomalyDetector {
             } else {
                 anomalyResult.setAnomalyLevel(AnomalyLevel.STRONG);
             }
+            anomalyResult.setMetric(mappedMpoint.getMpoint().getMetric());
+            anomalyResult.setObserved(new Double(mappedMpoint.getMpoint().getValue()));
+            anomalyResult.setEpochSecond(mappedMpoint.getMpoint().getEpochTimeInSeconds());
         }
         final MappedMpoint result = new MappedMpoint();
         result.setAnomalyResult(anomalyResult);
