@@ -55,6 +55,7 @@ public class RdsIamAuthDataSource extends DataSource {
         poolProperties.setUsername(settings.getUsername());
         poolProperties.setDriverClassName(settings.getDrivername());
 
+        LOG.info("Connecting to DB {}", settings.getUrl());
         return pool = new RdsIamAuthConnectionPool(poolProperties);
     }
 
