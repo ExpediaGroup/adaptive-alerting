@@ -15,10 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.anomdetect.MonitoredDetector.PerfMonHandler;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMpoint;
-import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
 import com.typesafe.config.Config;
 import org.slf4j.Logger;

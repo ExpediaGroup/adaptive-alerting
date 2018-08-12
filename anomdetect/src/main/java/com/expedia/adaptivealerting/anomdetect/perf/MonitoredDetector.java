@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect;
+package com.expedia.adaptivealerting.anomdetect.perf;
 
+import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMpoint;
 import com.expedia.adaptivealerting.core.util.AssertUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.UUID;
 
@@ -29,9 +30,8 @@ import java.util.UUID;
  *
  * @author kashah
  */
+@Slf4j
 public class MonitoredDetector extends AbstractAnomalyDetector {
-    private static Logger LOGGER = LoggerFactory.getLogger(MonitoredDetector.class);
-    
     private AnomalyDetector detector;
     private PerformanceMonitor perfMonitor;
     
@@ -58,7 +58,7 @@ public class MonitoredDetector extends AbstractAnomalyDetector {
     public static class PerfMonHandler implements PerfMonListener {
         @Override
         public void processScore(double score) {
-            LOGGER.info("Performance score: {}", score);
+            log.info("Performance score: {}", score);
         }
     }
 }

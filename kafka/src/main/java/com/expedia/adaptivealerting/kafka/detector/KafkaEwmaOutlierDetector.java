@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.kafka.detector;
 
-import com.expedia.adaptivealerting.anomdetect.EwmaAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.control.EwmaAnomalyDetector;
 import com.expedia.adaptivealerting.kafka.util.AppUtil;
 import com.expedia.adaptivealerting.kafka.util.BaseStreamRunnerBuilder;
 import com.expedia.adaptivealerting.kafka.util.DetectorUtil;

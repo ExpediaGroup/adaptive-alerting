@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.kafka.detector;
 
-import com.expedia.adaptivealerting.anomdetect.ConstantThresholdAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.control.ConstantThresholdAnomalyDetector;
 import com.expedia.adaptivealerting.kafka.util.AppUtil;
 import com.expedia.adaptivealerting.kafka.util.BaseStreamRunnerBuilder;
 import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
@@ -23,7 +23,7 @@ import com.expedia.www.haystack.commons.kstreams.app.StreamsRunner;
 import com.typesafe.config.Config;
 import org.apache.kafka.streams.StreamsBuilder;
 
-import static com.expedia.adaptivealerting.anomdetect.ConstantThresholdAnomalyDetector.RIGHT_TAILED;
+import static com.expedia.adaptivealerting.anomdetect.control.ConstantThresholdAnomalyDetector.RIGHT_TAILED;
 import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.INBOUND_TOPIC;
 
 /**

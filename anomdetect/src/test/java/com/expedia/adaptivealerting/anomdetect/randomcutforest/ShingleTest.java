@@ -13,50 +13,50 @@ import java.util.Iterator;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class MetricPointQueueTest {
-    private Shingle queue;
+public class ShingleTest {
+    private Shingle shingle;
     private Iterator<String> iterator;
 
      @Before
     public void setUp() {
-        queue = null;
+        shingle = null;
         iterator = null;
     }
 
     @Test
     public void emptyConstructorTest() {
-        queue = new Shingle();
+        shingle = new Shingle();
 
-        assertFalse(queue.toValues().isPresent());
-        assertFalse(queue.isReady());
+        assertFalse(shingle.toValues().isPresent());
+        assertFalse(shingle.isReady());
     }
 
     @Test
     public void isReadyTest() {
-        queue = new Shingle();
+        shingle = new Shingle();
 
 
-        queue.offer(toMappedMPoint(MetricUtil.metricPoint(Instant.now().getEpochSecond(), Double.valueOf(1))));
-        assertFalse(queue.isReady());
+        shingle.offer(toMappedMPoint(MetricUtil.metricPoint(Instant.now().getEpochSecond(), Double.valueOf(1))));
+        assertFalse(shingle.isReady());
 
         for (int i = 2; i <= 10; i++) {
-            queue.offer(toMappedMPoint(MetricUtil.metricPoint(Instant.now().getEpochSecond(), Double.valueOf(i))));
+            shingle.offer(toMappedMPoint(MetricUtil.metricPoint(Instant.now().getEpochSecond(), Double.valueOf(i))));
         }
-        assertTrue(queue.isReady());
+        assertTrue(shingle.isReady());
 
-        queue.offer(toMappedMPoint(MetricUtil.metricPoint(Instant.now().getEpochSecond(), Double.valueOf(11))));
-        assertTrue(queue.isReady());
+        shingle.offer(toMappedMPoint(MetricUtil.metricPoint(Instant.now().getEpochSecond(), Double.valueOf(11))));
+        assertTrue(shingle.isReady());
     }
 
     @Test
     public void toOutputFormatTest() {
-        queue = new Shingle();
+        shingle = new Shingle();
 
         for (int i = 1; i <= 10; i++) {
-            queue.offer(toMappedMPoint(MetricUtil.metricPoint(Instant.now().getEpochSecond(), Double.valueOf(i))));
+            shingle.offer(toMappedMPoint(MetricUtil.metricPoint(Instant.now().getEpochSecond(), Double.valueOf(i))));
         }
-        assertTrue(queue.isReady());
-        String out = queue.toCsv().get();
+        assertTrue(shingle.isReady());
+        String out = shingle.toCsv().get();
         String expectedOut = "1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0";
         assertTrue(out.equals(expectedOut));
     }

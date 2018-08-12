@@ -15,10 +15,10 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.CusumAnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.EwmaAnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.PewmaAnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.IndividualControlChartsDetector;
+import com.expedia.adaptivealerting.anomdetect.control.CusumAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.control.EwmaAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.control.PewmaAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.control.IndividualControlChartsDetector;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
