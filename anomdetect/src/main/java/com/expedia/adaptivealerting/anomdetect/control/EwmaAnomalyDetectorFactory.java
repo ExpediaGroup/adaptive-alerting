@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect;
+package com.expedia.adaptivealerting.anomdetect.control;
 
+import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorFactory;
 import com.typesafe.config.Config;
 
 import java.util.UUID;
@@ -24,8 +25,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 /**
  * @author Willie Wheeler
  */
-public class ConstantThresholdAnomalyDetectorFactory
-        implements AnomalyDetectorFactory<ConstantThresholdAnomalyDetector> {
+public final class EwmaAnomalyDetectorFactory implements AnomalyDetectorFactory<EwmaAnomalyDetector> {
     
     @Override
     public void init(Config appConfig) {
@@ -33,9 +33,14 @@ public class ConstantThresholdAnomalyDetectorFactory
     }
     
     @Override
-    public ConstantThresholdAnomalyDetector create(UUID uuid) {
+    public EwmaAnomalyDetector create(UUID uuid) {
         notNull(uuid, "uuid can't be null");
-        // TODO Look up bounds based on UUID.
+        // TODO Look up params
+        if (UUID.fromString("5159c1b8-94ca-424f-b25c-e9f5bcb2fc51").equals(uuid)) {
+
+            // Super noisy detector
+            return new EwmaAnomalyDetector(0.15, 0.5, 1.0, 0.0);
+        }
         return null;
     }
 }

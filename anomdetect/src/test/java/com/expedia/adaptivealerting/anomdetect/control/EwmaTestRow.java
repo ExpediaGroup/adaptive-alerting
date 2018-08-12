@@ -13,53 +13,64 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect;
+package com.expedia.adaptivealerting.anomdetect.control;
 
 import com.opencsv.bean.CsvBindByName;
 
-public class PewmaTestRow {
+public class EwmaTestRow {
     
     @CsvBindByName
-    private double observed;
+    private String date;
+    
+    @CsvBindByName
+    private int observed;
     
     @CsvBindByName
     private double mean;
-
-    @CsvBindByName
-    private String level;
+    
+    @CsvBindByName(column = "known.mean")
+    private double knownMean;
     
     @CsvBindByName
-    private double std;
-
-    public double getObserved() {
+    private double var;
+    
+    public String getDate() {
+        return date;
+    }
+    
+    public void setDate(String date) {
+        this.date = date;
+    }
+    
+    public int getObserved() {
         return observed;
     }
-
-    public void setObserved(double observed) {
+    
+    public void setObserved(int observed) {
         this.observed = observed;
     }
-
+    
     public double getMean() {
         return mean;
     }
-
+    
     public void setMean(double mean) {
         this.mean = mean;
     }
-
-    public String getLevel() {
-        return level;
+    
+    public double getKnownMean() {
+        return knownMean;
     }
-
-    public void setLevel(String level) {
-        this.level = level;
+    
+    public void setKnownMean(double knownMean) {
+        this.knownMean = knownMean;
     }
-
-    public double getStd() {
-        return std;
+    
+    public double getVar() {
+        return var;
     }
-
-    public void setStd(double std) {
-        this.std = std;
+    
+    public void setVar(double var) {
+        this.var = var;
     }
 }

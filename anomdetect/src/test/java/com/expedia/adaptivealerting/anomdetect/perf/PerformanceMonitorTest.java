@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect;
+package com.expedia.adaptivealerting.anomdetect.perf;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.ListIterator;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import com.expedia.adaptivealerting.anomdetect.MonitoredDetector.PerfMonHandler;
+import com.expedia.adaptivealerting.anomdetect.perf.MonitoredDetector.PerfMonHandler;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.opencsv.bean.CsvToBeanBuilder;
