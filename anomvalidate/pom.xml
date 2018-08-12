@@ -37,46 +37,24 @@
 
     <dependencies>
 
-        <!-- Haystack -->
+        <!-- Compile -->
+        <dependency>
+            <groupId>com.expedia.adaptivealerting</groupId>
+            <artifactId>adaptive-alerting-core</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.expedia.www</groupId>
             <artifactId>haystack-commons</artifactId>
         </dependency>
-
-        <!-- Adaptive Alerting -->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>adaptive-alerting-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <!-- Third-party -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.opencsv</groupId>
-            <artifactId>opencsv</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>fluent-hc</artifactId>
-            <version>4.5.5</version>
         </dependency>
+
+        <!-- Test -->
         <dependency>
             <groupId>com.github.tomakehurst</groupId>
             <artifactId>wiremock</artifactId>
-            <version>2.18.0</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

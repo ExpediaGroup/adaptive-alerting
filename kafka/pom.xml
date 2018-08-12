@@ -47,17 +47,14 @@
         <dependency>
             <groupId>com.expedia.adaptivealerting</groupId>
             <artifactId>adaptive-alerting-core</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.expedia.adaptivealerting</groupId>
             <artifactId>adaptive-alerting-anomdetect</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.expedia.adaptivealerting</groupId>
             <artifactId>adaptive-alerting-anomvalidate</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.expedia.www</groupId>
@@ -75,22 +72,8 @@
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-
-        <!-- Runtime -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-        </dependency>
 
         <!-- Test -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-streams</artifactId>

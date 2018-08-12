@@ -36,12 +36,10 @@
     <url>https://github.com/ExpediaDotCom/haystack-adaptive-alerting</url>
 
     <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>adaptive-alerting-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
+        <!-- Compile -->
+
+        <!-- TODO Move to a separate project? Want to eliminate AWS dependency. [WLW] -->
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-core</artifactId>
@@ -50,28 +48,16 @@
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-sagemakerruntime</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.expedia.adaptivealerting</groupId>
+            <artifactId>adaptive-alerting-core</artifactId>
+        </dependency>
+
+        <!-- TODO Remove dependency on Haystack commons. [WLW] -->
         <dependency>
             <groupId>com.expedia.www</groupId>
             <artifactId>haystack-commons</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.opencsv</groupId>
-            <artifactId>opencsv</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-        </dependency>
-
-        <!-- Test scope -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

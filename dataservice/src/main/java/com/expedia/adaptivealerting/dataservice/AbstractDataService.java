@@ -18,16 +18,15 @@ package com.expedia.adaptivealerting.dataservice;
 import com.expedia.adaptivealerting.core.data.Metric;
 import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.adaptivealerting.core.data.io.MetricFileFormat;
-import com.expedia.adaptivealerting.core.util.DailyDateRangeDecomposer;
-import com.expedia.adaptivealerting.core.util.DateRangeDecomposer;
 import com.expedia.adaptivealerting.core.data.io.MetricFileInfo;
 import com.expedia.adaptivealerting.core.data.io.MetricFileResolver;
 import com.expedia.adaptivealerting.core.data.io.MetricFrameLoader;
+import com.expedia.adaptivealerting.core.util.DailyDateRangeDecomposer;
+import com.expedia.adaptivealerting.core.util.DateRangeDecomposer;
 import com.expedia.adaptivealerting.core.util.MetricUtil;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
 import com.typesafe.config.Config;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,10 +41,9 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  *
  * @author Willie Wheeler
  */
+@Slf4j
 public abstract class AbstractDataService implements DataService {
     private static final String DATE_RANGE_DECOMPOSER_CLASS_KEY = "dateRangeDecomposer.class";
-    
-    private static final Logger log = LoggerFactory.getLogger(AbstractDataService.class);
     
     private DateRangeDecomposer dateRangeDecomposer = new DailyDateRangeDecomposer();
     private MetricFileResolver metricFileResolver = new MetricFileResolver();
