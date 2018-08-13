@@ -30,6 +30,7 @@ public class DatabaseSettings {
 
     private String url;
     private String username;
+    private String password;
     private String drivername;
     private String region;
 }
