@@ -30,11 +30,13 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 import com.expedia.adaptivealerting.modelservice.dto.ModelParams;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import static org.junit.Assert.assertSame;
 
@@ -67,21 +69,21 @@ public class ModelControllerTests {
     @Test
     public void testAddModelParams() {
         ModelParams params = new ModelParams();
-        HttpStatus status = controller.addModelParams(params);
-        assertSame(HttpStatus.OK, status);
+        ResponseEntity<String> status = controller.addModelParams(params);
+        assertEquals(HttpStatus.OK.value(), status.getStatusCodeValue());
     }
 
     @Test
     public void testmarkToRebuild() {
         RebuildParams params = new RebuildParams();
-        HttpStatus status = controller.markToRebuild(params);
-        assertSame(HttpStatus.OK, status);
+        ResponseEntity<String> status = controller.markToRebuild(params);
+        assertEquals(HttpStatus.OK.value(), status.getStatusCodeValue());
     }
 
     @Test
     public void testUpdateThresholds() {
         ThresholdParams params = new ThresholdParams();
-        HttpStatus status = controller.updateThresholds(params);
-        assertSame(HttpStatus.OK, status);
+        ResponseEntity<String> status = controller.updateThresholds(params);
+        assertEquals(HttpStatus.OK.value(), status.getStatusCodeValue());
     }
 }
