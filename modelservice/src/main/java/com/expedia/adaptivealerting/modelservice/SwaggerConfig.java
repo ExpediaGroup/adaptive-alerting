@@ -29,7 +29,6 @@ import springfox.documentation.service.Contact;
  * @author kashah
  *
  */
-
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig {
