@@ -69,21 +69,21 @@ public class ModelControllerTests {
     @Test
     public void testAddModelParams() {
         ModelParams params = new ModelParams();
-        ResponseEntity<String> status = controller.addModelParams(params);
-        assertEquals(HttpStatus.OK.value(), status.getStatusCodeValue());
+        String response = controller.addModelParams(params);
+        assertEquals("Model params saved successfully", response);
     }
 
     @Test
     public void testmarkToRebuild() {
         RebuildParams params = new RebuildParams();
-        ResponseEntity<String> status = controller.markToRebuild(params);
-        assertEquals(HttpStatus.OK.value(), status.getStatusCodeValue());
+        String response = controller.markToRebuild(params);
+        assertEquals("Model marked for rebuild", response);
     }
 
     @Test
     public void testUpdateThresholds() {
         ThresholdParams params = new ThresholdParams();
-        ResponseEntity<String> status = controller.updateThresholds(params);
-        assertEquals(HttpStatus.OK.value(), status.getStatusCodeValue());
+        String response = controller.updateThresholds(params);
+        assertEquals("Updated threshold successfully", response);
     }
 }
