@@ -30,28 +30,28 @@ import java.util.List;
  * @author kashah
  * @author shsethi
  */
-@RequestMapping("/api")
 @RestController
+@RequestMapping("/api")
 public class ModelController {
 
     @Autowired
     private ModelService modelService;
 
     @ApiOperation(value = "Get model info by providing metric key")
-    @RequestMapping(value = "/model/{metricKey}", method = RequestMethod.GET)
+    @GetMapping(value = "/model/{metricKey}")
     public List<ModelDto> getModel(@PathVariable String metricKey) {
         return modelService.getModels(metricKey);
     }
 
     @ApiOperation(value = "Add model hyper params")
-    @RequestMapping(value = "/addModelParams", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/addModelParams", produces = MediaType.APPLICATION_JSON_VALUE)
     public String addModelParams(@RequestBody ModelParams modelParams) {
         modelService.addModelParams(modelParams);
         return "Model params saved successfully";
     }
 
     @ApiOperation(value = "Mark model to rebuild")
-    @RequestMapping(value = "/markToRebuild", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/markToRebuild", produces = MediaType.APPLICATION_JSON_VALUE)
     public String markToRebuild(@RequestBody RebuildParams rebuildParams) {
         modelService.markToRebuild(rebuildParams.getModelUUID(), rebuildParams.getMetricKey(),
                 rebuildParams.getToRebuild());
@@ -59,7 +59,7 @@ public class ModelController {
     }
 
     @ApiOperation(value = "Update threshold for a given model")
-    @RequestMapping(value = "/updateThreshold", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/updateThreshold", produces = MediaType.APPLICATION_JSON_VALUE)
     public String updateThresholds(@RequestBody ThresholdParams thresholdParams) {
         modelService.updateThresholds(thresholdParams.getModelUUID(), thresholdParams.getMetricKey(),
                 thresholdParams.getThresholds());
