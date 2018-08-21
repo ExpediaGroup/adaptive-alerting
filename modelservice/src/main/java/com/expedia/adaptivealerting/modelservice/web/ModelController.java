@@ -20,11 +20,10 @@ import com.expedia.adaptivealerting.modelservice.dto.ModelParams;
 import com.expedia.adaptivealerting.modelservice.dto.RebuildParams;
 import com.expedia.adaptivealerting.modelservice.dto.ThresholdParams;
 import com.expedia.adaptivealerting.modelservice.service.ModelService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 /**
@@ -32,38 +31,39 @@ import java.util.List;
  * @author shsethi
  */
 @RestController
+@RequestMapping("/api")
 public class ModelController {
 
     @Autowired
     private ModelService modelService;
 
-    @RequestMapping(value = "/isActive")
-    public Boolean getModel() {
-        return true;
-    }
-    @RequestMapping(value = "/api/model", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<ModelDto> getModel(@RequestParam("metricKey") String metricKey) {
+    @ApiOperation(value = "Get model info by providing metric key")
+    @GetMapping(value = "/model/{metricKey}")
+    public List<ModelDto> getModel(@PathVariable String metricKey) {
         return modelService.getModels(metricKey);
     }
 
-    @RequestMapping(value = "/api/addModelParams", method = RequestMethod.POST)
-    public HttpStatus addModelParams(@RequestBody ModelParams modelParams) {
+    @ApiOperation(value = "Add model hyper params")
+    @PostMapping(value = "/addModelParams", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String addModelParams(@RequestBody ModelParams modelParams) {
         modelService.addModelParams(modelParams);
-        return HttpStatus.OK;
+        return "Model params saved successfully";
     }
 
-    @RequestMapping(value = "/api/markToRebuild", method = RequestMethod.PUT)
-    public HttpStatus markToRebuild(@RequestBody RebuildParams rebuildParams) {
+    @ApiOperation(value = "Mark model to rebuild")
+    @PutMapping(value = "/markToRebuild", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String markToRebuild(@RequestBody RebuildParams rebuildParams) {
         modelService.markToRebuild(rebuildParams.getModelUUID(), rebuildParams.getMetricKey(),
                 rebuildParams.getToRebuild());
-        return HttpStatus.OK;
+        return "Model marked for rebuild";
     }
 
-    @RequestMapping(value = "/api/updateThreshold", method = RequestMethod.PUT)
-    public HttpStatus updateThresholds(@RequestBody ThresholdParams thresholdParams) {
+    @ApiOperation(value = "Update threshold for a given model")
+    @PutMapping(value = "/updateThreshold", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String updateThresholds(@RequestBody ThresholdParams thresholdParams) {
         modelService.updateThresholds(thresholdParams.getModelUUID(), thresholdParams.getMetricKey(),
                 thresholdParams.getThresholds());
-        return HttpStatus.OK;
+        return "Updated threshold successfully";
     }
 
 }

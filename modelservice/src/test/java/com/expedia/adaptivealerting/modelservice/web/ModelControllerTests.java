@@ -30,11 +30,13 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 import com.expedia.adaptivealerting.modelservice.dto.ModelParams;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import static org.junit.Assert.assertSame;
 
@@ -67,21 +69,21 @@ public class ModelControllerTests {
     @Test
     public void testAddModelParams() {
         ModelParams params = new ModelParams();
-        HttpStatus status = controller.addModelParams(params);
-        assertSame(HttpStatus.OK, status);
+        String response = controller.addModelParams(params);
+        assertEquals("Model params saved successfully", response);
     }
 
     @Test
     public void testmarkToRebuild() {
         RebuildParams params = new RebuildParams();
-        HttpStatus status = controller.markToRebuild(params);
-        assertSame(HttpStatus.OK, status);
+        String response = controller.markToRebuild(params);
+        assertEquals("Model marked for rebuild", response);
     }
 
     @Test
     public void testUpdateThresholds() {
         ThresholdParams params = new ThresholdParams();
-        HttpStatus status = controller.updateThresholds(params);
-        assertSame(HttpStatus.OK, status);
+        String response = controller.updateThresholds(params);
+        assertEquals("Updated threshold successfully", response);
     }
 }
