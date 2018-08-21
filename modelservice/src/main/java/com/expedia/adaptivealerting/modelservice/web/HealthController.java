@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  */
 @RestController
-public class WebController {
+public class HealthController {
 
     @GetMapping(value = "/isActive")
     public Boolean isActive() {
