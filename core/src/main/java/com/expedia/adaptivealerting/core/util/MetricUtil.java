@@ -15,9 +15,9 @@
  */
 package com.expedia.adaptivealerting.core.util;
 
-import com.expedia.adaptivealerting.core.data.Metric;
 import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.adaptivealerting.core.data.Mpoint;
+import com.expedia.metrics.MetricDefinition;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.entities.MetricType;
 import scala.Enumeration;
@@ -75,7 +75,7 @@ public final class MetricUtil {
      */
     public static Mpoint toMpoint(MetricPoint metricPoint) {
         final Mpoint mpoint = new Mpoint();
-        mpoint.setMetric(toMetric(metricPoint));
+        mpoint.setMetricDefinition(toMetric(metricPoint));
         mpoint.setEpochTimeInSeconds(metricPoint.epochTimeInSeconds());
         mpoint.setValue(metricPoint.value());
         return mpoint;
@@ -97,8 +97,8 @@ public final class MetricUtil {
         return new MetricFrame(resultList);
     }
     
-    private static Metric toMetric(MetricPoint metricPoint) {
-        Metric metric = new Metric();
+    private static MetricDefinition toMetric(MetricPoint metricPoint) {
+        MetricDefinition metric = new MetricDefinition();
         metric.addTags(scala.collection.JavaConverters
                 .mapAsJavaMapConverter(metricPoint.tags()).asJava());
         return metric;

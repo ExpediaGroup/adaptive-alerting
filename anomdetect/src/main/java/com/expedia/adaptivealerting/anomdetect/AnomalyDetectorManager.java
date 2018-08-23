@@ -129,8 +129,8 @@ public final class AnomalyDetectorManager {
         log.info(
                 "Result: resultLevel={} hashcode={} tags={}",
                 result.getAnomalyLevel(),
-                result.getMetric().getTags().hashCode(),
-                result.getMetric().getTags().toString()
+                result.getMetricDefinition().getTags().hashCode(),
+                result.getMetricDefinition().getTags().toString()
         );
         return retVal;
     }

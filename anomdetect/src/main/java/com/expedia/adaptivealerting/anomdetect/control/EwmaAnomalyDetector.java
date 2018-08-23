@@ -159,7 +159,7 @@ public class EwmaAnomalyDetector extends AbstractAnomalyDetector {
             anomalyLevel = WEAK;
         }
         final AnomalyResult result = new AnomalyResult();
-        result.setMetric(mpoint.getMetric());
+        result.setMetricDefinition(mpoint.getMetricDefinition());
         result.setDetectorId(this.getId());
         result.setEpochSecond(mpoint.getEpochTimeInSeconds());
         result.setObserved(observed);

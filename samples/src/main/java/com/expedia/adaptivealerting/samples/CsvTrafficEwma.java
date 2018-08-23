@@ -16,15 +16,15 @@
 package com.expedia.adaptivealerting.samples;
 
 import com.expedia.adaptivealerting.anomdetect.control.EwmaAnomalyDetector;
-import com.expedia.adaptivealerting.core.data.Metric;
 import com.expedia.adaptivealerting.core.data.MetricFrame;
-import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.core.data.io.MetricFrameLoader;
+import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartSink;
 import com.expedia.adaptivealerting.tools.pipeline.source.MetricFrameMetricSource;
 import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
+import com.expedia.metrics.MetricDefinition;
 
 import java.io.InputStream;
 
@@ -40,7 +40,7 @@ public final class CsvTrafficEwma {
         
         // TODO Use the FileDataConnector rather than the MetricFrameLoader. [WLW]
         final InputStream is = ClassLoader.getSystemResourceAsStream("samples/cal-inflow.csv");
-        final MetricFrame frame = MetricFrameLoader.loadCsv(new Metric(), is, true);
+        final MetricFrame frame = MetricFrameLoader.loadCsv(new MetricDefinition("csv"), is, true);
         final MetricFrameMetricSource source = new MetricFrameMetricSource(frame, "data", 200L);
         
         final AnomalyDetectorFilter detector = new AnomalyDetectorFilter(new EwmaAnomalyDetector());

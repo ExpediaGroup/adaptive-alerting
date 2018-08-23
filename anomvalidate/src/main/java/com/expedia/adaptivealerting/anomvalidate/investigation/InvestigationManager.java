@@ -56,8 +56,8 @@ public class InvestigationManager {
                         anomalyResult.getInvestigationResults() == null
                                 ? 0 : anomalyResult.getInvestigationResults().size(),
                         anomalyResult.getAnomalyLevel(),
-                        anomalyResult.getMetric().getTags().hashCode(),
-                        anomalyResult.getMetric().getTags().toString()
+                        anomalyResult.getMetricDefinition().getTags().hashCode(),
+                        anomalyResult.getMetricDefinition().getTags().toString()
                 );
             }
         }

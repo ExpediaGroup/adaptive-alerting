@@ -19,6 +19,7 @@ package com.expedia.adaptivealerting.pipeline.integration
 import java.util.Properties
 import java.util.concurrent.{Executors, ScheduledExecutorService, TimeUnit}
 
+import com.expedia.adaptivealerting.core.data.Mpoint
 import com.expedia.adaptivealerting.kafka.util.AppUtil
 import com.expedia.www.haystack.commons.entities.MetricPoint
 import com.typesafe.config.{Config, ConfigValue, ConfigValueFactory}
@@ -39,7 +40,7 @@ object EmbeddedKafka {
 class IntegrationTestSpec extends WordSpec with GivenWhenThen with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
   protected var scheduler: ScheduledExecutorService = _
   protected val PUNCTUATE_INTERVAL_MS = 2000
-  protected val INPUT_TOPIC = "metrics"
+  protected val INPUT_TOPIC = "aa-metrics"
   protected val OUTPUT_TOPIC = "anomalies"
   val STREAM = "streams"
 
@@ -52,14 +53,14 @@ class IntegrationTestSpec extends WordSpec with GivenWhenThen with Matchers with
   }
 
   protected def produceSpansAsync(produceInterval: FiniteDuration,
-                                  metrics: List[MetricPoint]): Unit = {
+                                  metrics: List[Mpoint]): Unit = {
     var currentTime = System.currentTimeMillis()
     var idx = 0
     scheduler.scheduleWithFixedDelay(() => {
       if (idx < metrics.size) {
         currentTime = currentTime + ((idx * PUNCTUATE_INTERVAL_MS) / (metrics.size - 1))
-        val metricPoint = metrics.apply(idx)
-        val records = List(new KeyValue[String, MetricPoint](metricPoint.metric, metricPoint)).asJava
+        val mpoint:Mpoint = metrics.apply(idx)
+        val records = List(new KeyValue[String, Mpoint](mpoint.getMetricDefinition.toString, mpoint)).asJava
         IntegrationTestUtils.produceKeyValuesSynchronouslyWithTimestamp(
           INPUT_TOPIC,
           records,

@@ -50,7 +50,7 @@ public class MetricPointUtilTest {
             Instant.now().getEpochSecond());
         Mpoint mpoint = toMpoint(metricPoint);
         assertEquals(10, mpoint.getValue(), 0.001);
-        assertEquals("expweb", mpoint.getMetric().getTag(TagKeys.SERVICE_NAME_KEY()));
-        assertEquals("service:GPS", mpoint.getMetric().getTag(TagKeys.OPERATION_NAME_KEY()));
+        assertEquals("expweb", mpoint.getMetricDefinition().getTag(TagKeys.SERVICE_NAME_KEY()));
+        assertEquals("service:GPS", mpoint.getMetricDefinition().getTag(TagKeys.OPERATION_NAME_KEY()));
     }
 }

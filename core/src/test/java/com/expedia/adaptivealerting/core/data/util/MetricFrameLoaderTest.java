@@ -15,9 +15,9 @@
  */
 package com.expedia.adaptivealerting.core.data.util;
 
-import com.expedia.adaptivealerting.core.data.Metric;
 import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.adaptivealerting.core.data.io.MetricFrameLoader;
+import com.expedia.metrics.MetricDefinition;
 import org.junit.Test;
 
 import java.io.InputStream;
@@ -32,7 +32,7 @@ public final class MetricFrameLoaderTest {
     
     @Test
     public void testLoadCsv() throws Exception {
-        final Metric metric = new Metric();
+        final MetricDefinition metric = new MetricDefinition();
         final InputStream is = ClassLoader.getSystemResourceAsStream("datasets/cal-inflow.csv");
         final MetricFrame frame = MetricFrameLoader.loadCsv(metric, is, true);
         assertNotNull(frame);

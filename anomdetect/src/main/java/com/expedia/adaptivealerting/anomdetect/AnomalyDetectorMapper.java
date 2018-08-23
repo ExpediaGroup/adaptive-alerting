@@ -16,8 +16,8 @@
 package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.core.data.MappedMpoint;
-import com.expedia.adaptivealerting.core.data.Metric;
 import com.expedia.adaptivealerting.core.data.Mpoint;
+import com.expedia.metrics.MetricDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,14 +47,14 @@ public final class AnomalyDetectorMapper {
      */
     public Set<MappedMpoint> map(Mpoint mpoint) {
         notNull(mpoint, "mpoint can't be null");
-        return createMappedMpoints(mpoint, findDetectors(mpoint.getMetric()));
+        return createMappedMpoints(mpoint, findDetectors(mpoint.getMetricDefinition()));
     }
     
-    private Set<DetectorMeta> findDetectors(Metric metric) {
+    private Set<DetectorMeta> findDetectors(MetricDefinition metricDefinition) {
         
         // TODO Resolve mappings using the model service instead of the following hardcoded logic. For now, only
         // bookings metrics get through. We can generalize/fix this when we switch over to using Mpoints generally.
-        final Map<String, String> tags = metric.getTags();
+        final Map<String, String> tags = metricDefinition.getTags().getKv();
         final Set<DetectorMeta> results = new HashSet<>();
         if ("bookings".equals(tags.get("what"))) {
             results.add(new DetectorMeta(UUID.fromString("636e13ed-6882-48cc-be75-56986a3b0179"), "aquila-detector"));
@@ -64,11 +64,15 @@ public final class AnomalyDetectorMapper {
             results.add(new DetectorMeta(UUID.fromString("5159c1b8-94ca-424f-b25c-e9f5bcb2fc51"), "ewma-detector"));
         }
 
+        if ("latency".equals(tags.get("what"))) {
+            results.add(new DetectorMeta(UUID.fromString("748e13ed-6882-484f-be75-bcb26a3b0179"), "constant-detector"));
+        }
+
         log.info(
                 "Mapping: resultsSize={} hashcode={} tags={}",
                 results.size(),
-                metric.getTags().hashCode(),
-                metric.getTags().toString()
+                metricDefinition.getTags().hashCode(),
+                metricDefinition.getTags().toString()
         );
         return results;
     }

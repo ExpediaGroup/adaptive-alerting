@@ -243,7 +243,7 @@ public class CusumAnomalyDetector extends AbstractAnomalyDetector {
         // We probably need to make fewer assumptions about the algo in the AnomalyResult class, and support different
         // result approaches. [WLW]
         final AnomalyResult result = new AnomalyResult();
-        result.setMetric(mpoint.getMetric());
+        result.setMetricDefinition(mpoint.getMetricDefinition());
         result.setDetectorId(this.getId());
         result.setEpochSecond(mpoint.getEpochTimeInSeconds());
         result.setObserved(observed);

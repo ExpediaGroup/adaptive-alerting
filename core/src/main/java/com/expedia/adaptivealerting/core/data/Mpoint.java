@@ -15,13 +15,15 @@
  */
 package com.expedia.adaptivealerting.core.data;
 
+import com.expedia.metrics.MetricDefinition;
+
 /**
  * Metric point.
  *
  * @author Willie Wheeler
  */
 public final class Mpoint {
-    private Metric metric;
+    private MetricDefinition metricDefinition;
     
     // TODO Prefer Instant and Double, but trying not to diverge much from Haystack's MetricPoint for now. [WLW]
     private long epochTimeInSeconds;
@@ -30,18 +32,18 @@ public final class Mpoint {
     public Mpoint() {
     }
     
-    public Mpoint(Metric metric, long epochTimeInSeconds, Float value) {
-        this.metric = metric;
+    public Mpoint(MetricDefinition metricDefinition, long epochTimeInSeconds, Float value) {
+        this.metricDefinition = metricDefinition;
         this.epochTimeInSeconds = epochTimeInSeconds;
         this.value = value;
     }
     
-    public Metric getMetric() {
-        return metric;
+    public MetricDefinition getMetricDefinition() {
+        return metricDefinition;
     }
     
-    public void setMetric(Metric metric) {
-        this.metric = metric;
+    public void setMetricDefinition(MetricDefinition metricDefinition) {
+        this.metricDefinition = metricDefinition;
     }
     
     public long getEpochTimeInSeconds() {
@@ -63,7 +65,7 @@ public final class Mpoint {
     @Override
     public String toString() {
         return "Mpoint{" +
-                "metric=" + metric +
+                "metricDefinition=" + metricDefinition +
                 ", epochTimeInSeconds=" + epochTimeInSeconds +
                 ", value=" + value +
                 '}';

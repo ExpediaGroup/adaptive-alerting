@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.dataservice;
 
-import com.expedia.adaptivealerting.core.data.Metric;
+import com.expedia.adaptivealerting.core.data.MetricDefinition;
 import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.adaptivealerting.core.data.io.MetricFileFormat;
 import com.expedia.adaptivealerting.core.data.io.MetricFileInfo;
@@ -68,7 +68,7 @@ public abstract class AbstractDataService implements DataService {
     }
     
     @Override
-    public MetricFrame getMetricFrame(Metric metric, Instant startDate, Instant endDate) {
+    public MetricFrame getMetricFrame(MetricDefinition metric, Instant startDate, Instant endDate) {
         notNull(metric, "metric can't be null");
         notNull(startDate, "startDate can't be null");
         notNull(endDate, "endDate can't be null");
@@ -89,7 +89,7 @@ public abstract class AbstractDataService implements DataService {
         }
     }
     
-    private MetricFrame doGetMetricFrame(Metric metric, Instant date) {
+    private MetricFrame doGetMetricFrame(MetricDefinition metric, Instant date) {
         final MetricFileInfo meta = getMetricFileResolver().resolve(metric);
         final MetricFileFormat format = meta.getFormat();
         final String path = meta.getLocation().toMetricFilePath(date);

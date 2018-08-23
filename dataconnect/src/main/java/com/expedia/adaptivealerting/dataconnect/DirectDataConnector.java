@@ -15,10 +15,10 @@
  */
 package com.expedia.adaptivealerting.dataconnect;
 
-import com.expedia.adaptivealerting.core.data.Metric;
 import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
 import com.expedia.adaptivealerting.dataservice.DataService;
+import com.expedia.metrics.MetricDefinition;
 import com.typesafe.config.Config;
 
 import java.time.Instant;
@@ -48,7 +48,7 @@ public final class DirectDataConnector implements DataConnector {
     }
     
     @Override
-    public MetricFrame load(Metric metric, Instant startDate, Instant endDate) {
+    public MetricFrame load(MetricDefinition metric, Instant startDate, Instant endDate) {
         notNull(metric, "metric can't be null");
         notNull(startDate, "startDate can't be null");
         notNull(endDate, "endDate can't be null");

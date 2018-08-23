@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.dataservice;
 
-import com.expedia.adaptivealerting.core.data.Metric;
 import com.expedia.adaptivealerting.core.data.MetricFrame;
+import com.expedia.metrics.MetricDefinition;
 import com.typesafe.config.Config;
 
 import java.time.Instant;
@@ -43,5 +43,5 @@ public interface DataService {
      * @param endDate   End date.
      * @return The corresponding metric frame.
      */
-    MetricFrame getMetricFrame(Metric metric, Instant startDate, Instant endDate);
+    MetricFrame getMetricFrame(MetricDefinition metric, Instant startDate, Instant endDate);
 }

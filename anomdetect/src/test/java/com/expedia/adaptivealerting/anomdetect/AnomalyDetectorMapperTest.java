@@ -16,7 +16,6 @@
 package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.core.data.MappedMpoint;
-import com.expedia.adaptivealerting.core.data.Metric;
 import com.expedia.adaptivealerting.core.data.Mpoint;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,15 +43,15 @@ public final class AnomalyDetectorMapperTest {
         
         // TODO For now, this is known to have detectors.
         // We'll need to update this once we un-hardcode the AnomalyDetectorMapper.
-        final Metric metricWithDetectors = new Metric();
+        final MetricDefinition metricWithDetectors = new MetricDefinition();
         metricWithDetectors.putTag("what", "bookings");
         this.mpointWithDetectors = new Mpoint();
-        mpointWithDetectors.setMetric(metricWithDetectors);
+        mpointWithDetectors.setMetricDefinition(metricWithDetectors);
         
         // TODO For now, this is known to have no detectors. See above.
-        final Metric metricWithoutDetectors = new Metric();
+        final MetricDefinition metricWithoutDetectors = new MetricDefinition();
         this.mpointWithoutDetectors = new Mpoint();
-        mpointWithoutDetectors.setMetric(metricWithoutDetectors);
+        mpointWithoutDetectors.setMetricDefinition(metricWithoutDetectors);
     }
     
     @Test
