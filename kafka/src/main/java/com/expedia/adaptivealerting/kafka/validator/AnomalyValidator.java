@@ -19,7 +19,7 @@ import com.expedia.adaptivealerting.anomvalidate.filter.InvestigationFilter;
 import com.expedia.adaptivealerting.anomvalidate.filter.PostInvestigationFilter;
 import com.expedia.adaptivealerting.anomvalidate.filter.PreInvestigationFilter;
 import com.expedia.adaptivealerting.anomvalidate.investigation.InvestigationManager;
-import com.expedia.adaptivealerting.core.data.MappedMpoint;
+import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.kafka.util.AppUtil;
 import com.expedia.adaptivealerting.kafka.util.BaseStreamRunnerBuilder;
 import com.expedia.www.haystack.commons.kstreams.app.StreamsRunner;
@@ -50,7 +50,7 @@ public final class AnomalyValidator {
             final String outboundTopic = appConfig.getString(OUTBOUND_TOPIC);
             
             final StreamsBuilder builder = new StreamsBuilder();
-            final KStream<String, MappedMpoint> mpointWithAnomalies = builder.stream(inboundTopic);
+            final KStream<String, MappedMetricData> mpointWithAnomalies = builder.stream(inboundTopic);
 
             InvestigationFilter preInvestigationFilter = new PreInvestigationFilter();
             InvestigationFilter postInvestigationFilter = new PostInvestigationFilter();
@@ -64,7 +64,7 @@ public final class AnomalyValidator {
             mpointWithAnomalies
                     .filter((k, mpointWithAnomaly) -> preInvestigationFilter.keep(mpointWithAnomaly))
                     .mapValues(investigationManager::investigate)
-                    .filter((k, mappedMpoint) -> postInvestigationFilter.keep(mappedMpoint))
+                    .filter((k, mappedMetricData) -> postInvestigationFilter.keep(mappedMetricData))
                     .to(outboundTopic);
 
             return builder;

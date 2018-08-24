@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.data.MappedMpoint;
+import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.core.util.MetricUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 
@@ -41,8 +41,8 @@ public abstract class AbstractAnomalyDetector implements AnomalyDetector {
     
     @Override
     public AnomalyResult classify(MetricPoint metricPoint) {
-        final MappedMpoint mappedMpoint = new MappedMpoint();
-        mappedMpoint.setMpoint(MetricUtil.toMpoint(metricPoint));
-        return classify(mappedMpoint).getAnomalyResult();
+        final MappedMetricData mappedMetricData = new MappedMetricData();
+        mappedMetricData.setMetricData(MetricUtil.toMetricData(metricPoint));
+        return classify(mappedMetricData).getAnomalyResult();
     }
 }

@@ -24,7 +24,7 @@ import com.expedia.adaptivealerting.anomdetect.randomcutforest.beans.Scores;
 import com.expedia.adaptivealerting.anomdetect.randomcutforest.util.PropertiesCache;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.data.MappedMpoint;
+import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.adaptivealerting.core.util.MetricUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
@@ -87,21 +87,21 @@ public class RandomCutForestAnomalyDetector extends AbstractAnomalyDetector {
     @Override
     @Deprecated
     public AnomalyResult classify(MetricPoint metricPoint) {
-        final MappedMpoint mappedMpoint = new MappedMpoint();
-        mappedMpoint.setMpoint(MetricUtil.toMpoint(metricPoint));
-        return classify(mappedMpoint).getAnomalyResult();
+        final MappedMetricData mappedMetricData = new MappedMetricData();
+        mappedMetricData.setMetricData(MetricUtil.toMetricData(metricPoint));
+        return classify(mappedMetricData).getAnomalyResult();
     }
     
     @Override
-    public MappedMpoint classify(MappedMpoint mappedMpoint) {
-        AssertUtil.notNull(mappedMpoint, "metricPoint can't be null");
+    public MappedMetricData classify(MappedMetricData mappedMetricData) {
+        AssertUtil.notNull(mappedMetricData, "metricPoint can't be null");
 
-        this.shingle.offer(mappedMpoint);
+        this.shingle.offer(mappedMetricData);
 
         final AnomalyResult anomalyResult = new AnomalyResult();
         if (this.shingle.isReady()) {
             final double anomalyScore = getAnomalyScore();
-            anomalyResult.setEpochSecond(mappedMpoint.getMpoint().getEpochTimeInSeconds());
+            anomalyResult.setEpochSecond(mappedMetricData.getMetricData().getTimestamp());
             anomalyResult.setAnomalyScore(anomalyScore);
             if (anomalyScore < WEAK_SCORE_CUTOFF) {
                 anomalyResult.setAnomalyLevel(AnomalyLevel.NORMAL);
@@ -110,15 +110,15 @@ public class RandomCutForestAnomalyDetector extends AbstractAnomalyDetector {
             } else {
                 anomalyResult.setAnomalyLevel(AnomalyLevel.STRONG);
             }
-            anomalyResult.setMetricDefinition(mappedMpoint.getMpoint().getMetricDefinition());
-            anomalyResult.setObserved(new Double(mappedMpoint.getMpoint().getValue()));
-            anomalyResult.setEpochSecond(mappedMpoint.getMpoint().getEpochTimeInSeconds());
+            anomalyResult.setMetricDefinition(mappedMetricData.getMetricData().getMetricDefinition());
+            anomalyResult.setObserved(new Double(mappedMetricData.getMetricData().getValue()));
+            anomalyResult.setEpochSecond(mappedMetricData.getMetricData().getTimestamp());
         }
-        final MappedMpoint result = new MappedMpoint();
+        final MappedMetricData result = new MappedMetricData();
         result.setAnomalyResult(anomalyResult);
-        result.setDetectorType(mappedMpoint.getDetectorType());
-        result.setDetectorUuid(mappedMpoint.getDetectorUuid());
-        result.setMpoint(mappedMpoint.getMpoint());
+        result.setDetectorType(mappedMetricData.getDetectorType());
+        result.setDetectorUuid(mappedMetricData.getDetectorUuid());
+        result.setMetricData(mappedMetricData.getMetricData());
 
         return result;
     }

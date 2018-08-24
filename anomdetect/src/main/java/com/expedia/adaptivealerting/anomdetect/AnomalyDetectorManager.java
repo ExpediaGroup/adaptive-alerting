@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.data.MappedMpoint;
+import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
 import com.typesafe.config.Config;
 import org.slf4j.Logger;
@@ -77,16 +77,16 @@ public final class AnomalyDetectorManager {
      * Gets the anomaly detector for the given metric point, creating it if absent. Returns {@code null} if there's no
      * {@link AnomalyDetectorFactory} defined for the mapped mpoint's detector type.
      *
-     * @param mappedMpoint Mapped metric point.
+     * @param mappedMetricData Mapped metric point.
      * @return Anomaly detector for the given metric point, or {@code null} if there's no registered detector factory
      * for the mapped mpoint's detector type.
      */
-    public AnomalyDetector detectorFor(MappedMpoint mappedMpoint) {
-        notNull(mappedMpoint, "mappedMpoint can't be null");
-        final UUID detectorUuid = mappedMpoint.getDetectorUuid();
+    public AnomalyDetector detectorFor(MappedMetricData mappedMetricData) {
+        notNull(mappedMetricData, "mappedMetricData can't be null");
+        final UUID detectorUuid = mappedMetricData.getDetectorUuid();
         AnomalyDetector detector = detectors.get(detectorUuid);
         if (detector == null) {
-            final String detectorType = mappedMpoint.getDetectorType();
+            final String detectorType = mappedMetricData.getDetectorType();
             final AnomalyDetectorFactory factory = detectorFactories.get(detectorType);
             if (factory == null) {
                 log.warn("No AnomalyDetectorFactory registered for detectorType={}", detectorType);
@@ -114,17 +114,17 @@ public final class AnomalyDetectorManager {
      * Returns {@code null} if there's no detector defined for the given mapped mpoint.
      * </p>
      *
-     * @param mappedMpoint Mapped metric point.
+     * @param mappedMetricData Mapped metric point.
      * @return The mapped metric point, or {@code null} if there's no associated detector.
      */
-    public MappedMpoint classify(MappedMpoint mappedMpoint) {
-        notNull(mappedMpoint, "mappedMpoint can't be null");
-        final AnomalyDetector detector = detectorFor(mappedMpoint);
+    public MappedMetricData classify(MappedMetricData mappedMetricData) {
+        notNull(mappedMetricData, "mappedMetricData can't be null");
+        final AnomalyDetector detector = detectorFor(mappedMetricData);
         if (detector == null) {
             return null;
         }
 
-        MappedMpoint retVal = detector.classify(mappedMpoint);
+        MappedMetricData retVal = detector.classify(mappedMetricData);
         AnomalyResult result = retVal.getAnomalyResult();
         log.info(
                 "Result: resultLevel={} hashcode={} tags={}",

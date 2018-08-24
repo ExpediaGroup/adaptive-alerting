@@ -16,8 +16,9 @@
 package com.expedia.adaptivealerting.core.util;
 
 import com.expedia.adaptivealerting.core.data.MetricFrame;
-import com.expedia.adaptivealerting.core.data.Mpoint;
+import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
+import com.expedia.metrics.TagCollection;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.entities.MetricType;
 import scala.Enumeration;
@@ -25,6 +26,7 @@ import scala.collection.immutable.Map;
 import scala.collection.immutable.Map$;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -68,16 +70,13 @@ public final class MetricUtil {
     }
     
     /**
-     * Convert {@link MetricPoint} to a {@link Mpoint}.
+     * Convert {@link MetricPoint} to a {@link MetricData}.
      *
      * @param metricPoint a metric point.
-     * @return an Mpoint.
+     * @return an MetricData.
      */
-    public static Mpoint toMpoint(MetricPoint metricPoint) {
-        final Mpoint mpoint = new Mpoint();
-        mpoint.setMetricDefinition(toMetric(metricPoint));
-        mpoint.setEpochTimeInSeconds(metricPoint.epochTimeInSeconds());
-        mpoint.setValue(metricPoint.value());
+    public static MetricData toMetricData(MetricPoint metricPoint) {
+        final MetricData mpoint = new MetricData(toMetric(metricPoint),metricPoint.value(),metricPoint.epochTimeInSeconds());
         return mpoint;
     }
     
@@ -89,7 +88,7 @@ public final class MetricUtil {
             totalSize += frame.getNumRows();
         }
         
-        final List<Mpoint> resultList = new ArrayList<>(totalSize);
+        final List<MetricData> resultList = new ArrayList<>(totalSize);
         for (final MetricFrame frame : frames) {
             resultList.addAll(frame.getMetricPoints());
         }
@@ -98,9 +97,14 @@ public final class MetricUtil {
     }
     
     private static MetricDefinition toMetric(MetricPoint metricPoint) {
-        MetricDefinition metric = new MetricDefinition();
-        metric.addTags(scala.collection.JavaConverters
-                .mapAsJavaMapConverter(metricPoint.tags()).asJava());
+
+        final MetricDefinition metric = new MetricDefinition(new TagCollection(new HashMap<String, String>() {{
+            put("unit", "dummy");
+            put("mtype","dummy" );
+            put("what", metricPoint.metric());
+            putAll(scala.collection.JavaConverters
+                    .mapAsJavaMapConverter(metricPoint.tags()).asJava());
+        }}));
         return metric;
     }
 }

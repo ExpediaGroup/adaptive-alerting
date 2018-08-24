@@ -1,7 +1,7 @@
 package com.expedia.adaptivealerting.anomdetect.randomcutforest;
 
 
-import com.expedia.adaptivealerting.core.data.MappedMpoint;
+import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.core.util.MetricUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import org.junit.Before;
@@ -61,10 +61,10 @@ public class ShingleTest {
         assertTrue(out.equals(expectedOut));
     }
 
-    private MappedMpoint toMappedMPoint(MetricPoint metricPoint) {
-        final MappedMpoint mappedMpoint = new MappedMpoint();
-        mappedMpoint.setMpoint(MetricUtil.toMpoint(metricPoint));
-        return mappedMpoint;
+    private MappedMetricData toMappedMPoint(MetricPoint metricPoint) {
+        final MappedMetricData mappedMetricData = new MappedMetricData();
+        mappedMetricData.setMetricData(MetricUtil.toMetricData(metricPoint));
+        return mappedMetricData;
     }
 
 }

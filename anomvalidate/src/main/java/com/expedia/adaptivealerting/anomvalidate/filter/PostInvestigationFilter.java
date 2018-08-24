@@ -18,7 +18,7 @@ package com.expedia.adaptivealerting.anomvalidate.filter;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.InvestigationResult;
-import com.expedia.adaptivealerting.core.data.MappedMpoint;
+import com.expedia.adaptivealerting.core.data.MappedMetricData;
 
 import java.util.Objects;
 
@@ -26,12 +26,12 @@ public class PostInvestigationFilter  implements InvestigationFilter {
 
     // TODO: make configurable
     @Override
-    public boolean keep(MappedMpoint mappedMpoint) {
+    public boolean keep(MappedMetricData mappedMetricData) {
 
-        if(mappedMpoint==null){
+        if(mappedMetricData==null){
             return false;
         }
-        AnomalyResult anomalyResult = mappedMpoint.getAnomalyResult();
+        AnomalyResult anomalyResult = mappedMetricData.getAnomalyResult();
         if (anomalyResult == null) {
             return false;
         }

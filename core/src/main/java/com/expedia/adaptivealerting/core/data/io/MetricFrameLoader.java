@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.core.data.io;
 
 import com.expedia.adaptivealerting.core.data.MetricFrame;
-import com.expedia.adaptivealerting.core.data.Mpoint;
+import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
@@ -66,10 +66,10 @@ public final class MetricFrameLoader {
         }
         
         final int numRows = rows.size();
-        final Mpoint[] mpoints = new Mpoint[numRows];
+        final MetricData[] mpoints = new MetricData[numRows];
         
         for (int i = 0; i < numRows; i++) {
-            mpoints[i] = toMpoint(metric, rows.get(i));
+            mpoints[i] = toMetricData(metric, rows.get(i));
         }
         return new MetricFrame(mpoints);
     }
@@ -101,33 +101,27 @@ public final class MetricFrameLoader {
         }
         
         final int numRows = rows.size();
-        final Mpoint[] mpoints = new Mpoint[numRows];
+        final MetricData[] mpoints = new MetricData[numRows];
         final long incr = intervalInMinutes * 60L;
         
         long epochTimeInSeconds = startDate.getEpochSecond();
         for (int i = 0; i < numRows; i++) {
             final String[] row = rows.get(i);
             final Float value = Float.parseFloat(row[0]);
-            mpoints[i] = toMpoint(metric, epochTimeInSeconds, value);
+            mpoints[i] = toMetricData(metric, epochTimeInSeconds, value);
             epochTimeInSeconds += incr;
         }
         
         return new MetricFrame(mpoints);
     }
     
-    private static Mpoint toMpoint(MetricDefinition metric, String[] row) {
-        final Mpoint mpoint = new Mpoint();
-        mpoint.setMetricDefinition(metric);
-        mpoint.setEpochTimeInSeconds(Instant.parse(row[0]).getEpochSecond());
-        mpoint.setValue(Float.parseFloat(row[1]));
+    private static MetricData toMetricData(MetricDefinition metric, String[] row) {
+        final MetricData mpoint = new MetricData(metric,Float.parseFloat(row[1]),Instant.parse(row[0]).getEpochSecond());
         return mpoint;
     }
     
-    private static Mpoint toMpoint(MetricDefinition metric, long epochTimeInSeconds, Float value) {
-        final Mpoint mpoint = new Mpoint();
-        mpoint.setMetricDefinition(metric);
-        mpoint.setEpochTimeInSeconds(epochTimeInSeconds);
-        mpoint.setValue(value);
+    private static MetricData toMetricData(MetricDefinition metric, long epochTimeInSeconds, Float value) {
+        final MetricData mpoint = new MetricData(metric,value,epochTimeInSeconds);
         return mpoint;
     }
 }

@@ -15,6 +15,8 @@
  */
 package com.expedia.adaptivealerting.core.data;
 
+import com.expedia.metrics.MetricData;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,23 +31,23 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author Willie Wheeler
  */
 public class MetricFrame {
-    private final List<Mpoint> mpoints;
+    private final List<MetricData> mpoints;
     
     public MetricFrame() {
         this.mpoints = new ArrayList<>();
     }
     
     /**
-     * Creates a new metric frame from an array of {@link Mpoint}s.
+     * Creates a new metric frame from an array of {@link MetricData}s.
      *
      * @param mpoints Metric point array.
      */
-    public MetricFrame(Mpoint[] mpoints) {
+    public MetricFrame(MetricData[] mpoints) {
         notNull(mpoints, "mpoints can't be null");
         this.mpoints = Arrays.asList(mpoints);
     }
     
-    public MetricFrame(List<Mpoint> mpoints) {
+    public MetricFrame(List<MetricData> mpoints) {
         notNull(mpoints, "mpoints can't be null");
         this.mpoints = mpoints;
     }
@@ -60,17 +62,17 @@ public class MetricFrame {
     }
     
     /**
-     * Returns the {@link Mpoint} at the given row index.
+     * Returns the {@link MetricData} at the given row index.
      *
      * @param index Row index.
      * @return The corresponding metric point.
      */
-    public Mpoint getMetricPoint(int index) {
+    public MetricData getMetricPoint(int index) {
         isTrue(index >= 0, "Required: index >= 0");
         return mpoints.get(index);
     }
     
-    public List<Mpoint> getMetricPoints() {
+    public List<MetricData> getMetricPoints() {
         return mpoints;
     }
     
@@ -79,7 +81,7 @@ public class MetricFrame {
      *
      * @return List iterator for this frame.
      */
-    public ListIterator<Mpoint> listIterator() {
+    public ListIterator<MetricData> listIterator() {
         return mpoints.listIterator();
     }
     

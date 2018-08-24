@@ -18,9 +18,11 @@ package com.expedia.adaptivealerting.core.data.util;
 import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.adaptivealerting.core.data.io.MetricFrameLoader;
 import com.expedia.metrics.MetricDefinition;
+import com.expedia.metrics.TagCollection;
 import org.junit.Test;
 
 import java.io.InputStream;
+import java.util.HashMap;
 
 import static org.junit.Assert.*;
 
@@ -29,10 +31,13 @@ import static org.junit.Assert.*;
  */
 public final class MetricFrameLoaderTest {
     private static final double TOLERANCE = 0.001;
-    
+
     @Test
     public void testLoadCsv() throws Exception {
-        final MetricDefinition metric = new MetricDefinition();
+        final MetricDefinition metric = new MetricDefinition(new TagCollection(new HashMap<String, String>() {{
+            put("unit", "dummy");
+            put("mtype", "dummy");
+        }}));
         final InputStream is = ClassLoader.getSystemResourceAsStream("datasets/cal-inflow.csv");
         final MetricFrame frame = MetricFrameLoader.loadCsv(metric, is, true);
         assertNotNull(frame);

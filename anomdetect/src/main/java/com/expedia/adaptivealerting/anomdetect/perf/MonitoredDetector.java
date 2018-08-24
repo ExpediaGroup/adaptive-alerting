@@ -18,7 +18,7 @@ package com.expedia.adaptivealerting.anomdetect.perf;
 import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.data.MappedMpoint;
+import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.core.util.AssertUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,7 +26,7 @@ import java.util.UUID;
 
 /**
  * Wrapper around {@link AnomalyDetector}. It feeds the performance monitor with a listener and pushes the
- * classification outputs to the perfmon every time a new {@link MappedMpoint} comes in.
+ * classification outputs to the perfmon every time a new {@link MappedMetricData} comes in.
  *
  * @author kashah
  */
@@ -48,8 +48,8 @@ public class MonitoredDetector extends AbstractAnomalyDetector {
     }
     
     @Override
-    public MappedMpoint classify(MappedMpoint mappedMpoint) {
-        MappedMpoint classified = detector.classify(mappedMpoint);
+    public MappedMetricData classify(MappedMetricData mappedMetricData) {
+        MappedMetricData classified = detector.classify(mappedMetricData);
         AnomalyResult result = classified.getAnomalyResult();
         perfMonitor.evaluatePerformance(result);
         return classified;

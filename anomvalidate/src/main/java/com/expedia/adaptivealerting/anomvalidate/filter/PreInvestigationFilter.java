@@ -17,7 +17,7 @@ package com.expedia.adaptivealerting.anomvalidate.filter;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.data.MappedMpoint;
+import com.expedia.adaptivealerting.core.data.MappedMetricData;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,11 +26,11 @@ public class PreInvestigationFilter implements InvestigationFilter {
     private static final List<AnomalyLevel> KEEP_LEVELS = Arrays.asList(AnomalyLevel.WEAK, AnomalyLevel.STRONG);
 
     // TODO: make configurable
-    public boolean keep(MappedMpoint mappedMpoint) {
-        if (mappedMpoint == null) {
+    public boolean keep(MappedMetricData mappedMetricData) {
+        if (mappedMetricData == null) {
             return false;
         }
-        AnomalyResult anomalyResult = mappedMpoint.getAnomalyResult();
+        AnomalyResult anomalyResult = mappedMetricData.getAnomalyResult();
         return anomalyResult != null && KEEP_LEVELS.contains(anomalyResult.getAnomalyLevel());
     }
 }

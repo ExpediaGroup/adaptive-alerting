@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.core.data.MappedMpoint;
-import com.expedia.adaptivealerting.core.data.Mpoint;
+import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,8 +30,8 @@ import java.util.stream.Collectors;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
- * Entry into the Adaptive Alerting runtime. Its job is find for any incoming {@link Mpoint} its set of mapped
- * detectors, creating the corresponding {@link MappedMpoint}s.
+ * Entry into the Adaptive Alerting runtime. Its job is find for any incoming {@link MetricData} its set of mapped
+ * detectors, creating the corresponding {@link MappedMetricData}s.
  *
  * @author David Sutherland
  * @author Willie Wheeler
@@ -40,20 +40,20 @@ public final class AnomalyDetectorMapper {
     private static final Logger log = LoggerFactory.getLogger(AnomalyDetectorMapper.class);
     
     /**
-     * Maps an {@link Mpoint} to its corresponding set of {@link MappedMpoint}s.
+     * Maps an {@link MetricData} to its corresponding set of {@link MappedMetricData}s.
      *
-     * @param mpoint Mpoint to map.
-     * @return The corresponding set of {@link MappedMpoint}s: one per detector.
+     * @param mpoint MetricData to map.
+     * @return The corresponding set of {@link MappedMetricData}s: one per detector.
      */
-    public Set<MappedMpoint> map(Mpoint mpoint) {
+    public Set<MappedMetricData> map(MetricData mpoint) {
         notNull(mpoint, "mpoint can't be null");
-        return createMappedMpoints(mpoint, findDetectors(mpoint.getMetricDefinition()));
+        return createMappedMetricDatas(mpoint, findDetectors(mpoint.getMetricDefinition()));
     }
     
     private Set<DetectorMeta> findDetectors(MetricDefinition metricDefinition) {
         
         // TODO Resolve mappings using the model service instead of the following hardcoded logic. For now, only
-        // bookings metrics get through. We can generalize/fix this when we switch over to using Mpoints generally.
+        // bookings metrics get through. We can generalize/fix this when we switch over to using MetricDatas generally.
         final Map<String, String> tags = metricDefinition.getTags().getKv();
         final Set<DetectorMeta> results = new HashSet<>();
         if ("bookings".equals(tags.get("what"))) {
@@ -77,9 +77,9 @@ public final class AnomalyDetectorMapper {
         return results;
     }
     
-    private Set<MappedMpoint> createMappedMpoints(Mpoint mpoint, Set<DetectorMeta> detectors) {
+    private Set<MappedMetricData> createMappedMetricDatas(MetricData mpoint, Set<DetectorMeta> detectors) {
         return detectors.stream()
-                .map(detector -> new MappedMpoint(mpoint, detector.getUuid(), detector.getType()))
+                .map(detector -> new MappedMetricData(mpoint, detector.getUuid(), detector.getType()))
                 .collect(Collectors.toSet());
     }
     

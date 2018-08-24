@@ -15,14 +15,14 @@
  */
 package com.expedia.adaptivealerting.anomvalidate.filter;
 
-import com.expedia.adaptivealerting.core.data.MappedMpoint;
+import com.expedia.adaptivealerting.core.data.MappedMetricData;
 
 public interface InvestigationFilter {
 
     /**
      *
-     * @param mappedMpoint The MappedMpoint to perform filtering on.
-     * @return whether to keep the MappedMpoint in the output.
+     * @param mappedMetricData The MappedMetricData to perform filtering on.
+     * @return whether to keep the MappedMetricData in the output.
      */
-    boolean keep(MappedMpoint mappedMpoint);
+    boolean keep(MappedMetricData mappedMetricData);
 }

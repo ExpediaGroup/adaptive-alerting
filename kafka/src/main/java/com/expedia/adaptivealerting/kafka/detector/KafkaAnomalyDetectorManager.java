@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.kafka.detector;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorManager;
-import com.expedia.adaptivealerting.core.data.MappedMpoint;
+import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.kafka.AbstractKafkaApp;
 import com.expedia.adaptivealerting.kafka.util.AppUtil;
 import com.typesafe.config.Config;
@@ -55,17 +55,17 @@ public final class KafkaAnomalyDetectorManager extends AbstractKafkaApp {
         final String inboundTopic = getAppConfig().getString(INBOUND_TOPIC);
         final String outboundTopic = getAppConfig().getString(OUTBOUND_TOPIC);
         final StreamsBuilder builder = new StreamsBuilder();
-        final KStream<String, MappedMpoint> stream = builder.stream(inboundTopic);
+        final KStream<String, MappedMetricData> stream = builder.stream(inboundTopic);
         stream
-                .mapValues(mappedMpoint -> {
+                .mapValues(mappedMetricData -> {
                     try {
-                        return manager.classify(mappedMpoint);
+                        return manager.classify(mappedMetricData);
                     } catch (Exception e) {
                         log.error("Error while classifying", e);
                     }
                     return null;
                 })
-                .filter((key, mappedMpoint) -> mappedMpoint != null)
+                .filter((key, mappedMetricData) -> mappedMetricData != null)
                 .to(outboundTopic);
         return builder;
     }

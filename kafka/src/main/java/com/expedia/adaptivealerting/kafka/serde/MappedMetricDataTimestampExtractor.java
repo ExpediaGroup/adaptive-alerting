@@ -15,28 +15,33 @@
  */
 package com.expedia.adaptivealerting.kafka.serde;
 
-import com.expedia.adaptivealerting.core.data.Mpoint;
+import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.metrics.MetricData;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.streams.processor.TimestampExtractor;
 
 /**
+ * Timestamp extractor for {@link MetricData}, similar to
+ * {@link org.apache.kafka.streams.processor.LogAndSkipOnInvalidTimestamp}.
+ * Adding this as com.expedia.www.haystack.commons.kstreams.MetricPointTimestampExtractor doesn't handle null values.
+ *
  * @author Shubham Sethi
  * @author Willie Wheeler
  */
-public final class MpointTimestampExtractor implements TimestampExtractor {
+public final class MappedMetricDataTimestampExtractor implements TimestampExtractor {
     
     @Override
     public long extract(ConsumerRecord<Object, Object> record, long previousTimestamp) {
-        final Mpoint mpoint = (Mpoint) record.value();
-        if (mpoint == null) {
+        final MappedMetricData mappedMetricData = (MappedMetricData) record.value();
+        if (mappedMetricData == null || mappedMetricData.getMetricData() == null) {
             
             // We don't want to log this because sometimes it fills up the logs.
             // TODO Figure out what to do instead. Maybe a counter.
-//            log.warn("Skipping null Mpoint");
+//            log.warn("Skipping null MappedMetricData");
             
             // -1 skips the record.
             return -1L;
         }
-        return mpoint.getEpochTimeInSeconds() * 1000L;
+        return mappedMetricData.getMetricData().getTimestamp() * 1000L;
     }
 }

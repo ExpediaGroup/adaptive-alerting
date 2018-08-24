@@ -15,11 +15,14 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.core.data.MappedMpoint;
-import com.expedia.adaptivealerting.core.data.Mpoint;
+import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.metrics.MetricData;
+import com.expedia.metrics.MetricDefinition;
+import com.expedia.metrics.TagCollection;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.Set;
 
 import static junit.framework.TestCase.assertTrue;
@@ -29,40 +32,46 @@ import static org.junit.Assert.assertFalse;
  * @author Willie Wheeler
  */
 public final class AnomalyDetectorMapperTest {
-    
+
     // Class under test
     private AnomalyDetectorMapper mapper;
-    
+
     // Test objects
-    private Mpoint mpointWithDetectors;
-    private Mpoint mpointWithoutDetectors;
-    
+    private MetricData mpointWithDetectors;
+    private MetricData mpointWithoutDetectors;
+
     @Before
     public void setUp() {
         this.mapper = new AnomalyDetectorMapper();
-        
+
         // TODO For now, this is known to have detectors.
         // We'll need to update this once we un-hardcode the AnomalyDetectorMapper.
-        final MetricDefinition metricWithDetectors = new MetricDefinition();
-        metricWithDetectors.putTag("what", "bookings");
-        this.mpointWithDetectors = new Mpoint();
-        mpointWithDetectors.setMetricDefinition(metricWithDetectors);
-        
+        final MetricDefinition metricWithDetectors = new MetricDefinition(new TagCollection(
+                new HashMap<String, String>() {{
+                    put("unit", "dummy");
+                    put("mtype", "dummy");
+                    put("what", "bookings");
+                }}));
+        this.mpointWithDetectors = new MetricData(metricWithDetectors, 9, System.currentTimeMillis());
+
         // TODO For now, this is known to have no detectors. See above.
-        final MetricDefinition metricWithoutDetectors = new MetricDefinition();
-        this.mpointWithoutDetectors = new Mpoint();
-        mpointWithoutDetectors.setMetricDefinition(metricWithoutDetectors);
+        final MetricDefinition metricWithoutDetectors = new MetricDefinition(new TagCollection(
+                new HashMap<String, String>() {{
+                    put("unit", "dummy");
+                    put("mtype", "dummy");
+                }}));
+        this.mpointWithoutDetectors = new MetricData(metricWithoutDetectors, 9, System.currentTimeMillis());
     }
-    
+
     @Test
     public void testMap_mpointWithDetectors() {
-        final Set<MappedMpoint> results = mapper.map(mpointWithDetectors);
+        final Set<MappedMetricData> results = mapper.map(mpointWithDetectors);
         assertFalse(results.isEmpty());
     }
-    
+
     @Test
     public void testMap_mpointWithoutDetectors() {
-        final Set<MappedMpoint> results = mapper.map(mpointWithoutDetectors);
+        final Set<MappedMetricData> results = mapper.map(mpointWithoutDetectors);
         assertTrue(results.isEmpty());
     }
 }

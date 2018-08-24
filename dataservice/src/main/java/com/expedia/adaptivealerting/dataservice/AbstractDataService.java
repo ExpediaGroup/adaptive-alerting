@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.dataservice;
 
-import com.expedia.adaptivealerting.core.data.MetricDefinition;
 import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.adaptivealerting.core.data.io.MetricFileFormat;
 import com.expedia.adaptivealerting.core.data.io.MetricFileInfo;
@@ -25,6 +24,7 @@ import com.expedia.adaptivealerting.core.util.DailyDateRangeDecomposer;
 import com.expedia.adaptivealerting.core.util.DateRangeDecomposer;
 import com.expedia.adaptivealerting.core.util.MetricUtil;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
+import com.expedia.metrics.MetricDefinition;
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 

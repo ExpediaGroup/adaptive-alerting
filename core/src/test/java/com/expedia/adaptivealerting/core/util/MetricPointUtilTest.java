@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.core.util;
 
-import com.expedia.adaptivealerting.core.data.Mpoint;
+import com.expedia.metrics.MetricData;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.entities.MetricType;
 import com.expedia.www.haystack.commons.entities.TagKeys;
@@ -29,7 +29,7 @@ import scala.collection.mutable.WrappedArray;
 import java.time.Instant;
 
 import static com.expedia.adaptivealerting.core.util.MetricUtil.metricPoint;
-import static com.expedia.adaptivealerting.core.util.MetricUtil.toMpoint;
+import static com.expedia.adaptivealerting.core.util.MetricUtil.toMetricData;
 import static org.junit.Assert.assertEquals;
 
 public class MetricPointUtilTest {
@@ -41,16 +41,16 @@ public class MetricPointUtilTest {
     }
 
     @Test
-    public void testToMpoint() {
+    public void testToMetricData() {
         final Tuple2[] ts = { new Tuple2(TagKeys.SERVICE_NAME_KEY(), "expweb"),
             new Tuple2(TagKeys.OPERATION_NAME_KEY(), "service:GPS")};
         final WrappedArray wa = Predef.wrapRefArray(ts);
         final Map<String, String> tags = Predef$.MODULE$.Map().apply(wa);
         MetricPoint metricPoint = new MetricPoint("data", MetricType.Count(), tags, 10,
             Instant.now().getEpochSecond());
-        Mpoint mpoint = toMpoint(metricPoint);
+        MetricData mpoint = toMetricData(metricPoint);
         assertEquals(10, mpoint.getValue(), 0.001);
-        assertEquals("expweb", mpoint.getMetricDefinition().getTag(TagKeys.SERVICE_NAME_KEY()));
-        assertEquals("service:GPS", mpoint.getMetricDefinition().getTag(TagKeys.OPERATION_NAME_KEY()));
+        assertEquals("expweb", mpoint.getMetricDefinition().getTags().getKv().get(TagKeys.SERVICE_NAME_KEY()));
+        assertEquals("service:GPS", mpoint.getMetricDefinition().getTags().getKv().get(TagKeys.OPERATION_NAME_KEY()));
     }
 }

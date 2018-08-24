@@ -17,7 +17,7 @@ package com.expedia.adaptivealerting.anomvalidate.investigation;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.InvestigationResult;
-import com.expedia.adaptivealerting.core.data.MappedMpoint;
+import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
@@ -46,9 +46,9 @@ public class InvestigationManager {
         this.timeoutMs = timeoutMs == null ? DEFAULT_TIMEOUT_MS : timeoutMs;
     }
 
-    public MappedMpoint investigate(MappedMpoint mappedMpoint) {
-        if (mappedMpoint != null) {
-            AnomalyResult anomalyResult = mappedMpoint.getAnomalyResult();
+    public MappedMetricData investigate(MappedMetricData mappedMetricData) {
+        if (mappedMetricData != null) {
+            AnomalyResult anomalyResult = mappedMetricData.getAnomalyResult();
             if (anomalyResult != null) {
                 anomalyResult.setInvestigationResults(requestInvestigation(anomalyResult));
                 LOGGER.info(
@@ -61,7 +61,7 @@ public class InvestigationManager {
                 );
             }
         }
-        return mappedMpoint;
+        return mappedMetricData;
     }
 
     private List<InvestigationResult> requestInvestigation(AnomalyResult result) {
