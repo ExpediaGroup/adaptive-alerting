@@ -41,8 +41,7 @@ public class SwaggerConfig {
 
     private ApiInfo metaData() {
         ApiInfo apiInfo = new ApiInfo("Model Service REST API", "Spring Boot REST API for Model Service", "1.0",
-                "Terms of service", new Contact("Adatpive alerting team",
-                "https://github.com/ExpediaDotCom/haystack-adaptive-alerting/", null),
+                "Terms of service", "Adaptive alerting team",
                 "Apache License Version 2.0", "https://www.apache.org/licenses/LICENSE-2.0");
         return apiInfo;
     }
