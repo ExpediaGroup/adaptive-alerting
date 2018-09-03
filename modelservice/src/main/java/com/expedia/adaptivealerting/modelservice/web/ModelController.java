@@ -46,8 +46,7 @@ public class ModelController {
     @ApiOperation(value = "Add model hyper params")
     @PostMapping(value = "/addModelParams", produces = MediaType.APPLICATION_JSON_VALUE)
     public String addModelParams(@RequestBody ModelParams modelParams) {
-        modelService.addModelParams(modelParams);
-        return "Model params saved successfully";
+        return modelService.addModelParams(modelParams);
     }
 
     @ApiOperation(value = "Mark model to rebuild")

@@ -28,7 +28,7 @@ public interface ModelService {
 
     List<ModelDto> getModels(String metricKey);
 
-    void addModelParams(ModelParams modelParams);
+    String addModelParams(ModelParams modelParams);
 
     void markToRebuild(String modelUUID, String metricKey, Boolean toRebuild);
 

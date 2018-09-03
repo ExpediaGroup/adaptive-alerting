@@ -53,7 +53,7 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
-    public void addModelParams(ModelParams modelParams) {
+    public String addModelParams(ModelParams modelParams) {
 
         AssertUtil.notNull(modelParams.getHyperparams(), "Hyper params can't be null");
         AssertUtil.notNull(modelParams.getMetricKey(), "Metric key can't be null");
@@ -79,8 +79,11 @@ public class ModelServiceImpl implements ModelService {
         if (metricId == null || modelId == null) {
             model.getMetrics().add(metric);
             metric.getModels().add(model);
+            modelRepository.save(model);
+            return "Model params saved successfully";
+        } else {
+            return "Metric-Model mapping already exists";
         }
-        modelRepository.save(model);
     }
 
     @Override
