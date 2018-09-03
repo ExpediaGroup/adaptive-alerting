@@ -41,7 +41,6 @@ import com.expedia.adaptivealerting.modelservice.dto.ModelParams;
 
 /**
  * @author kashah
- *
  */
 public class ModelServiceImplTests {
 
@@ -75,7 +74,11 @@ public class ModelServiceImplTests {
 
     @Test
     public void testAddModelParams() {
-        service.addModelParams(new ModelParams());
+        ModelParams params = new ModelParams();
+        params.setHyperparams(new HashMap<String, Object>());
+        params.setMetricKey("key");
+        params.setModelUUID("1234");
+        service.addModelParams(params);
     }
 
     @Test

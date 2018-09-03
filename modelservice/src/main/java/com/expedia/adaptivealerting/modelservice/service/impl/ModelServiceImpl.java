@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.modelservice.service.impl;
 
+import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.adaptivealerting.modelservice.dto.ModelDto;
 import com.expedia.adaptivealerting.modelservice.dto.ModelParams;
 import com.expedia.adaptivealerting.modelservice.entity.Metric;
@@ -54,6 +55,10 @@ public class ModelServiceImpl implements ModelService {
     @Override
     public void addModelParams(ModelParams modelParams) {
 
+        AssertUtil.notNull(modelParams.getHyperparams(), "Hyper params can't be null");
+        AssertUtil.notNull(modelParams.getMetricKey(), "Metric key can't be null");
+        AssertUtil.notNull(modelParams.getModelUUID(), "Model UUID can't be null");
+
         Integer metricId = metricRepository.findIdByMetricKey(modelParams.getMetricKey());
         Integer modelId = modelRepository.findIdByModelUUID(modelParams.getModelUUID());
 
@@ -81,6 +86,9 @@ public class ModelServiceImpl implements ModelService {
     @Override
     public void markToRebuild(String modelUUID, String metricKey, Boolean toRebuild) {
 
+        AssertUtil.notNull(metricKey, "Metric key can't be null");
+        AssertUtil.notNull(modelUUID, "Model UUID can't be null");
+
         Integer modelID = modelRepositoryCustom.getModelID(metricKey, modelUUID);
         Model model = modelRepository.getOne(modelID);
         model.setToRebuild(toRebuild);
@@ -90,6 +98,9 @@ public class ModelServiceImpl implements ModelService {
 
     @Override
     public void updateThresholds(String modelUUID, String metricKey, Map<String, Object> thresholds) {
+
+        AssertUtil.notNull(modelUUID, "Model UUID can't be null");
+        AssertUtil.notNull(thresholds, "Thresholds can't be null");
 
         Integer modelID = modelRepositoryCustom.getModelID(metricKey, modelUUID);
         Model model = modelRepository.getOne(modelID);

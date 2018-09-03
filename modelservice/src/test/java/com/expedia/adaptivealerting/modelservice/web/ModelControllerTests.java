@@ -28,6 +28,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -35,14 +36,10 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 import com.expedia.adaptivealerting.modelservice.dto.ModelParams;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
-import static org.junit.Assert.assertSame;
 
 /**
  * @author kashah
- *
  */
 public class ModelControllerTests {
 
