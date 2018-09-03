@@ -19,6 +19,7 @@ import com.expedia.adaptivealerting.modelservice.dto.ModelDto;
 import com.expedia.adaptivealerting.modelservice.dto.ModelParams;
 import com.expedia.adaptivealerting.modelservice.entity.Metric;
 import com.expedia.adaptivealerting.modelservice.entity.Model;
+import com.expedia.adaptivealerting.modelservice.repo.MetricRepository;
 import com.expedia.adaptivealerting.modelservice.repo.ModelRepository;
 import com.expedia.adaptivealerting.modelservice.repo.ModelRepositoryCustom;
 import com.expedia.adaptivealerting.modelservice.service.ModelService;
@@ -42,6 +43,9 @@ public class ModelServiceImpl implements ModelService {
     @Autowired
     private ModelRepository modelRepository;
 
+    @Autowired
+    private MetricRepository metricRepository;
+
     @Override
     public List<ModelDto> getModels(String metricKey) {
         return modelRepositoryCustom.findModels(metricKey);
@@ -50,8 +54,23 @@ public class ModelServiceImpl implements ModelService {
     @Override
     public void addModelParams(ModelParams modelParams) {
 
-        Model model = new Model(modelParams.getModelUUID(), modelParams.getHyperparams());
-        Metric metric = new Metric(modelParams.getMetricKey());
+        Integer metricId = metricRepository.findIdByMetricKey(modelParams.getMetricKey());
+        Integer modelId = modelRepository.findIdByModelUUID(modelParams.getModelUUID());
+
+        Metric metric;
+        if (metricId == null) {
+            metric = new Metric(modelParams.getMetricKey());
+        } else {
+            metric = metricRepository.getOne(metricId);
+        }
+
+        Model model;
+        if (modelId == null) {
+            model = new Model(modelParams.getModelUUID(), modelParams.getHyperparams());
+        } else {
+            model = modelRepository.getOne(modelId);
+        }
+
         model.getMetrics().add(metric);
         metric.getModels().add(model);
         modelRepository.save(model);
@@ -61,7 +80,7 @@ public class ModelServiceImpl implements ModelService {
     public void markToRebuild(String modelUUID, String metricKey, Boolean toRebuild) {
 
         Integer modelID = modelRepositoryCustom.getModelID(metricKey, modelUUID);
-        Model model = modelRepository.getModelById(modelID);
+        Model model = modelRepository.getOne(modelID);
         model.setToRebuild(toRebuild);
         modelRepository.save(model);
 
@@ -71,7 +90,7 @@ public class ModelServiceImpl implements ModelService {
     public void updateThresholds(String modelUUID, String metricKey, Map<String, Object> thresholds) {
 
         Integer modelID = modelRepositoryCustom.getModelID(metricKey, modelUUID);
-        Model model = modelRepository.getModelById(modelID);
+        Model model = modelRepository.getOne(modelID);
         model.setThresholds(thresholds);
         modelRepository.save(model);
     }

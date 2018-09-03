@@ -17,6 +17,8 @@ package com.expedia.adaptivealerting.modelservice.repo;
 
 import com.expedia.adaptivealerting.modelservice.entity.Metric;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 /**
  * @author kashah
@@ -24,5 +26,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface MetricRepository extends JpaRepository<Metric, Integer> {
 
-    Metric findMetricByMetricKey(String metricKey);
+    @Query("select m.id from Metric m where m.metricKey = :key")
+    Integer findIdByMetricKey(@Param("key") String key);
 }

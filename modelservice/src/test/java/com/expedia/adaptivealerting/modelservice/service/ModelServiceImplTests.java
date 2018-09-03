@@ -107,6 +107,6 @@ public class ModelServiceImplTests {
 
     private void initDependencies() {
         when(modelRepositoryCustom.findModels(anyString())).thenReturn(modelDtoList);
-        when(modelRepository.getModelById(anyInt())).thenReturn(new Model());
+        when(modelRepository.getOne(anyInt())).thenReturn(new Model());
     }
 }
