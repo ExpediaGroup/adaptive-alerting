@@ -71,8 +71,10 @@ public class ModelServiceImpl implements ModelService {
             model = modelRepository.getOne(modelId);
         }
 
-        model.getMetrics().add(metric);
-        metric.getModels().add(model);
+        if (metricId == null || modelId == null) {
+            model.getMetrics().add(metric);
+            metric.getModels().add(model);
+        }
         modelRepository.save(model);
     }
 

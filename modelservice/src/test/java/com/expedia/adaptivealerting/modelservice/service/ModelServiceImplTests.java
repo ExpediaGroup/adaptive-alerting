@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.modelservice.service;
 
 import com.expedia.adaptivealerting.modelservice.dto.ModelDto;
 import com.expedia.adaptivealerting.modelservice.entity.Model;
+import com.expedia.adaptivealerting.modelservice.repo.MetricRepository;
 import com.expedia.adaptivealerting.modelservice.repo.ModelRepository;
 import com.expedia.adaptivealerting.modelservice.repo.ModelRepositoryCustom;
 import com.expedia.adaptivealerting.modelservice.service.impl.ModelServiceImpl;
@@ -53,6 +54,8 @@ public class ModelServiceImplTests {
 
     @Mock
     private ModelRepository modelRepository;
+    @Mock
+    private MetricRepository metricRepository;
 
     private List<ModelDto> modelDtoList;
 
@@ -107,6 +110,8 @@ public class ModelServiceImplTests {
 
     private void initDependencies() {
         when(modelRepositoryCustom.findModels(anyString())).thenReturn(modelDtoList);
+        when(modelRepository.findIdByModelUUID(anyString())).thenReturn(1);
+        when(metricRepository.findIdByMetricKey(anyString())).thenReturn(1);
         when(modelRepository.getOne(anyInt())).thenReturn(new Model());
     }
 }
