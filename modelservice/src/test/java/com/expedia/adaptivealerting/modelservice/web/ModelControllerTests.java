@@ -28,14 +28,13 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
-import com.expedia.adaptivealerting.modelservice.dto.ModelParams;
+import com.expedia.adaptivealerting.modelservice.dto.Hyperparams;
 
 
 /**
@@ -65,8 +64,8 @@ public class ModelControllerTests {
 
     @Test
     public void testAddModelParams() {
-        ModelParams params = new ModelParams();
-        String response = controller.addModelParams(params);
+        Hyperparams params = new Hyperparams();
+        String response = controller.addHyperparams("111", params);
     }
 
     @Test

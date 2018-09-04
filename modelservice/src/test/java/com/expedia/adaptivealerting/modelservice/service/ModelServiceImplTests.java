@@ -37,7 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.junit.Test;
-import com.expedia.adaptivealerting.modelservice.dto.ModelParams;
+import com.expedia.adaptivealerting.modelservice.dto.Hyperparams;
 
 /**
  * @author kashah
@@ -74,11 +74,10 @@ public class ModelServiceImplTests {
 
     @Test
     public void testAddModelParams() {
-        ModelParams params = new ModelParams();
+        Hyperparams params = new Hyperparams();
         params.setHyperparams(new HashMap<String, Object>());
         params.setMetricKey("key");
-        params.setModelUUID("1234");
-        service.addModelParams(params);
+        service.addModelParams("111", params);
     }
 
     @Test

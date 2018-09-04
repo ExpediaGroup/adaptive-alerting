@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.web;
 
 import com.expedia.adaptivealerting.modelservice.dto.ModelDto;
-import com.expedia.adaptivealerting.modelservice.dto.ModelParams;
+import com.expedia.adaptivealerting.modelservice.dto.Hyperparams;
 import com.expedia.adaptivealerting.modelservice.dto.RebuildParams;
 import com.expedia.adaptivealerting.modelservice.dto.ThresholdParams;
 import com.expedia.adaptivealerting.modelservice.service.ModelService;
@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 /**
@@ -43,24 +44,26 @@ public class ModelController {
         return modelService.getModels(metricKey);
     }
 
-    @ApiOperation(value = "Add model hyper params")
-    @PostMapping(value = "/addModelParams", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String addModelParams(@RequestBody ModelParams modelParams) {
-        return modelService.addModelParams(modelParams);
+    @ApiOperation(value = "Add hyperparams")
+    @PutMapping(value = "/models/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String addHyperparams(@PathVariable String uuid, @RequestBody Hyperparams hyperparams) {
+        modelService.addModelParams(uuid, hyperparams);
+        return "Model params saved successfully";
     }
 
     @ApiOperation(value = "Mark model to rebuild")
-    @PutMapping(value = "/markToRebuild", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String markToRebuild(@RequestBody RebuildParams rebuildParams) {
-        modelService.markToRebuild(rebuildParams.getModelUUID(), rebuildParams.getMetricKey(),
-                rebuildParams.getToRebuild());
+    @PutMapping(value = "/rebuildModel/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String markToRebuild(@PathVariable String uuid, @RequestBody RebuildParams rebuildParams) {
+        modelService.markToRebuild(uuid, rebuildParams.getMetricKey(),
+                rebuildParams.isToRebuild());
         return "Model marked for rebuild";
     }
 
+    @Deprecated
     @ApiOperation(value = "Update threshold for a given model")
-    @PutMapping(value = "/updateThreshold", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String updateThresholds(@RequestBody ThresholdParams thresholdParams) {
-        modelService.updateThresholds(thresholdParams.getModelUUID(), thresholdParams.getMetricKey(),
+    @PutMapping(value = "/updateThreshold/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String updateThresholds(@PathVariable String uuid, @RequestBody ThresholdParams thresholdParams) {
+        modelService.updateThresholds(uuid, thresholdParams.getMetricKey(),
                 thresholdParams.getThresholds());
         return "Updated threshold successfully";
     }
