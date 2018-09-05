@@ -1,0 +1,13 @@
+{
+   "type" : "record",
+   "namespace" : "com.expedia.adaptivealerting.dataservice.s3",
+   "name" : "MetricData",
+   "fields" : [
+      { "name": "key" , "type": "string" },
+      { "name": "lob", "type": "string" },
+      { "name": "pos", "type": "string" },
+      { "name": "tags", "type": { "type": "map", "values": "string" } },
+      { "name": "timestamp", "type": "long" },
+      { "name": "value", "type": "int" }
+   ]
+}

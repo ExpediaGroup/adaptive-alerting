@@ -38,7 +38,9 @@ public class KafkaDataSink {
                 if (shouldProcess(consumerRecord)) {
                     sinkRecords.add(consumerRecord.value());
                 }
+                kafkaConsumer.commitSync();
             });
+
             DataSinkService dataSinkService = (DataSinkService) ReflectionUtil.newInstance(appConfig.getString("data-sink-service"));
             dataSinkService.put(sinkRecords);
         }
