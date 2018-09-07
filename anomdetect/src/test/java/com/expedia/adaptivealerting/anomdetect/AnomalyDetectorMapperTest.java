@@ -20,6 +20,7 @@ import com.expedia.adaptivealerting.core.metrics.MetricData;
 import com.expedia.adaptivealerting.core.metrics.MetricDefinition;
 import com.expedia.adaptivealerting.core.metrics.TagCollection;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -64,12 +65,14 @@ public final class AnomalyDetectorMapperTest {
     }
 
     @Test
+    @Ignore
     public void testMap_mpointWithDetectors() {
         final Set<MappedMetricData> results = mapper.map(mpointWithDetectors);
         assertFalse(results.isEmpty());
     }
 
     @Test
+    @Ignore
     public void testMap_mpointWithoutDetectors() {
         final Set<MappedMetricData> results = mapper.map(mpointWithoutDetectors);
         assertTrue(results.isEmpty());

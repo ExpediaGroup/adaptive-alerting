@@ -38,6 +38,12 @@
     <dependencies>
 
         <!-- Compile -->
+        <!--
+        <dependency>
+            <groupId>com.expedia</groupId>
+            <artifactId>metrics-java</artifactId>
+        </dependency>
+        -->
         <dependency>
             <groupId>com.expedia.www</groupId>
             <artifactId>haystack-commons</artifactId>
@@ -46,9 +52,15 @@
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>com.expedia</groupId>-->
-            <!--<artifactId>metrics-java</artifactId>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>com.typesafe</groupId>
+            <artifactId>config</artifactId>
+        </dependency>
+
+        <!-- TODO Remove this after we get rid of haystack-commons. [WLW] -->
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+        </dependency>
     </dependencies>
 </project>

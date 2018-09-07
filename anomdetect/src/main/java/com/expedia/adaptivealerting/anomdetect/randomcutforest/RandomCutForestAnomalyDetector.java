@@ -151,5 +151,4 @@ public class RandomCutForestAnomalyDetector extends AbstractAnomalyDetector {
         }
         return -1;
     }
-
 }

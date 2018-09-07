@@ -28,6 +28,21 @@
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Anomaly detection for streaming time series.</description>
     <url>https://github.com/ExpediaDotCom/haystack-adaptive-alerting</url>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <name>Platform Team</name>
+            <email>eweplall@expedia.com</email>
+            <organization>Expedia Group</organization>
+            <organizationUrl>https://www.expediagroup.com</organizationUrl>
+        </developer>
+    </developers>
 
     <modules>
         <module>anomdetect</module>
@@ -39,21 +54,37 @@
 
         <module>dataconnect</module>
         <module>dataservice</module>
+        <module>dataservice-athena</module>
         <module>dataservice-file</module>
         <module>dataservice-s3</module>
         <module>modelservice</module>
         <module>samples</module>
         <module>tools</module>
     </modules>
-
+    <scm>
+        <connection>scm:git:git://github.com/ExpediaDotCom/haystack-adaptive-alerting.git</connection>
+        <developerConnection>scm:git:ssh://github.com/ExpediaDotCom/haystack-adaptive-alerting.git</developerConnection>
+        <url>http://github.com/ExpediaDotCom/haystack-adaptive-alerting</url>
+    </scm>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.jdk.version>1.8</project.jdk.version>
 
         <!-- Dependencies -->
         <aa.version>1.0.0-SNAPSHOT</aa.version>
-        <amazonaws.version>1.11.349</amazonaws.version>
+        <amazonaws.version>1.11.402</amazonaws.version>
         <apache.commons.version>3.7</apache.commons.version>
+        <codahale.metrics.version>3.0.2</codahale.metrics.version>
         <fluent.hc.version>4.5.5</fluent.hc.version>
         <haystack.commons.version>1.0.19</haystack.commons.version>
         <jackson.version>2.9.0</jackson.version>
@@ -62,6 +93,7 @@
         <kafka.streams.version>1.1.0</kafka.streams.version>
         <lombok.version>1.16.18</lombok.version>
         <msgpack.version>0.8.13</msgpack.version>
+        <mockito.version>1.10.19</mockito.version>
         <mysql.connector.version>8.0.11</mysql.connector.version>
         <opencsv.version>4.1</opencsv.version>
         <pegdown.version>1.4.2</pegdown.version>
@@ -92,7 +124,22 @@
             <!-- Compile -->
             <dependency>
                 <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-athena</artifactId>
+                <version>${amazonaws.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.amazonaws</groupId>
                 <artifactId>aws-java-sdk-core</artifactId>
+                <version>${amazonaws.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-rds</artifactId>
+                <version>${amazonaws.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-s3</artifactId>
                 <version>${amazonaws.version}</version>
             </dependency>
             <dependency>
@@ -101,9 +148,9 @@
                 <version>${amazonaws.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk-rds</artifactId>
-                <version>${amazonaws.version}</version>
+                <groupId>com.codahale.metrics</groupId>
+                <artifactId>metrics-core</artifactId>
+                <version>${codahale.metrics.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.expedia.adaptivealerting</groupId>
@@ -172,6 +219,12 @@
                 <groupId>com.expedia.www</groupId>
                 <artifactId>haystack-commons</artifactId>
                 <version>${haystack.commons.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>*</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -245,6 +298,12 @@
                 <groupId>org.jfree</groupId>
                 <artifactId>jfreechart</artifactId>
                 <version>${jfreechart.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-all</artifactId>
+                <version>${mockito.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.msgpack</groupId>
@@ -336,6 +395,7 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+
             <!-- Runtime -->
             <dependency>
                 <groupId>mysql</groupId>
@@ -422,6 +482,10 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
         </dependency>
     </dependencies>
 
@@ -536,29 +600,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <scm>
-        <connection>scm:git:git://github.com/ExpediaDotCom/haystack-adaptive-alerting.git</connection>
-        <developerConnection>scm:git:ssh://github.com/ExpediaDotCom/haystack-adaptive-alerting.git</developerConnection>
-        <url>http://github.com/ExpediaDotCom/haystack-adaptive-alerting</url>
-    </scm>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
-
-    <licenses>
-        <license>
-            <name>Apache License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
 </project>

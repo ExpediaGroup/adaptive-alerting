@@ -17,14 +17,9 @@ package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.core.metrics.MetricData;
-import com.expedia.adaptivealerting.core.metrics.MetricDefinition;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -36,68 +31,22 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author David Sutherland
  * @author Willie Wheeler
  */
+@Slf4j
 public final class AnomalyDetectorMapper {
-    private static final Logger log = LoggerFactory.getLogger(AnomalyDetectorMapper.class);
+    private final TempModelService modelService = new TempModelService();
     
     /**
      * Maps an {@link MetricData} to its corresponding set of {@link MappedMetricData}s.
      *
-     * @param mpoint MetricData to map.
+     * @param metricData MetricData to map.
      * @return The corresponding set of {@link MappedMetricData}s: one per detector.
      */
-    public Set<MappedMetricData> map(MetricData mpoint) {
-        notNull(mpoint, "mpoint can't be null");
-        return createMappedMetricDatas(mpoint, findDetectors(mpoint.getMetricDefinition()));
-    }
-    
-    private Set<DetectorMeta> findDetectors(MetricDefinition metricDefinition) {
-        
-        // TODO Resolve mappings using the model service instead of the following hardcoded logic. For now, only
-        // bookings metrics get through. We can generalize/fix this when we switch over to using MetricDatas generally.
-        final Map<String, String> tags = metricDefinition.getTags().getKv();
-        final Set<DetectorMeta> results = new HashSet<>();
-        if ("bookings".equals(tags.get("what"))) {
-            results.add(new DetectorMeta(UUID.fromString("636e13ed-6882-48cc-be75-56986a3b0179"), "aquila-detector"));
-            results.add(new DetectorMeta(UUID.fromString("fac1a330-e5ad-4902-b17a-3d6068596a95"), "rcf-detector"));
-        }
-        if (tags.hashCode() == -602511874) { // PV3 mean dur 5M
-            results.add(new DetectorMeta(UUID.fromString("5159c1b8-94ca-424f-b25c-e9f5bcb2fc51"), "ewma-detector"));
-        }
-
-        if ("latency".equals(tags.get("what"))) {
-            results.add(new DetectorMeta(UUID.fromString("748e13ed-6882-484f-be75-bcb26a3b0179"), "constant-detector"));
-        }
-
-        log.info(
-                "Mapping: resultsSize={} hashcode={} tags={}",
-                results.size(),
-                metricDefinition.getTags().hashCode(),
-                metricDefinition.getTags().toString()
-        );
-        return results;
-    }
-    
-    private Set<MappedMetricData> createMappedMetricDatas(MetricData mpoint, Set<DetectorMeta> detectors) {
-        return detectors.stream()
-                .map(detector -> new MappedMetricData(mpoint, detector.getUuid(), detector.getType()))
+    public Set<MappedMetricData> map(MetricData metricData) {
+        notNull(metricData, "mpoint can't be null");
+        return modelService
+                .findDetectors(metricData.getMetricDefinition())
+                .stream()
+                .map(detector -> new MappedMetricData(metricData, detector.getUuid(), detector.getType()))
                 .collect(Collectors.toSet());
-    }
-    
-    private static class DetectorMeta {
-        private UUID uuid;
-        private String type;
-    
-        public DetectorMeta(UUID uuid, String type) {
-            this.uuid = uuid;
-            this.type = type;
-        }
-    
-        public UUID getUuid() {
-            return uuid;
-        }
-    
-        public String getType() {
-            return type;
-        }
     }
 }
