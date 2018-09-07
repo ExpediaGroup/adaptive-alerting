@@ -46,9 +46,9 @@
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.expedia</groupId>
-            <artifactId>metrics-java</artifactId>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.expedia</groupId>-->
+            <!--<artifactId>metrics-java</artifactId>-->
+        <!--</dependency>-->
     </dependencies>
 </project>

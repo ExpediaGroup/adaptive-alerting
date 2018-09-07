@@ -13,24 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.data.io;
+package com.expedia.adaptivealerting.core.metrics;
 
-import com.expedia.adaptivealerting.core.metrics.MetricDefinition;
-
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
-
-/**
- * @author Willie Wheeler
- */
-public class MetricNotFoundException extends RuntimeException {
-    private MetricDefinition metric;
-    
-    public MetricNotFoundException(MetricDefinition metric) {
-        notNull(metric, "metric can't be null");
-        this.metric = metric;
-    }
-    
-    public MetricDefinition getMetric() {
-        return metric;
-    }
+public interface IdFactory {
+    String getId(MetricDefinition metric);
 }

@@ -134,11 +134,11 @@
                 <artifactId>adaptive-alerting-dataservice</artifactId>
                 <version>${aa.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.expedia</groupId>
-                <artifactId>metrics-java</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
-            </dependency>
+            <!--<dependency>-->
+            <!--<groupId>com.expedia</groupId>-->
+            <!--<artifactId>metrics-java</artifactId>-->
+            <!--<version>0.0.1-SNAPSHOT</version>-->
+            <!--</dependency>-->
             <dependency>
                 <groupId>com.expedia.adaptivealerting</groupId>
                 <artifactId>adaptive-alerting-dataservice-file</artifactId>

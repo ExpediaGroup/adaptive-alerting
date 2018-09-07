@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.kafka.serde;
 
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.metrics.MetricData;
+import com.expedia.adaptivealerting.core.metrics.MetricData;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.streams.processor.TimestampExtractor;
 

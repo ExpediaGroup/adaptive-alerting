@@ -16,8 +16,8 @@
 package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.metrics.MetricData;
-import com.expedia.metrics.MetricDefinition;
+import com.expedia.adaptivealerting.core.metrics.MetricData;
+import com.expedia.adaptivealerting.core.metrics.MetricDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

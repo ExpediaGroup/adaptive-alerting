@@ -32,7 +32,7 @@ import org.apache.kafka.streams.integration.utils.IntegrationTestUtils
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 import com.expedia.adaptivealerting.kafka.KafkaConfigProps._
-import com.expedia.metrics.MetricData
+import com.expedia.adaptivealerting.core.metrics.MetricData
 import org.scalatest.Ignore
 
 //TODO FIXME Fix this test

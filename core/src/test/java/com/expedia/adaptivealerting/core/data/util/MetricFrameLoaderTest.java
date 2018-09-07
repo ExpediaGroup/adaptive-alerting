@@ -17,8 +17,8 @@ package com.expedia.adaptivealerting.core.data.util;
 
 import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.adaptivealerting.core.data.io.MetricFrameLoader;
-import com.expedia.metrics.MetricDefinition;
-import com.expedia.metrics.TagCollection;
+import com.expedia.adaptivealerting.core.metrics.MetricDefinition;
+import com.expedia.adaptivealerting.core.metrics.TagCollection;
 import org.junit.Test;
 
 import java.io.InputStream;

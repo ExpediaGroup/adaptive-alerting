@@ -16,8 +16,8 @@
 package com.expedia.adaptivealerting.core.data.io;
 
 import com.expedia.adaptivealerting.core.data.MetricFrame;
-import com.expedia.metrics.MetricData;
-import com.expedia.metrics.MetricDefinition;
+import com.expedia.adaptivealerting.core.metrics.MetricData;
+import com.expedia.adaptivealerting.core.metrics.MetricDefinition;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 

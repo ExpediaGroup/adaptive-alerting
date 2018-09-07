@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.core.data;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.metrics.MetricData;
+import com.expedia.adaptivealerting.core.metrics.MetricData;
 
 import java.util.UUID;
 
