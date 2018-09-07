@@ -16,8 +16,8 @@
 package com.expedia.adaptivealerting.kafka.mapper;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorMapper;
-import com.expedia.adaptivealerting.core.data.MappedMpoint;
-import com.expedia.adaptivealerting.core.data.Mpoint;
+import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.adaptivealerting.core.metrics.MetricData;
 import com.expedia.adaptivealerting.kafka.AbstractKafkaApp;
 import com.expedia.adaptivealerting.kafka.util.AppUtil;
 import com.typesafe.config.Config;
@@ -56,7 +56,7 @@ public final class KafkaAnomalyDetectorMapper extends AbstractKafkaApp {
         final StreamsBuilder builder = new StreamsBuilder();
         final String inboundTopic = getAppConfig().getString(INBOUND_TOPIC);
         final String outboundTopic = getAppConfig().getString(OUTBOUND_TOPIC);
-        final KStream<String, Mpoint> stream = builder.stream(inboundTopic);
+        final KStream<String, MetricData> stream = builder.stream(inboundTopic);
         
         // This approach forces all detectors for a given metric to reside with a given manager.
 //        stream
@@ -67,13 +67,13 @@ public final class KafkaAnomalyDetectorMapper extends AbstractKafkaApp {
         stream
                 .flatMap((key, mpoint) -> {
                         
-                            // Convert the <key, mpoint> pair into a set of <detectorUuid, mappedMpoint> pairs.
+                            // Convert the <key, mpoint> pair into a set of <detectorUuid, mappedMetricData> pairs.
                             // Each detector UUID comes from its mapped mpoint.
-                            final Set<MappedMpoint> mappedMpoints = mapper.map(mpoint);
-                            return mappedMpoints.stream()
-                                    .map(mappedMpoint -> {
-                                        final String newKey = mappedMpoint.getDetectorUuid().toString();
-                                        return KeyValue.pair(newKey, mappedMpoint);
+                            final Set<MappedMetricData> mappedMetricDatas = mapper.map(mpoint);
+                            return mappedMetricDatas.stream()
+                                    .map(mappedMetricData -> {
+                                        final String newKey = mappedMetricData.getDetectorUuid().toString();
+                                        return KeyValue.pair(newKey, mappedMetricData);
                                     })
                                     .collect(Collectors.toSet());
                         }

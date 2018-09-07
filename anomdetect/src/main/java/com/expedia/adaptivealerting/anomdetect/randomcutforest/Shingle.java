@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.randomcutforest;
 
-import com.expedia.adaptivealerting.core.data.MappedMpoint;
+import com.expedia.adaptivealerting.core.data.MappedMetricData;
 
 import java.util.LinkedList;
 import java.util.Optional;
@@ -31,7 +31,7 @@ public class Shingle {
 
     private static final int DEFAULT_SIZE = 10;
 
-    private final LinkedList<MappedMpoint> fifo;
+    private final LinkedList<MappedMetricData> fifo;
     private final int maxSize;
 
     /**
@@ -54,7 +54,7 @@ public class Shingle {
      * Puts a new MetricPoint to the FIFO list. If list is full, it first removes the least recent Metric point.
      * @param metricPoint metric point
      */
-    public void offer(MappedMpoint metricPoint) {
+    public void offer(MappedMetricData metricPoint) {
         if (isReady()) {
             this.fifo.remove();
         }
@@ -72,7 +72,7 @@ public class Shingle {
         } else {
             return Optional.of(this.fifo
                     .stream()
-                    .map(mp -> mp.getMpoint().getValue())   // get values only from MetricPoint
+                    .map(mp -> mp.getMetricData().getValue())   // get values only from MetricPoint
                     .mapToDouble(f -> f != null ? f : Float.NaN) // convert list to array of doubles
                     .toArray());
         }
@@ -88,7 +88,7 @@ public class Shingle {
         } else {
             return Optional.of(this.fifo
                     .stream()
-                    .map( mp -> Float.toString(mp.getMpoint().getValue()) ) // get values from MetricPoints
+                    .map( mp -> Double.toString(mp.getMetricData().getValue()) ) // get values from MetricPoints
                     .collect( Collectors.joining( "," ) ));
         }
     }

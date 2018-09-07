@@ -11,7 +11,7 @@ mvn compile
 Run the following with the appropriate `mainClass`:
 
 ```bash
-mvn exec:java -Dexec.mainClass="com.expedia.adaptivealerting.kafka.detector.KafkaPewmaOutlierDetector"
+mvn exec:java -Dexec.mainClass="com.expedia.adaptivealerting.kafka.mapper.KafkaAnomalyDetectorMapper"
 ```
 
 

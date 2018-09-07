@@ -13,16 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomvalidate.filter;
+package com.expedia.adaptivealerting.core.metrics;
 
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import java.io.IOException;
+import java.util.List;
 
-public interface InvestigationFilter {
-
-    /**
-     *
-     * @param mappedMetricData The MappedMetricData to perform filtering on.
-     * @return whether to keep the MappedMetricData in the output.
-     */
-    boolean keep(MappedMetricData mappedMetricData);
+public interface MetricDataSerializer {
+    byte[] serialize(MetricData metric) throws IOException;
+    byte[] serializeList(List<MetricData> metrics) throws IOException;
+    MetricData deserialize(byte[] bytes) throws IOException;
+    List<MetricData> deserializeList(byte[] bytes) throws IOException;
 }

@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.core.anomaly;
 
-import com.expedia.adaptivealerting.core.data.Metric;
+import com.expedia.adaptivealerting.core.metrics.MetricDefinition;
 
 import java.util.List;
 
@@ -34,7 +34,7 @@ public class AnomalyResult {
     private Double strongThresholdLower;
     private Double anomalyScore;
     private AnomalyLevel anomalyLevel;
-    private Metric metric;
+    private MetricDefinition metricDefinition;
     private List<InvestigationResult> investigationResults;
 
     /**
@@ -122,12 +122,12 @@ public class AnomalyResult {
         this.detectorId = detectorId;
     }
 
-    public Metric getMetric() {
-        return metric;
+    public MetricDefinition getMetricDefinition() {
+        return metricDefinition;
     }
 
-    public void setMetric(Metric metric) {
-        this.metric = metric;
+    public void setMetricDefinition(MetricDefinition metricDefinition) {
+        this.metricDefinition = metricDefinition;
     }
 
     public List<InvestigationResult> getInvestigationResults() {

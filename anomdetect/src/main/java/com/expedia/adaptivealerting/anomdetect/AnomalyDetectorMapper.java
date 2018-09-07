@@ -15,9 +15,9 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.core.data.MappedMpoint;
-import com.expedia.adaptivealerting.core.data.Metric;
-import com.expedia.adaptivealerting.core.data.Mpoint;
+import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.adaptivealerting.core.metrics.MetricData;
+import com.expedia.adaptivealerting.core.metrics.MetricDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,8 +30,8 @@ import java.util.stream.Collectors;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
- * Entry into the Adaptive Alerting runtime. Its job is find for any incoming {@link Mpoint} its set of mapped
- * detectors, creating the corresponding {@link MappedMpoint}s.
+ * Entry into the Adaptive Alerting runtime. Its job is find for any incoming {@link MetricData} its set of mapped
+ * detectors, creating the corresponding {@link MappedMetricData}s.
  *
  * @author David Sutherland
  * @author Willie Wheeler
@@ -40,21 +40,21 @@ public final class AnomalyDetectorMapper {
     private static final Logger log = LoggerFactory.getLogger(AnomalyDetectorMapper.class);
     
     /**
-     * Maps an {@link Mpoint} to its corresponding set of {@link MappedMpoint}s.
+     * Maps an {@link MetricData} to its corresponding set of {@link MappedMetricData}s.
      *
-     * @param mpoint Mpoint to map.
-     * @return The corresponding set of {@link MappedMpoint}s: one per detector.
+     * @param mpoint MetricData to map.
+     * @return The corresponding set of {@link MappedMetricData}s: one per detector.
      */
-    public Set<MappedMpoint> map(Mpoint mpoint) {
+    public Set<MappedMetricData> map(MetricData mpoint) {
         notNull(mpoint, "mpoint can't be null");
-        return createMappedMpoints(mpoint, findDetectors(mpoint.getMetric()));
+        return createMappedMetricDatas(mpoint, findDetectors(mpoint.getMetricDefinition()));
     }
     
-    private Set<DetectorMeta> findDetectors(Metric metric) {
+    private Set<DetectorMeta> findDetectors(MetricDefinition metricDefinition) {
         
         // TODO Resolve mappings using the model service instead of the following hardcoded logic. For now, only
-        // bookings metrics get through. We can generalize/fix this when we switch over to using Mpoints generally.
-        final Map<String, String> tags = metric.getTags();
+        // bookings metrics get through. We can generalize/fix this when we switch over to using MetricDatas generally.
+        final Map<String, String> tags = metricDefinition.getTags().getKv();
         final Set<DetectorMeta> results = new HashSet<>();
         if ("bookings".equals(tags.get("what"))) {
             results.add(new DetectorMeta(UUID.fromString("636e13ed-6882-48cc-be75-56986a3b0179"), "aquila-detector"));
@@ -64,18 +64,22 @@ public final class AnomalyDetectorMapper {
             results.add(new DetectorMeta(UUID.fromString("5159c1b8-94ca-424f-b25c-e9f5bcb2fc51"), "ewma-detector"));
         }
 
+        if ("latency".equals(tags.get("what"))) {
+            results.add(new DetectorMeta(UUID.fromString("748e13ed-6882-484f-be75-bcb26a3b0179"), "constant-detector"));
+        }
+
         log.info(
                 "Mapping: resultsSize={} hashcode={} tags={}",
                 results.size(),
-                metric.getTags().hashCode(),
-                metric.getTags().toString()
+                metricDefinition.getTags().hashCode(),
+                metricDefinition.getTags().toString()
         );
         return results;
     }
     
-    private Set<MappedMpoint> createMappedMpoints(Mpoint mpoint, Set<DetectorMeta> detectors) {
+    private Set<MappedMetricData> createMappedMetricDatas(MetricData mpoint, Set<DetectorMeta> detectors) {
         return detectors.stream()
-                .map(detector -> new MappedMpoint(mpoint, detector.getUuid(), detector.getType()))
+                .map(detector -> new MappedMetricData(mpoint, detector.getUuid(), detector.getType()))
                 .collect(Collectors.toSet());
     }
     

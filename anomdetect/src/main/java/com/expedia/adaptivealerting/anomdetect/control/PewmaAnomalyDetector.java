@@ -18,8 +18,8 @@ package com.expedia.adaptivealerting.anomdetect.control;
 import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.data.MappedMpoint;
-import com.expedia.adaptivealerting.core.data.Mpoint;
+import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.adaptivealerting.core.metrics.MetricData;
 import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.adaptivealerting.core.util.MetricUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
@@ -172,7 +172,7 @@ public class PewmaAnomalyDetector extends AbstractAnomalyDetector {
     }
     
     @Override
-    public MappedMpoint classify(MappedMpoint mappedMpoint) {
+    public MappedMetricData classify(MappedMetricData mappedMetricData) {
         throw new UnsupportedOperationException("Not yet implemented");
     }
     
@@ -192,11 +192,11 @@ public class PewmaAnomalyDetector extends AbstractAnomalyDetector {
             anomalyLevel = WEAK;
         }
 
-        final Mpoint mpoint = MetricUtil.toMpoint(metricPoint);
+        final MetricData mpoint = MetricUtil.toMetricData(metricPoint);
         final AnomalyResult result = new AnomalyResult();
-        result.setMetric(mpoint.getMetric());
+        result.setMetricDefinition(mpoint.getMetricDefinition());
         result.setDetectorId(this.getId());
-        result.setEpochSecond(mpoint.getEpochTimeInSeconds());
+        result.setEpochSecond(mpoint.getTimestamp());
         result.setObserved(observed);
         result.setPredicted(mean);
         result.setWeakThresholdUpper(mean + weakThreshold);

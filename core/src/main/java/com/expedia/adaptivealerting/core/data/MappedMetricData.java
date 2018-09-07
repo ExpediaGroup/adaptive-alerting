@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.core.data;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.core.metrics.MetricData;
 
 import java.util.UUID;
 
@@ -26,13 +27,13 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * Wraps an endpoint with a representation that includes anomaly detection information.
  * </p>
  * <p>
- * By contract the {@link Mpoint} must be set.
+ * By contract the {@link MetricData} must be set.
  * </p>
  *
  * @author Willie Wheeler
  */
-public final class MappedMpoint {
-    private Mpoint mpoint;
+public final class MappedMetricData {
+    private MetricData mpoint;
     private UUID detectorUuid;
     private String detectorType;
     private AnomalyResult anomalyResult;
@@ -40,10 +41,10 @@ public final class MappedMpoint {
     /**
      * To support serialization.
      */
-    public MappedMpoint() {
+    public MappedMetricData() {
     }
     
-    public MappedMpoint(Mpoint mpoint, UUID detectorUuid, String detectorType) {
+    public MappedMetricData(MetricData mpoint, UUID detectorUuid, String detectorType) {
         notNull(mpoint, "mpoint can't be null");
         notNull(detectorUuid, "detectorUuid can't be null");
         notNull(detectorType, "detectorType can't be null");
@@ -52,11 +53,11 @@ public final class MappedMpoint {
         this.detectorType = detectorType;
     }
     
-    public Mpoint getMpoint() {
+    public MetricData getMetricData() {
         return mpoint;
     }
     
-    public void setMpoint(Mpoint mpoint) {
+    public void setMetricData(MetricData mpoint) {
         this.mpoint = mpoint;
     }
     
@@ -86,7 +87,7 @@ public final class MappedMpoint {
     
     @Override
     public String toString() {
-        return "MappedMpoint{" +
+        return "MappedMetricData{" +
                 "mpoint=" + mpoint +
                 ", detectorUuid=" + detectorUuid +
                 ", detectorType='" + detectorType + '\'' +

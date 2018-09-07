@@ -15,7 +15,9 @@
  */
 package com.expedia.adaptivealerting.core.data.io;
 
-import com.expedia.adaptivealerting.core.data.Metric;
+import com.expedia.adaptivealerting.core.metrics.MetricDefinition;
+
+import java.util.Map;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
@@ -27,31 +29,34 @@ public final class MetricFileResolver {
     /**
      * Resolves the given metric to a path, returning {@literal null} if there's no mapped path.
      *
-     * @param metric Metric.
+     * @param metricDefinition MetricDefinition.
      * @return Metric path, or {@literal null}.
      */
-    public MetricFileInfo resolve(Metric metric) {
-        notNull(metric, "metric can't be null");
+    public MetricFileInfo resolve(MetricDefinition metricDefinition) {
+        notNull(metricDefinition, "metric can't be null");
+
+        Map<String,String> metricTags = metricDefinition.getTags().getKv();
         
         // FIXME This is obviously a temporary, hardcoded implementation.
         // We'll replace it with the real thing as we onboard more metrics. [WLW]
-        if ("count".equals(metric.getTag("mtype")) &&
-                "".equals(metric.getTag("unit")) &&
-                "bookings".equals(metric.getTag("what")) &&
-                "hotels".equals(metric.getTag("lob")) &&
-                "expedia-com".equals(metric.getTag("pos")) &&
-                "5m".equals(metric.getTag("interval"))) {
+        if ("count".equals(metricTags.get("mtype")) &&
+                "".equals(metricTags.get("unit")) &&
+                "bookings".equals(metricTags.get("what")) &&
+                "hotels".equals(metricTags.get("lob")) &&
+                "expedia-com".equals(metricTags.get("pos")) &&
+                "5m".equals(metricTags.get("interval"))) {
             
-            return resolveExpBookingsMetric(metric);
+            return resolveExpBookingsMetric(metricDefinition);
         }
         
-        throw new MetricNotFoundException(metric);
+        throw new MetricNotFoundException(metricDefinition);
     }
     
-    private MetricFileInfo resolveExpBookingsMetric(Metric metric) {
-        
+    private MetricFileInfo resolveExpBookingsMetric(MetricDefinition metricDefinition) {
+        Map<String,String> metricTags = metricDefinition.getTags().getKv();
+
         // TODO We need the POS in here too.
-        final String path = metric.getTag("what") + "/" + metric.getTag("lob");
+        final String path = metricTags.get("what") + "/" + metricTags.get("lob");
         final MetricFileLocation location = new MetricFileLocation(path, "yyyy-MM-dd", "txt");
         final MetricFileFormat format = new MetricFileFormat(false, false, 5);
         return new MetricFileInfo(location, format);

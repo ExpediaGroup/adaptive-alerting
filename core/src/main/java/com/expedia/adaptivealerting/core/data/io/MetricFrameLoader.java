@@ -15,18 +15,13 @@
  */
 package com.expedia.adaptivealerting.core.data.io;
 
-import com.expedia.adaptivealerting.core.data.Metric;
 import com.expedia.adaptivealerting.core.data.MetricFrame;
-import com.expedia.adaptivealerting.core.data.Mpoint;
+import com.expedia.adaptivealerting.core.metrics.MetricData;
+import com.expedia.adaptivealerting.core.metrics.MetricDefinition;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
@@ -47,7 +42,7 @@ public final class MetricFrameLoader {
      * @return A data frame containing the CSV data.
      * @throws IOException if there's a problem reading the CSV file.
      */
-    public static MetricFrame loadCsv(Metric metric, File file, boolean hasHeader) throws IOException {
+    public static MetricFrame loadCsv(MetricDefinition metric, File file, boolean hasHeader) throws IOException {
         try (final InputStream is = new FileInputStream(file)) {
             return loadCsv(metric, is, hasHeader);
         }
@@ -62,7 +57,7 @@ public final class MetricFrameLoader {
      * @return A data frame containing the CSV data.
      * @throws IOException if there's a problem reading the CSV input stream.
      */
-    public static MetricFrame loadCsv(Metric metric, InputStream in, boolean hasHeader) throws IOException {
+    public static MetricFrame loadCsv(MetricDefinition metric, InputStream in, boolean hasHeader) throws IOException {
         List<String[]> rows;
         try (final BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
             final int skipLines = hasHeader ? 1 : 0;
@@ -71,10 +66,10 @@ public final class MetricFrameLoader {
         }
         
         final int numRows = rows.size();
-        final Mpoint[] mpoints = new Mpoint[numRows];
+        final MetricData[] mpoints = new MetricData[numRows];
         
         for (int i = 0; i < numRows; i++) {
-            mpoints[i] = toMpoint(metric, rows.get(i));
+            mpoints[i] = toMetricData(metric, rows.get(i));
         }
         return new MetricFrame(mpoints);
     }
@@ -91,7 +86,7 @@ public final class MetricFrameLoader {
      * @throws IOException if there's a problem reading the CSV input stream.
      */
     public static MetricFrame loadCsvMissingTimestamps(
-            Metric metric,
+            MetricDefinition metric,
             InputStream in,
             boolean hasHeader,
             Instant startDate,
@@ -106,33 +101,27 @@ public final class MetricFrameLoader {
         }
         
         final int numRows = rows.size();
-        final Mpoint[] mpoints = new Mpoint[numRows];
+        final MetricData[] mpoints = new MetricData[numRows];
         final long incr = intervalInMinutes * 60L;
         
         long epochTimeInSeconds = startDate.getEpochSecond();
         for (int i = 0; i < numRows; i++) {
             final String[] row = rows.get(i);
             final Float value = Float.parseFloat(row[0]);
-            mpoints[i] = toMpoint(metric, epochTimeInSeconds, value);
+            mpoints[i] = toMetricData(metric, epochTimeInSeconds, value);
             epochTimeInSeconds += incr;
         }
         
         return new MetricFrame(mpoints);
     }
     
-    private static Mpoint toMpoint(Metric metric, String[] row) {
-        final Mpoint mpoint = new Mpoint();
-        mpoint.setMetric(metric);
-        mpoint.setEpochTimeInSeconds(Instant.parse(row[0]).getEpochSecond());
-        mpoint.setValue(Float.parseFloat(row[1]));
+    private static MetricData toMetricData(MetricDefinition metric, String[] row) {
+        final MetricData mpoint = new MetricData(metric,Float.parseFloat(row[1]),Instant.parse(row[0]).getEpochSecond());
         return mpoint;
     }
     
-    private static Mpoint toMpoint(Metric metric, long epochTimeInSeconds, Float value) {
-        final Mpoint mpoint = new Mpoint();
-        mpoint.setMetric(metric);
-        mpoint.setEpochTimeInSeconds(epochTimeInSeconds);
-        mpoint.setValue(value);
+    private static MetricData toMetricData(MetricDefinition metric, long epochTimeInSeconds, Float value) {
+        final MetricData mpoint = new MetricData(metric,value,epochTimeInSeconds);
         return mpoint;
     }
 }

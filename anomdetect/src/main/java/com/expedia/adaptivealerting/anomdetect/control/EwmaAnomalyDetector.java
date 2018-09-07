@@ -18,8 +18,8 @@ package com.expedia.adaptivealerting.anomdetect.control;
 import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.data.MappedMpoint;
-import com.expedia.adaptivealerting.core.data.Mpoint;
+import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.adaptivealerting.core.metrics.MetricData;
 import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.adaptivealerting.core.util.MetricUtil;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
@@ -126,15 +126,15 @@ public class EwmaAnomalyDetector extends AbstractAnomalyDetector {
     }
     
     @Override
-    public MappedMpoint classify(MappedMpoint mappedMpoint) {
-        AssertUtil.notNull(mappedMpoint, "mappedMpoint can't be null");
-        AnomalyResult anomalyResult = classify(mappedMpoint.getMpoint());
+    public MappedMetricData classify(MappedMetricData mappedMetricData) {
+        AssertUtil.notNull(mappedMetricData, "mappedMetricData can't be null");
+        AnomalyResult anomalyResult = classify(mappedMetricData.getMetricData());
 
-        final MappedMpoint result = new MappedMpoint();
+        final MappedMetricData result = new MappedMetricData();
         result.setAnomalyResult(anomalyResult);
-        result.setDetectorType(mappedMpoint.getDetectorType());
-        result.setDetectorUuid(mappedMpoint.getDetectorUuid());
-        result.setMpoint(mappedMpoint.getMpoint());
+        result.setDetectorType(mappedMetricData.getDetectorType());
+        result.setDetectorUuid(mappedMetricData.getDetectorUuid());
+        result.setMetricData(mappedMetricData.getMetricData());
 
         return result;
     }
@@ -142,10 +142,10 @@ public class EwmaAnomalyDetector extends AbstractAnomalyDetector {
     @Override
     public AnomalyResult classify(MetricPoint metricPoint) {
         AssertUtil.notNull(metricPoint, "metricPoint can't be null");
-        return classify(MetricUtil.toMpoint(metricPoint));
+        return classify(MetricUtil.toMetricData(metricPoint));
     }
     
-    private AnomalyResult classify(Mpoint mpoint) {
+    private AnomalyResult classify(MetricData mpoint) {
         final double observed = mpoint.getValue();
         final double dist = abs(observed - mean);
         final double stdDev = sqrt(variance);
@@ -159,9 +159,9 @@ public class EwmaAnomalyDetector extends AbstractAnomalyDetector {
             anomalyLevel = WEAK;
         }
         final AnomalyResult result = new AnomalyResult();
-        result.setMetric(mpoint.getMetric());
+        result.setMetricDefinition(mpoint.getMetricDefinition());
         result.setDetectorId(this.getId());
-        result.setEpochSecond(mpoint.getEpochTimeInSeconds());
+        result.setEpochSecond(mpoint.getTimestamp());
         result.setObserved(observed);
         result.setPredicted(mean);
         result.setWeakThresholdUpper(mean + weakThreshold);

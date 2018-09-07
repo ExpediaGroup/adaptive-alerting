@@ -54,6 +54,11 @@
             <artifactId>adaptive-alerting-core</artifactId>
         </dependency>
 
+        <!--<dependency>-->
+            <!--<groupId>com.expedia</groupId>-->
+            <!--<artifactId>metrics-java</artifactId>-->
+        <!--</dependency>-->
+
         <!-- TODO Remove dependency on Haystack commons. [WLW] -->
         <dependency>
             <groupId>com.expedia.www</groupId>

@@ -13,21 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.detector;
+package com.expedia.adaptivealerting.core.metrics;
 
-import org.junit.Before;
-import org.junit.Test;
-
-public class KafkaEwmaAnomalyDetectorTests {
-    
-    // Class under test
-    private KafkaEwmaOutlierDetector detector;
-    
-    @Before
-    public void setUp() {
-    }
-    
-    @Test
-    public void testDummy() {
-    }
+public interface IdFactory {
+    String getId(MetricDefinition metric);
 }
