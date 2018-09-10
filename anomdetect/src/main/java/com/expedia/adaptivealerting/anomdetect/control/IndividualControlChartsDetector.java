@@ -177,7 +177,6 @@ public class IndividualControlChartsDetector extends AbstractAnomalyDetector {
 
         final AnomalyResult result = new AnomalyResult();
         result.setMetricDefinition(mpoint.getMetricDefinition());
-        result.setDetectorId(this.getId());
         result.setEpochSecond(mpoint.getTimestamp());
         result.setObserved(observed);
         result.setPredicted(this.target);

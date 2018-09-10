@@ -106,11 +106,10 @@ public class ConstantThresholdAnomalyDetector extends AbstractAnomalyDetector {
             throw new IllegalStateException("Illegal tail: " + tail);
         }
 
-        final MetricData mpoint = MetricUtil.toMetricData(metricPoint);
+        final MetricData metricData = MetricUtil.toMetricData(metricPoint);
         final AnomalyResult result = new AnomalyResult();
-        result.setMetricDefinition(mpoint.getMetricDefinition());
-        result.setDetectorId(this.getId());
-        result.setEpochSecond(mpoint.getTimestamp());
+        result.setMetricDefinition(metricData.getMetricDefinition());
+        result.setEpochSecond(metricData.getTimestamp());
         result.setObserved(observed);
         result.setWeakThresholdUpper(weakThresholdUpper);
         result.setWeakThresholdLower(weakThresholdLower);

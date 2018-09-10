@@ -38,15 +38,6 @@ public interface AnomalyDetector {
     // ========================================
     
     /**
-     * @return ID
-     * @deprecated Superseded by {@link #getUuid()}. [WLW]
-     */
-    @Deprecated
-    default String getId() {
-        return this.toString();
-    }
-    
-    /**
      * Classifies the given metric point.
      *
      * @param metricPoint Metric point.

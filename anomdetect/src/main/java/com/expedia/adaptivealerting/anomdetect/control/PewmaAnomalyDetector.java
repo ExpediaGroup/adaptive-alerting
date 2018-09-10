@@ -195,7 +195,6 @@ public class PewmaAnomalyDetector extends AbstractAnomalyDetector {
         final MetricData mpoint = MetricUtil.toMetricData(metricPoint);
         final AnomalyResult result = new AnomalyResult();
         result.setMetricDefinition(mpoint.getMetricDefinition());
-        result.setDetectorId(this.getId());
         result.setEpochSecond(mpoint.getTimestamp());
         result.setObserved(observed);
         result.setPredicted(mean);

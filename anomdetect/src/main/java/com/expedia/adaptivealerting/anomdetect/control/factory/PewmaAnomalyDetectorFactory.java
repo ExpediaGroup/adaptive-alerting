@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.control;
+package com.expedia.adaptivealerting.anomdetect.control.factory;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.control.PewmaAnomalyDetector;
 import com.typesafe.config.Config;
 
 import java.util.UUID;
@@ -25,18 +26,17 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 /**
  * @author Willie Wheeler
  */
-public class ConstantThresholdAnomalyDetectorFactory
-        implements AnomalyDetectorFactory<ConstantThresholdAnomalyDetector> {
+public final class PewmaAnomalyDetectorFactory implements AnomalyDetectorFactory<PewmaAnomalyDetector> {
     
-    @Override
     public void init(Config appConfig) {
         notNull(appConfig, "appConfig can't be null");
+        // TODO
     }
     
     @Override
-    public ConstantThresholdAnomalyDetector create(UUID uuid) {
+    public PewmaAnomalyDetector create(UUID uuid) {
         notNull(uuid, "uuid can't be null");
-        // TODO Look up bounds based on UUID.
+        // TODO Look up params
         return null;
     }
 }
