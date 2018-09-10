@@ -47,8 +47,8 @@ public final class S3DataService extends AbstractDataService {
         final String region = config.getString("region");
         final String bucketName = config.getString("bucketName");
         
-        notNull(region, "Property region must be defined");
-        notNull(bucketName, "Property bucketName must be defined");
+        notNull(region, "Property 'region' must be defined");
+        notNull(bucketName, "Property 'bucketName' must be defined");
         
         this.s3 = AmazonS3ClientBuilder.standard()
                 .withRegion(region)

@@ -19,8 +19,7 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
 import com.typesafe.config.Config;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,8 +33,8 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author David Sutherland
  * @author Willie Wheeler
  */
+@Slf4j
 public final class AnomalyDetectorManager {
-    private static final Logger log = LoggerFactory.getLogger(AnomalyDetectorManager.class);
     
     /**
      * Factories that know how to produce anomaly detectors on demand.

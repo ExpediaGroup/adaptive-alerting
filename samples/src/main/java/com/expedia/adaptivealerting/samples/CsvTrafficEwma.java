@@ -24,7 +24,7 @@ import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartSink;
 import com.expedia.adaptivealerting.tools.pipeline.source.MetricFrameMetricSource;
 import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
-import com.expedia.adaptivealerting.core.metrics.MetricDefinition;
+import com.expedia.metrics.MetricDefinition;
 
 import java.io.InputStream;
 

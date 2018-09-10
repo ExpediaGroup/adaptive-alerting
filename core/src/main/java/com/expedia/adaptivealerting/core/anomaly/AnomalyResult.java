@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.core.anomaly;
 
-import com.expedia.adaptivealerting.core.metrics.MetricDefinition;
+import com.expedia.metrics.MetricDefinition;
 
 import java.util.List;
 

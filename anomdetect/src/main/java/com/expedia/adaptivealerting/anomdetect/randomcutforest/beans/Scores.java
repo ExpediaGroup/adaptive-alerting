@@ -19,31 +19,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Scores {
-    List<Score> scores;
-
-    public Scores()
-    {
+    private List<Score> scores;
+    
+    public Scores() {
         this.scores = new ArrayList<>();
     }
-
-    public Scores(List<Score> scores)
-    {
+    
+    public Scores(List<Score> scores) {
         this.scores = scores;
     }
-
-    public List<Score> getScores()
-    {
+    
+    public List<Score> getScores() {
         return scores;
     }
-
-    public void setScores(List<Score> scores)
-    {
+    
+    public void setScores(List<Score> scores) {
         this.scores = scores;
     }
-
+    
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "Scores{" +
                 "scores=" + scores +
                 '}';

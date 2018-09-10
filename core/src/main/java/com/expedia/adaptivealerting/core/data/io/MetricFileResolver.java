@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.core.data.io;
 
-import com.expedia.adaptivealerting.core.metrics.MetricDefinition;
+import com.expedia.metrics.MetricDefinition;
 
 import java.util.Map;
 

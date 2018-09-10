@@ -13,14 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.metrics;
+package com.expedia.adaptivealerting.anomdetect;
 
-import java.io.IOException;
-import java.util.List;
+import java.util.UUID;
 
-public interface MetricDataSerializer {
-    byte[] serialize(MetricData metric) throws IOException;
-    byte[] serializeList(List<MetricData> metrics) throws IOException;
-    MetricData deserialize(byte[] bytes) throws IOException;
-    List<MetricData> deserializeList(byte[] bytes) throws IOException;
+/**
+ * @author Willie Wheeler
+ */
+public final class AnomalyDetectorMeta {
+    private UUID uuid;
+    private String type;
+    
+    public AnomalyDetectorMeta(UUID uuid, String type) {
+        this.uuid = uuid;
+        this.type = type;
+    }
+    
+    public UUID getUuid() {
+        return uuid;
+    }
+    
+    public String getType() {
+        return type;
+    }
 }

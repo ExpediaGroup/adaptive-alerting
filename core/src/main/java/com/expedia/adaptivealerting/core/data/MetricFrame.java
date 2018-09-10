@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.core.data;
 
 
-import  com.expedia.adaptivealerting.core.metrics.MetricData;
+import com.expedia.metrics.MetricData;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
