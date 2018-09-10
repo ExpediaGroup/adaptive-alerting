@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.aquila;
 
 import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
-import com.expedia.adaptivealerting.core.data.MappedMpoint;
+import com.expedia.adaptivealerting.core.data.MappedMetricData;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
@@ -28,8 +28,8 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 public final class AquilaAnomalyDetector extends AbstractAnomalyDetector {
     
     @Override
-    public MappedMpoint classify(MappedMpoint mappedMpoint) {
-        notNull(mappedMpoint, "mappedMpoint can't be null");
+    public MappedMetricData classify(MappedMetricData mappedMetricData) {
+        notNull(mappedMetricData, "mappedMetricData can't be null");
         
         return null;
     }

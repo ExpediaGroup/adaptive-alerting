@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.core.data;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.metrics.MetricData;
+import com.expedia.metrics.MetricData;
 
 import java.util.UUID;
 
@@ -33,7 +33,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author Willie Wheeler
  */
 public final class MappedMetricData {
-    private MetricData mpoint;
+    private MetricData metricData;
     private UUID detectorUuid;
     private String detectorType;
     private AnomalyResult anomalyResult;
@@ -44,21 +44,21 @@ public final class MappedMetricData {
     public MappedMetricData() {
     }
     
-    public MappedMetricData(MetricData mpoint, UUID detectorUuid, String detectorType) {
-        notNull(mpoint, "mpoint can't be null");
+    public MappedMetricData(MetricData metricData, UUID detectorUuid, String detectorType) {
+        notNull(metricData, "metricData can't be null");
         notNull(detectorUuid, "detectorUuid can't be null");
         notNull(detectorType, "detectorType can't be null");
-        this.mpoint = mpoint;
+        this.metricData = metricData;
         this.detectorUuid = detectorUuid;
         this.detectorType = detectorType;
     }
     
     public MetricData getMetricData() {
-        return mpoint;
+        return metricData;
     }
     
     public void setMetricData(MetricData mpoint) {
-        this.mpoint = mpoint;
+        this.metricData = mpoint;
     }
     
     public UUID getDetectorUuid() {
@@ -88,7 +88,7 @@ public final class MappedMetricData {
     @Override
     public String toString() {
         return "MappedMetricData{" +
-                "mpoint=" + mpoint +
+                "metricData=" + metricData +
                 ", detectorUuid=" + detectorUuid +
                 ", detectorType='" + detectorType + '\'' +
                 ", anomalyResult=" + anomalyResult +

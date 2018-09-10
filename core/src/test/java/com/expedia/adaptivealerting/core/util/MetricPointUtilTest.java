@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.core.util;
 
-import com.expedia.adaptivealerting.core.metrics.MetricData;
+import com.expedia.metrics.MetricData;
 import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.expedia.www.haystack.commons.entities.MetricType;
 import com.expedia.www.haystack.commons.entities.TagKeys;

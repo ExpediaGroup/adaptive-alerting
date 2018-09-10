@@ -16,9 +16,12 @@
 package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.adaptivealerting.core.metrics.MetricData;
+import com.expedia.metrics.MetricData;
+import com.expedia.metrics.MetricDefinition;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,7 +36,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  */
 @Slf4j
 public final class AnomalyDetectorMapper {
-    private final TempModelService modelService = new TempModelService();
     
     /**
      * Maps an {@link MetricData} to its corresponding set of {@link MappedMetricData}s.
@@ -42,11 +44,15 @@ public final class AnomalyDetectorMapper {
      * @return The corresponding set of {@link MappedMetricData}s: one per detector.
      */
     public Set<MappedMetricData> map(MetricData metricData) {
-        notNull(metricData, "mpoint can't be null");
-        return modelService
-                .findDetectors(metricData.getMetricDefinition())
+        notNull(metricData, "metricData can't be null");
+        return findDetectors(metricData.getMetricDefinition())
                 .stream()
                 .map(detector -> new MappedMetricData(metricData, detector.getUuid(), detector.getType()))
                 .collect(Collectors.toSet());
+    }
+    
+    private List<AnomalyDetectorMeta> findDetectors(MetricDefinition metricDefinition) {
+        // TODO Replace this to call to model service. Likely want caching here as well. [WLW]
+        return new ArrayList<>();
     }
 }

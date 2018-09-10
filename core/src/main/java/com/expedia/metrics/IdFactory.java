@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.metrics;
+package com.expedia.metrics;
 
 public interface IdFactory {
     String getId(MetricDefinition metric);

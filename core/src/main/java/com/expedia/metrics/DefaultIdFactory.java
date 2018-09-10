@@ -13,30 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect;
+package com.expedia.metrics;
 
-import com.expedia.adaptivealerting.core.data.Metric;
-
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
- * @author Peter Hall
- * @deprecated Use real metric key factory when it's available
+ * Creates ids similar to the sample ids in the Metrics 2.0 specification.
+ *
+ * As the tags, keys, and values are sorted and joined with '=' and ',' with no
+ * escaping this may create confusion if your keys or values contain '=' or
+ * ','.
  */
-public class TempMetricKeyFactory {
-    
-    public String toKey(Metric metric) {
-        final SortedMap<String, String> sortedTags = new TreeMap<>(metric.getTags());
+public class DefaultIdFactory implements IdFactory {
+    @Override
+    public String getId(MetricDefinition metric) {
         final StringBuilder builder = new StringBuilder();
-        for (Map.Entry<String, String> entry : sortedTags.entrySet()) {
+        if (metric.getKey() != null) {
+            builder.append(metric.getKey())
+                    .append(',');
+        }
+        final SortedMap<String, String> sortedKvTags = new TreeMap<>(metric.getTags().getKv());
+        for (Map.Entry<String, String> entry : sortedKvTags.entrySet()) {
             builder.append(entry.getKey());
             if (entry.getValue() != null) {
-                builder.append('=')
+                    builder.append('=')
                         .append(entry.getValue());
             }
             builder.append(',');
+        }
+        final SortedSet<String> sortedVTags = new TreeSet<>(metric.getTags().getV());
+        for (String tag : sortedVTags) {
+            builder.append(tag)
+                    .append(',');
         }
         if (builder.length() > 0) {
             builder.deleteCharAt(builder.length() - 1);

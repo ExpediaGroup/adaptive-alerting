@@ -17,7 +17,7 @@ package com.expedia.adaptivealerting.kafka.mapper;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorMapper;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.adaptivealerting.core.metrics.MetricData;
+import com.expedia.metrics.MetricData;
 import com.expedia.adaptivealerting.kafka.AbstractKafkaApp;
 import com.expedia.adaptivealerting.kafka.util.AppUtil;
 import com.typesafe.config.Config;

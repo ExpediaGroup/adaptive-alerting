@@ -18,7 +18,7 @@ package com.expedia.adaptivealerting.dataconnect;
 import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
 import com.expedia.adaptivealerting.dataservice.DataService;
-import com.expedia.adaptivealerting.core.metrics.MetricDefinition;
+import com.expedia.metrics.MetricDefinition;
 import com.typesafe.config.Config;
 
 import java.time.Instant;

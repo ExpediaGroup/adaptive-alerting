@@ -20,7 +20,7 @@ import java.util.Properties
 import java.util.concurrent.{Executors, ScheduledExecutorService, TimeUnit}
 
 import com.expedia.adaptivealerting.kafka.util.AppUtil
-import com.expedia.adaptivealerting.core.metrics.MetricData
+import com.expedia.metrics.MetricData
 import com.typesafe.config.{Config, ConfigValue, ConfigValueFactory}
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.producer.ProducerConfig
