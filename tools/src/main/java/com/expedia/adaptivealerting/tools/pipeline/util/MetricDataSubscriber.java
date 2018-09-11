@@ -15,12 +15,12 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.util;
 
-import com.expedia.www.haystack.commons.entities.MetricPoint;
+import com.expedia.metrics.MetricData;
 
 /**
  * @author Willie Wheeler
  */
-public interface MetricPointSubscriber {
+public interface MetricDataSubscriber {
     
-    void next(MetricPoint metricPoint);
+    void next(MetricData metricData);
 }

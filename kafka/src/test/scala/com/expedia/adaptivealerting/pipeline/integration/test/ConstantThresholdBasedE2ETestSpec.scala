@@ -21,19 +21,18 @@ import java.time.Instant
 import com.expedia.adaptivealerting.anomdetect.{AnomalyDetectorManager, AnomalyDetectorMapper}
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult
 import com.expedia.adaptivealerting.core.util.MetricUtil
-import com.expedia.adaptivealerting.core.util.MetricUtil.metricPoint
+import com.expedia.adaptivealerting.kafka.KafkaConfigProps._
 import com.expedia.adaptivealerting.kafka.detector.KafkaAnomalyDetectorManager
 import com.expedia.adaptivealerting.kafka.mapper.KafkaAnomalyDetectorMapper
 import com.expedia.adaptivealerting.pipeline.integration.{EmbeddedKafka, IntegrationTestSpec}
+import com.expedia.metrics.{MetricData, MetricDefinition}
 import org.apache.kafka.clients.admin.AdminClient
 import org.apache.kafka.streams.KeyValue
 import org.apache.kafka.streams.integration.utils.IntegrationTestUtils
+import org.scalatest.Ignore
 
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._
-import com.expedia.adaptivealerting.kafka.KafkaConfigProps._
-import com.expedia.metrics.MetricData
-import org.scalatest.Ignore
 
 //TODO FIXME Fix this test
 @Ignore
@@ -43,7 +42,7 @@ class ConstantThresholdBasedE2ETestSpec extends IntegrationTestSpec {
   protected val adManagerStreamConfig = streamConfigProperties(ANOMALY_DETECTOR_MANAGER, "ad-manager")
 
   protected var mappedMetricsTopicConsumerConfig = consumerConfig("mapped-metrics-consumer", "mapped-metrics-detector")
-  protected var anomalyTopicConsumerConfig = consumerConfig("anomalies-consumer","anomaly")
+  protected var anomalyTopicConsumerConfig = consumerConfig("anomalies-consumer", "anomaly")
 
 
   override def beforeEach() {
@@ -62,7 +61,7 @@ class ConstantThresholdBasedE2ETestSpec extends IntegrationTestSpec {
 
   "AA with 'Constant Threshold Anomaly Detection' model" should {
 
-    "consume anomalous metrics from input topic, classify and confirm them as anomalies and " +
+    "consume anomalous metrics from input topic, toAnomalyResult and confirm them as anomalies and " +
       "send results to output topic" in {
 
       Given("a set of anomalous metrics and kafka specific configurations")
@@ -123,10 +122,16 @@ class ConstantThresholdBasedE2ETestSpec extends IntegrationTestSpec {
     new KafkaAnomalyDetectorManager(appConfig(ANOMALY_DETECTOR_MANAGER), manager)
   }
 
-  private def generateAnomalousMetrics() : List[MetricData] = {
+  private def generateAnomalousMetrics(): List[MetricData] = {
+    val latencyMetricDef = new MetricDefinition("latency");
+    val latencyMetricData = new MetricData(latencyMetricDef, 2.0, Instant.now().getEpochSecond);
+
+    val failureCountMetricDef = new MetricDefinition("failureCount");
+    val failureCountMetricData = new MetricData(failureCountMetricDef, 3.0, Instant.now().getEpochSecond);
+
     List(
-      MetricUtil.toMetricData(metricPoint("latency", Instant.now().getEpochSecond, 2)),
-      MetricUtil.toMetricData(metricPoint("failureCount", Instant.now().getEpochSecond, 3))
+      latencyMetricData,
+      failureCountMetricData
     )
   }
 }

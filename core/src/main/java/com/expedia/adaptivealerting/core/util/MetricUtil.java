@@ -17,67 +17,23 @@ package com.expedia.adaptivealerting.core.util;
 
 import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.metrics.MetricData;
-import com.expedia.metrics.MetricDefinition;
-import com.expedia.metrics.TagCollection;
-import com.expedia.www.haystack.commons.entities.MetricPoint;
-import com.expedia.www.haystack.commons.entities.MetricType;
-import scala.Enumeration;
-import scala.collection.immutable.Map;
-import scala.collection.immutable.Map$;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
- * {@link MetricPoint} utilities.
+ * Metric utilities.
  *
  * @author Willie Wheeler
  */
 public final class MetricUtil {
-    private static final Enumeration.Value DEFAULT_TYPE = MetricType.Gauge();
-    private static final Map<String, String> DEFAULT_TAGS = Map$.MODULE$.<String, String>empty();
     
     /**
      * Prevent instantiation.
      */
     private MetricUtil() {
-    }
-    
-    /**
-     * {@link MetricPoint} factory method. Metric points have name "data", type gauge and no tags.
-     *
-     * @param epochSecond Epoch time in seconds.
-     * @param value       Metric value.
-     * @return Metric point.
-     */
-    public static MetricPoint metricPoint(long epochSecond, double value) {
-        return metricPoint("data", epochSecond, value);
-    }
-    
-    /**
-     * {@link MetricPoint} factory method. Metric points have type gauge and no tags.
-     *
-     * @param name        Metric name.
-     * @param epochSecond Epoch time in seconds.
-     * @param value       Metric value.
-     * @return Metric point.
-     */
-    public static MetricPoint metricPoint(String name, long epochSecond, double value) {
-        return new MetricPoint(name, DEFAULT_TYPE, DEFAULT_TAGS, (float) value, epochSecond);
-    }
-    
-    /**
-     * Convert {@link MetricPoint} to a {@link MetricData}.
-     *
-     * @param metricPoint a metric point.
-     * @return an MetricData.
-     */
-    public static MetricData toMetricData(MetricPoint metricPoint) {
-        final MetricData mpoint = new MetricData(toMetric(metricPoint),metricPoint.value(),metricPoint.epochTimeInSeconds());
-        return mpoint;
     }
     
     public static MetricFrame merge(List<MetricFrame> frames) {
@@ -94,17 +50,5 @@ public final class MetricUtil {
         }
         
         return new MetricFrame(resultList);
-    }
-    
-    private static MetricDefinition toMetric(MetricPoint metricPoint) {
-
-        final MetricDefinition metric = new MetricDefinition(new TagCollection(new HashMap<String, String>() {{
-            put("unit", "dummy");
-            put("mtype","dummy" );
-            put("what", metricPoint.metric());
-            putAll(scala.collection.JavaConverters
-                    .mapAsJavaMapConverter(metricPoint.tags()).asJava());
-        }}));
-        return metric;
     }
 }

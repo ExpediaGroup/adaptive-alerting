@@ -25,15 +25,14 @@ import com.expedia.adaptivealerting.anomdetect.randomcutforest.util.PropertiesCa
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.adaptivealerting.core.util.AssertUtil;
-import com.expedia.adaptivealerting.core.util.MetricUtil;
-import com.expedia.www.haystack.commons.entities.MetricPoint;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
+
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * <p>
@@ -78,23 +77,10 @@ public class RandomCutForestAnomalyDetector extends AbstractAnomalyDetector {
         this.invokeEndpointRequest = new InvokeEndpointRequest();
         this.invokeEndpointRequest.setContentType(TEXT_CSV_CONTENT_TYPE);
     }
-
-    /**
-     * Determine if MetricPoint is an anomaly.
-     * @param metricPoint Metric point to analyse.
-     * @return AnomalyResult based on score received from Sagemaker
-     */
-    @Override
-    @Deprecated
-    public AnomalyResult classify(MetricPoint metricPoint) {
-        final MappedMetricData mappedMetricData = new MappedMetricData();
-        mappedMetricData.setMetricData(MetricUtil.toMetricData(metricPoint));
-        return classify(mappedMetricData).getAnomalyResult();
-    }
     
     @Override
-    public MappedMetricData classify(MappedMetricData mappedMetricData) {
-        AssertUtil.notNull(mappedMetricData, "metricPoint can't be null");
+    public AnomalyResult toAnomalyResult(MappedMetricData mappedMetricData) {
+        notNull(mappedMetricData, "metricPoint can't be null");
 
         this.shingle.offer(mappedMetricData);
 
@@ -114,13 +100,7 @@ public class RandomCutForestAnomalyDetector extends AbstractAnomalyDetector {
             anomalyResult.setObserved(new Double(mappedMetricData.getMetricData().getValue()));
             anomalyResult.setEpochSecond(mappedMetricData.getMetricData().getTimestamp());
         }
-        final MappedMetricData result = new MappedMetricData();
-        result.setAnomalyResult(anomalyResult);
-        result.setDetectorType(mappedMetricData.getDetectorType());
-        result.setDetectorUuid(mappedMetricData.getDetectorUuid());
-        result.setMetricData(mappedMetricData.getMetricData());
-
-        return result;
+        return anomalyResult;
     }
 
     /**

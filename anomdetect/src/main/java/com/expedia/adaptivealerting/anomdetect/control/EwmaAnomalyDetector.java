@@ -19,10 +19,8 @@ import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.metrics.MetricData;
 import com.expedia.adaptivealerting.core.util.AssertUtil;
-import com.expedia.adaptivealerting.core.util.MetricUtil;
-import com.expedia.www.haystack.commons.entities.MetricPoint;
+import com.expedia.metrics.MetricData;
 
 import static com.expedia.adaptivealerting.anomdetect.NSigmasClassifier.DEFAULT_STRONG_SIGMAS;
 import static com.expedia.adaptivealerting.anomdetect.NSigmasClassifier.DEFAULT_WEAK_SIGMAS;
@@ -126,27 +124,9 @@ public class EwmaAnomalyDetector extends AbstractAnomalyDetector {
     }
     
     @Override
-    public MappedMetricData classify(MappedMetricData mappedMetricData) {
-        AssertUtil.notNull(mappedMetricData, "mappedMetricData can't be null");
-        AnomalyResult anomalyResult = classify(mappedMetricData.getMetricData());
-
-        final MappedMetricData result = new MappedMetricData();
-        result.setAnomalyResult(anomalyResult);
-        result.setDetectorType(mappedMetricData.getDetectorType());
-        result.setDetectorUuid(mappedMetricData.getDetectorUuid());
-        result.setMetricData(mappedMetricData.getMetricData());
-
-        return result;
-    }
-    
-    @Override
-    public AnomalyResult classify(MetricPoint metricPoint) {
-        AssertUtil.notNull(metricPoint, "metricPoint can't be null");
-        return classify(MetricUtil.toMetricData(metricPoint));
-    }
-    
-    private AnomalyResult classify(MetricData mpoint) {
-        final double observed = mpoint.getValue();
+    protected AnomalyResult toAnomalyResult(MappedMetricData mappedMetricData) {
+        final MetricData metricData = mappedMetricData.getMetricData();
+        final double observed = metricData.getValue();
         final double dist = abs(observed - mean);
         final double stdDev = sqrt(variance);
         final double weakThreshold = weakThresholdSigmas * stdDev;
@@ -158,10 +138,10 @@ public class EwmaAnomalyDetector extends AbstractAnomalyDetector {
         } else if (dist > weakThreshold) {
             anomalyLevel = WEAK;
         }
+        
         final AnomalyResult result = new AnomalyResult();
-        result.setMetricDefinition(mpoint.getMetricDefinition());
-        result.setDetectorId(this.getId());
-        result.setEpochSecond(mpoint.getTimestamp());
+        result.setMetricDefinition(metricData.getMetricDefinition());
+        result.setEpochSecond(metricData.getTimestamp());
         result.setObserved(observed);
         result.setPredicted(mean);
         result.setWeakThresholdUpper(mean + weakThreshold);

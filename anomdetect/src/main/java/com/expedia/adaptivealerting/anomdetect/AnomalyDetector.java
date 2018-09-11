@@ -15,9 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.www.haystack.commons.entities.MetricPoint;
 
 import java.util.UUID;
 
@@ -28,32 +26,12 @@ import java.util.UUID;
  */
 public interface AnomalyDetector {
     
+    /**
+     * Returns the anomaly detector UUID.
+     *
+     * @return Anomaly detector UUID.
+     */
     UUID getUuid();
     
     MappedMetricData classify(MappedMetricData mappedMetricData);
-    
-    
-    // ========================================
-    // Deprecated
-    // ========================================
-    
-    /**
-     * @return ID
-     * @deprecated Superseded by {@link #getUuid()}. [WLW]
-     */
-    @Deprecated
-    default String getId() {
-        return this.toString();
-    }
-    
-    /**
-     * Classifies the given metric point.
-     *
-     * @param metricPoint Metric point.
-     * @return Anomaly classification result, with supporting data such as the prediction, anomaly score and various
-     * thresholds.
-     * @deprecated Deprecated in favor of {@link #classify(MappedMetricData)}.
-     */
-    @Deprecated
-    AnomalyResult classify(MetricPoint metricPoint);
 }

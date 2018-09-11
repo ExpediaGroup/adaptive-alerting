@@ -15,8 +15,9 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.source;
 
-import com.expedia.adaptivealerting.tools.pipeline.util.MetricPointSubscriber;
-import com.expedia.www.haystack.commons.entities.MetricPoint;
+import com.expedia.adaptivealerting.tools.pipeline.util.MetricDataSubscriber;
+import com.expedia.metrics.MetricData;
+import com.expedia.metrics.MetricDefinition;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -32,66 +33,64 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author Willie Wheeler
  */
 public abstract class AbstractMetricSource implements MetricSource {
-    private final String metricName;
+    private final MetricDefinition metricDefinition;
     private final long period;
-    private final List<MetricPointSubscriber> subscribers = new LinkedList<>();
-
+    private final List<MetricDataSubscriber> subscribers = new LinkedList<>();
+    
     private final Timer timer = new Timer();
-
+    
     /**
      * Creates a new metric source with the given period.
      *
-     * @param metricName
-     *            Metric metricName.
-     * @param period
-     *            Timer period in seconds.
+     * @param metricKey Metric key.
+     * @param period    Timer period in seconds.
      */
-    public AbstractMetricSource(String metricName, long period) {
-        notNull(metricName, "metricName can't be null");
+    public AbstractMetricSource(String metricKey, long period) {
+        notNull(metricKey, "metricKey can't be null");
         isTrue(period > 0, "period must be > 0");
-
-        this.metricName = metricName;
+        
+        this.metricDefinition = new MetricDefinition(metricKey);
         this.period = period;
     }
-
+    
     @Override
-    public String getMetricName() {
-        return metricName;
+    public MetricDefinition getMetricDefinition() {
+        return metricDefinition;
     }
-
+    
     @Override
     public void start() {
         timer.scheduleAtFixedRate(new TimerTask() {
-
+            
             @Override
             public void run() {
-                final MetricPoint next = next();
+                final MetricData next = next();
                 if (next != null) {
                     publish(next);
                 }
             }
         }, 0L, period);
     }
-
+    
     @Override
     public void stop() {
         timer.cancel();
         timer.purge();
     }
-
+    
     @Override
-    public void addSubscriber(MetricPointSubscriber subscriber) {
+    public void addSubscriber(MetricDataSubscriber subscriber) {
         notNull(subscriber, "subscriber can't be null");
         subscribers.add(subscriber);
     }
-
+    
     @Override
-    public void removeSubscriber(MetricPointSubscriber subscriber) {
+    public void removeSubscriber(MetricDataSubscriber subscriber) {
         notNull(subscriber, "subscriber can't be null");
         subscribers.remove(subscriber);
     }
-
-    private void publish(MetricPoint metricPoint) {
-        subscribers.stream().forEach(subscriber -> subscriber.next(metricPoint));
+    
+    private void publish(MetricData metricData) {
+        subscribers.stream().forEach(subscriber -> subscriber.next(metricData));
     }
 }

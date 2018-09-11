@@ -17,10 +17,10 @@ package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.adaptivealerting.core.util.MetricUtil;
-import com.expedia.www.haystack.commons.entities.MetricPoint;
 
 import java.util.UUID;
+
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * Abstract base class implementing {@link AnomalyDetector}.
@@ -40,9 +40,14 @@ public abstract class AbstractAnomalyDetector implements AnomalyDetector {
     }
     
     @Override
-    public AnomalyResult classify(MetricPoint metricPoint) {
-        final MappedMetricData mappedMetricData = new MappedMetricData();
-        mappedMetricData.setMetricData(MetricUtil.toMetricData(metricPoint));
-        return classify(mappedMetricData).getAnomalyResult();
+    public MappedMetricData classify(MappedMetricData mappedMetricData) {
+        notNull(mappedMetricData, "mappedMetricData can't be null");
+        final MappedMetricData result = new MappedMetricData(mappedMetricData, toAnomalyResult(mappedMetricData));
+        result.setDetectorType(mappedMetricData.getDetectorType());
+        result.setDetectorUuid(mappedMetricData.getDetectorUuid());
+        result.setMetricData(mappedMetricData.getMetricData());
+        return result;
     }
+    
+    protected abstract AnomalyResult toAnomalyResult(MappedMetricData mappedMetricData);
 }

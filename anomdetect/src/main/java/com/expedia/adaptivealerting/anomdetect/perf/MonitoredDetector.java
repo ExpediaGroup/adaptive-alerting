@@ -48,11 +48,11 @@ public class MonitoredDetector extends AbstractAnomalyDetector {
     }
     
     @Override
-    public MappedMetricData classify(MappedMetricData mappedMetricData) {
+    protected AnomalyResult toAnomalyResult(MappedMetricData mappedMetricData) {
         MappedMetricData classified = detector.classify(mappedMetricData);
         AnomalyResult result = classified.getAnomalyResult();
         perfMonitor.evaluatePerformance(result);
-        return classified;
+        return result;
     }
 
     public static class PerfMonHandler implements PerfMonListener {

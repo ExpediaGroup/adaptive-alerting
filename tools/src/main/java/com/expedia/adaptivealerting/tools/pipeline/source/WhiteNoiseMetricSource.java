@@ -15,12 +15,11 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.source;
 
-import com.expedia.www.haystack.commons.entities.MetricPoint;
+import com.expedia.metrics.MetricData;
 
 import java.time.Instant;
 import java.util.Random;
 
-import static com.expedia.adaptivealerting.core.util.MetricUtil.metricPoint;
 import static java.lang.Math.sqrt;
 
 /**
@@ -57,8 +56,8 @@ public final class WhiteNoiseMetricSource extends AbstractMetricSource {
     }
     
     @Override
-    public MetricPoint next() {
+    public MetricData next() {
         final double value = mean + stdDev * random.nextGaussian();
-        return metricPoint(getMetricName(), Instant.now().getEpochSecond(), value);
+        return new MetricData(getMetricDefinition(), value, Instant.now().getEpochSecond());
     }
 }

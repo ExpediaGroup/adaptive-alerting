@@ -53,6 +53,16 @@ public final class MappedMetricData {
         this.detectorType = detectorType;
     }
     
+    public MappedMetricData(MappedMetricData orig, AnomalyResult result) {
+        notNull(orig, "orig can't be null");
+        notNull(result, "result can't be null");
+        
+        this.metricData = orig.getMetricData();
+        this.detectorUuid = orig.getDetectorUuid();
+        this.detectorType = orig.getDetectorType();
+        this.anomalyResult = result;
+    }
+    
     public MetricData getMetricData() {
         return metricData;
     }

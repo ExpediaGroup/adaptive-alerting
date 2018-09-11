@@ -15,12 +15,10 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.source;
 
-import com.expedia.www.haystack.commons.entities.MetricPoint;
+import com.expedia.metrics.MetricData;
 
 import java.time.Instant;
 import java.util.Random;
-
-import static com.expedia.adaptivealerting.core.util.MetricUtil.metricPoint;
 
 /**
  * Generates an infinite series based on a <a href="https://en.wikipedia.org/wiki/Random_walk">random walk</a>.
@@ -44,8 +42,8 @@ public final class RandomWalkMetricSource extends AbstractMetricSource {
     }
     
     @Override
-    public MetricPoint next() {
-        final MetricPoint result = metricPoint(getMetricName(), Instant.now().getEpochSecond(), currentValue);
+    public MetricData next() {
+        final MetricData result = new MetricData(getMetricDefinition(), Instant.now().getEpochSecond(), currentValue);
         final int movement = 1 - random.nextInt(3);
         this.currentValue += movement;
         return result;

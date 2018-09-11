@@ -20,9 +20,6 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.metrics.MetricData;
-import com.expedia.adaptivealerting.core.util.AssertUtil;
-import com.expedia.adaptivealerting.core.util.MetricUtil;
-import com.expedia.www.haystack.commons.entities.MetricPoint;
 
 import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.*;
 import static java.lang.Math.abs;
@@ -37,7 +34,6 @@ import static java.lang.Math.abs;
  * @author kashah
  */
 public class CusumAnomalyDetector extends AbstractAnomalyDetector {
-
     public static final int LEFT_TAILED = 0;
     public static final int RIGHT_TAILED = 1;
     public static final int TWO_TAILED = 2;
@@ -131,6 +127,7 @@ public class CusumAnomalyDetector extends AbstractAnomalyDetector {
             double weakThresholdSigmas,
             double strongThresholdSigmas,
             double targetValue) {
+        
         this.tail = tail;
         this.prevValue = initValue;
         this.slackParam = slackParam;
@@ -171,12 +168,11 @@ public class CusumAnomalyDetector extends AbstractAnomalyDetector {
     public double getSlackParam() {
         return slackParam;
     }
-
+    
     @Override
-    public AnomalyResult classify(MetricPoint metricPoint) {
-        AssertUtil.notNull(metricPoint, "metricPoint can't be null");
-
-        final double observed = metricPoint.value();
+    protected AnomalyResult toAnomalyResult(MappedMetricData mappedMetricData) {
+        final MetricData metricData = mappedMetricData.getMetricData();
+        final double observed = metricData.getValue();
         this.movingRange += abs(prevValue - observed);
         final double averageMovingRange = getAverageMovingRange();
         final double dist = abs(observed - targetValue);
@@ -184,68 +180,66 @@ public class CusumAnomalyDetector extends AbstractAnomalyDetector {
         final double slack = slackParam * stdDev;
         final double weakThreshold = weakThresholdSigmas * stdDev;
         final double strongThreshold = strongThresholdSigmas * stdDev;
-
+        
         this.sumHigh = Math.max(0, sumHigh + observed - (targetValue + slack));
         this.sumLow = Math.min(0, sumLow + observed - (targetValue - slack));
         this.prevValue = observed;
         this.totalDataPoints++;
-
+        
         Double weakThresholdUpper = null;
         Double weakThresholdLower = null;
         Double strongThresholdUpper = null;
         Double strongThresholdLower = null;
         AnomalyLevel anomalyLevel = null;
-
+        
         if (totalDataPoints <= warmUpPeriod) {
             anomalyLevel = UNKNOWN;
         } else {
             anomalyLevel = NORMAL;
             switch (tail) {
-            case LEFT_TAILED:
-                weakThresholdLower = -weakThreshold;
-                strongThresholdLower = -strongThreshold;
-                if (sumLow <= strongThresholdLower) {
-                    anomalyLevel = STRONG;
-                    resetSums();
-                } else if (sumLow <= weakThresholdLower) {
-                    anomalyLevel = WEAK;
-                }
-                break;
-            case RIGHT_TAILED:
-                weakThresholdUpper = weakThreshold;
-                strongThresholdUpper = strongThreshold;
-                if (sumHigh >= strongThresholdUpper) {
-                    anomalyLevel = STRONG;
-                    resetSums();
-                } else if (sumHigh > weakThresholdUpper) {
-                    anomalyLevel = WEAK;
-                }
-                break;
-            case TWO_TAILED:
-                weakThresholdLower = -weakThreshold;
-                strongThresholdLower = -strongThreshold;
-                weakThresholdUpper = weakThreshold;
-                strongThresholdUpper = strongThreshold;
-                if (sumHigh >= strongThreshold || sumLow <= strongThreshold) {
-                    anomalyLevel = STRONG;
-                    resetSums();
-                } else if (sumHigh > weakThreshold || sumLow <= weakThreshold) {
-                    anomalyLevel = WEAK;
-                }
-                break;
-            default:
-                throw new IllegalStateException("Illegal tail: " + tail);
+                case LEFT_TAILED:
+                    weakThresholdLower = -weakThreshold;
+                    strongThresholdLower = -strongThreshold;
+                    if (sumLow <= strongThresholdLower) {
+                        anomalyLevel = STRONG;
+                        resetSums();
+                    } else if (sumLow <= weakThresholdLower) {
+                        anomalyLevel = WEAK;
+                    }
+                    break;
+                case RIGHT_TAILED:
+                    weakThresholdUpper = weakThreshold;
+                    strongThresholdUpper = strongThreshold;
+                    if (sumHigh >= strongThresholdUpper) {
+                        anomalyLevel = STRONG;
+                        resetSums();
+                    } else if (sumHigh > weakThresholdUpper) {
+                        anomalyLevel = WEAK;
+                    }
+                    break;
+                case TWO_TAILED:
+                    weakThresholdLower = -weakThreshold;
+                    strongThresholdLower = -strongThreshold;
+                    weakThresholdUpper = weakThreshold;
+                    strongThresholdUpper = strongThreshold;
+                    if (sumHigh >= strongThreshold || sumLow <= strongThreshold) {
+                        anomalyLevel = STRONG;
+                        resetSums();
+                    } else if (sumHigh > weakThreshold || sumLow <= weakThreshold) {
+                        anomalyLevel = WEAK;
+                    }
+                    break;
+                default:
+                    throw new IllegalStateException("Illegal tail: " + tail);
             }
         }
-        final MetricData mpoint = MetricUtil.toMetricData(metricPoint);
         
         // FIXME These settings aren't consistent with the current visualization approach.
         // We probably need to make fewer assumptions about the algo in the AnomalyResult class, and support different
         // result approaches. [WLW]
         final AnomalyResult result = new AnomalyResult();
-        result.setMetricDefinition(mpoint.getMetricDefinition());
-        result.setDetectorId(this.getId());
-        result.setEpochSecond(mpoint.getTimestamp());
+        result.setMetricDefinition(metricData.getMetricDefinition());
+        result.setEpochSecond(metricData.getTimestamp());
         result.setObserved(observed);
         result.setPredicted(targetValue);
         result.setWeakThresholdUpper(weakThresholdUpper);
@@ -257,11 +251,6 @@ public class CusumAnomalyDetector extends AbstractAnomalyDetector {
         return result;
     }
     
-    @Override
-    public MappedMetricData classify(MappedMetricData mappedMetricData) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
     private double getAverageMovingRange() {
         if (totalDataPoints > 1) {
             return movingRange / (totalDataPoints - 1);
@@ -273,5 +262,4 @@ public class CusumAnomalyDetector extends AbstractAnomalyDetector {
         this.sumHigh = 0.0;
         this.sumLow = 0.0;
     }
-
 }

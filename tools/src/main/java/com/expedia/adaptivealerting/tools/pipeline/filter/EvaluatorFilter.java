@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * 
+ *
  */
 package com.expedia.adaptivealerting.tools.pipeline.filter;
 
@@ -31,38 +31,36 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * Stream filter that applies model evaluator to metrics and publishes the score.
- * 
+ *
  * @author kashah
  */
-public class EvaluatorFilter implements AnomalyResultSubscriber {
-
+public final class EvaluatorFilter implements AnomalyResultSubscriber {
     private final Evaluator evaluator;
     private final List<ModelEvaluationSubscriber> subscribers = new LinkedList<>();
-
+    
     public EvaluatorFilter(Evaluator evaluator) {
         notNull(evaluator, "evaluator can't be null");
         this.evaluator = evaluator;
     }
-
+    
     @Override
     public void next(AnomalyResult anomalyResult) {
         notNull(anomalyResult, "anomalyResult can't be null");
         evaluator.update(anomalyResult.getObserved(), anomalyResult.getPredicted());
         publish(evaluator.evaluate());
     }
-
+    
     public void addSubscriber(ModelEvaluationSubscriber subscriber) {
         notNull(subscriber, "subscriber can't be null");
         subscribers.add(subscriber);
     }
-
+    
     public void removeSubscriber(ModelEvaluationSubscriber subscriber) {
         notNull(subscriber, "subscriber can't be null");
         subscribers.remove(subscriber);
     }
-
+    
     private void publish(ModelEvaluation modelEvaluation) {
         subscribers.stream().forEach(subscriber -> subscriber.next(modelEvaluation));
     }
-
 }

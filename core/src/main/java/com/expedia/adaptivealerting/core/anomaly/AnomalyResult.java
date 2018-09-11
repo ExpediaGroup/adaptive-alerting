@@ -38,9 +38,9 @@ public class AnomalyResult {
     private List<InvestigationResult> investigationResults;
 
     /**
-     * Param that is used for identifying the AnomalyDetector that created this AnomalyResult.
+     * Identifies the AnomalyDetector that created this AnomalyResult.
      */
-    private String detectorId;
+    private String detectorUuid;
     
     public Long getEpochSecond() {
         return epochSecond;
@@ -114,14 +114,6 @@ public class AnomalyResult {
         this.anomalyLevel = anomalyLevel;
     }
 
-    public String getDetectorId() {
-        return detectorId;
-    }
-
-    public void setDetectorId(String detectorId) {
-        this.detectorId = detectorId;
-    }
-
     public MetricDefinition getMetricDefinition() {
         return metricDefinition;
     }
@@ -137,7 +129,15 @@ public class AnomalyResult {
     public void setInvestigationResults(List<InvestigationResult> investigationResults) {
         this.investigationResults = investigationResults;
     }
-
+    
+    public String getDetectorUuid() {
+        return detectorUuid;
+    }
+    
+    public void setDetectorUuid(String detectorUuid) {
+        this.detectorUuid = detectorUuid;
+    }
+    
     @Override
     public String toString() {
         return "AnomalyResult{" +
@@ -150,7 +150,7 @@ public class AnomalyResult {
                 ", strongThresholdLower=" + strongThresholdLower +
                 ", anomalyScore=" + anomalyScore +
                 ", anomalyLevel=" + anomalyLevel +
-                ", detectorId=" + detectorId +
+                ", detectorUuid=" + detectorUuid +
                 '}';
     }
 }

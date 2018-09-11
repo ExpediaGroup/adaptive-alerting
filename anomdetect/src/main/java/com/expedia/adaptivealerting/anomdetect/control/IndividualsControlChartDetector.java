@@ -20,9 +20,6 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.metrics.MetricData;
-import com.expedia.adaptivealerting.core.util.AssertUtil;
-import com.expedia.adaptivealerting.core.util.MetricUtil;
-import com.expedia.www.haystack.commons.entities.MetricPoint;
 
 import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.*;
 import static java.lang.Math.abs;
@@ -36,7 +33,7 @@ import static java.lang.Math.abs;
  *
  * @author shsethi
  */
-public class IndividualControlChartsDetector extends AbstractAnomalyDetector {
+public class IndividualsControlChartDetector extends AbstractAnomalyDetector {
     private static final double R_CONTROL_CHART_CONSTANT_D4 = 3.267;
     
     /**
@@ -108,7 +105,7 @@ public class IndividualControlChartsDetector extends AbstractAnomalyDetector {
     /**
      * Creates a new Individual Control Charts detector with initValue = 0.0, warmUpPeriod = 25
      */
-    public IndividualControlChartsDetector() {
+    public IndividualsControlChartDetector() {
         this(0.0, 25);
     }
 
@@ -119,7 +116,7 @@ public class IndividualControlChartsDetector extends AbstractAnomalyDetector {
      * @param warmUpPeriod Warm up period value. Minimum no of data points required before it can be used for actual anomaly
      *                     detection.
      */
-    public IndividualControlChartsDetector(
+    public IndividualsControlChartDetector(
             double initValue,
             int warmUpPeriod
     ) {
@@ -133,13 +130,12 @@ public class IndividualControlChartsDetector extends AbstractAnomalyDetector {
     public int getWarmUpPeriod() {
         return warmUpPeriod;
     }
-
-
+    
     @Override
-    public AnomalyResult classify(MetricPoint metricPoint) {
-        AssertUtil.notNull(metricPoint, "metricPoint can't be null");
+    protected AnomalyResult toAnomalyResult(MappedMetricData mappedMetricData) {
+        final MetricData metricData = mappedMetricData.getMetricData();
 
-        final double observed = metricPoint.value();
+        final double observed = metricData.getValue();
         double currentRange = abs(prevValue - observed);
         final double dist = abs(observed - target);
 
@@ -172,13 +168,10 @@ public class IndividualControlChartsDetector extends AbstractAnomalyDetector {
             lowerControlLimit_X = this.target - 2.66 * averageMovingRange;
         }
         this.prevValue = observed;
-
-        final MetricData mpoint = MetricUtil.toMetricData(metricPoint);
-
+        
         final AnomalyResult result = new AnomalyResult();
-        result.setMetricDefinition(mpoint.getMetricDefinition());
-        result.setDetectorId(this.getId());
-        result.setEpochSecond(mpoint.getTimestamp());
+        result.setMetricDefinition(metricData.getMetricDefinition());
+        result.setEpochSecond(metricData.getTimestamp());
         result.setObserved(observed);
         result.setPredicted(this.target);
         result.setWeakThresholdUpper(upperControlLimit_X);
@@ -192,11 +185,6 @@ public class IndividualControlChartsDetector extends AbstractAnomalyDetector {
 
     private double getRunningMean(double observed) {
         return this.mean + ((observed - this.mean)/(this.totalDataPoints + 1));
-    }
-
-    @Override
-    public MappedMetricData classify(MappedMetricData mappedMetricData) {
-        throw new UnsupportedOperationException("Not yet implemented");
     }
 
     private double getAverageMovingRange() {
