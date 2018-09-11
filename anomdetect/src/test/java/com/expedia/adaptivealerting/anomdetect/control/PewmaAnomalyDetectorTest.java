@@ -17,11 +17,14 @@ package com.expedia.adaptivealerting.anomdetect.control;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.core.util.MathUtil;
-import com.expedia.adaptivealerting.core.util.MetricUtil;
+import com.expedia.metrics.MetricData;
+import com.expedia.metrics.MetricDefinition;
 import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBeanBuilder;
 import junit.framework.TestCase;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -30,6 +33,7 @@ import java.io.InputStreamReader;
 import java.time.Instant;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.UUID;
 
 import static java.lang.Math.sqrt;
 import static junit.framework.TestCase.assertEquals;
@@ -41,6 +45,17 @@ public class PewmaAnomalyDetectorTest {
     private static final double WEAK_THRESHOLD = 2.0;
     private static final double STRONG_THRESHOLD = 3.0;
     private static final double DEFAULT_ALPHA = 0.05;
+    
+    private MetricDefinition metricDefinition;
+    private long epochSecond;
+    private UUID uuid;
+    
+    @Before
+    public void setUp() {
+        this.metricDefinition = new MetricDefinition("some-key");
+        this.epochSecond = Instant.now().getEpochSecond();
+        this.uuid = UUID.randomUUID();
+    }
     
     @Test
     public void testDefaultConstructor() {
@@ -61,18 +76,17 @@ public class PewmaAnomalyDetectorTest {
         
         int rowCount = 1;
         while (testRows.hasNext()) {
-            final Float value = Float.parseFloat(testRows.next()[0]);
+            final Float observed = Float.parseFloat(testRows.next()[0]);
             
             double ewmaStdDev = sqrt(ewmaOutlierDetector.getVariance());
             
             double threshold = 1.0 / rowCount; // results converge with more iterations
             assertApproxEqual(ewmaOutlierDetector.getMean(), pewmaOutlierDetector.getMean(), threshold);
             assertApproxEqual(ewmaStdDev, pewmaOutlierDetector.getStdDev(), threshold);
-            
-            final AnomalyResult pewmaResult =
-                    pewmaOutlierDetector.classify(MetricUtil.metricPoint(Instant.now().getEpochSecond(), value));
-            final AnomalyResult ewmaResult =
-                    ewmaOutlierDetector.classify(MetricUtil.metricPoint(Instant.now().getEpochSecond(), value));
+    
+            final MappedMetricData mappedMetricData = toMappedMetricData(epochSecond, observed);
+            final AnomalyResult pewmaResult = pewmaOutlierDetector.classify(mappedMetricData).getAnomalyResult();
+            final AnomalyResult ewmaResult = ewmaOutlierDetector.classify(mappedMetricData).getAnomalyResult();
             
             AnomalyLevel pOL = pewmaResult.getAnomalyLevel();
             AnomalyLevel eOL = ewmaResult.getAnomalyLevel();
@@ -96,11 +110,9 @@ public class PewmaAnomalyDetectorTest {
             final PewmaTestRow testRow = testRows.next();
             
             final double observed = testRow.getObserved();
-            
-            // This detector doesn't currently do anything with the instant, so we can just pass now().
-            // This may change in the future.
-            final AnomalyResult result =
-                    detector.classify(MetricUtil.metricPoint(Instant.now().getEpochSecond(), (float) observed));
+    
+            final MappedMetricData mappedMetricData = toMappedMetricData(epochSecond, observed);
+            final AnomalyResult result = detector.classify(mappedMetricData).getAnomalyResult();
             
             final AnomalyLevel level = result.getAnomalyLevel();
             assertApproxEqual(testRow.getMean(), detector.getMean(), 0.00001);
@@ -125,5 +137,10 @@ public class PewmaAnomalyDetectorTest {
     
     private static void assertApproxEqual(double d1, double d2, double tolerance) {
         TestCase.assertTrue(d1 + " !~ " + d2, MathUtil.isApproximatelyEqual(d1, d2, tolerance));
+    }
+    
+    private MappedMetricData toMappedMetricData(long epochSecond, double value) {
+        final MetricData metricData = new MetricData(metricDefinition, value, epochSecond);
+        return new MappedMetricData(metricData, uuid, "pewma-detector");
     }
 }

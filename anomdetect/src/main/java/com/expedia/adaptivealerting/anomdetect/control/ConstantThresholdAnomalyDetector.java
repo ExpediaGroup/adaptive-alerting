@@ -19,10 +19,8 @@ import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.metrics.MetricData;
 import com.expedia.adaptivealerting.core.util.AssertUtil;
-import com.expedia.adaptivealerting.core.util.MetricUtil;
-import com.expedia.www.haystack.commons.entities.MetricPoint;
+import com.expedia.metrics.MetricData;
 
 import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.*;
 
@@ -77,8 +75,18 @@ public class ConstantThresholdAnomalyDetector extends AbstractAnomalyDetector {
     }
     
     @Override
-    public AnomalyResult classify(MetricPoint metricPoint) {
-        final double observed = metricPoint.value();
+    public String toString() {
+        return "ConstantThresholdAnomalyDetector{" +
+                "tail=" + tail +
+                ", weakThreshold=" + weakThreshold +
+                ", strongThreshold=" + strongThreshold +
+                '}';
+    }
+    
+    @Override
+    protected AnomalyResult toAnomalyResult(MappedMetricData mappedMetricData) {
+        final MetricData metricData = mappedMetricData.getMetricData();
+        final double observed = metricData.getValue();
         
         Double weakThresholdUpper = null;
         Double weakThresholdLower = null;
@@ -105,8 +113,7 @@ public class ConstantThresholdAnomalyDetector extends AbstractAnomalyDetector {
         } else {
             throw new IllegalStateException("Illegal tail: " + tail);
         }
-
-        final MetricData metricData = MetricUtil.toMetricData(metricPoint);
+        
         final AnomalyResult result = new AnomalyResult();
         result.setMetricDefinition(metricData.getMetricDefinition());
         result.setEpochSecond(metricData.getTimestamp());
@@ -117,19 +124,5 @@ public class ConstantThresholdAnomalyDetector extends AbstractAnomalyDetector {
         result.setStrongThresholdLower(strongThresholdLower);
         result.setAnomalyLevel(anomalyLevel);
         return result;
-    }
-    
-    @Override
-    public MappedMetricData classify(MappedMetricData mappedMetricData) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    @Override
-    public String toString() {
-        return "ConstantThresholdAnomalyDetector{" +
-                "tail=" + tail +
-                ", weakThreshold=" + weakThreshold +
-                ", strongThreshold=" + strongThreshold +
-                '}';
     }
 }

@@ -17,8 +17,6 @@ package com.expedia.adaptivealerting.tools.pipeline.source;
 
 import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.metrics.MetricData;
-import com.expedia.adaptivealerting.core.util.MetricUtil;
-import com.expedia.www.haystack.commons.entities.MetricPoint;
 
 import java.util.ListIterator;
 
@@ -28,20 +26,18 @@ import java.util.ListIterator;
  * @author Willie Wheeler
  */
 public final class MetricFrameMetricSource extends AbstractMetricSource {
-    private ListIterator<MetricData> mpoints;
+    private ListIterator<MetricData> metricDataIterator;
     
     public MetricFrameMetricSource(MetricFrame frame, String name, long period) {
         super(name, period);
-        this.mpoints = frame.listIterator();
+        this.metricDataIterator = frame.listIterator();
     }
     
     @Override
-    public MetricPoint next() {
-        if (mpoints.hasNext()) {
-            final MetricData mpoint = mpoints.next();
-            final long epochSecond = mpoint.getTimestamp();
-            final double value = mpoint.getValue();
-            return MetricUtil.metricPoint(epochSecond, value);
+    public MetricData next() {
+        if (metricDataIterator.hasNext()) {
+            final MetricData metricData = metricDataIterator.next();
+            return new MetricData(getMetricDefinition(), metricData.getValue(), metricData.getTimestamp());
         } else {
             return null;
         }

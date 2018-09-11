@@ -15,10 +15,13 @@
  */
 package com.expedia.adaptivealerting.anomdetect.control;
 
+import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.core.util.MathUtil;
-import com.expedia.adaptivealerting.core.util.MetricUtil;
+import com.expedia.metrics.MetricData;
+import com.expedia.metrics.MetricDefinition;
 import com.opencsv.bean.CsvToBeanBuilder;
 import junit.framework.TestCase;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -28,6 +31,7 @@ import java.io.InputStreamReader;
 import java.time.Instant;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.UUID;
 
 import static com.expedia.adaptivealerting.anomdetect.NSigmasClassifier.DEFAULT_STRONG_SIGMAS;
 import static com.expedia.adaptivealerting.anomdetect.NSigmasClassifier.DEFAULT_WEAK_SIGMAS;
@@ -41,11 +45,21 @@ public class EwmaAnomalyDetectorTest {
     private static final double STRONG_SIGMAS = DEFAULT_STRONG_SIGMAS;
     private static final double TOLERANCE = 0.001;
     
+    private MetricDefinition metricDefinition;
+    private long epochSecond;
+    private UUID uuid;
     private static List<EwmaTestRow> data;
     
     @BeforeClass
     public static void setUpClass() throws IOException {
         readData_calInflow();
+    }
+    
+    @Before
+    public void setUp() {
+        this.metricDefinition = new MetricDefinition("some-key");
+        this.epochSecond = Instant.now().getEpochSecond();
+        this.uuid = UUID.randomUUID();
     }
     
     @Test
@@ -70,8 +84,7 @@ public class EwmaAnomalyDetectorTest {
         final ListIterator<EwmaTestRow> testRows = data.listIterator();
         final EwmaTestRow testRow0 = testRows.next();
         final double observed0 = testRow0.getObserved();
-        final EwmaAnomalyDetector detector =
-                new EwmaAnomalyDetector(alpha, WEAK_SIGMAS, STRONG_SIGMAS, observed0);
+        final EwmaAnomalyDetector detector = new EwmaAnomalyDetector(alpha, WEAK_SIGMAS, STRONG_SIGMAS, observed0);
     
         // Params
         assertEquals(alpha, detector.getAlpha());
@@ -86,9 +99,8 @@ public class EwmaAnomalyDetectorTest {
             final EwmaTestRow testRow = testRows.next();
             final int observed = testRow.getObserved();
             
-            // This detector doesn't currently do anything with the instant, so we can just pass now().
-            // This may change in the future.
-            detector.classify(MetricUtil.metricPoint(Instant.now().getEpochSecond(), observed));
+            final MappedMetricData mappedMetricData = toMappedMetricData(epochSecond, observed);
+            detector.classify(mappedMetricData);
             
             assertApproxEqual(testRow.getKnownMean(), testRow.getMean());
             assertApproxEqual(testRow.getMean(), detector.getMean());
@@ -108,5 +120,10 @@ public class EwmaAnomalyDetectorTest {
     
     private static void assertApproxEqual(double d1, double d2) {
         TestCase.assertTrue(MathUtil.isApproximatelyEqual(d1, d2, TOLERANCE));
+    }
+    
+    private MappedMetricData toMappedMetricData(long epochSecond, double value) {
+        final MetricData metricData = new MetricData(metricDefinition, value, epochSecond);
+        return new MappedMetricData(metricData, uuid, "ewma-detector");
     }
 }

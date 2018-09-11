@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.tools.kafka;
 
-import com.expedia.adaptivealerting.tools.pipeline.util.MetricPointSubscriber;
-import com.expedia.www.haystack.commons.entities.MetricPoint;
+import com.expedia.adaptivealerting.tools.pipeline.util.MetricDataSubscriber;
+import com.expedia.metrics.MetricData;
 import com.expedia.www.haystack.commons.kstreams.serde.metricpoint.MetricPointSerializer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -25,12 +25,14 @@ import org.apache.kafka.streams.StreamsConfig;
 
 import java.util.Properties;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+
 /**
  * @author Willie Wheeler
  */
-public class KafkaStreamSubscriber implements MetricPointSubscriber {
+public class KafkaStreamSubscriber implements MetricDataSubscriber {
     private final String topicName;
-    private final KafkaProducer<String, MetricPoint> producer;
+    private final KafkaProducer<String, MetricData> producer;
     
     /**
      * Creates a data generator callback to publish messages to the given topic.
@@ -38,6 +40,8 @@ public class KafkaStreamSubscriber implements MetricPointSubscriber {
      * @param topicName Kafka topic name.
      */
     public KafkaStreamSubscriber(String topicName) {
+        notNull(topicName, "topicName can't be null");
+        
         this.topicName = topicName;
         
         // TODO Externalize
@@ -49,7 +53,7 @@ public class KafkaStreamSubscriber implements MetricPointSubscriber {
         this.producer = new KafkaProducer<>(conf);
     }
     
-    public void next(MetricPoint metricPoint) {
-        producer.send(new ProducerRecord<String, MetricPoint>(topicName, null, metricPoint));
+    public void next(MetricData metricData) {
+        producer.send(new ProducerRecord<String, MetricData>(topicName, null, metricData));
     }
 }

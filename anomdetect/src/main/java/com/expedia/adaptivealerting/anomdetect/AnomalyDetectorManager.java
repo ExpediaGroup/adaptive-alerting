@@ -106,7 +106,7 @@ public final class AnomalyDetectorManager {
     
     /**
      * <p>
-     * Convenience method to classify the mapped metric point, performing detector lookup behind the scenes. Note that
+     * Convenience method to toAnomalyResult the mapped metric point, performing detector lookup behind the scenes. Note that
      * this method has a side-effect in that it updates the passed mapped metric point itself.
      * </p>
      * <p>

@@ -23,7 +23,7 @@ import com.opencsv.bean.CsvBindByName;
  *
  * @author shsethi
  */
-public class IndividualChartTestRow {
+public class IndividualsChartTestRow {
 
     @CsvBindByName
     private int sample;

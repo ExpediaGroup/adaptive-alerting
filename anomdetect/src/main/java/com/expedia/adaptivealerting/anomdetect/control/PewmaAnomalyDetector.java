@@ -19,10 +19,8 @@ import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.metrics.MetricData;
 import com.expedia.adaptivealerting.core.util.AssertUtil;
-import com.expedia.adaptivealerting.core.util.MetricUtil;
-import com.expedia.www.haystack.commons.entities.MetricPoint;
+import com.expedia.metrics.MetricData;
 
 import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.*;
 import static java.lang.Math.*;
@@ -166,21 +164,29 @@ public class PewmaAnomalyDetector extends AbstractAnomalyDetector {
         updateMeanAndStdDev();
     }
     
-    private void updateMeanAndStdDev() {
-        this.mean = this.s1;
-        this.stdDev = sqrt(this.s2 - this.s1 * this.s1);
+    public double getMean() {
+        return mean;
+    }
+    
+    public double getStdDev() {
+        return stdDev;
     }
     
     @Override
-    public MappedMetricData classify(MappedMetricData mappedMetricData) {
-        throw new UnsupportedOperationException("Not yet implemented");
+    public String toString() {
+        return "PewmaAnomalyDetector{" +
+                "alpha0=" + alpha0 +
+                ", beta=" + beta +
+                ", trainingLength=" + trainingLength +
+                ", weakThresholdSigmas=" + weakThresholdSigmas +
+                ", strongThresholdSigmas=" + strongThresholdSigmas +
+                '}';
     }
     
     @Override
-    public AnomalyResult classify(MetricPoint metricPoint) {
-        AssertUtil.notNull(metricPoint, "metricPoint can't be null");
-    
-        final double observed = metricPoint.value();
+    protected AnomalyResult toAnomalyResult(MappedMetricData mappedMetricData) {
+        final MetricData metricData = mappedMetricData.getMetricData();
+        final double observed = metricData.getValue();
         final double dist = abs(observed - mean);
         final double weakThreshold = weakThresholdSigmas * stdDev;
         final double strongThreshold = strongThresholdSigmas * stdDev;
@@ -192,10 +198,9 @@ public class PewmaAnomalyDetector extends AbstractAnomalyDetector {
             anomalyLevel = WEAK;
         }
 
-        final MetricData mpoint = MetricUtil.toMetricData(metricPoint);
         final AnomalyResult result = new AnomalyResult();
-        result.setMetricDefinition(mpoint.getMetricDefinition());
-        result.setEpochSecond(mpoint.getTimestamp());
+        result.setMetricDefinition(metricData.getMetricDefinition());
+        result.setEpochSecond(metricData.getTimestamp());
         result.setObserved(observed);
         result.setPredicted(mean);
         result.setWeakThresholdUpper(mean + weakThreshold);
@@ -224,30 +229,16 @@ public class PewmaAnomalyDetector extends AbstractAnomalyDetector {
         updateMeanAndStdDev();
     }
     
+    private void updateMeanAndStdDev() {
+        this.mean = this.s1;
+        this.stdDev = sqrt(this.s2 - this.s1 * this.s1);
+    }
+    
     private double calculateAlpha(double pt) {
         if (this.trainingCount < this.trainingLength) {
             this.trainingCount++;
             return 1 - 1.0 / this.trainingCount;
         }
         return (1 - this.beta * pt) * this.alpha0;
-    }
-    
-    public double getMean() {
-        return mean;
-    }
-    
-    public double getStdDev() {
-        return stdDev;
-    }
-
-    @Override
-    public String toString() {
-        return "PewmaAnomalyDetector{" +
-                "alpha0=" + alpha0 +
-                ", beta=" + beta +
-                ", trainingLength=" + trainingLength +
-                ", weakThresholdSigmas=" + weakThresholdSigmas +
-                ", strongThresholdSigmas=" + strongThresholdSigmas +
-                '}';
     }
 }

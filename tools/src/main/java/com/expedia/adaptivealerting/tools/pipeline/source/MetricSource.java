@@ -15,8 +15,9 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.source;
 
-import com.expedia.adaptivealerting.tools.pipeline.util.MetricPointSubscriber;
-import com.expedia.www.haystack.commons.entities.MetricPoint;
+import com.expedia.adaptivealerting.tools.pipeline.util.MetricDataSubscriber;
+import com.expedia.metrics.MetricData;
+import com.expedia.metrics.MetricDefinition;
 
 /**
  * Metric source interface.
@@ -26,25 +27,25 @@ import com.expedia.www.haystack.commons.entities.MetricPoint;
 public interface MetricSource {
     
     /**
-     * Returns the metric name.
+     * Returns the metric definition.
      *
-     * @return Metric name.
+     * @return Metric definition.
      */
-    String getMetricName();
+    MetricDefinition getMetricDefinition();
     
     /**
      * Adds a metric point subscriber to this source.
      *
      * @param subscriber Metric point subscriber.
      */
-    void addSubscriber(MetricPointSubscriber subscriber);
+    void addSubscriber(MetricDataSubscriber subscriber);
     
     /**
      * Removes a metric point subscriber from this source.
      *
      * @param subscriber Metric point subscriber.
      */
-    void removeSubscriber(MetricPointSubscriber subscriber);
+    void removeSubscriber(MetricDataSubscriber subscriber);
     
     /**
      * Starts the metric source.
@@ -54,9 +55,9 @@ public interface MetricSource {
     /**
      * Returns the next message in the stream.
      *
-     * @return Next metric point.
+     * @return Next metric data.
      */
-    MetricPoint next();
+    MetricData next();
     
     /**
      * Stops the metric source.

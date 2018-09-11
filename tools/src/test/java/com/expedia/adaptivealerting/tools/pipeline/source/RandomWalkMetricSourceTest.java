@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.source;
 
-import com.expedia.www.haystack.commons.entities.MetricPoint;
+import com.expedia.metrics.MetricData;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
@@ -28,7 +28,7 @@ public final class RandomWalkMetricSourceTest {
     @Test
     public void testStartAndStop() {
         final MetricSource metricSource = new RandomWalkMetricSource("random-walk", 100L, 0);
-        final MetricPoint result = metricSource.next();
+        final MetricData result = metricSource.next();
         assertNotNull(result);
     }
 }
