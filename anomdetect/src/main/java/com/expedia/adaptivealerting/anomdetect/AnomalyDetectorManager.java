@@ -106,11 +106,11 @@ public final class AnomalyDetectorManager {
     
     /**
      * <p>
-     * Convenience method to toAnomalyResult the mapped metric point, performing detector lookup behind the scenes. Note that
-     * this method has a side-effect in that it updates the passed mapped metric point itself.
+     * Convenience method to classify the mapped metric point, performing detector lookup behind the scenes. Note that
+     * this method has a side-effect in that it updates the passed mapped metric data itself.
      * </p>
      * <p>
-     * Returns {@code null} if there's no detector defined for the given mapped mpoint.
+     * Returns {@code null} if there's no detector defined for the given mapped metric data.
      * </p>
      *
      * @param mappedMetricData Mapped metric point.
