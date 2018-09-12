@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.service;
 
 import com.expedia.adaptivealerting.modelservice.dto.ModelDto;
-import com.expedia.adaptivealerting.modelservice.dto.ModelParams;
+import com.expedia.adaptivealerting.modelservice.dto.Hyperparams;
 
 import java.util.List;
 import java.util.Map;
@@ -28,9 +28,9 @@ public interface ModelService {
 
     List<ModelDto> getModels(String metricKey);
 
-    void addModelParams(ModelParams modelParams);
+    void addHyperparams(String modelUUID, Hyperparams hyperparams);
 
-    void markToRebuild(String modelUUID, String metricKey, Boolean toRebuild);
+    void markToRebuild(String modelUUID, String metricKey, boolean toRebuild);
 
     void updateThresholds(String modelUUID, String metricKey, Map<String, Object> thresholds);
 

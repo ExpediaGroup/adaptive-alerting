@@ -34,15 +34,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
-import com.expedia.adaptivealerting.modelservice.dto.ModelParams;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import com.expedia.adaptivealerting.modelservice.dto.Hyperparams;
 
-import static org.junit.Assert.assertSame;
 
 /**
  * @author kashah
- *
  */
 public class ModelControllerTests {
 
@@ -68,22 +64,21 @@ public class ModelControllerTests {
 
     @Test
     public void testAddModelParams() {
-        ModelParams params = new ModelParams();
-        String response = controller.addModelParams(params);
-        assertEquals("Model params saved successfully", response);
+        Hyperparams params = new Hyperparams();
+        String response = controller.addHyperparams("111", params);
     }
 
     @Test
     public void testmarkToRebuild() {
         RebuildParams params = new RebuildParams();
-        String response = controller.markToRebuild(params);
+        String response = controller.markToRebuild("111", params);
         assertEquals("Model marked for rebuild", response);
     }
 
     @Test
     public void testUpdateThresholds() {
         ThresholdParams params = new ThresholdParams();
-        String response = controller.updateThresholds(params);
+        String response = controller.updateThresholds("111", params);
         assertEquals("Updated threshold successfully", response);
     }
 }

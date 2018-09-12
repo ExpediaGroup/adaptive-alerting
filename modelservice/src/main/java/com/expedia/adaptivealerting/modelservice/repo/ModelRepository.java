@@ -17,6 +17,8 @@ package com.expedia.adaptivealerting.modelservice.repo;
 
 import com.expedia.adaptivealerting.modelservice.entity.Model;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 /**
  * @author kashah
@@ -24,6 +26,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface ModelRepository extends JpaRepository<Model, Integer> {
 
-    Model getModelById(Integer id);
+    @Query("select m.id from Model m where m.modelUUID = :uuid")
+    Integer findIdByModelUUID(@Param("uuid") String uuid);
 
 }

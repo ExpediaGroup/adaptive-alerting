@@ -15,10 +15,12 @@
  */
 package com.expedia.adaptivealerting.modelservice.service.impl;
 
+import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.adaptivealerting.modelservice.dto.ModelDto;
-import com.expedia.adaptivealerting.modelservice.dto.ModelParams;
+import com.expedia.adaptivealerting.modelservice.dto.Hyperparams;
 import com.expedia.adaptivealerting.modelservice.entity.Metric;
 import com.expedia.adaptivealerting.modelservice.entity.Model;
+import com.expedia.adaptivealerting.modelservice.repo.MetricRepository;
 import com.expedia.adaptivealerting.modelservice.repo.ModelRepository;
 import com.expedia.adaptivealerting.modelservice.repo.ModelRepositoryCustom;
 import com.expedia.adaptivealerting.modelservice.service.ModelService;
@@ -42,26 +44,55 @@ public class ModelServiceImpl implements ModelService {
     @Autowired
     private ModelRepository modelRepository;
 
+    @Autowired
+    private MetricRepository metricRepository;
+
     @Override
     public List<ModelDto> getModels(String metricKey) {
         return modelRepositoryCustom.findModels(metricKey);
     }
 
     @Override
-    public void addModelParams(ModelParams modelParams) {
+    public void addHyperparams(String uuid, Hyperparams hyperparams) {
 
-        Model model = new Model(modelParams.getModelUUID(), modelParams.getHyperparams());
-        Metric metric = new Metric(modelParams.getMetricKey());
-        model.getMetrics().add(metric);
-        metric.getModels().add(model);
-        modelRepository.save(model);
+        AssertUtil.notNull(hyperparams.getHyperparams(), "Hyperparams can't be null");
+        AssertUtil.notNull(hyperparams.getMetricKey(), "Metric key can't be null");
+        AssertUtil.notNull(uuid, "Model UUID can't be null");
+
+        Integer metricId = metricRepository.findIdByMetricKey(hyperparams.getMetricKey());
+        Integer modelId = modelRepository.findIdByModelUUID(uuid);
+
+        Metric metric;
+        if (metricId == null) {
+            metric = new Metric(hyperparams.getMetricKey());
+        } else {
+            metric = metricRepository.getOne(metricId);
+        }
+
+        Model model;
+        if (modelId == null) {
+            model = new Model(uuid, hyperparams.getHyperparams());
+        } else {
+            model = modelRepository.getOne(modelId);
+        }
+
+        if (metricId == null || modelId == null) {
+            model.getMetrics().add(metric);
+            metric.getModels().add(model);
+            modelRepository.save(model);
+        } else {
+            throw new RuntimeException("Metric-Model mapping already exits");
+        }
     }
 
     @Override
-    public void markToRebuild(String modelUUID, String metricKey, Boolean toRebuild) {
+    public void markToRebuild(String modelUUID, String metricKey, boolean toRebuild) {
+
+        AssertUtil.notNull(modelUUID, "Model UUID can't be null");
+        AssertUtil.notNull(metricKey, "Metric key can't be null");
 
         Integer modelID = modelRepositoryCustom.getModelID(metricKey, modelUUID);
-        Model model = modelRepository.getModelById(modelID);
+        Model model = modelRepository.getOne(modelID);
         model.setToRebuild(toRebuild);
         modelRepository.save(model);
 
@@ -70,8 +101,11 @@ public class ModelServiceImpl implements ModelService {
     @Override
     public void updateThresholds(String modelUUID, String metricKey, Map<String, Object> thresholds) {
 
+        AssertUtil.notNull(modelUUID, "Model UUID can't be null");
+        AssertUtil.notNull(thresholds, "Thresholds can't be null");
+
         Integer modelID = modelRepositoryCustom.getModelID(metricKey, modelUUID);
-        Model model = modelRepository.getModelById(modelID);
+        Model model = modelRepository.getOne(modelID);
         model.setThresholds(thresholds);
         modelRepository.save(model);
     }

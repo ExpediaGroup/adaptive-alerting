@@ -24,9 +24,8 @@ import java.util.Map;
  */
 
 @Data
-public class ModelParams {
+public class Hyperparams {
 
-    private String modelUUID;
     private String metricKey;
     private Map<String, Object> hyperparams;
 }

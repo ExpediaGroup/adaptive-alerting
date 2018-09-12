@@ -16,7 +16,6 @@
 package com.expedia.adaptivealerting.modelservice.dto;
 
 import lombok.Data;
-
 import java.util.Map;
 
 /**
@@ -26,7 +25,6 @@ import java.util.Map;
 @Data
 public class ThresholdParams {
 
-    private String modelUUID;
     private String metricKey;
     private Map<String, Object> thresholds;
 }
