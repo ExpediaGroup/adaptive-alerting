@@ -15,39 +15,28 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
+import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.metrics.MetricData;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
-
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * Abstract base class implementing {@link AnomalyDetector}.
  *
  * @author Willie Wheeler
  */
+@RequiredArgsConstructor
 public abstract class AbstractAnomalyDetector implements AnomalyDetector {
+    
+    @NonNull
+    @Getter
     private UUID uuid;
     
-    @Override
-    public UUID getUuid() {
-        return uuid;
+    protected AnomalyResult anomalyResult(MetricData metricData, AnomalyLevel level) {
+        return new AnomalyResult(uuid, metricData, level);
     }
-    
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
-    }
-    
-    @Override
-    public MappedMetricData classify(MappedMetricData mappedMetricData) {
-        notNull(mappedMetricData, "mappedMetricData can't be null");
-        final MappedMetricData result = new MappedMetricData(mappedMetricData, toAnomalyResult(mappedMetricData));
-        result.setDetectorType(mappedMetricData.getDetectorType());
-        result.setDetectorUuid(mappedMetricData.getDetectorUuid());
-        result.setMetricData(mappedMetricData.getMetricData());
-        return result;
-    }
-    
-    protected abstract AnomalyResult toAnomalyResult(MappedMetricData mappedMetricData);
 }

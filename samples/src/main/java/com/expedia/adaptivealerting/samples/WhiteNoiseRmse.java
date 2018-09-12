@@ -15,10 +15,8 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.control.CusumAnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.control.EwmaAnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.control.PewmaAnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.control.IndividualsControlChartDetector;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
@@ -26,8 +24,12 @@ import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartSink;
 import com.expedia.adaptivealerting.tools.pipeline.source.WhiteNoiseMetricSource;
 import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
 
+import java.util.UUID;
+
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.createChartFrame;
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showChartFrame;
+
+// Disabled CUSUM and individuals as they don't have natural predictions. [WLW]
 
 /**
  * This is a sample pipeline to calculate RMSE
@@ -39,10 +41,14 @@ public class WhiteNoiseRmse {
     public static void main(String[] args) {
         final WhiteNoiseMetricSource source = new WhiteNoiseMetricSource("white-noise", 1000L, 0.0, 1.0);
 
-        final AnomalyDetectorFilter ewmaFilter = new AnomalyDetectorFilter(new EwmaAnomalyDetector());
-        final AnomalyDetectorFilter pewmaFilter = new AnomalyDetectorFilter(new PewmaAnomalyDetector());
-        final AnomalyDetectorFilter cusumFilter = new AnomalyDetectorFilter(new CusumAnomalyDetector());
-        final AnomalyDetectorFilter shewhartIndividualsFilter = new AnomalyDetectorFilter(new IndividualsControlChartDetector());
+        final AnomalyDetectorFilter ewmaFilter =
+                new AnomalyDetectorFilter(new EwmaAnomalyDetector(UUID.randomUUID()));
+        final AnomalyDetectorFilter pewmaFilter =
+                new AnomalyDetectorFilter(new PewmaAnomalyDetector(UUID.randomUUID()));
+//        final AnomalyDetectorFilter cusumFilter =
+//                new AnomalyDetectorFilter(new CusumAnomalyDetector(UUID.randomUUID()));
+//        final AnomalyDetectorFilter shewhartIndividualsFilter =
+//                new AnomalyDetectorFilter(new IndividualsControlChartDetector(UUID.randomUUID()));
 
         final EvaluatorFilter ewmaEval = new EvaluatorFilter(new RmseEvaluator());
         final EvaluatorFilter pewmaEval = new EvaluatorFilter(new RmseEvaluator());
@@ -64,22 +70,22 @@ public class WhiteNoiseRmse {
         pewmaFilter.addSubscriber(pewmaChart);
         pewmaEval.addSubscriber(pewmaChart);
         
-        source.addSubscriber(cusumFilter);
-        cusumFilter.addSubscriber(cusumEval);
-        cusumFilter.addSubscriber(cusumChart);
-        cusumEval.addSubscriber(cusumChart);
-
-        source.addSubscriber(shewhartIndividualsFilter);
-        shewhartIndividualsFilter.addSubscriber(individualChartEval);
-        shewhartIndividualsFilter.addSubscriber(individualsChart);
-        individualChartEval.addSubscriber(individualsChart);
+//        source.addSubscriber(cusumFilter);
+//        cusumFilter.addSubscriber(cusumEval);
+//        cusumFilter.addSubscriber(cusumChart);
+//        cusumEval.addSubscriber(cusumChart);
+//
+//        source.addSubscriber(shewhartIndividualsFilter);
+//        shewhartIndividualsFilter.addSubscriber(individualChartEval);
+//        shewhartIndividualsFilter.addSubscriber(individualsChart);
+//        individualChartEval.addSubscriber(individualsChart);
 
         showChartFrame(createChartFrame(
                 "White Noise RMSE",
                 ewmaChart.getChart(),
-                pewmaChart.getChart(),
-                cusumChart.getChart(),
-                individualsChart.getChart()
+                pewmaChart.getChart()
+//                cusumChart.getChart(),
+//                individualsChart.getChart()
         ));
         source.start();
     }

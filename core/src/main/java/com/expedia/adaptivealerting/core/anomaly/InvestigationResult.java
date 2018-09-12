@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.core.anomaly;
 
 import java.util.Map;
 
+@Deprecated
 public class InvestigationResult {
     private boolean result; //TODO: review this name.
     private Map<String, Object> details; // TODO: think about structure.

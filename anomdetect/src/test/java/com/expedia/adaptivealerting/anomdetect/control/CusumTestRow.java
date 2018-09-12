@@ -16,11 +16,14 @@
 package com.expedia.adaptivealerting.anomdetect.control;
 
 import com.opencsv.bean.CsvBindByName;
+import lombok.Data;
+import lombok.ToString;
 
 /**
  * @author kashah
- *
  */
+@Data
+@ToString
 public class CusumTestRow {
 
     @CsvBindByName
@@ -40,95 +43,4 @@ public class CusumTestRow {
 
     @CsvBindByName
     private String level;
-
-    /**
-     * @return the sample
-     */
-    public int getSample() {
-        return sample;
-    }
-
-    /**
-     * @param sample
-     *            the sample to set
-     */
-    public void setSample(int sample) {
-        this.sample = sample;
-    }
-
-    /**
-     * @return the observed
-     */
-    public double getObserved() {
-        return observed;
-    }
-
-    /**
-     * @param observed
-     *            the observed to set
-     */
-    public void setObserved(double observed) {
-        this.observed = observed;
-    }
-
-    /**
-     * @return the sh
-     */
-    public double getSh() {
-        return sh;
-    }
-
-    /**
-     * @param sh
-     *            the sh to set
-     */
-    public void setSh(double sh) {
-        this.sh = sh;
-    }
-
-    /**
-     * @return the sl
-     */
-    public double getSl() {
-        return sl;
-    }
-
-    /**
-     * @param sl
-     *            the sl to set
-     */
-    public void setSl(double sl) {
-        this.sl = sl;
-    }
-
-    /**
-     * @return the stdDev
-     */
-    public double getStdDev() {
-        return stdDev;
-    }
-
-    /**
-     * @param stdDev
-     *            the stdDev to set
-     */
-    public void setStdDev(double stdDev) {
-        this.stdDev = stdDev;
-    }
-
-    /**
-     * @return the level
-     */
-    public String getLevel() {
-        return level;
-    }
-
-    /**
-     * @param level
-     *            the level to set
-     */
-    public void setLevel(String level) {
-        this.level = level;
-    }
-
 }

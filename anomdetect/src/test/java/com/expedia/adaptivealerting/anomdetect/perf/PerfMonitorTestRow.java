@@ -16,11 +16,14 @@
 package com.expedia.adaptivealerting.anomdetect.perf;
 
 import com.opencsv.bean.CsvBindByName;
+import lombok.Data;
+import lombok.ToString;
 
 /**
  * @author kashah
- *
  */
+@Data
+@ToString
 public class PerfMonitorTestRow {
 
     @CsvBindByName
@@ -31,50 +34,4 @@ public class PerfMonitorTestRow {
 
     @CsvBindByName
     private double score;
-
-    /**
-     * @return the observed
-     */
-    public double getObserved() {
-        return observed;
-    }
-
-    /**
-     * @param observed
-     *            the observed to set
-     */
-    public void setObserved(double observed) {
-        this.observed = observed;
-    }
-
-    /**
-     * @return the predicted
-     */
-    public double getPredicted() {
-        return predicted;
-    }
-
-    /**
-     * @param predicted
-     *            the predicted to set
-     */
-    public void setPredicted(double predicted) {
-        this.predicted = predicted;
-    }
-
-    /**
-     * @return the score
-     */
-    public double getScore() {
-        return score;
-    }
-
-    /**
-     * @param score
-     *            the score to set
-     */
-    public void setScore(double score) {
-        this.score = score;
-    }
-
 }

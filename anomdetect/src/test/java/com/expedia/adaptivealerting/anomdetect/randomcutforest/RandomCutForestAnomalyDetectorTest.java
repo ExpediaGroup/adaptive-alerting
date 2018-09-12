@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.anomdetect.randomcutforest;
 
 import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBeanBuilder;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -24,6 +25,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.UUID;
 
 import static junit.framework.TestCase.assertNotNull;
 
@@ -31,10 +33,16 @@ import static junit.framework.TestCase.assertNotNull;
  * @author Tatjana Kamenov
  */
 public class RandomCutForestAnomalyDetectorTest {
+    private UUID detectorUUID;
+    
+    @Before
+    public void setUp() {
+        this.detectorUUID = UUID.randomUUID();
+    }
 
     @Test
     public void testDefaultConstructor() {
-        final RandomCutForestAnomalyDetector detector = new RandomCutForestAnomalyDetector();
+        final RandomCutForestAnomalyDetector detector = new RandomCutForestAnomalyDetector(detectorUUID);
         assertNotNull(detector);
     }
 
@@ -42,12 +50,12 @@ public class RandomCutForestAnomalyDetectorTest {
     public void evaluate() {
         final ListIterator<RandomCutForestTestRow> testRows = readDataStream().listIterator();
         final RandomCutForestTestRow testRow0 = testRows.next();
-        final RandomCutForestAnomalyDetector detector = new RandomCutForestAnomalyDetector();
+        final RandomCutForestAnomalyDetector detector = new RandomCutForestAnomalyDetector(detectorUUID);
 
         while (testRows.hasNext()) {
             final RandomCutForestTestRow testRow = testRows.next();
-
             final double observed = testRow.getObserved();
+            // TODO
         }
     }
 

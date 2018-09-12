@@ -15,142 +15,46 @@
  */
 package com.expedia.adaptivealerting.core.anomaly;
 
-import com.expedia.metrics.MetricDefinition;
+import com.expedia.metrics.MetricData;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 import java.util.List;
+import java.util.UUID;
+
+// TODO Currently including the prediction and thresholds because the tools module requires these to render the model
+// bands, and because the predictor performance code depends on having predictions. Eventually I think we want to remove
+// these from AnomalyResult and stream the prediction and thresholds to visualization through some other means.
 
 /**
  * Anomaly result.
  *
  * @author Willie Wheeler
  */
+@Data
+@NoArgsConstructor
+@RequiredArgsConstructor
+@ToString
 public class AnomalyResult {
-    private Long epochSecond;
-    private Double observed;
-    private Double predicted;
-    private Double weakThresholdUpper;
-    private Double weakThresholdLower;
-    private Double strongThresholdUpper;
-    private Double strongThresholdLower;
-    private Double anomalyScore;
+    
+    @NonNull
+    private UUID detectorUUID;
+    
+    @NonNull
+    private MetricData metricData;
+    
+    @NonNull
     private AnomalyLevel anomalyLevel;
-    private MetricDefinition metricDefinition;
+    
+    @Deprecated
+    private Double predicted;
+    
+    @Deprecated
+    private AnomalyThresholds thresholds;
+    
+    @Deprecated
     private List<InvestigationResult> investigationResults;
-
-    /**
-     * Identifies the AnomalyDetector that created this AnomalyResult.
-     */
-    private String detectorUuid;
-    
-    public Long getEpochSecond() {
-        return epochSecond;
-    }
-    
-    public void setEpochSecond(Long epochSecond) {
-        this.epochSecond = epochSecond;
-    }
-    
-    public Double getObserved() {
-        return observed;
-    }
-    
-    public void setObserved(Double observed) {
-        this.observed = observed;
-    }
-    
-    public Double getPredicted() {
-        return predicted;
-    }
-    
-    public void setPredicted(Double predicted) {
-        this.predicted = predicted;
-    }
-    
-    public Double getWeakThresholdUpper() {
-        return weakThresholdUpper;
-    }
-    
-    public void setWeakThresholdUpper(Double weakThresholdUpper) {
-        this.weakThresholdUpper = weakThresholdUpper;
-    }
-    
-    public Double getWeakThresholdLower() {
-        return weakThresholdLower;
-    }
-    
-    public void setWeakThresholdLower(Double weakThresholdLower) {
-        this.weakThresholdLower = weakThresholdLower;
-    }
-    
-    public Double getStrongThresholdUpper() {
-        return strongThresholdUpper;
-    }
-    
-    public void setStrongThresholdUpper(Double strongThresholdUpper) {
-        this.strongThresholdUpper = strongThresholdUpper;
-    }
-    
-    public Double getStrongThresholdLower() {
-        return strongThresholdLower;
-    }
-    
-    public void setStrongThresholdLower(Double strongThresholdLower) {
-        this.strongThresholdLower = strongThresholdLower;
-    }
-    
-    public Double getAnomalyScore() {
-        return anomalyScore;
-    }
-    
-    public void setAnomalyScore(Double anomalyScore) {
-        this.anomalyScore = anomalyScore;
-    }
-    
-    public AnomalyLevel getAnomalyLevel() {
-        return anomalyLevel;
-    }
-    
-    public void setAnomalyLevel(AnomalyLevel anomalyLevel) {
-        this.anomalyLevel = anomalyLevel;
-    }
-
-    public MetricDefinition getMetricDefinition() {
-        return metricDefinition;
-    }
-
-    public void setMetricDefinition(MetricDefinition metricDefinition) {
-        this.metricDefinition = metricDefinition;
-    }
-
-    public List<InvestigationResult> getInvestigationResults() {
-        return investigationResults;
-    }
-
-    public void setInvestigationResults(List<InvestigationResult> investigationResults) {
-        this.investigationResults = investigationResults;
-    }
-    
-    public String getDetectorUuid() {
-        return detectorUuid;
-    }
-    
-    public void setDetectorUuid(String detectorUuid) {
-        this.detectorUuid = detectorUuid;
-    }
-    
-    @Override
-    public String toString() {
-        return "AnomalyResult{" +
-                "epochSecond=" + epochSecond +
-                ", observed=" + observed +
-                ", predicted=" + predicted +
-                ", weakThresholdUpper=" + weakThresholdUpper +
-                ", weakThresholdLower=" + weakThresholdLower +
-                ", strongThresholdUpper=" + strongThresholdUpper +
-                ", strongThresholdLower=" + strongThresholdLower +
-                ", anomalyScore=" + anomalyScore +
-                ", anomalyLevel=" + anomalyLevel +
-                ", detectorUuid=" + detectorUuid +
-                '}';
-    }
 }

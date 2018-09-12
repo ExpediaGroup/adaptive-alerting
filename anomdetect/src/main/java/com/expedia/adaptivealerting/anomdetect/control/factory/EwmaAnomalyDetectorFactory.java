@@ -29,19 +29,13 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 public final class EwmaAnomalyDetectorFactory implements AnomalyDetectorFactory<EwmaAnomalyDetector> {
     
     @Override
-    public void init(Config appConfig) {
-        notNull(appConfig, "appConfig can't be null");
+    public void init(Config config) {
+        notNull(config, "config can't be null");
     }
     
     @Override
     public EwmaAnomalyDetector create(UUID uuid) {
         notNull(uuid, "uuid can't be null");
-        // TODO Look up params
-        if (UUID.fromString("5159c1b8-94ca-424f-b25c-e9f5bcb2fc51").equals(uuid)) {
-
-            // Super noisy detector
-            return new EwmaAnomalyDetector(0.15, 0.5, 1.0, 0.0);
-        }
-        return null;
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 }

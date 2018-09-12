@@ -17,6 +17,11 @@ package com.expedia.adaptivealerting.core.data;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.metrics.MetricData;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 import java.util.UUID;
 
@@ -32,76 +37,30 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  *
  * @author Willie Wheeler
  */
+@Data
+@NoArgsConstructor
+@RequiredArgsConstructor
+@ToString
 public final class MappedMetricData {
+    
+    @NonNull
     private MetricData metricData;
+    
+    @NonNull
     private UUID detectorUuid;
+    
+    @NonNull
     private String detectorType;
+    
     private AnomalyResult anomalyResult;
     
-    /**
-     * To support serialization.
-     */
-    public MappedMetricData() {
-    }
-    
-    public MappedMetricData(MetricData metricData, UUID detectorUuid, String detectorType) {
-        notNull(metricData, "metricData can't be null");
-        notNull(detectorUuid, "detectorUuid can't be null");
-        notNull(detectorType, "detectorType can't be null");
-        this.metricData = metricData;
-        this.detectorUuid = detectorUuid;
-        this.detectorType = detectorType;
-    }
-    
-    public MappedMetricData(MappedMetricData orig, AnomalyResult result) {
+    public MappedMetricData(MappedMetricData orig, AnomalyResult anomalyResult) {
         notNull(orig, "orig can't be null");
-        notNull(result, "result can't be null");
+        notNull(anomalyResult, "anomalyResult can't be null");
         
         this.metricData = orig.getMetricData();
         this.detectorUuid = orig.getDetectorUuid();
         this.detectorType = orig.getDetectorType();
-        this.anomalyResult = result;
-    }
-    
-    public MetricData getMetricData() {
-        return metricData;
-    }
-    
-    public void setMetricData(MetricData mpoint) {
-        this.metricData = mpoint;
-    }
-    
-    public UUID getDetectorUuid() {
-        return detectorUuid;
-    }
-    
-    public void setDetectorUuid(UUID detectorUuid) {
-        this.detectorUuid = detectorUuid;
-    }
-    
-    public String getDetectorType() {
-        return detectorType;
-    }
-    
-    public void setDetectorType(String detectorType) {
-        this.detectorType = detectorType;
-    }
-    
-    public AnomalyResult getAnomalyResult() {
-        return anomalyResult;
-    }
-    
-    public void setAnomalyResult(AnomalyResult anomalyResult) {
         this.anomalyResult = anomalyResult;
-    }
-    
-    @Override
-    public String toString() {
-        return "MappedMetricData{" +
-                "metricData=" + metricData +
-                ", detectorUuid=" + detectorUuid +
-                ", detectorType='" + detectorType + '\'' +
-                ", anomalyResult=" + anomalyResult +
-                '}';
     }
 }

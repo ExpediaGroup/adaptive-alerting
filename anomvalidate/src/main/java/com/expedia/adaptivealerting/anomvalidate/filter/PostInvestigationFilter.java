@@ -22,13 +22,13 @@ import com.expedia.adaptivealerting.core.data.MappedMetricData;
 
 import java.util.Objects;
 
-public class PostInvestigationFilter  implements InvestigationFilter {
-
+public class PostInvestigationFilter implements InvestigationFilter {
+    
     // TODO: make configurable
     @Override
     public boolean keep(MappedMetricData mappedMetricData) {
-
-        if(mappedMetricData==null){
+        
+        if (mappedMetricData == null) {
             return false;
         }
         AnomalyResult anomalyResult = mappedMetricData.getAnomalyResult();

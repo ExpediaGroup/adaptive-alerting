@@ -18,10 +18,14 @@ package com.expedia.adaptivealerting.anomdetect.control;
 import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.metrics.MetricData;
+import lombok.Getter;
+import lombok.ToString;
+
+import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.*;
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 import static java.lang.Math.abs;
 
 /**
@@ -33,55 +37,65 @@ import static java.lang.Math.abs;
  *
  * @author kashah
  */
-public class CusumAnomalyDetector extends AbstractAnomalyDetector {
-    public static final int LEFT_TAILED = 0;
-    public static final int RIGHT_TAILED = 1;
-    public static final int TWO_TAILED = 2;
-    public static final double STD_DEV_DIVISOR = 1.128;
-
-    private final int tail;
-
+@ToString
+public final class CusumAnomalyDetector extends AbstractAnomalyDetector {
+    public enum Type {
+        LEFT_TAILED,
+        RIGHT_TAILED,
+        TWO_TAILED
+    }
+    
+    private static final double STD_DEV_DIVISOR = 1.128;
+    
+    @Getter
+    private Type type;
+    
     /**
      * Local Moving range. Used to calculate standard deviation.
      */
     private double movingRange;
-
+    
     /**
      * Local previous value.
      */
     private double prevValue;
-
+    
     /**
      * Local total no of received data points.
      */
     private int totalDataPoints;
-
+    
     /**
      * Local warm up period value. Minimum no of data points required before it can be used for actual anomaly
      * detection.
      */
+    @Getter
     private int warmUpPeriod;
-
+    
     /**
      * Local cumulative sum on the high side. SH
      */
+    @Getter
     private double sumHigh;
-
+    
     /**
      * Local cumulative sum on the low side. SL
      */
+    @Getter
     private double sumLow;
-
+    
     /**
-     * Strong outlier threshold, in sigmas.
+     * Strong anomaly threshold, in sigmas.
      */
-    private final double strongThresholdSigmas;
-
+    @Getter
+    private double strongSigmas;
+    
     /**
-     * Weak outlier threshold, in sigmas.
+     * Weak anomaly threshold, in sigmas.
      */
-    private final double weakThresholdSigmas;
-
+    @Getter
+    private double weakSigmas;
+    
     /**
      * Local target value.
      */
@@ -91,44 +105,41 @@ public class CusumAnomalyDetector extends AbstractAnomalyDetector {
      * Local slack param value.
      */
     private double slackParam;
-
+    
     /**
-     * Creates a new CUSUM detector with left tail (tail=0), initValue = 0.0, slackParam = 0.5, warmUpPeriod = 25,
-     * weakThresholdSigmas = 3.0, strongThresholdSigmas = 4.0 and targetValue = 0.0
+     * Creates a new CUSUM detector with left type, initValue = 0.0, slackParam = 0.5, warmUpPeriod = 25,
+     * weakSigmas = 3.0, strongSigmas = 4.0 and targetValue = 0.0
      */
-    public CusumAnomalyDetector() {
-        this(0, 0.0, 0.5, 25, 3.0, 4.0, 0.0);
+    public CusumAnomalyDetector(UUID uuid) {
+        this(uuid, Type.LEFT_TAILED, 0.0, 0.5, 25, 3.0, 4.0, 0.0);
     }
-
+    
     /**
      * Creates a new CUSUM detector. Initial mean is given by initValue and initial variance is 0.
      *
-     * @param tail
-     *            Either LEFT_TAILED, RIGHT_TAILED or TWO_TAILED
-     * @param initValue
-     *            Initial observation, used to set the first mean estimate.
-     * @param slackParam
-     *            Slack param to calculate slack value k where k = slack param * stdev
-     * @param warmUpPeriod
-     *            Warm up period value. Minimum no of data points required before it can be used for actual anomaly
-     *            detection.
-     * @param weakThresholdSigmas
-     *            Weak outlier threshold, in sigmas.
-     * @param strongThresholdSigmas
-     *            Strong outlier threshold, in sigmas.
-     * @param targetValue
-     *            User defined target value
+     * @param uuid         Detector UUID
+     * @param type         Either LEFT_TAILED, RIGHT_TAILED or TWO_TAILED
+     * @param initValue    Initial observation, used to set the first mean estimate.
+     * @param slackParam   Slack param to calculate slack value k where k = slack param * stdev
+     * @param warmUpPeriod Warm up period value. Minimum no of data points required before it can be used for
+     *                     actual anomaly detection.
+     * @param weakSigmas   Weak outlier threshold, in sigmas.
+     * @param strongSigmas Strong outlier threshold, in sigmas.
+     * @param targetValue  User defined target value
      */
     public CusumAnomalyDetector(
-            int tail,
+            UUID uuid,
+            Type type,
             double initValue,
             double slackParam,
             int warmUpPeriod,
-            double weakThresholdSigmas,
-            double strongThresholdSigmas,
+            double weakSigmas,
+            double strongSigmas,
             double targetValue) {
         
-        this.tail = tail;
+        super(uuid);
+        
+        this.type = type;
         this.prevValue = initValue;
         this.slackParam = slackParam;
         this.warmUpPeriod = warmUpPeriod;
@@ -136,119 +147,75 @@ public class CusumAnomalyDetector extends AbstractAnomalyDetector {
         this.totalDataPoints = 1;
         this.sumHigh = 0.0;
         this.sumLow = 0.0;
-        this.weakThresholdSigmas = weakThresholdSigmas;
-        this.strongThresholdSigmas = strongThresholdSigmas;
+        this.weakSigmas = weakSigmas;
+        this.strongSigmas = strongSigmas;
         this.targetValue = targetValue;
-    }
-
-    public double getTargetValue() {
-        return targetValue;
-    }
-
-    public double getSumHigh() {
-        return sumHigh;
-    }
-
-    public double getSumLow() {
-        return sumLow;
-    }
-
-    public double getWeakThresholdSigmas() {
-        return weakThresholdSigmas;
-    }
-
-    public double getStrongThresholdSigmas() {
-        return strongThresholdSigmas;
-    }
-
-    public int getWarmUpPeriod() {
-        return warmUpPeriod;
-    }
-
-    public double getSlackParam() {
-        return slackParam;
     }
     
     @Override
-    protected AnomalyResult toAnomalyResult(MappedMetricData mappedMetricData) {
-        final MetricData metricData = mappedMetricData.getMetricData();
+    public AnomalyResult classify(MetricData metricData) {
+        notNull(metricData, "metricData can't be null");
+        
         final double observed = metricData.getValue();
+        
         this.movingRange += abs(prevValue - observed);
         final double averageMovingRange = getAverageMovingRange();
-        final double dist = abs(observed - targetValue);
         final double stdDev = averageMovingRange / STD_DEV_DIVISOR;
         final double slack = slackParam * stdDev;
-        final double weakThreshold = weakThresholdSigmas * stdDev;
-        final double strongThreshold = strongThresholdSigmas * stdDev;
+        final double weakThreshold = weakSigmas * stdDev;
+        final double strongThreshold = strongSigmas * stdDev;
         
         this.sumHigh = Math.max(0, sumHigh + observed - (targetValue + slack));
         this.sumLow = Math.min(0, sumLow + observed - (targetValue - slack));
         this.prevValue = observed;
         this.totalDataPoints++;
         
-        Double weakThresholdUpper = null;
-        Double weakThresholdLower = null;
-        Double strongThresholdUpper = null;
-        Double strongThresholdLower = null;
-        AnomalyLevel anomalyLevel = null;
+        // TODO Evaluate whether we can use an AnomalyThresholds here. [WLW]
+        Double upperStrong;
+        Double upperWeak;
+        Double lowerStrong;
+        Double lowerWeak;
+        AnomalyLevel level;
         
         if (totalDataPoints <= warmUpPeriod) {
-            anomalyLevel = UNKNOWN;
+            level = UNKNOWN;
         } else {
-            anomalyLevel = NORMAL;
-            switch (tail) {
+            level = NORMAL;
+            switch (type) {
                 case LEFT_TAILED:
-                    weakThresholdLower = -weakThreshold;
-                    strongThresholdLower = -strongThreshold;
-                    if (sumLow <= strongThresholdLower) {
-                        anomalyLevel = STRONG;
+                    lowerWeak = -weakThreshold;
+                    lowerStrong = -strongThreshold;
+                    if (sumLow <= lowerStrong) {
+                        level = STRONG;
                         resetSums();
-                    } else if (sumLow <= weakThresholdLower) {
-                        anomalyLevel = WEAK;
+                    } else if (sumLow <= lowerWeak) {
+                        level = WEAK;
                     }
                     break;
                 case RIGHT_TAILED:
-                    weakThresholdUpper = weakThreshold;
-                    strongThresholdUpper = strongThreshold;
-                    if (sumHigh >= strongThresholdUpper) {
-                        anomalyLevel = STRONG;
+                    upperWeak = weakThreshold;
+                    upperStrong = strongThreshold;
+                    if (sumHigh >= upperStrong) {
+                        level = STRONG;
                         resetSums();
-                    } else if (sumHigh > weakThresholdUpper) {
-                        anomalyLevel = WEAK;
+                    } else if (sumHigh > upperWeak) {
+                        level = WEAK;
                     }
                     break;
                 case TWO_TAILED:
-                    weakThresholdLower = -weakThreshold;
-                    strongThresholdLower = -strongThreshold;
-                    weakThresholdUpper = weakThreshold;
-                    strongThresholdUpper = strongThreshold;
                     if (sumHigh >= strongThreshold || sumLow <= strongThreshold) {
-                        anomalyLevel = STRONG;
+                        level = STRONG;
                         resetSums();
                     } else if (sumHigh > weakThreshold || sumLow <= weakThreshold) {
-                        anomalyLevel = WEAK;
+                        level = WEAK;
                     }
                     break;
                 default:
-                    throw new IllegalStateException("Illegal tail: " + tail);
+                    throw new IllegalStateException("Illegal type: " + type);
             }
         }
         
-        // FIXME These settings aren't consistent with the current visualization approach.
-        // We probably need to make fewer assumptions about the algo in the AnomalyResult class, and support different
-        // result approaches. [WLW]
-        final AnomalyResult result = new AnomalyResult();
-        result.setMetricDefinition(metricData.getMetricDefinition());
-        result.setEpochSecond(metricData.getTimestamp());
-        result.setObserved(observed);
-        result.setPredicted(targetValue);
-        result.setWeakThresholdUpper(weakThresholdUpper);
-        result.setWeakThresholdLower(weakThresholdLower);
-        result.setStrongThresholdUpper(strongThresholdUpper);
-        result.setStrongThresholdLower(strongThresholdLower);
-        result.setAnomalyScore(dist);
-        result.setAnomalyLevel(anomalyLevel);
-        return result;
+        return anomalyResult(metricData, level);
     }
     
     private double getAverageMovingRange() {
@@ -257,7 +224,7 @@ public class CusumAnomalyDetector extends AbstractAnomalyDetector {
         }
         return movingRange;
     }
-
+    
     private void resetSums() {
         this.sumHigh = 0.0;
         this.sumLow = 0.0;

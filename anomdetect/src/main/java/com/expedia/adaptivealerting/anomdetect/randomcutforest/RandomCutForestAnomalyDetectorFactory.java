@@ -38,6 +38,6 @@ public final class RandomCutForestAnomalyDetectorFactory
         notNull(uuid, "uuid can't be null");
         
         // TODO Return different models for different metrics. [WLW]
-        return new RandomCutForestAnomalyDetector();
+        return new RandomCutForestAnomalyDetector(uuid);
     }
 }

@@ -33,7 +33,7 @@ public class AnomalyResultTimeStampExtractor implements TimestampExtractor {
             // Returns -1 as timestamp which ultimately causes the record to be skipped and not to be processed
             return -1;
         }
-        Long epochSecond = ((AnomalyResult) record.value()).getEpochSecond();
+        Long epochSecond = ((AnomalyResult) record.value()).getMetricData().getTimestamp();
         return epochSecond == null ? -1 : epochSecond * 1000;
     }
 }

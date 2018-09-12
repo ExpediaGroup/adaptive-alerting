@@ -17,7 +17,9 @@ package com.expedia.adaptivealerting.anomdetect.aquila;
 
 import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.metrics.MetricData;
+
+import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
@@ -28,9 +30,13 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  */
 public final class AquilaAnomalyDetector extends AbstractAnomalyDetector {
     
+    public AquilaAnomalyDetector(UUID uuid) {
+        super(uuid);
+    }
+    
     @Override
-    protected AnomalyResult toAnomalyResult(MappedMetricData mappedMetricData) {
-        notNull(mappedMetricData, "mappedMetricData can't be null");
+    public AnomalyResult classify(MetricData metricData) {
+        notNull(metricData, "metricData can't be null");
         throw new UnsupportedOperationException("Not yet implemented");
     }
 }

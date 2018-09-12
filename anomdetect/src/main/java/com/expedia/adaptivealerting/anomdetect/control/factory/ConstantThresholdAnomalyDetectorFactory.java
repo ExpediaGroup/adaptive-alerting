@@ -30,14 +30,13 @@ public class ConstantThresholdAnomalyDetectorFactory
         implements AnomalyDetectorFactory<ConstantThresholdAnomalyDetector> {
     
     @Override
-    public void init(Config appConfig) {
-        notNull(appConfig, "appConfig can't be null");
+    public void init(Config config) {
+        notNull(config, "config can't be null");
     }
     
     @Override
     public ConstantThresholdAnomalyDetector create(UUID uuid) {
         notNull(uuid, "uuid can't be null");
-        // TODO Look up bounds based on UUID.
-        return null;
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 }

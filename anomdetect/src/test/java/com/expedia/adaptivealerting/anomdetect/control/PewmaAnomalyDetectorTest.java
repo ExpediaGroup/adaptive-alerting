@@ -16,8 +16,6 @@
 package com.expedia.adaptivealerting.anomdetect.control;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.core.util.MathUtil;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
@@ -42,24 +40,28 @@ import static junit.framework.TestCase.assertEquals;
  * @author David Sutherland
  */
 public class PewmaAnomalyDetectorTest {
-    private static final double WEAK_THRESHOLD = 2.0;
-    private static final double STRONG_THRESHOLD = 3.0;
+    private static final double WEAK_SIGMAS = 2.0;
+    private static final double STRONG_SIGMAS = 3.0;
     private static final double DEFAULT_ALPHA = 0.05;
+    private static final double TOLERANCE = 0.00001;
     
+    private static final String SAMPLE_INPUT_PATH = "tests/pewma-sample-input.csv";
+    private static final String CAL_INFLOW_PATH = "tests/cal-inflow-tests-pewma.csv";
+    
+    private UUID detectorUUID;
     private MetricDefinition metricDefinition;
     private long epochSecond;
-    private UUID uuid;
     
     @Before
     public void setUp() {
+        this.detectorUUID = UUID.randomUUID();
         this.metricDefinition = new MetricDefinition("some-key");
         this.epochSecond = Instant.now().getEpochSecond();
-        this.uuid = UUID.randomUUID();
     }
     
     @Test
     public void testDefaultConstructor() {
-        final PewmaAnomalyDetector detector = new PewmaAnomalyDetector();
+        final PewmaAnomalyDetector detector = new PewmaAnomalyDetector(detectorUUID);
         assertEquals(0.0, detector.getMean());
     }
     
@@ -67,12 +69,12 @@ public class PewmaAnomalyDetectorTest {
     public void pewmaCloseToEwmaWithZeroBeta() throws IOException {
         double beta = 0.0;
         
-        final ListIterator<String[]> testRows = readCsv("tests/pewma-sample-input.csv").listIterator();
+        final ListIterator<String[]> testRows = readData_sampleInput().listIterator();
         final Double initialValue = Double.parseDouble(testRows.next()[0]);
         final PewmaAnomalyDetector pewmaOutlierDetector = new PewmaAnomalyDetector(
-                DEFAULT_ALPHA, beta, WEAK_THRESHOLD, STRONG_THRESHOLD, initialValue);
+                detectorUUID, DEFAULT_ALPHA, beta, STRONG_SIGMAS, WEAK_SIGMAS, initialValue);
         final EwmaAnomalyDetector ewmaOutlierDetector = new EwmaAnomalyDetector(
-                DEFAULT_ALPHA, WEAK_THRESHOLD, STRONG_THRESHOLD, initialValue);
+                detectorUUID, DEFAULT_ALPHA, STRONG_SIGMAS, WEAK_SIGMAS, initialValue);
         
         int rowCount = 1;
         while (testRows.hasNext()) {
@@ -83,15 +85,13 @@ public class PewmaAnomalyDetectorTest {
             double threshold = 1.0 / rowCount; // results converge with more iterations
             assertApproxEqual(ewmaOutlierDetector.getMean(), pewmaOutlierDetector.getMean(), threshold);
             assertApproxEqual(ewmaStdDev, pewmaOutlierDetector.getStdDev(), threshold);
-    
-            final MappedMetricData mappedMetricData = toMappedMetricData(epochSecond, observed);
-            final AnomalyResult pewmaResult = pewmaOutlierDetector.classify(mappedMetricData).getAnomalyResult();
-            final AnomalyResult ewmaResult = ewmaOutlierDetector.classify(mappedMetricData).getAnomalyResult();
             
-            AnomalyLevel pOL = pewmaResult.getAnomalyLevel();
-            AnomalyLevel eOL = ewmaResult.getAnomalyLevel();
+            final MetricData metricData = new MetricData(metricDefinition, observed, epochSecond);
+            final AnomalyLevel pewmaLevel = pewmaOutlierDetector.classify(metricData).getAnomalyLevel();
+            final AnomalyLevel ewmaLevel = ewmaOutlierDetector.classify(metricData).getAnomalyLevel();
+            
             if (rowCount > PewmaAnomalyDetector.DEFAULT_TRAINING_LENGTH) {
-                assertEquals(pOL, eOL);
+                assertEquals(pewmaLevel, ewmaLevel);
             }
             rowCount++;
         }
@@ -104,31 +104,30 @@ public class PewmaAnomalyDetectorTest {
         final ListIterator<PewmaTestRow> testRows = readData_calInflow().listIterator();
         final PewmaTestRow testRow0 = testRows.next();
         final PewmaAnomalyDetector detector = new PewmaAnomalyDetector(
-                DEFAULT_ALPHA, beta, WEAK_THRESHOLD, STRONG_THRESHOLD, testRow0.getObserved());
+                detectorUUID, DEFAULT_ALPHA, beta, STRONG_SIGMAS, WEAK_SIGMAS, testRow0.getObserved());
         
         while (testRows.hasNext()) {
             final PewmaTestRow testRow = testRows.next();
             
             final double observed = testRow.getObserved();
-    
-            final MappedMetricData mappedMetricData = toMappedMetricData(epochSecond, observed);
-            final AnomalyResult result = detector.classify(mappedMetricData).getAnomalyResult();
             
-            final AnomalyLevel level = result.getAnomalyLevel();
-            assertApproxEqual(testRow.getMean(), detector.getMean(), 0.00001);
-            assertApproxEqual(testRow.getStd(), detector.getStdDev(), 0.00001);
+            final MetricData metricData = new MetricData(metricDefinition, observed, epochSecond);
+            final AnomalyLevel level = detector.classify(metricData).getAnomalyLevel();
+            
+            assertApproxEqual(testRow.getMean(), detector.getMean(), TOLERANCE);
+            assertApproxEqual(testRow.getStd(), detector.getStdDev(), TOLERANCE);
             assertEquals(AnomalyLevel.valueOf(testRow.getLevel()), level);
         }
     }
     
-    private static List<String[]> readCsv(String path) throws IOException {
-        final InputStream is = ClassLoader.getSystemResourceAsStream(path);
+    private static List<String[]> readData_sampleInput() throws IOException {
+        final InputStream is = ClassLoader.getSystemResourceAsStream(SAMPLE_INPUT_PATH);
         CSVReader reader = new CSVReader(new InputStreamReader(is));
         return reader.readAll();
     }
     
     private static List<PewmaTestRow> readData_calInflow() {
-        final InputStream is = ClassLoader.getSystemResourceAsStream("tests/cal-inflow-tests-pewma.csv");
+        final InputStream is = ClassLoader.getSystemResourceAsStream(CAL_INFLOW_PATH);
         return new CsvToBeanBuilder<PewmaTestRow>(new InputStreamReader(is))
                 .withType(PewmaTestRow.class)
                 .build()
@@ -137,10 +136,5 @@ public class PewmaAnomalyDetectorTest {
     
     private static void assertApproxEqual(double d1, double d2, double tolerance) {
         TestCase.assertTrue(d1 + " !~ " + d2, MathUtil.isApproximatelyEqual(d1, d2, tolerance));
-    }
-    
-    private MappedMetricData toMappedMetricData(long epochSecond, double value) {
-        final MetricData metricData = new MetricData(metricDefinition, value, epochSecond);
-        return new MappedMetricData(metricData, uuid, "pewma-detector");
     }
 }

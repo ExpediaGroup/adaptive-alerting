@@ -24,13 +24,14 @@ import com.expedia.adaptivealerting.anomdetect.randomcutforest.beans.Scores;
 import com.expedia.adaptivealerting.anomdetect.randomcutforest.util.PropertiesCache;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.metrics.MetricData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
@@ -39,14 +40,14 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * Anomaly detector based on the Random Cut Forest (RCF) algorithm provided by AWS Sagemaker.
  * </p>
  * <p>
- * To get a prediction if a metric point is an anomaly, endpoint in AWS needs to be invoked.
- * It sends back score which is the likeliness of a metric point to be an anomaly.
- * A metric point is likely an anomaly if it's value is higher than score_cutoff, usually set as score_cutoff = score_mean + 3 * score_std
+ * To get a prediction if a metric point is an anomaly, endpoint in AWS needs to be invoked. It sends back score which
+ * is the likeliness of a metric point to be an anomaly. A metric point is likely an anomaly if it's value is higher
+ * than score_cutoff, usually set as score_cutoff = score_mean + 3 * score_std
  * </p>
  * <p>
- * This detector is using shingles to obtain better results with the RCF algoritm. The shingles implementation is in the
- * MetricPointQueue. To do predictions, the MetricPointQueue needs to be full. At start, MetricPoints sent will just
- * fill the MetricPointQueue. Anomaly scoring is executed after the queue is fully filled.
+ * This detector is using shingles to obtain better results with the RCF algorithm. The shingles implementation is in
+ * {@link Shingle}. To do predictions, the shingle needs to be full. At start, metric data sent will just fill the
+ * shingle. Anomaly scoring is executed after the queue is fully filled.
  * </p>
  *
  * <p>
@@ -55,7 +56,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author Tatjana Kamenov
  */
 public class RandomCutForestAnomalyDetector extends AbstractAnomalyDetector {
-
     private static final String TEXT_CSV_CONTENT_TYPE = "text/csv";
     private static final String APPLICATION_JSON_ACCEPT = "application/json";
 
@@ -71,7 +71,8 @@ public class RandomCutForestAnomalyDetector extends AbstractAnomalyDetector {
     public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     //TODO Consider passing endpoint, shingle size and score cutoff to constructor
-    public RandomCutForestAnomalyDetector() {
+    public RandomCutForestAnomalyDetector(UUID uuid) {
+        super(uuid);
         this.shingle = new Shingle(SHINGLE_SIZE);
         this.amazonSageMaker = AmazonSageMakerRuntimeClientBuilder.standard().withRegion(AWS_REGION).build();
         this.invokeEndpointRequest = new InvokeEndpointRequest();
@@ -79,28 +80,23 @@ public class RandomCutForestAnomalyDetector extends AbstractAnomalyDetector {
     }
     
     @Override
-    public AnomalyResult toAnomalyResult(MappedMetricData mappedMetricData) {
-        notNull(mappedMetricData, "metricPoint can't be null");
-
-        this.shingle.offer(mappedMetricData);
-
-        final AnomalyResult anomalyResult = new AnomalyResult();
+    public AnomalyResult classify(MetricData metricData) {
+        notNull(metricData, "metricData can't be null");
+        
+        this.shingle.offer(metricData);
+        
+        AnomalyLevel level = AnomalyLevel.UNKNOWN;
         if (this.shingle.isReady()) {
             final double anomalyScore = getAnomalyScore();
-            anomalyResult.setEpochSecond(mappedMetricData.getMetricData().getTimestamp());
-            anomalyResult.setAnomalyScore(anomalyScore);
             if (anomalyScore < WEAK_SCORE_CUTOFF) {
-                anomalyResult.setAnomalyLevel(AnomalyLevel.NORMAL);
+                level = AnomalyLevel.NORMAL;
             } else if (anomalyScore < STRONG_SCORE_CUTOFF) {
-                anomalyResult.setAnomalyLevel(AnomalyLevel.WEAK);
+                level = AnomalyLevel.WEAK;
             } else {
-                anomalyResult.setAnomalyLevel(AnomalyLevel.STRONG);
+                level = AnomalyLevel.STRONG;
             }
-            anomalyResult.setMetricDefinition(mappedMetricData.getMetricData().getMetricDefinition());
-            anomalyResult.setObserved(new Double(mappedMetricData.getMetricData().getValue()));
-            anomalyResult.setEpochSecond(mappedMetricData.getMetricData().getTimestamp());
         }
-        return anomalyResult;
+        return anomalyResult(metricData, level);
     }
 
     /**
@@ -108,13 +104,11 @@ public class RandomCutForestAnomalyDetector extends AbstractAnomalyDetector {
      * @return AWS anomaly score as a double
      */
     private double getAnomalyScore() {
-
         final String shingleBody = this.shingle.toCsv().get();
-
-        final Optional<ByteBuffer> bodyBuffer = Optional.of(ByteBuffer.wrap(shingleBody.getBytes(StandardCharsets.UTF_8)));
+        final Optional<ByteBuffer> bodyBuffer =
+                Optional.of(ByteBuffer.wrap(shingleBody.getBytes(StandardCharsets.UTF_8)));
 
         if (bodyBuffer.isPresent()) {
-
             invokeEndpointRequest.setBody(bodyBuffer.get());
             invokeEndpointRequest.setEndpointName(ENDPOINT);
             invokeEndpointRequest.setAccept(APPLICATION_JSON_ACCEPT);

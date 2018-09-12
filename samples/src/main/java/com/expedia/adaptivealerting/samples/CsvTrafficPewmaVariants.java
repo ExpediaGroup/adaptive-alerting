@@ -27,6 +27,7 @@ import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
 import com.expedia.metrics.MetricDefinition;
 
 import java.io.InputStream;
+import java.util.UUID;
 
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.createChartFrame;
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showChartFrame;
@@ -44,11 +45,11 @@ public class CsvTrafficPewmaVariants {
         final MetricFrameMetricSource source = new MetricFrameMetricSource(frame, "data", 200L);
         
         final AnomalyDetectorFilter ad1 =
-                new AnomalyDetectorFilter(new PewmaAnomalyDetector(0.15, 1.0, 2.0, 3.0, 0.0));
+                new AnomalyDetectorFilter(new PewmaAnomalyDetector(UUID.randomUUID(), 0.15, 1.0, 3.0, 2.0, 0.0));
         final AnomalyDetectorFilter ad2 =
-                new AnomalyDetectorFilter(new PewmaAnomalyDetector(0.25, 1.0, 2.0, 3.0, 0.0));
+                new AnomalyDetectorFilter(new PewmaAnomalyDetector(UUID.randomUUID(), 0.25, 1.0, 3.0, 2.0, 0.0));
         final AnomalyDetectorFilter ad3 =
-                new AnomalyDetectorFilter(new PewmaAnomalyDetector(0.35, 1.0, 2.0, 3.0, 0.0));
+                new AnomalyDetectorFilter(new PewmaAnomalyDetector(UUID.randomUUID(), 0.35, 1.0, 3.0, 2.0, 0.0));
     
         final EvaluatorFilter eval1 = new EvaluatorFilter(new RmseEvaluator());
         final EvaluatorFilter eval2 = new EvaluatorFilter(new RmseEvaluator());

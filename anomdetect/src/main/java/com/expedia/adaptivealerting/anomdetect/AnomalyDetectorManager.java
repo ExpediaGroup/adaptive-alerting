@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.anomdetect;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
+import com.expedia.metrics.MetricData;
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 
@@ -116,21 +117,18 @@ public final class AnomalyDetectorManager {
      * @param mappedMetricData Mapped metric point.
      * @return The mapped metric point, or {@code null} if there's no associated detector.
      */
-    public MappedMetricData classify(MappedMetricData mappedMetricData) {
+    public AnomalyResult classify(MappedMetricData mappedMetricData) {
         notNull(mappedMetricData, "mappedMetricData can't be null");
+        
         final AnomalyDetector detector = detectorFor(mappedMetricData);
+        
         if (detector == null) {
             return null;
         }
-
-        MappedMetricData retVal = detector.classify(mappedMetricData);
-        AnomalyResult result = retVal.getAnomalyResult();
-        log.info(
-                "Result: resultLevel={} hashcode={} tags={}",
-                result.getAnomalyLevel(),
-                result.getMetricDefinition().getTags().hashCode(),
-                result.getMetricDefinition().getTags().toString()
-        );
-        return retVal;
+        
+        final MetricData metricData = mappedMetricData.getMetricData();
+        final AnomalyResult result = detector.classify(metricData);
+        log.trace("AnomalyResult: {}", result);
+        return result;
     }
 }

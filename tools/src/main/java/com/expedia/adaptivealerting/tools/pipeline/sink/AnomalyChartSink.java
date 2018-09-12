@@ -17,10 +17,13 @@ package com.expedia.adaptivealerting.tools.pipeline.sink;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.adaptivealerting.core.evaluator.ModelEvaluation;
 import com.expedia.adaptivealerting.tools.pipeline.util.AnomalyResultSubscriber;
 import com.expedia.adaptivealerting.tools.pipeline.util.ModelEvaluationSubscriber;
 import com.expedia.adaptivealerting.tools.visualization.ChartSeries;
+import com.expedia.metrics.MetricData;
+import lombok.Getter;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeries;
@@ -36,6 +39,8 @@ import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.toSecon
  * @author Willie Wheeler
  */
 public final class AnomalyChartSink implements AnomalyResultSubscriber, ModelEvaluationSubscriber {
+    
+    @Getter
     private final JFreeChart chart;
     private final ChartSeries chartSeries;
     private final String baseTitle;
@@ -50,30 +55,24 @@ public final class AnomalyChartSink implements AnomalyResultSubscriber, ModelEva
         this.baseTitle = chart.getTitle().getText();
     }
     
-    public JFreeChart getChart() {
-        return chart;
-    }
-    
-    public ChartSeries getChartSeries() {
-        return chartSeries;
-    }
-    
     @Override
     public void next(AnomalyResult result) {
         notNull(result, "result can't be null");
         
-        final long epochSecond = result.getEpochSecond();
-        final double observed = result.getObserved();
+        final MetricData metricData = result.getMetricData();
+        final long epochSecond = metricData.getTimestamp();
+        final double observed = metricData.getValue();
         final AnomalyLevel level = result.getAnomalyLevel();
+        final AnomalyThresholds thresholds = result.getThresholds();
+    
         final Second second = toSecond(epochSecond);
-        
         chartSeries.getObserved().add(second, observed);
         
         addValue(chartSeries.getPredicted(), second, result.getPredicted());
-        addValue(chartSeries.getWeakThresholdUpper(), second, result.getWeakThresholdUpper());
-        addValue(chartSeries.getWeakThresoldLower(), second, result.getWeakThresholdLower());
-        addValue(chartSeries.getStrongThresholdUpper(), second, result.getStrongThresholdUpper());
-        addValue(chartSeries.getStrongThresholdLower(), second, result.getStrongThresholdLower());
+        addValue(chartSeries.getWeakThresholdUpper(), second, thresholds.getUpperWeak());
+        addValue(chartSeries.getWeakThresoldLower(), second, thresholds.getLowerWeak());
+        addValue(chartSeries.getStrongThresholdUpper(), second, thresholds.getUpperStrong());
+        addValue(chartSeries.getStrongThresholdLower(), second, thresholds.getLowerStrong());
         
         if (level == STRONG) {
             chartSeries.getStrongOutlier().add(second, observed);

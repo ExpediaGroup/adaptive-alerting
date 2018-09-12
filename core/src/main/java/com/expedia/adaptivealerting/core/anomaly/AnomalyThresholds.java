@@ -1,0 +1,91 @@
+/*
+ * Copyright 2018 Expedia Group, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.expedia.adaptivealerting.core.anomaly;
+
+import lombok.Data;
+import lombok.ToString;
+
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
+
+/**
+ * Weak and strong thresholds to support both one- and two-tailed tests.
+ *
+ * @author Willie Wheeler
+ */
+@Data
+@ToString
+public class AnomalyThresholds {
+    private Double upperStrong;
+    private Double upperWeak;
+    private Double lowerStrong;
+    private Double lowerWeak;
+    
+    public AnomalyThresholds(Double upperStrong, Double upperWeak, Double lowerStrong, Double lowerWeak) {
+        if (upperStrong != null) {
+            isTrue(upperWeak == null || upperStrong >= upperWeak, "Required: upperStrong >= upperWeak");
+            isTrue(lowerWeak == null || upperStrong >= lowerWeak, "Required: upperStrong >= lowerWeak");
+            isTrue(lowerStrong == null || upperStrong >= lowerStrong, "Required: upperStrong >= lowerStrong");
+        }
+        if (upperWeak != null) {
+            isTrue(lowerWeak == null || upperWeak >= lowerWeak, "Required: upperWeak >= lowerWeak");
+            isTrue(lowerStrong == null || upperWeak >= lowerStrong, "Required: upperWeak >= lowerStrong");
+        }
+        if (lowerWeak != null) {
+            isTrue(lowerStrong == null || lowerWeak >= lowerStrong, "Required: lowerWeak >= lowerStrong");
+        }
+    
+        this.upperStrong = upperStrong;
+        this.upperWeak = upperWeak;
+        this.lowerStrong = lowerStrong;
+        this.lowerWeak = lowerWeak;
+    }
+    
+    public AnomalyLevel classify(double value) {
+        if (upperStrong != null && value >= upperStrong) {
+            return AnomalyLevel.STRONG;
+        } else if (upperWeak != null && value >= upperWeak) {
+            return AnomalyLevel.WEAK;
+        } else if (lowerStrong != null && value <= lowerStrong) {
+            return AnomalyLevel.STRONG;
+        } else if (lowerWeak != null && value <= lowerWeak) {
+            return AnomalyLevel.WEAK;
+        } else {
+            return AnomalyLevel.NORMAL;
+        }
+    }
+    
+    /**
+     * Legacy classification to handle exclusive bounds, since some of the detectors were using this previously, and
+     * hence have unit tests that expect it.
+     *
+     * @param value Value to classify.
+     * @return Anomaly classification.
+     */
+    @Deprecated
+    public AnomalyLevel classifyExclusiveBounds(double value) {
+        if (upperStrong != null && value > upperStrong) {
+            return AnomalyLevel.STRONG;
+        } else if (upperWeak != null && value > upperWeak) {
+            return AnomalyLevel.WEAK;
+        } else if (lowerStrong != null && value < lowerStrong) {
+            return AnomalyLevel.STRONG;
+        } else if (lowerWeak != null && value < lowerWeak) {
+            return AnomalyLevel.WEAK;
+        } else {
+            return AnomalyLevel.NORMAL;
+        }
+    }
+}
