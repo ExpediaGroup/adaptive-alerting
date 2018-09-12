@@ -13,9 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/**
- *
- */
 package com.expedia.adaptivealerting.tools.pipeline.filter;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
@@ -46,7 +43,7 @@ public final class EvaluatorFilter implements AnomalyResultSubscriber {
     @Override
     public void next(AnomalyResult anomalyResult) {
         notNull(anomalyResult, "anomalyResult can't be null");
-        evaluator.update(anomalyResult.getObserved(), anomalyResult.getPredicted());
+        evaluator.update(anomalyResult.getMetricData().getValue(), anomalyResult.getPredicted());
         publish(evaluator.evaluate());
     }
     

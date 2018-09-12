@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.control;
 
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.core.util.MathUtil;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
@@ -25,7 +24,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.time.Instant;
@@ -45,34 +43,34 @@ public class EwmaAnomalyDetectorTest {
     private static final double STRONG_SIGMAS = DEFAULT_STRONG_SIGMAS;
     private static final double TOLERANCE = 0.001;
     
+    private UUID detectorUUID;
     private MetricDefinition metricDefinition;
     private long epochSecond;
-    private UUID uuid;
     private static List<EwmaTestRow> data;
     
     @BeforeClass
-    public static void setUpClass() throws IOException {
+    public static void setUpClass() {
         readData_calInflow();
     }
     
     @Before
     public void setUp() {
+        this.detectorUUID = UUID.randomUUID();
         this.metricDefinition = new MetricDefinition("some-key");
         this.epochSecond = Instant.now().getEpochSecond();
-        this.uuid = UUID.randomUUID();
     }
     
     @Test
     public void testDefaultConstructor() {
-        final EwmaAnomalyDetector detector = new EwmaAnomalyDetector();
+        final EwmaAnomalyDetector detector = new EwmaAnomalyDetector(detectorUUID);
         assertEquals(0.15, detector.getAlpha());
-        assertEquals(WEAK_SIGMAS, detector.getWeakThresholdSigmas());
-        assertEquals(STRONG_SIGMAS, detector.getStrongThresholdSigmas());
+        assertEquals(STRONG_SIGMAS, detector.getStrongSigmas());
+        assertEquals(WEAK_SIGMAS, detector.getWeakSigmas());
     }
     
     @Test(expected = IllegalArgumentException.class)
     public void testConstructor_alphaOutOfRange() {
-        new EwmaAnomalyDetector(2.0, 100.0, 150.0, 0.0);
+        new EwmaAnomalyDetector(detectorUUID, 2.0, 150.0, 100.0, 0.0);
     }
     
     @Test
@@ -84,12 +82,13 @@ public class EwmaAnomalyDetectorTest {
         final ListIterator<EwmaTestRow> testRows = data.listIterator();
         final EwmaTestRow testRow0 = testRows.next();
         final double observed0 = testRow0.getObserved();
-        final EwmaAnomalyDetector detector = new EwmaAnomalyDetector(alpha, WEAK_SIGMAS, STRONG_SIGMAS, observed0);
-    
+        final EwmaAnomalyDetector detector =
+                new EwmaAnomalyDetector(detectorUUID, alpha, STRONG_SIGMAS, WEAK_SIGMAS, observed0);
+        
         // Params
         assertEquals(alpha, detector.getAlpha());
-        assertEquals(WEAK_SIGMAS, detector.getWeakThresholdSigmas());
-        assertEquals(STRONG_SIGMAS, detector.getStrongThresholdSigmas());
+        assertEquals(STRONG_SIGMAS, detector.getStrongSigmas());
+        assertEquals(WEAK_SIGMAS, detector.getWeakSigmas());
         
         // Seed observation
         assertEquals(observed0, detector.getMean());
@@ -99,8 +98,8 @@ public class EwmaAnomalyDetectorTest {
             final EwmaTestRow testRow = testRows.next();
             final int observed = testRow.getObserved();
             
-            final MappedMetricData mappedMetricData = toMappedMetricData(epochSecond, observed);
-            detector.classify(mappedMetricData);
+            final MetricData metricData = new MetricData(metricDefinition, observed, epochSecond);
+            detector.classify(metricData);
             
             assertApproxEqual(testRow.getKnownMean(), testRow.getMean());
             assertApproxEqual(testRow.getMean(), detector.getMean());
@@ -115,15 +114,10 @@ public class EwmaAnomalyDetectorTest {
                 .withType(EwmaTestRow.class)
                 .build()
                 .parse();
-
+        
     }
     
     private static void assertApproxEqual(double d1, double d2) {
         TestCase.assertTrue(MathUtil.isApproximatelyEqual(d1, d2, TOLERANCE));
-    }
-    
-    private MappedMetricData toMappedMetricData(long epochSecond, double value) {
-        final MetricData metricData = new MetricData(metricDefinition, value, epochSecond);
-        return new MappedMetricData(metricData, uuid, "ewma-detector");
     }
 }

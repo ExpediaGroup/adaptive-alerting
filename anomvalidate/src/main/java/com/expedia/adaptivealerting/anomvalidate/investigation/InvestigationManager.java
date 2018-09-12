@@ -18,52 +18,59 @@ package com.expedia.adaptivealerting.anomvalidate.investigation;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.InvestigationResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.metrics.MetricData;
+import com.expedia.metrics.MetricDefinition;
+import com.expedia.metrics.TagCollection;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+@Slf4j
 public class InvestigationManager {
-    private static final Logger LOGGER = LoggerFactory.getLogger(InvestigationManager.class);
     private static final int DEFAULT_TIMEOUT_MS = 30000;
     private String endpoint;
     private int timeoutMs;
     private final ObjectReader reader = new ObjectMapper().readerFor(new TypeReference<List<InvestigationResult>>() {});
     private final ObjectWriter writer = new ObjectMapper().writerFor(AnomalyResult.class);
-
+    
     public InvestigationManager(String endpoint, Integer timeoutMs) {
         this.endpoint = endpoint;
         this.timeoutMs = timeoutMs == null ? DEFAULT_TIMEOUT_MS : timeoutMs;
     }
-
+    
+    // TODO Return InvestigationResults, not MappedMetricData
     public MappedMetricData investigate(MappedMetricData mappedMetricData) {
         if (mappedMetricData != null) {
-            AnomalyResult anomalyResult = mappedMetricData.getAnomalyResult();
+            final AnomalyResult anomalyResult = mappedMetricData.getAnomalyResult();
+            final MetricData metricData = anomalyResult.getMetricData();
+            final MetricDefinition metricDefinition = metricData.getMetricDefinition();
+            final TagCollection tags = metricDefinition.getTags();
+            
             if (anomalyResult != null) {
                 anomalyResult.setInvestigationResults(requestInvestigation(anomalyResult));
-                LOGGER.info(
+                log.info(
                         "Investigation: investigationResultsSize={} resultLevel={} hashcode={} tags={}",
                         anomalyResult.getInvestigationResults() == null
                                 ? 0 : anomalyResult.getInvestigationResults().size(),
                         anomalyResult.getAnomalyLevel(),
-                        anomalyResult.getMetricDefinition().getTags().hashCode(),
-                        anomalyResult.getMetricDefinition().getTags().toString()
+                        tags.hashCode(),
+                        tags.toString()
                 );
             }
         }
         return mappedMetricData;
     }
-
+    
     private List<InvestigationResult> requestInvestigation(AnomalyResult result) {
         if (StringUtils.isEmpty(endpoint)) {
             return Collections.emptyList();
@@ -78,14 +85,13 @@ public class InvestigationManager {
                     .execute()
                     .returnContent()
                     .asString();
-
+            
             return reader.readValue(response);
         } catch (IOException e) {
-            LOGGER.error("Error while investigating.", e);
-            LOGGER.error("Trying to Post to: " + endpoint);
-            LOGGER.error("Data posted: " + postData);
+            log.error("Error while investigating.", e);
+            log.error("Data posted: {}", postData);
             if (e instanceof HttpResponseException) {
-                LOGGER.error("Status Code: " + ((HttpResponseException) e).getStatusCode());
+                log.error("Status code: {}", ((HttpResponseException) e).getStatusCode());
             }
             return Collections.emptyList();
         }

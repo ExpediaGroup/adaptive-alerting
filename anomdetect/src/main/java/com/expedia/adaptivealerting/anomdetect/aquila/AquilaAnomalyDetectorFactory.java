@@ -38,8 +38,7 @@ public class AquilaAnomalyDetectorFactory implements AnomalyDetectorFactory {
     @Override
     public AnomalyDetector create(UUID uuid) {
         notNull(uuid, "uuid can't be null");
-        final AquilaAnomalyDetector detector = new AquilaAnomalyDetector();
-        detector.setUuid(uuid);
+        final AquilaAnomalyDetector detector = new AquilaAnomalyDetector(uuid);
         return detector;
     }
 }

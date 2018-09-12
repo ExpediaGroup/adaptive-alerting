@@ -26,11 +26,12 @@ import java.util.Random;
  * @author Willie Wheeler
  */
 public final class RandomWalkMetricSource extends AbstractMetricSource {
+    private long currentEpochSecond = Instant.now().getEpochSecond();
     private int currentValue = 0;
     private final Random random = new Random();
     
     /**
-     * Creates a new random walk metric source with name "random-walk", period=1000 and startValue=0.
+     * Creates a new random walk metric source with name "random-walk", period=1000L and startValue=0.
      */
     public RandomWalkMetricSource() {
         this("random-walk", 1000L, 0);
@@ -43,8 +44,9 @@ public final class RandomWalkMetricSource extends AbstractMetricSource {
     
     @Override
     public MetricData next() {
-        final MetricData result = new MetricData(getMetricDefinition(), Instant.now().getEpochSecond(), currentValue);
+        final MetricData result = new MetricData(getMetricDefinition(), currentValue, currentEpochSecond);
         final int movement = 1 - random.nextInt(3);
+        this.currentEpochSecond++;
         this.currentValue += movement;
         return result;
     }

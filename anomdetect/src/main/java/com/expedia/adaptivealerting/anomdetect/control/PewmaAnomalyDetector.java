@@ -18,12 +18,17 @@ package com.expedia.adaptivealerting.anomdetect.control;
 import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.metrics.MetricData;
+import lombok.Getter;
+import lombok.ToString;
 
-import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.*;
-import static java.lang.Math.*;
+import java.util.UUID;
+
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static java.lang.Math.exp;
+import static java.lang.Math.sqrt;
 
 /**
  * <p>
@@ -41,7 +46,8 @@ import static java.lang.Math.*;
  *
  * @author David Sutherland
  */
-public class PewmaAnomalyDetector extends AbstractAnomalyDetector {
+@ToString
+public final class PewmaAnomalyDetector extends AbstractAnomalyDetector {
     static final int DEFAULT_TRAINING_LENGTH = 30;
     
     /**
@@ -75,31 +81,33 @@ public class PewmaAnomalyDetector extends AbstractAnomalyDetector {
     private double s2;
     
     /**
-     * Strong outlier threshold, in sigmas.
+     * Strong anomaly threshold, in sigmas.
      */
-    private final double strongThresholdSigmas;
+    private final double strongSigmas;
     
     /**
-     * Weak outlier threshold, in sigmas.
+     * Weak anomaly threshold, in sigmas.
      */
-    private final double weakThresholdSigmas;
+    private final double weakSigmas;
     
     /**
      * Local mean estimate.
      */
+    @Getter
     private double mean;
     
     /**
      * Local standard deviation estimate.
      */
+    @Getter
     private double stdDev;
     
     /**
-     * Creates a new PEWMA outlier detector with initialAlpha = 0.15, beta = 1.0, weakThresholdSigmas = 3.0,
-     * strongThresholdSigmas = 4.0 and initValue = 0.0.
+     * Creates a new PEWMA outlier detector with initialAlpha = 0.15, beta = 1.0, weakSigmas = 3.0,
+     * strongSigmas = 4.0 and initValue = 0.0.
      */
-    public PewmaAnomalyDetector() {
-        this(0.15, 1.0, 3.0, 4.0, 0.0);
+    public PewmaAnomalyDetector(UUID uuid) {
+        this(uuid, 0.15, 1.0, 4.0, 3.0, 0.0);
     }
     
     // FIXME "initialAlpha" is a confusing name for this parameter as it suggests that the value evolves over time.
@@ -117,101 +125,80 @@ public class PewmaAnomalyDetector extends AbstractAnomalyDetector {
     /**
      * Creates a new PEWMA outlier detector. Initial mean is given by initValue and initial standard deviation is 0.
      *
-     * @param initialAlpha          Smoothing parameter.
-     * @param beta                  Outlier weighting parameter.
-     * @param weakThresholdSigmas   Weak outlier threshold, in sigmas.
-     * @param strongThresholdSigmas Strong outlier threshold, in sigmas.
-     * @param initValue             Initial observation, used to set the first mean estimate.
+     * @param uuid         Detector UUID.
+     * @param initialAlpha Smoothing parameter.
+     * @param beta         Outlier weighting parameter.
+     * @param strongSigmas Strong outlier threshold, in sigmas.
+     * @param weakSigmas   Weak outlier threshold, in sigmas.
+     * @param initValue    Initial observation, used to set the first mean estimate.
      */
     public PewmaAnomalyDetector(
+            UUID uuid,
             double initialAlpha,
             double beta,
-            double weakThresholdSigmas,
-            double strongThresholdSigmas,
-            double initValue
-    ) {
-        this(initialAlpha, beta, DEFAULT_TRAINING_LENGTH, weakThresholdSigmas, strongThresholdSigmas, initValue);
+            double strongSigmas,
+            double weakSigmas,
+            double initValue) {
+        
+        this(uuid, initialAlpha, beta, DEFAULT_TRAINING_LENGTH, strongSigmas, weakSigmas, initValue);
     }
     
     /**
      * Creates a new PEWMA outlier detector. Initial mean is given by initValue and initial standard deviation is 0.
      *
-     * @param initialAlpha          Smoothing parameter.
-     * @param beta                  Outlier weighting parameter.
-     * @param trainingLength        How many iterations to train for.
-     * @param weakThresholdSigmas   Weak outlier threshold, in sigmas.
-     * @param strongThresholdSigmas Strong outlier threshold, in sigmas.
-     * @param initValue             Initial observation, used to set the first mean estimate.
+     * @param initialAlpha   Smoothing parameter.
+     * @param beta           Outlier weighting parameter.
+     * @param trainingLength How many iterations to train for.
+     * @param strongSigmas   Strong outlier threshold, in sigmas.
+     * @param weakSigmas     Weak outlier threshold, in sigmas.
+     * @param initValue      Initial observation, used to set the first mean estimate.
      */
     public PewmaAnomalyDetector(
+            UUID uuid,
             double initialAlpha,
             double beta,
             int trainingLength,
-            double weakThresholdSigmas,
-            double strongThresholdSigmas,
-            double initValue
-    ) {
+            double strongSigmas,
+            double weakSigmas,
+            double initValue) {
+        
+        super(uuid);
+        
         AssertUtil.isBetween(initialAlpha, 0.0, 1.0, "initialAlpha must be in the range [0, 1]");
         
-        this.alpha0 = 1 - initialAlpha;  // To standardise with the EWMA implementation we use the complement value.
+        this.alpha0 = 1.0 - initialAlpha;  // To standardise with the EWMA implementation we use the complement value.
         this.beta = beta;
         this.trainingLength = trainingLength;
         this.trainingCount = 1;
-        this.weakThresholdSigmas = weakThresholdSigmas;
-        this.strongThresholdSigmas = strongThresholdSigmas;
+        this.weakSigmas = weakSigmas;
+        this.strongSigmas = strongSigmas;
         this.s1 = initValue;
         this.s2 = initValue * initValue;
+        
         updateMeanAndStdDev();
     }
     
-    public double getMean() {
-        return mean;
-    }
-    
-    public double getStdDev() {
-        return stdDev;
-    }
-    
     @Override
-    public String toString() {
-        return "PewmaAnomalyDetector{" +
-                "alpha0=" + alpha0 +
-                ", beta=" + beta +
-                ", trainingLength=" + trainingLength +
-                ", weakThresholdSigmas=" + weakThresholdSigmas +
-                ", strongThresholdSigmas=" + strongThresholdSigmas +
-                '}';
-    }
-    
-    @Override
-    protected AnomalyResult toAnomalyResult(MappedMetricData mappedMetricData) {
-        final MetricData metricData = mappedMetricData.getMetricData();
+    public AnomalyResult classify(MetricData metricData) {
+        notNull(metricData, "metricData can't be null");
+        
         final double observed = metricData.getValue();
-        final double dist = abs(observed - mean);
-        final double weakThreshold = weakThresholdSigmas * stdDev;
-        final double strongThreshold = strongThresholdSigmas * stdDev;
-    
-        AnomalyLevel anomalyLevel = NORMAL;
-        if (dist > strongThreshold) {
-            anomalyLevel = STRONG;
-        } else if (dist > weakThreshold) {
-            anomalyLevel = WEAK;
-        }
-
-        final AnomalyResult result = new AnomalyResult();
-        result.setMetricDefinition(metricData.getMetricDefinition());
-        result.setEpochSecond(metricData.getTimestamp());
-        result.setObserved(observed);
-        result.setPredicted(mean);
-        result.setWeakThresholdUpper(mean + weakThreshold);
-        result.setWeakThresholdLower(mean - weakThreshold);
-        result.setStrongThresholdUpper(mean + strongThreshold);
-        result.setStrongThresholdLower(mean - strongThreshold);
-        result.setAnomalyScore(dist);
-        result.setAnomalyLevel(anomalyLevel);
-    
+        final double strongDelta = strongSigmas * stdDev;
+        final double weakDelta = weakSigmas * stdDev;
+        
+        final AnomalyThresholds thresholds = new AnomalyThresholds(
+                mean + strongDelta,
+                mean + weakDelta,
+                mean - strongDelta,
+                mean - weakDelta);
+        
         updateEstimates(observed);
-    
+        
+        final AnomalyLevel level = thresholds.classifyExclusiveBounds(observed);
+        
+        final AnomalyResult result = anomalyResult(metricData, level);
+        result.setPredicted(mean);
+        result.setThresholds(thresholds);
         return result;
     }
     

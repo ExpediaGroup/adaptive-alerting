@@ -17,7 +17,9 @@ package com.expedia.adaptivealerting.anomdetect.perf;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.evaluator.Evaluator;
-import com.expedia.adaptivealerting.core.util.AssertUtil;
+
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * <p>
@@ -45,31 +47,34 @@ public class PerformanceMonitor {
      * @param maxTicks  Maximum number of ticks before reset.
      */
     public PerformanceMonitor(PerfMonListener listener, Evaluator evaluator, int maxTicks) {
-        AssertUtil.notNull(listener, "Listener can't be null");
-        AssertUtil.notNull(evaluator, "Evaluator can't be null");
-        AssertUtil.isTrue(maxTicks > 0, "Max ticks should be greather than 0");
+        notNull(listener, "Listener can't be null");
+        notNull(evaluator, "Evaluator can't be null");
+        isTrue(maxTicks > 0, "Max ticks should be greather than 0");
         
         this.listener = listener;
         this.evaluator = evaluator;
         this.maxTicks = maxTicks;
+        
         resetCounter();
     }
     
     public double evaluatePerformance(AnomalyResult result) {
-        double observed = result.getObserved();
+        notNull(result, "result can't be null");
+        
+        double observed = result.getMetricData().getValue();
         double predicted = result.getPredicted();
         evaluator.update(observed, predicted);
         double evaluatorScore = evaluator.evaluate().getEvaluatorScore();
-        
+
         if (tickCounter >= maxTicks) {
             listener.processScore(evaluatorScore);
             evaluator.reset();
             resetCounter();
-            return evaluatorScore;
         } else {
             this.tickCounter++;
-            return evaluatorScore;
         }
+        
+        return evaluatorScore;
     }
     
     private void resetCounter() {

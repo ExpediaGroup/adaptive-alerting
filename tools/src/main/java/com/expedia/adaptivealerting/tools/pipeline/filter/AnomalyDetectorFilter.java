@@ -17,14 +17,12 @@ package com.expedia.adaptivealerting.tools.pipeline.filter;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.tools.pipeline.util.AnomalyResultSubscriber;
 import com.expedia.adaptivealerting.tools.pipeline.util.MetricDataSubscriber;
 import com.expedia.metrics.MetricData;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
@@ -45,13 +43,7 @@ public final class AnomalyDetectorFilter implements MetricDataSubscriber {
     @Override
     public void next(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
-        
-        // TODO For now, wrap with a dummy MappedMetricData since that's what the AnomalyDetector currently expects.
-        // But we should update AnomalyDetector to accept a MetricData and return an AnomalyResult. [WLW]
-        final MappedMetricData dummyWrapper = new MappedMetricData(metricData, UUID.randomUUID(), "dummy-type");
-        
-        final MappedMetricData resultWrapper = anomalyDetector.classify(dummyWrapper);
-        publish(resultWrapper.getAnomalyResult());
+        publish(anomalyDetector.classify(metricData));
     }
 
     public void addSubscriber(AnomalyResultSubscriber subscriber) {

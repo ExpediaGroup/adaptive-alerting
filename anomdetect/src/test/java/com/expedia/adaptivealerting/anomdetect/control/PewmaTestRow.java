@@ -16,7 +16,9 @@
 package com.expedia.adaptivealerting.anomdetect.control;
 
 import com.opencsv.bean.CsvBindByName;
+import lombok.Data;
 
+@Data
 public class PewmaTestRow {
     
     @CsvBindByName
@@ -30,36 +32,4 @@ public class PewmaTestRow {
     
     @CsvBindByName
     private double std;
-
-    public double getObserved() {
-        return observed;
-    }
-
-    public void setObserved(double observed) {
-        this.observed = observed;
-    }
-
-    public double getMean() {
-        return mean;
-    }
-
-    public void setMean(double mean) {
-        this.mean = mean;
-    }
-
-    public String getLevel() {
-        return level;
-    }
-
-    public void setLevel(String level) {
-        this.level = level;
-    }
-
-    public double getStd() {
-        return std;
-    }
-
-    public void setStd(double std) {
-        this.std = std;
-    }
 }

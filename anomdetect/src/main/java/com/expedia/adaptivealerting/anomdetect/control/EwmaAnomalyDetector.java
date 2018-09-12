@@ -18,14 +18,17 @@ package com.expedia.adaptivealerting.anomdetect.control;
 import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.adaptivealerting.core.util.AssertUtil;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.metrics.MetricData;
+import lombok.Getter;
+import lombok.ToString;
+
+import java.util.UUID;
 
 import static com.expedia.adaptivealerting.anomdetect.NSigmasClassifier.DEFAULT_STRONG_SIGMAS;
 import static com.expedia.adaptivealerting.anomdetect.NSigmasClassifier.DEFAULT_WEAK_SIGMAS;
-import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.*;
-import static java.lang.Math.abs;
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isBetween;
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 import static java.lang.Math.sqrt;
 
 /**
@@ -44,115 +47,97 @@ import static java.lang.Math.sqrt;
  * @see <a href="https://en.wikipedia.org/wiki/Moving_average#Exponentially_weighted_moving_variance_and_standard_deviation">Exponentially weighted moving average and standard deviation</a>
  * @see <a href="https://www.itl.nist.gov/div898/handbook/pmc/section3/pmc324.htm">EWMA Control Charts</a>
  */
-public class EwmaAnomalyDetector extends AbstractAnomalyDetector {
+@ToString
+public final class EwmaAnomalyDetector extends AbstractAnomalyDetector {
     
     /**
      * Smoothing param. Somewhat misnamed because higher values lead to less smoothing, but it's called the smoothing
      * parameter in the literature.
      */
+    @Getter
     private double alpha;
     
     /**
-     * Strong outlier threshold, in sigmas.
+     * Strong anomaly threshold, in sigmas.
      */
-    private double strongThresholdSigmas;
+    @Getter
+    private double strongSigmas;
     
     /**
-     * Weak outlier threshold, in sigmas.
+     * Weak anomaly threshold, in sigmas.
      */
-    private double weakThresholdSigmas;
+    @Getter
+    private double weakSigmas;
     
     /**
      * Local mean estimate.
      */
+    @Getter
     private double mean;
     
     /**
      * Local variance estimate.
      */
+    @Getter
     private double variance;
     
     /**
-     * Creates a new EWMA outlier detector with alpha = 0.15, weakThresholdSigmas = 3.0, strongThresholdSigmas = 4.0 and
+     * Creates a new EWMA outlier detector with alpha = 0.15, weakSigmas = 3.0, strongSigmas = 4.0 and
      * initValue = 0.0.
      */
-    public EwmaAnomalyDetector() {
-        this(0.15, DEFAULT_WEAK_SIGMAS, DEFAULT_STRONG_SIGMAS, 0.0);
+    public EwmaAnomalyDetector(UUID uuid) {
+        this(uuid, 0.15, DEFAULT_STRONG_SIGMAS, DEFAULT_WEAK_SIGMAS, 0.0);
     }
     
     /**
-     * Creates a new EWMA outlier detector. Initial mean is given by initValue and initial variance is 0.
+     * Creates a new EWMA anomaly detector. Initial mean is given by initValue and initial variance is 0.
      *
-     * @param alpha                 Smoothing parameter.
-     * @param weakThresholdSigmas   Weak outlier threshold, in sigmas.
-     * @param strongThresholdSigmas Strong outlier threshold, in sigmas.
-     * @param initValue             Initial observation, used to set the first mean estimate.
+     * @param uuid         Detector UUID.
+     * @param alpha        Smoothing parameter.
+     * @param strongSigmas Strong outlier threshold, in sigmas.
+     * @param weakSigmas   Weak outlier threshold, in sigmas.
+     * @param initValue    Initial observation, used to set the first mean estimate.
      */
     public EwmaAnomalyDetector(
+            UUID uuid,
             double alpha,
-            double weakThresholdSigmas,
-            double strongThresholdSigmas,
+            double strongSigmas,
+            double weakSigmas,
             double initValue) {
         
-        AssertUtil.isBetween(alpha, 0.0, 1.0, "alpha must be in the range [0, 1]");
+        super(uuid);
+        
+        isBetween(alpha, 0.0, 1.0, "alpha must be in the range [0, 1]");
         
         this.alpha = alpha;
-        this.weakThresholdSigmas = weakThresholdSigmas;
-        this.strongThresholdSigmas = strongThresholdSigmas;
+        this.strongSigmas = strongSigmas;
+        this.weakSigmas = weakSigmas;
         this.mean = initValue;
         this.variance = 0.0;
     }
     
-    public double getAlpha() {
-        return alpha;
-    }
-    
-    public double getWeakThresholdSigmas() {
-        return weakThresholdSigmas;
-    }
-    
-    public double getStrongThresholdSigmas() {
-        return strongThresholdSigmas;
-    }
-    
-    public double getMean() {
-        return mean;
-    }
-    
-    public double getVariance() {
-        return variance;
-    }
-    
     @Override
-    protected AnomalyResult toAnomalyResult(MappedMetricData mappedMetricData) {
-        final MetricData metricData = mappedMetricData.getMetricData();
+    public AnomalyResult classify(MetricData metricData) {
+        notNull(metricData, "metricData can't be null");
+        
         final double observed = metricData.getValue();
-        final double dist = abs(observed - mean);
         final double stdDev = sqrt(variance);
-        final double weakThreshold = weakThresholdSigmas * stdDev;
-        final double strongThreshold = strongThresholdSigmas * stdDev;
+        final double strongDelta = strongSigmas * stdDev;
+        final double weakDelta = weakSigmas * stdDev;
         
-        AnomalyLevel anomalyLevel = NORMAL;
-        if (dist > strongThreshold) {
-            anomalyLevel = STRONG;
-        } else if (dist > weakThreshold) {
-            anomalyLevel = WEAK;
-        }
-        
-        final AnomalyResult result = new AnomalyResult();
-        result.setMetricDefinition(metricData.getMetricDefinition());
-        result.setEpochSecond(metricData.getTimestamp());
-        result.setObserved(observed);
-        result.setPredicted(mean);
-        result.setWeakThresholdUpper(mean + weakThreshold);
-        result.setWeakThresholdLower(mean - weakThreshold);
-        result.setStrongThresholdUpper(mean + strongThreshold);
-        result.setStrongThresholdLower(mean - strongThreshold);
-        result.setAnomalyScore(dist);
-        result.setAnomalyLevel(anomalyLevel);
+        final AnomalyThresholds thresholds = new AnomalyThresholds(
+                mean + strongDelta,
+                mean + weakDelta,
+                mean - strongDelta,
+                mean - weakDelta);
         
         updateEstimates(observed);
         
+        final AnomalyLevel level = thresholds.classify(observed);
+        
+        final AnomalyResult result = anomalyResult(metricData, level);
+        result.setPredicted(mean);
+        result.setThresholds(thresholds);
         return result;
     }
     
@@ -168,14 +153,5 @@ public class EwmaAnomalyDetector extends AbstractAnomalyDetector {
         // https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Online_algorithm
         // https://www.johndcook.com/blog/2008/09/26/comparing-three-methods-of-computing-standard-deviation/
         this.variance = (1.0 - alpha) * (variance + diff * incr);
-    }
-    
-    @Override
-    public String toString() {
-        return "EwmaAnomalyDetector{" +
-                "alpha=" + alpha +
-                ", weakThresholdSigmas=" + weakThresholdSigmas +
-                ", strongThresholdSigmas=" + strongThresholdSigmas +
-                '}';
     }
 }

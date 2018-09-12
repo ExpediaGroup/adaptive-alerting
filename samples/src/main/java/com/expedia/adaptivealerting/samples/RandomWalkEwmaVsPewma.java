@@ -24,6 +24,8 @@ import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartSink;
 import com.expedia.adaptivealerting.tools.pipeline.source.RandomWalkMetricSource;
 import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
 
+import java.util.UUID;
+
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.createChartFrame;
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showChartFrame;
 
@@ -37,8 +39,8 @@ public class RandomWalkEwmaVsPewma {
     public static void main(String[] args) {
         final RandomWalkMetricSource source = new RandomWalkMetricSource();
         
-        final AnomalyDetectorFilter ewmaAD = new AnomalyDetectorFilter(new EwmaAnomalyDetector());
-        final AnomalyDetectorFilter pewmaAD = new AnomalyDetectorFilter(new PewmaAnomalyDetector());
+        final AnomalyDetectorFilter ewmaAD = new AnomalyDetectorFilter(new EwmaAnomalyDetector(UUID.randomUUID()));
+        final AnomalyDetectorFilter pewmaAD = new AnomalyDetectorFilter(new PewmaAnomalyDetector(UUID.randomUUID()));
         
         final EvaluatorFilter ewmaEval = new EvaluatorFilter(new RmseEvaluator());
         final EvaluatorFilter pewmaEval = new EvaluatorFilter(new RmseEvaluator());

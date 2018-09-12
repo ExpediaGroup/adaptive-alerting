@@ -1,14 +1,26 @@
+/*
+ * Copyright 2018 Expedia Group, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.expedia.adaptivealerting.anomdetect.randomcutforest;
 
-
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.time.Instant;
-import java.util.UUID;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -18,7 +30,6 @@ public class ShingleTest {
     
     private MetricDefinition metricDefinition;
     private long epochSecond;
-    private UUID uuid;
     
     @Before
     public void setUp() {
@@ -26,7 +37,6 @@ public class ShingleTest {
         
         this.metricDefinition = new MetricDefinition("some-key");
         this.epochSecond = Instant.now().getEpochSecond();
-        this.uuid = UUID.randomUUID();
     }
     
     @Test
@@ -41,15 +51,15 @@ public class ShingleTest {
     public void isReadyTest() {
         shingle = new Shingle();
         
-        shingle.offer(toMappedMetricData(epochSecond, 1.0));
+        shingle.offer(toMetricData(epochSecond, 1.0));
         assertFalse(shingle.isReady());
         
         for (int i = 2; i <= 10; i++) {
-            shingle.offer(toMappedMetricData(epochSecond, i));
+            shingle.offer(toMetricData(epochSecond, i));
         }
         assertTrue(shingle.isReady());
-    
-        shingle.offer(toMappedMetricData(epochSecond, 11.0));
+        
+        shingle.offer(toMetricData(epochSecond, 11.0));
         assertTrue(shingle.isReady());
     }
     
@@ -58,7 +68,7 @@ public class ShingleTest {
         shingle = new Shingle();
         
         for (int i = 1; i <= 10; i++) {
-            shingle.offer(toMappedMetricData(epochSecond, i));
+            shingle.offer(toMetricData(epochSecond, i));
         }
         assertTrue(shingle.isReady());
         String out = shingle.toCsv().get();
@@ -66,9 +76,7 @@ public class ShingleTest {
         assertTrue(out.equals(expectedOut));
     }
     
-    
-    private MappedMetricData toMappedMetricData(long epochSecond, double value) {
-        final MetricData metricData = new MetricData(metricDefinition, value, epochSecond);
-        return new MappedMetricData(metricData, uuid, "pewma-detector");
+    private MetricData toMetricData(long epochSecond, double value) {
+        return new MetricData(metricDefinition, value, epochSecond);
     }
 }

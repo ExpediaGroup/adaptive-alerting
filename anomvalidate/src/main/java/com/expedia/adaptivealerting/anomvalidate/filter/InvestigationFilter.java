@@ -20,7 +20,6 @@ import com.expedia.adaptivealerting.core.data.MappedMetricData;
 public interface InvestigationFilter {
 
     /**
-     *
      * @param mappedMetricData The MappedMetricData to perform filtering on.
      * @return whether to keep the MappedMetricData in the output.
      */

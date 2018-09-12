@@ -18,15 +18,14 @@ package com.expedia.adaptivealerting.anomdetect.perf;
 import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.adaptivealerting.core.util.AssertUtil;
+import com.expedia.metrics.MetricData;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.UUID;
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * Wrapper around {@link AnomalyDetector}. It feeds the performance monitor with a listener and pushes the
- * classification outputs to the perfmon every time a new {@link MappedMetricData} comes in.
+ * classification outputs to the perfmon every time a new {@link MetricData} comes in.
  *
  * @author kashah
  */
@@ -36,26 +35,27 @@ public class MonitoredDetector extends AbstractAnomalyDetector {
     private PerformanceMonitor perfMonitor;
     
     public MonitoredDetector(AnomalyDetector detector, PerformanceMonitor perfMonitor) {
-        AssertUtil.notNull(detector, "detector can't be null");
-        AssertUtil.notNull(perfMonitor, "perfMonitor can't be null");
+        
+        // This wrapper becomes the model's detector.
+        super(detector.getUuid());
+        
+        notNull(detector, "detector can't be null");
+        notNull(perfMonitor, "perfMonitor can't be null");
+        
         this.detector = detector;
         this.perfMonitor = perfMonitor;
     }
     
     @Override
-    public UUID getUuid() {
-        return detector.getUuid();
-    }
-    
-    @Override
-    protected AnomalyResult toAnomalyResult(MappedMetricData mappedMetricData) {
-        MappedMetricData classified = detector.classify(mappedMetricData);
-        AnomalyResult result = classified.getAnomalyResult();
+    public AnomalyResult classify(MetricData metricData) {
+        notNull(metricData, "metricData can't be null");
+        final AnomalyResult result = detector.classify(metricData);
         perfMonitor.evaluatePerformance(result);
         return result;
     }
-
+    
     public static class PerfMonHandler implements PerfMonListener {
+        
         @Override
         public void processScore(double score) {
             log.info("Performance score: {}", score);

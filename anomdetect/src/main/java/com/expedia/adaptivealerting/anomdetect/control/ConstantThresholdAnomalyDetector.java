@@ -18,111 +18,37 @@ package com.expedia.adaptivealerting.anomdetect.control;
 import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.adaptivealerting.core.util.AssertUtil;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.metrics.MetricData;
+import lombok.Getter;
+import lombok.ToString;
 
-import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.*;
+import java.util.UUID;
+
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
- * Outlier detector with one-sided constant thresholds for weak and strong outliers.
+ * Anomaly detector with constant thresholds for weak and strong anomalies. Supports both one- and two-tailed tests.
  *
  * @author Willie Wheeler
  */
-public class ConstantThresholdAnomalyDetector extends AbstractAnomalyDetector {
-    public static final int LEFT_TAILED = 0;
-    public static final int RIGHT_TAILED = 1;
+@ToString
+public final class ConstantThresholdAnomalyDetector extends AbstractAnomalyDetector {
     
-    private final int tail;
-    private final double strongThreshold;
-    private final double weakThreshold;
+    @Getter
+    private final AnomalyThresholds thresholds;
     
-    // TODO Support two-tailed strategy.
-    
-    /**
-     * Builds a constant-threshold anomaly detector that performs anomaly tests in the specified tail. For left-tailed
-     * detectors we expect strongThreshold &lt;= weakThreshold, and for right-tailed detectors we expect
-     * weakThreshold &lt;= strongThreshold.
-     *
-     * @param tail            Either LEFT_TAILED or RIGHT_TAILED.
-     * @param strongThreshold Large outlier threshold.
-     * @param weakThreshold   Small outlier threshold.
-     */
-    public ConstantThresholdAnomalyDetector(int tail, double strongThreshold, double weakThreshold) {
-        if (tail == LEFT_TAILED) {
-            AssertUtil.isTrue(strongThreshold <= weakThreshold, "Left-tailed detector requires strongThreshold <= weakThreshold");
-        } else if (tail == RIGHT_TAILED) {
-            AssertUtil.isTrue(weakThreshold <= strongThreshold, "Right-tailed detector requires weakThreshold <= strongThreshold");
-        } else {
-            throw new IllegalArgumentException("tail must be either LEFT_TAILED or RIGHT_TAILED");
-        }
+    public ConstantThresholdAnomalyDetector(UUID uuid, AnomalyThresholds thresholds) {
+        super(uuid);
         
-        this.tail = tail;
-        this.weakThreshold = weakThreshold;
-        this.strongThreshold = strongThreshold;
-    }
-    
-    public int getTail() {
-        return tail;
-    }
-    
-    public double getWeakThreshold() {
-        return weakThreshold;
-    }
-    
-    public double getStrongThreshold() {
-        return strongThreshold;
+        notNull(thresholds, "thresholds can't be null");
+        this.thresholds = thresholds;
     }
     
     @Override
-    public String toString() {
-        return "ConstantThresholdAnomalyDetector{" +
-                "tail=" + tail +
-                ", weakThreshold=" + weakThreshold +
-                ", strongThreshold=" + strongThreshold +
-                '}';
-    }
-    
-    @Override
-    protected AnomalyResult toAnomalyResult(MappedMetricData mappedMetricData) {
-        final MetricData metricData = mappedMetricData.getMetricData();
-        final double observed = metricData.getValue();
-        
-        Double weakThresholdUpper = null;
-        Double weakThresholdLower = null;
-        Double strongThresholdUpper = null;
-        Double strongThresholdLower = null;
-        AnomalyLevel anomalyLevel = NORMAL;
-        
-        if (tail == LEFT_TAILED) {
-            weakThresholdLower = weakThreshold;
-            strongThresholdLower = strongThreshold;
-            if (observed <= strongThreshold) {
-                anomalyLevel = STRONG;
-            } else if (observed <= weakThreshold) {
-                anomalyLevel = WEAK;
-            }
-        } else if (tail == RIGHT_TAILED) {
-            weakThresholdUpper = weakThreshold;
-            strongThresholdUpper = strongThreshold;
-            if (observed >= strongThreshold) {
-                anomalyLevel = STRONG;
-            } else if (observed >= weakThreshold) {
-                anomalyLevel = WEAK;
-            }
-        } else {
-            throw new IllegalStateException("Illegal tail: " + tail);
-        }
-        
-        final AnomalyResult result = new AnomalyResult();
-        result.setMetricDefinition(metricData.getMetricDefinition());
-        result.setEpochSecond(metricData.getTimestamp());
-        result.setObserved(observed);
-        result.setWeakThresholdUpper(weakThresholdUpper);
-        result.setWeakThresholdLower(weakThresholdLower);
-        result.setStrongThresholdUpper(strongThresholdUpper);
-        result.setStrongThresholdLower(strongThresholdLower);
-        result.setAnomalyLevel(anomalyLevel);
-        return result;
+    public AnomalyResult classify(MetricData metricData) {
+        notNull(metricData, "metricData can't be null");
+        final AnomalyLevel level = thresholds.classify(metricData.getValue());
+        return anomalyResult(metricData, level);
     }
 }

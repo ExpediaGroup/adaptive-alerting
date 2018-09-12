@@ -16,8 +16,6 @@
 package com.expedia.adaptivealerting.anomdetect.control;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.core.util.MathUtil;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
@@ -43,9 +41,9 @@ public class IndividualsChartDetectorTest {
     private static final int WARMUP_PERIOD = 25;
     private static final double TOLERANCE = 0.1;
     
+    private UUID detectorUUID;
     private MetricDefinition metricDefinition;
     private long epochSecond;
-    private UUID uuid;
     private static List<IndividualsChartTestRow> data;
     
     
@@ -56,37 +54,36 @@ public class IndividualsChartDetectorTest {
     
     @Before
     public void setUp() {
+        this.detectorUUID = UUID.randomUUID();
         this.metricDefinition = new MetricDefinition("some-key");
         this.epochSecond = Instant.now().getEpochSecond();
-        this.uuid = UUID.randomUUID();
     }
     
     @Test
     public void testEvaluate() {
-        
         final ListIterator<IndividualsChartTestRow> testRows = data.listIterator();
         final IndividualsChartTestRow testRow0 = testRows.next();
         final double observed0 = testRow0.getObserved();
-        final IndividualsControlChartDetector detector = new IndividualsControlChartDetector(observed0, WARMUP_PERIOD);
+        final IndividualsControlChartDetector detector =
+                new IndividualsControlChartDetector(detectorUUID, observed0, WARMUP_PERIOD);
         int noOfDataPoints = 1;
         
-        // Params
         assertEquals(WARMUP_PERIOD, detector.getWarmUpPeriod());
         
         while (testRows.hasNext()) {
             final IndividualsChartTestRow testRow = testRows.next();
             final double observed = testRow.getObserved();
             
-            final MappedMetricData mappedMetricData = toMappedMetricData(epochSecond, observed);
-            AnomalyResult result = detector.classify(mappedMetricData).getAnomalyResult();
+            final MetricData metricData = new MetricData(metricDefinition, observed, epochSecond);
+            final AnomalyLevel level = detector.classify(metricData).getAnomalyLevel();
             
             if (noOfDataPoints < WARMUP_PERIOD) {
-                assertEquals(AnomalyLevel.valueOf("UNKNOWN"), result.getAnomalyLevel());
+                assertEquals(AnomalyLevel.UNKNOWN, level);
             } else {
                 assertApproxEqual(testRow.getUpperControlLimit_R(), detector.getUpperControlLimit_R());
                 assertApproxEqual(testRow.getLowerControlLimit_X(), detector.getLowerControlLimit_X());
                 assertApproxEqual(testRow.getUpperControlLimit_X(), detector.getUpperControlLimit_X());
-                assertEquals(AnomalyLevel.valueOf(testRow.getAnomalyLevel()), result.getAnomalyLevel());
+                assertEquals(AnomalyLevel.valueOf(testRow.getAnomalyLevel()), level);
             }
             noOfDataPoints += 1;
         }
@@ -102,10 +99,5 @@ public class IndividualsChartDetectorTest {
                 .withType(IndividualsChartTestRow.class)
                 .build()
                 .parse();
-    }
-    
-    private MappedMetricData toMappedMetricData(long epochSecond, double value) {
-        final MetricData metricData = new MetricData(metricDefinition, value, epochSecond);
-        return new MappedMetricData(metricData, uuid, "individuals-detector");
     }
 }

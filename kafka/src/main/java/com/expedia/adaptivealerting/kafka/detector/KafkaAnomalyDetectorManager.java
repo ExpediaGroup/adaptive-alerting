@@ -16,14 +16,14 @@
 package com.expedia.adaptivealerting.kafka.detector;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorManager;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.kafka.AbstractKafkaApp;
 import com.expedia.adaptivealerting.kafka.util.AppUtil;
 import com.typesafe.config.Config;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.KStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.*;
@@ -34,8 +34,8 @@ import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.*;
  * @author David Sutherland
  * @author Willie Wheeler
  */
+@Slf4j
 public final class KafkaAnomalyDetectorManager extends AbstractKafkaApp {
-    private static final Logger log = LoggerFactory.getLogger(AnomalyDetectorManager.class);
     private AnomalyDetectorManager manager;
     
     public static void main(String[] args) {
@@ -59,13 +59,14 @@ public final class KafkaAnomalyDetectorManager extends AbstractKafkaApp {
         stream
                 .mapValues(mappedMetricData -> {
                     try {
-                        return manager.classify(mappedMetricData);
+                        final AnomalyResult result = manager.classify(mappedMetricData);
+                        return new MappedMetricData(mappedMetricData, result);
                     } catch (Exception e) {
                         log.error("Error while classifying", e);
+                        return null;
                     }
-                    return null;
                 })
-                .filter((key, mappedMetricData) -> mappedMetricData != null)
+                .filter((key, anomalyResult) -> anomalyResult != null)
                 .to(outboundTopic);
         return builder;
     }

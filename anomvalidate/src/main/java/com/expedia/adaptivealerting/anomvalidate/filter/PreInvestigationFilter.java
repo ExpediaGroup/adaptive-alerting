@@ -24,7 +24,7 @@ import java.util.List;
 
 public class PreInvestigationFilter implements InvestigationFilter {
     private static final List<AnomalyLevel> KEEP_LEVELS = Arrays.asList(AnomalyLevel.WEAK, AnomalyLevel.STRONG);
-
+    
     // TODO: make configurable
     public boolean keep(MappedMetricData mappedMetricData) {
         if (mappedMetricData == null) {

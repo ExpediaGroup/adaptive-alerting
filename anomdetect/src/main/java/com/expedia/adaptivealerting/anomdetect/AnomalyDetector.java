@@ -15,7 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.metrics.MetricData;
 
 import java.util.UUID;
 
@@ -33,5 +34,11 @@ public interface AnomalyDetector {
      */
     UUID getUuid();
     
-    MappedMetricData classify(MappedMetricData mappedMetricData);
+    /**
+     * Classifies a given metric data point.
+     *
+     * @param metricData Metric data point.
+     * @return Anomaly result.
+     */
+    AnomalyResult classify(MetricData metricData);
 }
