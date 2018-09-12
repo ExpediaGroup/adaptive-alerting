@@ -26,5 +26,5 @@ public class RebuildParams {
 
     private String modelUUID;
     private String metricKey;
-    private Boolean toRebuild;
+    private boolean toRebuild;
 }

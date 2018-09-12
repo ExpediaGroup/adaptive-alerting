@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.modelservice.service;
 
 import com.expedia.adaptivealerting.modelservice.dto.ModelDto;
 import com.expedia.adaptivealerting.modelservice.entity.Model;
+import com.expedia.adaptivealerting.modelservice.repo.MetricRepository;
 import com.expedia.adaptivealerting.modelservice.repo.ModelRepository;
 import com.expedia.adaptivealerting.modelservice.repo.ModelRepositoryCustom;
 import com.expedia.adaptivealerting.modelservice.service.impl.ModelServiceImpl;
@@ -36,11 +37,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.junit.Test;
-import com.expedia.adaptivealerting.modelservice.dto.ModelParams;
+import com.expedia.adaptivealerting.modelservice.dto.Hyperparams;
 
 /**
  * @author kashah
- *
  */
 public class ModelServiceImplTests {
 
@@ -53,6 +53,8 @@ public class ModelServiceImplTests {
 
     @Mock
     private ModelRepository modelRepository;
+    @Mock
+    private MetricRepository metricRepository;
 
     private List<ModelDto> modelDtoList;
 
@@ -72,7 +74,10 @@ public class ModelServiceImplTests {
 
     @Test
     public void testAddModelParams() {
-        service.addModelParams(new ModelParams());
+        Hyperparams params = new Hyperparams();
+        params.setHyperparams(new HashMap<String, Object>());
+        params.setMetricKey("key");
+        service.addModelParams("111", params);
     }
 
     @Test
@@ -107,6 +112,8 @@ public class ModelServiceImplTests {
 
     private void initDependencies() {
         when(modelRepositoryCustom.findModels(anyString())).thenReturn(modelDtoList);
-        when(modelRepository.getModelById(anyInt())).thenReturn(new Model());
+        when(modelRepository.findIdByModelUUID(anyString())).thenReturn(1);
+        when(metricRepository.findIdByMetricKey(anyString())).thenReturn(1);
+        when(modelRepository.getOne(anyInt())).thenReturn(new Model());
     }
 }
