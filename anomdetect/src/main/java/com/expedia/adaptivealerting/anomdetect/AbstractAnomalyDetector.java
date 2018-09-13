@@ -19,23 +19,45 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.metrics.MetricData;
 import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
+
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * Abstract base class implementing {@link AnomalyDetector}.
  *
  * @author Willie Wheeler
  */
-@RequiredArgsConstructor
 public abstract class AbstractAnomalyDetector implements AnomalyDetector {
     
-    @NonNull
     @Getter
-    private UUID uuid;
+    private final UUID uuid;
     
+    /**
+     * Creates a new anomaly detector, randomly assigning a detector UUID.
+     */
+    public AbstractAnomalyDetector() {
+        this(UUID.randomUUID());
+    }
+    
+    /**
+     * Creates a new anomaly detector with the given detector UUID.
+     *
+     * @param uuid Detector UUID.
+     */
+    public AbstractAnomalyDetector(UUID uuid) {
+        notNull(uuid, "uuid can't be null");
+        this.uuid = uuid;
+    }
+    
+    /**
+     * Convenience method to create an {@link AnomalyResult}.
+     *
+     * @param metricData Metric data.
+     * @param level      Anomaly level.
+     * @return Anomaly result with the detector UUID, metric data and anomaly level set.
+     */
     protected AnomalyResult anomalyResult(MetricData metricData, AnomalyLevel level) {
         return new AnomalyResult(uuid, metricData, level);
     }
