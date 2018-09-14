@@ -27,7 +27,6 @@ import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
 import com.expedia.metrics.MetricDefinition;
 
 import java.io.InputStream;
-import java.util.UUID;
 
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.createChartFrame;
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showChartFrame;
@@ -44,12 +43,29 @@ public class CsvTrafficPewmaVariants {
         final MetricFrame frame = MetricFrameLoader.loadCsv(new MetricDefinition("csv"), is, true);
         final MetricFrameMetricSource source = new MetricFrameMetricSource(frame, "data", 200L);
         
-        final AnomalyDetectorFilter ad1 =
-                new AnomalyDetectorFilter(new PewmaAnomalyDetector(UUID.randomUUID(), 0.15, 1.0, 3.0, 2.0, 0.0));
-        final AnomalyDetectorFilter ad2 =
-                new AnomalyDetectorFilter(new PewmaAnomalyDetector(UUID.randomUUID(), 0.25, 1.0, 3.0, 2.0, 0.0));
-        final AnomalyDetectorFilter ad3 =
-                new AnomalyDetectorFilter(new PewmaAnomalyDetector(UUID.randomUUID(), 0.35, 1.0, 3.0, 2.0, 0.0));
+        final PewmaAnomalyDetector.Params params1 = new PewmaAnomalyDetector.Params()
+                .setAlpha(0.15)
+                .setBeta(1.0)
+                .setWeakSigmas(2.0)
+                .setStrongSigmas(3.0)
+                .setInitMeanEstimate(0.0);
+        final AnomalyDetectorFilter ad1 = new AnomalyDetectorFilter(new PewmaAnomalyDetector(params1));
+    
+        final PewmaAnomalyDetector.Params params2 = new PewmaAnomalyDetector.Params()
+                .setAlpha(0.25)
+                .setBeta(1.0)
+                .setWeakSigmas(2.0)
+                .setStrongSigmas(3.0)
+                .setInitMeanEstimate(0.0);
+        final AnomalyDetectorFilter ad2 = new AnomalyDetectorFilter(new PewmaAnomalyDetector(params2));
+    
+        final PewmaAnomalyDetector.Params params3 = new PewmaAnomalyDetector.Params()
+                .setAlpha(0.35)
+                .setBeta(1.0)
+                .setWeakSigmas(2.0)
+                .setStrongSigmas(3.0)
+                .setInitMeanEstimate(0.0);
+        final AnomalyDetectorFilter ad3 = new AnomalyDetectorFilter(new PewmaAnomalyDetector(params3));
     
         final EvaluatorFilter eval1 = new EvaluatorFilter(new RmseEvaluator());
         final EvaluatorFilter eval2 = new EvaluatorFilter(new RmseEvaluator());

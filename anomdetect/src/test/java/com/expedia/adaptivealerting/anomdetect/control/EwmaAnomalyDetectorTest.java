@@ -31,16 +31,12 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.UUID;
 
-import static com.expedia.adaptivealerting.anomdetect.NSigmasClassifier.DEFAULT_STRONG_SIGMAS;
-import static com.expedia.adaptivealerting.anomdetect.NSigmasClassifier.DEFAULT_WEAK_SIGMAS;
 import static junit.framework.TestCase.assertEquals;
 
 /**
  * @author Willie Wheeler
  */
 public class EwmaAnomalyDetectorTest {
-    private static final double WEAK_SIGMAS = DEFAULT_WEAK_SIGMAS;
-    private static final double STRONG_SIGMAS = DEFAULT_STRONG_SIGMAS;
     private static final double TOLERANCE = 0.001;
     
     private UUID detectorUUID;
@@ -60,37 +56,24 @@ public class EwmaAnomalyDetectorTest {
         this.epochSecond = Instant.now().getEpochSecond();
     }
     
-    @Test
-    public void testDefaultConstructor() {
-        final EwmaAnomalyDetector detector = new EwmaAnomalyDetector(detectorUUID);
-        assertEquals(0.15, detector.getAlpha());
-        assertEquals(STRONG_SIGMAS, detector.getStrongSigmas());
-        assertEquals(WEAK_SIGMAS, detector.getWeakSigmas());
-    }
-    
     @Test(expected = IllegalArgumentException.class)
     public void testConstructor_alphaOutOfRange() {
-        new EwmaAnomalyDetector(detectorUUID, 2.0, 150.0, 100.0, 0.0);
+        final EwmaAnomalyDetector.Params params = new EwmaAnomalyDetector.Params()
+                .setAlpha(2.0);
+        new EwmaAnomalyDetector(detectorUUID, params);
     }
     
     @Test
     public void testEvaluate() {
-        
-        // Params
-        final double alpha = 0.05;
-        
         final ListIterator<EwmaTestRow> testRows = data.listIterator();
         final EwmaTestRow testRow0 = testRows.next();
         final double observed0 = testRow0.getObserved();
-        final EwmaAnomalyDetector detector =
-                new EwmaAnomalyDetector(detectorUUID, alpha, STRONG_SIGMAS, WEAK_SIGMAS, observed0);
         
-        // Params
-        assertEquals(alpha, detector.getAlpha());
-        assertEquals(STRONG_SIGMAS, detector.getStrongSigmas());
-        assertEquals(WEAK_SIGMAS, detector.getWeakSigmas());
+        final EwmaAnomalyDetector.Params params = new EwmaAnomalyDetector.Params()
+                .setAlpha(0.05)
+                .setInitMeanEstimate(observed0);
+        final EwmaAnomalyDetector detector = new EwmaAnomalyDetector(detectorUUID, params);
         
-        // Seed observation
         assertEquals(observed0, detector.getMean());
         assertEquals(0.0, detector.getVariance());
         

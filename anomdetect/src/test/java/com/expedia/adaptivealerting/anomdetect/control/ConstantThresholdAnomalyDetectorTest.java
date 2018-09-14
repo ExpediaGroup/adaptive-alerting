@@ -52,14 +52,14 @@ public class ConstantThresholdAnomalyDetectorTest {
     
     @Test
     public void testAccessors() {
-        ConstantThresholdAnomalyDetector detector = new ConstantThresholdAnomalyDetector(detectorUUID, thresholds);
-        assertSame(thresholds, detector.getThresholds());
+        ConstantThresholdAnomalyDetector detector = detector(detectorUUID, thresholds);
+        assertSame(thresholds, detector.getParams().getThresholds());
     }
     
     @Test
     public void testEvaluateLeftTailed_positiveThresholds() {
         AnomalyThresholds thresholds = new AnomalyThresholds(null, null, 100.0, 300.0);
-        ConstantThresholdAnomalyDetector detector = new ConstantThresholdAnomalyDetector(detectorUUID, thresholds);
+        ConstantThresholdAnomalyDetector detector = detector(detectorUUID, thresholds);
         assertEquals(AnomalyLevel.NORMAL, classify(detector, epochSecond, 500.0f));
         assertEquals(AnomalyLevel.WEAK, classify(detector, epochSecond, 300.0f));
         assertEquals(AnomalyLevel.WEAK, classify(detector,epochSecond, 200.0f));
@@ -70,7 +70,7 @@ public class ConstantThresholdAnomalyDetectorTest {
     @Test
     public void testEvaluateLeftTailed_negativeThresholds() {
         AnomalyThresholds thresholds = new AnomalyThresholds(null, null, -30.0, -10.0);
-        ConstantThresholdAnomalyDetector detector = new ConstantThresholdAnomalyDetector(detectorUUID, thresholds);
+        ConstantThresholdAnomalyDetector detector = detector(detectorUUID, thresholds);
         assertEquals(AnomalyLevel.NORMAL, classify(detector,epochSecond, 1.0f));
         assertEquals(AnomalyLevel.WEAK, classify(detector,epochSecond, -10.0f));
         assertEquals(AnomalyLevel.WEAK, classify(detector,epochSecond, -15.0f));
@@ -81,7 +81,7 @@ public class ConstantThresholdAnomalyDetectorTest {
     @Test
     public void testEvaluateRightTailed_positiveThresholds() {
         AnomalyThresholds thresholds = new AnomalyThresholds(300.0, 200.0, null, null);
-        ConstantThresholdAnomalyDetector detector = new ConstantThresholdAnomalyDetector(detectorUUID, thresholds);
+        ConstantThresholdAnomalyDetector detector = detector(detectorUUID, thresholds);
         assertEquals(AnomalyLevel.NORMAL, classify(detector,epochSecond, 100.0f));
         assertEquals(AnomalyLevel.WEAK, classify(detector,epochSecond, 200.0f));
         assertEquals(AnomalyLevel.WEAK, classify(detector,epochSecond, 220.0f));
@@ -92,12 +92,18 @@ public class ConstantThresholdAnomalyDetectorTest {
     @Test
     public void testEvaluateRightTailed_negativeThresholds() {
         AnomalyThresholds thresholds = new AnomalyThresholds(-100.0, -300.0, null, null);
-        ConstantThresholdAnomalyDetector detector = new ConstantThresholdAnomalyDetector(detectorUUID, thresholds);
+        ConstantThresholdAnomalyDetector detector = detector(detectorUUID, thresholds);
         assertEquals(AnomalyLevel.NORMAL, classify(detector,epochSecond, -1000.0f));
         assertEquals(AnomalyLevel.WEAK, classify(detector,epochSecond, -300.0f));
         assertEquals(AnomalyLevel.WEAK, classify(detector,epochSecond, -250.0f));
         assertEquals(AnomalyLevel.STRONG, classify(detector,epochSecond, -100.0f));
         assertEquals(AnomalyLevel.STRONG, classify(detector,epochSecond, 0.0f));
+    }
+    
+    private ConstantThresholdAnomalyDetector detector(UUID uuid, AnomalyThresholds thresholds) {
+        ConstantThresholdAnomalyDetector.Params params = new ConstantThresholdAnomalyDetector.Params()
+                .setThresholds(thresholds);
+        return new ConstantThresholdAnomalyDetector(uuid, params);
     }
     
     private AnomalyLevel classify(AnomalyDetector detector, long epochSecond, float value) {

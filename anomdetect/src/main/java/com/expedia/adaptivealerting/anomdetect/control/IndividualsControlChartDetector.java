@@ -15,12 +15,14 @@
  */
 package com.expedia.adaptivealerting.anomdetect.control;
 
-import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.metrics.MetricData;
-import lombok.Getter;
+import lombok.Data;
+import lombok.NonNull;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
 import java.util.UUID;
 
@@ -29,16 +31,33 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 import static java.lang.Math.abs;
 
 /**
- * <p>
- * Anomaly detector implementation of  <a href="https://en.wikipedia.org/wiki/Shewhart_individuals_control_chart"> Shewhart individuals control chart </a>
- * It uses the moving range (R) and the individual samples (X) to observe long-term and short-term variation in input stream of data
+ * Anomaly detector implementation of
+ * <a href="https://en.wikipedia.org/wiki/Shewhart_individuals_control_chart">Shewhart individuals control chart </a>
+ * It uses the moving range (R) and the individual samples (X) to observe long-term and short-term variation in input
+ * stream of data.
  *
  * @author shsethi
  * @see <a href="https://www.spcforexcel.com/knowledge/variable-control-charts/individuals-control-charts">https://www.spcforexcel.com/knowledge/variable-control-charts/individuals-control-charts</a>
- * </p>
  */
+@Data
 @ToString
-public final class IndividualsControlChartDetector extends AbstractAnomalyDetector {
+public final class IndividualsControlChartDetector implements AnomalyDetector {
+    
+    @Data
+    @Accessors(chain = true)
+    public static final class Params {
+        
+        /**
+         * Initial mean estimate.
+         */
+        private double initValue = 0.0;
+        
+        /**
+         * Minimum number of data points required before the anomaly detector is ready for use.
+         */
+        private int warmUpPeriod = 25;
+    }
+    
     private static final double R_CONTROL_CHART_CONSTANT_D4 = 3.267;
     
     /**
@@ -46,78 +65,70 @@ public final class IndividualsControlChartDetector extends AbstractAnomalyDetect
      */
     private static final int RECOMPUTE_LIMITS_PERIOD = 100;
     
-    /**
-     * Local Aggregate Moving range. Used to calculate avg. moving range.
-     */
-    private double movingRangeSum;
+    @NonNull
+    private UUID uuid;
+    
+    @NonNull
+    private Params params;
     
     /**
-     * Local target predicted from average mean.
+     * Aggregate Moving range. Used to calculate avg. moving range.
+     */
+    private double movingRangeSum = 0.0;
+    
+    /**
+     * Target predicted from average mean.
      */
     private double target;
     
     /**
-     * Local previous value.
+     * Previous value.
      */
     private double prevValue;
     
     /**
-     * Local total no of received data points.
+     * Total number of received data points.
      */
-    private int totalDataPoints;
-    
-    /**
-     * Local warm up period value. Minimum no of data points required before it can be used for actual anomaly
-     * detection.
-     */
-    @Getter
-    private int warmUpPeriod;
+    private int totalDataPoints = 1;
     
     /**
      * Upper limit for R chart
      */
-    @Getter
     private double upperControlLimit_R;
     
     /**
      * Upper limit for X chart
      */
-    @Getter
     private double upperControlLimit_X;
     
     /**
      * Lower limit for X chart
      */
-    @Getter
     private double lowerControlLimit_X;
     
     /**
-     * Local mean
+     * Mean estimate.
      */
     private double mean;
     
-    /**
-     * Creates a new Individual Control Charts detector with initValue = 0.0, warmUpPeriod = 25
-     */
-    public IndividualsControlChartDetector(UUID uuid) {
-        this(uuid, 0.0, 25);
+    public IndividualsControlChartDetector() {
+        this(UUID.randomUUID(), new Params());
     }
     
     /**
-     * Creates a new MovingRangeChart detector. Initial target is given by initValue and initial variance is 0.
+     * Creates a new detector. Initial target is given by params.initValue and initial variance is 0.
      *
-     * @param initValue    Initial observation, used to set the first target estimate.
-     * @param warmUpPeriod Warm up period value. Minimum no of data points required before it can be used for actual
-     *                     anomaly detection.
+     * @param uuid   Detector UUID.
+     * @param params Model params.
      */
-    public IndividualsControlChartDetector(UUID uuid, double initValue, int warmUpPeriod) {
-        super(uuid);
+    public IndividualsControlChartDetector(UUID uuid, Params params) {
+        notNull(uuid, "uuid can't be null");
+        notNull(params, "params can't be null");
         
-        this.prevValue = initValue;
-        this.warmUpPeriod = warmUpPeriod;
-        this.movingRangeSum = 0.0;
-        this.totalDataPoints = 1;
-        this.target = initValue;
+        this.uuid = uuid;
+        this.params = params;
+        this.prevValue = params.initValue;
+        this.target = params.initValue;
     }
     
     @Override
@@ -125,11 +136,11 @@ public final class IndividualsControlChartDetector extends AbstractAnomalyDetect
         notNull(metricData, "metricData can't be null");
         
         final double observed = metricData.getValue();
-        double currentRange = abs(prevValue - observed);
+        double currentRange = Math.abs(prevValue - observed);
         
         AnomalyLevel level = UNKNOWN;
         
-        if (totalDataPoints > warmUpPeriod) {
+        if (totalDataPoints > params.warmUpPeriod) {
             level = NORMAL;
             if (currentRange > upperControlLimit_R) {
                 level = STRONG;
@@ -146,7 +157,7 @@ public final class IndividualsControlChartDetector extends AbstractAnomalyDetect
             this.totalDataPoints++;
         }
         
-        if (((totalDataPoints - warmUpPeriod) % RECOMPUTE_LIMITS_PERIOD) == 0) {
+        if (((totalDataPoints - params.warmUpPeriod) % RECOMPUTE_LIMITS_PERIOD) == 0) {
             double averageMovingRange = getAverageMovingRange();
             this.target = this.mean;
             
@@ -156,7 +167,7 @@ public final class IndividualsControlChartDetector extends AbstractAnomalyDetect
         }
         this.prevValue = observed;
         
-        return anomalyResult(metricData, level);
+        return new AnomalyResult(uuid, metricData, level);
     }
     
     private double getRunningMean(double observed) {
@@ -164,9 +175,6 @@ public final class IndividualsControlChartDetector extends AbstractAnomalyDetect
     }
     
     private double getAverageMovingRange() {
-        if (totalDataPoints > 1) {
-            return movingRangeSum / (totalDataPoints - 1);
-        }
-        return movingRangeSum;
+        return movingRangeSum / Math.max(1, totalDataPoints - 1);
     }
 }

@@ -15,11 +15,16 @@
  */
 package com.expedia.adaptivealerting.anomdetect.perf;
 
-import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.metrics.MetricData;
+import lombok.Data;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
@@ -29,21 +34,21 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  *
  * @author kashah
  */
+@Data
+@RequiredArgsConstructor
+@ToString
 @Slf4j
-public class MonitoredDetector extends AbstractAnomalyDetector {
+public final class MonitoredDetector implements AnomalyDetector {
+    
+    @NonNull
     private AnomalyDetector detector;
+    
+    @NonNull
     private PerformanceMonitor perfMonitor;
     
-    public MonitoredDetector(AnomalyDetector detector, PerformanceMonitor perfMonitor) {
-        
-        // This wrapper becomes the model's detector.
-        super(detector.getUuid());
-        
-        notNull(detector, "detector can't be null");
-        notNull(perfMonitor, "perfMonitor can't be null");
-        
-        this.detector = detector;
-        this.perfMonitor = perfMonitor;
+    @Override
+    public UUID getUuid() {
+        return detector.getUuid();
     }
     
     @Override
