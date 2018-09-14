@@ -21,7 +21,6 @@ import com.expedia.metrics.MetricData;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 
 import java.util.UUID;
 
@@ -34,7 +33,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  */
 @Data
 @RequiredArgsConstructor
-@ToString
 public final class AquilaAnomalyDetector implements AnomalyDetector {
     
     @NonNull

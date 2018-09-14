@@ -21,7 +21,6 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
 import lombok.NonNull;
-import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import java.util.UUID;
@@ -40,7 +39,6 @@ import static java.lang.Math.abs;
  * @see <a href="https://www.spcforexcel.com/knowledge/variable-control-charts/individuals-control-charts">https://www.spcforexcel.com/knowledge/variable-control-charts/individuals-control-charts</a>
  */
 @Data
-@ToString
 public final class IndividualsControlChartDetector implements AnomalyDetector {
     
     @Data

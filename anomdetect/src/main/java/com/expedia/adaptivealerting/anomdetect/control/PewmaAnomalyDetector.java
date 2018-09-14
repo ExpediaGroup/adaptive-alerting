@@ -22,7 +22,6 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
 import lombok.NonNull;
-import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import java.util.UUID;
@@ -46,7 +45,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author David Sutherland
  */
 @Data
-@ToString
 public final class PewmaAnomalyDetector implements AnomalyDetector {
     
     @Data

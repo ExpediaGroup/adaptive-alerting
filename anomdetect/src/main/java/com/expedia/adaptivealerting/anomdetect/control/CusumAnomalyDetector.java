@@ -21,7 +21,6 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
 import lombok.NonNull;
-import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import java.util.UUID;
@@ -41,7 +40,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author kashah
  */
 @Data
-@ToString
 public final class CusumAnomalyDetector implements AnomalyDetector {
     private static final double STD_DEV_DIVISOR = 1.128;
     

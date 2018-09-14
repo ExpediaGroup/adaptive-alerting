@@ -22,7 +22,6 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
 import lombok.NonNull;
-import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import java.util.UUID;
@@ -48,7 +47,6 @@ import static java.lang.Math.sqrt;
  * @see <a href="https://www.itl.nist.gov/div898/handbook/pmc/section3/pmc324.htm">EWMA Control Charts</a>
  */
 @Data
-@ToString
 public final class EwmaAnomalyDetector implements AnomalyDetector {
     
     @Data
