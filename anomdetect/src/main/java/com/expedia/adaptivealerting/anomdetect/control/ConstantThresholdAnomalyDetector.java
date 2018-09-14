@@ -15,13 +15,15 @@
  */
 package com.expedia.adaptivealerting.anomdetect.control;
 
-import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.metrics.MetricData;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.Data;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.util.UUID;
 
@@ -32,23 +34,31 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  *
  * @author Willie Wheeler
  */
-@ToString
-public final class ConstantThresholdAnomalyDetector extends AbstractAnomalyDetector {
+@Data
+@RequiredArgsConstructor
+public final class ConstantThresholdAnomalyDetector implements AnomalyDetector {
     
-    @Getter
-    private final AnomalyThresholds thresholds;
+    @Data
+    @Accessors(chain = true)
+    public static final class Params {
+        private AnomalyThresholds thresholds;
+    }
     
-    public ConstantThresholdAnomalyDetector(UUID uuid, AnomalyThresholds thresholds) {
-        super(uuid);
-        
-        notNull(thresholds, "thresholds can't be null");
-        this.thresholds = thresholds;
+    @NonNull
+    private final UUID uuid;
+    
+    @NonNull
+    private final Params params;
+    
+    public ConstantThresholdAnomalyDetector(Params params) {
+        this(UUID.randomUUID(), params);
     }
     
     @Override
     public AnomalyResult classify(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
+        final AnomalyThresholds thresholds = params.getThresholds();
         final AnomalyLevel level = thresholds.classify(metricData.getValue());
-        return anomalyResult(metricData, level);
+        return new AnomalyResult(uuid, metricData, level);
     }
 }

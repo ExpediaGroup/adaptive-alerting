@@ -19,13 +19,16 @@ import com.amazonaws.services.sagemakerruntime.AmazonSageMakerRuntime;
 import com.amazonaws.services.sagemakerruntime.AmazonSageMakerRuntimeClientBuilder;
 import com.amazonaws.services.sagemakerruntime.model.InvokeEndpointRequest;
 import com.amazonaws.services.sagemakerruntime.model.InvokeEndpointResult;
-import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.randomcutforest.beans.Scores;
 import com.expedia.adaptivealerting.anomdetect.randomcutforest.util.PropertiesCache;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.metrics.MetricData;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Data;
+import lombok.NonNull;
+import lombok.ToString;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -55,7 +58,9 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  *
  * @author Tatjana Kamenov
  */
-public class RandomCutForestAnomalyDetector extends AbstractAnomalyDetector {
+@Data
+@ToString
+public final class RandomCutForestAnomalyDetector implements AnomalyDetector {
     private static final String TEXT_CSV_CONTENT_TYPE = "text/csv";
     private static final String APPLICATION_JSON_ACCEPT = "application/json";
 
@@ -64,15 +69,21 @@ public class RandomCutForestAnomalyDetector extends AbstractAnomalyDetector {
     private static final int SHINGLE_SIZE = Integer.valueOf(PropertiesCache.getInstance().get("shingle_size"));
     private static final double STRONG_SCORE_CUTOFF = Double.valueOf(PropertiesCache.getInstance().get("strong_score_cutoff"));
     private static final double WEAK_SCORE_CUTOFF = Double.valueOf(PropertiesCache.getInstance().get("weak_score_cutoff"));
-
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    
+    @NonNull
+    private UUID uuid;
+    
     private final Shingle shingle;
     private final AmazonSageMakerRuntime amazonSageMaker;
     private final InvokeEndpointRequest invokeEndpointRequest;
-    public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    //TODO Consider passing endpoint, shingle size and score cutoff to constructor
+    // TODO Consider passing endpoint, shingle size and score cutoff to constructor [TK]
+    // - If we do this, please create a Params class for these. See some of the other detectors. [WLW]
     public RandomCutForestAnomalyDetector(UUID uuid) {
-        super(uuid);
+        notNull(uuid, "uuid can't be null");
+        
+        this.uuid = uuid;
         this.shingle = new Shingle(SHINGLE_SIZE);
         this.amazonSageMaker = AmazonSageMakerRuntimeClientBuilder.standard().withRegion(AWS_REGION).build();
         this.invokeEndpointRequest = new InvokeEndpointRequest();
@@ -96,7 +107,7 @@ public class RandomCutForestAnomalyDetector extends AbstractAnomalyDetector {
                 level = AnomalyLevel.STRONG;
             }
         }
-        return anomalyResult(metricData, level);
+        return new AnomalyResult(uuid, metricData, level);
     }
 
     /**

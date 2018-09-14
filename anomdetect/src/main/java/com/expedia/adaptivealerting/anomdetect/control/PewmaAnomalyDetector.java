@@ -15,20 +15,18 @@
  */
 package com.expedia.adaptivealerting.anomdetect.control;
 
-import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
-import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.metrics.MetricData;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.Data;
+import lombok.NonNull;
+import lombok.experimental.Accessors;
 
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
-import static java.lang.Math.exp;
-import static java.lang.Math.sqrt;
 
 /**
  * <p>
@@ -46,29 +44,59 @@ import static java.lang.Math.sqrt;
  *
  * @author David Sutherland
  */
-@ToString
-public final class PewmaAnomalyDetector extends AbstractAnomalyDetector {
-    static final int DEFAULT_TRAINING_LENGTH = 30;
+@Data
+public final class PewmaAnomalyDetector implements AnomalyDetector {
+    
+    @Data
+    @Accessors(chain = true)
+    public static final class Params {
+        
+        /**
+         * Smoothing param.
+         */
+        private double alpha = 0.15;
+        
+        /**
+         * Anomaly weighting param.
+         */
+        private double beta = 1.0;
+        
+        /**
+         * Weak anomaly threshold, in sigmas.
+         */
+        private double weakSigmas = 3.0;
+        
+        /**
+         * Strong anomaly threshold, in sigmas.
+         */
+        private double strongSigmas = 4.0;
+        
+        /**
+         * Initial mean estimate.
+         */
+        private double initMeanEstimate = 0.0;
+        
+        /**
+         * How many iterations to train for.
+         */
+        private final int warmUpPeriod = 30;
+    }
+    
+    @NonNull
+    private UUID uuid;
+    
+    @NonNull
+    private Params params;
     
     /**
-     * Smoothing param.
+     * Adjusted alpha, to match the way alpha is used in the paper that describes the algorithm.
      */
-    private final double alpha0;
+    private double adjAlpha;
     
     /**
-     * Outlier weighting param.
+     * Number of data points seen so far.
      */
-    private final double beta;
-    
-    /**
-     * How many iterations to train for.
-     */
-    private final double trainingLength;
-    
-    /**
-     * Smoothing param.
-     */
-    private double trainingCount;
+    private int trainingCount = 1;
     
     /**
      * Internal state for PEWMA algorithm.
@@ -81,100 +109,32 @@ public final class PewmaAnomalyDetector extends AbstractAnomalyDetector {
     private double s2;
     
     /**
-     * Strong anomaly threshold, in sigmas.
-     */
-    private final double strongSigmas;
-    
-    /**
-     * Weak anomaly threshold, in sigmas.
-     */
-    private final double weakSigmas;
-    
-    /**
      * Local mean estimate.
      */
-    @Getter
     private double mean;
     
     /**
      * Local standard deviation estimate.
      */
-    @Getter
     private double stdDev;
     
-    /**
-     * Creates a new PEWMA outlier detector with initialAlpha = 0.15, beta = 1.0, weakSigmas = 3.0,
-     * strongSigmas = 4.0 and initValue = 0.0.
-     */
-    public PewmaAnomalyDetector(UUID uuid) {
-        this(uuid, 0.15, 1.0, 4.0, 3.0, 0.0);
+    public PewmaAnomalyDetector() {
+        this(UUID.randomUUID(), new Params());
     }
     
-    // FIXME "initialAlpha" is a confusing name for this parameter as it suggests that the value evolves over time.
-    // I understand that the intent is to handle reversing the alpha. I would suggest just using "alpha" as the param
-    // name since that's what we expose to the client, and then choosing some other name internally (lambda or
-    // reverseAlpha or alphaPrime or whatever). I think it's more important that EWMA and PEWMA expose use the same
-    // name for the parameter in question than it is for this implementation to use the same name as what's in the
-    // paper.
-    //
-    // If you think that's likely to be confusing, then another option would be to expose a parameter called "lambda"
-    // on both EWMA and PEWMA, and then use alpha here as per the paper.
-    //
-    // I don't have a strong preference between those two. [WLW]
-    
-    /**
-     * Creates a new PEWMA outlier detector. Initial mean is given by initValue and initial standard deviation is 0.
-     *
-     * @param uuid         Detector UUID.
-     * @param initialAlpha Smoothing parameter.
-     * @param beta         Outlier weighting parameter.
-     * @param strongSigmas Strong outlier threshold, in sigmas.
-     * @param weakSigmas   Weak outlier threshold, in sigmas.
-     * @param initValue    Initial observation, used to set the first mean estimate.
-     */
-    public PewmaAnomalyDetector(
-            UUID uuid,
-            double initialAlpha,
-            double beta,
-            double strongSigmas,
-            double weakSigmas,
-            double initValue) {
-        
-        this(uuid, initialAlpha, beta, DEFAULT_TRAINING_LENGTH, strongSigmas, weakSigmas, initValue);
+    public PewmaAnomalyDetector(Params params) {
+        this(UUID.randomUUID(), params);
     }
     
-    /**
-     * Creates a new PEWMA outlier detector. Initial mean is given by initValue and initial standard deviation is 0.
-     *
-     * @param initialAlpha   Smoothing parameter.
-     * @param beta           Outlier weighting parameter.
-     * @param trainingLength How many iterations to train for.
-     * @param strongSigmas   Strong outlier threshold, in sigmas.
-     * @param weakSigmas     Weak outlier threshold, in sigmas.
-     * @param initValue      Initial observation, used to set the first mean estimate.
-     */
-    public PewmaAnomalyDetector(
-            UUID uuid,
-            double initialAlpha,
-            double beta,
-            int trainingLength,
-            double strongSigmas,
-            double weakSigmas,
-            double initValue) {
+    public PewmaAnomalyDetector(UUID uuid, Params params) {
+        notNull(uuid, "uuid can't be null");
+        notNull(params, "params can't be null");
         
-        super(uuid);
-        
-        AssertUtil.isBetween(initialAlpha, 0.0, 1.0, "initialAlpha must be in the range [0, 1]");
-        
-        this.alpha0 = 1.0 - initialAlpha;  // To standardise with the EWMA implementation we use the complement value.
-        this.beta = beta;
-        this.trainingLength = trainingLength;
-        this.trainingCount = 1;
-        this.weakSigmas = weakSigmas;
-        this.strongSigmas = strongSigmas;
-        this.s1 = initValue;
-        this.s2 = initValue * initValue;
-        
+        this.uuid = uuid;
+        this.params = params;
+        this.adjAlpha = 1.0 - params.alpha;
+        this.s1 = params.initMeanEstimate;
+        this.s2 = params.initMeanEstimate * params.initMeanEstimate;
         updateMeanAndStdDev();
     }
     
@@ -183,8 +143,8 @@ public final class PewmaAnomalyDetector extends AbstractAnomalyDetector {
         notNull(metricData, "metricData can't be null");
         
         final double observed = metricData.getValue();
-        final double strongDelta = strongSigmas * stdDev;
-        final double weakDelta = weakSigmas * stdDev;
+        final double weakDelta = params.weakSigmas * stdDev;
+        final double strongDelta = params.strongSigmas * stdDev;
         
         final AnomalyThresholds thresholds = new AnomalyThresholds(
                 mean + strongDelta,
@@ -196,7 +156,7 @@ public final class PewmaAnomalyDetector extends AbstractAnomalyDetector {
         
         final AnomalyLevel level = thresholds.classifyExclusiveBounds(observed);
         
-        final AnomalyResult result = anomalyResult(metricData, level);
+        final AnomalyResult result = new AnomalyResult(uuid, metricData, level);
         result.setPredicted(mean);
         result.setThresholds(thresholds);
         return result;
@@ -204,28 +164,28 @@ public final class PewmaAnomalyDetector extends AbstractAnomalyDetector {
     
     private void updateEstimates(double value) {
         double zt = 0;
-        if (this.stdDev != 0) {
+        if (this.stdDev != 0.0) {
             zt = (value - this.mean) / this.stdDev;
         }
-        double pt = (1 / sqrt(2 * Math.PI)) * exp(-0.5 * zt * zt);
+        double pt = (1.0 / Math.sqrt(2.0 * Math.PI)) * Math.exp(-0.5 * zt * zt);
         double alpha = calculateAlpha(pt);
         
-        this.s1 = alpha * this.s1 + (1 - alpha) * value;
-        this.s2 = alpha * this.s2 + (1 - alpha) * value * value;
+        this.s1 = alpha * this.s1 + (1.0 - alpha) * value;
+        this.s2 = alpha * this.s2 + (1.0 - alpha) * value * value;
         
         updateMeanAndStdDev();
     }
     
     private void updateMeanAndStdDev() {
         this.mean = this.s1;
-        this.stdDev = sqrt(this.s2 - this.s1 * this.s1);
+        this.stdDev = Math.sqrt(this.s2 - this.s1 * this.s1);
     }
     
     private double calculateAlpha(double pt) {
-        if (this.trainingCount < this.trainingLength) {
+        if (this.trainingCount < params.warmUpPeriod) {
             this.trainingCount++;
-            return 1 - 1.0 / this.trainingCount;
+            return 1.0 - 1.0 / this.trainingCount;
         }
-        return (1 - this.beta * pt) * this.alpha0;
+        return (1.0 - params.beta * pt) * this.adjAlpha;
     }
 }

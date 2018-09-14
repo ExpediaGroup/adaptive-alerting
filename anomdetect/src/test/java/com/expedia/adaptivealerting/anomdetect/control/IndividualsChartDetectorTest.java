@@ -39,6 +39,8 @@ import static junit.framework.TestCase.assertEquals;
  */
 public class IndividualsChartDetectorTest {
     private static final int WARMUP_PERIOD = 25;
+    
+    // TODO This tolerance is very loose. Can we tighten it up? [WLW]
     private static final double TOLERANCE = 0.1;
     
     private UUID detectorUUID;
@@ -64,11 +66,13 @@ public class IndividualsChartDetectorTest {
         final ListIterator<IndividualsChartTestRow> testRows = data.listIterator();
         final IndividualsChartTestRow testRow0 = testRows.next();
         final double observed0 = testRow0.getObserved();
-        final IndividualsControlChartDetector detector =
-                new IndividualsControlChartDetector(detectorUUID, observed0, WARMUP_PERIOD);
-        int noOfDataPoints = 1;
         
-        assertEquals(WARMUP_PERIOD, detector.getWarmUpPeriod());
+        final IndividualsControlChartDetector.Params params = new IndividualsControlChartDetector.Params()
+                .setInitValue(observed0)
+                .setWarmUpPeriod(WARMUP_PERIOD);
+        final IndividualsControlChartDetector detector = new IndividualsControlChartDetector(detectorUUID, params);
+        
+        int noOfDataPoints = 1;
         
         while (testRows.hasNext()) {
             final IndividualsChartTestRow testRow = testRows.next();

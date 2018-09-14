@@ -15,9 +15,12 @@
  */
 package com.expedia.adaptivealerting.anomdetect.aquila;
 
-import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.metrics.MetricData;
+import lombok.Data;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
 
@@ -28,10 +31,15 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 /**
  * @author Willie Wheeler
  */
-public final class AquilaAnomalyDetector extends AbstractAnomalyDetector {
+@Data
+@RequiredArgsConstructor
+public final class AquilaAnomalyDetector implements AnomalyDetector {
     
-    public AquilaAnomalyDetector(UUID uuid) {
-        super(uuid);
+    @NonNull
+    private UUID uuid;
+    
+    public AquilaAnomalyDetector() {
+        this(UUID.randomUUID());
     }
     
     @Override

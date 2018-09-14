@@ -60,37 +60,42 @@ public class PewmaAnomalyDetectorTest {
     }
     
     @Test
-    public void testDefaultConstructor() {
-        final PewmaAnomalyDetector detector = new PewmaAnomalyDetector(detectorUUID);
-        assertEquals(0.0, detector.getMean());
-    }
-    
-    @Test
     public void pewmaCloseToEwmaWithZeroBeta() throws IOException {
-        double beta = 0.0;
+        final double beta = 0.0;
         
         final ListIterator<String[]> testRows = readData_sampleInput().listIterator();
-        final Double initialValue = Double.parseDouble(testRows.next()[0]);
-        final PewmaAnomalyDetector pewmaOutlierDetector = new PewmaAnomalyDetector(
-                detectorUUID, DEFAULT_ALPHA, beta, STRONG_SIGMAS, WEAK_SIGMAS, initialValue);
-        final EwmaAnomalyDetector ewmaOutlierDetector = new EwmaAnomalyDetector(
-                detectorUUID, DEFAULT_ALPHA, STRONG_SIGMAS, WEAK_SIGMAS, initialValue);
+        final Double observed0 = Double.parseDouble(testRows.next()[0]);
+        
+        final PewmaAnomalyDetector.Params pewmaParams = new PewmaAnomalyDetector.Params()
+                .setAlpha(DEFAULT_ALPHA)
+                .setBeta(beta)
+                .setWeakSigmas(WEAK_SIGMAS)
+                .setStrongSigmas(STRONG_SIGMAS)
+                .setInitMeanEstimate(observed0);
+        final PewmaAnomalyDetector pewmaDetector = new PewmaAnomalyDetector(detectorUUID, pewmaParams);
+    
+        final EwmaAnomalyDetector.Params ewmaParams = new EwmaAnomalyDetector.Params()
+                .setAlpha(DEFAULT_ALPHA)
+                .setWeakSigmas(WEAK_SIGMAS)
+                .setStrongSigmas(STRONG_SIGMAS)
+                .setInitMeanEstimate(observed0);
+        final EwmaAnomalyDetector ewmaDetector = new EwmaAnomalyDetector(UUID.randomUUID(), ewmaParams);
         
         int rowCount = 1;
         while (testRows.hasNext()) {
             final Float observed = Float.parseFloat(testRows.next()[0]);
             
-            double ewmaStdDev = sqrt(ewmaOutlierDetector.getVariance());
+            double ewmaStdDev = sqrt(ewmaDetector.getVariance());
             
             double threshold = 1.0 / rowCount; // results converge with more iterations
-            assertApproxEqual(ewmaOutlierDetector.getMean(), pewmaOutlierDetector.getMean(), threshold);
-            assertApproxEqual(ewmaStdDev, pewmaOutlierDetector.getStdDev(), threshold);
+            assertApproxEqual(ewmaDetector.getMean(), pewmaDetector.getMean(), threshold);
+            assertApproxEqual(ewmaStdDev, pewmaDetector.getStdDev(), threshold);
             
             final MetricData metricData = new MetricData(metricDefinition, observed, epochSecond);
-            final AnomalyLevel pewmaLevel = pewmaOutlierDetector.classify(metricData).getAnomalyLevel();
-            final AnomalyLevel ewmaLevel = ewmaOutlierDetector.classify(metricData).getAnomalyLevel();
+            final AnomalyLevel pewmaLevel = pewmaDetector.classify(metricData).getAnomalyLevel();
+            final AnomalyLevel ewmaLevel = ewmaDetector.classify(metricData).getAnomalyLevel();
             
-            if (rowCount > PewmaAnomalyDetector.DEFAULT_TRAINING_LENGTH) {
+            if (rowCount > pewmaParams.getWarmUpPeriod()) {
                 assertEquals(pewmaLevel, ewmaLevel);
             }
             rowCount++;
@@ -99,12 +104,16 @@ public class PewmaAnomalyDetectorTest {
     
     @Test
     public void evaluate() {
-        double beta = 0.5;
-        
         final ListIterator<PewmaTestRow> testRows = readData_calInflow().listIterator();
-        final PewmaTestRow testRow0 = testRows.next();
-        final PewmaAnomalyDetector detector = new PewmaAnomalyDetector(
-                detectorUUID, DEFAULT_ALPHA, beta, STRONG_SIGMAS, WEAK_SIGMAS, testRow0.getObserved());
+        final double observed0 = testRows.next().getObserved();
+    
+        final PewmaAnomalyDetector.Params params = new PewmaAnomalyDetector.Params()
+                .setAlpha(DEFAULT_ALPHA)
+                .setBeta(0.5)
+                .setWeakSigmas(WEAK_SIGMAS)
+                .setStrongSigmas(STRONG_SIGMAS)
+                .setInitMeanEstimate(observed0);
+        final PewmaAnomalyDetector detector = new PewmaAnomalyDetector(detectorUUID, params);
         
         while (testRows.hasNext()) {
             final PewmaTestRow testRow = testRows.next();

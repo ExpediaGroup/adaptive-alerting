@@ -32,16 +32,14 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.UUID;
 
-import static com.expedia.adaptivealerting.anomdetect.NSigmasClassifier.DEFAULT_STRONG_SIGMAS;
-import static com.expedia.adaptivealerting.anomdetect.NSigmasClassifier.DEFAULT_WEAK_SIGMAS;
 import static junit.framework.TestCase.assertEquals;
 
 /**
  * @author kashah
  */
 public class CusumAnomalyDetectorTest {
-    private static final double WEAK_SIGMAS = DEFAULT_WEAK_SIGMAS;
-    private static final double STRONG_SIGMAS = DEFAULT_STRONG_SIGMAS;
+    private static final double WEAK_SIGMAS = 3.0;
+    private static final double STRONG_SIGMAS = 4.0;
     private static final double TOLERANCE = 0.01;
     private static final int WARMUP_PERIOD = 25;
     
@@ -63,48 +61,36 @@ public class CusumAnomalyDetectorTest {
     }
     
     @Test
-    public void testDefaultConstructor() {
-        final CusumAnomalyDetector detector = new CusumAnomalyDetector(detectorUUID);
-        assertEquals(WEAK_SIGMAS, detector.getWeakSigmas());
-        assertEquals(STRONG_SIGMAS, detector.getStrongSigmas());
-        assertEquals(WARMUP_PERIOD, detector.getWarmUpPeriod());
-    }
-    
-    @Test
     public void testEvaluate() {
         final ListIterator<CusumTestRow> testRows = data.listIterator();
         final CusumTestRow testRow0 = testRows.next();
-        final double observed0 = testRow0.getObserved();
-        final double slackParam = 0.5;
-        final CusumAnomalyDetector detector = new CusumAnomalyDetector(
-                detectorUUID,
-                CusumAnomalyDetector.Type.RIGHT_TAILED,
-                observed0,
-                slackParam,
-                WARMUP_PERIOD,
-                WEAK_SIGMAS,
-                STRONG_SIGMAS,
-                0.16);
-        int noOfDataPoints = 1;
         
-        assertEquals(WEAK_SIGMAS, detector.getWeakSigmas());
-        assertEquals(STRONG_SIGMAS, detector.getStrongSigmas());
-        assertEquals(WARMUP_PERIOD, detector.getWarmUpPeriod());
+        final CusumAnomalyDetector.Params params = new CusumAnomalyDetector.Params()
+                .setType(CusumAnomalyDetector.Type.RIGHT_TAILED)
+                .setTargetValue(0.16)
+                .setWeakSigmas(WEAK_SIGMAS)
+                .setStrongSigmas(STRONG_SIGMAS)
+                .setSlackParam(0.5)
+                .setInitMeanEstimate(testRow0.getObserved())
+                .setWarmUpPeriod(WARMUP_PERIOD);
+        final CusumAnomalyDetector detector = new CusumAnomalyDetector(detectorUUID, params);
         
+        int numDataPoints = 1;
+    
         while (testRows.hasNext()) {
             final CusumTestRow testRow = testRows.next();
             final double observed = testRow.getObserved();
             final MetricData metricData = new MetricData(metricDefinition, observed, epochSecond);
             final AnomalyLevel level = detector.classify(metricData).getAnomalyLevel();
             
-            if (noOfDataPoints < WARMUP_PERIOD) {
+            if (numDataPoints < WARMUP_PERIOD) {
                 assertEquals(AnomalyLevel.UNKNOWN, level);
             } else {
                 assertApproxEqual(testRow.getSh(), detector.getSumHigh());
                 assertApproxEqual(testRow.getSl(), detector.getSumLow());
                 assertEquals(AnomalyLevel.valueOf(testRow.getLevel()), level);
             }
-            noOfDataPoints++;
+            numDataPoints++;
         }
     }
     
@@ -114,7 +100,6 @@ public class CusumAnomalyDetectorTest {
                 .withType(CusumTestRow.class)
                 .build()
                 .parse();
-        
     }
     
     private static void assertApproxEqual(double d1, double d2) {
