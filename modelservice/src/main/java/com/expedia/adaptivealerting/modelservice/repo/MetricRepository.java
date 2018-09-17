@@ -16,13 +16,16 @@
 package com.expedia.adaptivealerting.modelservice.repo;
 
 import com.expedia.adaptivealerting.modelservice.entity.Metric;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 /**
  * @author kashah
- *
  */
-public interface MetricRepository extends JpaRepository<Metric, Integer> {
 
-    Metric findMetricByMetricKey(String metricKey);
+public interface MetricRepository extends PagingAndSortingRepository<Metric, Long> {
+    List<Metric> findByHash(@Param("hash") String hash);
+
 }

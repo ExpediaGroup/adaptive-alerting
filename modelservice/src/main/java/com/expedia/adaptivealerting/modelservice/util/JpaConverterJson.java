@@ -30,7 +30,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author kashah
- *
  */
 
 @Component

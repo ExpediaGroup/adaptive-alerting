@@ -3,10 +3,10 @@ spring:
     web-environment: true
     show-banner: true
   datasource:
-    drivername: com.mysql.cj.jdbc.Driver 
+    drivername: com.mysql.cj.jdbc.Driver
     url: "jdbc:mysql://127.0.0.1:3306/model_service?autoReconnect=true"
-    password: 
-    username: "aa_user"
+    password:
+    username: "root"
     maximum-pool-size: 8
     minimum-idle: 0
   jpa:
@@ -16,6 +16,9 @@ spring:
     generate-ddl: false
     hibernate:
       naming_strategy: org.hibernate.cfg.ImprovedNamingStrategy
+  data:
+    rest:
+      base-path: /api
 
 endpoints:
   health:

@@ -23,8 +23,9 @@ import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class ModelServiceApp {
-    
-    @Autowired private DatabaseSettings settings;
+
+    @Autowired
+    private DatabaseSettings settings;
 
     public static void main(String[] args) {
         SpringApplication.run(ModelServiceApp.class, args);
