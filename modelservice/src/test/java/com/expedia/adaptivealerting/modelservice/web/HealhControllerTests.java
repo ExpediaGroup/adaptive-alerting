@@ -19,7 +19,7 @@ public class HealhControllerTests {
     }
 
     @Test
-    public void testGetModel() {
+    public void testIsActive() {
         boolean isActive = controller.isActive();
         assertEquals(isActive, true);
     }
