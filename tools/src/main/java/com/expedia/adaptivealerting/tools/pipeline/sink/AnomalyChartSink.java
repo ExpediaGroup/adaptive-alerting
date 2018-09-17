@@ -69,10 +69,14 @@ public final class AnomalyChartSink implements AnomalyResultSubscriber, ModelEva
         chartSeries.getObserved().add(second, observed);
         
         addValue(chartSeries.getPredicted(), second, result.getPredicted());
-        addValue(chartSeries.getWeakThresholdUpper(), second, thresholds.getUpperWeak());
-        addValue(chartSeries.getWeakThresoldLower(), second, thresholds.getLowerWeak());
-        addValue(chartSeries.getStrongThresholdUpper(), second, thresholds.getUpperStrong());
-        addValue(chartSeries.getStrongThresholdLower(), second, thresholds.getLowerStrong());
+        
+        // FIXME Hacky check
+        if (thresholds != null) {
+            addValue(chartSeries.getWeakThresholdUpper(), second, thresholds.getUpperWeak());
+            addValue(chartSeries.getWeakThresoldLower(), second, thresholds.getLowerWeak());
+            addValue(chartSeries.getStrongThresholdUpper(), second, thresholds.getUpperStrong());
+            addValue(chartSeries.getStrongThresholdLower(), second, thresholds.getLowerStrong());
+        }
         
         if (level == STRONG) {
             chartSeries.getStrongOutlier().add(second, observed);

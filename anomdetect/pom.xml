@@ -39,10 +39,14 @@
 
         <!-- Compile -->
 
-        <!-- TODO Move to a separate project? Want to eliminate AWS dependency. [WLW] -->
+        <!-- TODO Move these to a separate project. anomdetect shouldn't depend on AWS. [WLW] -->
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-s3</artifactId>
         </dependency>
         <dependency>
             <groupId>com.amazonaws</groupId>
