@@ -39,14 +39,6 @@
 
         <!-- Compile -->
         <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-rds</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.expedia.adaptivealerting</groupId>
-            <artifactId>adaptive-alerting-core</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
         </dependency>
