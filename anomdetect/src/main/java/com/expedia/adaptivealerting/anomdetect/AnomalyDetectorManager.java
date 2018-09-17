@@ -56,9 +56,10 @@ public final class AnomalyDetectorManager {
         notNull(factoryConfig, "factoryConfig can't be null");
         this.detectorFactories = new HashMap<>();
         factoryConfig.entrySet().forEach(entry -> {
+            final String type = entry.getKey();
             final String className = entry.getValue().unwrapped().toString();
             final AnomalyDetectorFactory factory = (AnomalyDetectorFactory) ReflectionUtil.newInstance(className);
-            factory.init(factoryConfig);
+            factory.init(type, factoryConfig);
             detectorFactories.put(entry.getKey(), factory);
         });
     }

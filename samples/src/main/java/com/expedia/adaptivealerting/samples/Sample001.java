@@ -15,8 +15,12 @@
  */
 package com.expedia.adaptivealerting.samples;
 
+import com.expedia.adaptivealerting.anomdetect.cusum.CusumAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.cusum.CusumParams;
 import com.expedia.adaptivealerting.anomdetect.ewma.EwmaAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.ewma.EwmaParams;
 import com.expedia.adaptivealerting.anomdetect.pewma.PewmaAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.pewma.PewmaParams;
 import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.adaptivealerting.core.data.io.MetricFrameLoader;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
@@ -33,40 +37,65 @@ import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.createC
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showChartFrame;
 
 /**
- * Sample that creates a pipeline for traffic data sourced from a CSV file. We have both EWMA and PEWMA charts, both
- * with RMSE evaluators.
- *
  * @author Willie Wheeler
  */
-public final class CsvTrafficEwmaVsPewma {
+public final class Sample001 {
     
     public static void main(String[] args) throws Exception {
         
         // TODO Use the FileDataConnector rather than the MetricFrameLoader. [WLW]
-        final InputStream is = ClassLoader.getSystemResourceAsStream("samples/cal-inflow.csv");
+        final InputStream is = ClassLoader.getSystemResourceAsStream("samples/sample001.csv");
         final MetricFrame frame = MetricFrameLoader.loadCsv(new MetricDefinition("csv"), is, true);
         final MetricFrameMetricSource source = new MetricFrameMetricSource(frame, "data", 200L);
         
-        final AnomalyDetectorFilter ewmaAD = new AnomalyDetectorFilter(new EwmaAnomalyDetector());
-        final AnomalyDetectorFilter pewmaAD = new AnomalyDetectorFilter(new PewmaAnomalyDetector());
+        final EwmaParams ewmaParams = new EwmaParams()
+                .setAlpha(0.20)
+                .setWeakSigmas(4.5)
+                .setStrongSigmas(5.5);
+        final EwmaAnomalyDetector ewmaAD = new EwmaAnomalyDetector(ewmaParams);
+        final AnomalyDetectorFilter ewmaADF = new AnomalyDetectorFilter(ewmaAD);
     
+        final PewmaParams pewmaParams = new PewmaParams()
+                .setAlpha(0.20)
+                .setWeakSigmas(5.0)
+                .setStrongSigmas(6.0);
+        final PewmaAnomalyDetector pewmaAD = new PewmaAnomalyDetector(pewmaParams);
+        final AnomalyDetectorFilter pewmaADF = new AnomalyDetectorFilter(pewmaAD);
+        
+        final CusumParams cusumParams = new CusumParams()
+                .setType(CusumParams.Type.RIGHT_TAILED)
+                .setTargetValue(20_000_000)
+                .setWeakSigmas(3.0)
+                .setStrongSigmas(4.0)
+                .setInitMeanEstimate(13_000_000);
+        final CusumAnomalyDetector cusumAD = new CusumAnomalyDetector(cusumParams);
+        final AnomalyDetectorFilter cusumADF = new AnomalyDetectorFilter(cusumAD);
+        
         final EvaluatorFilter ewmaEval = new EvaluatorFilter(new RmseEvaluator());
         final EvaluatorFilter pewmaEval = new EvaluatorFilter(new RmseEvaluator());
         
         final AnomalyChartSink ewmaChart = PipelineFactory.createChartSink("EWMA");
         final AnomalyChartSink pewmaChart = PipelineFactory.createChartSink("PEWMA");
+        final AnomalyChartSink cusumChart = PipelineFactory.createChartSink("CUSUM");
         
-        source.addSubscriber(ewmaAD);
-        ewmaAD.addSubscriber(ewmaEval);
-        ewmaAD.addSubscriber(ewmaChart);
+        source.addSubscriber(ewmaADF);
+        ewmaADF.addSubscriber(ewmaEval);
+        ewmaADF.addSubscriber(ewmaChart);
         ewmaEval.addSubscriber(ewmaChart);
         
-        source.addSubscriber(pewmaAD);
-        pewmaAD.addSubscriber(pewmaEval);
-        pewmaAD.addSubscriber(pewmaChart);
+        source.addSubscriber(pewmaADF);
+        pewmaADF.addSubscriber(pewmaEval);
+        pewmaADF.addSubscriber(pewmaChart);
         pewmaEval.addSubscriber(pewmaChart);
         
-        showChartFrame(createChartFrame("Cal Inflow", ewmaChart.getChart(), pewmaChart.getChart()));
+        source.addSubscriber(cusumADF);
+        cusumADF.addSubscriber(cusumChart);
+        
+        showChartFrame(createChartFrame(
+                "Sample001.csv",
+                ewmaChart.getChart(),
+                pewmaChart.getChart(),
+                cusumChart.getChart()));
         source.start();
     }
 }

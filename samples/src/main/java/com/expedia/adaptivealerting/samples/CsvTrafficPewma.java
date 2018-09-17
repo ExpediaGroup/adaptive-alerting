@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.control.PewmaAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.pewma.PewmaAnomalyDetector;
 import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.adaptivealerting.core.data.io.MetricFrameLoader;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;

@@ -15,7 +15,8 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.control.PewmaAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.pewma.PewmaAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.pewma.PewmaParams;
 import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.adaptivealerting.core.data.io.MetricFrameLoader;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
@@ -43,7 +44,7 @@ public class CsvTrafficPewmaVariants {
         final MetricFrame frame = MetricFrameLoader.loadCsv(new MetricDefinition("csv"), is, true);
         final MetricFrameMetricSource source = new MetricFrameMetricSource(frame, "data", 200L);
         
-        final PewmaAnomalyDetector.Params params1 = new PewmaAnomalyDetector.Params()
+        final PewmaParams params1 = new PewmaParams()
                 .setAlpha(0.15)
                 .setBeta(1.0)
                 .setWeakSigmas(2.0)
@@ -51,7 +52,7 @@ public class CsvTrafficPewmaVariants {
                 .setInitMeanEstimate(0.0);
         final AnomalyDetectorFilter ad1 = new AnomalyDetectorFilter(new PewmaAnomalyDetector(params1));
     
-        final PewmaAnomalyDetector.Params params2 = new PewmaAnomalyDetector.Params()
+        final PewmaParams params2 = new PewmaParams()
                 .setAlpha(0.25)
                 .setBeta(1.0)
                 .setWeakSigmas(2.0)
@@ -59,7 +60,7 @@ public class CsvTrafficPewmaVariants {
                 .setInitMeanEstimate(0.0);
         final AnomalyDetectorFilter ad2 = new AnomalyDetectorFilter(new PewmaAnomalyDetector(params2));
     
-        final PewmaAnomalyDetector.Params params3 = new PewmaAnomalyDetector.Params()
+        final PewmaParams params3 = new PewmaParams()
                 .setAlpha(0.35)
                 .setBeta(1.0)
                 .setWeakSigmas(2.0)
