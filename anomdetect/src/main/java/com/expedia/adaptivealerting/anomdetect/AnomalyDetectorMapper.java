@@ -52,7 +52,12 @@ public final class AnomalyDetectorMapper {
     }
     
     private List<AnomalyDetectorMeta> findDetectors(MetricDefinition metricDefinition) {
+        
         // TODO Replace this to call to model service. Likely want caching here as well. [WLW]
-        return new ArrayList<>();
+        final List<AnomalyDetectorMeta> metas = new ArrayList<>();
+        
+        
+        
+        return metas;
     }
 }

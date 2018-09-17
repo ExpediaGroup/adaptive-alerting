@@ -13,12 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.dao;
+package com.expedia.adaptivealerting.modelservice.entity;
+
+import lombok.Data;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 /**
- * Model data access object.
+ * Model type.
  *
  * @author Willie Wheeler
  */
-public interface ModelDao {
+@Data
+@Entity
+public class ModelType {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    public String key;
 }

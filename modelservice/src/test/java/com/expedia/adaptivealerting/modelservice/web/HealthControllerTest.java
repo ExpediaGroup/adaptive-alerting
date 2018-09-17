@@ -7,7 +7,7 @@ import org.mockito.MockitoAnnotations;
 
 import static junit.framework.TestCase.assertEquals;
 
-public class HealhControllerTests {
+public class HealthControllerTest {
 
     /* Class under test */
     @InjectMocks

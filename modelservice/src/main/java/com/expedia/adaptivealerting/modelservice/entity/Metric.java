@@ -17,19 +17,22 @@ package com.expedia.adaptivealerting.modelservice.entity;
 
 import com.expedia.adaptivealerting.modelservice.util.JpaConverterJson;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.util.Map;
-
 
 @Data
 @Entity
-@NoArgsConstructor
 public class Metric {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(name = "m_key")
     private String key;
@@ -38,10 +41,4 @@ public class Metric {
 
     @Convert(converter = JpaConverterJson.class)
     private Map<String, Object> tags;
-
-    public Metric(String key, String hash) {
-        this.key = key;
-        this.hash = hash;
-
-    }
 }
