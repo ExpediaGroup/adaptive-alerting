@@ -16,59 +16,37 @@
 package com.expedia.adaptivealerting.modelservice.entity;
 
 import lombok.Data;
+
 import javax.persistence.*;
+
 import com.expedia.adaptivealerting.modelservice.util.JpaConverterJson;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import lombok.NoArgsConstructor;
+
+import java.sql.Timestamp;
 import java.util.Map;
 
 @Data
 @Entity
-@Table(name = "model")
+@NoArgsConstructor
 public class Model {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private long id;
 
-    @Column(name = "model_uuid")
-    private String modelUUID;
+    private String uuid;
 
-    @Column(name = "hyperparams")
     @Convert(converter = JpaConverterJson.class)
     private Map<String, Object> hyperparams;
 
-    @Convert(converter = JpaConverterJson.class)
-    private Map<String, Object> thresholds;
-
-    @Column(name = "to_rebuild")
-    private boolean toRebuild;
+    @Column(name = "training_location")
+    private String trainingLocation;
 
     @Column(name = "last_build_ts")
-    private Date buildTimestamp;
+    private Timestamp buildTimestamp;
 
-    @Column(name = "training_location")
-    private Date trainingLocation;
-
-    @ManyToMany(mappedBy = "models", cascade = CascadeType.ALL)
-    private List<Metric> metrics = new ArrayList<>();
-
-    public Model() {
-
-    }
-
-    public Model(String uuid, Map<String, Object> hyperparams, Map<String, Object> thresholds, boolean toRebuild,
-            Date buildTimestamp) {
-        this.modelUUID = uuid;
+    public Model(String uuid, Map<String, Object> hyperparams, String trainingLocation) {
+        this.uuid = uuid;
         this.hyperparams = hyperparams;
-        this.thresholds = thresholds;
-        this.toRebuild = toRebuild;
-        this.buildTimestamp = buildTimestamp;
-    }
-
-    public Model(String uuid, Map<String, Object> hyperparams) {
-        this.modelUUID = uuid;
-        this.hyperparams = hyperparams;
+        this.trainingLocation = trainingLocation;
     }
 }

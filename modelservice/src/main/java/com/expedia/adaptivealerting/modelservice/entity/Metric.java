@@ -15,35 +15,33 @@
  */
 package com.expedia.adaptivealerting.modelservice.entity;
 
+import com.expedia.adaptivealerting.modelservice.util.JpaConverterJson;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
+
 
 @Data
 @Entity
-@Table(name = "metric")
+@NoArgsConstructor
 public class Metric {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private long id;
 
-    @Column(name = "metric_key")
-    private String metricKey;
+    @Column(name = "m_key")
+    private String key;
 
-    @ManyToMany(targetEntity = Model.class, cascade = { CascadeType.ALL })
-    @JoinTable(name = "metric_model", joinColumns = { @JoinColumn(name = "metric_id") }, inverseJoinColumns = {
-            @JoinColumn(name = "model_id") })
-    private List<Model> models = new ArrayList<>();
+    private String hash;
 
-    public Metric() {
+    @Convert(converter = JpaConverterJson.class)
+    private Map<String, Object> tags;
+
+    public Metric(String key, String hash) {
+        this.key = key;
+        this.hash = hash;
 
     }
-
-    public Metric(String key) {
-        this.metricKey = key;
-    }
-
 }

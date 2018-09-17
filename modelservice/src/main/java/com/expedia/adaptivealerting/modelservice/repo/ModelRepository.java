@@ -16,17 +16,16 @@
 package com.expedia.adaptivealerting.modelservice.repo;
 
 import com.expedia.adaptivealerting.modelservice.entity.Model;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
+
+import java.util.List;
+
 
 /**
  * @author kashah
- *
  */
-public interface ModelRepository extends JpaRepository<Model, Integer> {
-
-    @Query("select m.id from Model m where m.modelUUID = :uuid")
-    Integer findIdByModelUUID(@Param("uuid") String uuid);
+public interface ModelRepository extends PagingAndSortingRepository<Model, Long> {
+    List<Model> findByUuid(@Param("uuid") String uuid);
 
 }
