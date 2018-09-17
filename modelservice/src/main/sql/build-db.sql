@@ -26,7 +26,7 @@ create table model
 
 create table metric_model_mapping
 (
-  id         int unsigned primary key not null  AUTO_INCREMENT,
+  id         int unsigned primary key not null auto_increment,
   metric_id  int unsigned not null,
   model_id   int unsigned not null,
   constraint metric_id_fk foreign key (metric_id) references metric (id)
