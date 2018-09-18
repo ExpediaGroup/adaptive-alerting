@@ -3,10 +3,10 @@ spring:
     web-environment: true
     show-banner: true
   datasource:
-    drivername: com.mysql.cj.jdbc.Driver
-    url: "jdbc:mysql://127.0.0.1:3306/model_service?autoReconnect=true"
-    password:
-    username: "root"
+    driver-class-name: "com.mysql.cj.jdbc.Driver"
+    url: "jdbc:mysql://127.0.0.1:3306/aa_model_service?autoReconnect=true"
+    username: "aa"
+    password: "password"
     maximum-pool-size: 8
     minimum-idle: 0
   jpa:
