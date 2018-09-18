@@ -38,8 +38,8 @@ public final class AnomalyDetectorMapperTest {
     private AnomalyDetectorMapper mapper;
 
     // Test objects
-    private MetricData mpointWithDetectors;
-    private MetricData mpointWithoutDetectors;
+    private MetricData metricDataWithDetectors;
+    private MetricData metricDataWithoutDetectors;
 
     @Before
     public void setUp() {
@@ -53,7 +53,7 @@ public final class AnomalyDetectorMapperTest {
                     put("mtype", "dummy");
                     put("what", "bookings");
                 }}));
-        this.mpointWithDetectors = new MetricData(metricWithDetectors, 9, System.currentTimeMillis());
+        this.metricDataWithDetectors = new MetricData(metricWithDetectors, 9, System.currentTimeMillis());
 
         // TODO For now, this is known to have no detectors. See above.
         final MetricDefinition metricWithoutDetectors = new MetricDefinition(new TagCollection(
@@ -61,20 +61,20 @@ public final class AnomalyDetectorMapperTest {
                     put("unit", "dummy");
                     put("mtype", "dummy");
                 }}));
-        this.mpointWithoutDetectors = new MetricData(metricWithoutDetectors, 9, System.currentTimeMillis());
+        this.metricDataWithoutDetectors = new MetricData(metricWithoutDetectors, 9, System.currentTimeMillis());
     }
 
     @Test
     @Ignore
-    public void testMap_mpointWithDetectors() {
-        final Set<MappedMetricData> results = mapper.map(mpointWithDetectors);
+    public void testMap_metricDataWithDetectors() {
+        final Set<MappedMetricData> results = mapper.map(metricDataWithDetectors);
         assertFalse(results.isEmpty());
     }
 
     @Test
     @Ignore
-    public void testMap_mpointWithoutDetectors() {
-        final Set<MappedMetricData> results = mapper.map(mpointWithoutDetectors);
+    public void testMap_metricDataWithoutDetectors() {
+        final Set<MappedMetricData> results = mapper.map(metricDataWithoutDetectors);
         assertTrue(results.isEmpty());
     }
 }

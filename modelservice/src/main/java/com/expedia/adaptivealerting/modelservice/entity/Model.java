@@ -15,38 +15,51 @@
  */
 package com.expedia.adaptivealerting.modelservice.entity;
 
+import com.expedia.adaptivealerting.modelservice.util.JpaConverterJson;
 import lombok.Data;
 
-import javax.persistence.*;
-
-import com.expedia.adaptivealerting.modelservice.util.JpaConverterJson;
-import lombok.NoArgsConstructor;
-
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import java.sql.Timestamp;
 import java.util.Map;
 
 @Data
 @Entity
-@NoArgsConstructor
 public class Model {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-
+    private Long id;
+    
     private String uuid;
-
+    
+    @ManyToOne
+    @JoinColumn(name = "type_id")
+    private ModelType type;
+    
     @Convert(converter = JpaConverterJson.class)
     private Map<String, Object> hyperparams;
-
-    @Column(name = "training_location")
+    
     private String trainingLocation;
-
+    
+    /**
+     * DB-driven weak sigma override for models that have this parameter. Allows us to make sensitivity adjustments in
+     * response to user feedback when ground truth classifications aren't available.
+     */
+    private double weakSigmas;
+    
+    /**
+     * DB-driven strong sigma override for models that have this parameter. Allows us to make sensitivity adjustments in
+     * response to user feedback when ground truth classifications aren't available.
+     */
+    private double strongSigmas;
+    
     @Column(name = "last_build_ts")
     private Timestamp buildTimestamp;
-
-    public Model(String uuid, Map<String, Object> hyperparams, String trainingLocation) {
-        this.uuid = uuid;
-        this.hyperparams = hyperparams;
-        this.trainingLocation = trainingLocation;
-    }
 }

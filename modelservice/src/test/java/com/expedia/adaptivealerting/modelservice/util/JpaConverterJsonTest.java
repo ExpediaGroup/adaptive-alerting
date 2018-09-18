@@ -33,7 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * @author kashah
  */
-public class JpaConverterJsonTests {
+public class JpaConverterJsonTest {
 
     /* Class under test */
     @InjectMocks
