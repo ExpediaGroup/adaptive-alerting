@@ -15,29 +15,13 @@
  */
 package com.expedia.adaptivealerting.modelservice;
 
-import org.apache.tomcat.jdbc.pool.DataSource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class ModelServiceApp {
 
-    @Autowired
-    private DatabaseSettings settings;
-
     public static void main(String[] args) {
         SpringApplication.run(ModelServiceApp.class, args);
-    }
-
-    @Bean
-    public DataSource dataSource() {
-        DataSource dataSource = new DataSource();
-        dataSource.setDriverClassName(settings.getDrivername());
-        dataSource.setUrl(settings.getUrl());
-        dataSource.setUsername(settings.getUsername());
-        dataSource.setPassword(settings.getPassword());
-        return dataSource;
     }
 }
