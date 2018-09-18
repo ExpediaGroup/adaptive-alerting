@@ -21,7 +21,7 @@ ENV JMXTRANS_AGENT jmxtrans-agent-1.2.6
 
 RUN mkdir -p ${APP_HOME}
 
-COPY target/haystack-adaptive-alerting-modelservice-1.0.0-SNAPSHOT.jar ${APP_HOME}/haystack-adaptive-alerting-modelservice.jar
+COPY target/adaptive-alerting-modelservice-1.0.0-SNAPSHOT.jar ${APP_HOME}/adaptive-alerting-modelservice.jar
 COPY docker/start-app.sh ${APP_HOME}/
 COPY docker/jmxtrans-agent.xml ${APP_HOME}/
 
