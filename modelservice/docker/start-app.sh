@@ -31,4 +31,4 @@ JAVA_OPTS="${JAVA_OPTS} \
     -Dapplication.home=${APP_HOME}"
 
 
-exec java ${JAVA_OPTS} -jar "${APP_HOME}/haystack-adaptive-alerting-modelservice.jar" --spring.config.location=/config/application.yml
+exec java ${JAVA_OPTS} -jar "${APP_HOME}/adaptive-alerting-modelservice.jar" --spring.config.location=/config/application.yml
