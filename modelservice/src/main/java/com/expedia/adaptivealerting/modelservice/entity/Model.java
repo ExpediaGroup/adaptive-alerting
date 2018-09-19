@@ -45,6 +45,10 @@ public class Model {
     
     @Convert(converter = JpaConverterJson.class)
     private Map<String, Object> hyperparams;
+
+
+    @Convert(converter = JpaConverterJson.class)
+    private Map<String, Object> otherStuff;
     
     private String trainingLocation;
     

@@ -39,6 +39,8 @@ public class Metric {
 
     private String hash;
 
+    private String description;
+
     @Convert(converter = JpaConverterJson.class)
     private Map<String, Object> tags;
 }

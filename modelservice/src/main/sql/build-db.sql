@@ -10,6 +10,7 @@ create table metric
   id        int unsigned primary key not null auto_increment,
   m_key     varchar(100) unique not null,
   hash      varchar(100) unique not null,
+  description varchar(100) unique not null,
   tags      json
 );
 
@@ -29,6 +30,7 @@ create table model
   weak_sigmas         decimal(3, 3),
   strong_sigmas       decimal(3, 3),
   last_build_ts       timestamp,
+  other_stuff         json,
   constraint type_id_fk foreign key (type_id) references model_type (id)
 );
 
