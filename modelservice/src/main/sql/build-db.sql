@@ -7,11 +7,11 @@ use aa_model_service;
 
 create table metric
 (
-  id        int unsigned primary key not null auto_increment,
-  m_key     varchar(100) unique not null,
-  hash      varchar(100) unique not null,
-  description varchar(100) unique not null,
-  tags      json
+  id           int unsigned primary key not null auto_increment,
+  m_key        varchar(100) unique not null,
+  hash         varchar(100) unique not null,
+  description  varchar(100) unique not null,
+  tags         json
 );
 
 create table model_type
