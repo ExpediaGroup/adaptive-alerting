@@ -46,21 +46,21 @@ public class Model {
     @Convert(converter = JpaConverterJson.class)
     private Map<String, Object> hyperparams;
 
-    @Convert(converter = JpaConverterJson.class)
-    private Map<String, Object> otherStuff;
-    
+    @Column(name = "training_location")
     private String trainingLocation;
     
     /**
      * DB-driven weak sigma override for models that have this parameter. Allows us to make sensitivity adjustments in
      * response to user feedback when ground truth classifications aren't available.
      */
+    @Column(name = "weak_sigmas")
     private double weakSigmas;
     
     /**
      * DB-driven strong sigma override for models that have this parameter. Allows us to make sensitivity adjustments in
      * response to user feedback when ground truth classifications aren't available.
      */
+    @Column(name = "strong_sigmas")
     private double strongSigmas;
     
     @Column(name = "last_build_ts")

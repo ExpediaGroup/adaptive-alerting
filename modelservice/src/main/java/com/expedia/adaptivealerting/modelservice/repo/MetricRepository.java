@@ -26,6 +26,7 @@ import java.util.List;
  */
 
 public interface MetricRepository extends PagingAndSortingRepository<Metric, Long> {
+
     List<Metric> findByHash(@Param("hash") String hash);
 
 }

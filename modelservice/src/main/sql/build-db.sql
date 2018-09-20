@@ -8,16 +8,17 @@ use aa_model_service;
 create table metric
 (
   id           int unsigned primary key not null auto_increment,
-  m_key        varchar(100) unique not null,
+  `key`        varchar(255) unique not null,
   hash         varchar(100) unique not null,
-  description  varchar(100) unique not null,
+  description  varchar(255) unique not null,
   tags         json
 );
 
 create table model_type
 (
-  id        smallint unsigned primary key not null auto_increment,
-  `key`     varchar(100) unique not null
+  id           smallint unsigned primary key not null auto_increment,
+  `key`        varchar(100) unique not null,
+  seyren_flag  boolean default false,
 );
 
 create table model

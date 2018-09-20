@@ -36,4 +36,8 @@ public class ModelType {
     private Long id;
     
     public String key;
+
+    boolean seyrenFlag;
+
+
 }
