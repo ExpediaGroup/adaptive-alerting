@@ -18,7 +18,7 @@ create table model_type
 (
   id           smallint unsigned primary key not null auto_increment,
   `key`        varchar(100) unique not null,
-  seyren_flag  boolean default false,
+  seyren_flag  boolean default false
 );
 
 create table model

@@ -30,14 +30,13 @@ import javax.persistence.Id;
 @Data
 @Entity
 public class ModelType {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     public String key;
 
     boolean seyrenFlag;
-
 
 }

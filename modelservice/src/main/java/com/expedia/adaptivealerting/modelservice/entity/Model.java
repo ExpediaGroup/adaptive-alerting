@@ -32,37 +32,34 @@ import java.util.Map;
 @Data
 @Entity
 public class Model {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     private String uuid;
-    
+
     @ManyToOne
     @JoinColumn(name = "type_id")
     private ModelType type;
-    
+
     @Convert(converter = JpaConverterJson.class)
     private Map<String, Object> hyperparams;
 
-    @Column(name = "training_location")
     private String trainingLocation;
-    
+
     /**
      * DB-driven weak sigma override for models that have this parameter. Allows us to make sensitivity adjustments in
      * response to user feedback when ground truth classifications aren't available.
      */
-    @Column(name = "weak_sigmas")
     private double weakSigmas;
-    
+
     /**
      * DB-driven strong sigma override for models that have this parameter. Allows us to make sensitivity adjustments in
      * response to user feedback when ground truth classifications aren't available.
      */
-    @Column(name = "strong_sigmas")
     private double strongSigmas;
-    
+
     @Column(name = "last_build_ts")
     private Timestamp buildTimestamp;
 }
