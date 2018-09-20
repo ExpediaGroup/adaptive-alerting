@@ -7,16 +7,18 @@ use aa_model_service;
 
 create table metric
 (
-  id        int unsigned primary key not null auto_increment,
-  m_key     varchar(100) unique not null,
-  hash      varchar(100) unique not null,
-  tags      json
+  id           int unsigned primary key not null auto_increment,
+  `key`        varchar(255) unique not null,
+  hash         char(36) unique not null,
+  description  varchar(255) unique not null,
+  tags         json
 );
 
 create table model_type
 (
-  id        smallint unsigned primary key not null auto_increment,
-  `key`     varchar(100) unique not null
+  id           smallint unsigned primary key not null auto_increment,
+  `key`        varchar(100) unique not null,
+  seyren_flag  boolean default false
 );
 
 create table model
@@ -29,6 +31,7 @@ create table model
   weak_sigmas         decimal(3, 3),
   strong_sigmas       decimal(3, 3),
   last_build_ts       timestamp,
+  other_stuff         json,
   constraint type_id_fk foreign key (type_id) references model_type (id)
 );
 

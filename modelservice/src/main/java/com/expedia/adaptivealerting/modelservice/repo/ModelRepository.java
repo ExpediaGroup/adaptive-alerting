@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.repo;
 
 import com.expedia.adaptivealerting.modelservice.entity.Model;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
@@ -26,6 +27,10 @@ import java.util.List;
  * @author kashah
  */
 public interface ModelRepository extends PagingAndSortingRepository<Model, Long> {
+
     List<Model> findByUuid(@Param("uuid") String uuid);
+
+    @Query("select mmm.model from MetricModelMapping mmm where mmm.metric.hash=:hash")
+    List<Model> findModelsByHash(@Param("hash") String hash);
 
 }
