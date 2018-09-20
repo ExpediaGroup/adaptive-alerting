@@ -35,8 +35,8 @@ public class ModelType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    public String key;
+    private String key;
 
-    boolean seyrenFlag;
+    private boolean seyrenFlag;
 
 }
