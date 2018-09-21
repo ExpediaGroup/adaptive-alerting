@@ -29,37 +29,42 @@ import javax.persistence.ManyToOne;
 import java.sql.Timestamp;
 import java.util.Map;
 
+/**
+ * Anomaly detection model.
+ *
+ * @author kashah
+ */
 @Data
 @Entity
 public class Model {
-    
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    
+
     private String uuid;
-    
+
     @ManyToOne
     @JoinColumn(name = "type_id")
     private ModelType type;
-    
+
     @Convert(converter = JpaConverterJson.class)
     private Map<String, Object> hyperparams;
-    
+
     private String trainingLocation;
-    
+
     /**
      * DB-driven weak sigma override for models that have this parameter. Allows us to make sensitivity adjustments in
      * response to user feedback when ground truth classifications aren't available.
      */
     private double weakSigmas;
-    
+
     /**
      * DB-driven strong sigma override for models that have this parameter. Allows us to make sensitivity adjustments in
      * response to user feedback when ground truth classifications aren't available.
      */
     private double strongSigmas;
-    
+
     @Column(name = "last_build_ts")
     private Timestamp buildTimestamp;
 }

@@ -9,7 +9,7 @@ import javax.persistence.*;
 public class MetricModelMapping {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @ManyToOne

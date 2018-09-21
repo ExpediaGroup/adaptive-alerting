@@ -16,16 +16,21 @@
 package com.expedia.adaptivealerting.modelservice.repo;
 
 import com.expedia.adaptivealerting.modelservice.entity.Model;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-
 /**
+ * Spring Data repository for anomaly detection models.
+ *
  * @author kashah
  */
 public interface ModelRepository extends PagingAndSortingRepository<Model, Long> {
+
     List<Model> findByUuid(@Param("uuid") String uuid);
 
+    @Query("select mmm.model from MetricModelMapping mmm where mmm.metric.hash = :hash")
+    List<Model> findByMetricHash(@Param("hash") String hash);
 }
