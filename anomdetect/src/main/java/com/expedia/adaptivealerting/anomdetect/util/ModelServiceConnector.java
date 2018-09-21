@@ -17,9 +17,8 @@ package com.expedia.adaptivealerting.anomdetect.util;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorMeta;
 import com.expedia.metrics.MetricDefinition;
-import com.expedia.metrics.metrictank.MetricTankIdFactory;
 import lombok.Getter;
-import sun.net.www.http.HttpClient;
+import org.apache.http.client.HttpClient;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -50,8 +49,8 @@ public class ModelServiceConnector {
     }
     
     public Set<AnomalyDetectorMeta> findDetectors(MetricDefinition metricDefinition) {
-        MetricTankIdFactory idFactory = new MetricTankIdFactory();
-        String id = idFactory.getId(metricDefinition);
+//        MetricTankIdFactory idFactory = new MetricTankIdFactory();
+//        String id = idFactory.getId(metricDefinition);
         
         // TODO
         

@@ -17,18 +17,18 @@ package com.expedia.adaptivealerting.anomdetect.util;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorMeta;
 import com.expedia.metrics.MetricDefinition;
+import org.apache.http.client.HttpClient;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import sun.net.www.http.HttpClient;
 
 import java.util.Set;
 
 import static org.junit.Assert.assertNotNull;
 
 /**
- * {@link ModelServiceConnector} unit tests.
+ * {@link ModelServiceConnector} unit tests.R
  *
  * @author Willie Wheeler
  */
