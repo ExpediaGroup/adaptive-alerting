@@ -26,6 +26,8 @@ import com.expedia.adaptivealerting.kafka.detector.KafkaAnomalyDetectorManager
 import com.expedia.adaptivealerting.kafka.mapper.KafkaAnomalyDetectorMapper
 import com.expedia.adaptivealerting.pipeline.integration.{EmbeddedKafka, IntegrationTestSpec}
 import com.expedia.metrics.{MetricData, MetricDefinition}
+import org.apache.http.client.HttpClient
+import org.apache.http.impl.client.HttpClients
 import org.apache.kafka.clients.admin.AdminClient
 import org.apache.kafka.streams.KeyValue
 import org.apache.kafka.streams.integration.utils.IntegrationTestUtils
@@ -113,12 +115,9 @@ class ConstantThresholdBasedE2ETestSpec extends IntegrationTestSpec {
     }
   }
 
-  private def modelServiceConnector = {
-    new ModelServiceConnector()
-  }
-
   private def adMapperRunner = {
-    val modelServiceConnector: ModelServiceConnector = new ModelServiceConnector()
+    val httpClient: HttpClient = HttpClients.createDefault()
+    val modelServiceConnector: ModelServiceConnector = new ModelServiceConnector(httpClient)
     new KafkaAnomalyDetectorMapper(appConfig(ANOMALY_DETECTOR_MAPPER), new AnomalyDetectorMapper(modelServiceConnector))
   }
 

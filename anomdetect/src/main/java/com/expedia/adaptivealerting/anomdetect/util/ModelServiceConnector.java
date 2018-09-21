@@ -17,8 +17,13 @@ package com.expedia.adaptivealerting.anomdetect.util;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorMeta;
 import com.expedia.metrics.MetricDefinition;
+import lombok.Getter;
+import org.apache.http.client.HttpClient;
 
+import java.util.HashSet;
 import java.util.Set;
+
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * <p>
@@ -35,12 +40,21 @@ import java.util.Set;
  */
 public class ModelServiceConnector {
     
+    @Getter
+    private HttpClient httpClient;
+    
+    public ModelServiceConnector(HttpClient httpClient) {
+        notNull(httpClient, "httpClient can't be null");
+        this.httpClient = httpClient;
+    }
+    
     public Set<AnomalyDetectorMeta> findDetectors(MetricDefinition metricDefinition) {
 //        MetricTankIdFactory idFactory = new MetricTankIdFactory();
-//        String id = idFactory.getId(metricPoint.getMetricDefinition());
-//        final Set<AnomalyDetectorMeta> metas = new HashSet<>();
-//        return metas;
+//        String id = idFactory.getId(metricDefinition);
         
-        throw new UnsupportedOperationException("Not yet implemented");
+        // TODO
+        
+        final Set<AnomalyDetectorMeta> metas = new HashSet<>();
+        return metas;
     }
 }

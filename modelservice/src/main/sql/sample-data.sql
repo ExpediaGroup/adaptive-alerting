@@ -1,4 +1,6 @@
-INSERT INTO model_type (`key`) VALUES
+USE aa_model_service;
+
+INSERT INTO model_type (ukey) VALUES
   ('aquila-detector'),
   ('constant-detector'),
   ('cusum-detector'),
