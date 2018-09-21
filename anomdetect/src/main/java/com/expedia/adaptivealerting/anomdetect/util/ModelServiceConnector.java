@@ -17,11 +17,14 @@ package com.expedia.adaptivealerting.anomdetect.util;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorMeta;
 import com.expedia.metrics.MetricDefinition;
+import com.expedia.metrics.metrictank.MetricTankIdFactory;
 import lombok.Getter;
 import sun.net.www.http.HttpClient;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * <p>
@@ -42,12 +45,15 @@ public class ModelServiceConnector {
     private HttpClient httpClient;
     
     public ModelServiceConnector(HttpClient httpClient) {
+        notNull(httpClient, "httpClient can't be null");
         this.httpClient = httpClient;
     }
     
     public Set<AnomalyDetectorMeta> findDetectors(MetricDefinition metricDefinition) {
-//        MetricTankIdFactory idFactory = new MetricTankIdFactory();
-//        String id = idFactory.getId(metricPoint.getMetricDefinition());
+        MetricTankIdFactory idFactory = new MetricTankIdFactory();
+        String id = idFactory.getId(metricDefinition);
+        
+        // TODO
         
         final Set<AnomalyDetectorMeta> metas = new HashSet<>();
         return metas;

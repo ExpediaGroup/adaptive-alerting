@@ -58,6 +58,10 @@
             <artifactId>adaptive-alerting-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.expedia</groupId>
+            <artifactId>metrics-java-metrictank</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
         </dependency>
