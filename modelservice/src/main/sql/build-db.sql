@@ -6,15 +6,15 @@ USE aa_model_service;
 
 create table metric (
   id          int unsigned primary key not null auto_increment,
-  `key`       varchar(255) unique      not null,
+  ukey        varchar(255) unique      not null,
   hash        char(36) unique          not null,
   description varchar(255) unique      not null,
   tags        json
 );
 
 create table model_type (
-  id    smallint unsigned primary key not null auto_increment,
-  `key` varchar(100) unique           not null
+  id   smallint unsigned primary key not null auto_increment,
+  ukey varchar(100) unique           not null
 );
 
 create table model (
