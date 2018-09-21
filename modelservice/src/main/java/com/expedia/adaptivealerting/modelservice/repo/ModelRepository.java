@@ -23,6 +23,8 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 /**
+ * Spring Data repository for anomaly detection models.
+ *
  * @author kashah
  */
 public interface ModelRepository extends PagingAndSortingRepository<Model, Long> {

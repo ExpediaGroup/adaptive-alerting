@@ -29,12 +29,17 @@ import javax.persistence.ManyToOne;
 import java.sql.Timestamp;
 import java.util.Map;
 
+/**
+ * Anomaly detection model.
+ *
+ * @author kashah
+ */
 @Data
 @Entity
 public class Model {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     private String uuid;

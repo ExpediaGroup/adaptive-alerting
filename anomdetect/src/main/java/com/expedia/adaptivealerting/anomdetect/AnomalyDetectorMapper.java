@@ -53,6 +53,10 @@ public final class AnomalyDetectorMapper {
     
     private List<AnomalyDetectorMeta> findDetectors(MetricDefinition metricDefinition) {
         
+        // TODO Added
+//        MetricTankIdFactory idFactory =  new MetricTankIdFactory();
+//        String id = idFactory.getId(metricPoint.getMetricDefinition());
+        
         // TODO Replace this to call to model service. Likely want caching here as well. [WLW]
         final List<AnomalyDetectorMeta> metas = new ArrayList<>();
         

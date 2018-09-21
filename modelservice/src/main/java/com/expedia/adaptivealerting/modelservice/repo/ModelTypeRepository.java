@@ -13,27 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.entity;
+package com.expedia.adaptivealerting.modelservice.repo;
 
-import lombok.Data;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import com.expedia.adaptivealerting.modelservice.entity.ModelType;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
 /**
- * Model type.
+ * Spring Data repository for model types.
  *
  * @author Willie Wheeler
  */
-@Data
-@Entity
-public class ModelType {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
-    private String key;
+public interface ModelTypeRepository extends PagingAndSortingRepository<ModelType, Long> {
+    
+    /**
+     * Returns the model type having the given key.
+     *
+     * @param key Key.
+     * @return Model type with the given key.
+     */
+    ModelType findByKey(@Param("key") String key);
 }

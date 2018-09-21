@@ -22,11 +22,11 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 /**
+ * Spring Data repository for metrics.
+ *
  * @author kashah
  */
-
 public interface MetricRepository extends PagingAndSortingRepository<Metric, Long> {
-
+    
     List<Metric> findByHash(@Param("hash") String hash);
-
 }
