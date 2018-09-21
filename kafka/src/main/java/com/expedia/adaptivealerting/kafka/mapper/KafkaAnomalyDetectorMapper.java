@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.kafka.mapper;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorMapper;
+import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.metrics.MetricData;
 import com.expedia.adaptivealerting.kafka.AbstractKafkaApp;
@@ -42,7 +43,9 @@ public final class KafkaAnomalyDetectorMapper extends AbstractKafkaApp {
     
     public static void main(String[] args) {
         final Config appConfig = AppUtil.getAppConfig(ANOMALY_DETECTOR_MAPPER);
-        new KafkaAnomalyDetectorMapper(appConfig, new AnomalyDetectorMapper()).start();
+        final ModelServiceConnector modelServiceConnector = new ModelServiceConnector();
+        final AnomalyDetectorMapper mapper = new AnomalyDetectorMapper(modelServiceConnector);
+        new KafkaAnomalyDetectorMapper(appConfig, mapper).start();
     }
     
     public KafkaAnomalyDetectorMapper(Config appConfig, AnomalyDetectorMapper mapper) {

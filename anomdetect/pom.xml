@@ -57,6 +57,10 @@
             <groupId>com.expedia.adaptivealerting</groupId>
             <artifactId>adaptive-alerting-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>
 
         <!-- TODO Remove dependency on Haystack commons. [WLW] -->
         <dependency>

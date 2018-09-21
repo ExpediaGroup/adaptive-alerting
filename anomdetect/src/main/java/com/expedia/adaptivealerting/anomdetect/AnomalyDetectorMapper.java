@@ -15,27 +15,37 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
+import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.metrics.MetricData;
-import com.expedia.metrics.MetricDefinition;
-import lombok.extern.slf4j.Slf4j;
+import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
- * Entry into the Adaptive Alerting runtime. Its job is find for any incoming {@link MetricData} its set of mapped
- * detectors, creating the corresponding {@link MappedMetricData}s.
+ * Entry into the Adaptive Alerting runtime. Its job is find for any incoming {@link MetricData} the corresponding set
+ * of mapped detectors, creating a {@link MappedMetricData} for each.
  *
  * @author David Sutherland
  * @author Willie Wheeler
  */
-@Slf4j
 public final class AnomalyDetectorMapper {
+    
+    @Getter
+    private ModelServiceConnector modelServiceConnector;
+    
+    /**
+     * Creates a new mapper.
+     *
+     * @param modelServiceConnector
+     */
+    public AnomalyDetectorMapper(ModelServiceConnector modelServiceConnector) {
+        notNull(modelServiceConnector, "modelServiceConnector can't be null");
+        this.modelServiceConnector = modelServiceConnector;
+    }
     
     /**
      * Maps an {@link MetricData} to its corresponding set of {@link MappedMetricData}s.
@@ -45,23 +55,9 @@ public final class AnomalyDetectorMapper {
      */
     public Set<MappedMetricData> map(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
-        return findDetectors(metricData.getMetricDefinition())
+        return modelServiceConnector.findDetectors(metricData.getMetricDefinition())
                 .stream()
                 .map(detector -> new MappedMetricData(metricData, detector.getUuid(), detector.getType()))
                 .collect(Collectors.toSet());
-    }
-    
-    private List<AnomalyDetectorMeta> findDetectors(MetricDefinition metricDefinition) {
-        
-        // TODO Added
-//        MetricTankIdFactory idFactory =  new MetricTankIdFactory();
-//        String id = idFactory.getId(metricPoint.getMetricDefinition());
-        
-        // TODO Replace this to call to model service. Likely want caching here as well. [WLW]
-        final List<AnomalyDetectorMeta> metas = new ArrayList<>();
-        
-        
-        
-        return metas;
     }
 }
