@@ -15,66 +15,99 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
+import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.TagCollection;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.UUID;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.mockito.Mockito.when;
 
 /**
+ * {@link AnomalyDetectorMapper} unit tests.
+ *
  * @author Willie Wheeler
  */
 public final class AnomalyDetectorMapperTest {
 
     // Class under test
     private AnomalyDetectorMapper mapper;
-
+    
+    @Mock
+    private ModelServiceConnector modelServiceConnector;
+    
     // Test objects
-    private MetricData metricDataWithDetectors;
-    private MetricData metricDataWithoutDetectors;
+    private MetricDefinition mappedDefinition;
+    private MetricDefinition unmappedDefinition;
+    private MetricData mappedData;
+    private MetricData unmappedData;
+    private AnomalyDetectorMeta detectorMeta;
 
     @Before
     public void setUp() {
-        this.mapper = new AnomalyDetectorMapper();
+        MockitoAnnotations.initMocks(this);
+        initTestObjects();
+        initDependencies();
+        this.mapper = new AnomalyDetectorMapper(modelServiceConnector);
+    }
+    
+    @Test
+    public void testConstructorInjection() {
+        assertSame(modelServiceConnector, mapper.getModelServiceConnector());
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testModelServiceConnectorNotNull() {
+        new AnomalyDetectorMapper(null);
+    }
+    
+    @Test
+    public void testMap_metricDataWithDetectors() {
+        final Set<MappedMetricData> results = mapper.map(mappedData);
+        assertFalse(results.isEmpty());
+    }
 
-        // TODO For now, this is known to have detectors.
-        // We'll need to update this once we un-hardcode the AnomalyDetectorMapper.
-        final MetricDefinition metricWithDetectors = new MetricDefinition(new TagCollection(
+    @Test
+    public void testMap_metricDataWithoutDetectors() {
+        final Set<MappedMetricData> results = mapper.map(unmappedData);
+        assertTrue(results.isEmpty());
+    }
+    
+    private void initTestObjects() {
+        this.mappedDefinition = new MetricDefinition(new TagCollection(
                 new HashMap<String, String>() {{
                     put("unit", "dummy");
                     put("mtype", "dummy");
                     put("what", "bookings");
                 }}));
-        this.metricDataWithDetectors = new MetricData(metricWithDetectors, 9, System.currentTimeMillis());
-
-        // TODO For now, this is known to have no detectors. See above.
-        final MetricDefinition metricWithoutDetectors = new MetricDefinition(new TagCollection(
+        this.unmappedDefinition = new MetricDefinition(new TagCollection(
                 new HashMap<String, String>() {{
                     put("unit", "dummy");
                     put("mtype", "dummy");
                 }}));
-        this.metricDataWithoutDetectors = new MetricData(metricWithoutDetectors, 9, System.currentTimeMillis());
+        
+        this.mappedData = new MetricData(mappedDefinition, 9, System.currentTimeMillis());
+        this.unmappedData = new MetricData(unmappedDefinition, 9, System.currentTimeMillis());
+        
+        this.detectorMeta = new AnomalyDetectorMeta(UUID.randomUUID(), "my-detector");
     }
-
-    @Test
-    @Ignore
-    public void testMap_metricDataWithDetectors() {
-        final Set<MappedMetricData> results = mapper.map(metricDataWithDetectors);
-        assertFalse(results.isEmpty());
-    }
-
-    @Test
-    @Ignore
-    public void testMap_metricDataWithoutDetectors() {
-        final Set<MappedMetricData> results = mapper.map(metricDataWithoutDetectors);
-        assertTrue(results.isEmpty());
+    
+    private void initDependencies() {
+        when(modelServiceConnector.findDetectors(mappedDefinition))
+                .thenReturn(Collections.singleton(detectorMeta));
+        when(modelServiceConnector.findDetectors(unmappedDefinition))
+                .thenReturn(Collections.emptySet());
     }
 }

@@ -18,9 +18,9 @@ package com.expedia.adaptivealerting.pipeline.integration.test
 
 import java.time.Instant
 
+import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector
 import com.expedia.adaptivealerting.anomdetect.{AnomalyDetectorManager, AnomalyDetectorMapper}
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult
-import com.expedia.adaptivealerting.core.util.MetricUtil
 import com.expedia.adaptivealerting.kafka.KafkaConfigProps._
 import com.expedia.adaptivealerting.kafka.detector.KafkaAnomalyDetectorManager
 import com.expedia.adaptivealerting.kafka.mapper.KafkaAnomalyDetectorMapper
@@ -34,7 +34,7 @@ import org.scalatest.Ignore
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 
-//TODO FIXME Fix this test
+// FIXME Fix this test
 @Ignore
 class ConstantThresholdBasedE2ETestSpec extends IntegrationTestSpec {
   protected val INTERMEDIATE_TOPIC = "mapped-metrics"
@@ -113,8 +113,13 @@ class ConstantThresholdBasedE2ETestSpec extends IntegrationTestSpec {
     }
   }
 
+  private def modelServiceConnector = {
+    new ModelServiceConnector()
+  }
+
   private def adMapperRunner = {
-    new KafkaAnomalyDetectorMapper(appConfig(ANOMALY_DETECTOR_MAPPER), new AnomalyDetectorMapper())
+    val modelServiceConnector: ModelServiceConnector = new ModelServiceConnector()
+    new KafkaAnomalyDetectorMapper(appConfig(ANOMALY_DETECTOR_MAPPER), new AnomalyDetectorMapper(modelServiceConnector))
   }
 
   private def adManagerRunner = {
@@ -123,11 +128,11 @@ class ConstantThresholdBasedE2ETestSpec extends IntegrationTestSpec {
   }
 
   private def generateAnomalousMetrics(): List[MetricData] = {
-    val latencyMetricDef = new MetricDefinition("latency");
-    val latencyMetricData = new MetricData(latencyMetricDef, 2.0, Instant.now().getEpochSecond);
+    val latencyMetricDef = new MetricDefinition("latency")
+    val latencyMetricData = new MetricData(latencyMetricDef, 2.0, Instant.now().getEpochSecond)
 
-    val failureCountMetricDef = new MetricDefinition("failureCount");
-    val failureCountMetricData = new MetricData(failureCountMetricDef, 3.0, Instant.now().getEpochSecond);
+    val failureCountMetricDef = new MetricDefinition("failureCount")
+    val failureCountMetricData = new MetricData(failureCountMetricDef, 3.0, Instant.now().getEpochSecond)
 
     List(
       latencyMetricData,
