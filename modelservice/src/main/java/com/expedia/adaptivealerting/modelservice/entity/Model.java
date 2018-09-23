@@ -57,13 +57,13 @@ public class Model {
      * DB-driven weak sigma override for models that have this parameter. Allows us to make sensitivity adjustments in
      * response to user feedback when ground truth classifications aren't available.
      */
-    private double weakSigmas;
+    private Double weakSigmas;
 
     /**
      * DB-driven strong sigma override for models that have this parameter. Allows us to make sensitivity adjustments in
      * response to user feedback when ground truth classifications aren't available.
      */
-    private double strongSigmas;
+    private Double strongSigmas;
 
     @Column(name = "last_build_ts")
     private Timestamp buildTimestamp;

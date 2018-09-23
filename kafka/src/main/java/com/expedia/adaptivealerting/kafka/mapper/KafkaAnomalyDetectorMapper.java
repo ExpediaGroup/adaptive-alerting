@@ -16,14 +16,13 @@
 package com.expedia.adaptivealerting.kafka.mapper;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorMapper;
+import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.kafka.AbstractKafkaApp;
 import com.expedia.adaptivealerting.kafka.util.AppUtil;
 import com.expedia.metrics.MetricData;
 import com.typesafe.config.Config;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.KStream;
@@ -45,8 +44,9 @@ public final class KafkaAnomalyDetectorMapper extends AbstractKafkaApp {
     
     public static void main(String[] args) {
         final Config appConfig = AppUtil.getAppConfig(ANOMALY_DETECTOR_MAPPER);
-        final CloseableHttpClient httpClient = HttpClients.createDefault();
-        final ModelServiceConnector modelServiceConnector = new ModelServiceConnector(httpClient);
+        final HttpClientWrapper httpClient = new HttpClientWrapper();
+        final String uriTemplate = appConfig.getString(MODEL_SERVICE_URI_TEMPLATE);
+        final ModelServiceConnector modelServiceConnector = new ModelServiceConnector(httpClient, uriTemplate);
         final AnomalyDetectorMapper mapper = new AnomalyDetectorMapper(modelServiceConnector);
         new KafkaAnomalyDetectorMapper(appConfig, mapper).start();
     }

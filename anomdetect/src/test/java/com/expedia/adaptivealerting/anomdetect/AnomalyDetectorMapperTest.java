@@ -15,20 +15,20 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
+import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
 import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
+import com.expedia.adaptivealerting.anomdetect.util.ModelTypeResource;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
-import com.expedia.metrics.TagCollection;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.hateoas.Resources;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Set;
-import java.util.UUID;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertFalse;
@@ -41,20 +41,29 @@ import static org.mockito.Mockito.when;
  * @author Willie Wheeler
  */
 public final class AnomalyDetectorMapperTest {
-
+    
     // Class under test
     private AnomalyDetectorMapper mapper;
+    
+    // Dependencies
     
     @Mock
     private ModelServiceConnector modelServiceConnector;
     
     // Test objects
+    
+    @Mock
     private MetricDefinition mappedDefinition;
+    
+    @Mock
     private MetricDefinition unmappedDefinition;
+    
     private MetricData mappedData;
     private MetricData unmappedData;
-    private AnomalyDetectorMeta detectorMeta;
-
+    private ModelResource modelResource;
+    private Resources<ModelResource> modelResources;
+    private Resources<ModelResource> emptyModelResources;
+    
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -78,7 +87,7 @@ public final class AnomalyDetectorMapperTest {
         final Set<MappedMetricData> results = mapper.map(mappedData);
         assertFalse(results.isEmpty());
     }
-
+    
     @Test
     public void testMap_metricDataWithoutDetectors() {
         final Set<MappedMetricData> results = mapper.map(unmappedData);
@@ -86,28 +95,21 @@ public final class AnomalyDetectorMapperTest {
     }
     
     private void initTestObjects() {
-        this.mappedDefinition = new MetricDefinition(new TagCollection(
-                new HashMap<String, String>() {{
-                    put("unit", "dummy");
-                    put("mtype", "dummy");
-                    put("what", "bookings");
-                }}));
-        this.unmappedDefinition = new MetricDefinition(new TagCollection(
-                new HashMap<String, String>() {{
-                    put("unit", "dummy");
-                    put("mtype", "dummy");
-                }}));
-        
         this.mappedData = new MetricData(mappedDefinition, 9, System.currentTimeMillis());
         this.unmappedData = new MetricData(unmappedDefinition, 9, System.currentTimeMillis());
         
-        this.detectorMeta = new AnomalyDetectorMeta(UUID.randomUUID(), "my-detector");
+        this.modelResource = new ModelResource(
+                "7629c28a-5958-4ca7-9aaa-49b95d3481ff",
+                new ModelTypeResource("ewma-detector"));
+        
+        this.modelResources = new Resources<>(Collections.singletonList(modelResource));
+        this.emptyModelResources = new Resources<>(Collections.EMPTY_LIST);
     }
     
     private void initDependencies() {
-        when(modelServiceConnector.findDetectors(mappedDefinition))
-                .thenReturn(Collections.singleton(detectorMeta));
-        when(modelServiceConnector.findDetectors(unmappedDefinition))
-                .thenReturn(Collections.emptySet());
+        when(modelServiceConnector.findModels(mappedDefinition))
+                .thenReturn(modelResources);
+        when(modelServiceConnector.findModels(unmappedDefinition))
+                .thenReturn(emptyModelResources);
     }
 }

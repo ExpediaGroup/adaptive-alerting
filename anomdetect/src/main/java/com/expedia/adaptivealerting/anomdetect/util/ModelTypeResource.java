@@ -13,37 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.entity;
+package com.expedia.adaptivealerting.anomdetect.util;
 
-import com.expedia.adaptivealerting.modelservice.util.JpaConverterJson;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import java.util.Map;
+import lombok.NoArgsConstructor;
+import org.springframework.hateoas.ResourceSupport;
 
 /**
- * Metric entity.
+ * Model type resource.
  *
- * @author kashah
+ * @author Willie Wheeler
  */
 @Data
-@Entity
-public class Metric {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    @Column(name = "ukey")
+@NoArgsConstructor
+@AllArgsConstructor
+public class ModelTypeResource extends ResourceSupport {
     private String key;
-
-    private String hash;
-
-    @Convert(converter = JpaConverterJson.class)
-    private Map<String, Object> tags;
 }

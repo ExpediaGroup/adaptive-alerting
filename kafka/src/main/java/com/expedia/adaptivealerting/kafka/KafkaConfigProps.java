@@ -31,25 +31,17 @@ public interface KafkaConfigProps {
     /**
      * Anomaly Detector Mapper KStreams app name.
      */
-    public static final String ANOMALY_DETECTOR_MAPPER = "ad-mapper";
-    
-    /**
-     * Metric Router KStreams app name.
-     *
-     * @deprecated MetricRouter is going away in favor of AnomalyDetectorMapper
-     */
-    @Deprecated
-    public static final String METRIC_ROUTER = "metric-router";
+    String ANOMALY_DETECTOR_MAPPER = "ad-mapper";
     
     /**
      * Anomaly Detector Manager KStreams app name.
      */
-    public static final String ANOMALY_DETECTOR_MANAGER = "ad-manager";
+    String ANOMALY_DETECTOR_MANAGER = "ad-manager";
     
     /**
      * Anomaly Validator KStreams app name.
      */
-    public static final String ANOMALY_VALIDATOR = "anomaly-validator";
+    String ANOMALY_VALIDATOR = "anomaly-validator";
     
     
     // ================================================================================
@@ -59,30 +51,30 @@ public interface KafkaConfigProps {
     /**
      * Factories property name.
      */
-    public static final String FACTORIES = "factories";
+    String FACTORIES = "factories";
     
     /**
      * Streams property name.
      */
-    public static final String STREAMS = "streams";
+    String STREAMS = "streams";
     
     /**
      * Health status path property name.
      */
-    public static final String HEALTH_STATUS_PATH = "health.status.path";
+    String HEALTH_STATUS_PATH = "health.status.path";
     
     /**
      * Inbound topic property name.
      */
-    public static final String INBOUND_TOPIC = "inbound-topic";
+    String INBOUND_TOPIC = "inbound-topic";
     
     /**
      * Outbound topic property name.
      */
-    public static final String OUTBOUND_TOPIC = "outbound-topic";
+    String OUTBOUND_TOPIC = "outbound-topic";
     
     /**
-     * JSON POJO class property name.
+     * Model service URI template property name.
      */
-    public static final String JSON_POJO_CLASS = "JsonPojoClass";
+    String MODEL_SERVICE_URI_TEMPLATE = "model-service-uri-template";
 }

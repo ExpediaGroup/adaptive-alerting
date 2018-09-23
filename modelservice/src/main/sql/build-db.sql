@@ -8,7 +8,7 @@ create table metric (
   id          int unsigned primary key not null auto_increment,
   ukey        varchar(255) unique      not null,
   hash        char(36) unique          not null,
-  description varchar(255) unique      not null,
+  description varchar(255),
   tags        json
 );
 

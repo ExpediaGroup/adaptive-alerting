@@ -4,10 +4,9 @@ spring:
     show-banner: false
   datasource:
     driver-class-name: "com.mysql.cj.jdbc.Driver"
-#    url: "jdbc:mysql://mysql.aa-apps.svc.cluster.local:3306/aa_model_service?autoReconnect=true"
-    url: "jdbc:mysql://mysql.aa-apps.svc.cluster.local:3306/aa_model_service"
+    url: "jdbc:mysql://localhost:3306/aa_model_service?autoReconnect=true"
     username: "root"
-    password: "password"
+    password: ""
     maximum-pool-size: 8
     minimum-idle: 0
   jpa:

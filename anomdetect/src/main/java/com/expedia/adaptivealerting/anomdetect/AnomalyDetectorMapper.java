@@ -15,12 +15,17 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
+import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
 import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.metrics.MetricData;
+import com.expedia.metrics.MetricDefinition;
 import lombok.Getter;
+import org.springframework.hateoas.Resources;
 
+import java.util.Collection;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -55,9 +60,17 @@ public final class AnomalyDetectorMapper {
      */
     public Set<MappedMetricData> map(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
-        return modelServiceConnector.findDetectors(metricData.getMetricDefinition())
-                .stream()
-                .map(detector -> new MappedMetricData(metricData, detector.getUuid(), detector.getType()))
+        
+        final MetricDefinition metricDefinition = metricData.getMetricDefinition();
+        final Resources<ModelResource> modelResources = modelServiceConnector.findModels(metricDefinition);
+        final Collection<ModelResource> modelCollection = modelResources.getContent();
+        
+        return modelCollection.stream()
+                .map(model -> {
+                    final UUID detectorUuid = UUID.fromString(model.getUuid());
+                    final String detectorType = model.getType().getKey();
+                    return new MappedMetricData(metricData, detectorUuid, detectorType);
+                })
                 .collect(Collectors.toSet());
     }
 }

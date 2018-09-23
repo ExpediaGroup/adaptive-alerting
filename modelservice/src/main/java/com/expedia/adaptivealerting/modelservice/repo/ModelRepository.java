@@ -16,9 +16,11 @@
 package com.expedia.adaptivealerting.modelservice.repo;
 
 import com.expedia.adaptivealerting.modelservice.entity.Model;
+import com.expedia.adaptivealerting.modelservice.entity.projection.InlineType;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.util.List;
 
@@ -27,6 +29,7 @@ import java.util.List;
  *
  * @author kashah
  */
+@RepositoryRestResource(excerptProjection = InlineType.class)
 public interface ModelRepository extends PagingAndSortingRepository<Model, Long> {
 
     List<Model> findByUuid(@Param("uuid") String uuid);
