@@ -33,4 +33,5 @@ target/
 .settings
 *.classpath
 
-kafka/docker/tmp
+/kafka/docker/tmp
+/modelservice/application.yml

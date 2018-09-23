@@ -15,13 +15,16 @@
  */
 package com.expedia.adaptivealerting.anomdetect.util;
 
-import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorMeta;
 import com.expedia.metrics.MetricDefinition;
+import com.expedia.metrics.metrictank.MetricTankIdFactory;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
-import org.apache.http.client.HttpClient;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.http.client.fluent.Content;
+import org.springframework.hateoas.Resources;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.io.IOException;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
@@ -38,23 +41,37 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  *
  * @author Willie Wheeler
  */
+@Slf4j
 public class ModelServiceConnector {
+    private final MetricTankIdFactory metricTankIdFactory = new MetricTankIdFactory();
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final TypeReference<Resources<ModelResource>> resourcesTypeRef =
+            new TypeReference<Resources<ModelResource>>() {};
     
     @Getter
-    private HttpClient httpClient;
+    private HttpClientWrapper httpClient;
     
-    public ModelServiceConnector(HttpClient httpClient) {
+    @Getter
+    private String uriTemplate;
+    
+    public ModelServiceConnector(HttpClientWrapper httpClient, String uriTemplate) {
         notNull(httpClient, "httpClient can't be null");
+        notNull(uriTemplate, "uriTemplate can't be null");
         this.httpClient = httpClient;
+        this.uriTemplate = uriTemplate;
     }
     
-    public Set<AnomalyDetectorMeta> findDetectors(MetricDefinition metricDefinition) {
-//        MetricTankIdFactory idFactory = new MetricTankIdFactory();
-//        String id = idFactory.getId(metricDefinition);
+    public Resources<ModelResource> findModels(MetricDefinition metricDefinition) {
+        notNull(metricDefinition, "metricDefinition can't be null");
         
-        // TODO
+        final String id = metricTankIdFactory.getId(metricDefinition);
+        final String uri = String.format(uriTemplate, id);
         
-        final Set<AnomalyDetectorMeta> metas = new HashSet<>();
-        return metas;
+        try {
+            final Content content = httpClient.get(uri);
+            return objectMapper.readValue(content.asString(), resourcesTypeRef);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

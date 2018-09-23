@@ -18,7 +18,7 @@ package com.expedia.adaptivealerting.pipeline.integration.test
 
 import java.time.Instant
 
-import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector
+import com.expedia.adaptivealerting.anomdetect.util.{HttpClientWrapper, ModelServiceConnector}
 import com.expedia.adaptivealerting.anomdetect.{AnomalyDetectorManager, AnomalyDetectorMapper}
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult
 import com.expedia.adaptivealerting.kafka.KafkaConfigProps._
@@ -26,8 +26,7 @@ import com.expedia.adaptivealerting.kafka.detector.KafkaAnomalyDetectorManager
 import com.expedia.adaptivealerting.kafka.mapper.KafkaAnomalyDetectorMapper
 import com.expedia.adaptivealerting.pipeline.integration.{EmbeddedKafka, IntegrationTestSpec}
 import com.expedia.metrics.{MetricData, MetricDefinition}
-import org.apache.http.client.HttpClient
-import org.apache.http.impl.client.HttpClients
+import com.typesafe.config.Config
 import org.apache.kafka.clients.admin.AdminClient
 import org.apache.kafka.streams.KeyValue
 import org.apache.kafka.streams.integration.utils.IntegrationTestUtils
@@ -116,14 +115,22 @@ class ConstantThresholdBasedE2ETestSpec extends IntegrationTestSpec {
   }
 
   private def adMapperRunner = {
-    val httpClient: HttpClient = HttpClients.createDefault()
-    val modelServiceConnector: ModelServiceConnector = new ModelServiceConnector(httpClient)
-    new KafkaAnomalyDetectorMapper(appConfig(ANOMALY_DETECTOR_MAPPER), new AnomalyDetectorMapper(modelServiceConnector))
+    val conf: Config = appConfig(ANOMALY_DETECTOR_MAPPER)
+
+    val httpClient: HttpClientWrapper = new HttpClientWrapper()
+    val uriTemplate: String = conf.getString(MODEL_SERVICE_URI_TEMPLATE)
+    val modelServiceConnector: ModelServiceConnector = new ModelServiceConnector(httpClient, uriTemplate)
+    val mapper: AnomalyDetectorMapper = new AnomalyDetectorMapper(modelServiceConnector)
+
+    new KafkaAnomalyDetectorMapper(conf, mapper)
   }
 
   private def adManagerRunner = {
-    val manager: AnomalyDetectorManager = new AnomalyDetectorManager(appConfig(ANOMALY_DETECTOR_MANAGER).getConfig(FACTORIES))
-    new KafkaAnomalyDetectorManager(appConfig(ANOMALY_DETECTOR_MANAGER), manager)
+    val conf: Config = appConfig(ANOMALY_DETECTOR_MANAGER)
+
+    val manager: AnomalyDetectorManager = new AnomalyDetectorManager(conf.getConfig(FACTORIES))
+
+    new KafkaAnomalyDetectorManager(conf, manager)
   }
 
   private def generateAnomalousMetrics(): List[MetricData] = {
