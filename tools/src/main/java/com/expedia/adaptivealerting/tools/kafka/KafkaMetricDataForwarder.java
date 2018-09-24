@@ -13,42 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.util;
+package com.expedia.adaptivealerting.tools.kafka;
 
-import com.expedia.adaptivealerting.core.data.MetricFrame;
+import com.expedia.adaptivealerting.tools.pipeline.source.MetricSource;
 import com.expedia.metrics.MetricData;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerRecord;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
- * Metric utilities.
+ * Forwards data from a metric source to a single Kafka topic.
  *
  * @author Willie Wheeler
  */
-public final class MetricUtil {
+public final class KafkaMetricDataForwarder {
     
-    /**
-     * Prevent instantiation.
-     */
-    private MetricUtil() {
-    }
-    
-    public static MetricFrame merge(List<MetricFrame> frames) {
-        notNull(frames, "frames can't be null");
+    public KafkaMetricDataForwarder(
+            MetricSource metricSource,
+            Producer<String, MetricData> kafkaProducer,
+            String topicName) {
         
-        int totalSize = 0;
-        for (final MetricFrame frame : frames) {
-            totalSize += frame.getNumRows();
-        }
+        notNull(metricSource, "metricSource can't be null");
+        notNull(kafkaProducer, "kafkaProducer can't be null");
         
-        final List<MetricData> resultList = new ArrayList<>(totalSize);
-        for (final MetricFrame frame : frames) {
-            resultList.addAll(frame.getMetricData());
-        }
-        
-        return new MetricFrame(resultList);
+        metricSource.addSubscriber(metricData -> kafkaProducer.send(new ProducerRecord<>(topicName, null, metricData)));
+        metricSource.start();
     }
 }

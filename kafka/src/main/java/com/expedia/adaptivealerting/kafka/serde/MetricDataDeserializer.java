@@ -22,25 +22,25 @@ import java.io.IOException;
 import java.util.Map;
 
 public class MetricDataDeserializer implements Deserializer<MetricData> {
-
-	private final static MessagePackSerializer mps = new MessagePackSerializer();
-
-	@Override
-	public void configure(Map<String, ?> configs, boolean isKey) {
-
-	}
-
-	@Override
-	public MetricData deserialize(String topic, byte[] data) {
-		try {
-			return mps.deserialize(data);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@Override
-	public void close() {
-
-	}
+    
+    private final static MessagePackSerializer mps = new MessagePackSerializer();
+    
+    @Override
+    public void configure(Map<String, ?> configs, boolean isKey) {
+    
+    }
+    
+    @Override
+    public MetricData deserialize(String topic, byte[] data) {
+        try {
+            return mps.deserialize(data);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    @Override
+    public void close() {
+    
+    }
 }

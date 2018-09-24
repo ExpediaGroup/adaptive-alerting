@@ -28,9 +28,16 @@ import java.util.ListIterator;
 public final class MetricFrameMetricSource extends AbstractMetricSource {
     private ListIterator<MetricData> metricDataIterator;
     
-    public MetricFrameMetricSource(MetricFrame frame, String name, long period) {
-        super(name, period);
-        this.metricDataIterator = frame.listIterator();
+    /**
+     * Publishes data from the given metric frame to any subscribers.
+     *
+     * @param metricFrame Source metric frame.
+     * @param metricName  Metric name.
+     * @param periodMs    Publication period in milliseconds.
+     */
+    public MetricFrameMetricSource(MetricFrame metricFrame, String metricName, long periodMs) {
+        super(metricName, periodMs);
+        this.metricDataIterator = metricFrame.listIterator();
     }
     
     @Override

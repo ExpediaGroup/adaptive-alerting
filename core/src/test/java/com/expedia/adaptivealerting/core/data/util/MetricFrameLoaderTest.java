@@ -42,7 +42,7 @@ public final class MetricFrameLoaderTest {
         final MetricFrame frame = MetricFrameLoader.loadCsv(metric, is, true);
         assertNotNull(frame);
         assertTrue(frame.getNumRows() > 0);
-        assertEquals(0.0, frame.getMetricPoint(0).getValue(), TOLERANCE);
-        assertEquals(3.0, frame.getMetricPoint(15).getValue(), TOLERANCE);
+        assertEquals(0.0, frame.getMetricDataPoint(0).getValue(), TOLERANCE);
+        assertEquals(3.0, frame.getMetricDataPoint(15).getValue(), TOLERANCE);
     }
 }
