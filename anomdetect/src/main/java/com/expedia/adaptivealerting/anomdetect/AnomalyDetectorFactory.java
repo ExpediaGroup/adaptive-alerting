@@ -26,6 +26,13 @@ import java.util.UUID;
  */
 public interface AnomalyDetectorFactory<T extends AnomalyDetector> {
     
+    // FIXME Remove these hardcodes. We are planning to move the models into the DB so these will go away. [WLW]
+    @Deprecated
+    String REGION = "us-west-2";
+    
+    @Deprecated
+    String BUCKET = "aa-models";
+    
     /**
      * Initializes the factory.
      *

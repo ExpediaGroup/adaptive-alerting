@@ -40,7 +40,6 @@ public final class ConstantThresholdFactory implements AnomalyDetectorFactory<Co
     // TODO Move this AWS-specific code out of this factory.
     // The actual param load code will go in modelservice-s3. [WLW]
     private AmazonS3 s3;
-    private String bucket;
     private String folder;
     
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -50,20 +49,12 @@ public final class ConstantThresholdFactory implements AnomalyDetectorFactory<Co
         notNull(type, "type can't be null");
         notNull(config, "config can't be null");
         
-        // TODO Reorganize the config here. We don't want every factory to have its own region and bucket. [WLW]
-        final String region = config.getString("region");
-        final String bucket = config.getString("bucket");
-    
-        notNull(region, "Property 'region' must be defined");
-        notNull(bucket, "Property 'bucket' must be defined");
-    
         this.s3 = AmazonS3ClientBuilder.standard()
-                .withRegion(region)
+                .withRegion(REGION)
                 .build();
-        this.bucket = bucket;
         this.folder = type;
     
-        log.info("Initialized ConstantThresholdFactory: region={}, bucket={}, folder={}", region, bucket, folder);
+        log.info("Initialized ConstantThresholdFactory: folder={}", folder);
     }
     
     @Override
@@ -71,7 +62,7 @@ public final class ConstantThresholdFactory implements AnomalyDetectorFactory<Co
         notNull(uuid, "uuid can't be null");
     
         final String path = folder + "/" + uuid.toString() + ".json";
-        final S3Object s3Obj = s3.getObject(bucket, path);
+        final S3Object s3Obj = s3.getObject(BUCKET, path);
         final InputStream is = s3Obj.getObjectContent();
     
         ConstantThresholdModel model;
