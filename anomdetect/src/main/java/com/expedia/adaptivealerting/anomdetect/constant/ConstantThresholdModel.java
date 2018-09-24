@@ -13,16 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.tools.pipeline.util;
+package com.expedia.adaptivealerting.anomdetect.constant;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Data;
 
 /**
- * Interface for processors that subscribe to an anomaly result channel.
- *
  * @author Willie Wheeler
  */
-public interface AnomalyResultSubscriber {
-    
-    void next(AnomalyResult anomalyResult);
+@Data
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class ConstantThresholdModel {
+    private String uuid;
+    private String type;
+    private ConstantThresholdParams params;
 }

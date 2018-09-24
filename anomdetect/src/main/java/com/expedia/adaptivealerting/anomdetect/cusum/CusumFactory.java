@@ -29,6 +29,8 @@ import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
+// TODO DRY up this code, which is duplicated in the ConstantThresholdFactory. [WLW]
+
 /**
  * @author Willie Wheeler
  */

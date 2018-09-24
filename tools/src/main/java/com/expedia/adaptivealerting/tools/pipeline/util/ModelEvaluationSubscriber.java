@@ -18,11 +18,11 @@ package com.expedia.adaptivealerting.tools.pipeline.util;
 import com.expedia.adaptivealerting.core.evaluator.ModelEvaluation;
 
 /**
- * @author kashah
+ * Interface for processors that subscribe to a model evaluation channel.
  *
+ * @author kashah
  */
 public interface ModelEvaluationSubscriber {
     
     void next(ModelEvaluation modelEvaluation);
-
 }

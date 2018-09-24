@@ -40,16 +40,16 @@ public class MetricFrame {
     /**
      * Creates a new metric frame from an array of {@link MetricData}s.
      *
-     * @param mpoints Metric point array.
+     * @param metricData Metric point array.
      */
-    public MetricFrame(MetricData[] mpoints) {
-        notNull(mpoints, "mpoints can't be null");
-        this.mpoints = Arrays.asList(mpoints);
+    public MetricFrame(MetricData[] metricData) {
+        notNull(metricData, "metricData can't be null");
+        this.mpoints = Arrays.asList(metricData);
     }
     
-    public MetricFrame(List<MetricData> mpoints) {
-        notNull(mpoints, "mpoints can't be null");
-        this.mpoints = mpoints;
+    public MetricFrame(List<MetricData> metricData) {
+        notNull(metricData, "metricData can't be null");
+        this.mpoints = metricData;
     }
     
     /**
@@ -67,12 +67,12 @@ public class MetricFrame {
      * @param index Row index.
      * @return The corresponding metric point.
      */
-    public MetricData getMetricPoint(int index) {
+    public MetricData getMetricDataPoint(int index) {
         isTrue(index >= 0, "Required: index >= 0");
         return mpoints.get(index);
     }
     
-    public List<MetricData> getMetricPoints() {
+    public List<MetricData> getMetricData() {
         return mpoints;
     }
     
@@ -89,7 +89,7 @@ public class MetricFrame {
         final int n = getNumRows();
         final double[] values = new double[n];
         for (int i = 0; i < n; i++) {
-            values[i] = getMetricPoint(i).getValue();
+            values[i] = getMetricDataPoint(i).getValue();
         }
         return values;
     }
