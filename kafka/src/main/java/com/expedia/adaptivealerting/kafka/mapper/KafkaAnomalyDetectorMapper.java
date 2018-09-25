@@ -24,15 +24,12 @@ import com.expedia.adaptivealerting.kafka.serde.JsonPojoSerde;
 import com.expedia.adaptivealerting.kafka.util.AppUtil;
 import com.expedia.metrics.MetricData;
 import com.typesafe.config.Config;
-import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Produced;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -48,11 +45,6 @@ import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.*;
 public final class KafkaAnomalyDetectorMapper extends AbstractKafkaApp {
     private AnomalyDetectorMapper mapper;
     
-    // TODO Make these configurable [WLW]
-    private final Serde<String> outboundKeySerde = new Serdes.StringSerde();
-    private final Serde<MappedMetricData> outboundValueSerde = new JsonPojoSerde<>();
-    private final Produced<String, MappedMetricData> outboundProduced;
-    
     public static void main(String[] args) {
         final Config appConfig = AppUtil.getAppConfig(ANOMALY_DETECTOR_MAPPER);
         final HttpClientWrapper httpClient = new HttpClientWrapper();
@@ -65,14 +57,7 @@ public final class KafkaAnomalyDetectorMapper extends AbstractKafkaApp {
     public KafkaAnomalyDetectorMapper(Config appConfig, AnomalyDetectorMapper mapper) {
         super(appConfig);
         notNull(mapper, "mapper can't be null");
-        
         this.mapper = mapper;
-        
-        final Map<String, String> props = new HashMap<>();
-        props.put("JsonPojoClass", appConfig.getString("JsonPojoClass"));
-        outboundValueSerde.configure(props, false);
-        
-        outboundProduced = Produced.with(outboundKeySerde, outboundValueSerde);
     }
     
     @Override
@@ -102,7 +87,7 @@ public final class KafkaAnomalyDetectorMapper extends AbstractKafkaApp {
                                     .collect(Collectors.toSet());
                         }
                 )
-                .to(outboundTopic, outboundProduced);
+                .to(outboundTopic, Produced.with(new Serdes.StringSerde(), new JsonPojoSerde<>()));
     
         return builder;
     }
