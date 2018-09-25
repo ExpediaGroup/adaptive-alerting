@@ -20,12 +20,14 @@ import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.kafka.AbstractKafkaApp;
+import com.expedia.adaptivealerting.kafka.serde.JsonPojoSerde;
 import com.expedia.adaptivealerting.kafka.util.AppUtil;
 import com.expedia.metrics.MetricData;
 import com.typesafe.config.Config;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.KStream;
+import org.apache.kafka.streams.kstream.Produced;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -41,6 +43,9 @@ import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.*;
  */
 public final class KafkaAnomalyDetectorMapper extends AbstractKafkaApp {
     private AnomalyDetectorMapper mapper;
+    
+    // TODO Make this configurable [WLW]
+    private JsonPojoSerde<MappedMetricData> outboundValueSerde = new JsonPojoSerde<MappedMetricData>();
     
     public static void main(String[] args) {
         final Config appConfig = AppUtil.getAppConfig(ANOMALY_DETECTOR_MAPPER);
@@ -84,7 +89,7 @@ public final class KafkaAnomalyDetectorMapper extends AbstractKafkaApp {
                                     .collect(Collectors.toSet());
                         }
                 )
-                .to(outboundTopic);
+                .to(outboundTopic, Produced.valueSerde(outboundValueSerde));
     
         return builder;
     }
