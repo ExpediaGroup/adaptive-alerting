@@ -16,30 +16,79 @@
 package com.expedia.adaptivealerting.kafka.serde;
 
 import com.expedia.metrics.MetricData;
+import com.expedia.metrics.metrictank.MessagePackSerializer;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serializer;
 
+import java.io.IOException;
 import java.util.Map;
 
 public class MetricDataSerde implements Serde<MetricData> {
-	@Override
-	public void configure(Map<String, ?> configs, boolean isKey) {
 
-	}
+    private final static MessagePackSerializer mps = new MessagePackSerializer();
 
-	@Override
-	public void close() {
+    @Override
+    public void configure(Map<String, ?> configs, boolean isKey) {
 
-	}
+    }
 
-	@Override
-	public Serializer<MetricData> serializer() {
-		return null;
-	}
+    @Override
+    public void close() {
 
-	@Override
-	public Deserializer<MetricData> deserializer() {
-		return new MetricDataDeserializer();
-	}
+    }
+
+    @Override
+    public Serializer<MetricData> serializer() {
+        return new DataSerializer();
+    }
+
+    @Override
+    public Deserializer<MetricData> deserializer() {
+        return new DataDeserializer();
+    }
+
+    public static class DataDeserializer implements Deserializer<MetricData> {
+
+        @Override
+        public void configure(Map<String, ?> configs, boolean isKey) {
+
+        }
+
+        @Override
+        public MetricData deserialize(String topic, byte[] data) {
+            try {
+                return mps.deserialize(data);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public void close() {
+
+        }
+    }
+
+    public static class DataSerializer implements Serializer<MetricData> {
+    
+        @Override
+        public void configure(Map<String, ?> configs, boolean isKey) {
+
+        }
+
+        @Override
+        public byte[] serialize(String topic, MetricData data) {
+            try {
+                return mps.serialize(data);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public void close() {
+
+        }
+    }
 }
