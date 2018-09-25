@@ -58,15 +58,12 @@ public final class KafkaAnomalyDetectorManager extends AbstractKafkaApp {
         final KStream<String, MappedMetricData> stream = builder.stream(inboundTopic);
         stream
                 .mapValues(mappedMetricData -> {
-                    try {
-                        final AnomalyResult result = manager.classify(mappedMetricData);
-                        return new MappedMetricData(mappedMetricData, result);
-                    } catch (Exception e) {
-                        log.error("Error while classifying", e);
-                        return null;
-                    }
+                    // TODO Not sure why we would get null here--mappedMetricData are mapped to models. But in fact we
+                    // are seeing this occur so let's handle it and investigate the cause. [WLW]
+                    final AnomalyResult anomalyResult = manager.classify(mappedMetricData);
+                    return anomalyResult == null ? null : new MappedMetricData(mappedMetricData, anomalyResult);
                 })
-                .filter((key, anomalyResult) -> anomalyResult != null)
+                .filter((key, mappedMetricData) -> mappedMetricData != null)
                 .to(outboundTopic);
         return builder;
     }

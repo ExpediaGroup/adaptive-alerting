@@ -124,6 +124,7 @@ public final class AnomalyDetectorManager {
         final AnomalyDetector detector = detectorFor(mappedMetricData);
         
         if (detector == null) {
+            log.warn("No detector for mappedMetricData={}", mappedMetricData);
             return null;
         }
         
