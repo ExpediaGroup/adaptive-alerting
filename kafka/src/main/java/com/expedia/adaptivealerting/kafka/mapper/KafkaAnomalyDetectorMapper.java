@@ -24,6 +24,7 @@ import com.expedia.adaptivealerting.kafka.serde.JsonPojoSerde;
 import com.expedia.adaptivealerting.kafka.util.AppUtil;
 import com.expedia.metrics.MetricData;
 import com.typesafe.config.Config;
+import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.KStream;
@@ -44,8 +45,9 @@ import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.*;
 public final class KafkaAnomalyDetectorMapper extends AbstractKafkaApp {
     private AnomalyDetectorMapper mapper;
     
-    // TODO Make this configurable [WLW]
-    private JsonPojoSerde<MappedMetricData> outboundValueSerde = new JsonPojoSerde<MappedMetricData>();
+    // TODO Make these configurable [WLW]
+    private Serdes.StringSerde outboundKeySerde = new Serdes.StringSerde();
+    private JsonPojoSerde<MappedMetricData> outboundValueSerde = new JsonPojoSerde<>();
     
     public static void main(String[] args) {
         final Config appConfig = AppUtil.getAppConfig(ANOMALY_DETECTOR_MAPPER);
@@ -76,12 +78,12 @@ public final class KafkaAnomalyDetectorMapper extends AbstractKafkaApp {
         
         // This approach allows us to distribute detectors for a given metric across managers.
         stream
-                .flatMap((key, mpoint) -> {
+                .flatMap((key, metricData) -> {
                         
                             // Convert the <key, mpoint> pair into a set of <detectorUuid, mappedMetricData> pairs.
                             // Each detector UUID comes from its mapped mpoint.
-                            final Set<MappedMetricData> mappedMetricDatas = mapper.map(mpoint);
-                            return mappedMetricDatas.stream()
+                            final Set<MappedMetricData> mappedMetricDataSet = mapper.map(metricData);
+                            return mappedMetricDataSet.stream()
                                     .map(mappedMetricData -> {
                                         final String newKey = mappedMetricData.getDetectorUuid().toString();
                                         return KeyValue.pair(newKey, mappedMetricData);
@@ -89,7 +91,7 @@ public final class KafkaAnomalyDetectorMapper extends AbstractKafkaApp {
                                     .collect(Collectors.toSet());
                         }
                 )
-                .to(outboundTopic, Produced.valueSerde(outboundValueSerde));
+                .to(outboundTopic, Produced.with(outboundKeySerde, outboundValueSerde));
     
         return builder;
     }
