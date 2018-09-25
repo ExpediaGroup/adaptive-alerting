@@ -22,6 +22,8 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.fluent.Content;
 import org.springframework.hateoas.Resources;
+import org.springframework.hateoas.hal.Jackson2HalModule;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import java.io.IOException;
 
@@ -43,7 +45,11 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @Slf4j
 public class ModelServiceConnector {
     private final MetricTankIdFactory metricTankIdFactory = new MetricTankIdFactory();
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    
+    // https://hdpe.me/post/spring-data-rest-hal-client/
+    final ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json()
+            .modules(new Jackson2HalModule())
+            .build();
     
     @Getter
     private HttpClientWrapper httpClient;
