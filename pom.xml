@@ -105,6 +105,7 @@
         <spring.boot.version>2.0.3.RELEASE</spring.boot.version>
 
         <!-- Version 0.25.0.RELEASE breaks Model Service. [WLW] -->
+        <!-- Caused by: org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'org.springframework.hateoas.hal.HalConfiguration' available -->
         <!--spring.hateoas.version>0.25.0.RELEASE</spring.hateoas.version-->
         <spring.hateoas.version>0.24.0.RELEASE</spring.hateoas.version>
 

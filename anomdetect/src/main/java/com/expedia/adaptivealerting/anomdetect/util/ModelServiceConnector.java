@@ -17,7 +17,6 @@ package com.expedia.adaptivealerting.anomdetect.util;
 
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.metrictank.MetricTankIdFactory;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -45,8 +44,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 public class ModelServiceConnector {
     private final MetricTankIdFactory metricTankIdFactory = new MetricTankIdFactory();
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final TypeReference<Resources<ModelResource>> resourcesTypeRef =
-            new TypeReference<Resources<ModelResource>>() {};
     
     @Getter
     private HttpClientWrapper httpClient;
@@ -71,7 +68,7 @@ public class ModelServiceConnector {
         
         try {
             final Content content = httpClient.get(uri);
-            return objectMapper.readValue(content.asString(), resourcesTypeRef);
+            return objectMapper.readValue(content.asBytes(), ModelResources.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

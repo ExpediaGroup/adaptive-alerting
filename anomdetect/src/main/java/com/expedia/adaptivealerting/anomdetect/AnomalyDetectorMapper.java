@@ -30,6 +30,8 @@ import java.util.stream.Collectors;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
+// TODO Cache ModelService responses [WLW]
+
 /**
  * Entry into the Adaptive Alerting runtime. Its job is find for any incoming {@link MetricData} the corresponding set
  * of mapped detectors, creating a {@link MappedMetricData} for each.
