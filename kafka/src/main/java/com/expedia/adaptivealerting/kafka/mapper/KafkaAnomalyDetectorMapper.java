@@ -24,12 +24,15 @@ import com.expedia.adaptivealerting.kafka.serde.JsonPojoSerde;
 import com.expedia.adaptivealerting.kafka.util.AppUtil;
 import com.expedia.metrics.MetricData;
 import com.typesafe.config.Config;
+import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Produced;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -46,8 +49,9 @@ public final class KafkaAnomalyDetectorMapper extends AbstractKafkaApp {
     private AnomalyDetectorMapper mapper;
     
     // TODO Make these configurable [WLW]
-    private Serdes.StringSerde outboundKeySerde = new Serdes.StringSerde();
-    private JsonPojoSerde<MappedMetricData> outboundValueSerde = new JsonPojoSerde<>();
+    private final Serde<String> outboundKeySerde = new Serdes.StringSerde();
+    private final Serde<MappedMetricData> outboundValueSerde = new JsonPojoSerde<>();
+    private final Produced<String, MappedMetricData> outboundProduced;
     
     public static void main(String[] args) {
         final Config appConfig = AppUtil.getAppConfig(ANOMALY_DETECTOR_MAPPER);
@@ -61,7 +65,14 @@ public final class KafkaAnomalyDetectorMapper extends AbstractKafkaApp {
     public KafkaAnomalyDetectorMapper(Config appConfig, AnomalyDetectorMapper mapper) {
         super(appConfig);
         notNull(mapper, "mapper can't be null");
+        
         this.mapper = mapper;
+        
+        final Map<String, String> props = new HashMap<>();
+        props.put("JsonPojoClass", appConfig.getString("JsonPojoClass"));
+        outboundValueSerde.configure(props, false);
+        
+        outboundProduced = Produced.with(outboundKeySerde, outboundValueSerde);
     }
     
     @Override
@@ -73,7 +84,7 @@ public final class KafkaAnomalyDetectorMapper extends AbstractKafkaApp {
         
         // This approach forces all detectors for a given metric to reside with a given manager.
 //        stream
-//                .flatMapValues(mpoint -> mapper.map(mpoint))
+//                .flatMapValues(metricData -> mapper.map(metricData))
 //                .to(outboundTopic);
         
         // This approach allows us to distribute detectors for a given metric across managers.
@@ -91,7 +102,7 @@ public final class KafkaAnomalyDetectorMapper extends AbstractKafkaApp {
                                     .collect(Collectors.toSet());
                         }
                 )
-                .to(outboundTopic, Produced.with(outboundKeySerde, outboundValueSerde));
+                .to(outboundTopic, outboundProduced);
     
         return builder;
     }
