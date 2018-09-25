@@ -16,20 +16,21 @@
 package com.expedia.adaptivealerting.anomdetect.util;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.Resources;
+
+import java.util.Collection;
 
 /**
- * Model type resource.
+ * Model resources.
  *
  * @author Willie Wheeler
  */
-@Data
 @NoArgsConstructor
-@AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ModelTypeResource extends ResourceSupport {
-    private String key;
+public class ModelResources extends Resources<ModelResource> {
+    
+    public ModelResources(Collection<ModelResource> modelResources) {
+        super(modelResources);
+    }
 }

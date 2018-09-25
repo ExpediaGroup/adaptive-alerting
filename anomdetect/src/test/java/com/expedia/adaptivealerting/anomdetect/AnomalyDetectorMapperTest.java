@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
+import com.expedia.adaptivealerting.anomdetect.util.ModelResources;
 import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.expedia.adaptivealerting.anomdetect.util.ModelTypeResource;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
@@ -25,7 +26,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.hateoas.Resources;
 
 import java.util.Collections;
 import java.util.Set;
@@ -61,8 +61,8 @@ public final class AnomalyDetectorMapperTest {
     private MetricData mappedData;
     private MetricData unmappedData;
     private ModelResource modelResource;
-    private Resources<ModelResource> modelResources;
-    private Resources<ModelResource> emptyModelResources;
+    private ModelResources modelResources;
+    private ModelResources emptyModelResources;
     
     @Before
     public void setUp() {
@@ -102,8 +102,8 @@ public final class AnomalyDetectorMapperTest {
                 "7629c28a-5958-4ca7-9aaa-49b95d3481ff",
                 new ModelTypeResource("ewma-detector"));
         
-        this.modelResources = new Resources<>(Collections.singletonList(modelResource));
-        this.emptyModelResources = new Resources<>(Collections.EMPTY_LIST);
+        this.modelResources = new ModelResources(Collections.singletonList(modelResource));
+        this.emptyModelResources = new ModelResources(Collections.EMPTY_LIST);
     }
     
     private void initDependencies() {
