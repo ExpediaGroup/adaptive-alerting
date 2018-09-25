@@ -40,62 +40,64 @@ import static java.lang.Math.abs;
 @Data
 public final class IndividualsControlChartDetector implements AnomalyDetector {
     private static final double R_CONTROL_CHART_CONSTANT_D4 = 3.267;
-    
+    private static final double R_CONTROL_CHART_CONSTANT_D2 = 1.128;
+
+
     /**
      * Number of points after which limits will be recomputed
      */
     private static final int RECOMPUTE_LIMITS_PERIOD = 100;
-    
+
     @NonNull
     private UUID uuid;
-    
+
     @NonNull
     private IndividualsControlChartParams params;
-    
+
     /**
      * Aggregate Moving range. Used to calculate avg. moving range.
      */
     private double movingRangeSum = 0.0;
-    
+
     /**
      * Target predicted from average mean.
      */
     private double target;
-    
+
     /**
      * Previous value.
      */
     private double prevValue;
-    
+
     /**
      * Total number of received data points.
      */
     private int totalDataPoints = 1;
-    
+
     /**
      * Upper limit for R chart
      */
     private double upperControlLimit_R;
-    
+
     /**
      * Upper limit for X chart
      */
     private double upperControlLimit_X;
-    
+
     /**
      * Lower limit for X chart
      */
     private double lowerControlLimit_X;
-    
+
     /**
      * Mean estimate.
      */
     private double mean;
-    
+
     public IndividualsControlChartDetector() {
         this(UUID.randomUUID(), new IndividualsControlChartParams());
     }
-    
+
     /**
      * Creates a new detector. Initial target is given by params.initValue and initial variance is 0.
      *
@@ -105,22 +107,22 @@ public final class IndividualsControlChartDetector implements AnomalyDetector {
     public IndividualsControlChartDetector(UUID uuid, IndividualsControlChartParams params) {
         notNull(uuid, "uuid can't be null");
         notNull(params, "params can't be null");
-        
+
         this.uuid = uuid;
         this.params = params;
         this.prevValue = params.getInitValue();
         this.target = params.getInitValue();
     }
-    
+
     @Override
     public AnomalyResult classify(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
-        
+
         final double observed = metricData.getValue();
         double currentRange = Math.abs(prevValue - observed);
-        
+
         AnomalyLevel level = UNKNOWN;
-        
+
         if (totalDataPoints > params.getWarmUpPeriod()) {
             level = NORMAL;
             if (currentRange > upperControlLimit_R) {
@@ -131,30 +133,31 @@ public final class IndividualsControlChartDetector implements AnomalyDetector {
                 }
             }
         }
-        
+
         if (level == NORMAL || level == UNKNOWN) {
             this.movingRangeSum += abs(currentRange);
             this.mean = getRunningMean(observed);
             this.totalDataPoints++;
         }
-        
+
         if (((totalDataPoints - params.getWarmUpPeriod()) % RECOMPUTE_LIMITS_PERIOD) == 0) {
             double averageMovingRange = getAverageMovingRange();
+            double multiplier = params.getStrongSigmas() / R_CONTROL_CHART_CONSTANT_D2;
             this.target = this.mean;
-            
+
             upperControlLimit_R = R_CONTROL_CHART_CONSTANT_D4 * averageMovingRange;
-            upperControlLimit_X = this.target + 2.66 * averageMovingRange;
-            lowerControlLimit_X = this.target - 2.66 * averageMovingRange;
+            upperControlLimit_X = this.target + multiplier * averageMovingRange;
+            lowerControlLimit_X = this.target - multiplier * averageMovingRange;
         }
         this.prevValue = observed;
-        
+
         return new AnomalyResult(uuid, metricData, level);
     }
-    
+
     private double getRunningMean(double observed) {
         return this.mean + ((observed - this.mean) / (this.totalDataPoints + 1));
     }
-    
+
     private double getAverageMovingRange() {
         return movingRangeSum / Math.max(1, totalDataPoints - 1);
     }
