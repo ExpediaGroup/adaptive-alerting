@@ -67,6 +67,8 @@ public class ModelServiceConnector {
         final String id = metricTankIdFactory.getId(metricDefinition);
         final String uri = String.format(uriTemplate, id);
         
+        log.info("Finding models: metricDefinition={}, id={}, uri={}", metricDefinition, id, uri);
+        
         try {
             final Content content = httpClient.get(uri);
             return objectMapper.readValue(content.asString(), resourcesTypeRef);
