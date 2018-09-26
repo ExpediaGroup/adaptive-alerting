@@ -60,7 +60,16 @@ public final class KafkaAnomalyDetectorManager extends AbstractKafkaApp {
                 .mapValues(mappedMetricData -> {
                     // TODO Not sure why we would get null here--mappedMetricData are mapped to models. But in fact we
                     // are seeing this occur so let's handle it and investigate the cause. [WLW]
-                    final AnomalyResult anomalyResult = manager.classify(mappedMetricData);
+                    AnomalyResult anomalyResult = null;
+                    try {
+                        anomalyResult = manager.classify(mappedMetricData);
+                    } catch (Exception e) {
+                        log.error(
+                                "Error while classifying [{}]. mappedMetricData={}",
+                                e.getMessage(),
+                                mappedMetricData
+                        );
+                    }
                     return anomalyResult == null ? null : new MappedMetricData(mappedMetricData, anomalyResult);
                 })
                 .filter((key, mappedMetricData) -> mappedMetricData != null)
