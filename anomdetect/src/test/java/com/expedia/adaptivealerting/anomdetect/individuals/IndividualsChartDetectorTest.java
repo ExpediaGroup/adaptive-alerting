@@ -82,7 +82,7 @@ public class IndividualsChartDetectorTest {
             final AnomalyLevel level = detector.classify(metricData).getAnomalyLevel();
             
             if (noOfDataPoints < WARMUP_PERIOD) {
-                assertEquals(AnomalyLevel.UNKNOWN, level);
+                assertEquals(AnomalyLevel.MODEL_WARMUP, level);
             } else {
                 assertApproxEqual(testRow.getUpperControlLimit_R(), detector.getUpperControlLimit_R());
                 assertApproxEqual(testRow.getLowerControlLimit_X(), detector.getLowerControlLimit_X());

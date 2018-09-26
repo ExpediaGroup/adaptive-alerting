@@ -36,6 +36,11 @@ public enum AnomalyLevel {
      * Strong outlier.
      */
     STRONG,
+    
+    /**
+     * No classification because the model is warming up.
+     */
+    MODEL_WARMUP,
 
     /**
      * Unknown outlier. Should be used when we are not sure about the anomaly level. e.g. during the warm up period.
