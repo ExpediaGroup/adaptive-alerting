@@ -84,7 +84,7 @@ public class CusumAnomalyDetectorTest {
             final AnomalyLevel level = detector.classify(metricData).getAnomalyLevel();
             
             if (numDataPoints < WARMUP_PERIOD) {
-                assertEquals(AnomalyLevel.UNKNOWN, level);
+                assertEquals(AnomalyLevel.MODEL_WARMUP, level);
             } else {
                 assertApproxEqual(testRow.getSh(), detector.getSumHigh());
                 assertApproxEqual(testRow.getSl(), detector.getSumLow());
