@@ -50,7 +50,7 @@ public final class AnomalyValidator {
             final String outboundTopic = appConfig.getString(OUTBOUND_TOPIC);
             
             final StreamsBuilder builder = new StreamsBuilder();
-            final KStream<String, MappedMetricData> mpointWithAnomalies = builder.stream(inboundTopic);
+            final KStream<String, MappedMetricData> anomalies = builder.stream(inboundTopic);
 
             InvestigationFilter preInvestigationFilter = new PreInvestigationFilter();
             InvestigationFilter postInvestigationFilter = new PostInvestigationFilter();
@@ -61,10 +61,10 @@ public final class AnomalyValidator {
                     ? appConfig.getInt("investigation.timeoutMs") : null;
             InvestigationManager investigationManager = new InvestigationManager(endpoint, timeoutMs);
 
-            mpointWithAnomalies
-                    .filter((k, mpointWithAnomaly) -> preInvestigationFilter.keep(mpointWithAnomaly))
+            anomalies
+                    .filter((k, anomaly) -> preInvestigationFilter.keep(anomaly))
                     .mapValues(investigationManager::investigate)
-                    .filter((k, mappedMetricData) -> postInvestigationFilter.keep(mappedMetricData))
+                    .filter((k, anomaly) -> postInvestigationFilter.keep(anomaly))
                     .to(outboundTopic);
 
             return builder;
