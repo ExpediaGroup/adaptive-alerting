@@ -47,7 +47,7 @@ public interface AnomalyDetectorFactory<T extends AnomalyDetector> {
      * pretrained model.
      *
      * @param uuid Detector UUID.
-     * @return Anomaly detector, or {@link null} if the creation attempt failed.
+     * @return Anomaly detector, or {@literal null} if the creation attempt failed.
      */
     T create(UUID uuid);
 }
