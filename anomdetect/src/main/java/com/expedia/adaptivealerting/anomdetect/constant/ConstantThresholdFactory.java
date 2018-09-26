@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 
@@ -60,18 +59,19 @@ public final class ConstantThresholdFactory implements AnomalyDetectorFactory<Co
     @Override
     public ConstantThresholdAnomalyDetector create(UUID uuid) {
         notNull(uuid, "uuid can't be null");
-    
+        
         final String path = folder + "/" + uuid.toString() + ".json";
         final S3Object s3Obj = s3.getObject(BUCKET, path);
         final InputStream is = s3Obj.getObjectContent();
     
         ConstantThresholdModel model;
         try {
+            log.info("Loading model for detectorUuid={} from S3: bucket={}, path={}", uuid, BUCKET, path);
             model = objectMapper.readValue(is, ConstantThresholdModel.class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            log.error("{} while loading model for detectorUuid={}: {}", e.getClass().getName(), uuid, e.getMessage());
+            return null;
         }
-    
         log.info("Loaded model: {}", model);
         return new ConstantThresholdAnomalyDetector(uuid, model.getParams());
     }
