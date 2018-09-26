@@ -15,6 +15,8 @@
  */
 package com.expedia.adaptivealerting.core.anomaly;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.ToString;
 
@@ -33,7 +35,13 @@ public class AnomalyThresholds {
     private Double lowerStrong;
     private Double lowerWeak;
     
-    public AnomalyThresholds(Double upperStrong, Double upperWeak, Double lowerStrong, Double lowerWeak) {
+    @JsonCreator
+    public AnomalyThresholds(
+            @JsonProperty("upperStrong") Double upperStrong,
+            @JsonProperty("upperWeak") Double upperWeak,
+            @JsonProperty("lowerStrong") Double lowerStrong,
+            @JsonProperty("lowerWeak") Double lowerWeak) {
+        
         if (upperStrong != null) {
             isTrue(upperWeak == null || upperStrong >= upperWeak, "Required: upperStrong >= upperWeak");
             isTrue(lowerWeak == null || upperStrong >= lowerWeak, "Required: upperStrong >= lowerWeak");
