@@ -76,11 +76,11 @@ public final class AnomalyDetectorManager {
     
     /**
      * Gets the anomaly detector for the given metric point, creating it if absent. Returns {@code null} if there's no
-     * {@link AnomalyDetectorFactory} defined for the mapped mpoint's detector type.
+     * {@link AnomalyDetectorFactory} defined for the mapped metric data's detector type.
      *
      * @param mappedMetricData Mapped metric point.
-     * @return Anomaly detector for the given metric point, or {@code null} if there's no registered detector factory
-     * for the mapped mpoint's detector type.
+     * @return Anomaly detector for the given metric point, or {@code null} if there's some problem loading the
+     * detector.
      */
     public AnomalyDetector detectorFor(MappedMetricData mappedMetricData) {
         notNull(mappedMetricData, "mappedMetricData can't be null");
@@ -92,6 +92,7 @@ public final class AnomalyDetectorManager {
             if (factory == null) {
                 log.warn("No AnomalyDetectorFactory registered for detectorType={}", detectorType);
             } else {
+                log.info("Creating anomaly detector: uuid={}, type={}", detectorUuid, detectorType);
                 final AnomalyDetector innerDetector = factory.create(detectorUuid);
 
                 // TODO Temporarily commenting this out because it's causing a problem
