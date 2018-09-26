@@ -4,7 +4,7 @@
 
 # Adaptive Alerting (AA)
 
-Streaming anomaly detection with automated model selection.
+Streaming anomaly detection with automated model selection and autotuning.
 
 [Wiki documentation](https://github.com/ExpediaDotCom/haystack-adaptive-alerting/wiki)
 
