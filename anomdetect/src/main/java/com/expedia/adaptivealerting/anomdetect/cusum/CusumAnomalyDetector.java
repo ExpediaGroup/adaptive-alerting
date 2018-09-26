@@ -155,7 +155,7 @@ public final class CusumAnomalyDetector implements AnomalyDetector {
                     throw new IllegalStateException("Illegal type: " + params.getType());
             }
         } else {
-            level = UNKNOWN;
+            level = MODEL_WARMUP;
         }
         
         return new AnomalyResult(uuid, metricData, level);

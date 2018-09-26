@@ -121,7 +121,7 @@ public final class IndividualsControlChartDetector implements AnomalyDetector {
         final double observed = metricData.getValue();
         double currentRange = Math.abs(prevValue - observed);
 
-        AnomalyLevel level = UNKNOWN;
+        AnomalyLevel level;
 
         if (totalDataPoints > params.getWarmUpPeriod()) {
             level = NORMAL;
@@ -132,9 +132,11 @@ public final class IndividualsControlChartDetector implements AnomalyDetector {
                     level = WEAK;
                 }
             }
+        } else {
+            level = MODEL_WARMUP;
         }
 
-        if (level == NORMAL || level == UNKNOWN) {
+        if (level == NORMAL || level == MODEL_WARMUP) {
             this.movingRangeSum += abs(currentRange);
             this.mean = getRunningMean(observed);
             this.totalDataPoints++;

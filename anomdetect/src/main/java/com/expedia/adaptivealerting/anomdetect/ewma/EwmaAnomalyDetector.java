@@ -28,6 +28,8 @@ import java.util.UUID;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 import static java.lang.Math.sqrt;
 
+// TODO Add model warmup param and anomaly level. See e.g. CUSUM, Individuals, PEWMA. [WLW]
+
 /**
  * <p>
  * Anomaly detector based on the exponential weighted moving average (EWMA) chart, a type of control chart used in

@@ -27,6 +27,8 @@ import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
+// TODO Return MODEL_WARMUP anomaly level if the model is still warming up. [WLW]
+
 /**
  * <p>
  * Anomaly detector based on the probabilistic exponential weighted moving average. This is an online algorithm, meaning
