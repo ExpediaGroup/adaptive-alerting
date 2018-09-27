@@ -21,6 +21,7 @@ import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.Resources;
 
 import java.util.Collection;
@@ -39,6 +40,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author David Sutherland
  * @author Willie Wheeler
  */
+@Slf4j
 public final class AnomalyDetectorMapper {
     
     @Getter
@@ -66,6 +68,8 @@ public final class AnomalyDetectorMapper {
         final MetricDefinition metricDefinition = metricData.getMetricDefinition();
         final Resources<ModelResource> modelResources = modelServiceConnector.findModels(metricDefinition);
         final Collection<ModelResource> modelCollection = modelResources.getContent();
+        
+        log.info("metricData={}", metricData);
         
         return modelCollection.stream()
                 .map(model -> {
