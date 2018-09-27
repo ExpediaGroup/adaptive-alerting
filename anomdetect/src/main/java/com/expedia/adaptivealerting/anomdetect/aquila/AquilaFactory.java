@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.aquila;
 
-import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetectorFactory;
 import com.typesafe.config.Config;
 
 import java.util.UUID;
@@ -27,12 +27,11 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 /**
  * @author Willie Wheeler
  */
-public class AquilaFactory implements AnomalyDetectorFactory<AquilaAnomalyDetector> {
+public class AquilaFactory extends AbstractAnomalyDetectorFactory<AquilaAnomalyDetector> {
     
     @Override
     public void init(String type, Config config) {
-        notNull(type, "type can't be null");
-        notNull(config, "config can't be null");
+        super.init(type, config);
         
         // TODO
     }

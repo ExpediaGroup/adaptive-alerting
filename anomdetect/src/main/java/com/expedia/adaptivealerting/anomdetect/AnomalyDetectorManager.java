@@ -51,15 +51,26 @@ public final class AnomalyDetectorManager {
      * Max samples required to evaluate performance
      */
     private static final int PERFMON_SAMPLE_SIZE = 100;
-
-    public AnomalyDetectorManager(Config factoryConfig) {
-        notNull(factoryConfig, "factoryConfig can't be null");
+    
+    /**
+     * Creates a new anomaly detector manager.
+     *
+     * @param factoriesConfig Factories config
+     */
+    public AnomalyDetectorManager(Config factoriesConfig) {
+        notNull(factoriesConfig, "factoriesConfig can't be null");
+        
+        final Config byTypeConfig = factoriesConfig.getConfig("by-type");
+        
         this.detectorFactories = new HashMap<>();
-        factoryConfig.entrySet().forEach(entry -> {
+        byTypeConfig.entrySet().forEach(entry -> {
             final String type = entry.getKey();
             final String className = entry.getValue().unwrapped().toString();
             final AnomalyDetectorFactory factory = (AnomalyDetectorFactory) ReflectionUtil.newInstance(className);
-            factory.init(type, factoryConfig);
+            
+            // Pass in the factories config so the individual factories can get at the region and bucket.
+            factory.init(type, factoriesConfig);
+            
             detectorFactories.put(entry.getKey(), factory);
         });
     }
