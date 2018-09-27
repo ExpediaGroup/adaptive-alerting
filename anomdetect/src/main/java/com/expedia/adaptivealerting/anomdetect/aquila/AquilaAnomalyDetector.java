@@ -47,7 +47,7 @@ public final class AquilaAnomalyDetector implements AnomalyDetector {
     public AnomalyResult classify(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
         
-        // FIXME Temporary
-        return new AnomalyResult(uuid, metricData, AnomalyLevel.UNKNOWN);
+        // FIXME Temporary so we can see whether we trip this detector
+        return new AnomalyResult(uuid, metricData, AnomalyLevel.STRONG);
     }
 }
