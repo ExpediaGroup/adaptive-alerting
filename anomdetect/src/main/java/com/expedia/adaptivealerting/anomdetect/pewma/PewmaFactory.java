@@ -17,10 +17,13 @@ package com.expedia.adaptivealerting.anomdetect.pewma;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.S3Object;
 import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetectorFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.InputStream;
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -36,6 +39,8 @@ public final class PewmaFactory extends AbstractAnomalyDetectorFactory<PewmaAnom
     private AmazonS3 s3;
     private String folder;
     
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    
     public void init(String type, Config config) {
         super.init(type, config);
     
@@ -44,12 +49,26 @@ public final class PewmaFactory extends AbstractAnomalyDetectorFactory<PewmaAnom
                 .build();
         this.folder = type;
     
-        log.info("Initialized ConstantThresholdFactory: folder={}", folder);
+        log.info("Initialized PewmaFactory: folder={}", folder);
     }
     
     @Override
     public PewmaAnomalyDetector create(UUID uuid) {
         notNull(uuid, "uuid can't be null");
-        throw new UnsupportedOperationException("Not yet implemented");
+    
+        final String path = folder + "/" + uuid.toString() + ".json";
+        final S3Object s3Obj = s3.getObject(getBucket(), path);
+        final InputStream is = s3Obj.getObjectContent();
+    
+        PewmaModel model;
+        try {
+            log.info("Loading model for detectorUuid={} from S3: bucket={}, path={}", uuid, getBucket(), path);
+            model = objectMapper.readValue(is, PewmaModel.class);
+        } catch (Exception e) {
+            log.error("{} while loading model for detectorUuid={}: {}", e.getClass().getName(), uuid, e.getMessage());
+            return null;
+        }
+        log.info("Loaded model: {}", model);
+        return new PewmaAnomalyDetector(uuid, model.getParams());
     }
 }
