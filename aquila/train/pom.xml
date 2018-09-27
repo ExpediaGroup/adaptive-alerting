@@ -47,6 +47,10 @@
         </dependency>
         <dependency>
             <groupId>com.expedia.adaptivealerting</groupId>
+            <artifactId>adaptive-alerting-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.expedia.adaptivealerting</groupId>
             <artifactId>adaptive-alerting-dataconnect</artifactId>
         </dependency>
         <dependency>

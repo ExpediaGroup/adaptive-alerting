@@ -43,7 +43,7 @@ public final class MidpointModelTrainer {
         notNull(metricFrame, "metricFrame can't be null");
         isTrue(metricFrame.getNumRows() > 0, "Required: metricFrame.numRows > 0");
         
-        final Instant instant0 = Instant.ofEpochSecond(metricFrame.getMetricPoint(0).getTimestamp());
+        final Instant instant0 = Instant.ofEpochSecond(metricFrame.getMetricDataPoint(0).getTimestamp());
         final int tickOffset = DateUtil.tickOffsetFromWeekStart(instant0, params.getIntervalInMinutes());
         isTrue(tickOffset == 0, "Required: metricFrame must start from Sunday at midnight, UTC time");
         
