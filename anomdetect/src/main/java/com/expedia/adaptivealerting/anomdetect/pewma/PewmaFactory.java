@@ -15,8 +15,11 @@
  */
 package com.expedia.adaptivealerting.anomdetect.pewma;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetectorFactory;
 import com.typesafe.config.Config;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.UUID;
 
@@ -25,12 +28,23 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 /**
  * @author Willie Wheeler
  */
+@Slf4j
 public final class PewmaFactory extends AbstractAnomalyDetectorFactory<PewmaAnomalyDetector> {
+    
+    // TODO Move this AWS-specific code out of this factory.
+    // The actual param load code will go in modelservice-s3. [WLW]
+    private AmazonS3 s3;
+    private String folder;
     
     public void init(String type, Config config) {
         super.init(type, config);
     
-        // TODO
+        this.s3 = AmazonS3ClientBuilder.standard()
+                .withRegion(getRegion())
+                .build();
+        this.folder = type;
+    
+        log.info("Initialized ConstantThresholdFactory: folder={}", folder);
     }
     
     @Override
