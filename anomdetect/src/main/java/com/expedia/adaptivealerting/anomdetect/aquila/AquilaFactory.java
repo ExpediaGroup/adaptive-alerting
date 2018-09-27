@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.anomdetect.aquila;
 
 import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetectorFactory;
 import com.typesafe.config.Config;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.UUID;
 
@@ -27,6 +28,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 /**
  * @author Willie Wheeler
  */
+@Slf4j
 public class AquilaFactory extends AbstractAnomalyDetectorFactory<AquilaAnomalyDetector> {
     
     @Override
@@ -34,6 +36,7 @@ public class AquilaFactory extends AbstractAnomalyDetectorFactory<AquilaAnomalyD
         super.init(type, config);
         
         // TODO
+        log.info("Initialized AquilaFactory");
     }
     
     @Override

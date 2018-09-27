@@ -19,6 +19,7 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
 import com.expedia.metrics.MetricData;
+import com.expedia.metrics.MetricDefinition;
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 
@@ -66,12 +67,14 @@ public final class AnomalyDetectorManager {
         byTypeConfig.entrySet().forEach(entry -> {
             final String type = entry.getKey();
             final String className = entry.getValue().unwrapped().toString();
-            final AnomalyDetectorFactory factory = (AnomalyDetectorFactory) ReflectionUtil.newInstance(className);
             
+            log.info("Initializing AnomalyDetectorFactory: type={}, className={}", type, className);
+            final AnomalyDetectorFactory factory = (AnomalyDetectorFactory) ReflectionUtil.newInstance(className);
             // Pass in the factories config so the individual factories can get at the region and bucket.
             factory.init(type, factoriesConfig);
+            log.info("Initialized AnomalyDetectorFactory: type={}, className={}", type, className);
             
-            detectorFactories.put(entry.getKey(), factory);
+            detectorFactories.put(type, factory);
         });
     }
     
@@ -96,7 +99,7 @@ public final class AnomalyDetectorManager {
     public AnomalyDetector detectorFor(MappedMetricData mappedMetricData) {
         notNull(mappedMetricData, "mappedMetricData can't be null");
         final UUID detectorUuid = mappedMetricData.getDetectorUuid();
-        AnomalyDetector detector = detectors.get(detectorUuid);
+        final AnomalyDetector detector = detectors.get(detectorUuid);
         if (detector == null) {
             final String detectorType = mappedMetricData.getDetectorType();
             final AnomalyDetectorFactory factory = detectorFactories.get(detectorType);
@@ -132,6 +135,14 @@ public final class AnomalyDetectorManager {
      */
     public AnomalyResult classify(MappedMetricData mappedMetricData) {
         notNull(mappedMetricData, "mappedMetricData can't be null");
+        
+        final MetricData metricData = mappedMetricData.getMetricData();
+        final MetricDefinition metricDefinition = metricData.getMetricDefinition();
+        final UUID detectorUuid = mappedMetricData.getDetectorUuid();
+        final String detectorType = mappedMetricData.getDetectorType();
+        
+        log.info("Classifying: metricDefinition={}, detectorUuid={}, detectorType={}",
+                metricDefinition, detectorUuid, detectorType);
         
         final AnomalyDetector detector = detectorFor(mappedMetricData);
         
