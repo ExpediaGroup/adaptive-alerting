@@ -151,7 +151,6 @@ public final class AnomalyDetectorManager {
             return null;
         }
         
-        final MetricData metricData = mappedMetricData.getMetricData();
         final AnomalyResult result = detector.classify(metricData);
         log.trace("AnomalyResult: {}", result);
         return result;
