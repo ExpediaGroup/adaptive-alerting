@@ -47,6 +47,11 @@
     <modules>
         <module>anomdetect</module>
         <module>anomvalidate</module>
+
+        <!-- TODO Temporary, move this out after we are pushing AA to Maven Central. -->
+        <!-- Or else decouple Aquila from AA, which is probably even better. [WLW] -->
+        <module>aquila</module>
+
         <module>core</module>
 
         <!-- TODO Split this into anomdetect-kafka, anomvalidate-kafka, etc. [WLW] -->
@@ -539,6 +544,16 @@
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
                     <version>${spring.boot.version}</version>
+                    <configuration>
+                        <addResources>true</addResources>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>repackage</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
