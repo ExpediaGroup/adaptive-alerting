@@ -13,30 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.ewma;
+package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetectorFactory;
 import com.typesafe.config.Config;
-
-import java.util.UUID;
+import lombok.Getter;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
+ * Abstract base class for implementing {@link AnomalyDetectorFactory}.
+ *
  * @author Willie Wheeler
  */
-public final class EwmaFactory extends AbstractAnomalyDetectorFactory<EwmaAnomalyDetector> {
+public abstract class AbstractAnomalyDetectorFactory<T extends AnomalyDetector> implements AnomalyDetectorFactory<T> {
     
-    @Override
-    public void init(String type, Config config) {
-        super.init(type, config);
+    @Getter
+    private String type;
     
-        // TODO
-    }
+    @Getter
+    private String region;
     
-    @Override
-    public EwmaAnomalyDetector create(UUID uuid) {
-        notNull(uuid, "uuid can't be null");
-        throw new UnsupportedOperationException("Not yet implemented");
+    @Getter
+    private String bucket;
+    
+    public void init(String type, Config factoriesConfig) {
+        notNull(type, "type can't be null");
+        notNull(factoriesConfig, "factoriesConfig can't be null");
+        
+        this.type = type;
+        this.region = factoriesConfig.getString("region");
+        this.bucket = factoriesConfig.getString("bucket");
     }
 }
