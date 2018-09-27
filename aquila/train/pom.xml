@@ -19,66 +19,68 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
+    <modelVersion>4.0.0</modelVersion>
+
     <parent>
-        <groupId>com.expedia.adaptivealerting</groupId>
-        <artifactId>adaptive-alerting</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <groupId>com.expedia</groupId>
+        <artifactId>aquila</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
     </parent>
 
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.expedia.adaptivealerting</groupId>
-    <artifactId>adaptive-alerting-anomdetect</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <artifactId>aquila-train</artifactId>
     <packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
-    <description>Anomaly detection for streaming time series.</description>
+    <description>Aquila trainer.</description>
     <url>${project.parent.url}</url>
 
     <dependencies>
 
         <!-- Compile -->
-
-        <!-- TODO Move these to a separate project. anomdetect shouldn't depend on AWS. [WLW] -->
         <dependency>
             <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-core</artifactId>
+            <artifactId>aws-java-sdk-athena</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-s3</artifactId>
+            <groupId>com.expedia</groupId>
+            <artifactId>aquila-core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-sagemakerruntime</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>com.expedia.adaptivealerting</groupId>
             <artifactId>adaptive-alerting-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.expedia</groupId>
-            <artifactId>metrics-java-metrictank</artifactId>
+            <groupId>com.expedia.adaptivealerting</groupId>
+            <artifactId>adaptive-alerting-dataconnect</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-        </dependency>
-
-        <!-- TODO Remove dependency on Haystack commons. [WLW] -->
-        <dependency>
-            <groupId>com.expedia.www</groupId>
-            <artifactId>haystack-commons</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>fluent-hc</artifactId>
+            <groupId>com.expedia.adaptivealerting</groupId>
+            <artifactId>adaptive-alerting-dataservice-athena</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.hateoas</groupId>
-            <artifactId>spring-hateoas</artifactId>
+            <groupId>com.github.servicenow.stl4j</groupId>
+            <artifactId>stl-decomp-4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 </project>
