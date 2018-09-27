@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.aquila;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
@@ -45,6 +46,8 @@ public final class AquilaAnomalyDetector implements AnomalyDetector {
     @Override
     public AnomalyResult classify(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
-        throw new UnsupportedOperationException("Not yet implemented");
+        
+        // FIXME Temporary
+        return new AnomalyResult(uuid, metricData, AnomalyLevel.UNKNOWN);
     }
 }
