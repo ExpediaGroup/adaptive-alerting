@@ -23,7 +23,7 @@ RUN mkdir -p ${APP_HOME}
 
 # TODO Figure out a nice way to avoid the hardcode here.
 # Right now I'm having to do this because otherwise I pick up the javadoc and sources jars. [WLW]
-COPY target/aquila-detect-0.2.0-SNAPSHOT.jar ${APP_HOME}/aquila-detect.jar
+COPY target/aquila-detect-0.1.0-SNAPSHOT.jar ${APP_HOME}/aquila-detect.jar
 
 COPY docker/jmxtrans-agent.xml ${APP_HOME}/
 COPY docker/start-app.sh ${APP_HOME}/
