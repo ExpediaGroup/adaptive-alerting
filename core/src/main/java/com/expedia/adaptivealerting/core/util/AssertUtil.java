@@ -34,6 +34,10 @@ public class AssertUtil {
         }
     }
     
+    public static void isFalse(boolean b, String message) {
+        isTrue(!b, message);
+    }
+    
     public static void notNull(Object o, String message) {
         isTrue(o != null, message);
     }

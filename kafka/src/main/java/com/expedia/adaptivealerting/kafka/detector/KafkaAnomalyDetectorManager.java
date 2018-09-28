@@ -59,6 +59,8 @@ public final class KafkaAnomalyDetectorManager extends AbstractKafkaApp {
         final KStream<String, MappedMetricData> stream = builder.stream(inboundTopic);
         stream
                 .mapValues(mappedMetricData -> {
+                    log.info("Processing mappedMetricData: {}", mappedMetricData);
+                    
                     // TODO Not sure why we would get null here--mappedMetricData are mapped to models. But in fact we
                     // are seeing this occur so let's handle it and investigate the cause. [WLW]
                     AnomalyResult anomalyResult = null;
@@ -71,6 +73,9 @@ public final class KafkaAnomalyDetectorManager extends AbstractKafkaApp {
                                 mappedMetricData
                         );
                     }
+                    
+                    log.info("anomalyResult={}", anomalyResult);
+                    
                     return anomalyResult == null ? null : new MappedMetricData(mappedMetricData, anomalyResult);
                 })
                 .filter((key, mappedMetricData) -> mappedMetricData != null)
