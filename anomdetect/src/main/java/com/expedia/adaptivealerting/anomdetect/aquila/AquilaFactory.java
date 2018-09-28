@@ -30,6 +30,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  */
 @Slf4j
 public class AquilaFactory extends AbstractAnomalyDetectorFactory<AquilaAnomalyDetector> {
+    private static final String AQUILA_URL = "http://foo.example.com/";
     
     @Override
     public void init(String type, Config config) {

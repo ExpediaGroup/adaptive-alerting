@@ -49,7 +49,7 @@ public final class AnomalyDetectorMapper {
     /**
      * Creates a new mapper.
      *
-     * @param modelServiceConnector
+     * @param modelServiceConnector Model service connector.
      */
     public AnomalyDetectorMapper(ModelServiceConnector modelServiceConnector) {
         notNull(modelServiceConnector, "modelServiceConnector can't be null");
