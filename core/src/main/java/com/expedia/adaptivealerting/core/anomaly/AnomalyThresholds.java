@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.ToString;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isFalse;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 
 /**
@@ -41,6 +42,9 @@ public class AnomalyThresholds {
             @JsonProperty("upperWeak") Double upperWeak,
             @JsonProperty("lowerStrong") Double lowerStrong,
             @JsonProperty("lowerWeak") Double lowerWeak) {
+        
+        isFalse(upperStrong == null && upperWeak == null && lowerWeak == null && lowerStrong == null,
+                "At least one of the thresholds must be not null");
         
         if (upperStrong != null) {
             isTrue(upperWeak == null || upperStrong >= upperWeak, "Required: upperStrong >= upperWeak");
