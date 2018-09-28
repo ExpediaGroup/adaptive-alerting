@@ -35,12 +35,19 @@ public class PostInvestigationFilter implements InvestigationFilter {
         if (anomalyResult == null) {
             return false;
         }
+        //FIXME - need to revisit this logic for Weak Anomaly check later.
         if (AnomalyLevel.WEAK == anomalyResult.getAnomalyLevel()
+                && isBookingMetric(mappedMetricData)
                 && anomalyResult.getInvestigationResults() != null) {
             return anomalyResult.getInvestigationResults().stream()
                     .filter(Objects::nonNull)
                     .anyMatch(InvestigationResult::isResult);
         }
-        return AnomalyLevel.STRONG.equals(anomalyResult.getAnomalyLevel());
+        return true;
+    }
+
+    private boolean isBookingMetric(MappedMetricData mappedMetricData) {
+        return "bookings".equals(mappedMetricData.getMetricData().getMetricDefinition()
+            .getTags().getKv().get("what"));
     }
 }
