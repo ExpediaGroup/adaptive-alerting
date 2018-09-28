@@ -16,12 +16,16 @@
 package com.expedia.adaptivealerting.anomdetect.aquila;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.metrics.MetricData;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.hateoas.hal.Jackson2HalModule;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import java.util.UUID;
 
@@ -38,6 +42,13 @@ public final class AquilaAnomalyDetector implements AnomalyDetector {
     
     @NonNull
     private UUID uuid;
+    
+    private HttpClientWrapper httpClient = new HttpClientWrapper();
+    
+    // https://hdpe.me/post/spring-data-rest-hal-client/
+    final ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json()
+            .modules(new Jackson2HalModule())
+            .build();
     
     public AquilaAnomalyDetector() {
         this(UUID.randomUUID());
