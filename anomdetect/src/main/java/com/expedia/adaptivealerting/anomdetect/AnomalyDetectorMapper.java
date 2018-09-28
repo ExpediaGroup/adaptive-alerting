@@ -24,6 +24,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.Resources;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
@@ -68,8 +69,8 @@ public final class AnomalyDetectorMapper {
         final MetricDefinition metricDefinition = metricData.getMetricDefinition();
         final Resources<ModelResource> modelResources = modelServiceConnector.findModels(metricDefinition);
         final Collection<ModelResource> modelCollection = modelResources.getContent();
-        
-        log.info("metricData={}", metricData);
+
+        log.info("metricData={}, models={}", metricData, Arrays.toString(modelCollection.toArray()));
         
         return modelCollection.stream()
                 .map(model -> {
