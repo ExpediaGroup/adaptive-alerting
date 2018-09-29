@@ -41,35 +41,67 @@ import java.time.Instant;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
- * Athena-based {@link DataService} implementation.
+ * AWS Athena-based {@link DataService} implementation. This implementation queries an Athena database and then writes
+ * the query results into a configurable S3 bucket.
  *
  * @author Willie Wheeler
  */
 @Slf4j
 public class AthenaDataService extends AbstractDataService {
+    private static final String CONFIG_KEY_REGION = "region";
+    private static final String CONFIG_KEY_DATABASE = "database";
+    private static final String CONFIG_KEY_OUTPUT_BUCKET = "outputBucket";
+    private static final String CONFIG_KEY_CLIENT_EXECUTION_TIMEOUT = "clientExecutionTimeout";
     
     // FIXME Temporarily using a hardcoded query.
     private static final String QUERY = "SELECT * FROM bookings_test WHERE lob='air' AND pos='expedia.com' AND timestamp BETWEEN 1517443200 AND 1517443200";
     
     private AmazonAthena athena;
     private AmazonS3 s3;
-    private String database;
-    private String outputLocation;
     
+    private String region;
+    private String database;
+    private String outputBucket;
+    private int clientExecutionTimeout = 0;
+    
+    /**
+     * Initializes the data service. Required configuration properties:
+     *
+     * <ul>
+     *     <li>region: AWS region</li>
+     *     <li>database: Athena database name</li>
+     *     <li>outputBucket: S3 bucket into which to write the query results</li>
+     * </ul>
+     *
+     * Optional configuration properties:
+     *
+     * <ul>
+     *     <li>clientExecutionTimeout: Total number of milliseconds for a request/response including the time to execute
+     *     the request handlers, the round-trip to AWS, and the time to execute the response handlers. Captured on a per
+     *     request-type level. (Default 0)</li>
+     * </ul>
+     *
+     * @param config Data service configuration.
+     */
     @Override
     public void init(Config config) {
         super.init(config);
     
-        final int clientExecutionTimeout = config.getInt("clientExecutionTimeout");
-        final String region = config.getString("region");
-        
-        this.database = config.getString("database");
-        this.outputLocation = config.getString("outputLocation");
+        this.region = config.getString(CONFIG_KEY_REGION);
+        this.database = config.getString(CONFIG_KEY_DATABASE);
+        this.outputBucket = config.getString(CONFIG_KEY_OUTPUT_BUCKET);
         
         notNull(region, "Property 'region' must be defined");
         notNull(database, "Property 'database' must be defined");
-        notNull(outputLocation, "Property 'outputLocation' must be defined");
-    
+        notNull(outputBucket, "Property 'outputBucket' must be defined");
+        
+        if (config.hasPath(CONFIG_KEY_CLIENT_EXECUTION_TIMEOUT)) {
+            this.clientExecutionTimeout = config.getInt(CONFIG_KEY_CLIENT_EXECUTION_TIMEOUT);
+        }
+        
+        log.info("Initializing AthenaDataService: region={}, database={}, outputBucket={}, clientExecutionTimeout={}",
+                region, database, outputBucket, clientExecutionTimeout);
+        
         final ClientConfiguration clientConfig =
                 new ClientConfiguration().withClientExecutionTimeout(clientExecutionTimeout);
     
@@ -85,8 +117,7 @@ public class AthenaDataService extends AbstractDataService {
                 .withClientConfiguration(clientConfig)
                 .build();
         
-        log.info("Initialized AthenaDataService: region={}, database={}, outputLocation={}",
-                region, database, outputLocation);
+        log.info("Successfully initialized AthenaDataService");
     }
     
     public AmazonAthena getAthena() {
@@ -111,7 +142,7 @@ public class AthenaDataService extends AbstractDataService {
         final QueryExecutionContext context = new QueryExecutionContext().withDatabase(database);
         final ResultConfiguration conf = new ResultConfiguration()
 //                .withEncryptionConfiguration(encryptionConfiguration)
-                .withOutputLocation(outputLocation);
+                .withOutputLocation(outputBucket);
         final StartQueryExecutionRequest request = new StartQueryExecutionRequest()
                 .withQueryString(QUERY)
                 .withQueryExecutionContext(context)
@@ -151,7 +182,7 @@ public class AthenaDataService extends AbstractDataService {
         // FIXME FIXME FIXME
         // This should be the bucket name not the output location
         // FIXME FIXME FIXME
-        final S3Object s3Obj = s3.getObject(outputLocation, path);
+        final S3Object s3Obj = s3.getObject(outputBucket, path);
         return s3Obj.getObjectContent();
     }
 }

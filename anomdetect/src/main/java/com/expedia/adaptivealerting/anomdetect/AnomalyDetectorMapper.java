@@ -50,7 +50,7 @@ public final class AnomalyDetectorMapper {
     /**
      * Creates a new mapper.
      *
-     * @param modelServiceConnector
+     * @param modelServiceConnector Model service connector.
      */
     public AnomalyDetectorMapper(ModelServiceConnector modelServiceConnector) {
         notNull(modelServiceConnector, "modelServiceConnector can't be null");
@@ -69,7 +69,8 @@ public final class AnomalyDetectorMapper {
         final MetricDefinition metricDefinition = metricData.getMetricDefinition();
         final Resources<ModelResource> modelResources = modelServiceConnector.findModels(metricDefinition);
         final Collection<ModelResource> modelCollection = modelResources.getContent();
-
+        
+        // TODO This logging is expensive. Don't want to keep it permanently, at least not at INFO level. [WLW]
         log.info("metricData={}, models={}", metricData, Arrays.toString(modelCollection.toArray()));
         
         return modelCollection.stream()

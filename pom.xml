@@ -180,11 +180,6 @@
                 <version>${metrics.java.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.expedia</groupId>
-                <artifactId>metrics-java-metrictank</artifactId>
-                <version>${metrics.java.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>com.expedia.adaptivealerting</groupId>
                 <artifactId>adaptive-alerting-aws</artifactId>
                 <version>${aa.version}</version>
