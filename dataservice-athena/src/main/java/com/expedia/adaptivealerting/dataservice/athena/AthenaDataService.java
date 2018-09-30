@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.dataservice.athena;
 
 import com.amazonaws.ClientConfiguration;
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.services.athena.AmazonAthena;
 import com.amazonaws.services.athena.AmazonAthenaClientBuilder;
 import com.amazonaws.services.athena.model.GetQueryExecutionRequest;
@@ -28,9 +29,10 @@ import com.amazonaws.services.athena.model.StartQueryExecutionResult;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.S3Object;
-import com.expedia.adaptivealerting.core.data.io.MetricFileInfo;
-import com.expedia.adaptivealerting.dataservice.AbstractDataService;
+import com.expedia.adaptivealerting.core.data.MetricFrame;
+import com.expedia.adaptivealerting.core.data.io.MetricFrameLoader;
 import com.expedia.adaptivealerting.dataservice.DataService;
+import com.expedia.metrics.MetricDefinition;
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,14 +49,19 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author Willie Wheeler
  */
 @Slf4j
-public class AthenaDataService extends AbstractDataService {
+public class AthenaDataService implements DataService {
     private static final String CONFIG_KEY_REGION = "region";
     private static final String CONFIG_KEY_DATABASE = "database";
     private static final String CONFIG_KEY_OUTPUT_BUCKET = "outputBucket";
     private static final String CONFIG_KEY_CLIENT_EXECUTION_TIMEOUT = "clientExecutionTimeout";
     
     // FIXME Temporarily using a hardcoded query.
-    private static final String QUERY = "SELECT * FROM bookings_test WHERE lob='air' AND pos='expedia.com' AND timestamp BETWEEN 1517443200 AND 1517443200";
+    private static final String POS_QUERY_TEMPLATE =
+            "SELECT timestamp, value" +
+            " FROM bookings_lob_pos" +
+            " WHERE lob='%s'" +
+            " AND pos='%s'" +
+            " AND timestamp BETWEEN %d AND %d";
     
     private AmazonAthena athena;
     private AmazonS3 s3;
@@ -85,8 +92,6 @@ public class AthenaDataService extends AbstractDataService {
      */
     @Override
     public void init(Config config) {
-        super.init(config);
-    
         this.region = config.getString(CONFIG_KEY_REGION);
         this.database = config.getString(CONFIG_KEY_DATABASE);
         this.outputBucket = config.getString(CONFIG_KEY_OUTPUT_BUCKET);
@@ -107,13 +112,13 @@ public class AthenaDataService extends AbstractDataService {
     
         this.athena = AmazonAthenaClientBuilder.standard()
                 .withRegion(region)
-//                .withCredentials(DefaultAWSCredentialsProviderChain.getInstance())
+                .withCredentials(DefaultAWSCredentialsProviderChain.getInstance())
                 .withClientConfiguration(clientConfig)
                 .build();
         
         this.s3 = AmazonS3ClientBuilder.standard()
                 .withRegion(region)
-//                .withCredentials(DefaultAWSCredentialsProviderChain.getInstance())
+                .withCredentials(DefaultAWSCredentialsProviderChain.getInstance())
                 .withClientConfiguration(clientConfig)
                 .build();
         
@@ -125,26 +130,43 @@ public class AthenaDataService extends AbstractDataService {
     }
     
     @Override
-    protected InputStream toInputStream(MetricFileInfo meta, Instant date) throws IOException {
-        final String queryExecutionId = submitAthenaQuery();
+    public MetricFrame getMetricFrame(MetricDefinition metricDefinition, Instant startDate, Instant endDate) {
+        notNull(metricDefinition, "metricDefinition can't be null");
+        notNull(startDate, "startDate can't be null");
+        notNull(endDate, "endDate can't be null");
+        
+        final String query = buildAthenaQuery(metricDefinition, startDate, endDate);
+        final String queryExecutionId = submitAthenaQuery(query);
         
         try {
             waitForQueryToComplete(queryExecutionId);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-    
-//        processResultRows(queryExecutionId);
-        return toS3InputStream(queryExecutionId);
+        
+        try (final InputStream in = toS3InputStream(queryExecutionId)) {
+            return MetricFrameLoader.loadCsv(metricDefinition, in, true);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
     
-    private String submitAthenaQuery() {
+    private String buildAthenaQuery(MetricDefinition metricDefinition, Instant startDate, Instant endDate) {
+        // FIXME Remove hardcodes
+        final String lob = metricDefinition.getTags().getKv().get("lob");
+        final String pos = metricDefinition.getTags().getKv().get("pos");
+        final long startSecond = startDate.getEpochSecond();
+        final long endSecond = endDate.getEpochSecond();
+        return String.format(POS_QUERY_TEMPLATE, lob, pos, startSecond, endSecond);
+    }
+    
+    private String submitAthenaQuery(String query) {
         final QueryExecutionContext context = new QueryExecutionContext().withDatabase(database);
         final ResultConfiguration conf = new ResultConfiguration()
 //                .withEncryptionConfiguration(encryptionConfiguration)
-                .withOutputLocation(outputBucket);
+                .withOutputLocation("s3://" + outputBucket);
         final StartQueryExecutionRequest request = new StartQueryExecutionRequest()
-                .withQueryString(QUERY)
+                .withQueryString(query)
                 .withQueryExecutionContext(context)
                 .withResultConfiguration(conf);
         final StartQueryExecutionResult result = athena.startQueryExecution(request);
@@ -178,10 +200,6 @@ public class AthenaDataService extends AbstractDataService {
         // TODO Consider using the defaults here. They are nice because they make it easier to clean up old results.
         // https://docs.aws.amazon.com/athena/latest/ug/querying.html
         final String path = queryExecutionId + ".csv";
-        
-        // FIXME FIXME FIXME
-        // This should be the bucket name not the output location
-        // FIXME FIXME FIXME
         final S3Object s3Obj = s3.getObject(outputBucket, path);
         return s3Obj.getObjectContent();
     }

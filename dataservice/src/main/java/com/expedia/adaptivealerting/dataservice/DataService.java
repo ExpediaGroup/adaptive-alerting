@@ -38,10 +38,10 @@ public interface DataService {
     /**
      * Gets the metric frame for a given date range.
      *
-     * @param metric    Metric.
-     * @param startDate Start date.
-     * @param endDate   End date.
+     * @param metricDefinition Metric.
+     * @param startDate        Start date.
+     * @param endDate          End date.
      * @return The corresponding metric frame.
      */
-    MetricFrame getMetricFrame(MetricDefinition metric, Instant startDate, Instant endDate);
+    MetricFrame getMetricFrame(MetricDefinition metricDefinition, Instant startDate, Instant endDate);
 }

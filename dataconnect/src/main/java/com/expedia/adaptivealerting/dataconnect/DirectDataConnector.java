@@ -48,10 +48,10 @@ public final class DirectDataConnector implements DataConnector {
     }
     
     @Override
-    public MetricFrame load(MetricDefinition metric, Instant startDate, Instant endDate) {
-        notNull(metric, "metric can't be null");
+    public MetricFrame load(MetricDefinition metricDefinition, Instant startDate, Instant endDate) {
+        notNull(metricDefinition, "metric can't be null");
         notNull(startDate, "startDate can't be null");
         notNull(endDate, "endDate can't be null");
-        return dataService.getMetricFrame(metric, startDate, endDate);
+        return dataService.getMetricFrame(metricDefinition, startDate, endDate);
     }
 }
