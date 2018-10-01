@@ -18,12 +18,14 @@ package com.expedia.aquila.train.service;
 import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.adaptivealerting.dataconnect.DataConnector;
 import com.expedia.aquila.core.model.AquilaModel;
+import com.expedia.aquila.core.model.AquilaModelMetadata;
 import com.expedia.aquila.core.model.PredictionModel;
 import com.expedia.aquila.core.repo.AquilaModelRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -55,10 +57,12 @@ public final class AquilaTrainerService {
         final PredictionModel predictionModel = predictionModelTrainer.train(request.getParams(), data);
         final AquilaModel aquilaModel = new AquilaModel(UUID.randomUUID(), predictionModel);
         
+        final AquilaModelMetadata metadata = toMetadata(request);
+        
         // TODO Not sure we want to do this, especially for the model search/HPO use case.
         // If we do save it, we need some way to flag whether it's a model under evaluation or a "good" model. [WLW]
         log.info("Saving model: detectorUuid={}, request={}", request);
-        modelRepo.save(aquilaModel);
+        modelRepo.save(aquilaModel, metadata);
         log.info("Saved model: detectorUuid={}", aquilaModel.getDetectorUuid());
         
         return aquilaModel;
@@ -67,5 +71,26 @@ public final class AquilaTrainerService {
     private MetricFrame loadTrainingData(TrainingRequest request) {
         log.trace("Loading training data: request={}", request);
         return dataConnector.load(request.getMetricDefinition(), request.getStartDate(), request.getEndDate());
+    }
+    
+    private AquilaModelMetadata toMetadata(TrainingRequest request) {
+        final Instant startDate = request.getStartDate();
+        final Instant endDate = request.getEndDate();
+        final Instant trainDate = Instant.now();
+        
+        final AquilaModelMetadata metadata = new AquilaModelMetadata();
+        
+        metadata.setMetricDefinition(request.getMetricDefinition());
+        metadata.setTrainingParams(request.getParams());
+    
+        metadata.setStartDateUtc(startDate.toString());
+        metadata.setEndDateUtc(endDate.toString());
+        metadata.setTrainDateUtc(trainDate.toString());
+        
+        metadata.setStartEpochSecond(startDate.getEpochSecond());
+        metadata.setEndEpochSecond(endDate.getEpochSecond());
+        metadata.setTrainEpochSecond(trainDate.getEpochSecond());
+        
+        return metadata;
     }
 }

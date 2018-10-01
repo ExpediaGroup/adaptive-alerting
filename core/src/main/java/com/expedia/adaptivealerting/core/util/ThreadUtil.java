@@ -13,26 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.aquila.train.service;
+package com.expedia.adaptivealerting.core.util;
 
-import com.expedia.aquila.core.model.TrainingParams;
-import com.expedia.metrics.MetricDefinition;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.time.Instant;
+import lombok.SneakyThrows;
 
 /**
+ * Thread utilities.
+ *
  * @author Willie Wheeler
- * @author Karan Shah
  */
-@NoArgsConstructor
-@AllArgsConstructor
-@Data
-public final class TrainingRequest {
-    private MetricDefinition metricDefinition;
-    private TrainingParams params;
-    private Instant startDate;
-    private Instant endDate;
+public final class ThreadUtil {
+    
+    // Prevent instantiation
+    private ThreadUtil() {
+    }
+    
+    @SneakyThrows
+    public static void sleep(long millis) {
+        Thread.sleep(millis);
+    }
 }

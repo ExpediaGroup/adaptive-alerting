@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.aquila.train.service;
+package com.expedia.aquila.core.model;
 
-import com.expedia.aquila.core.model.DecompType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.util;
+package com.expedia.adaptivealerting.core.util.jackson;
 
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;

@@ -13,21 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.aquila.core.repo;
+package com.expedia.aquila.core.model;
 
-import com.expedia.aquila.core.model.PredictionModel;
-
-import java.util.UUID;
+import com.expedia.metrics.MetricDefinition;
+import lombok.Data;
 
 /**
- * Interface for model persistence operations.
+ * Aquila model metadata.
  *
  * @author Willie Wheeler
- * @author Karan Shah
  */
-public interface PredictionModelRepo {
+@Data
+public class AquilaModelMetadata {
+    private MetricDefinition metricDefinition;
+    private TrainingParams trainingParams;
     
-    void save(UUID detectorUuid, PredictionModel predModel);
+    private String startDateUtc;
+    private String endDateUtc;
+    private String trainDateUtc;
     
-    PredictionModel load(UUID detectorUuid);
+    private long startEpochSecond;
+    private long endEpochSecond;
+    private long trainEpochSecond;
 }

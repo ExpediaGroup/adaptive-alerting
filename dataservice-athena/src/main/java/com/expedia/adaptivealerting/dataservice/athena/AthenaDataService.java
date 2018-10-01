@@ -23,6 +23,7 @@ import com.amazonaws.services.athena.model.GetQueryExecutionRequest;
 import com.amazonaws.services.athena.model.GetQueryExecutionResult;
 import com.amazonaws.services.athena.model.QueryExecutionContext;
 import com.amazonaws.services.athena.model.QueryExecutionState;
+import com.amazonaws.services.athena.model.QueryExecutionStatus;
 import com.amazonaws.services.athena.model.ResultConfiguration;
 import com.amazonaws.services.athena.model.StartQueryExecutionRequest;
 import com.amazonaws.services.athena.model.StartQueryExecutionResult;
@@ -31,15 +32,21 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.S3Object;
 import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.adaptivealerting.core.data.io.MetricFrameLoader;
+import com.expedia.adaptivealerting.core.util.MetricUtil;
+import com.expedia.adaptivealerting.core.util.ThreadUtil;
 import com.expedia.adaptivealerting.dataservice.DataService;
 import com.expedia.metrics.MetricDefinition;
 import com.typesafe.config.Config;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
@@ -55,13 +62,16 @@ public class AthenaDataService implements DataService {
     private static final String CONFIG_KEY_OUTPUT_BUCKET = "outputBucket";
     private static final String CONFIG_KEY_CLIENT_EXECUTION_TIMEOUT = "clientExecutionTimeout";
     
+    private static final int ATHENA_MAX_RESULTS = 1000;
+    
     // FIXME Temporarily using a hardcoded query.
     private static final String POS_QUERY_TEMPLATE =
             "SELECT timestamp, value" +
             " FROM bookings_lob_pos" +
             " WHERE lob='%s'" +
             " AND pos='%s'" +
-            " AND timestamp BETWEEN %d AND %d";
+            " AND timestamp BETWEEN %d AND %d" +
+            " ORDER BY timestamp";
     
     private AmazonAthena athena;
     private AmazonS3 s3;
@@ -92,13 +102,11 @@ public class AthenaDataService implements DataService {
      */
     @Override
     public void init(Config config) {
+        
+        // These generate exceptions for missing properties.
         this.region = config.getString(CONFIG_KEY_REGION);
         this.database = config.getString(CONFIG_KEY_DATABASE);
         this.outputBucket = config.getString(CONFIG_KEY_OUTPUT_BUCKET);
-        
-        notNull(region, "Property 'region' must be defined");
-        notNull(database, "Property 'database' must be defined");
-        notNull(outputBucket, "Property 'outputBucket' must be defined");
         
         if (config.hasPath(CONFIG_KEY_CLIENT_EXECUTION_TIMEOUT)) {
             this.clientExecutionTimeout = config.getInt(CONFIG_KEY_CLIENT_EXECUTION_TIMEOUT);
@@ -134,33 +142,49 @@ public class AthenaDataService implements DataService {
         notNull(metricDefinition, "metricDefinition can't be null");
         notNull(startDate, "startDate can't be null");
         notNull(endDate, "endDate can't be null");
+        isTrue(!startDate.isAfter(endDate), "startDate cannot be after endDate");
         
-        final String query = buildAthenaQuery(metricDefinition, startDate, endDate);
-        final String queryExecutionId = submitAthenaQuery(query);
+        // TODO Athena returns a maximum of 1,000 query results. So in general we need to make multiple queries.
+        // The metrics are currently stored every minute. At some point this will likely change (it will be different
+        // for different metrics), but until then we can assume it's one per minute. [WLW]
         
-        try {
+        long endEpochSecond = endDate.getEpochSecond();
+        long currEpochSecond = startDate.getEpochSecond();
+        
+        // Each result represents 1 minute, so we need to move 1 minute (60 seconds) forward for each one.
+        int incrSecond = 60 * ATHENA_MAX_RESULTS;
+        
+        final List<MetricFrame> frames = new ArrayList<>();
+        while (currEpochSecond < endEpochSecond) {
+            long nextEpochSecond = currEpochSecond + incrSecond;
+            
+            // TODO Run these in parallel
+            final String query = buildAthenaQuery(metricDefinition, currEpochSecond, nextEpochSecond);
+            final String queryExecutionId = submitAthenaQuery(query);
             waitForQueryToComplete(queryExecutionId);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            
+            // Need to capture the results as part of the loop too.
+            try (final InputStream in = toS3InputStream(queryExecutionId)) {
+                frames.add(MetricFrameLoader.loadCsv(metricDefinition, in, true));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            
+            currEpochSecond = nextEpochSecond;
         }
         
-        try (final InputStream in = toS3InputStream(queryExecutionId)) {
-            return MetricFrameLoader.loadCsv(metricDefinition, in, true);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return MetricUtil.merge(frames);
     }
     
-    private String buildAthenaQuery(MetricDefinition metricDefinition, Instant startDate, Instant endDate) {
+    private String buildAthenaQuery(MetricDefinition metricDefinition, long startSecond, long endSecond) {
         // FIXME Remove hardcodes
         final String lob = metricDefinition.getTags().getKv().get("lob");
         final String pos = metricDefinition.getTags().getKv().get("pos");
-        final long startSecond = startDate.getEpochSecond();
-        final long endSecond = endDate.getEpochSecond();
         return String.format(POS_QUERY_TEMPLATE, lob, pos, startSecond, endSecond);
     }
     
     private String submitAthenaQuery(String query) {
+        log.info("Executing Athena query: {}", query);
         final QueryExecutionContext context = new QueryExecutionContext().withDatabase(database);
         final ResultConfiguration conf = new ResultConfiguration()
 //                .withEncryptionConfiguration(encryptionConfiguration)
@@ -173,26 +197,26 @@ public class AthenaDataService implements DataService {
         return result.getQueryExecutionId();
     }
     
-    private void waitForQueryToComplete(String queryExecutionId) throws InterruptedException {
-        final GetQueryExecutionRequest request = new GetQueryExecutionRequest()
-                .withQueryExecutionId(queryExecutionId);
+    @SneakyThrows
+    private void waitForQueryToComplete(String queryExecutionId) {
+        final GetQueryExecutionRequest request = new GetQueryExecutionRequest().withQueryExecutionId(queryExecutionId);
         
         GetQueryExecutionResult result = null;
         boolean isQueryStillRunning = true;
         while (isQueryStillRunning) {
             result = athena.getQueryExecution(request);
-            final String queryState = result.getQueryExecution().getStatus().getState();
-            if (queryState.equals(QueryExecutionState.FAILED.toString())) {
-                throw new RuntimeException("Query failed: " +
-                        result.getQueryExecution().getStatus().getStateChangeReason());
-            } else if (queryState.equals(QueryExecutionState.CANCELLED.toString())) {
+            final QueryExecutionStatus status = result.getQueryExecution().getStatus();
+            final String state = status.getState();
+            if (state.equals(QueryExecutionState.FAILED.toString())) {
+                throw new RuntimeException("Query failed: " + status.getStateChangeReason());
+            } else if (state.equals(QueryExecutionState.CANCELLED.toString())) {
                 throw new RuntimeException("Query cancelled.");
-            } else if (queryState.equals(QueryExecutionState.SUCCEEDED.toString())) {
+            } else if (state.equals(QueryExecutionState.SUCCEEDED.toString())) {
                 isQueryStillRunning = false;
             } else {
-                Thread.sleep(1000L);
+                ThreadUtil.sleep(1000L);
             }
-            log.trace("Current query status: {}", queryState);
+            log.trace("Current query state: {}", state);
         }
     }
     

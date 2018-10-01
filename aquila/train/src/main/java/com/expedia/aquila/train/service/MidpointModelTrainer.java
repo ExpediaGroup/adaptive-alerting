@@ -19,8 +19,10 @@ import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.adaptivealerting.core.util.DateUtil;
 import com.expedia.aquila.core.model.DecompType;
 import com.expedia.aquila.core.model.MidpointModel;
+import com.expedia.aquila.core.model.TrainingParams;
 import com.expedia.aquila.core.util.MathUtil;
 import com.github.servicenow.ds.stats.stl.SeasonalTrendLoess;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -37,6 +39,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author Karan Shah
  */
 @Component
+@Slf4j
 public final class MidpointModelTrainer {
     
     public MidpointModel train(TrainingParams params, MetricFrame metricFrame) {
@@ -44,6 +47,7 @@ public final class MidpointModelTrainer {
         isTrue(metricFrame.getNumRows() > 0, "Required: metricFrame.numRows > 0");
         
         final Instant instant0 = Instant.ofEpochSecond(metricFrame.getMetricDataPoint(0).getTimestamp());
+        log.info("Training midpoint model: params={}, startInstant={}", params, instant0);
         final int tickOffset = DateUtil.tickOffsetFromWeekStart(instant0, params.getIntervalInMinutes());
         isTrue(tickOffset == 0, "Required: metricFrame must start from Sunday at midnight, UTC time");
         

@@ -15,7 +15,7 @@
  */
 package com.expedia.aquila.train;
 
-import com.expedia.adaptivealerting.core.util.MetricsJavaModule;
+import com.expedia.adaptivealerting.core.util.jackson.MetricsJavaModule;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
 import com.expedia.adaptivealerting.dataconnect.DataConnector;
 import com.expedia.aquila.core.repo.AquilaModelRepo;
