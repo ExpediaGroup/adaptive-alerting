@@ -6,12 +6,19 @@
 {
   "metricDefinition": {
     "tags": {
-      "mtype": "count",
-      "unit": "",
-      "what": "bookings",
-      "lob": "hotels",
-      "pos": "expedia-com",
-      "interval": "5m"
+      "kv": {
+        "mtype": "count",
+        "unit": "",
+        "what": "bookings",
+        "lob": "hotels",
+        "pos": "expedia-com",
+        "interval": "5m"
+      },
+      "v": []
+    },
+    "meta": {
+      "kv": {},
+      "v": []
     }
   },
   "startDate": "2018-04-29T00:00:00Z",

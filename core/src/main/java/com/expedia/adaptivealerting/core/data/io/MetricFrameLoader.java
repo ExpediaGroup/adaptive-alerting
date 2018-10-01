@@ -21,9 +21,11 @@ import com.expedia.metrics.MetricDefinition;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
 import java.util.List;
 
 /**
@@ -32,21 +34,6 @@ import java.util.List;
  * @author Willie Wheeler
  */
 public final class MetricFrameLoader {
-    
-    /**
-     * Loads a {@link MetricFrame} from a CSV file. Assumes that the file has timestamps.
-     *
-     * @param metric    The underlying metric.
-     * @param file      CSV file.
-     * @param hasHeader Indicates whether the data has a header row.
-     * @return A data frame containing the CSV data.
-     * @throws IOException if there's a problem reading the CSV file.
-     */
-    public static MetricFrame loadCsv(MetricDefinition metric, File file, boolean hasHeader) throws IOException {
-        try (final InputStream is = new FileInputStream(file)) {
-            return loadCsv(metric, is, hasHeader);
-        }
-    }
     
     /**
      * Loads a {@link MetricFrame} from a CSV input stream.
@@ -74,54 +61,9 @@ public final class MetricFrameLoader {
         return new MetricFrame(mpoints);
     }
     
-    /**
-     * Loader for CSV files with missing timestamps.
-     *
-     * @param metric            The underlying metric.
-     * @param in                CSV input stream.
-     * @param hasHeader         Indicates whether the data has a header row.
-     * @param startDate         Start date.
-     * @param intervalInMinutes Interval in minutes.
-     * @return A data frame containing the CSV data.
-     * @throws IOException if there's a problem reading the CSV input stream.
-     */
-    public static MetricFrame loadCsvMissingTimestamps(
-            MetricDefinition metric,
-            InputStream in,
-            boolean hasHeader,
-            Instant startDate,
-            int intervalInMinutes)
-            throws IOException {
-        
-        List<String[]> rows;
-        try (final BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
-            final int skipLines = hasHeader ? 1 : 0;
-            final CSVReader reader = new CSVReaderBuilder(br).withSkipLines(skipLines).build();
-            rows = reader.readAll();
-        }
-        
-        final int numRows = rows.size();
-        final MetricData[] mpoints = new MetricData[numRows];
-        final long incr = intervalInMinutes * 60L;
-        
-        long epochTimeInSeconds = startDate.getEpochSecond();
-        for (int i = 0; i < numRows; i++) {
-            final String[] row = rows.get(i);
-            final Float value = Float.parseFloat(row[0]);
-            mpoints[i] = toMetricData(metric, epochTimeInSeconds, value);
-            epochTimeInSeconds += incr;
-        }
-        
-        return new MetricFrame(mpoints);
-    }
-    
     private static MetricData toMetricData(MetricDefinition metric, String[] row) {
-        final MetricData mpoint = new MetricData(metric,Float.parseFloat(row[1]),Instant.parse(row[0]).getEpochSecond());
-        return mpoint;
-    }
-    
-    private static MetricData toMetricData(MetricDefinition metric, long epochTimeInSeconds, Float value) {
-        final MetricData mpoint = new MetricData(metric,value,epochTimeInSeconds);
-        return mpoint;
+        // FIXME Some of the CSVs use Instants, some use epoch seconds
+//        return new MetricData(metric, Float.parseFloat(row[1]), Instant.parse(row[0]).getEpochSecond());
+        return new MetricData(metric, Float.parseFloat(row[1]), Long.parseLong(row[0]));
     }
 }

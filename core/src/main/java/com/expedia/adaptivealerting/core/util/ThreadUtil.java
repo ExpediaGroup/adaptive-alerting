@@ -15,23 +15,21 @@
  */
 package com.expedia.adaptivealerting.core.util;
 
-import java.time.Instant;
-import java.util.List;
+import lombok.SneakyThrows;
 
 /**
- * Interface for different strategies for decomposing a date range into dates. Intended primarily to support loading
- * training data files.
+ * Thread utilities.
  *
  * @author Willie Wheeler
  */
-public interface DateRangeDecomposer {
+public final class ThreadUtil {
     
-    /**
-     * Decompose the given date range into a list of dates.
-     *
-     * @param startDate Start date. Its floor is the inclusive lower bound for the range.
-     * @param endDate   End date. Its floor is the exclusive upper bound for the range.
-     * @return Date range decomposition.
-     */
-    List<Instant> decompose(Instant startDate, Instant endDate);
+    // Prevent instantiation
+    private ThreadUtil() {
+    }
+    
+    @SneakyThrows
+    public static void sleep(long millis) {
+        Thread.sleep(millis);
+    }
 }

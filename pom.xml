@@ -60,8 +60,6 @@
         <module>dataconnect</module>
         <module>dataservice</module>
         <module>dataservice-athena</module>
-        <module>dataservice-file</module>
-        <module>dataservice-s3</module>
         <module>modelservice</module>
         <module>samples</module>
         <module>tools</module>
@@ -172,11 +170,6 @@
             <dependency>
                 <groupId>com.expedia</groupId>
                 <artifactId>metrics-java-jackson</artifactId>
-                <version>${metrics.java.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.expedia</groupId>
-                <artifactId>metrics-java-metrictank</artifactId>
                 <version>${metrics.java.version}</version>
             </dependency>
             <dependency>

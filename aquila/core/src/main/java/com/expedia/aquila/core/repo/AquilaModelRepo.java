@@ -16,19 +16,46 @@
 package com.expedia.aquila.core.repo;
 
 import com.expedia.aquila.core.model.AquilaModel;
+import com.expedia.aquila.core.model.AquilaModelMetadata;
 import com.typesafe.config.Config;
 
 import java.util.UUID;
 
+// TODO At some point I expect that there will be multiple models for a given UUID. There are a number of reasons. For
+// example, we will likely want to store historical models so we can stitch them together when somebody wants to see an
+// aggregate model for a stretch in time. Another reason would be that even for a given point in time, we often need
+// multiple models to support rolling windows for large intervals. (For example, if the time series has a four hour
+// interval, then we may want to create models for every 15 minutes.) So we will need to figure out how we want to
+// handle this. [WLW]
+
 /**
+ * Aquila model repository interface.
+ *
  * @author Willie Wheeler
  * @author Karan Shah
  */
 public interface AquilaModelRepo {
     
+    /**
+     * Initializes the repository.
+     *
+     * @param config Repository configuration.
+     */
     void init(Config config);
     
-    void save(AquilaModel model);
+    /**
+     * Saves the given Aquila model, attaching the associated metadata.
+     *
+     * @param model    Aquila model.
+     * @param metadata Aquila model metadata.
+     */
+    void save(AquilaModel model, AquilaModelMetadata metadata);
     
+    /**
+     * Loads the Aquila model for the given detector UUID.
+     *
+     * @param detectorUuid Detector UUID.
+     * @return Aquila model.
+     */
     AquilaModel load(UUID detectorUuid);
 }

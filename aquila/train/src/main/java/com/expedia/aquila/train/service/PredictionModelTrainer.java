@@ -19,6 +19,7 @@ import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.aquila.core.model.DispersionModel;
 import com.expedia.aquila.core.model.MidpointModel;
 import com.expedia.aquila.core.model.PredictionModel;
+import com.expedia.aquila.core.model.TrainingParams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

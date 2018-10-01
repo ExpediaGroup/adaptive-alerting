@@ -15,6 +15,7 @@
  */
 package com.expedia.aquila.train.service;
 
+import com.expedia.aquila.core.model.TrainingParams;
 import com.expedia.metrics.MetricDefinition;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,7 +32,7 @@ import java.time.Instant;
 @Data
 public final class TrainingRequest {
     private MetricDefinition metricDefinition;
+    private TrainingParams params;
     private Instant startDate;
     private Instant endDate;
-    private TrainingParams params;
 }

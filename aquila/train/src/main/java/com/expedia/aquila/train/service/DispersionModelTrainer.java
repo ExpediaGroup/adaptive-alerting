@@ -19,6 +19,7 @@ package com.expedia.aquila.train.service;
 import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.aquila.core.model.DispersionModel;
 import com.expedia.aquila.core.model.MidpointModel;
+import com.expedia.aquila.core.model.TrainingParams;
 import org.springframework.stereotype.Component;
 
 /**

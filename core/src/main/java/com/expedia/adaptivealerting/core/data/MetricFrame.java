@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.core.data;
 
-
 import com.expedia.metrics.MetricData;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,25 +30,25 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author Willie Wheeler
  */
 public class MetricFrame {
-    private final List<MetricData> mpoints;
+    private final List<MetricData> metricDataPoints;
     
     public MetricFrame() {
-        this.mpoints = new ArrayList<>();
+        this.metricDataPoints = new ArrayList<>();
     }
     
     /**
      * Creates a new metric frame from an array of {@link MetricData}s.
      *
-     * @param metricData Metric point array.
+     * @param metricDataPoints Metric point array.
      */
-    public MetricFrame(MetricData[] metricData) {
-        notNull(metricData, "metricData can't be null");
-        this.mpoints = Arrays.asList(metricData);
+    public MetricFrame(MetricData[] metricDataPoints) {
+        notNull(metricDataPoints, "metricData can't be null");
+        this.metricDataPoints = Arrays.asList(metricDataPoints);
     }
     
     public MetricFrame(List<MetricData> metricData) {
         notNull(metricData, "metricData can't be null");
-        this.mpoints = metricData;
+        this.metricDataPoints = metricData;
     }
     
     /**
@@ -58,7 +57,7 @@ public class MetricFrame {
      * @return Number of metric points in the frame.
      */
     public int getNumRows() {
-        return mpoints.size();
+        return metricDataPoints.size();
     }
     
     /**
@@ -69,11 +68,11 @@ public class MetricFrame {
      */
     public MetricData getMetricDataPoint(int index) {
         isTrue(index >= 0, "Required: index >= 0");
-        return mpoints.get(index);
+        return metricDataPoints.get(index);
     }
     
     public List<MetricData> getMetricData() {
-        return mpoints;
+        return metricDataPoints;
     }
     
     /**
@@ -82,7 +81,7 @@ public class MetricFrame {
      * @return List iterator for this frame.
      */
     public ListIterator<MetricData> listIterator() {
-        return mpoints.listIterator();
+        return metricDataPoints.listIterator();
     }
     
     public double[] toDoubleValues() {
