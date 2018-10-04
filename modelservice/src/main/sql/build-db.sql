@@ -23,8 +23,7 @@ create table model (
   id                int unsigned primary key not null auto_increment,
   uuid              char(36) unique          not null,
   type_id           smallint unsigned        not null,
-  hyperparams       json,
-  training_location varchar(300),
+  params            json,
   weak_sigmas       decimal(3, 3),
   strong_sigmas     decimal(3, 3),
   last_build_ts     timestamp,
@@ -42,4 +41,14 @@ create table metric_model_mapping (
   constraint metric_id_fk foreign key (metric_id) references metric (id),
   constraint model_id_fk foreign key (model_id) references model (id),
   unique index (metric_id, model_id)
+);
+
+CREATE TABLE detector (
+   id int NOT NULL AUTO_INCREMENT,
+   model_type_id           smallint unsigned        not null,
+   hyperparams json NOT NULL,
+   training_location varchar(300) NULL,
+   date_created timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+   CONSTRAINT detector_pk PRIMARY KEY (id),
+   constraint detector_id_fk foreign key (model_type_id) references model_type (id)
 );
