@@ -65,18 +65,20 @@ public final class AnomalyDetectorManager {
     
         this.detectorFactories = new HashMap<>();
         for (Map.Entry<String, ConfigValue> entry : detectorsConfig.entrySet()) {
-            final String type = entry.getKey() + "-detector";
+            final String detectorType = entry.getKey();
             final Config detectorFactoryAndConfig = ((ConfigObject) entry.getValue()).toConfig();
             final String detectorFactoryClassname = detectorFactoryAndConfig.getString("factory");
             final Config detectorConfig = detectorFactoryAndConfig.getConfig("config");
     
-            log.info("Initializing AnomalyDetectorFactory: type={}, className={}", type, detectorFactoryClassname);
+            log.info("Initializing AnomalyDetectorFactory: type={}, className={}",
+                    detectorType, detectorFactoryClassname);
             final AnomalyDetectorFactory factory =
                     (AnomalyDetectorFactory) ReflectionUtil.newInstance(detectorFactoryClassname);
             factory.init(detectorConfig);
-            log.info("Initialized AnomalyDetectorFactory: type={}, className={}", type, detectorFactoryClassname);
+            log.info("Initialized AnomalyDetectorFactory: type={}, className={}",
+                    detectorType, detectorFactoryClassname);
     
-            detectorFactories.put(type, factory);
+            detectorFactories.put(detectorType, factory);
         }
     }
     
