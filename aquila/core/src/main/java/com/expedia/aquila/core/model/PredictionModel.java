@@ -31,9 +31,9 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author Willie Wheeler
  * @author Karan Shah
  */
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 public final class PredictionModel {
     private MidpointModel midpointModel;
     private DispersionModel dispersionModel;

@@ -18,6 +18,9 @@ package com.expedia.aquila.detect;
 import com.expedia.aquila.core.repo.AquilaModelRepo;
 import com.expedia.aquila.core.repo.s3.S3AquilaModelRepo;
 import com.expedia.aquila.detect.service.AquilaDetectorService;
+import com.expedia.metrics.jackson.MetricsJavaModule;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -53,5 +56,13 @@ public class AquilaDetectorApp {
     @Bean
     public AquilaDetectorService aquilaDetectorService() {
         return new AquilaDetectorService();
+    }
+    
+    @Bean
+    public ObjectMapper objectMapper() {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.registerModule(new MetricsJavaModule());
+        return objectMapper;
     }
 }

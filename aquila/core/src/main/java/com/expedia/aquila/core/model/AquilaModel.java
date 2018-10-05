@@ -16,7 +16,8 @@
 package com.expedia.aquila.core.model;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,7 +34,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  */
 @Data
 @Slf4j
-@JsonIgnoreProperties("id")
 public final class AquilaModel {
     private UUID detectorUuid;
     private PredictionModel predictionModel;
@@ -42,14 +42,21 @@ public final class AquilaModel {
     /**
      * @param detectorUuid    Detector UUID.
      * @param predictionModel Prediction model.
+     * @param classifier      Classification model.
      */
-    public AquilaModel(UUID detectorUuid, PredictionModel predictionModel) {
+    @JsonCreator
+    public AquilaModel(
+            @JsonProperty("detectorUuid") UUID detectorUuid,
+            @JsonProperty("predictionModel") PredictionModel predictionModel,
+            @JsonProperty("classifier") Classifier classifier) {
+        
         notNull(detectorUuid, "detectorUuid can't be null");
         notNull(predictionModel, "predictionModel can't be null");
+        notNull(classifier, "classifer can't be null");
         
         this.detectorUuid = detectorUuid;
         this.predictionModel = predictionModel;
-        this.classifier = new Classifier();
+        this.classifier = classifier;
     }
     
     public AquilaResponse classify(AquilaRequest aquilaRequest) {

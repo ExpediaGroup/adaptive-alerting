@@ -13,19 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.cusum;
-
-import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorModel;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
+package com.expedia.adaptivealerting.anomdetect;
 
 /**
+ * Anomaly detector model parameters.
+ *
  * @author Willie Wheeler
  */
-@Data
-@JsonIgnoreProperties(ignoreUnknown = true)
-public final class CusumModel implements AnomalyDetectorModel {
-    private String uuid;
-    private String type;
-    private CusumParams params;
+public interface AnomalyDetectorModel {
 }

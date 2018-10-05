@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.cusum;
-
-import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorModel;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
+package com.expedia.adaptivealerting.anomdetect;
 
 /**
+ * Basic anomaly detector interface. A basic anomaly detector is one that generally has a single fixed model.
+ *
  * @author Willie Wheeler
  */
-@Data
-@JsonIgnoreProperties(ignoreUnknown = true)
-public final class CusumModel implements AnomalyDetectorModel {
-    private String uuid;
-    private String type;
-    private CusumParams params;
+public interface BasicAnomalyDetector extends AnomalyDetector {
+    
+    /**
+     * Initializes this detector with the given model.
+     *
+     * @param anomalyDetectorModel Anomaly detector model.
+     */
+    void init(AnomalyDetectorModel anomalyDetectorModel);
 }

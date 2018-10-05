@@ -40,8 +40,8 @@ public final class KafkaAnomalyDetectorManager extends AbstractKafkaApp {
     
     public static void main(String[] args) {
         final Config appConfig = AppUtil.getAppConfig(ANOMALY_DETECTOR_MANAGER);
-        final Config factoriesConfig = appConfig.getConfig(FACTORIES);
-        final AnomalyDetectorManager manager = new AnomalyDetectorManager(factoriesConfig);
+        final Config detectorsConfig = appConfig.getConfig(DETECTORS);
+        final AnomalyDetectorManager manager = new AnomalyDetectorManager(detectorsConfig);
         new KafkaAnomalyDetectorManager(appConfig, manager).start();
     }
     
