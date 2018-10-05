@@ -46,7 +46,7 @@
         <!-- TODO Currently this is a direct dependency. Soon we will replace this with a web service call. [WLW] -->
         <dependency>
             <groupId>com.expedia.adaptivealerting</groupId>
-            <artifactId>adaptive-alerting-dataservice-s3</artifactId>
+            <artifactId>adaptive-alerting-dataservice</artifactId>
         </dependency>
     </dependencies>
 </project>
