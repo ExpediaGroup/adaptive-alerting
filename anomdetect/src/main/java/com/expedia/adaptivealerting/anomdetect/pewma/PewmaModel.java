@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.pewma;
 
+import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorModel;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
@@ -23,7 +24,7 @@ import lombok.Data;
  */
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PewmaModel {
+public class PewmaModel implements AnomalyDetectorModel {
     private String uuid;
     private String type;
     private PewmaParams params;

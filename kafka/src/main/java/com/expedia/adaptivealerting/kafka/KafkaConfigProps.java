@@ -49,9 +49,9 @@ public interface KafkaConfigProps {
     // ================================================================================
     
     /**
-     * Factories property name.
+     * Detectors property name.
      */
-    String FACTORIES = "factories";
+    String DETECTORS = "detectors";
     
     /**
      * Streams property name.

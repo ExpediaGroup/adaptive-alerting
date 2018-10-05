@@ -128,7 +128,7 @@ class ConstantThresholdBasedE2ETestSpec extends IntegrationTestSpec {
   private def adManagerRunner = {
     val conf: Config = appConfig(ANOMALY_DETECTOR_MANAGER)
 
-    val manager: AnomalyDetectorManager = new AnomalyDetectorManager(conf.getConfig(FACTORIES))
+    val manager: AnomalyDetectorManager = new AnomalyDetectorManager(conf.getConfig(DETECTORS))
 
     new KafkaAnomalyDetectorManager(conf, manager)
   }

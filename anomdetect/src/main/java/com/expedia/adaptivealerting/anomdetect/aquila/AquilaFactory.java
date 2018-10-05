@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.aquila;
 
-import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorFactory;
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,13 +29,15 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author Willie Wheeler
  */
 @Slf4j
-public class AquilaFactory extends AbstractAnomalyDetectorFactory<AquilaAnomalyDetector> {
+public class AquilaFactory implements AnomalyDetectorFactory<AquilaAnomalyDetector> {
+    private String urlTemplate;
     
     @Override
-    public void init(String type, Config config) {
-        super.init(type, config);
+    public void init(Config config) {
         
-        // TODO
+        // TODO Need to make the config strategy more flexible here.
+//        this.urlTemplate = config.getString("");
+        
         log.info("Initialized AquilaFactory");
     }
     

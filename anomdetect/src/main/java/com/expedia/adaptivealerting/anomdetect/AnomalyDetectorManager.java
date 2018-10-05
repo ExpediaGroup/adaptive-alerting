@@ -21,6 +21,8 @@ import com.expedia.adaptivealerting.core.util.ReflectionUtil;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.typesafe.config.Config;
+import com.typesafe.config.ConfigObject;
+import com.typesafe.config.ConfigValue;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
@@ -47,7 +49,7 @@ public final class AnomalyDetectorManager {
      * The managed detectors.
      */
     private final Map<UUID, AnomalyDetector> detectors = new HashMap<>();
-
+    
     /**
      * Max samples required to evaluate performance
      */
@@ -56,26 +58,28 @@ public final class AnomalyDetectorManager {
     /**
      * Creates a new anomaly detector manager.
      *
-     * @param factoriesConfig Factories config
+     * @param detectorsConfig Factories config
      */
-    public AnomalyDetectorManager(Config factoriesConfig) {
-        notNull(factoriesConfig, "factoriesConfig can't be null");
-        
-        final Config byTypeConfig = factoriesConfig.getConfig("by-type");
-        
+    public AnomalyDetectorManager(Config detectorsConfig) {
+        notNull(detectorsConfig, "detectorsConfig can't be null");
+    
         this.detectorFactories = new HashMap<>();
-        byTypeConfig.entrySet().forEach(entry -> {
-            final String type = entry.getKey();
-            final String className = entry.getValue().unwrapped().toString();
-            
-            log.info("Initializing AnomalyDetectorFactory: type={}, className={}", type, className);
-            final AnomalyDetectorFactory factory = (AnomalyDetectorFactory) ReflectionUtil.newInstance(className);
-            // Pass in the factories config so the individual factories can get at the region and bucket.
-            factory.init(type, factoriesConfig);
-            log.info("Initialized AnomalyDetectorFactory: type={}, className={}", type, className);
-            
-            detectorFactories.put(type, factory);
-        });
+        for (Map.Entry<String, ConfigValue> entry : detectorsConfig.entrySet()) {
+            final String detectorType = entry.getKey();
+            final Config detectorFactoryAndConfig = ((ConfigObject) entry.getValue()).toConfig();
+            final String detectorFactoryClassname = detectorFactoryAndConfig.getString("factory");
+            final Config detectorConfig = detectorFactoryAndConfig.getConfig("config");
+    
+            log.info("Initializing AnomalyDetectorFactory: type={}, className={}",
+                    detectorType, detectorFactoryClassname);
+            final AnomalyDetectorFactory factory =
+                    (AnomalyDetectorFactory) ReflectionUtil.newInstance(detectorFactoryClassname);
+            factory.init(detectorConfig);
+            log.info("Initialized AnomalyDetectorFactory: type={}, className={}",
+                    detectorType, detectorFactoryClassname);
+    
+            detectorFactories.put(detectorType, factory);
+        }
     }
     
     /**
@@ -108,7 +112,7 @@ public final class AnomalyDetectorManager {
             } else {
                 log.info("Creating anomaly detector: uuid={}, type={}", detectorUuid, detectorType);
                 final AnomalyDetector innerDetector = factory.create(detectorUuid);
-
+                
                 // TODO Temporarily commenting this out because it's causing a problem
                 // for the RandomCutForest detector (NPE). We can reinstate after we
                 // figure out how we want to address this. [WLW]

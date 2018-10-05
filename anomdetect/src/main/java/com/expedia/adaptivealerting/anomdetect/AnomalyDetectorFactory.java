@@ -29,10 +29,9 @@ public interface AnomalyDetectorFactory<T extends AnomalyDetector> {
     /**
      * Initializes the factory.
      *
-     * @param type   Anomaly detector type.
      * @param config Factory configuration.
      */
-    void init(String type, Config config);
+    void init(Config config);
     
     /**
      * Creates an anomaly detector. This would usually involve looking up at least the model parameters from persistent

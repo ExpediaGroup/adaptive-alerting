@@ -19,6 +19,7 @@ import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.adaptivealerting.dataconnect.DataConnector;
 import com.expedia.aquila.core.model.AquilaModel;
 import com.expedia.aquila.core.model.AquilaModelMetadata;
+import com.expedia.aquila.core.model.Classifier;
 import com.expedia.aquila.core.model.PredictionModel;
 import com.expedia.aquila.core.repo.AquilaModelRepo;
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +56,8 @@ public final class AquilaTrainerService {
         log.info("Training model: request={}", request);
         final MetricFrame data = loadTrainingData(request);
         final PredictionModel predictionModel = predictionModelTrainer.train(request.getParams(), data);
-        final AquilaModel aquilaModel = new AquilaModel(UUID.randomUUID(), predictionModel);
+        final Classifier classifier = new Classifier();
+        final AquilaModel aquilaModel = new AquilaModel(UUID.randomUUID(), predictionModel, classifier);
         
         final AquilaModelMetadata metadata = toMetadata(request);
         

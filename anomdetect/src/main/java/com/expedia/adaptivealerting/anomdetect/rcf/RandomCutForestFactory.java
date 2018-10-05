@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.rcf;
 
-import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorFactory;
 import com.typesafe.config.Config;
 
 import java.util.UUID;
@@ -25,13 +25,10 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 /**
  * @author Willie Wheeler
  */
-public final class RandomCutForestFactory
-        extends AbstractAnomalyDetectorFactory<RandomCutForestAnomalyDetector> {
+public final class RandomCutForestFactory implements AnomalyDetectorFactory<RandomCutForestAnomalyDetector> {
     
     @Override
-    public void init(String type, Config config) {
-        super.init(type, config);
-    
+    public void init(Config config) {
         // TODO
     }
     

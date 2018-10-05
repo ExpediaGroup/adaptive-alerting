@@ -18,6 +18,8 @@ package com.expedia.adaptivealerting.core.util;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
+ * Reflection utilities.
+ *
  * @author Willie Wheeler
  */
 public final class ReflectionUtil {
@@ -28,11 +30,23 @@ public final class ReflectionUtil {
     private ReflectionUtil() {
     }
     
+    public static Class classForName(String className) {
+        try {
+            return Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
     public static Object newInstance(String className) {
         notNull(className, "className can't be null");
+        return newInstance(classForName(className));
+    }
+    
+    public static <T> T newInstance(Class<T> clazz) {
         try {
-            return Class.forName(className).newInstance();
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            return clazz.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
