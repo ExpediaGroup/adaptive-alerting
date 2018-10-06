@@ -13,30 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.rcf;
+package com.expedia.adaptivealerting.anomdetect.aquila;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorFactory;
+import com.expedia.metrics.jackson.MetricsJavaModule;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
+// TODO Move this class to the Aquila repo. [WLW]
+
 /**
  * @author Willie Wheeler
  */
-public final class RandomCutForestFactory implements AnomalyDetectorFactory<RandomCutForestAnomalyDetector> {
+@Slf4j
+public class AquilaAnomalyDetectorFactory implements AnomalyDetectorFactory<AquilaAnomalyDetector> {
+    
+    private final ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json()
+            .modules(new MetricsJavaModule())
+            .build();
+    
+    private String uri;
     
     @Override
     public void init(Config config) {
-        // TODO
+        this.uri = config.getString("uri");
+        log.info("Initialized AquilaFactory: uri={}", uri);
     }
     
     @Override
-    public RandomCutForestAnomalyDetector create(UUID uuid) {
+    public AquilaAnomalyDetector create(UUID uuid) {
         notNull(uuid, "uuid can't be null");
-        
-        // TODO Return different models for different metrics. [WLW]
-        return new RandomCutForestAnomalyDetector(uuid);
+        return new AquilaAnomalyDetector(objectMapper, uri, uuid);
     }
 }
