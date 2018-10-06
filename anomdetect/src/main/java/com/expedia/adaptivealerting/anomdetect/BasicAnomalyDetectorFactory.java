@@ -63,7 +63,7 @@ public final class BasicAnomalyDetectorFactory<T extends BasicAnomalyDetector> i
                 .build();
         
         log.info("Initialized factory: detectorClass={}, region={}, bucket={}, folder={}",
-                detectorClass, region, bucket, folder);
+                detectorClass.getName(), region, bucket, folder);
     }
     
     @Override
