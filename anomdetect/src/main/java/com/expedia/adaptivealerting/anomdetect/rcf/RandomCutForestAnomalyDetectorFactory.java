@@ -13,38 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.aquila;
+package com.expedia.adaptivealerting.anomdetect.rcf;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorFactory;
 import com.typesafe.config.Config;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
-// TODO Move this class to the Aquila repo. [WLW]
-
 /**
  * @author Willie Wheeler
  */
-@Slf4j
-public class AquilaFactory implements AnomalyDetectorFactory<AquilaAnomalyDetector> {
-    private String urlTemplate;
+public final class RandomCutForestAnomalyDetectorFactory implements AnomalyDetectorFactory<RandomCutForestAnomalyDetector> {
     
     @Override
     public void init(Config config) {
-        
-        // TODO Need to make the config strategy more flexible here.
-//        this.urlTemplate = config.getString("");
-        
-        log.info("Initialized AquilaFactory");
+        // TODO
     }
     
     @Override
-    public AquilaAnomalyDetector create(UUID uuid) {
+    public RandomCutForestAnomalyDetector create(UUID uuid) {
         notNull(uuid, "uuid can't be null");
-        final AquilaAnomalyDetector detector = new AquilaAnomalyDetector(uuid);
-        return detector;
+        
+        // TODO Return different models for different metrics. [WLW]
+        return new RandomCutForestAnomalyDetector(uuid);
     }
 }

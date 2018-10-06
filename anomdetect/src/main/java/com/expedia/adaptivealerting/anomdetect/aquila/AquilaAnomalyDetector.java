@@ -19,10 +19,15 @@ import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.metrics.MetricData;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.http.client.fluent.Content;
+import org.apache.http.client.fluent.Request;
 
+import java.io.IOException;
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -30,24 +35,42 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 // TODO Move this class to the Aquila repo. [WLW]
 
 /**
+ * You must register a {@link com.expedia.metrics.jackson.MetricsJavaModule} with the injected {@link ObjectMapper}.
+ *
  * @author Willie Wheeler
  */
 @Data
 @RequiredArgsConstructor
+@Slf4j
 public final class AquilaAnomalyDetector implements AnomalyDetector {
     
     @NonNull
-    private UUID uuid;
+    private ObjectMapper objectMapper;
     
-    public AquilaAnomalyDetector() {
-        this(UUID.randomUUID());
-    }
+    @NonNull
+    private String uri;
+    
+    @NonNull
+    private UUID uuid;
     
     @Override
     public AnomalyResult classify(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
         
-        // FIXME Temporary so we can see whether we trip this detector
-        return new AnomalyResult(uuid, metricData, AnomalyLevel.STRONG);
+        AnomalyLevel level;
+        try {
+            byte[] metricDataBytes = objectMapper.writeValueAsBytes(metricData);
+            Content content = Request.Post(uri)
+                    .bodyByteArray(metricDataBytes)
+                    .execute()
+                    .returnContent();
+            final AnomalyResult tempResult = objectMapper.readValue(content.asBytes(), AnomalyResult.class);
+            level = tempResult.getAnomalyLevel();
+        } catch (IOException e) {
+            log.error("Classification failed", e);
+            level = AnomalyLevel.UNKNOWN;
+        }
+        
+        return new AnomalyResult(uuid, metricData, level);
     }
 }

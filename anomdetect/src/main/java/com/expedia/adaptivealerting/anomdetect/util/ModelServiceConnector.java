@@ -47,7 +47,7 @@ public class ModelServiceConnector {
     private final MetricTankIdFactory metricTankIdFactory = new MetricTankIdFactory();
     
     // https://hdpe.me/post/spring-data-rest-hal-client/
-    final ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json()
+    private final ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json()
             .modules(new Jackson2HalModule())
             .build();
     
