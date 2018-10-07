@@ -64,12 +64,15 @@ public final class AnomalyDetectorManager {
         notNull(detectorsConfig, "detectorsConfig can't be null");
     
         this.detectorFactories = new HashMap<>();
-        for (Map.Entry<String, ConfigValue> entry : detectorsConfig.entrySet()) {
+        
+        // Calling detectorsConfig.entrySet() does a recursive traversal, which isn't what we want here.
+        // Whereas detectorsConfig.root().entrySet() returns only the direct children.
+        for (Map.Entry<String, ConfigValue> entry : detectorsConfig.root().entrySet()) {
             final String detectorType = entry.getKey();
             final Config detectorFactoryAndConfig = ((ConfigObject) entry.getValue()).toConfig();
             final String detectorFactoryClassname = detectorFactoryAndConfig.getString("factory");
             final Config detectorConfig = detectorFactoryAndConfig.getConfig("config");
-    
+
             log.info("Initializing AnomalyDetectorFactory: type={}, className={}",
                     detectorType, detectorFactoryClassname);
             final AnomalyDetectorFactory factory =
@@ -77,19 +80,9 @@ public final class AnomalyDetectorManager {
             factory.init(detectorConfig);
             log.info("Initialized AnomalyDetectorFactory: type={}, className={}",
                     detectorType, detectorFactoryClassname);
-    
+
             detectorFactories.put(detectorType, factory);
         }
-    }
-    
-    /**
-     * Creates a new anomaly detector manager.
-     *
-     * @param detectorFactories Mapping of detector types to their corresponding factories.
-     */
-    public AnomalyDetectorManager(Map<String, AnomalyDetectorFactory> detectorFactories) {
-        notNull(detectorFactories, "detectorFactories can't be null");
-        this.detectorFactories = detectorFactories;
     }
     
     /**
