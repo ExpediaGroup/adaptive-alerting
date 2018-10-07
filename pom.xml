@@ -93,6 +93,7 @@
         <haystack.commons.version>1.0.19</haystack.commons.version>
         <jackson.version>2.9.0</jackson.version>
         <jfreechart.version>1.0.19</jfreechart.version>
+        <jopt.version>4.9</jopt.version>
         <junit.version>4.12</junit.version>
         <kafka.streams.version>1.1.0</kafka.streams.version>
         <lombok.version>1.16.18</lombok.version>
@@ -284,6 +285,11 @@
                 <artifactId>springfox-swagger2</artifactId>
                 <version>${swagger.version}</version>
                 <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>net.sf.jopt-simple</groupId>
+                <artifactId>jopt-simple</artifactId>
+                <version>${jopt.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>

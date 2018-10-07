@@ -18,10 +18,16 @@ package com.expedia.adaptivealerting.core.data.io;
 import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
+import com.expedia.metrics.jackson.MetricsJavaModule;
+import com.expedia.metrics.metrictank.MetricTankIdFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -33,18 +39,31 @@ import java.util.List;
  *
  * @author Willie Wheeler
  */
+@Slf4j
 public final class MetricFrameLoader {
+    final static ObjectMapper objectMapper = new ObjectMapper().registerModule(new MetricsJavaModule());
+    
+    public static MetricFrame loadCsv(File metricDefinitionFile, File metricDataFile, boolean hasHeader)
+            throws IOException {
+        
+        final MetricDefinition metricDefinition = objectMapper.readValue(metricDefinitionFile, MetricDefinition.class);
+        log.info("metricDefinition={}", metricDefinition);
+        log.info("metricId={}", new MetricTankIdFactory().getId(metricDefinition));
+        return loadCsv(metricDefinition, new FileInputStream(metricDataFile), hasHeader);
+    }
     
     /**
      * Loads a {@link MetricFrame} from a CSV input stream.
      *
-     * @param metric    The underlying metric.
-     * @param in        CSV input stream.
-     * @param hasHeader Indicates whether the data has a header row.
+     * @param metricDefinition The underlying metric.
+     * @param in               CSV input stream.
+     * @param hasHeader        Indicates whether the data has a header row.
      * @return A data frame containing the CSV data.
      * @throws IOException if there's a problem reading the CSV input stream.
      */
-    public static MetricFrame loadCsv(MetricDefinition metric, InputStream in, boolean hasHeader) throws IOException {
+    public static MetricFrame loadCsv(MetricDefinition metricDefinition, InputStream in, boolean hasHeader)
+            throws IOException {
+        
         List<String[]> rows;
         try (final BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
             final int skipLines = hasHeader ? 1 : 0;
@@ -53,17 +72,17 @@ public final class MetricFrameLoader {
         }
         
         final int numRows = rows.size();
-        final MetricData[] mpoints = new MetricData[numRows];
+        final MetricData[] metricData = new MetricData[numRows];
         
         for (int i = 0; i < numRows; i++) {
-            mpoints[i] = toMetricData(metric, rows.get(i));
+            metricData[i] = toMetricData(metricDefinition, rows.get(i));
         }
-        return new MetricFrame(mpoints);
+        return new MetricFrame(metricData);
     }
     
-    private static MetricData toMetricData(MetricDefinition metric, String[] row) {
+    private static MetricData toMetricData(MetricDefinition metricDefinition, String[] row) {
         // FIXME Some of the CSVs use Instants, some use epoch seconds
 //        return new MetricData(metric, Float.parseFloat(row[1]), Instant.parse(row[0]).getEpochSecond());
-        return new MetricData(metric, Float.parseFloat(row[1]), Long.parseLong(row[0]));
+        return new MetricData(metricDefinition, Float.parseFloat(row[1]), Long.parseLong(row[0]));
     }
 }

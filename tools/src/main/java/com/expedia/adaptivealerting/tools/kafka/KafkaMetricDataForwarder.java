@@ -15,10 +15,21 @@
  */
 package com.expedia.adaptivealerting.tools.kafka;
 
+import com.expedia.adaptivealerting.core.data.MetricFrame;
+import com.expedia.adaptivealerting.core.data.io.MetricFrameLoader;
+import com.expedia.adaptivealerting.tools.pipeline.source.MetricFrameMetricSource;
 import com.expedia.adaptivealerting.tools.pipeline.source.MetricSource;
 import com.expedia.metrics.MetricData;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Properties;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
@@ -27,7 +38,39 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  *
  * @author Willie Wheeler
  */
+@Slf4j
 public final class KafkaMetricDataForwarder {
+    
+    public static void main(String[] args) throws IOException {
+        final OptionParser parser = new OptionParser();
+        parser.accepts("m").withRequiredArg().ofType(String.class);
+        parser.accepts("d").withRequiredArg().ofType(String.class);
+        parser.accepts("t").withRequiredArg().ofType(String.class);
+        
+        final OptionSet options = parser.parse(args);
+        final File metricFile = new File((String) options.valueOf("m"));
+        final File dataFile = new File((String) options.valueOf("d"));
+        final String topicName = (String) options.valueOf("t");
+        
+        final MetricFrame metricFrame = MetricFrameLoader.loadCsv(metricFile, dataFile, true);
+        
+        // TODO Make the metric name and publication period optional params? [WLW]
+        final MetricFrameMetricSource metricSource = new MetricFrameMetricSource(metricFrame, "metric", 1000L);
+    
+        Properties props = new Properties();
+        props.put("bootstrap.servers", "haystack.local:9092");
+        props.put("acks", "all");
+        props.put("retries", 0);
+//        props.put("batch.size", 16384);
+        props.put("linger.ms", 1);
+        props.put("buffer.memory", 33554432);
+        props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        props.put("value.serializer", "com.expedia.adaptivealerting.kafka.serde.JsonPojoSerializer");
+//        props.put("value.serializer", "com.expedia.adaptivealerting.kafka.serde.MetricDataSerde$DataSerializer");
+        Producer<String, MetricData> producer = new KafkaProducer<>(props);
+        
+        new KafkaMetricDataForwarder(metricSource, producer, topicName);
+    }
     
     public KafkaMetricDataForwarder(
             MetricSource metricSource,

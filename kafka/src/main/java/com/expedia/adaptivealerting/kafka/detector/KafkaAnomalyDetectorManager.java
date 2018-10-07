@@ -55,6 +55,9 @@ public final class KafkaAnomalyDetectorManager extends AbstractKafkaApp {
     protected StreamsBuilder streamsBuilder() {
         final String inboundTopic = getAppConfig().getString(INBOUND_TOPIC);
         final String outboundTopic = getAppConfig().getString(OUTBOUND_TOPIC);
+        
+        log.info("Initializing: inboundTopic={}, outboundTopic={}", inboundTopic, outboundTopic);
+        
         final StreamsBuilder builder = new StreamsBuilder();
         final KStream<String, MappedMetricData> stream = builder.stream(inboundTopic);
         stream

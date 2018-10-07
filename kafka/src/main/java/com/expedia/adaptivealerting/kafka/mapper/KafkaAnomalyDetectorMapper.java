@@ -24,6 +24,7 @@ import com.expedia.adaptivealerting.kafka.serde.JsonPojoSerde;
 import com.expedia.adaptivealerting.kafka.util.AppUtil;
 import com.expedia.metrics.MetricData;
 import com.typesafe.config.Config;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
@@ -42,42 +43,33 @@ import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.*;
  * @author David Sutherland
  * @author Willie Wheeler
  */
+@Slf4j
 public final class KafkaAnomalyDetectorMapper extends AbstractKafkaApp {
     private AnomalyDetectorMapper mapper;
     
     public static void main(String[] args) {
-        final Config appConfig = AppUtil.getAppConfig(ANOMALY_DETECTOR_MAPPER);
-        final HttpClientWrapper httpClient = new HttpClientWrapper();
-        final String uriTemplate = appConfig.getString(MODEL_SERVICE_URI_TEMPLATE);
-        final ModelServiceConnector modelServiceConnector = new ModelServiceConnector(httpClient, uriTemplate);
-        final AnomalyDetectorMapper mapper = new AnomalyDetectorMapper(modelServiceConnector);
-        new KafkaAnomalyDetectorMapper(appConfig, mapper).start();
+        final Config config = AppUtil.getAppConfig(ANOMALY_DETECTOR_MAPPER);
+        new KafkaAnomalyDetectorMapper(config, buildMapper(config)).start();
     }
     
-    public KafkaAnomalyDetectorMapper(Config appConfig, AnomalyDetectorMapper mapper) {
-        super(appConfig);
+    public KafkaAnomalyDetectorMapper(Config config, AnomalyDetectorMapper mapper) {
+        super(config);
         notNull(mapper, "mapper can't be null");
         this.mapper = mapper;
     }
     
     @Override
     protected StreamsBuilder streamsBuilder() {
-        final StreamsBuilder builder = new StreamsBuilder();
         final String inboundTopic = getAppConfig().getString(INBOUND_TOPIC);
         final String outboundTopic = getAppConfig().getString(OUTBOUND_TOPIC);
+        
+        log.info("Initializing: inboundTopic={}, outboundTopic={}", inboundTopic, outboundTopic);
+        
+        final StreamsBuilder builder = new StreamsBuilder();
         final KStream<String, MetricData> stream = builder.stream(inboundTopic);
-        
-        // This approach forces all detectors for a given metric to reside with a given manager.
-//        stream
-//                .flatMapValues(metricData -> mapper.map(metricData))
-//                .to(outboundTopic);
-        
-        // This approach allows us to distribute detectors for a given metric across managers.
         stream
                 .flatMap((key, metricData) -> {
-                        
-                            // Convert the <key, mpoint> pair into a set of <detectorUuid, mappedMetricData> pairs.
-                            // Each detector UUID comes from its mapped mpoint.
+                            log.info("Mapping key={}, metricData={}", key, metricData);
                             final Set<MappedMetricData> mappedMetricDataSet = mapper.map(metricData);
                             return mappedMetricDataSet.stream()
                                     .map(mappedMetricData -> {
@@ -87,8 +79,16 @@ public final class KafkaAnomalyDetectorMapper extends AbstractKafkaApp {
                                     .collect(Collectors.toSet());
                         }
                 )
+                // TODO Make outbound serde configurable. [WLW]
                 .to(outboundTopic, Produced.with(new Serdes.StringSerde(), new JsonPojoSerde<>()));
-    
+        
         return builder;
+    }
+    
+    private static AnomalyDetectorMapper buildMapper(Config appConfig) {
+        final HttpClientWrapper httpClient = new HttpClientWrapper();
+        final String uriTemplate = appConfig.getString(MODEL_SERVICE_URI_TEMPLATE);
+        final ModelServiceConnector connector = new ModelServiceConnector(httpClient, uriTemplate);
+        return new AnomalyDetectorMapper(connector);
     }
 }

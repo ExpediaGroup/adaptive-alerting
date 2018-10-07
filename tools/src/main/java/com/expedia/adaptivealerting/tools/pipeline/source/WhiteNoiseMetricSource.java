@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.tools.pipeline.source;
 
 import com.expedia.metrics.MetricData;
+import com.expedia.metrics.MetricDefinition;
 
 import java.time.Instant;
 import java.util.Random;
@@ -29,6 +30,7 @@ import static java.lang.Math.sqrt;
  * @author Willie Wheeler
  */
 public final class WhiteNoiseMetricSource extends AbstractMetricSource {
+    private MetricDefinition metricDefinition = new MetricDefinition("white-noise-metric");
     private final double mean;
     private final double stdDev;
     private final Random random = new Random();
@@ -58,6 +60,6 @@ public final class WhiteNoiseMetricSource extends AbstractMetricSource {
     @Override
     public MetricData next() {
         final double value = mean + stdDev * random.nextGaussian();
-        return new MetricData(getMetricDefinition(), value, Instant.now().getEpochSecond());
+        return new MetricData(metricDefinition, value, Instant.now().getEpochSecond());
     }
 }

@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.tools.pipeline.source;
 
 import com.expedia.metrics.MetricData;
+import com.expedia.metrics.MetricDefinition;
 
 import java.time.Instant;
 import java.util.Random;
@@ -26,6 +27,7 @@ import java.util.Random;
  * @author Willie Wheeler
  */
 public final class RandomWalkMetricSource extends AbstractMetricSource {
+    private MetricDefinition metricDefinition = new MetricDefinition("random-walk-metric");
     private long currentEpochSecond = Instant.now().getEpochSecond();
     private int currentValue = 0;
     private final Random random = new Random();
@@ -44,7 +46,7 @@ public final class RandomWalkMetricSource extends AbstractMetricSource {
     
     @Override
     public MetricData next() {
-        final MetricData result = new MetricData(getMetricDefinition(), currentValue, currentEpochSecond);
+        final MetricData result = new MetricData(metricDefinition, currentValue, currentEpochSecond);
         final int movement = 1 - random.nextInt(3);
         this.currentEpochSecond++;
         this.currentValue += movement;

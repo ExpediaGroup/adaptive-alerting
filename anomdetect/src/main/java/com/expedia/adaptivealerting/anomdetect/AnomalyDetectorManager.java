@@ -19,7 +19,6 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
 import com.expedia.metrics.MetricData;
-import com.expedia.metrics.MetricDefinition;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigObject;
 import com.typesafe.config.ConfigValue;
@@ -86,6 +85,31 @@ public final class AnomalyDetectorManager {
     }
     
     /**
+     * <p>
+     * Convenience method to classify the mapped metric point, performing detector lookup behind the scenes. Note that
+     * this method has a side-effect in that it updates the passed mapped metric data itself.
+     * </p>
+     * <p>
+     * Returns {@code null} if there's no detector defined for the given mapped metric data.
+     * </p>
+     *
+     * @param mappedMetricData Mapped metric point.
+     * @return The mapped metric point, or {@code null} if there's no associated detector.
+     */
+    public AnomalyResult classify(MappedMetricData mappedMetricData) {
+        notNull(mappedMetricData, "mappedMetricData can't be null");
+        
+        log.info("Classifying mappedMetricData={}", mappedMetricData);
+        final AnomalyDetector detector = detectorFor(mappedMetricData);
+        if (detector == null) {
+            log.warn("No detector for mappedMetricData={}", mappedMetricData);
+            return null;
+        }
+        final MetricData metricData = mappedMetricData.getMetricData();
+        return detector.classify(metricData);
+    }
+    
+    /**
      * Gets the anomaly detector for the given metric point, creating it if absent. Returns {@code null} if there's no
      * {@link AnomalyDetectorFactory} defined for the mapped metric data's detector type.
      *
@@ -93,7 +117,7 @@ public final class AnomalyDetectorManager {
      * @return Anomaly detector for the given metric point, or {@code null} if there's some problem loading the
      * detector.
      */
-    public AnomalyDetector detectorFor(MappedMetricData mappedMetricData) {
+    private AnomalyDetector detectorFor(MappedMetricData mappedMetricData) {
         notNull(mappedMetricData, "mappedMetricData can't be null");
         final UUID detectorUuid = mappedMetricData.getDetectorUuid();
         final AnomalyDetector detector = detectors.get(detectorUuid);
@@ -116,40 +140,5 @@ public final class AnomalyDetectorManager {
             }
         }
         return detector;
-    }
-    
-    /**
-     * <p>
-     * Convenience method to classify the mapped metric point, performing detector lookup behind the scenes. Note that
-     * this method has a side-effect in that it updates the passed mapped metric data itself.
-     * </p>
-     * <p>
-     * Returns {@code null} if there's no detector defined for the given mapped metric data.
-     * </p>
-     *
-     * @param mappedMetricData Mapped metric point.
-     * @return The mapped metric point, or {@code null} if there's no associated detector.
-     */
-    public AnomalyResult classify(MappedMetricData mappedMetricData) {
-        notNull(mappedMetricData, "mappedMetricData can't be null");
-        
-        final MetricData metricData = mappedMetricData.getMetricData();
-        final MetricDefinition metricDefinition = metricData.getMetricDefinition();
-        final UUID detectorUuid = mappedMetricData.getDetectorUuid();
-        final String detectorType = mappedMetricData.getDetectorType();
-        
-        log.info("Classifying: metricDefinition={}, detectorUuid={}, detectorType={}",
-                metricDefinition, detectorUuid, detectorType);
-        
-        final AnomalyDetector detector = detectorFor(mappedMetricData);
-        
-        if (detector == null) {
-            log.warn("No detector for mappedMetricData={}", mappedMetricData);
-            return null;
-        }
-        
-        final AnomalyResult result = detector.classify(metricData);
-        log.trace("AnomalyResult: {}", result);
-        return result;
     }
 }

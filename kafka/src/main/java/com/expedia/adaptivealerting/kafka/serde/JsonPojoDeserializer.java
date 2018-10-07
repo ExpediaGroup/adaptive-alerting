@@ -30,7 +30,7 @@ import org.apache.kafka.common.serialization.Deserializer;
 import java.util.Map;
 
 public class JsonPojoDeserializer<T> implements Deserializer<T> {
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper = new ObjectMapper().registerModule(new MetricsJavaModule());
     private Class<T> tClass;
     
     /**
@@ -38,8 +38,6 @@ public class JsonPojoDeserializer<T> implements Deserializer<T> {
      */
     public JsonPojoDeserializer() {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        final ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new MetricsJavaModule());
     }
     
     @SuppressWarnings("unchecked")

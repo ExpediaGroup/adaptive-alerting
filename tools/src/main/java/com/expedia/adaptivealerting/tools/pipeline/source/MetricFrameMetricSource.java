@@ -43,8 +43,7 @@ public final class MetricFrameMetricSource extends AbstractMetricSource {
     @Override
     public MetricData next() {
         if (metricDataIterator.hasNext()) {
-            final MetricData metricData = metricDataIterator.next();
-            return new MetricData(getMetricDefinition(), metricData.getValue(), metricData.getTimestamp());
+            return metricDataIterator.next();
         } else {
             return null;
         }

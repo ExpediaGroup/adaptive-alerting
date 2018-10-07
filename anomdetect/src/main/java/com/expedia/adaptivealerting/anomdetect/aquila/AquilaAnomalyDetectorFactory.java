@@ -20,7 +20,6 @@ import com.expedia.metrics.jackson.MetricsJavaModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import java.util.UUID;
 
@@ -34,9 +33,11 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @Slf4j
 public class AquilaAnomalyDetectorFactory implements AnomalyDetectorFactory<AquilaAnomalyDetector> {
     
-    private final ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json()
-            .modules(new MetricsJavaModule())
-            .build();
+//    private final ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json()
+//            .modules(new MetricsJavaModule())
+//            .build();
+    
+    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new MetricsJavaModule());
     
     private String uri;
     
