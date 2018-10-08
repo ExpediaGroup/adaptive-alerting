@@ -15,7 +15,7 @@
 FROM openjdk:8-jre
 MAINTAINER Haystack <haystack@expedia.com>
 
-ENV APP_NAME haystack-adaptive-alerting-notifier
+ENV APP_NAME adaptive-alerting-notifier
 ENV APP_HOME /app/bin
 ENV JMXTRANS_AGENT jmxtrans-agent-1.2.6
 

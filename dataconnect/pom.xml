@@ -33,7 +33,7 @@
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Client library for data connectors.</description>
-    <url>https://github.com/ExpediaDotCom/haystack-adaptive-alerting</url>
+    <url>${project.parent.url}</url>
 
     <dependencies>
 
