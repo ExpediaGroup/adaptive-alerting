@@ -2,7 +2,7 @@ USE `aa_model_service`;
 
 DROP PROCEDURE IF EXISTS insert_mapping;
 DROP PROCEDURE IF EXISTS insert_model;
-DROP PROCEDURE IF EXISTS insert_mapping;
+DROP PROCEDURE IF EXISTS insert_detector;
 
 DELIMITER //
 
@@ -11,10 +11,21 @@ CREATE PROCEDURE insert_detector (
   IN type_ukey VARCHAR(100)
 )
   BEGIN
-    DECLARE type_id SMALLINT(5) UNSIGNED;
+    DECLARE type_id INT(5) UNSIGNED;
 
     SELECT t.id INTO type_id FROM model_type t WHERE t.ukey = type_ukey;
     INSERT INTO detector (uuid, model_type_id) VALUES (uuid, type_id);
+  END //
+
+CREATE PROCEDURE insert_model (
+  IN uuid CHAR(36),
+  IN params json
+)
+  BEGIN
+    DECLARE detector_id INT(5) UNSIGNED;
+
+    SELECT d.id INTO detector_id FROM detector d WHERE d.uuid = uuid;
+    INSERT INTO model (detector_id, params) VALUES (detector_id, params);
   END //
 
 CREATE PROCEDURE insert_mapping (
