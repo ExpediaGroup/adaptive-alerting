@@ -17,7 +17,6 @@ package com.expedia.adaptivealerting.tools.pipeline.source;
 
 import com.expedia.adaptivealerting.tools.pipeline.util.MetricDataSubscriber;
 import com.expedia.metrics.MetricData;
-import com.expedia.metrics.MetricDefinition;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -33,7 +32,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author Willie Wheeler
  */
 public abstract class AbstractMetricSource implements MetricSource {
-    private final MetricDefinition metricDefinition;
+//    private final MetricDefinition metricDefinition;
     private final long periodMs;
     private final List<MetricDataSubscriber> subscribers = new LinkedList<>();
     
@@ -49,14 +48,14 @@ public abstract class AbstractMetricSource implements MetricSource {
         notNull(metricKey, "metricKey can't be null");
         isTrue(periodMs > 0, "periodMs must be > 0");
         
-        this.metricDefinition = new MetricDefinition(metricKey);
+//        this.metricDefinition = new MetricDefinition(metricKey);
         this.periodMs = periodMs;
     }
     
-    @Override
-    public MetricDefinition getMetricDefinition() {
-        return metricDefinition;
-    }
+//    @Override
+//    public MetricDefinition getMetricDefinition() {
+//        return metricDefinition;
+//    }
     
     @Override
     public void start() {

@@ -46,9 +46,9 @@ public class MetricFrame {
         this.metricDataPoints = Arrays.asList(metricDataPoints);
     }
     
-    public MetricFrame(List<MetricData> metricData) {
-        notNull(metricData, "metricData can't be null");
-        this.metricDataPoints = metricData;
+    public MetricFrame(List<MetricData> metricDataPoints) {
+        notNull(metricDataPoints, "metricDataPoints can't be null");
+        this.metricDataPoints = metricDataPoints;
     }
     
     /**

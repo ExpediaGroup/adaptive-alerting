@@ -18,9 +18,12 @@ package com.expedia.adaptivealerting.anomdetect.aquila;
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.metrics.MetricData;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,18 +62,42 @@ public final class AquilaAnomalyDetector implements AnomalyDetector {
         
         AnomalyLevel level;
         try {
-            byte[] metricDataBytes = objectMapper.writeValueAsBytes(metricData);
-            Content content = Request.Post(uri)
-                    .bodyByteArray(metricDataBytes)
+            final AquilaRequest aquilaRequest = toAquilaRequest(metricData);
+            final byte[] aquilaRequestBytes = objectMapper.writeValueAsBytes(aquilaRequest);
+            final Content content = Request.Post(uri)
+                    .addHeader("Content-Type", "application/json")
+                    .bodyByteArray(aquilaRequestBytes)
                     .execute()
                     .returnContent();
-            final AnomalyResult tempResult = objectMapper.readValue(content.asBytes(), AnomalyResult.class);
-            level = tempResult.getAnomalyLevel();
+            final AquilaResponse aquilaResponse = objectMapper.readValue(content.asBytes(), AquilaResponse.class);
+            level = AnomalyLevel.valueOf(aquilaResponse.getLevel());
         } catch (IOException e) {
-            log.error("Classification failed", e);
+            log.error("Classification failed: " + e.getMessage(), e);
             level = AnomalyLevel.UNKNOWN;
         }
         
         return new AnomalyResult(uuid, metricData, level);
+    }
+    
+    private AquilaRequest toAquilaRequest(MetricData metricData) {
+        return new AquilaRequest(uuid.toString(), metricData.getTimestamp(), metricData.getValue());
+    }
+    
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    private static class AquilaRequest {
+        private String detectorUuid;
+        private Long epochSecond;
+        private Double observed;
+    }
+    
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    private static class AquilaResponse {
+        private Double predicted;
+        private AnomalyThresholds thresholds;
+        private String level;
     }
 }

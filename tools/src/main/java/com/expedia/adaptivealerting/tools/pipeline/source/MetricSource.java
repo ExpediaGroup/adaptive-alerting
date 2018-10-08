@@ -17,7 +17,6 @@ package com.expedia.adaptivealerting.tools.pipeline.source;
 
 import com.expedia.adaptivealerting.tools.pipeline.util.MetricDataSubscriber;
 import com.expedia.metrics.MetricData;
-import com.expedia.metrics.MetricDefinition;
 
 /**
  * Metric source interface.
@@ -26,12 +25,12 @@ import com.expedia.metrics.MetricDefinition;
  */
 public interface MetricSource {
     
-    /**
-     * Returns the metric definition.
-     *
-     * @return Metric definition.
-     */
-    MetricDefinition getMetricDefinition();
+//    /**
+//     * Returns the metric definition.
+//     *
+//     * @return Metric definition.
+//     */
+//    MetricDefinition getMetricDefinition();
     
     /**
      * Adds a metric point subscriber to this source.

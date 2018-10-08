@@ -22,15 +22,16 @@
 package com.expedia.adaptivealerting.kafka.serde;
 
 
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.expedia.metrics.jackson.MetricsJavaModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.Serializer;
 
 import java.util.Map;
 
 public class JsonPojoSerializer<T> implements Serializer<T> {
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper = new ObjectMapper().registerModule(new MetricsJavaModule());
 
     /**
      * Default constructor needed by Kafka

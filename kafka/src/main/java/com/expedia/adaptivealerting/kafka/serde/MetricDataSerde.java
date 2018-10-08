@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.util.Map;
 
 public class MetricDataSerde implements Serde<MetricData> {
-
     private final static MessagePackSerializer mps = new MessagePackSerializer();
 
     @Override

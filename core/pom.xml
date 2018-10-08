@@ -39,6 +39,20 @@
 
         <!-- Compile -->
         <dependency>
+            <groupId>com.expedia</groupId>
+            <artifactId>metrics-java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.expedia</groupId>
+            <artifactId>metrics-java-jackson</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.expedia</groupId>
+            <artifactId>metrics-java-metrictank</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>com.expedia.www</groupId>
             <artifactId>haystack-commons</artifactId>
         </dependency>
