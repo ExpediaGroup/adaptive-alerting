@@ -27,7 +27,7 @@
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Anomaly detection for streaming time series.</description>
-    <url>https://github.com/ExpediaDotCom/haystack-adaptive-alerting</url>
+    <url>https://github.com/ExpediaDotCom/adaptive-alerting</url>
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
@@ -66,9 +66,9 @@
         <module>tools</module>
     </modules>
     <scm>
-        <connection>scm:git:git://github.com/ExpediaDotCom/haystack-adaptive-alerting.git</connection>
-        <developerConnection>scm:git:ssh://github.com/ExpediaDotCom/haystack-adaptive-alerting.git</developerConnection>
-        <url>http://github.com/ExpediaDotCom/haystack-adaptive-alerting</url>
+        <connection>scm:git:git://github.com/ExpediaDotCom/adaptive-alerting.git</connection>
+        <developerConnection>scm:git:ssh://github.com/ExpediaDotCom/adaptive-alerting.git</developerConnection>
+        <url>http://github.com/ExpediaDotCom/adaptive-alerting</url>
     </scm>
     <distributionManagement>
         <snapshotRepository>
@@ -181,11 +181,6 @@
             </dependency>
             <dependency>
                 <groupId>com.expedia.adaptivealerting</groupId>
-                <artifactId>adaptive-alerting-aws</artifactId>
-                <version>${aa.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.expedia.adaptivealerting</groupId>
                 <artifactId>adaptive-alerting-anomdetect</artifactId>
                 <version>${aa.version}</version>
             </dependency>
@@ -207,16 +202,6 @@
             <dependency>
                 <groupId>com.expedia.adaptivealerting</groupId>
                 <artifactId>adaptive-alerting-dataservice</artifactId>
-                <version>${aa.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.expedia.adaptivealerting</groupId>
-                <artifactId>adaptive-alerting-dataservice-file</artifactId>
-                <version>${aa.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.expedia.adaptivealerting</groupId>
-                <artifactId>adaptive-alerting-dataservice-s3</artifactId>
                 <version>${aa.version}</version>
             </dependency>
             <dependency>
@@ -301,13 +286,6 @@
                 <artifactId>fluent-hc</artifactId>
                 <version>${apache.httpcomponents.version}</version>
             </dependency>
-            <!--
-            <dependency>
-                <groupId>org.apache.httpcomponents</groupId>
-                <artifactId>httpclient</artifactId>
-                <version>${apache.httpcomponents.version}</version>
-            </dependency>
-            -->
             <dependency>
                 <groupId>org.apache.kafka</groupId>
                 <artifactId>kafka_${scala.version}</artifactId>

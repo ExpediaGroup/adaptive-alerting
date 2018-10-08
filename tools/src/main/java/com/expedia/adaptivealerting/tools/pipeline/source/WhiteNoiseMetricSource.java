@@ -24,8 +24,7 @@ import java.util.Random;
 import static java.lang.Math.sqrt;
 
 /**
- * Generates an infinite series of white noise {@link com.expedia.www.haystack.commons.entities.MetricPoint}s at a given
- * rate. The data distribution is Gaussian and configurable.
+ * Generates an infinite series of white noise at a given rate. The data distribution is Gaussian and configurable.
  *
  * @author Willie Wheeler
  */

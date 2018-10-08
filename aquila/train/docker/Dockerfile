@@ -13,7 +13,7 @@
 # limitations under the License.
 
 FROM openjdk:8-jre
-MAINTAINER Haystack <haystack@expedia.com>
+MAINTAINER Adaptive Alerting <adaptive-alerting@expedia.com>
 
 ENV APP_NAME aquila-train
 ENV APP_HOME /app/bin
