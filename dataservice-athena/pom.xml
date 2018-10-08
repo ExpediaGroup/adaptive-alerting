@@ -32,7 +32,6 @@
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Data service implementation backed by AWS Athena.</description>
-    <url>${project.parent.url}</url>
 
     <dependencies>
 
