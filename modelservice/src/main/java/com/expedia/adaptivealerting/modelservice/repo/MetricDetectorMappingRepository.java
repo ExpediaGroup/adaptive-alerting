@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.modelservice.repo;
 
-import com.expedia.adaptivealerting.modelservice.entity.MetricModelMapping;
+import com.expedia.adaptivealerting.modelservice.entity.MetricDetectorMapping;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
@@ -24,8 +24,8 @@ import java.util.List;
 /**
  * Spring Data repository for metric/model mappings.
  */
-public interface MetricModelMappingRepository extends PagingAndSortingRepository<MetricModelMapping, Long> {
+public interface MetricDetectorMappingRepository extends PagingAndSortingRepository<MetricDetectorMapping, Long> {
 
-    List<MetricModelMapping> findByMetricHash(@Param("hash") String hash);
+    List<MetricDetectorMapping> findByMetricHash(@Param("hash") String hash);
 }
 

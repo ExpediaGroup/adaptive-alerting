@@ -14,6 +14,8 @@ INSERT INTO `model_type` (`ukey`) VALUES
   ('rcf-detector')
 ;
 
-CALL insert_model('3ec81aa2-2cdc-415e-b4f3-c1beb223ae60', 'cusum-detector');
+CALL insert_detector('3ec81aa2-2cdc-415e-b4f3-c1beb223ae60','cusum-detector')
 
 CALL insert_mapping('1.71828d68a2938ff1ef96c340f12e2dd6', '3ec81aa2-2cdc-415e-b4f3-c1beb223ae60');
+
+
