@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-APP_NAME="haystack-adaptive-alerting-notifier"
+APP_NAME="adaptive-alerting-notifier"
 
 cd `cd -P -- "$(dirname -- "$0")" && pwd -P`
 

@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-APP_NAME="haystack-adaptive-alerting-ad-manager"
+APP_NAME="adaptive-alerting-ad-manager"
 DOTTED_APP_NAME="ad.manager"
 MAIN_CLASS="com.expedia.adaptivealerting.kafka.detector.KafkaAnomalyDetectorManager"
 

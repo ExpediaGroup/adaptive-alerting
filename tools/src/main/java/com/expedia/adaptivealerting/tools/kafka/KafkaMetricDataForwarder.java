@@ -58,7 +58,7 @@ public final class KafkaMetricDataForwarder {
         final MetricFrameMetricSource metricSource = new MetricFrameMetricSource(metricFrame, "metric", 1000L);
     
         Properties props = new Properties();
-        props.put("bootstrap.servers", "haystack.local:9092");
+        props.put("bootstrap.servers", "aa.local:9092");
         props.put("acks", "all");
         props.put("retries", 0);
 //        props.put("batch.size", 16384);
