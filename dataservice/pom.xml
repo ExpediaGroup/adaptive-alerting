@@ -32,7 +32,6 @@
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Data service interface and implementation support.</description>
-    <url>${project.parent.url}</url>
 
     <dependencies>
 

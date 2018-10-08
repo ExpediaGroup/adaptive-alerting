@@ -32,7 +32,6 @@
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Client library for data connectors.</description>
-    <url>${project.parent.url}</url>
 
     <dependencies>
 
