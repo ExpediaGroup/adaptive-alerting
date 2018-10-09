@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.notifier;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,7 +23,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class NotifierApplicationTests {
+@Ignore("This was never run due to naming convention! It is broke until we add a Kafka fixture")
+public class NotifierApplicationTest {
 
     @Test
     public void contextLoads() {

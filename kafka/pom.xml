@@ -34,9 +34,10 @@
     <description>Kafka interface for Adaptive Alerting.</description>
 
     <properties>
-        <maven.scalatest.plugin.version>1.0</maven.scalatest.plugin.version>
-        <maven.scala.plugin.version>3.2.1</maven.scala.plugin.version>
-        <maven.build.helper.plugin.version>1.9.1</maven.build.helper.plugin.version>
+        <maven.scalatest.plugin.version>2.0.0</maven.scalatest.plugin.version>
+        <maven.scala.plugin.version>3.4.2</maven.scala.plugin.version>
+        <maven.build.helper.plugin.version>3.0.0</maven.build.helper.plugin.version>
+        <maven.assembly.plugin.version>3.1.0</maven.assembly.plugin.version>
     </properties>
 
     <dependencies>
@@ -69,14 +70,6 @@
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-streams</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.msgpack</groupId>
-            <artifactId>msgpack-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
         </dependency>
         <dependency>
             <groupId>com.expedia</groupId>
@@ -116,10 +109,6 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.pegdown</groupId>
-            <artifactId>pegdown</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.scalatest</groupId>
             <artifactId>scalatest_${scala.version}</artifactId>
         </dependency>
@@ -129,25 +118,8 @@
         <testSourceDirectory>src/test/scala</testSourceDirectory>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>${maven.build.helper.plugin.version}</version>
-                <executions>
-                    <execution>
-                        <phase>generate-test-sources</phase>
-                        <goals>
-                            <goal>add-test-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>src/test/java</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <version>${maven.assembly.plugin.version}</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -168,14 +140,6 @@
                 <version>${maven.scala.plugin.version}</version>
                 <executions>
                     <execution>
-                        <id>scala-compile-first</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                    <execution>
                         <id>scala-test-compile</id>
                         <phase>process-test-resources</phase>
                         <goals>
@@ -183,6 +147,9 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <scalaVersion>${scala.library.version}</scalaVersion>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.scalatest</groupId>

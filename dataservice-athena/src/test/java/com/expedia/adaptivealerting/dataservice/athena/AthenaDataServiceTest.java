@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Willie Wheeler
  */
-public class AthenaDataServiceTests {
+public class AthenaDataServiceTest {
     
     // Class under test
     private AthenaDataService dataService;
