@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.notifier.service;
 
-import com.codahale.metrics.MetricRegistry;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.notifier.config.AppConfig;
 import com.expedia.adaptivealerting.notifier.util.MetricsMonitor;
@@ -30,69 +29,89 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+import javax.annotation.PreDestroy;
 
 @Component
 @Slf4j
 public class Notifier implements ApplicationListener<ApplicationReadyEvent> {
 
     private long TIME_OUT = 10_000;
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    private final KafkaConsumer<String, MappedMetricData> kafkaConsumer;
+    private final ObjectMapper objectMapper;
+    private final AppConfig appConfig;
     private final RestTemplate restTemplate;
     private final String webhookUrl;
 
+    final AtomicBoolean running = new AtomicBoolean(); // Visible for testing
+
     @Autowired
-    public Notifier(AppConfig appConfig, RestTemplate restTemplate) {
-        kafkaConsumer = buildKafkaConsumer(appConfig);
+    public Notifier(AppConfig appConfig, ObjectMapper objectMapper, RestTemplate restTemplate) {
+        this.appConfig = appConfig;
+        this.objectMapper = objectMapper;
         this.restTemplate = restTemplate;
         this.webhookUrl = appConfig.getWebhookUrl();
     }
 
-    private KafkaConsumer<String, MappedMetricData> buildKafkaConsumer(AppConfig appConfig) {
-        KafkaConsumer<String, MappedMetricData> kafkaConsumer = new KafkaConsumer<>(appConfig.getKafkaConsumerConfig());
-        kafkaConsumer.subscribe(Arrays.asList(appConfig.getKafkaTopic()));
-        return kafkaConsumer;
+    @PreDestroy
+    public void stopLooperThread() {
+        running.set(false);
     }
 
+    /**
+     * This launches a thread to run the notify loop. This prevents a several second hang, or worse
+     * crash if zookeeper isn't running, yet.
+     */
     @Override
     public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {
-        processAlerts();
+        if (!running.compareAndSet(false, true)) return; // already running
+
+        Thread notifyLoop = new Thread(this::loopUntilShutdown);
+        notifyLoop.setName("adaptivealerting notify loop");
+        notifyLoop.setDaemon(true);
+        notifyLoop.start();
     }
 
-    private void processAlerts() {
-        while(!ObjectUtils.isEmpty(webhookUrl)) {
-            ConsumerRecords<String, MappedMetricData> consumerRecords = kafkaConsumer.poll(TIME_OUT);
-            consumerRecords.forEach( record -> {
-                buildJson(record.value()).ifPresent(json -> {
-                    HttpHeaders headers = new HttpHeaders();
-                    headers.setContentType(MediaType.APPLICATION_JSON);
-                    HttpEntity<String> entity = new HttpEntity<>(json, headers);
-                    try {
-                        ResponseEntity responseEntity =
-                            restTemplate.exchange(webhookUrl, HttpMethod.POST, entity, ResponseEntity.class);
-                        if (responseEntity.getStatusCode().is2xxSuccessful()) {
-                            MetricsMonitor.notification_success.mark();
-                        }
-                        else {
-                            MetricsMonitor.notification_failure.mark();
-                        }
-                    } catch (HttpClientErrorException ex) {
-                        MetricsMonitor.notification_failure.mark();
-                        log.error("Webhook Url invocation failed", ex);
-                    }
-                });
-            });
+    private void loopUntilShutdown() {
+        try (KafkaConsumer<String, MappedMetricData> kafkaConsumer =
+                 new KafkaConsumer<>(appConfig.getKafkaConsumerConfig())) {
+            kafkaConsumer.subscribe(Arrays.asList(appConfig.getKafkaTopic()));
+
+            while (running.get()) {
+                processAlerts(kafkaConsumer);
+            }
         }
+    }
+
+    private void processAlerts(KafkaConsumer<String, MappedMetricData> kafkaConsumer) {
+        ConsumerRecords<String, MappedMetricData> consumerRecords = kafkaConsumer.poll(TIME_OUT);
+        consumerRecords.forEach(record -> {
+            buildJson(record.value()).ifPresent(json -> {
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON);
+                HttpEntity<String> entity = new HttpEntity<>(json, headers);
+                try {
+                    ResponseEntity responseEntity =
+                        restTemplate.exchange(webhookUrl, HttpMethod.POST, entity, ResponseEntity.class);
+                    if (responseEntity.getStatusCode().is2xxSuccessful()) {
+                        MetricsMonitor.notification_success.mark();
+                    }
+                    else {
+                        MetricsMonitor.notification_failure.mark();
+                    }
+                } catch (HttpClientErrorException ex) {
+                    MetricsMonitor.notification_failure.mark();
+                    log.error("Webhook Url invocation failed", ex);
+                }
+            });
+        });
     }
 
     private Optional<String> buildJson(MappedMetricData mappedMetricData) {
@@ -103,5 +122,4 @@ public class Notifier implements ApplicationListener<ApplicationReadyEvent> {
         }
         return Optional.empty();
     }
-
 }
