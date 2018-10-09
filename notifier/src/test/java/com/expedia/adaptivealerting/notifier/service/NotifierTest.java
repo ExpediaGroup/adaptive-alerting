@@ -15,22 +15,12 @@
  */
 package com.expedia.adaptivealerting.notifier.service;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.notifier.config.AppConfig;
-import com.expedia.metrics.MetricData;
-import com.expedia.metrics.MetricDefinition;
-import com.expedia.metrics.TagCollection;
 import com.github.charithe.kafka.EphemeralKafkaBroker;
 import com.github.charithe.kafka.KafkaJunitRule;
-import com.google.common.collect.ImmutableMap;
-import java.time.Instant;
-import java.util.UUID;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
-import org.apache.kafka.clients.CommonClientConfigs;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -39,8 +29,8 @@ import org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoCon
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import static com.expedia.metrics.MetricDefinition.MTYPE;
-import static com.expedia.metrics.MetricDefinition.UNIT;
+import static com.expedia.adaptivealerting.notifier.TestHelper.bootstrapServers;
+import static com.expedia.adaptivealerting.notifier.TestHelper.newMappedMetricData;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.springframework.boot.test.util.EnvironmentTestUtils.addEnvironment;
@@ -59,7 +49,7 @@ public class NotifierTest {
     @Before
     public void init() {
         addEnvironment(context,
-                "kafka.consumer.bootstrap.servers=" + bootstrapServers(),
+                "kafka.consumer.bootstrap.servers=" + bootstrapServers(kafka),
                 "webhook.url=http://localhost:" + webhook.getPort() + "/hook"
         );
 
@@ -110,21 +100,5 @@ public class NotifierTest {
                 .isEqualTo("POST");
         assertThat(webhookRequest.getBody().readUtf8())
                 .isEqualTo(json);
-    }
-
-    static MappedMetricData newMappedMetricData() {
-        TagCollection tags = new TagCollection(ImmutableMap.of(MTYPE, "gauge", UNIT, "metric"));
-        MetricDefinition def = new MetricDefinition("latency", tags, TagCollection.EMPTY);
-        MetricData data = new MetricData(def, 2.0f, Instant.now().getEpochSecond());
-        UUID detectorUUID = UUID.randomUUID();
-        MappedMetricData mappedData = new MappedMetricData(data, detectorUUID, "aquila-detector");
-        mappedData.setAnomalyResult(new AnomalyResult(detectorUUID, data, AnomalyLevel.NORMAL));
-        return mappedData;
-    }
-
-    static String bootstrapServers() {
-        return kafka.helper()
-                .consumerConfig()
-                .getProperty(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG);
     }
 }
