@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -77,12 +78,14 @@ public final class MetricFrameLoader {
         for (int i = 0; i < numRows; i++) {
             metricData[i] = toMetricData(metricDefinition, rows.get(i));
         }
+        
+        
         return new MetricFrame(metricData);
     }
     
     private static MetricData toMetricData(MetricDefinition metricDefinition, String[] row) {
         // FIXME Some of the CSVs use Instants, some use epoch seconds
-//        return new MetricData(metric, Float.parseFloat(row[1]), Instant.parse(row[0]).getEpochSecond());
-        return new MetricData(metricDefinition, Float.parseFloat(row[1]), Long.parseLong(row[0]));
+        return new MetricData(metricDefinition, Float.parseFloat(row[1]), Instant.parse(row[0]).getEpochSecond());
+//        return new MetricData(metricDefinition, Float.parseFloat(row[1]), Long.parseLong(row[0]));
     }
 }
