@@ -293,11 +293,6 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.kafka</groupId>
-                <artifactId>kafka_${scala.version}</artifactId>
-                <version>${kafka.streams.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.kafka</groupId>
                 <artifactId>kafka-streams</artifactId>
                 <version>${kafka.streams.version}</version>
             </dependency>
@@ -464,6 +459,12 @@
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka_${scala.version}</artifactId>
+                <version>${kafka.streams.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>

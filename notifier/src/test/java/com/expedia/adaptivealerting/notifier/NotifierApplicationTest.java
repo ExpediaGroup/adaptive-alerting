@@ -15,19 +15,76 @@
  */
 package com.expedia.adaptivealerting.notifier;
 
-import org.junit.Ignore;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.charithe.kafka.EphemeralKafkaBroker;
+import com.github.charithe.kafka.KafkaJunitRule;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.RecordedRequest;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.support.TestPropertySourceUtils;
+
+import static com.expedia.adaptivealerting.notifier.TestHelper.bootstrapServers;
+import static com.expedia.adaptivealerting.notifier.TestHelper.newMappedMetricData;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
-@Ignore("This was never run due to naming convention! It is broke until we add a Kafka fixture")
+@SpringBootTest(
+    classes = {
+        NotifierApplication.class,
+        NotifierApplicationTest.ServiceDependencies.class
+    },
+    webEnvironment = SpringBootTest.WebEnvironment.MOCK,
+    properties = { // Set the only required properties
+        "kafka.consumer.bootstrap.servers=${bootstrap.servers}",
+        "webhook.url=http://localhost:${webhook.port}/hook"
+    }
+)
+@ContextConfiguration(initializers = {
+    NotifierApplicationTest.ServiceDependencies.class
+})
 public class NotifierApplicationTest {
 
+    @ClassRule public static KafkaJunitRule kafka = new KafkaJunitRule(EphemeralKafkaBroker.create());
+    @ClassRule public static MockWebServer webhook = new MockWebServer();
+
+    @Autowired ObjectMapper objectMapper;
+
     @Test
-    public void contextLoads() {
+    public void message_invokesWebhook() throws Exception {
+        // Given a webhook that responds
+        webhook.enqueue(new MockResponse());
+
+        // When a mapped metric is sent in json to the alerts topic
+        String json = objectMapper.writeValueAsString(newMappedMetricData());
+        kafka.helper().produceStrings("alerts", json);
+
+        // Then, the notifier POSTs the json from the message into the webhook
+        RecordedRequest webhookRequest = webhook.takeRequest();
+        assertThat(webhookRequest.getMethod())
+            .isEqualTo("POST");
+        assertThat(webhookRequest.getBody().readUtf8())
+            .isEqualTo(json);
     }
 
+    /** This grabs ports from the junit rules and inlines properties accordingly */
+    static class ServiceDependencies
+        implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+
+        @Override
+        public void initialize(ConfigurableApplicationContext applicationContext) {
+            TestPropertySourceUtils.addInlinedPropertiesToEnvironment(applicationContext,
+                "bootstrap.servers=" + bootstrapServers(kafka),
+                "webhook.port=" + webhook.getPort()
+            );
+        }
+    }
 }
