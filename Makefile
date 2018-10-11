@@ -17,3 +17,4 @@ release: all
 	cd modelservice && $(MAKE) release && cd ..
 	cd aquila/train && $(MAKE) release && cd ../..
 	cd aquila/detect && $(MAKE) release && cd ../..
+	cd notifier && $(MAKE) release && cd ..
