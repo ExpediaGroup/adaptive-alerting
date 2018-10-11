@@ -42,16 +42,12 @@ public class Model {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String uuid;
-
     @ManyToOne
-    @JoinColumn(name = "type_id")
-    private ModelType type;
+    @JoinColumn(name = "detector_id")
+    private Detector detector;
 
     @Convert(converter = JpaConverterJson.class)
-    private Map<String, Object> hyperparams;
-
-    private String trainingLocation;
+    private Map<String, Object> params;
 
     /**
      * DB-driven weak sigma override for models that have this parameter. Allows us to make sensitivity adjustments in

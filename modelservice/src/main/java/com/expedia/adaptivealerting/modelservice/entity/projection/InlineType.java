@@ -15,9 +15,11 @@
  */
 package com.expedia.adaptivealerting.modelservice.entity.projection;
 
-import com.expedia.adaptivealerting.modelservice.entity.Model;
+import com.expedia.adaptivealerting.modelservice.entity.Detector;
 import com.expedia.adaptivealerting.modelservice.entity.ModelType;
 import org.springframework.data.rest.core.config.Projection;
+
+import java.util.Map;
 
 // Projection must be in the same package or a subpackage as entities, or else special config required.
 
@@ -26,10 +28,17 @@ import org.springframework.data.rest.core.config.Projection;
  *
  * @author Willie Wheeler
  */
-@Projection(name = "inlineType", types = Model.class)
+@Projection(name = "inlineType", types = Detector.class)
 public interface InlineType {
-    
-    String getUuid();
-    
+
+    String getId();
+
     ModelType getType();
+
+    String getUuid();
+
+    Map<String, Object> getHyperparams();
+
+    Map<String, Object> getTrainingMetaData();
+
 }

@@ -1,7 +1,6 @@
 package com.expedia.adaptivealerting.modelservice.repo;
 
 import com.expedia.adaptivealerting.modelservice.entity.Detector;
-import com.expedia.adaptivealerting.modelservice.entity.Model;
 import com.expedia.adaptivealerting.modelservice.entity.projection.InlineType;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -16,8 +15,8 @@ import java.util.List;
 @RepositoryRestResource(excerptProjection = InlineType.class)
 public interface DetectorRepository extends PagingAndSortingRepository<Detector, Long> {
 
-    List<Model> findByDetectorId(@Param("detectorId") String detectorId);
+    List<Detector> findByUuid(@Param("uuid") String uuid);
 
     @Query("select mmm.detector from MetricDetectorMapping mmm where mmm.metric.hash = :hash")
-    List<Model> findByMetricHash(@Param("hash") String hash);
+    List<Detector> findByMetricHash(@Param("hash") String hash);
 }

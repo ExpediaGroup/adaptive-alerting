@@ -25,6 +25,7 @@ CREATE TABLE detector (
   model_type_id smallint unsigned        not null,
   hyperparams   json,
   training_meta json,
+  seyren_flag   boolean                           default false,
   date_created  timestamp                NULL     DEFAULT CURRENT_TIMESTAMP,
   constraint model_type_id_fk foreign key (model_type_id) references model_type (id)
 );
@@ -36,7 +37,6 @@ create table model (
   weak_sigmas       decimal(3, 3),
   strong_sigmas     decimal(3, 3),
   last_build_ts timestamp,
-  seyren_flag   boolean                           default false,
   other_stuff   json,
   date_created  timestamp                         default CURRENT_TIMESTAMP,
   constraint detector_id_fk foreign key (detector_id) references detector (id)
