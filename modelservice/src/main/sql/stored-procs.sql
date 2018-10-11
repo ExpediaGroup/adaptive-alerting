@@ -20,13 +20,14 @@ CREATE PROCEDURE insert_detector (
 
 CREATE PROCEDURE insert_model (
   IN uuid CHAR(36),
-  IN params json
+  IN params json,
+  IN last_build_ts timestamp
 )
   BEGIN
     DECLARE detector_id INT(5) UNSIGNED;
 
     SELECT d.id INTO detector_id FROM detector d WHERE d.uuid = uuid;
-    INSERT INTO model (detector_id, params) VALUES (detector_id, params);
+    INSERT INTO model (detector_id, params , last_build_ts) VALUES (detector_id, params, last_build_ts);
   END //
 
 CREATE PROCEDURE insert_mapping (
@@ -45,7 +46,7 @@ CREATE PROCEDURE insert_mapping (
 CREATE PROCEDURE insert_mapping_wildcard_metric_targets_to_detector (
   IN detector_uuid CHAR(36),
   IN metric_ukey CHAR(100)
- )
+)
   BEGIN
     DECLARE metric_id INT(10) UNSIGNED;
     DECLARE detector_id INT(10) UNSIGNED;
@@ -57,16 +58,16 @@ CREATE PROCEDURE insert_mapping_wildcard_metric_targets_to_detector (
     open cur1;
 
     REPEAT
-    	FETCH cur1 into metric_id;
-    	if NOT done then
-    	SELECT id INTO detector_id FROM detector WHERE uuid = detector_uuid;
-    	IF NOT EXISTS (SELECT 1 FROM metric_detector_mapping m3 WHERE m3.metric_id = metric_id and m3.detector_id = detector_id)
-    	THEN
-    	INSERT INTO metric_detector_mapping (metric_id, detector_id) VALUES (metric_id, detector_id);
-    	END IF;
+      FETCH cur1 into metric_id;
+      if NOT done then
+        SELECT id INTO detector_id FROM detector WHERE uuid = detector_uuid;
+        IF NOT EXISTS (SELECT 1 FROM metric_detector_mapping m3 WHERE m3.metric_id = metric_id and m3.detector_id = detector_id)
+        THEN
+          INSERT INTO metric_detector_mapping (metric_id, detector_id) VALUES (metric_id, detector_id);
         END IF;
+      END IF;
     UNTIL done END REPEAT;
     close cur1;
-END //
+  END //
 
 DELIMITER ;
