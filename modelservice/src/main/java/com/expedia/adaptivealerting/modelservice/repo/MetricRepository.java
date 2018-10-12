@@ -19,14 +19,27 @@ import com.expedia.adaptivealerting.modelservice.entity.Metric;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
-
 /**
  * Spring Data repository for metrics.
  *
  * @author kashah
+ * @author Willie Wheeler
  */
 public interface MetricRepository extends PagingAndSortingRepository<Metric, Long> {
     
-    List<Metric> findByHash(@Param("hash") String hash);
+    /**
+     * Finds a metric by its unique key, if any.
+     *
+     * @param key Unique key.
+     * @return Metric identified by the unique key.
+     */
+    Metric findByKey(@Param("key") String key);
+    
+    /**
+     * Finds a metric by its unique hash.
+     *
+     * @param hash Unique hash.
+     * @return Metric identified by the unique hash.
+     */
+    Metric findByHash(@Param("hash") String hash);
 }
