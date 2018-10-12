@@ -29,4 +29,3 @@ CALL insert_model('2cdc1aa2-2cdc-355e-b4f3-d2beb223ae60','{"low":100,"high":455}
 
 CALL insert_mapping('1.71828d68a2938ff1ef96c340f12e2dd6', '3ec81aa2-2cdc-415e-b4f3-c1beb223ae60');
 CALL insert_mapping('1.25345234523452352253452f12e2dd6', '2cdc1aa2-2cdc-355e-b4f3-d2beb223ae60');
-
