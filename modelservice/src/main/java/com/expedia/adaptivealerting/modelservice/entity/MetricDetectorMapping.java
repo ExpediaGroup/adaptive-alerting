@@ -6,7 +6,7 @@ import javax.persistence.*;
 
 @Data
 @Entity
-public class MetricModelMapping {
+public class MetricDetectorMapping {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,6 +17,6 @@ public class MetricModelMapping {
     private Metric metric;
 
     @ManyToOne
-    @JoinColumn(name = "model_id")
-    private Model model;
+    @JoinColumn(name = "detector_id")
+    private Detector detector;
 }

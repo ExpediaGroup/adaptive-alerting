@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.repo;
 
 import com.expedia.adaptivealerting.modelservice.entity.Model;
-import com.expedia.adaptivealerting.modelservice.entity.projection.InlineType;
+import com.expedia.adaptivealerting.modelservice.entity.projection.ModelProjection;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -29,11 +29,23 @@ import java.util.List;
  *
  * @author kashah
  */
-@RepositoryRestResource(excerptProjection = InlineType.class)
+
+@RepositoryRestResource(excerptProjection = ModelProjection.class)
 public interface ModelRepository extends PagingAndSortingRepository<Model, Long> {
 
-    List<Model> findByUuid(@Param("uuid") String uuid);
+    List<Model> findByDetectorIdOrderByBuildTimestampDesc(@Param("detectorId") Long detectorId);
 
-    @Query("select mmm.model from MetricModelMapping mmm where mmm.metric.hash = :hash")
+    @Query(nativeQuery = true, value = "SELECT *\n" +
+            "FROM model m1\n" +
+            "       join (SELECT model.detector_id, MAX(model.last_build_ts) max_last_build_ts\n" +
+            "             FROM model\n" +
+            "             where detector_id in(SELECT detector_id\n" +
+            "                                  from metric_detector_mapping\n" +
+            "                                  where metric_id =\n" +
+            "                                        (SELECT m.id from metric m where hash = :hash))\n" +
+            "             GROUP BY model.detector_id) filtered_table\n" +
+            "where m1.detector_id = filtered_table.detector_id\n" +
+            "  and m1.last_build_ts = filtered_table.max_last_build_ts;")
     List<Model> findByMetricHash(@Param("hash") String hash);
+
 }

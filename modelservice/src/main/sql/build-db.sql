@@ -19,27 +19,36 @@ create table model_type (
   date_created timestamp                              default CURRENT_TIMESTAMP
 );
 
-create table model (
-  id                int unsigned primary key not null auto_increment,
-  uuid              char(36) unique          not null,
-  type_id           smallint unsigned        not null,
-  hyperparams       json,
-  training_location varchar(300),
-  weak_sigmas       decimal(3, 3),
-  strong_sigmas     decimal(3, 3),
-  last_build_ts     timestamp,
-  seyren_flag       boolean                           default false,
-  other_stuff       json,
-  date_created      timestamp                         default CURRENT_TIMESTAMP,
-  constraint type_id_fk foreign key (type_id) references model_type (id)
+CREATE TABLE detector (
+  id            int unsigned primary key NOT NULL AUTO_INCREMENT,
+  uuid          char(36) unique          not null,
+  model_type_id smallint unsigned        not null,
+  hyperparams   json,
+  training_meta json,
+  seyren_flag   boolean                           default false,
+  date_created  timestamp                NULL     DEFAULT CURRENT_TIMESTAMP,
+  created_by    varchar(100)
+  constraint model_type_id_fk foreign key (model_type_id) references model_type (id)
 );
 
-create table metric_model_mapping (
+create table model (
+  id            int unsigned primary key not null auto_increment,
+  params        json,
+  detector_id   int unsigned             not null,
+  weak_sigmas       decimal(3, 3),
+  strong_sigmas     decimal(3, 3),
+  last_build_ts timestamp,
+  other_stuff   json,
+  date_created  timestamp                         default CURRENT_TIMESTAMP,
+  constraint detector_id_fk foreign key (detector_id) references detector (id)
+);
+
+create table metric_detector_mapping (
   id           int unsigned primary key not null auto_increment,
   metric_id    int unsigned             not null,
-  model_id     int unsigned             not null,
+  detector_id  int unsigned             not null,
   date_created timestamp                         default CURRENT_TIMESTAMP,
   constraint metric_id_fk foreign key (metric_id) references metric (id),
-  constraint model_id_fk foreign key (model_id) references model (id),
-  unique index (metric_id, model_id)
+  constraint detector_id_mapping_fk foreign key (detector_id) references detector (id),
+  unique index (metric_id, detector_id)
 );
