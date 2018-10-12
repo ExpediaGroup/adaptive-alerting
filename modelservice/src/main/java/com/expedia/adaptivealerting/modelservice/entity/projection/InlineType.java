@@ -41,4 +41,6 @@ public interface InlineType {
 
     Map<String, Object> getTrainingMetaData();
 
+    String getCreatedBy();
+
 }

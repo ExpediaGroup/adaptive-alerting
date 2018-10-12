@@ -27,6 +27,7 @@ CREATE TABLE detector (
   training_meta json,
   seyren_flag   boolean                           default false,
   date_created  timestamp                NULL     DEFAULT CURRENT_TIMESTAMP,
+  created_by    varchar(100)
   constraint model_type_id_fk foreign key (model_type_id) references model_type (id)
 );
 

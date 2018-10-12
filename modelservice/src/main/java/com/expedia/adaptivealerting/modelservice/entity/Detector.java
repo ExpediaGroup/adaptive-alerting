@@ -31,4 +31,7 @@ public class Detector {
     @Convert(converter = JpaConverterJson.class)
     private Map<String, Object> trainingMetaData;
 
+    @Column(name = "created_by")
+    private String createdBy;
+
 }
