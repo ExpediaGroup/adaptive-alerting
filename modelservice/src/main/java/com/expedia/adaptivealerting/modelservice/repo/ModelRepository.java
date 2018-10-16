@@ -48,4 +48,8 @@ public interface ModelRepository extends PagingAndSortingRepository<Model, Long>
             "  and m1.last_build_ts = filtered_table.max_last_build_ts;")
     List<Model> findByMetricHash(@Param("hash") String hash);
 
+
+    @Query(nativeQuery = true, value = "SELECT * FROM model where last_build_ts =(SELECT MAX(m1.last_build_ts) from model m1 , detector d1 where d1.id=m1.detector_id and d1.uuid=:uuid) LIMIT 1")
+    Model findByDetectorUuid(@Param("uuid") String uuid);
+
 }
