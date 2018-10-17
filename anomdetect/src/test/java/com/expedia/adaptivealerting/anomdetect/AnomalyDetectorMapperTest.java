@@ -107,9 +107,9 @@ public final class AnomalyDetectorMapperTest {
     }
     
     private void initDependencies() {
-        when(modelServiceConnector.findModels(mappedDefinition))
+        when(modelServiceConnector.findDetectors(mappedDefinition))
                 .thenReturn(detectorResources);
-        when(modelServiceConnector.findModels(unmappedDefinition))
+        when(modelServiceConnector.findDetectors(unmappedDefinition))
                 .thenReturn(emptyDetectorResources);
     }
 }

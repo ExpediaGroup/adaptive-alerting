@@ -64,7 +64,7 @@ public class ModelServiceConnector {
         this.uriTemplate = uriTemplate;
     }
     
-    public Resources<DetectorResource> findModels(MetricDefinition metricDefinition) {
+    public Resources<DetectorResource> findDetectors(MetricDefinition metricDefinition) {
         notNull(metricDefinition, "metricDefinition can't be null");
         
         final String id = metricTankIdFactory.getId(metricDefinition);

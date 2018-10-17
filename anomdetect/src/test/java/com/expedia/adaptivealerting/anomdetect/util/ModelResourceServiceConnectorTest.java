@@ -82,12 +82,12 @@ public class ModelResourceServiceConnectorTest {
     
     @Test
     public void testFindDetectors() {
-        final Resources<DetectorResource> results = connector.findModels(metricDefinition);
+        final Resources<DetectorResource> results = connector.findDetectors(metricDefinition);
     }
     
     @Test(expected = IllegalArgumentException.class)
     public void testFindDetectors_metricDefinitionNotNull() {
-        connector.findModels(null);
+        connector.findDetectors(null);
     }
     
     private void initTestObjects() throws Exception {
