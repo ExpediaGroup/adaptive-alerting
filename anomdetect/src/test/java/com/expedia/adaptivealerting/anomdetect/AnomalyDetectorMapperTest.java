@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
-import com.expedia.adaptivealerting.anomdetect.util.ModelResources;
+import com.expedia.adaptivealerting.anomdetect.util.DetectorResource;
+import com.expedia.adaptivealerting.anomdetect.util.DetectorResources;
 import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.expedia.adaptivealerting.anomdetect.util.ModelTypeResource;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
@@ -60,9 +60,9 @@ public final class AnomalyDetectorMapperTest {
     
     private MetricData mappedData;
     private MetricData unmappedData;
-    private ModelResource modelResource;
-    private ModelResources modelResources;
-    private ModelResources emptyModelResources;
+    private DetectorResource detectorResource;
+    private DetectorResources detectorResources;
+    private DetectorResources emptyDetectorResources;
     
     @Before
     public void setUp() {
@@ -98,18 +98,18 @@ public final class AnomalyDetectorMapperTest {
         this.mappedData = new MetricData(mappedDefinition, 9, System.currentTimeMillis());
         this.unmappedData = new MetricData(unmappedDefinition, 9, System.currentTimeMillis());
         
-        this.modelResource = new ModelResource(
+        this.detectorResource = new DetectorResource(
                 "7629c28a-5958-4ca7-9aaa-49b95d3481ff",
                 new ModelTypeResource("ewma-detector"));
         
-        this.modelResources = new ModelResources(Collections.singletonList(modelResource));
-        this.emptyModelResources = new ModelResources(Collections.EMPTY_LIST);
+        this.detectorResources = new DetectorResources(Collections.singletonList(detectorResource));
+        this.emptyDetectorResources = new DetectorResources(Collections.EMPTY_LIST);
     }
     
     private void initDependencies() {
-        when(modelServiceConnector.findModels(mappedDefinition))
-                .thenReturn(modelResources);
-        when(modelServiceConnector.findModels(unmappedDefinition))
-                .thenReturn(emptyModelResources);
+        when(modelServiceConnector.findDetectors(mappedDefinition))
+                .thenReturn(detectorResources);
+        when(modelServiceConnector.findDetectors(unmappedDefinition))
+                .thenReturn(emptyDetectorResources);
     }
 }

@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
+import com.expedia.adaptivealerting.anomdetect.util.DetectorResource;
 import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.metrics.MetricData;
@@ -67,13 +67,13 @@ public final class AnomalyDetectorMapper {
         notNull(metricData, "metricData can't be null");
         
         final MetricDefinition metricDefinition = metricData.getMetricDefinition();
-        final Resources<ModelResource> modelResources = modelServiceConnector.findModels(metricDefinition);
-        final Collection<ModelResource> modelCollection = modelResources.getContent();
+        final Resources<DetectorResource> detectorResources = modelServiceConnector.findDetectors(metricDefinition);
+        final Collection<DetectorResource> detectorCollection = detectorResources.getContent();
         
         // TODO This logging is expensive. Don't want to keep it permanently, at least not at INFO level. [WLW]
-        log.info("metricData={}, models={}", metricData, Arrays.toString(modelCollection.toArray()));
+        log.info("metricData={}, models={}", metricData, Arrays.toString(detectorCollection.toArray()));
         
-        return modelCollection.stream()
+        return detectorCollection.stream()
                 .map(model -> {
                     final UUID detectorUuid = UUID.fromString(model.getUuid());
                     final String detectorType = model.getType().getKey();
