@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
+import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.typesafe.config.Config;
 
 import java.util.UUID;
@@ -39,7 +40,8 @@ public interface AnomalyDetectorFactory<T extends AnomalyDetector> {
      * pretrained model.
      *
      * @param uuid Detector UUID.
+     * @param modelServiceConnector
      * @return Anomaly detector, or {@literal null} if the creation attempt failed.
      */
-    T create(UUID uuid);
+    T create(UUID uuid, ModelServiceConnector modelServiceConnector);
 }

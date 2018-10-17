@@ -15,16 +15,17 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.S3Object;
+import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
+import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
-import com.expedia.adaptivealerting.core.util.jackson.ObjectMapperUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.hateoas.Resources;
 
-import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -42,41 +43,32 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @Slf4j
 public final class BasicAnomalyDetectorFactory<T extends BasicAnomalyDetector> implements AnomalyDetectorFactory<T> {
     private Class<T> detectorClass;
-    private String region;
-    private String bucket;
-    private String folder;
-    
-    private AmazonS3 s3;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
-    
+
     @Override
     public void init(Config config) {
         notNull(config, "config can't be null");
-    
+
         this.detectorClass = ReflectionUtil.classForName(config.getString("detectorClass"));
-        this.region = config.getString("region");
-        this.bucket = config.getString("bucket");
-        this.folder = config.getString("folder");
-        
-        this.s3 = AmazonS3ClientBuilder.standard()
-                .withRegion(region)
-                .build();
-        
-        log.info("Initialized factory: detectorClass={}, region={}, bucket={}, folder={}",
-                detectorClass.getName(), region, bucket, folder);
+        log.info("Initialized factory: detectorClass={}", detectorClass.getName());
     }
-    
+
     @Override
-    public T create(UUID uuid) {
+    public T create(UUID uuid, ModelServiceConnector modelServiceConnector) {
         notNull(uuid, "uuid can't be null");
-        
-        final String path = folder + "/" + uuid.toString() + ".json";
-        log.info("Loading model: path={}", path);
-        final S3Object s3Obj = s3.getObject(bucket, path);
-        final InputStream is = s3Obj.getObjectContent();
-        final AnomalyDetectorModel model = ObjectMapperUtil.readValue(objectMapper, is, AnomalyDetectorModel.class);
-        log.info("Loaded model: {}", model);
-        
+
+        final Resources<ModelResource> modelResources = modelServiceConnector.findModels(uuid);
+        final Collection<ModelResource> modelResourceCollection = modelResources.getContent();
+
+        List<ModelResource> modelResourceList = new ArrayList<>(modelResourceCollection);
+
+        if (modelResourceList.size() < 1) {
+            log.error("No model found for uuid = {}", uuid);
+        }
+        final AnomalyDetectorModel model = modelResourceList.get(0);
+        log.info("Loaded model: {}", modelResourceList.get(0));
+
         T detector = ReflectionUtil.newInstance(detectorClass);
         detector.init(model);
         return detector;

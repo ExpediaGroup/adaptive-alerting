@@ -42,7 +42,11 @@ public final class ConstantThresholdAnomalyDetector implements AnomalyDetector {
     
     @NonNull
     private final ConstantThresholdParams params;
-    
+
+    public ConstantThresholdAnomalyDetector() {
+        this(UUID.randomUUID(), new ConstantThresholdParams());
+    }
+
     public ConstantThresholdAnomalyDetector(ConstantThresholdParams params) {
         this(UUID.randomUUID(), params);
     }
