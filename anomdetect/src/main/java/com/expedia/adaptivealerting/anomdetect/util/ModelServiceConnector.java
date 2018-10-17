@@ -64,16 +64,16 @@ public class ModelServiceConnector {
         this.uriTemplate = uriTemplate;
     }
     
-    public Resources<ModelResource> findModels(MetricDefinition metricDefinition) {
+    public Resources<DetectorResource> findModels(MetricDefinition metricDefinition) {
         notNull(metricDefinition, "metricDefinition can't be null");
         
         final String id = metricTankIdFactory.getId(metricDefinition);
         final String uri = String.format(uriTemplate, id);
         
-        log.info("Finding models: metricDefinition={}, id={}, uri={}", metricDefinition, id, uri);
+        log.info("Finding detectors: metricDefinition={}, id={}, uri={}", metricDefinition, id, uri);
         try {
             final Content content = httpClient.get(uri);
-            return objectMapper.readValue(content.asBytes(), ModelResources.class);
+            return objectMapper.readValue(content.asBytes(), DetectorResources.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -52,7 +52,7 @@ public class ModelResourceServiceConnectorTest {
     // Test objects
     private MetricDefinition metricDefinition;
     private Content modelsContent;
-    private Resources<ModelResource> modelResources;
+    private Resources<DetectorResource> detectorResources;
     
     // Util
     
@@ -82,7 +82,7 @@ public class ModelResourceServiceConnectorTest {
     
     @Test
     public void testFindDetectors() {
-        final Resources<ModelResource> results = connector.findModels(metricDefinition);
+        final Resources<DetectorResource> results = connector.findModels(metricDefinition);
     }
     
     @Test(expected = IllegalArgumentException.class)
@@ -100,14 +100,14 @@ public class ModelResourceServiceConnectorTest {
         
         this.metricDefinition = new MetricDefinition("some-key", new TagCollection(tags), TagCollection.EMPTY);
         
-        final List<ModelResource> models = new ArrayList<>();
-        models.add(new ModelResource("90c37a3c-f6bb-4c00-b41b-191909cccfb7", new ModelTypeResource("ewma-detector")));
-        models.add(new ModelResource("3217d4be-9c33-490f-828e-c976b393b000", new ModelTypeResource("aquila-detector")));
+        final List<DetectorResource> models = new ArrayList<>();
+        models.add(new DetectorResource("90c37a3c-f6bb-4c00-b41b-191909cccfb7", new ModelTypeResource("ewma-detector")));
+        models.add(new DetectorResource("3217d4be-9c33-490f-828e-c976b393b000", new ModelTypeResource("aquila-detector")));
         
-        this.modelResources = new Resources<>(models);
+        this.detectorResources = new Resources<>(models);
         
         final ObjectMapper objectMapper = new ObjectMapper();
-        final byte[] modelResourcesBytes = objectMapper.writeValueAsBytes(modelResources);
+        final byte[] modelResourcesBytes = objectMapper.writeValueAsBytes(detectorResources);
         this.modelsContent = new Content(modelResourcesBytes, ContentType.APPLICATION_JSON);
     }
     
