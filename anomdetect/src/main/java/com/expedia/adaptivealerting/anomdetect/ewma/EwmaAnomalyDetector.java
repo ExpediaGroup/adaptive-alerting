@@ -16,6 +16,8 @@
 package com.expedia.adaptivealerting.anomdetect.ewma;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorModel;
+import com.expedia.adaptivealerting.anomdetect.BasicAnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
@@ -47,7 +49,7 @@ import static java.lang.Math.sqrt;
  * @see <a href="https://www.itl.nist.gov/div898/handbook/pmc/section3/pmc324.htm">EWMA Control Charts</a>
  */
 @Data
-public final class EwmaAnomalyDetector implements AnomalyDetector {
+public final class EwmaAnomalyDetector implements BasicAnomalyDetector {
     
     @NonNull
     private UUID uuid;
@@ -80,8 +82,19 @@ public final class EwmaAnomalyDetector implements AnomalyDetector {
         params.validate();
         
         this.uuid = uuid;
+        loadParams(params);
+    }
+
+    private void loadParams(EwmaParams params) {
         this.params = params;
         this.mean = params.getInitMeanEstimate();
+    }
+
+    @Override
+    public void init(AnomalyDetectorModel anomalyDetectorModel) {
+        if (anomalyDetectorModel instanceof EwmaModel) {
+            loadParams(((EwmaModel) anomalyDetectorModel).getParams());
+        }
     }
     
     @Override

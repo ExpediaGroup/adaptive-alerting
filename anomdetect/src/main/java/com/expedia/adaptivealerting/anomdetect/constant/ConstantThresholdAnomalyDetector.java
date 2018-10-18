@@ -16,6 +16,8 @@
 package com.expedia.adaptivealerting.anomdetect.constant;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorModel;
+import com.expedia.adaptivealerting.anomdetect.BasicAnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
@@ -35,7 +37,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  */
 @Data
 @RequiredArgsConstructor
-public final class ConstantThresholdAnomalyDetector implements AnomalyDetector {
+public final class ConstantThresholdAnomalyDetector implements BasicAnomalyDetector {
     
     @NonNull
     private final UUID uuid;
@@ -50,6 +52,9 @@ public final class ConstantThresholdAnomalyDetector implements AnomalyDetector {
     public ConstantThresholdAnomalyDetector(ConstantThresholdParams params) {
         this(UUID.randomUUID(), params);
     }
+
+    @Override
+    public void init(AnomalyDetectorModel anomalyDetectorModel) { }
     
     @Override
     public AnomalyResult classify(MetricData metricData) {

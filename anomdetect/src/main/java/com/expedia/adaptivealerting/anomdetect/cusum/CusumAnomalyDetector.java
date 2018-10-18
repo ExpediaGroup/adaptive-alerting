@@ -16,6 +16,8 @@
 package com.expedia.adaptivealerting.anomdetect.cusum;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorModel;
+import com.expedia.adaptivealerting.anomdetect.BasicAnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.metrics.MetricData;
@@ -39,14 +41,14 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author kashah
  */
 @Data
-public final class CusumAnomalyDetector implements AnomalyDetector {
+public final class CusumAnomalyDetector implements BasicAnomalyDetector {
     private static final double STD_DEV_DIVISOR = 1.128;
     
     @NonNull
     private final UUID uuid;
     
     @NonNull
-    private final CusumParams params;
+    private CusumParams params;
     
     /**
      * Total number of data points seen so far.
@@ -88,6 +90,18 @@ public final class CusumAnomalyDetector implements AnomalyDetector {
         this.uuid = uuid;
         this.params = params;
         this.prevValue = params.getInitMeanEstimate();
+    }
+
+    private void loadParams(CusumParams params) {
+        this.params = params;
+        this.prevValue = params.getInitMeanEstimate();
+    }
+
+    @Override
+    public void init(AnomalyDetectorModel anomalyDetectorModel) {
+        if (anomalyDetectorModel instanceof CusumModel) {
+            loadParams(((CusumModel) anomalyDetectorModel).getParams());
+        }
     }
     
     @Override
