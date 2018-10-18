@@ -42,7 +42,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 public final class ConstantThresholdAnomalyDetector implements BasicAnomalyDetector {
     
     @NonNull
-    private final UUID uuid;
+    private UUID uuid;
     
     @NonNull
     private ConstantThresholdParams params;
@@ -61,7 +61,9 @@ public final class ConstantThresholdAnomalyDetector implements BasicAnomalyDetec
 
     @Override
     public void init(AnomalyDetectorModel anomalyDetectorModel) {
-        loadParams(extractParams(anomalyDetectorModel, ConstantThresholdParams.class));
+        ModelResource mr = extractModelResource(anomalyDetectorModel);
+        this.uuid = mr.getUuid();
+        loadParams(extractParams(mr, ConstantThresholdParams.class));
     }
     
     @Override

@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.anomdetect.ewma;
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorModel;
 import com.expedia.adaptivealerting.anomdetect.BasicAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
@@ -92,7 +93,9 @@ public final class EwmaAnomalyDetector implements BasicAnomalyDetector {
 
     @Override
     public void init(AnomalyDetectorModel anomalyDetectorModel) {
-        loadParams(extractParams(anomalyDetectorModel, EwmaParams.class));
+        ModelResource mr = extractModelResource(anomalyDetectorModel);
+        this.uuid = mr.getUuid();
+        loadParams(extractParams(mr, EwmaParams.class));
     }
     
     @Override

@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.anomdetect.cusum;
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorModel;
 import com.expedia.adaptivealerting.anomdetect.BasicAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.metrics.MetricData;
@@ -45,7 +46,7 @@ public final class CusumAnomalyDetector implements BasicAnomalyDetector {
     private static final double STD_DEV_DIVISOR = 1.128;
     
     @NonNull
-    private final UUID uuid;
+    private UUID uuid;
     
     @NonNull
     private CusumParams params;
@@ -88,8 +89,7 @@ public final class CusumAnomalyDetector implements BasicAnomalyDetector {
         notNull(params, "params can't be null");
         
         this.uuid = uuid;
-        this.params = params;
-        this.prevValue = params.getInitMeanEstimate();
+        loadParams(params);
     }
 
     private void loadParams(CusumParams params) {
@@ -99,7 +99,9 @@ public final class CusumAnomalyDetector implements BasicAnomalyDetector {
 
     @Override
     public void init(AnomalyDetectorModel anomalyDetectorModel) {
-        loadParams(extractParams(anomalyDetectorModel, CusumParams.class));
+        ModelResource mr = extractModelResource(anomalyDetectorModel);
+        this.uuid = mr.getUuid();
+        loadParams(extractParams(mr, CusumParams.class));
     }
     
     @Override

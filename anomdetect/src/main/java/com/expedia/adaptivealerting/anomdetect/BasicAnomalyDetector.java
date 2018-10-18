@@ -34,10 +34,17 @@ public interface BasicAnomalyDetector extends AnomalyDetector {
      */
     void init(AnomalyDetectorModel anomalyDetectorModel);
 
-    default <T> T extractParams(AnomalyDetectorModel anomalyDetectorModel, Class<T> clazz) {
+    default <T> T extractParams(ModelResource modelResource, Class<T> clazz) {
+        if (modelResource == null) {
+            return null;
+        }
+        Map<String, Object> params = modelResource.getParams();
+        return new ObjectMapper().convertValue(params, clazz);
+    }
+
+    default ModelResource extractModelResource(AnomalyDetectorModel anomalyDetectorModel) {
         if (anomalyDetectorModel instanceof ModelResource) {
-            Map<String, Object> params = ((ModelResource) anomalyDetectorModel).getParams();
-            return new ObjectMapper().convertValue(params, clazz);
+            return (ModelResource) anomalyDetectorModel;
         }
         return null;
     }

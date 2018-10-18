@@ -114,7 +114,9 @@ public final class PewmaAnomalyDetector implements BasicAnomalyDetector {
 
     @Override
     public void init(AnomalyDetectorModel anomalyDetectorModel) {
-        loadParams(extractParams(anomalyDetectorModel, PewmaParams.class));
+        ModelResource mr = extractModelResource(anomalyDetectorModel);
+        this.uuid = mr.getUuid();
+        loadParams(extractParams(mr, PewmaParams.class));
     }
     
     @Override
