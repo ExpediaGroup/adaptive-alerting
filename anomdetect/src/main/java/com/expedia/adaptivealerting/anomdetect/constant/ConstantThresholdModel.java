@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.constant;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorModel;
+import com.expedia.adaptivealerting.anomdetect.util.ModelTypeResource;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
@@ -26,6 +27,6 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ConstantThresholdModel implements AnomalyDetectorModel {
     private String uuid;
-    private String type;
+    private ModelTypeResource detectorType;
     private ConstantThresholdParams params;
 }

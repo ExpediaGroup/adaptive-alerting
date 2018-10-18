@@ -36,6 +36,8 @@ public class ModelResource implements AnomalyDetectorModel {
 
     private UUID uuid;
 
+    private ModelTypeResource detectorType;
+
     private Map<String, Object> params;
 
     private Double weakSigmas;
