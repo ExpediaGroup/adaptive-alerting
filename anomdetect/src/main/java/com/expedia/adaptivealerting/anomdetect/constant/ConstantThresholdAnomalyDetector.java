@@ -17,14 +17,17 @@ package com.expedia.adaptivealerting.anomdetect.constant;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorModel;
 import com.expedia.adaptivealerting.anomdetect.BasicAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.metrics.MetricData;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Map;
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -55,11 +58,10 @@ public final class ConstantThresholdAnomalyDetector implements BasicAnomalyDetec
     private void loadParams(ConstantThresholdParams params) {
         this.params = params;
     }
+
     @Override
     public void init(AnomalyDetectorModel anomalyDetectorModel) {
-        if (anomalyDetectorModel instanceof ConstantThresholdModel) {
-            loadParams(((ConstantThresholdModel) anomalyDetectorModel).getParams());
-        }
+        loadParams(extractParams(anomalyDetectorModel, ConstantThresholdParams.class));
     }
     
     @Override

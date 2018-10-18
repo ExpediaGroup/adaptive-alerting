@@ -15,6 +15,11 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
+import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.Map;
+
 /**
  * Basic anomaly detector interface. A basic anomaly detector is one that generally has a single fixed model.
  *
@@ -28,4 +33,12 @@ public interface BasicAnomalyDetector extends AnomalyDetector {
      * @param anomalyDetectorModel Anomaly detector model.
      */
     void init(AnomalyDetectorModel anomalyDetectorModel);
+
+    default <T> T extractParams(AnomalyDetectorModel anomalyDetectorModel, Class<T> clazz) {
+        if (anomalyDetectorModel instanceof ModelResource) {
+            Map<String, Object> params = ((ModelResource) anomalyDetectorModel).getParams();
+            return new ObjectMapper().convertValue(params, clazz);
+        }
+        return null;
+    }
 }

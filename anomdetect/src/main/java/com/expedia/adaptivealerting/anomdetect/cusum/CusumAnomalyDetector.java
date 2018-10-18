@@ -99,9 +99,7 @@ public final class CusumAnomalyDetector implements BasicAnomalyDetector {
 
     @Override
     public void init(AnomalyDetectorModel anomalyDetectorModel) {
-        if (anomalyDetectorModel instanceof CusumModel) {
-            loadParams(((CusumModel) anomalyDetectorModel).getParams());
-        }
+        loadParams(extractParams(anomalyDetectorModel, CusumParams.class));
     }
     
     @Override

@@ -92,9 +92,7 @@ public final class EwmaAnomalyDetector implements BasicAnomalyDetector {
 
     @Override
     public void init(AnomalyDetectorModel anomalyDetectorModel) {
-        if (anomalyDetectorModel instanceof EwmaModel) {
-            loadParams(((EwmaModel) anomalyDetectorModel).getParams());
-        }
+        loadParams(extractParams(anomalyDetectorModel, EwmaParams.class));
     }
     
     @Override

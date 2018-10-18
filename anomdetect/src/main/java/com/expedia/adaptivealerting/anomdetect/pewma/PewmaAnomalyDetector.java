@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.anomdetect.pewma;
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorModel;
 import com.expedia.adaptivealerting.anomdetect.BasicAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
@@ -25,6 +26,7 @@ import com.expedia.metrics.MetricData;
 import lombok.Data;
 import lombok.NonNull;
 
+import java.util.Map;
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -112,9 +114,7 @@ public final class PewmaAnomalyDetector implements BasicAnomalyDetector {
 
     @Override
     public void init(AnomalyDetectorModel anomalyDetectorModel) {
-        if (anomalyDetectorModel instanceof PewmaModel) {
-            loadParams(((PewmaModel) anomalyDetectorModel).getParams());
-        }
+        loadParams(extractParams(anomalyDetectorModel, PewmaParams.class));
     }
     
     @Override
