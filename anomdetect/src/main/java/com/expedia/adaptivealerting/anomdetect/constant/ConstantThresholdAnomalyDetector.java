@@ -38,12 +38,8 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author Willie Wheeler
  */
 @Data
-@RequiredArgsConstructor
-public final class ConstantThresholdAnomalyDetector implements BasicAnomalyDetector {
-    
-    @NonNull
-    private UUID uuid;
-    
+public final class ConstantThresholdAnomalyDetector extends BasicAnomalyDetector<ConstantThresholdParams> {
+
     @NonNull
     private ConstantThresholdParams params;
 
@@ -55,15 +51,22 @@ public final class ConstantThresholdAnomalyDetector implements BasicAnomalyDetec
         this(UUID.randomUUID(), params);
     }
 
-    private void loadParams(ConstantThresholdParams params) {
-        this.params = params;
+    public ConstantThresholdAnomalyDetector(UUID uuid, ConstantThresholdParams params) {
+        notNull(uuid, "uuid can't be null");
+        notNull(params, "params can't be null");
+
+        setUuid(uuid);
+        loadParams(params);
     }
 
     @Override
-    public void init(AnomalyDetectorModel anomalyDetectorModel) {
-        ModelResource mr = extractModelResource(anomalyDetectorModel);
-        this.uuid = mr.getUuid();
-        loadParams(extractParams(mr, ConstantThresholdParams.class));
+    protected Class<ConstantThresholdParams> getParamsClass() {
+        return ConstantThresholdParams.class;
+    }
+
+    @Override
+    protected void loadParams(ConstantThresholdParams params) {
+        this.params = params;
     }
     
     @Override
@@ -71,6 +74,6 @@ public final class ConstantThresholdAnomalyDetector implements BasicAnomalyDetec
         notNull(metricData, "metricData can't be null");
         final AnomalyThresholds thresholds = params.getThresholds();
         final AnomalyLevel level = thresholds.classify(metricData.getValue());
-        return new AnomalyResult(uuid, metricData, level);
+        return new AnomalyResult(getUuid(), metricData, level);
     }
 }

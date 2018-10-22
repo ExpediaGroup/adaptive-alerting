@@ -15,10 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.cusum;
 
-import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorModel;
 import com.expedia.adaptivealerting.anomdetect.BasicAnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.metrics.MetricData;
@@ -42,11 +39,8 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author kashah
  */
 @Data
-public final class CusumAnomalyDetector implements BasicAnomalyDetector {
+public final class CusumAnomalyDetector extends BasicAnomalyDetector<CusumParams> {
     private static final double STD_DEV_DIVISOR = 1.128;
-    
-    @NonNull
-    private UUID uuid;
     
     @NonNull
     private CusumParams params;
@@ -88,20 +82,19 @@ public final class CusumAnomalyDetector implements BasicAnomalyDetector {
         notNull(uuid, "uuid can't be null");
         notNull(params, "params can't be null");
         
-        this.uuid = uuid;
+        setUuid(uuid);
         loadParams(params);
     }
 
-    private void loadParams(CusumParams params) {
-        this.params = params;
-        this.prevValue = params.getInitMeanEstimate();
+    @Override
+    protected Class<CusumParams> getParamsClass() {
+        return CusumParams.class;
     }
 
     @Override
-    public void init(AnomalyDetectorModel anomalyDetectorModel) {
-        ModelResource mr = extractModelResource(anomalyDetectorModel);
-        this.uuid = mr.getUuid();
-        loadParams(extractParams(mr, CusumParams.class));
+    protected void loadParams(CusumParams params) {
+        this.params = params;
+        this.prevValue = params.getInitMeanEstimate();
     }
     
     @Override
@@ -172,7 +165,7 @@ public final class CusumAnomalyDetector implements BasicAnomalyDetector {
             level = MODEL_WARMUP;
         }
         
-        return new AnomalyResult(uuid, metricData, level);
+        return new AnomalyResult(getUuid(), metricData, level);
     }
     
     private void resetSums() {

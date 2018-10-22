@@ -63,10 +63,11 @@ public final class BasicAnomalyDetectorFactory<T extends BasicAnomalyDetector> i
 
         List<ModelResource> modelResourceList = new ArrayList<>(modelResourceCollection);
 
-        if (modelResourceList.size() < 1) {
+        if (modelResourceList.isEmpty()) {
             log.error("No model found for uuid = {}", uuid);
+            return  null; // TODO: decide how to deal with this.
         }
-        final AnomalyDetectorModel model = modelResourceList.get(0);
+        final ModelResource model = modelResourceList.get(0);
         log.info("Loaded model: {}", modelResourceList.get(0));
 
         T detector = ReflectionUtil.newInstance(detectorClass);
