@@ -29,12 +29,12 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 public final class RandomCutForestAnomalyDetectorFactory implements AnomalyDetectorFactory<RandomCutForestAnomalyDetector> {
     
     @Override
-    public void init(Config config) {
+    public void init(Config config, ModelServiceConnector modelServiceConnector) {
         // TODO
     }
     
     @Override
-    public RandomCutForestAnomalyDetector create(UUID uuid, ModelServiceConnector modelServiceConnector) {
+    public RandomCutForestAnomalyDetector create(UUID uuid) {
         notNull(uuid, "uuid can't be null");
         
         // TODO Return different models for different metrics. [WLW]

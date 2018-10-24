@@ -33,23 +33,18 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  */
 @Slf4j
 public class AquilaAnomalyDetectorFactory implements AnomalyDetectorFactory<AquilaAnomalyDetector> {
-    
-//    private final ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json()
-//            .modules(new MetricsJavaModule())
-//            .build();
-    
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new MetricsJavaModule());
     
     private String uri;
     
     @Override
-    public void init(Config config) {
+    public void init(Config config, ModelServiceConnector modelServiceConnector) {
         this.uri = config.getString("uri");
         log.info("Initialized AquilaFactory: uri={}", uri);
     }
     
     @Override
-    public AquilaAnomalyDetector create(UUID uuid, ModelServiceConnector modelServiceConnector) {
+    public AquilaAnomalyDetector create(UUID uuid) {
         notNull(uuid, "uuid can't be null");
         return new AquilaAnomalyDetector(objectMapper, uri, uuid);
     }
