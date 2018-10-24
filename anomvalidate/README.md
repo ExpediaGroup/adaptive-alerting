@@ -1,1 +1,0 @@
-# Adaptive Alerting - Anomaly Validation
