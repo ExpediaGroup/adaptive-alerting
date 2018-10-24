@@ -16,6 +16,8 @@
 package com.expedia.adaptivealerting.kafka.detector;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorManager;
+import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
+import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.kafka.AbstractKafkaApp;
@@ -40,9 +42,7 @@ public final class KafkaAnomalyDetectorManager extends AbstractKafkaApp {
     
     public static void main(String[] args) {
         final Config appConfig = AppUtil.getAppConfig(ANOMALY_DETECTOR_MANAGER);
-        final Config detectorsConfig = appConfig.getConfig(DETECTORS);
-        final AnomalyDetectorManager manager = new AnomalyDetectorManager(detectorsConfig);
-        new KafkaAnomalyDetectorManager(appConfig, manager).start();
+        new KafkaAnomalyDetectorManager(appConfig, buildManager(appConfig)).start();
     }
     
     public KafkaAnomalyDetectorManager(Config appConfig, AnomalyDetectorManager manager) {
@@ -84,5 +84,12 @@ public final class KafkaAnomalyDetectorManager extends AbstractKafkaApp {
                 .filter((key, mappedMetricData) -> mappedMetricData != null)
                 .to(outboundTopic);
         return builder;
+    }
+
+    private static AnomalyDetectorManager buildManager(Config appConfig) {
+        final HttpClientWrapper httpClient = new HttpClientWrapper();
+        final String uriTemplate = appConfig.getString(MODEL_SERVICE_URI_TEMPLATE);
+        final ModelServiceConnector connector = new ModelServiceConnector(httpClient, uriTemplate);
+        return new AnomalyDetectorManager(appConfig.getConfig(DETECTORS),connector);
     }
 }

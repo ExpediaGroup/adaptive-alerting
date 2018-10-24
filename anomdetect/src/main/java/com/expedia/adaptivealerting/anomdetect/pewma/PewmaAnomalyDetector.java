@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.pewma;
 
-import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.BasicAnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
@@ -46,10 +46,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author David Sutherland
  */
 @Data
-public final class PewmaAnomalyDetector implements AnomalyDetector {
-    
-    @NonNull
-    private UUID uuid;
+public final class PewmaAnomalyDetector extends BasicAnomalyDetector<PewmaParams> {
     
     @NonNull
     private PewmaParams params;
@@ -95,8 +92,18 @@ public final class PewmaAnomalyDetector implements AnomalyDetector {
     public PewmaAnomalyDetector(UUID uuid, PewmaParams params) {
         notNull(uuid, "uuid can't be null");
         notNull(params, "params can't be null");
-        
-        this.uuid = uuid;
+
+        setUuid(uuid);
+        loadParams(params);
+    }
+
+    @Override
+    protected Class<PewmaParams> getParamsClass() {
+        return PewmaParams.class;
+    }
+
+    @Override
+    protected void loadParams(PewmaParams params) {
         this.params = params;
         this.adjAlpha = 1.0 - params.getAlpha();
         this.s1 = params.getInitMeanEstimate();
@@ -122,7 +129,7 @@ public final class PewmaAnomalyDetector implements AnomalyDetector {
         
         final AnomalyLevel level = thresholds.classifyExclusiveBounds(observed);
         
-        final AnomalyResult result = new AnomalyResult(uuid, metricData, level);
+        final AnomalyResult result = new AnomalyResult(getUuid(), metricData, level);
         result.setPredicted(mean);
         result.setThresholds(thresholds);
         return result;

@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.ewma;
 
-import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.BasicAnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
@@ -47,11 +47,8 @@ import static java.lang.Math.sqrt;
  * @see <a href="https://www.itl.nist.gov/div898/handbook/pmc/section3/pmc324.htm">EWMA Control Charts</a>
  */
 @Data
-public final class EwmaAnomalyDetector implements AnomalyDetector {
-    
-    @NonNull
-    private UUID uuid;
-    
+public final class EwmaAnomalyDetector extends BasicAnomalyDetector<EwmaParams> {
+
     @NonNull
     private EwmaParams params;
 
@@ -78,10 +75,20 @@ public final class EwmaAnomalyDetector implements AnomalyDetector {
         notNull(params, "params can't be null");
         
         params.validate();
-        
-        this.uuid = uuid;
+
+        setUuid(uuid);
+        loadParams(params);
+    }
+
+    @Override
+    protected void loadParams(EwmaParams params) {
         this.params = params;
         this.mean = params.getInitMeanEstimate();
+    }
+
+    @Override
+    protected Class<EwmaParams> getParamsClass() {
+        return EwmaParams.class;
     }
     
     @Override
@@ -103,7 +110,7 @@ public final class EwmaAnomalyDetector implements AnomalyDetector {
         
         final AnomalyLevel level = thresholds.classify(observed);
         
-        final AnomalyResult result = new AnomalyResult(uuid, metricData, level);
+        final AnomalyResult result = new AnomalyResult(getUuid(), metricData, level);
         result.setPredicted(this.mean);
         result.setThresholds(thresholds);
         return result;

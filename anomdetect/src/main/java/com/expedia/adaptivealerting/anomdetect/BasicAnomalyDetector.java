@@ -15,17 +15,45 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
+import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.UUID;
+
 /**
- * Basic anomaly detector interface. A basic anomaly detector is one that generally has a single fixed model.
+ * Basic anomaly detector abstract class. A basic anomaly detector is one that generally has a single fixed model.
  *
  * @author Willie Wheeler
  */
-public interface BasicAnomalyDetector extends AnomalyDetector {
+public abstract class BasicAnomalyDetector<T> implements AnomalyDetector {
+
+    private UUID uuid;
+
+    abstract protected Class<T> getParamsClass();
+
+    abstract protected void loadParams(T params);
     
     /**
      * Initializes this detector with the given model.
      *
-     * @param anomalyDetectorModel Anomaly detector model.
+     * @param modelResource Model resource.
      */
-    void init(AnomalyDetectorModel anomalyDetectorModel);
+    public void init(ModelResource modelResource) {
+        if (modelResource == null) {
+            return; // TODO: decide what to do in this case. Throw?
+        }
+        this.uuid = modelResource.getUuid();
+
+        T params = new ObjectMapper().convertValue(modelResource.getParams(), getParamsClass());
+        loadParams(params);
+    }
+
+    @Override
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    protected void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
 }

@@ -19,6 +19,9 @@ public interface ModelProjection {
     @Value("#{target.detector.getType()}")
     ModelType getDetectorType();
 
+    @Value("#{target.detector.getUuid()}")
+    String getUuid();
+
     Map<String, Object> getParams();
 
     Double getWeakSigmas();

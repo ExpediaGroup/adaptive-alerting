@@ -13,20 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.constant;
 
-import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorModel;
-import com.expedia.adaptivealerting.anomdetect.util.ModelTypeResource;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
+package com.expedia.adaptivealerting.anomdetect.util;
+
+import lombok.NoArgsConstructor;
+import org.springframework.hateoas.Resources;
+
+import java.util.Collection;
+
 
 /**
- * @author Willie Wheeler
+ * Model resources.
+ *
+ * @author Shubham Sethi
  */
-@Data
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class ConstantThresholdModel implements AnomalyDetectorModel {
-    private String uuid;
-    private ModelTypeResource detectorType;
-    private ConstantThresholdParams params;
+@NoArgsConstructor
+public class ModelResources extends Resources<ModelResource> {
+
+    public ModelResources(Collection<ModelResource> modelResources) {
+        super(modelResources);
+    }
 }

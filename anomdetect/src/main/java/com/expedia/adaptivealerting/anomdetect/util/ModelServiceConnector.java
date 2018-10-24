@@ -26,6 +26,7 @@ import org.springframework.hateoas.hal.Jackson2HalModule;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
@@ -78,4 +79,19 @@ public class ModelServiceConnector {
             throw new RuntimeException(e);
         }
     }
+
+    public Resources<ModelResource> findModels(UUID detectorUuid) {
+        notNull(detectorUuid, "detectorUuid can't be null");
+
+        final String uri = String.format(uriTemplate, detectorUuid);
+
+        log.info("Finding models: , uuid={}, uri={}", detectorUuid, uri);
+        try {
+            final Content content = httpClient.get(uri);
+            return objectMapper.readValue(content.asBytes(), ModelResources.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

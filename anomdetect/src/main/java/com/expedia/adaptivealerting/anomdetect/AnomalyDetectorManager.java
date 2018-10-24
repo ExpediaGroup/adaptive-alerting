@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
+import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
@@ -22,6 +23,7 @@ import com.expedia.metrics.MetricData;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigObject;
 import com.typesafe.config.ConfigValue;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
@@ -53,15 +55,20 @@ public final class AnomalyDetectorManager {
      * Max samples required to evaluate performance
      */
     private static final int PERFMON_SAMPLE_SIZE = 100;
-    
+
+    @Getter
+    private ModelServiceConnector modelServiceConnector;
+
     /**
      * Creates a new anomaly detector manager.
      *
      * @param detectorsConfig Factories config
+     * @param modelServiceConnector Model service connector.
      */
-    public AnomalyDetectorManager(Config detectorsConfig) {
+    public AnomalyDetectorManager(Config detectorsConfig, ModelServiceConnector modelServiceConnector) {
         notNull(detectorsConfig, "detectorsConfig can't be null");
-    
+        this.modelServiceConnector = modelServiceConnector;
+
         this.detectorFactories = new HashMap<>();
         
         // Calling detectorsConfig.entrySet() does a recursive traversal, which isn't what we want here.
@@ -128,7 +135,7 @@ public final class AnomalyDetectorManager {
                 log.warn("No AnomalyDetectorFactory registered for detectorType={}", detectorType);
             } else {
                 log.info("Creating anomaly detector: uuid={}, type={}", detectorUuid, detectorType);
-                final AnomalyDetector innerDetector = factory.create(detectorUuid);
+                final AnomalyDetector innerDetector = factory.create(detectorUuid,modelServiceConnector);
                 
                 // TODO Temporarily commenting this out because it's causing a problem
                 // for the RandomCutForest detector (NPE). We can reinstate after we

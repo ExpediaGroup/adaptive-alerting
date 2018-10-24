@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.rcf;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.typesafe.config.Config;
 
 import java.util.UUID;
@@ -33,7 +34,7 @@ public final class RandomCutForestAnomalyDetectorFactory implements AnomalyDetec
     }
     
     @Override
-    public RandomCutForestAnomalyDetector create(UUID uuid) {
+    public RandomCutForestAnomalyDetector create(UUID uuid, ModelServiceConnector modelServiceConnector) {
         notNull(uuid, "uuid can't be null");
         
         // TODO Return different models for different metrics. [WLW]

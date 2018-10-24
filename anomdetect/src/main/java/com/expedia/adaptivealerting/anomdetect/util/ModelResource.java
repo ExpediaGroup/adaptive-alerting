@@ -13,20 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.constant;
+package com.expedia.adaptivealerting.anomdetect.util;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorModel;
-import com.expedia.adaptivealerting.anomdetect.util.ModelTypeResource;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.sql.Timestamp;
+import java.util.Map;
+import java.util.UUID;
 
 /**
- * @author Willie Wheeler
+ * @author shsethi
  */
 @Data
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class ConstantThresholdModel implements AnomalyDetectorModel {
-    private String uuid;
+@NoArgsConstructor
+@AllArgsConstructor
+public class ModelResource implements AnomalyDetectorModel {
+
+    private Long id;
+
+    private UUID uuid;
+
     private ModelTypeResource detectorType;
-    private ConstantThresholdParams params;
+
+    private Map<String, Object> params;
+
+    private Double weakSigmas;
+
+    private Double strongSigmas;
+
+    private Timestamp buildTimestamp;
 }
