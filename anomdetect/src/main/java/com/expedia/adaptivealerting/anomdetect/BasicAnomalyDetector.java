@@ -17,6 +17,8 @@ package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Getter;
+import org.springframework.util.Assert;
 
 import java.util.UUID;
 
@@ -26,12 +28,11 @@ import java.util.UUID;
  * @author Willie Wheeler
  */
 public abstract class BasicAnomalyDetector<T> implements AnomalyDetector {
-
+    protected abstract Class<T> getParamsClass();
+    protected abstract void loadParams(T params);
+    
+    @Getter
     private UUID uuid;
-
-    abstract protected Class<T> getParamsClass();
-
-    abstract protected void loadParams(T params);
     
     /**
      * Initializes this detector with the given model.
@@ -39,20 +40,13 @@ public abstract class BasicAnomalyDetector<T> implements AnomalyDetector {
      * @param modelResource Model resource.
      */
     public void init(ModelResource modelResource) {
-        if (modelResource == null) {
-            return; // TODO: decide what to do in this case. Throw?
-        }
+        Assert.notNull(modelResource, "modelResource can't be null");
         this.uuid = modelResource.getUuid();
-
+        
         T params = new ObjectMapper().convertValue(modelResource.getParams(), getParamsClass());
         loadParams(params);
     }
-
-    @Override
-    public UUID getUuid() {
-        return uuid;
-    }
-
+    
     protected void setUuid(UUID uuid) {
         this.uuid = uuid;
     }
