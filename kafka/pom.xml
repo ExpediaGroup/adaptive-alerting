@@ -60,10 +60,6 @@
             <artifactId>adaptive-alerting-anomdetect</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.expedia.adaptivealerting</groupId>
-            <artifactId>adaptive-alerting-anomvalidate</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.expedia.www</groupId>
             <artifactId>haystack-commons</artifactId>
         </dependency>

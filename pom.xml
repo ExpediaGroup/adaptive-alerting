@@ -46,7 +46,6 @@
 
     <modules>
         <module>anomdetect</module>
-        <module>anomvalidate</module>
 
         <!-- TODO Temporary, move this out after we are pushing AA to Maven Central. -->
         <!-- Or else decouple Aquila from AA, which is probably even better. [WLW] -->
