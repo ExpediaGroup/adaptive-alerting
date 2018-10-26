@@ -30,8 +30,28 @@ import java.util.List;
 @RepositoryRestResource(excerptProjection = InlineType.class)
 public interface DetectorRepository extends PagingAndSortingRepository<Detector, Long> {
 
+    /**
+     * Finds a detector by its unique uuid, if any.
+     *
+     * @param uuid Detector uuid.
+     * @return Detector identified by the unique key.
+     */
     List<Detector> findByUuid(@Param("uuid") String uuid);
 
+    /**
+     * Finds a list of detectors owned by provided owner, if any.
+     *
+     * @param owner Detector owner.
+     * @return List of detectors
+     */
+    List<Detector> findByCreatedBy(@Param("owner") String owner);
+
+    /**
+     * Finds list of detectors attached to a given metric
+     *
+     * @param hash Metric hash.
+     * @return Metric identified by the unique key.
+     */
     @Query("select mmm.detector from MetricDetectorMapping mmm where mmm.metric.hash = :hash")
     List<Detector> findByMetricHash(@Param("hash") String hash);
 }
