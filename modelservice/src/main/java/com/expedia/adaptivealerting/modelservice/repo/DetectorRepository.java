@@ -41,10 +41,10 @@ public interface DetectorRepository extends PagingAndSortingRepository<Detector,
     /**
      * Finds a list of detectors owned by provided owner, if any.
      *
-     * @param owner Detector owner.
+     * @param user Detector user.
      * @return List of detectors
      */
-    List<Detector> findByCreatedBy(@Param("owner") String owner);
+    List<Detector> findByCreatedBy(@Param("user") String user);
 
     /**
      * Finds list of detectors attached to a given metric
