@@ -48,11 +48,11 @@ public interface MetricRepository extends PagingAndSortingRepository<Metric, Lon
 
 
     /**
-     * Finds a list of metrics by its owner.
+     * Finds a list of metrics by its user.
      *
-     * @param owner Detector owner.
-     * @return List of metrics by its owner
+     * @param user Detector user.
+     * @return List of metrics by its user
      */
-    @Query(nativeQuery = true, value = "SELECT * FROM metric WHERE id IN (SELECT metric_id FROM metric_detector_mapping WHERE detector_id IN (SELECT id FROM detector WHERE created_by=:owner))")
-    List<Metric> findByDetectorOwner(@Param("owner") String owner);
+    @Query(nativeQuery = true, value = "SELECT * FROM metric WHERE id IN (SELECT metric_id FROM metric_detector_mapping WHERE detector_id IN (SELECT id FROM detector WHERE created_by=:user))")
+    List<Metric> findByDetectorOwner(@Param("user") String user);
 }
