@@ -39,7 +39,7 @@ public interface DetectorRepository extends PagingAndSortingRepository<Detector,
     List<Detector> findByUuid(@Param("uuid") String uuid);
 
     /**
-     * Finds a list of detectors owned by provided user, if any.
+     * Finds a list of detectors created by provided user, if any.
      *
      * @param user Detector user.
      * @return List of detectors for the provided user.
@@ -47,7 +47,7 @@ public interface DetectorRepository extends PagingAndSortingRepository<Detector,
     List<Detector> findByCreatedBy(@Param("user") String user);
 
     /**
-     * Finds list of detectors attached to a given metric
+     * Finds a list of detectors attached to a given metric hash
      *
      * @param hash Metric hash.
      * @return Metric identified by the unique key.
