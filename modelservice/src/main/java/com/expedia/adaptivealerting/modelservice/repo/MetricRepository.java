@@ -16,8 +16,11 @@
 package com.expedia.adaptivealerting.modelservice.repo;
 
 import com.expedia.adaptivealerting.modelservice.entity.Metric;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 /**
  * Spring Data repository for metrics.
@@ -26,7 +29,7 @@ import org.springframework.data.repository.query.Param;
  * @author Willie Wheeler
  */
 public interface MetricRepository extends PagingAndSortingRepository<Metric, Long> {
-    
+
     /**
      * Finds a metric by its unique key, if any.
      *
@@ -34,7 +37,7 @@ public interface MetricRepository extends PagingAndSortingRepository<Metric, Lon
      * @return Metric identified by the unique key.
      */
     Metric findByKey(@Param("key") String key);
-    
+
     /**
      * Finds a metric by its unique hash.
      *
@@ -42,4 +45,14 @@ public interface MetricRepository extends PagingAndSortingRepository<Metric, Lon
      * @return Metric identified by the unique hash.
      */
     Metric findByHash(@Param("hash") String hash);
+
+
+    /**
+     * Finds a list of metrics by its user.
+     *
+     * @param user Detector user.
+     * @return List of metrics by its user
+     */
+    @Query(nativeQuery = true, value = "SELECT * FROM metric WHERE id IN (SELECT metric_id FROM metric_detector_mapping WHERE detector_id IN (SELECT id FROM detector WHERE created_by=:user))")
+    List<Metric> findByCreatedBy(@Param("user") String user);
 }
