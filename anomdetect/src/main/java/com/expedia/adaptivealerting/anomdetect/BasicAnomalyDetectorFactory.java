@@ -18,7 +18,6 @@ package com.expedia.adaptivealerting.anomdetect;
 import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
 import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.Resources;
@@ -43,19 +42,21 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @Slf4j
 public final class BasicAnomalyDetectorFactory<T extends BasicAnomalyDetector> implements AnomalyDetectorFactory<T> {
     private Class<T> detectorClass;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private ModelServiceConnector modelServiceConnector;
 
     @Override
-    public void init(Config config) {
+    public void init(Config config, ModelServiceConnector modelServiceConnector) {
         notNull(config, "config can't be null");
+        notNull(modelServiceConnector, "modelServiceConnector can't be null");
 
         this.detectorClass = ReflectionUtil.classForName(config.getString("detectorClass"));
+        this.modelServiceConnector = modelServiceConnector;
+        
         log.info("Initialized factory: detectorClass={}", detectorClass.getName());
     }
 
     @Override
-    public T create(UUID uuid, ModelServiceConnector modelServiceConnector) {
+    public T create(UUID uuid) {
         notNull(uuid, "uuid can't be null");
 
         final Resources<ModelResource> modelResources = modelServiceConnector.findModels(uuid);

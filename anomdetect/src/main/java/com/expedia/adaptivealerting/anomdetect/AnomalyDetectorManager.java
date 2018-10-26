@@ -83,7 +83,7 @@ public final class AnomalyDetectorManager {
                     detectorType, detectorFactoryClassname);
             final AnomalyDetectorFactory factory =
                     (AnomalyDetectorFactory) ReflectionUtil.newInstance(detectorFactoryClassname);
-            factory.init(detectorConfig);
+            factory.init(detectorConfig, modelServiceConnector);
             log.info("Initialized AnomalyDetectorFactory: type={}, className={}",
                     detectorType, detectorFactoryClassname);
 
@@ -135,7 +135,7 @@ public final class AnomalyDetectorManager {
                 log.warn("No AnomalyDetectorFactory registered for detectorType={}", detectorType);
             } else {
                 log.info("Creating anomaly detector: uuid={}, type={}", detectorUuid, detectorType);
-                final AnomalyDetector innerDetector = factory.create(detectorUuid,modelServiceConnector);
+                final AnomalyDetector innerDetector = factory.create(detectorUuid);
                 
                 // TODO Temporarily commenting this out because it's causing a problem
                 // for the RandomCutForest detector (NPE). We can reinstate after we

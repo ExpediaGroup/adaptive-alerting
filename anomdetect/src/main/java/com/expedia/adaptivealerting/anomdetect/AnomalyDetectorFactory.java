@@ -30,9 +30,10 @@ public interface AnomalyDetectorFactory<T extends AnomalyDetector> {
     /**
      * Initializes the factory.
      *
-     * @param config Factory configuration.
+     * @param config                Factory configuration.
+     * @param modelServiceConnector Model service connector.
      */
-    void init(Config config);
+    void init(Config config, ModelServiceConnector modelServiceConnector);
     
     /**
      * Creates an anomaly detector. This would usually involve looking up at least the model parameters from persistent
@@ -40,8 +41,7 @@ public interface AnomalyDetectorFactory<T extends AnomalyDetector> {
      * pretrained model.
      *
      * @param uuid Detector UUID.
-     * @param modelServiceConnector
      * @return Anomaly detector, or {@literal null} if the creation attempt failed.
      */
-    T create(UUID uuid, ModelServiceConnector modelServiceConnector);
+    T create(UUID uuid);
 }
