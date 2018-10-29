@@ -21,6 +21,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import org.springframework.data.rest.core.annotation.RestResource;
 
 import java.util.List;
 
@@ -29,11 +30,8 @@ import java.util.List;
  *
  * @author kashah
  */
-
 @RepositoryRestResource(excerptProjection = ModelProjection.class)
 public interface ModelRepository extends PagingAndSortingRepository<Model, Long> {
-
-    List<Model> findByDetectorIdOrderByBuildTimestampDesc(@Param("detectorId") Long detectorId);
 
     @Query(nativeQuery = true, value = "SELECT *\n" +
             "FROM model m1\n" +
@@ -47,12 +45,14 @@ public interface ModelRepository extends PagingAndSortingRepository<Model, Long>
             "where m1.detector_id = filtered_table.detector_id\n" +
             "  and m1.last_build_ts = filtered_table.max_last_build_ts;")
     List<Model> findByMetricHash(@Param("hash") String hash);
-
-
-    List<Model> findTopByDetectorUuidOrderByBuildTimestampDesc(@Param("uuid") String uuid);
-
-
+    
+    @RestResource(rel = "findByDetectorId", path = "findByDetectorId")
+    List<Model> findByDetectorIdOrderByBuildTimestampDesc(@Param("detectorId") Long detectorId);
+    
     @Query(nativeQuery = true, value = "SELECT * FROM model where last_build_ts =(SELECT MAX(m1.last_build_ts) from model m1 , detector d1 where d1.id=m1.detector_id and d1.uuid=:uuid) LIMIT 1")
     Model findByDetectorUuid(@Param("uuid") String uuid);
-
+    
+    // FIXME Shouldn't this return a single model? [WLW]
+    @RestResource(rel = "findLatestByDetectorUuid", path = "findLatestByDetectorUuid")
+    List<Model> findTopByDetectorUuidOrderByBuildTimestampDesc(@Param("uuid") String uuid);
 }
