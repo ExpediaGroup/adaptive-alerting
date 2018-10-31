@@ -49,7 +49,7 @@ public interface ModelRepository extends PagingAndSortingRepository<Model, Long>
     @RestResource(rel = "findByDetectorId", path = "findByDetectorId")
     List<Model> findByDetectorIdOrderByBuildTimestampDesc(@Param("detectorId") Long detectorId);
     
-    @Query(nativeQuery = true, value = "SELECT * FROM model where last_build_ts =(SELECT MAX(m1.last_build_ts) from model m1 , detector d1 where d1.id=m1.detector_id and d1.uuid=:uuid) LIMIT 1")
+    @Query(nativeQuery = true, value = "SELECT * FROM model m where m.id =(SELECT m1.id from model m1 , detector d1 where d1.id=m1.detector_id and d1.uuid=:uuid) LIMIT 1")
     Model findByDetectorUuid(@Param("uuid") String uuid);
     
     // FIXME Shouldn't this return a single model? [WLW]
