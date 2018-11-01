@@ -56,7 +56,7 @@ do_release() {
     echo 'Releasing...'
     export DOCKER_ORG="expediadotcom"
     export DOCKER_IMAGE_NAME=$APP_NAME
-    ../../scripts/publish-to-docker-hub.sh
+    ../../deployment/scripts/publish-to-docker-hub.sh
 }
 
 while :; do
