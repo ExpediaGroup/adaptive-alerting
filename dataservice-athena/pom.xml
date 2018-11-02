@@ -46,11 +46,11 @@
         </dependency>
         <dependency>
             <groupId>com.expedia.adaptivealerting</groupId>
-            <artifactId>adaptive-alerting-core</artifactId>
+            <artifactId>adaptive-alerting-dataservice</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.expedia.adaptivealerting</groupId>
-            <artifactId>adaptive-alerting-dataservice</artifactId>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
         </dependency>
         <dependency>
             <groupId>com.opencsv</groupId>

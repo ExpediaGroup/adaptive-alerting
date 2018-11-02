@@ -7,7 +7,7 @@ locals {
   configmap_name = "ad-manager-${local.checksum}"
 }
 
-resource "kubernetes_config_map" "haystack-config" {
+resource "kubernetes_config_map" "aa-config" {
   metadata {
     name = "${local.configmap_name}"
     namespace = "${var.namespace}"

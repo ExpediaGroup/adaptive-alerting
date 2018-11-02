@@ -3,7 +3,6 @@
 MAVEN := ../mvnw
 
 docker_build:
-	./docker/scripts/build-anomaly-validator.sh -b
 	./docker/scripts/build-ad-mapper.sh -b
 	./docker/scripts/build-ad-manager.sh -b
 
@@ -15,6 +14,5 @@ all: docker_build integration_test
 
 # build all and publish docker images
 release: docker_build
-	./docker/scripts/build-anomaly-validator.sh --release
 	./docker/scripts/build-ad-mapper.sh --release
 	./docker/scripts/build-ad-manager.sh --release

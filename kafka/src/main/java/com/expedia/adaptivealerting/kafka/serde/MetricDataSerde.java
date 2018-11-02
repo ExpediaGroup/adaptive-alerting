@@ -29,57 +29,52 @@ public class MetricDataSerde implements Serde<MetricData> {
 
     @Override
     public void configure(Map<String, ?> configs, boolean isKey) {
-
     }
 
     @Override
     public void close() {
-
     }
 
     @Override
     public Serializer<MetricData> serializer() {
-        return new DataSerializer();
+        return new MetricDataSerializer();
     }
 
     @Override
     public Deserializer<MetricData> deserializer() {
-        return new DataDeserializer();
+        return new MetricDataDeserializer();
     }
-
-    public static class DataDeserializer implements Deserializer<MetricData> {
-
-        @Override
-        public void configure(Map<String, ?> configs, boolean isKey) {
-
-        }
-
-        @Override
-        public MetricData deserialize(String topic, byte[] data) {
-            try {
-                return mps.deserialize(data);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        @Override
-        public void close() {
-
-        }
-    }
-
-    public static class DataSerializer implements Serializer<MetricData> {
     
+    public static class MetricDataSerializer implements Serializer<MetricData> {
+        
         @Override
         public void configure(Map<String, ?> configs, boolean isKey) {
+        }
+        
+        @Override
+        public byte[] serialize(String topic, MetricData metricData) {
+            try {
+                return mps.serialize(metricData);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        
+        @Override
+        public void close() {
+        }
+    }
 
+    public static class MetricDataDeserializer implements Deserializer<MetricData> {
+
+        @Override
+        public void configure(Map<String, ?> configs, boolean isKey) {
         }
 
         @Override
-        public byte[] serialize(String topic, MetricData data) {
+        public MetricData deserialize(String topic, byte[] metricDataBytes) {
             try {
-                return mps.serialize(data);
+                return mps.deserialize(metricDataBytes);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -87,7 +82,6 @@ public class MetricDataSerde implements Serde<MetricData> {
 
         @Override
         public void close() {
-
         }
     }
 }

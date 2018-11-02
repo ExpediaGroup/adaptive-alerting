@@ -27,8 +27,8 @@ public final class MetricDataTimestampExtractor implements TimestampExtractor {
     
     @Override
     public long extract(ConsumerRecord<Object, Object> record, long previousTimestamp) {
-        final MetricData mpoint = (MetricData) record.value();
-        if (mpoint == null) {
+        final MetricData metricData = (MetricData) record.value();
+        if (metricData == null) {
             
             // We don't want to log this because sometimes it fills up the logs.
             // TODO Figure out what to do instead. Maybe a counter.
@@ -37,6 +37,6 @@ public final class MetricDataTimestampExtractor implements TimestampExtractor {
             // -1 skips the record.
             return -1L;
         }
-        return mpoint.getTimestamp() * 1000L;
+        return metricData.getTimestamp() * 1000L;
     }
 }

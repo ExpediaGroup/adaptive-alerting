@@ -27,23 +27,32 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.Deserializer;
 
+import java.io.IOException;
 import java.util.Map;
 
-public class JsonPojoDeserializer<T> implements Deserializer<T> {
-    private ObjectMapper objectMapper = new ObjectMapper().registerModule(new MetricsJavaModule());
+public final class JsonPojoDeserializer<T> implements Deserializer<T> {
+    
+    /**
+     * JSON POJO class configuration key.
+     */
+    public static final String CK_JSON_POJO_CLASS = "JsonPojoClass";
+    
+    private ObjectMapper objectMapper;
     private Class<T> tClass;
     
     /**
      * Default constructor needed by Kafka
      */
     public JsonPojoDeserializer() {
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        this.objectMapper = new ObjectMapper()
+                .registerModule(new MetricsJavaModule())
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
     
     @SuppressWarnings("unchecked")
     @Override
     public void configure(Map<String, ?> props, boolean isKey) {
-        Object propClass = props.get("JsonPojoClass");
+        Object propClass = props.get(CK_JSON_POJO_CLASS);
         if (propClass instanceof Class) {
             tClass = (Class<T>) propClass;
         } else {
@@ -57,13 +66,15 @@ public class JsonPojoDeserializer<T> implements Deserializer<T> {
     
     @Override
     public T deserialize(String topic, byte[] bytes) {
-        if (bytes == null)
+        if (bytes == null) {
             return null;
+        }
         
         T data;
         try {
             data = objectMapper.readValue(bytes, tClass);
-        } catch (Exception e) {
+        } catch (IOException e) {
+            // TODO Is it correct to throw a SerializationException while deserializing? [WLW]
             throw new SerializationException(e);
         }
         

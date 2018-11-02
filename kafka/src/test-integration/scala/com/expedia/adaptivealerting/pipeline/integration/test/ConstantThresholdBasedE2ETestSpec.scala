@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.expedia.adaptivealerting.pipeline.integration.test
 
 import java.time.Instant
@@ -22,8 +21,8 @@ import com.expedia.adaptivealerting.anomdetect.util.{HttpClientWrapper, ModelSer
 import com.expedia.adaptivealerting.anomdetect.{AnomalyDetectorManager, AnomalyDetectorMapper}
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult
 import com.expedia.adaptivealerting.kafka.KafkaConfigProps._
-import com.expedia.adaptivealerting.kafka.detector.KafkaAnomalyDetectorManager
-import com.expedia.adaptivealerting.kafka.mapper.KafkaAnomalyDetectorMapper
+import com.expedia.adaptivealerting.kafka.KafkaAnomalyDetectorManager
+import com.expedia.adaptivealerting.kafka.KafkaAnomalyDetectorMapper
 import com.expedia.adaptivealerting.pipeline.integration.{EmbeddedKafka, IntegrationTestSpec}
 import com.expedia.metrics.{MetricData, MetricDefinition}
 import com.typesafe.config.Config
@@ -89,7 +88,6 @@ class ConstantThresholdBasedE2ETestSpec extends IntegrationTestSpec {
           case _ => fail("Unexpected metrics in input topic for 'constant threshold outlier detector'")
         }
       })
-
 
       Then("'constant threshold outlier detector' should read records from its topic and " +
         "write those anomalous records to output topic")
