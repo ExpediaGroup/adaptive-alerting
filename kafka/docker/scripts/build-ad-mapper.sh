@@ -16,7 +16,7 @@
 
 APP_NAME="adaptive-alerting-ad-mapper"
 DOTTED_APP_NAME="ad.mapper"
-MAIN_CLASS="com.expedia.adaptivealerting.kafka.mapper.KafkaAnomalyDetectorMapper"
+MAIN_CLASS="com.expedia.adaptivealerting.kafka.KafkaAnomalyDetectorMapper"
 
 cd `cd -P -- "$(dirname -- "$0")" && pwd -P`
 

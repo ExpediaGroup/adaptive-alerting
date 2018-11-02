@@ -49,6 +49,10 @@
         </dependency>
         <dependency>
             <groupId>com.expedia</groupId>
+            <artifactId>metrics-java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.expedia</groupId>
             <artifactId>metrics-java-jackson</artifactId>
         </dependency>
         <dependency>
@@ -58,10 +62,6 @@
         <dependency>
             <groupId>com.expedia.adaptivealerting</groupId>
             <artifactId>adaptive-alerting-anomdetect</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.expedia.www</groupId>
-            <artifactId>haystack-commons</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.kafka</groupId>
@@ -75,7 +75,11 @@
         <!-- Test -->
         <dependency>
             <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka-streams</artifactId>
+            <artifactId>kafka_${scala.version}</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka_${scala.version}</artifactId>
             <classifier>test</classifier>
         </dependency>
         <dependency>
@@ -85,12 +89,12 @@
         </dependency>
         <dependency>
             <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka_${scala.version}</artifactId>
+            <artifactId>kafka-streams</artifactId>
+            <classifier>test</classifier>
         </dependency>
         <dependency>
             <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka_${scala.version}</artifactId>
-            <classifier>test</classifier>
+            <artifactId>kafka-streams-test-utils</artifactId>
         </dependency>
         <dependency>
             <groupId>org.scalatest</groupId>
@@ -99,7 +103,8 @@
     </dependencies>
 
     <build>
-        <testSourceDirectory>src/test/scala</testSourceDirectory>
+        <!-- TODO Also want to support Java unit tests [WLW] -->
+        <!--testSourceDirectory>src/test/scala</testSourceDirectory-->
         <plugins>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -117,6 +122,9 @@
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
                 </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-failsafe-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>net.alchim31.maven</groupId>

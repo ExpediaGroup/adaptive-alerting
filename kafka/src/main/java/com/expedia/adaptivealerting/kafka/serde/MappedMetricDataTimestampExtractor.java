@@ -23,7 +23,6 @@ import org.apache.kafka.streams.processor.TimestampExtractor;
 /**
  * Timestamp extractor for {@link MetricData}, similar to
  * {@link org.apache.kafka.streams.processor.LogAndSkipOnInvalidTimestamp}.
- * Adding this as com.expedia.www.haystack.commons.kstreams.MetricPointTimestampExtractor doesn't handle null values.
  *
  * @author Shubham Sethi
  * @author Willie Wheeler

@@ -21,8 +21,7 @@ import org.apache.kafka.streams.processor.TimestampExtractor;
 
 /**
  * Timestamp extractor for MetricPoints
- * similar to class {@link org.apache.kafka.streams.processor.LogAndSkipOnInvalidTimestamp}
- * adding this as com.expedia.www.haystack.commons.kstreams.MetricPointTimestampExtractor doesn't handle this
+ * similar to class {@link org.apache.kafka.streams.processor.LogAndSkipOnInvalidTimestamp}.
  */
 // TODO Rename to AnomalyResultTimestampExtractor [WLW]
 public class AnomalyResultTimeStampExtractor implements TimestampExtractor {

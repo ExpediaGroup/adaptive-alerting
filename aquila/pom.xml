@@ -48,7 +48,6 @@
         <!-- Dependencies -->
         <aa.version>1.0.0-SNAPSHOT</aa.version>
         <aws.sdk.version>1.11.396</aws.sdk.version>
-        <haystack.commons.version>1.0.19</haystack.commons.version>
         <jackson.version>2.9.6</jackson.version>
         <junit.version>4.12</junit.version>
         <lombok.version>1.18.2</lombok.version>

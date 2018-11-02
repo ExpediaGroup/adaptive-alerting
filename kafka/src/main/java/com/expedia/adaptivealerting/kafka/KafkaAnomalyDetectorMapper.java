@@ -13,67 +13,68 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.mapper;
+package com.expedia.adaptivealerting.kafka;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorMapper;
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.adaptivealerting.kafka.AbstractKafkaApp;
 import com.expedia.adaptivealerting.kafka.serde.JsonPojoSerde;
-import com.expedia.adaptivealerting.kafka.util.AppUtil;
 import com.expedia.metrics.MetricData;
-import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
+import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Produced;
 
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
-import static com.expedia.adaptivealerting.kafka.KafkaConfigProps.*;
 
 /**
- * Kafka wrapper around {@link AnomalyDetectorMapper}.
+ * Kafka streams wrapper around {@link AnomalyDetectorMapper}.
  *
  * @author David Sutherland
  * @author Willie Wheeler
  */
 @Slf4j
-public final class KafkaAnomalyDetectorMapper extends AbstractKafkaApp {
-    private AnomalyDetectorMapper mapper;
+public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
+    static final String CK_AD_MAPPER = "ad-mapper";
+    static final String CK_MODEL_SERVICE_URI_TEMPLATE = "model-service-uri-template";
+    
+    private final AnomalyDetectorMapper mapper;
     
     public static void main(String[] args) {
-        final Config config = AppUtil.getAppConfig(ANOMALY_DETECTOR_MAPPER);
-        new KafkaAnomalyDetectorMapper(config, buildMapper(config)).start();
+        val config = StreamsAppConfigLoader.load(CK_AD_MAPPER);
+        val mapper = buildMapper(config);
+        new KafkaAnomalyDetectorMapper(config, mapper).start();
     }
     
-    public KafkaAnomalyDetectorMapper(Config config, AnomalyDetectorMapper mapper) {
+    public KafkaAnomalyDetectorMapper(StreamsAppConfig config, AnomalyDetectorMapper mapper) {
         super(config);
         notNull(mapper, "mapper can't be null");
         this.mapper = mapper;
     }
     
     @Override
-    protected StreamsBuilder streamsBuilder() {
-        final String inboundTopic = getAppConfig().getString(INBOUND_TOPIC);
-        final String outboundTopic = getAppConfig().getString(OUTBOUND_TOPIC);
-        
+    protected Topology buildTopology() {
+        val config = getConfig();
+        val inboundTopic = config.getInboundTopic();
+        val outboundTopic = config.getOutboundTopic();
+    
         log.info("Initializing: inboundTopic={}, outboundTopic={}", inboundTopic, outboundTopic);
-        
-        final StreamsBuilder builder = new StreamsBuilder();
+    
+        val builder = new StreamsBuilder();
         final KStream<String, MetricData> stream = builder.stream(inboundTopic);
         stream
                 .flatMap((key, metricData) -> {
                             log.info("Mapping key={}, metricData={}", key, metricData);
-                            final Set<MappedMetricData> mappedMetricDataSet = mapper.map(metricData);
+                            val mappedMetricDataSet = mapper.map(metricData);
                             return mappedMetricDataSet.stream()
                                     .map(mappedMetricData -> {
-                                        final String newKey = mappedMetricData.getDetectorUuid().toString();
+                                        val newKey = mappedMetricData.getDetectorUuid().toString();
                                         return KeyValue.pair(newKey, mappedMetricData);
                                     })
                                     .collect(Collectors.toSet());
@@ -81,14 +82,15 @@ public final class KafkaAnomalyDetectorMapper extends AbstractKafkaApp {
                 )
                 // TODO Make outbound serde configurable. [WLW]
                 .to(outboundTopic, Produced.with(new Serdes.StringSerde(), new JsonPojoSerde<>()));
-        
-        return builder;
+    
+        return builder.build();
     }
     
-    private static AnomalyDetectorMapper buildMapper(Config appConfig) {
-        final HttpClientWrapper httpClient = new HttpClientWrapper();
-        final String uriTemplate = appConfig.getString(MODEL_SERVICE_URI_TEMPLATE);
-        final ModelServiceConnector connector = new ModelServiceConnector(httpClient, uriTemplate);
+    private static AnomalyDetectorMapper buildMapper(StreamsAppConfig appConfig) {
+        val managerConfig = appConfig.getTypesafeConfig();
+        val httpClient = new HttpClientWrapper();
+        val modelServiceUriTemplate = managerConfig.getString(CK_MODEL_SERVICE_URI_TEMPLATE);
+        val connector = new ModelServiceConnector(httpClient, modelServiceUriTemplate);
         return new AnomalyDetectorMapper(connector);
     }
 }

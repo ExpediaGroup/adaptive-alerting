@@ -31,13 +31,15 @@ import org.apache.kafka.common.serialization.Serializer;
 import java.util.Map;
 
 public class JsonPojoSerializer<T> implements Serializer<T> {
-    private ObjectMapper objectMapper = new ObjectMapper().registerModule(new MetricsJavaModule());
+    private final ObjectMapper objectMapper;
 
     /**
      * Default constructor needed by Kafka
      */
     public JsonPojoSerializer() {
-        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        this.objectMapper = new ObjectMapper()
+                .registerModule(new MetricsJavaModule())
+                .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
     }
 
     @Override
@@ -46,8 +48,9 @@ public class JsonPojoSerializer<T> implements Serializer<T> {
 
     @Override
     public byte[] serialize(String topic, T data) {
-        if (data == null)
+        if (data == null) {
             return null;
+        }
 
         try {
             return objectMapper.writeValueAsBytes(data);
@@ -59,5 +62,4 @@ public class JsonPojoSerializer<T> implements Serializer<T> {
     @Override
     public void close() {
     }
-
 }

@@ -37,8 +37,8 @@
     </licenses>
     <developers>
         <developer>
-            <name>Platform Team</name>
-            <email>eweplall@expedia.com</email>
+            <name>Adaptive Alerting team</name>
+            <email>adaptive-alerting@expedia.com</email>
             <organization>Expedia Group</organization>
             <organizationUrl>https://www.expediagroup.com</organizationUrl>
         </developer>
@@ -52,13 +52,10 @@
         <module>aquila</module>
 
         <module>core</module>
-
-        <!-- TODO Split this into anomdetect-kafka, anomvalidate-kafka, etc. [WLW] -->
-        <module>kafka</module>
-
         <module>dataconnect</module>
         <module>dataservice</module>
         <module>dataservice-athena</module>
+        <module>kafka</module>
         <module>modelservice</module>
         <module>notifier</module>
         <module>samples</module>
@@ -95,7 +92,10 @@
         <jfreechart.version>1.0.19</jfreechart.version>
         <jopt.version>4.9</jopt.version>
         <junit.version>4.12</junit.version>
+
+        <!-- TODO Upgrade to 2.0.0 -->
         <kafka.streams.version>1.1.1</kafka.streams.version>
+
         <lombok.version>1.18.2</lombok.version>
         <metrics.java.version>0.5.0</metrics.java.version>
         <msgpack.version>0.8.13</msgpack.version>
@@ -125,9 +125,10 @@
         <cobertura.maven.plugin.version>2.7</cobertura.maven.plugin.version>
         <maven.compiler.plugin.version>3.8.0</maven.compiler.plugin.version>
         <maven.exec.plugin.version>1.6.0</maven.exec.plugin.version>
+        <maven.failsafe.plugin.version>2.22.1</maven.failsafe.plugin.version>
         <maven.gpg.plugin.version>1.6</maven.gpg.plugin.version>
         <maven.jar.plugin.version>3.1.0</maven.jar.plugin.version>
-        <maven.surefire.plugin.version>2.22.0</maven.surefire.plugin.version>
+        <maven.surefire.plugin.version>2.22.1</maven.surefire.plugin.version>
         <maven.resources.plugin.version>3.1.0</maven.resources.plugin.version>
         <maven.javadoc.plugin.version>3.0.1</maven.javadoc.plugin.version>
         <maven.source.plugin.version>3.0.1</maven.source.plugin.version>
@@ -488,6 +489,12 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka-streams-test-utils</artifactId>
+                <version>${kafka.streams.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.scalatest</groupId>
                 <artifactId>scalatest_${scala.version}</artifactId>
                 <version>${scalatest.version}</version>
@@ -541,6 +548,20 @@
                     <version>0.6.1</version>
                 </plugin>
                 <plugin>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${maven.failsafe.plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
+                            </goals>
+                            <configuration>
+                                <!-- TODO -->
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>                <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
                     <version>${spring.boot.version}</version>
