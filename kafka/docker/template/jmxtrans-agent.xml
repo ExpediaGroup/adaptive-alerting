@@ -51,13 +51,17 @@
         <query objectName="kafka.consumer:type=consumer-fetch-manager-metrics,client-id=*" attribute="records-lag-max" resultAlias="kafka-consumer-%client-id%.records-lag.max"/>
         <query objectName="kafka.consumer:type=consumer-fetch-manager-metrics,client-id=*" attribute="records-consumed-rate" resultAlias="kafka-consumer-%client-id%.records-consumed.rate"/>
 
+        <!-- commented to control the number of metrics/series in influxDb.
+             Uncomment them, if required, to troubleshoot any KStreams related issue -->
         <!-- kafka streams mbeans -->
+        <!--
         <query objectName="kafka.streams:type=*,client-id=*"
             resultAlias="kstreams.%type%.#attribute#"/>
         <query objectName="kafka.streams:type=*,client-id=*,task-id=*,in-memory-lru-state-id=trend-metric-store"
             resultAlias="kstreams.%type%.%task-id%.trend-metric-store.#attribute#"/>
         <query objectName="kafka.streams:type=*,client-id=*,task-id=*,processor-node-id=*"
             resultAlias="kstreams.%type%.%task-id%.%processor-node-id%.#attribute#"/>
+        -->
 
 
         <!-- service mbeans -->
