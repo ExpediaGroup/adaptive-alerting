@@ -53,7 +53,7 @@ docker/scripts/build-{APP_NAME}.sh -p -b -r
     If `kafka-topics` is not found you will need to locate `kafka-topics` or `kafka-topics.sh` file
      (might be in the bin directory of your kafka install) and use that to run the command.
    
-2. If you get an error:
+1. If you get an error:
 
     ```java
     Caused by: org.apache.kafka.common.config.ConfigException: No resolvable bootstrap urls given in bootstrap.servers
@@ -65,7 +65,7 @@ docker/scripts/build-{APP_NAME}.sh -p -b -r
     {YOUR_EXTERNAL_IP} kafkasvc
     ```
 
-3. If you get an error:
+1. If you get an error:
 
     ```java
     java.net.ConnectException: Exception connecting to HostAndPort{host='monitoring-influxdb-graphite.kube-system.svc', port=2003}
