@@ -127,7 +127,7 @@ public final class PewmaAnomalyDetector extends BasicAnomalyDetector<PewmaParams
         
         updateEstimates(observed);
         
-        final AnomalyLevel level = thresholds.classifyExclusiveBounds(observed);
+        final AnomalyLevel level = thresholds.classify(observed);
         
         final AnomalyResult result = new AnomalyResult(getUuid(), metricData, level);
         result.setPredicted(mean);

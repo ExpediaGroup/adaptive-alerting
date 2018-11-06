@@ -34,10 +34,15 @@ public final class IndividualsControlChartParams {
     /**
      * Minimum number of data points required before the anomaly detector is ready for use.
      */
-    private int warmUpPeriod = 25;
+    private int warmUpPeriod = 30;
 
     /**
      * Strong threshold sigmas.
      */
     private double strongSigmas = 3.0;
+
+    /**
+     * Initial mean estimate.
+     */
+    private double initMeanEstimate = 0.0;
 }
