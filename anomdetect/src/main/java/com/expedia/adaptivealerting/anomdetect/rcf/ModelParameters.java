@@ -1,6 +1,5 @@
 package com.expedia.adaptivealerting.anomdetect.rcf;
 
-import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

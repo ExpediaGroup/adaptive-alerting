@@ -22,8 +22,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
+ * <p>
  * A LIFO structure to hold up to maxSize metric points. This structure is representing shingles used with the
  * Sagemaker's Random Cut Forest algorithm.
+ * </p>
+ * <p>
+ * See: https://aws.amazon.com/blogs/machine-learning/use-the-built-in-amazon-sagemaker-random-cut-forest-algorithm-for-anomaly-detection/
+ * </p>
  *
  * @author Tatjana Kamenov
  */
@@ -62,25 +67,7 @@ public class Shingle {
         }
         this.fifo.add(metricData);
     }
-    
-    /**
-     * Converts shingle's metric points values to an array of double values.
-     *
-     * @return An array of doubles with the size of maxSize containing metric point values. The array is empty if
-     * metric point queue size is less than shingle's maxSize.
-     */
-    public Optional<double[]> toValues() {
-        if (!isReady()) {
-            return Optional.empty();
-        } else {
-            return Optional.of(this.fifo
-                    .stream()
-                    .map(mp -> mp.getValue())   // get values only from MetricPoint
-                    .mapToDouble(f -> f != null ? f : Float.NaN) // convert list to array of doubles
-                    .toArray());
-        }
-    }
-    
+
     /**
      * Converts shingle's metric points values to CSV format i.e. "1.0,2.0,3.0,4.0"
      *

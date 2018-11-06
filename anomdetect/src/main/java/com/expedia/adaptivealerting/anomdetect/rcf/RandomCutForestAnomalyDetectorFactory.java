@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.rcf;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.util.DetectorResource;
 import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
 import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,28 +44,30 @@ public final class RandomCutForestAnomalyDetectorFactory implements AnomalyDetec
     @NonNull
     private ObjectMapper objectMapper;
 
-    private ModelServiceConnector connector;
+    private ModelServiceConnector modelServiceConnector;
 
     @Override
-    public void init(Config config, ModelServiceConnector connector) {
-        this.connector = connector;
+    public void init(Config config, ModelServiceConnector modelServiceConnector) {
+        this.modelServiceConnector = modelServiceConnector;
     }
 
     @Override
     public RandomCutForestAnomalyDetector create(UUID uuid) {
         notNull(uuid, "uuid can't be null");
-        final Resources<ModelResource> models = connector.findModels(uuid);
+
+
+        final Resources<ModelResource> models = modelServiceConnector.findModels(uuid);
         final Collection<ModelResource> modelResources = models.getContent();
 
         List<ModelResource> modelResourceList = new ArrayList<>(modelResources);
         if (modelResourceList.isEmpty()) {
             log.error("There is no model associated with uuid: {}", uuid);
+            //TODO remove later. No need to raise the exception here
             throw new RandomCutForestProcessingException("There is no model associated with uuid:" + uuid);
         }
 
-        // TODO [TK] we are not supporting multiple models for a single uuid for now, just grab first detector
+        // TODO [TK] grab the first model. Should we return only one?
         final ModelResource modelResource = modelResourceList.get(0);
-        log.info("Found NEW model: {}", modelResource);
 
         if (modelResource.getDetectorType().getKey().equals(RCF_DETECTOR)) {
             return new RandomCutForestAnomalyDetector(uuid, modelResource);

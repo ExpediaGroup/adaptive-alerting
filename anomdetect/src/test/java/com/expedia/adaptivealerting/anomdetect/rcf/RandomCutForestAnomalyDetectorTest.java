@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.rcf;
 
-import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
+import com.expedia.adaptivealerting.anomdetect.util.DetectorResource;
 import com.expedia.adaptivealerting.anomdetect.util.ModelTypeResource;
 import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBeanBuilder;
@@ -38,41 +38,16 @@ import static junit.framework.TestCase.assertNotNull;
  */
 public class RandomCutForestAnomalyDetectorTest {
     private UUID detectorUUID;
-    private ModelResource modelResource;
+    private DetectorResource detectorResource;
     
     @Before
     public void setUp() {
         this.detectorUUID = UUID.randomUUID();
-        this.modelResource = new ModelResource(
-                5L,
-                new UUID(0,0),
-                new ModelTypeResource(),
-                new HashMap<String, Object>(),
-                1.42,
-                1.5,
-                "",
-                new Timestamp(132465798L));
-    }
-/*
-    @Test
-    public void testDefaultConstructor() {
-        final RandomCutForestAnomalyDetector detector = new RandomCutForestAnomalyDetector(detectorUUID, modelResource);
-        assertNotNull(detector);
+        this.detectorResource = new DetectorResource(
+                "a-b-c-d",
+                new ModelTypeResource());
     }
 
-    @Test
-    public void evaluate() {
-        final ListIterator<RandomCutForestTestRow> testRows = readDataStream().listIterator();
-        final RandomCutForestTestRow testRow0 = testRows.next();
-        final RandomCutForestAnomalyDetector detector = new RandomCutForestAnomalyDetector(detectorUUID, modelResource);
-
-        while (testRows.hasNext()) {
-            final RandomCutForestTestRow testRow = testRows.next();
-            final double observed = testRow.getObserved();
-            // TODO
-        }
-    }
-*/
     private static List<String[]> readCsv(String path) throws IOException {
         final InputStream is = ClassLoader.getSystemResourceAsStream(path);
         CSVReader reader = new CSVReader(new InputStreamReader(is));

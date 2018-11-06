@@ -45,14 +45,14 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * Anomaly detector based on the Random Cut Forest (RCF) algorithm provided by AWS Sagemaker.
  * </p>
  * <p>
- * To get a prediction if a metric point is an anomaly, endpoint in AWS needs to be invoked. It sends back score which
- * is the likeliness of a metric point to be an anomaly. A metric point is likely an anomaly if it's value is higher
- * than score_cutoff, usually set as score_cutoff = score_mean + 3 * score_std
+ * Invokes endpoint in AWS needs get an anomaly score for metric data. The received score is the likeliness of a metric
+ * point to be an anomaly. A metric point is likely an anomaly if it's value is higher than score_cutoff, usually set as
+ * score_cutoff = score_mean + 3 * score_std
  * </p>
  * <p>
- * This detector is using shingles to obtain better results with the RCF algorithm. The shingles implementation is in
- * {@link Shingle}. To do predictions, the shingle needs to be full. At start, metric data sent will just fill the
- * shingle. Anomaly scoring is executed after the queue is fully filled.
+ * This detector is using {@link Shingle} to obtain better results with the RCF algorithm. To do predictions, the shingle
+ * needs to be at full capacity . At start, metric data sent will just fill the shingle. Anomaly scoring is executed
+ * after the shingle queue is fully filled.
  * </p>
  *
  * <p>
@@ -82,18 +82,25 @@ public final class RandomCutForestAnomalyDetector implements AnomalyDetector {
 
     public RandomCutForestAnomalyDetector(UUID uuid, ModelResource modelResource) {
         notNull(uuid, "uuid can't be null");
+        log.info("Creating new RandomCutForestAnomalyDetector for: {} and modelResource {} ", uuid, modelResource);
         this.uuid = uuid;
-        try {
-            this.modelParameters = objectMapper.readValue(modelResource.getOtherStuff(), ModelParameters.class);
-        } catch (IOException ioe) {
-            throw new RandomCutForestProcessingException("Unable to read parameters from model resource, uuid:" + uuid, ioe);
-        }
+
+        this.modelParameters = new ObjectMapper().convertValue(modelResource.getParams(), ModelParameters.class);
+
         this.shingle = new Shingle(modelParameters.getShingleSize());
         this.amazonSageMaker = AmazonSageMakerRuntimeClientBuilder.standard().withRegion(modelParameters.getAwsRegion()).build();
         this.invokeEndpointRequest = new InvokeEndpointRequest();
         this.invokeEndpointRequest.setContentType(CONTENT_TYPE);
     }
 
+    /**
+     * Classifies metric data into NORMAL, WEAK, STRONG or UNKNOWN class. If shingle is not ready yet (needs
+     * to be full to successfully classify), sets the anomaly class to UNKNOWN.
+     *
+     * @param metricData Incoming metric data.
+     *
+     * @return AnomalyResult for metric data
+     */
     @Override
     public AnomalyResult classify(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
@@ -101,10 +108,8 @@ public final class RandomCutForestAnomalyDetector implements AnomalyDetector {
         this.shingle.offer(metricData);
 
         AnomalyLevel level = AnomalyLevel.UNKNOWN;
-        float weakScoreCutoff = modelParameters.getWeakScoreCutoff();
-        float strongScoreCutoff = modelParameters.getStrongScoreCutoff();
-
-        log.info("Checking shingle ready: {}", this.shingle.isReady());
+        final float weakScoreCutoff = modelParameters.getWeakScoreCutoff();
+        final float strongScoreCutoff = modelParameters.getStrongScoreCutoff();
 
         if (this.shingle.isReady()) {
             final double anomalyScore = getAnomalyScore();
@@ -120,7 +125,10 @@ public final class RandomCutForestAnomalyDetector implements AnomalyDetector {
     }
 
     /**
-     * Invokes the endpoint with the data that is held in the Shingle queue.
+     * Invokes the endpoint with the data that is held in the Shingle queue. This version supports sending one shingle
+     * at a time to predict endpoint and getting a single score back. Future versions can easily support sending multiple
+     * shingles in one request and getting multiple scores back with a little code change in this ma. [TK]
+     *
      * @return AWS anomaly score as a double
      */
     private double getAnomalyScore() {
@@ -137,7 +145,7 @@ public final class RandomCutForestAnomalyDetector implements AnomalyDetector {
             final InvokeEndpointResult invokeEndpointResult = amazonSageMaker.invokeEndpoint(invokeEndpointRequest);
             final String bodyResponse = new String(invokeEndpointResult.getBody().array(), StandardCharsets.UTF_8);
 
-            log.info("The score is: {}", bodyResponse);
+            log.info("The score retrieved from AWS endpoint for {}: {}", this.uuid, bodyResponse);
 
             try {
                 final Scores response = objectMapper.readValue(bodyResponse, Scores.class);
