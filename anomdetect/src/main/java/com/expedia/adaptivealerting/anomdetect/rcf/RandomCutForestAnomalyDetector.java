@@ -88,7 +88,7 @@ public final class RandomCutForestAnomalyDetector implements AnomalyDetector {
 
     public RandomCutForestAnomalyDetector(UUID uuid, ModelResource modelResource) {
         notNull(uuid, "uuid can't be null");
-        log.info("Creating new RandomCutForestAnomalyDetector for uuid {} and modelResource {} ", uuid, modelResource);
+        log.info("Creating new RandomCutForestAnomalyDetector [uuid {}, modelResource {}]", uuid, modelResource);
         this.uuid = uuid;
 
         this.modelParameters = new ObjectMapper().convertValue(modelResource.getParams(), ModelParameters.class);
@@ -96,6 +96,7 @@ public final class RandomCutForestAnomalyDetector implements AnomalyDetector {
         this.shingle = new Shingle(modelParameters.getShingleSize());
         this.amazonSageMaker = AmazonSageMakerRuntimeClientBuilder.standard().withRegion(modelParameters.getAwsRegion()).build();
         this.invokeEndpointRequest = new InvokeEndpointRequest();
+        this.invokeEndpointRequest.setEndpointName(modelParameters.getEndpoint());
         this.invokeEndpointRequest.setContentType(CONTENT_TYPE);
     }
 
@@ -144,20 +145,19 @@ public final class RandomCutForestAnomalyDetector implements AnomalyDetector {
                 Optional.of(ByteBuffer.wrap(shingleBody.getBytes(StandardCharsets.UTF_8)));
 
         if (bodyBuffer.isPresent()) {
-            invokeEndpointRequest.setBody(bodyBuffer.get());
-            invokeEndpointRequest.setEndpointName(modelParameters.getEndpoint());
-            invokeEndpointRequest.setAccept(ACCEPT);
+            this.invokeEndpointRequest.setBody(bodyBuffer.get());
+            this.invokeEndpointRequest.setAccept(ACCEPT);
 
-            final InvokeEndpointResult invokeEndpointResult = amazonSageMaker.invokeEndpoint(invokeEndpointRequest);
+            final InvokeEndpointResult invokeEndpointResult = amazonSageMaker.invokeEndpoint(this.invokeEndpointRequest);
             final String bodyResponse = new String(invokeEndpointResult.getBody().array(), StandardCharsets.UTF_8);
 
-            log.info("The RCF score using detector having uuid {} is {}", this.uuid, bodyResponse);
+            log.info("The RCF detector score [uuid: {}] is {}", this.uuid, bodyResponse);
 
             try {
                 final Scores response = objectMapper.readValue(bodyResponse, Scores.class);
                 return response.getScores().get(0).getScore();
             } catch (IOException e) {
-                log.error("Error deserialising result from AWS endpoint for detector with uuid {}", uuid);
+                log.error("Error deserialising result from AWS endpoint [detector uuid: {}]", uuid);
             }
         }
         return -1;
