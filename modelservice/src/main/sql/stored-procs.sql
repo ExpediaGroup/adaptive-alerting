@@ -21,13 +21,13 @@ CREATE PROCEDURE insert_detector (
 CREATE PROCEDURE insert_model (
   IN uuid CHAR(36),
   IN params json,
-  IN last_build_ts timestamp
+  IN date_created timestamp
 )
   BEGIN
     DECLARE detector_id INT(5) UNSIGNED;
 
     SELECT d.id INTO detector_id FROM detector d WHERE d.uuid = uuid;
-    INSERT INTO model (detector_id, params , last_build_ts) VALUES (detector_id, params, last_build_ts);
+    INSERT INTO model (detector_id, params , date_created) VALUES (detector_id, params, date_created);
   END //
 
 CREATE PROCEDURE insert_mapping (

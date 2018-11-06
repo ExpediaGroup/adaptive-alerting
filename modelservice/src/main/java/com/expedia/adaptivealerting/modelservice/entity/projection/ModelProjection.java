@@ -28,5 +28,5 @@ public interface ModelProjection {
 
     Double getStrongSigmas();
 
-    Timestamp getBuildTimestamp();
+    Timestamp getDateCreated();
 }

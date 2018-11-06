@@ -35,7 +35,7 @@ public interface ModelRepository extends PagingAndSortingRepository<Model, Long>
 
     @Query(nativeQuery = true, value = "SELECT *\n" +
             "FROM model m1\n" +
-            "       join (SELECT model.detector_id, MAX(model.last_build_ts) max_last_build_ts\n" +
+            "       join (SELECT model.detector_id, MAX(model.date_created) max_date_created\n" +
             "             FROM model\n" +
             "             where detector_id in(SELECT detector_id\n" +
             "                                  from metric_detector_mapping\n" +
@@ -43,16 +43,16 @@ public interface ModelRepository extends PagingAndSortingRepository<Model, Long>
             "                                        (SELECT m.id from metric m where hash = :hash))\n" +
             "             GROUP BY model.detector_id) filtered_table\n" +
             "where m1.detector_id = filtered_table.detector_id\n" +
-            "  and m1.last_build_ts = filtered_table.max_last_build_ts;")
+            "  and m1.date_created = filtered_table.max_date_created;")
     List<Model> findByMetricHash(@Param("hash") String hash);
     
     @RestResource(rel = "findByDetectorId", path = "findByDetectorId")
-    List<Model> findByDetectorIdOrderByBuildTimestampDesc(@Param("detectorId") Long detectorId);
+    List<Model> findByDetectorIdOrderByDateCreatedDesc(@Param("detectorId") Long detectorId);
     
-    @Query(nativeQuery = true, value = "SELECT * FROM model where last_build_ts =(SELECT MAX(m1.last_build_ts) from model m1 , detector d1 where d1.id=m1.detector_id and d1.uuid=:uuid) LIMIT 1")
+    @Query(nativeQuery = true, value = "SELECT m1.* FROM  model m1, detector d1  where d1.id=m1.detector_id and d1.uuid=:uuid ORDER BY m1.date_created DESC LIMIT 1;")
     Model findByDetectorUuid(@Param("uuid") String uuid);
     
     // FIXME Shouldn't this return a single model? [WLW]
     @RestResource(rel = "findLatestByDetectorUuid", path = "findLatestByDetectorUuid")
-    List<Model> findTopByDetectorUuidOrderByBuildTimestampDesc(@Param("uuid") String uuid);
+    List<Model> findTopByDetectorUuidOrderByDateCreatedDesc(@Param("uuid") String uuid);
 }

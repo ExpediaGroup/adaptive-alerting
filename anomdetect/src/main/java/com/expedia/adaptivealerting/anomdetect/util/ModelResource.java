@@ -44,5 +44,5 @@ public class ModelResource implements AnomalyDetectorModel {
 
     private Double strongSigmas;
 
-    private Timestamp buildTimestamp;
+    private Timestamp dateCreated;
 }

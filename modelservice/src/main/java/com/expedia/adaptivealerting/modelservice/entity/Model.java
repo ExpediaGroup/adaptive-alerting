@@ -61,6 +61,6 @@ public class Model {
      */
     private Double strongSigmas;
 
-    @Column(name = "last_build_ts")
-    private Timestamp buildTimestamp;
+    @Column(name = "date_created")
+    private Timestamp dateCreated;
 }
