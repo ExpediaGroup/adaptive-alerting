@@ -79,10 +79,16 @@ public final class RandomCutForestAnomalyDetector implements AnomalyDetector {
     private final AmazonSageMakerRuntime amazonSageMaker;
     private final InvokeEndpointRequest invokeEndpointRequest;
 
+    /**
+     * Creates a new RCF anomaly detector based on uuid and model parameters.
+     *
+     * @param uuid UUID The detector uuid.
+     * @param modelResource Model parameters containing AWS endpoint and region, shingle size, score cutoffs
+     */
 
     public RandomCutForestAnomalyDetector(UUID uuid, ModelResource modelResource) {
         notNull(uuid, "uuid can't be null");
-        log.info("Creating new RandomCutForestAnomalyDetector for: {} and modelResource {} ", uuid, modelResource);
+        log.info("Creating new RandomCutForestAnomalyDetector for uuid {} and modelResource {} ", uuid, modelResource);
         this.uuid = uuid;
 
         this.modelParameters = new ObjectMapper().convertValue(modelResource.getParams(), ModelParameters.class);
@@ -126,16 +132,16 @@ public final class RandomCutForestAnomalyDetector implements AnomalyDetector {
 
     /**
      * Invokes the endpoint with the data that is held in the Shingle queue. This version supports sending one shingle
-     * at a time to predict endpoint and getting a single score back. Future versions can easily support sending multiple
-     * shingles in one request and getting multiple scores back with a little code change in this ma. [TK]
-     *
-     * @return AWS anomaly score as a double
+     * at a time to predict endpoint and getting a single score back.
+     **
+     * @return AWS anomaly score(s) as a double
      */
     private double getAnomalyScore() {
+        // TODO Note: Future versions can easily support sending multiple shingles in one request and getting multiple
+        // scores back by simple updates to this class. [TK]
         final String shingleBody = this.shingle.toCsv().get();
         final Optional<ByteBuffer> bodyBuffer =
                 Optional.of(ByteBuffer.wrap(shingleBody.getBytes(StandardCharsets.UTF_8)));
-        log.info("Invoking AWS Sagemaker endpoint: {}", modelParameters.getEndpoint() + " with " + bodyBuffer.get());
 
         if (bodyBuffer.isPresent()) {
             invokeEndpointRequest.setBody(bodyBuffer.get());
@@ -145,13 +151,13 @@ public final class RandomCutForestAnomalyDetector implements AnomalyDetector {
             final InvokeEndpointResult invokeEndpointResult = amazonSageMaker.invokeEndpoint(invokeEndpointRequest);
             final String bodyResponse = new String(invokeEndpointResult.getBody().array(), StandardCharsets.UTF_8);
 
-            log.info("The score retrieved from AWS endpoint for {}: {}", this.uuid, bodyResponse);
+            log.info("The RCF score using detector having uuid {} is {}", this.uuid, bodyResponse);
 
             try {
                 final Scores response = objectMapper.readValue(bodyResponse, Scores.class);
                 return response.getScores().get(0).getScore();
             } catch (IOException e) {
-                throw new RandomCutForestProcessingException("Error deserialising result from AWS inference endpoint", e);
+                log.error("Error deserialising result from AWS endpoint for detector with uuid {}", uuid);
             }
         }
         return -1;

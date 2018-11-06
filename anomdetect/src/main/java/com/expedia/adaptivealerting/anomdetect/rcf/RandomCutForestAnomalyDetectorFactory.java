@@ -16,13 +16,10 @@
 package com.expedia.adaptivealerting.anomdetect.rcf;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorFactory;
-import com.expedia.adaptivealerting.anomdetect.util.DetectorResource;
 import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
 import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
-
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,6 +30,8 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.Resources;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+
 /**
  * @author Willie Wheeler
  * @author Tatjana Kamenov
@@ -41,6 +40,7 @@ import org.springframework.hateoas.Resources;
 public final class RandomCutForestAnomalyDetectorFactory implements AnomalyDetectorFactory<RandomCutForestAnomalyDetector> {
 
     private static final String RCF_DETECTOR = "rcf-detector";
+
     @NonNull
     private ObjectMapper objectMapper;
 
@@ -51,22 +51,26 @@ public final class RandomCutForestAnomalyDetectorFactory implements AnomalyDetec
         this.modelServiceConnector = modelServiceConnector;
     }
 
+    /**
+     * Create a new RCF anomaly detector.
+     *
+     * @param uuid A new detector UUID
+     *
+     * @return A new anomaly detector
+     */
     @Override
     public RandomCutForestAnomalyDetector create(UUID uuid) {
         notNull(uuid, "uuid can't be null");
-
 
         final Resources<ModelResource> models = modelServiceConnector.findModels(uuid);
         final Collection<ModelResource> modelResources = models.getContent();
 
         List<ModelResource> modelResourceList = new ArrayList<>(modelResources);
         if (modelResourceList.isEmpty()) {
-            log.error("There is no model associated with uuid: {}", uuid);
-            //TODO remove later. No need to raise the exception here
-            throw new RandomCutForestProcessingException("There is no model associated with uuid:" + uuid);
+            log.error("There is no RCF model associated with uuid: {}", uuid);
         }
 
-        // TODO [TK] grab the first model. Should we return only one?
+        // TODO [TK] this grabs the first model. Should we refactor here?
         final ModelResource modelResource = modelResourceList.get(0);
 
         if (modelResource.getDetectorType().getKey().equals(RCF_DETECTOR)) {
