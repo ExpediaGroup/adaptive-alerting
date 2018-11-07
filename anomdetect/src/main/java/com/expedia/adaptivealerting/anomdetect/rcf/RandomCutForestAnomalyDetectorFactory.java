@@ -68,6 +68,7 @@ public final class RandomCutForestAnomalyDetectorFactory implements AnomalyDetec
         List<ModelResource> modelResourceList = new ArrayList<>(modelResources);
         if (modelResourceList.isEmpty()) {
             log.error("There is no RCF model associated with uuid: {}", uuid);
+            throw new RandomCutForestProcessingException("Could not find model in the modelservice for uuid:" + uuid);
         }
 
         // TODO [TK] this grabs the first model. Should we refactor here?

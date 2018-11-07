@@ -77,7 +77,6 @@ public final class RandomCutForestAnomalyDetector implements AnomalyDetector {
 
     private final Shingle shingle;
     private final AmazonSageMakerRuntime amazonSageMaker;
-    private final InvokeEndpointRequest invokeEndpointRequest;
 
     /**
      * Creates a new RCF anomaly detector based on uuid and model parameters.
@@ -88,16 +87,22 @@ public final class RandomCutForestAnomalyDetector implements AnomalyDetector {
 
     public RandomCutForestAnomalyDetector(UUID uuid, ModelResource modelResource) {
         notNull(uuid, "uuid can't be null");
-        log.info("Creating new RandomCutForestAnomalyDetector [uuid {}, modelResource {}]", uuid, modelResource);
+        notNull(modelResource, "modelResource can't be null");
+
         this.uuid = uuid;
 
         this.modelParameters = new ObjectMapper().convertValue(modelResource.getParams(), ModelParameters.class);
 
+        log.info("Creating new RandomCutForestAnomalyDetector [uuid {}, modelResource {}]", uuid, modelResource);
+
+        notNull(this.modelParameters.endpoint, "Error creating RCF detector. Missing value for model parameter 'endpoint'");
+        notNull(this.modelParameters.awsRegion, "Error creating RCF detector. Missing value for model parameter 'awsRegion'");
+        notNull(this.modelParameters.shingleSize, "Error creating RCF detector. Missing value for model parameter 'shingleSize'");
+        notNull(this.modelParameters.strongScoreCutoff, "Error creating RCF detector. Missing value for model parameter 'strongScoreCutoff'");
+        notNull(this.modelParameters.weakScoreCutoff, "Error creating RCF detector. Missing value for model parameter 'weakScoreCutoff'");
+
         this.shingle = new Shingle(modelParameters.getShingleSize());
         this.amazonSageMaker = AmazonSageMakerRuntimeClientBuilder.standard().withRegion(modelParameters.getAwsRegion()).build();
-        this.invokeEndpointRequest = new InvokeEndpointRequest();
-        this.invokeEndpointRequest.setEndpointName(modelParameters.getEndpoint());
-        this.invokeEndpointRequest.setContentType(CONTENT_TYPE);
     }
 
     /**
@@ -145,10 +150,13 @@ public final class RandomCutForestAnomalyDetector implements AnomalyDetector {
                 Optional.of(ByteBuffer.wrap(shingleBody.getBytes(StandardCharsets.UTF_8)));
 
         if (bodyBuffer.isPresent()) {
-            this.invokeEndpointRequest.setBody(bodyBuffer.get());
-            this.invokeEndpointRequest.setAccept(ACCEPT);
+            InvokeEndpointRequest invokeEndpointRequest = new InvokeEndpointRequest();
+            invokeEndpointRequest.setEndpointName(modelParameters.getEndpoint());
+            invokeEndpointRequest.setContentType(CONTENT_TYPE);
+            invokeEndpointRequest.setBody(bodyBuffer.get());
+            invokeEndpointRequest.setAccept(ACCEPT);
 
-            final InvokeEndpointResult invokeEndpointResult = amazonSageMaker.invokeEndpoint(this.invokeEndpointRequest);
+            final InvokeEndpointResult invokeEndpointResult = amazonSageMaker.invokeEndpoint(invokeEndpointRequest);
             final String bodyResponse = new String(invokeEndpointResult.getBody().array(), StandardCharsets.UTF_8);
 
             log.info("The RCF detector score [uuid: {}] is {}", this.uuid, bodyResponse);
