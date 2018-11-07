@@ -44,15 +44,9 @@
             <groupId>com.expedia</groupId>
             <artifactId>metrics-java-jackson</artifactId>
         </dependency>
-
         <dependency>
             <groupId>com.expedia</groupId>
             <artifactId>metrics-java-metrictank</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.expedia.www</groupId>
-            <artifactId>haystack-commons</artifactId>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -69,12 +63,6 @@
         <dependency>
             <groupId>com.typesafe</groupId>
             <artifactId>config</artifactId>
-        </dependency>
-
-        <!-- TODO Remove this after we get rid of haystack-commons. [WLW] -->
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
         </dependency>
     </dependencies>
 </project>
