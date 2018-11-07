@@ -37,7 +37,7 @@ import static junit.framework.TestCase.assertEquals;
 /**
  * @author shsethi
  */
-public class IndividualsChartDetectorTest {
+public class IndividualsChartAnomalyDetectorTest {
     private static final int WARMUP_PERIOD = 25;
     
     // TODO This tolerance is very loose. Can we tighten it up? [WLW]
@@ -70,7 +70,7 @@ public class IndividualsChartDetectorTest {
         final IndividualsControlChartParams params = new IndividualsControlChartParams()
                 .setInitValue(observed0)
                 .setWarmUpPeriod(WARMUP_PERIOD);
-        final IndividualsControlChartDetector detector = new IndividualsControlChartDetector(detectorUUID, params);
+        final IndividualsControlChartAnomalyDetector detector = new IndividualsControlChartAnomalyDetector(detectorUUID, params);
         
         int noOfDataPoints = 1;
         

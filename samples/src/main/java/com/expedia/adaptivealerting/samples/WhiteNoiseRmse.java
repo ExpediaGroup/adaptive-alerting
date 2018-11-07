@@ -43,7 +43,7 @@ public class WhiteNoiseRmse {
         final AnomalyDetectorFilter pewmaFilter = new AnomalyDetectorFilter(new PewmaAnomalyDetector());
 //        final AnomalyDetectorFilter cusumFilter = new AnomalyDetectorFilter(new CusumAnomalyDetector());
 //        final AnomalyDetectorFilter shewhartIndividualsFilter =
-//                new AnomalyDetectorFilter(new IndividualsControlChartDetector());
+//                new AnomalyDetectorFilter(new IndividualsControlChartAnomalyDetector());
         
         final EvaluatorFilter ewmaEval = new EvaluatorFilter(new RmseEvaluator());
         final EvaluatorFilter pewmaEval = new EvaluatorFilter(new RmseEvaluator());
