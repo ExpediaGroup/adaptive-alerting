@@ -47,9 +47,10 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
     private final AnomalyDetectorMapper mapper;
     
     public static void main(String[] args) {
-        val config = StreamsAppConfigLoader.load(CK_AD_MAPPER);
-        val mapper = buildMapper(config);
-        new KafkaAnomalyDetectorMapper(config, mapper).start();
+        val tsConfig = new TypesafeConfigLoader(CK_AD_MAPPER).loadMergedConfig();
+        val saConfig = new StreamsAppConfig(tsConfig);
+        val mapper = buildMapper(saConfig);
+        new KafkaAnomalyDetectorMapper(saConfig, mapper).start();
     }
     
     public KafkaAnomalyDetectorMapper(StreamsAppConfig config, AnomalyDetectorMapper mapper) {
