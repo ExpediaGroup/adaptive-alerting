@@ -15,6 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect.rcf;
 
+import com.expedia.adaptivealerting.anomdetect.util.DetectorResource;
+import com.expedia.adaptivealerting.anomdetect.util.ModelTypeResource;
 import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBeanBuilder;
 import org.junit.Before;
@@ -23,6 +25,8 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.UUID;
@@ -34,29 +38,14 @@ import static junit.framework.TestCase.assertNotNull;
  */
 public class RandomCutForestAnomalyDetectorTest {
     private UUID detectorUUID;
+    private DetectorResource detectorResource;
     
     @Before
     public void setUp() {
         this.detectorUUID = UUID.randomUUID();
-    }
-
-    @Test
-    public void testDefaultConstructor() {
-        final RandomCutForestAnomalyDetector detector = new RandomCutForestAnomalyDetector(detectorUUID);
-        assertNotNull(detector);
-    }
-
-    @Test
-    public void evaluate() {
-        final ListIterator<RandomCutForestTestRow> testRows = readDataStream().listIterator();
-        final RandomCutForestTestRow testRow0 = testRows.next();
-        final RandomCutForestAnomalyDetector detector = new RandomCutForestAnomalyDetector(detectorUUID);
-
-        while (testRows.hasNext()) {
-            final RandomCutForestTestRow testRow = testRows.next();
-            final double observed = testRow.getObserved();
-            // TODO
-        }
+        this.detectorResource = new DetectorResource(
+                "a-b-c-d",
+                new ModelTypeResource());
     }
 
     private static List<String[]> readCsv(String path) throws IOException {
