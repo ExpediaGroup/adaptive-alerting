@@ -17,19 +17,14 @@ package com.expedia.adaptivealerting.kafka;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorMapper;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.adaptivealerting.kafka.serde.JsonPojoDeserializer;
-import com.expedia.adaptivealerting.kafka.serde.JsonPojoSerde;
-import com.expedia.adaptivealerting.kafka.serde.JsonPojoSerializer;
 import com.expedia.metrics.MetricData;
-import com.expedia.metrics.MetricDefinition;
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.common.serialization.StringSerializer;
-import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.TopologyTestDriver;
+import org.apache.kafka.streams.errors.StreamsException;
 import org.apache.kafka.streams.test.ConsumerRecordFactory;
 import org.apache.kafka.streams.test.OutputVerifier;
 import org.junit.After;
@@ -38,11 +33,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.time.Instant;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Properties;
-import java.util.UUID;
 
 import static com.expedia.adaptivealerting.kafka.KafkaAnomalyDetectorMapper.CK_MODEL_SERVICE_URI_TEMPLATE;
 import static org.mockito.ArgumentMatchers.any;
@@ -56,6 +47,7 @@ import static org.mockito.Mockito.when;
  */
 @Slf4j
 public final class KafkaAnomalyDetectorMapperTest {
+    private static final String KAFKA_KEY = "some-kafka-key";
     private static final String INBOUND_TOPIC = "metrics";
     private static final String OUTBOUND_TOPIC = "mapped-metrics";
     
@@ -63,22 +55,22 @@ public final class KafkaAnomalyDetectorMapperTest {
     private AnomalyDetectorMapper mapper;
     
     @Mock
-    private StreamsAppConfig streamsAppConfig;
+    private StreamsAppConfig saConfig;
     
     @Mock
-    private Config config;
-    
-    private Properties streamsProps;
+    private Config tsConfig;
     
     // Test objects
     private MetricData metricData;
     private MappedMetricData mappedMetricData;
     
     // Test machinery
+    private TopologyTestDriver logAndFailDriver;
+    private TopologyTestDriver logAndContinueDriver;
+    private ConsumerRecordFactory<String, MetricData> mdRecordFactory;
+    private ConsumerRecordFactory<String, String> stringRecordFactory;
     private StringDeserializer stringDeser;
-    private JsonPojoDeserializer<MappedMetricData> mmdDeserializer;
-    private ConsumerRecordFactory<String, MetricData> recordFactory;
-    private TopologyTestDriver testDriver;
+    private Deserializer<MappedMetricData> mmdDeserializer;
     
     @Before
     public void setUp() {
@@ -91,48 +83,50 @@ public final class KafkaAnomalyDetectorMapperTest {
     
     @After
     public void tearDown() {
-        testDriver.close();
+        logAndFailDriver.close();
+        logAndContinueDriver.close();
     }
     
     @Test
     public void metricDataToMappedMetricData() {
-        val inputKafkaKey = "some-kafka-key";
-        testDriver.pipeInput(recordFactory.create(INBOUND_TOPIC, inputKafkaKey, metricData));
-        val outputRecord = testDriver.readOutput(OUTBOUND_TOPIC, stringDeser, mmdDeserializer);
+        logAndFailDriver.pipeInput(mdRecordFactory.create(INBOUND_TOPIC, KAFKA_KEY, metricData));
         
         // The streams app remaps the key to the detector UUID. [WLW]
+        val outputRecord = logAndFailDriver.readOutput(OUTBOUND_TOPIC, stringDeser, mmdDeserializer);
+        log.trace("outputRecord={}", outputRecord);
         val outputKafkaKey = mappedMetricData.getDetectorUuid().toString();
         OutputVerifier.compareKeyValue(outputRecord, outputKafkaKey, mappedMetricData);
     }
     
+    /**
+     * Addresses bug https://github.com/ExpediaDotCom/adaptive-alerting/issues/253
+     */
+    @Test(expected = StreamsException.class)
+    public void failsOnDeserializationException() {
+        logAndFailDriver.pipeInput(stringRecordFactory.create(INBOUND_TOPIC, KAFKA_KEY, "invalid_input"));
+        logAndFailDriver.readOutput(OUTBOUND_TOPIC, stringDeser, mmdDeserializer);
+    }
+    
+    /**
+     * Addresses bug https://github.com/ExpediaDotCom/adaptive-alerting/issues/253
+     */
     @Test
-    public void handlesDeserializationException() {
-        // TODO
+    public void continuesOnDeserializationException() {
+        logAndContinueDriver.pipeInput(stringRecordFactory.create(INBOUND_TOPIC, KAFKA_KEY, "invalid_input"));
+        logAndContinueDriver.readOutput(OUTBOUND_TOPIC, stringDeser, mmdDeserializer);
     }
     
     private void initConfig() {
-        when(config.getString(CK_MODEL_SERVICE_URI_TEMPLATE)).thenReturn("https://example.com/");
+        when(tsConfig.getString(CK_MODEL_SERVICE_URI_TEMPLATE)).thenReturn("https://example.com/");
         
-        when(streamsAppConfig.getTypesafeConfig()).thenReturn(config);
-        when(streamsAppConfig.getInboundTopic()).thenReturn(INBOUND_TOPIC);
-        when(streamsAppConfig.getOutboundTopic()).thenReturn(OUTBOUND_TOPIC);
-        
-        this.streamsProps = new Properties();
-        streamsProps.put(StreamsConfig.APPLICATION_ID_CONFIG, "test");
-        streamsProps.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "dummy:1234");
-        streamsProps.setProperty(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName());
-        streamsProps.setProperty(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, JsonPojoSerde.class.getName());
-        streamsProps.setProperty(JsonPojoDeserializer.CK_JSON_POJO_CLASS, MetricData.class.getName());
-    
-        // TODO Activate this to avoid crashing the app when deserialization fails.
-//        streamsProps.setProperty(StreamsConfig.DEFAULT_DESERIALIZATION_EXCEPTION_HANDLER_CLASS_CONFIG, TODO);
+        when(saConfig.getTypesafeConfig()).thenReturn(tsConfig);
+        when(saConfig.getInboundTopic()).thenReturn(INBOUND_TOPIC);
+        when(saConfig.getOutboundTopic()).thenReturn(OUTBOUND_TOPIC);
     }
     
     private void initTestObjects() {
-        val metricDefinition = new MetricDefinition("some-metric-key");
-        val now = Instant.now().getEpochSecond();
-        this.metricData = new MetricData(metricDefinition, 100.0, now);
-        this.mappedMetricData = new MappedMetricData(metricData, UUID.randomUUID(), "some-detector-type");
+        this.metricData = TestObjectMother.metricData();
+        this.mappedMetricData = TestObjectMother.mappedMetricData(metricData);
     }
     
     private void initDependencies() {
@@ -141,22 +135,18 @@ public final class KafkaAnomalyDetectorMapperTest {
     }
     
     private void initTestMachinery() {
+    
+        // Topology test drivers
+        val topology = new KafkaAnomalyDetectorMapper(saConfig, mapper).buildTopology();
+        this.logAndFailDriver = TestObjectMother.topologyTestDriver(topology, false);
+        this.logAndContinueDriver = TestObjectMother.topologyTestDriver(topology, true);
         
-        // Test driver
-        val kafkaMapper = new KafkaAnomalyDetectorMapper(streamsAppConfig, mapper);
-        val topology = kafkaMapper.buildTopology();
-        this.testDriver = new TopologyTestDriver(topology, streamsProps);
+        // MetricData sources
+        this.mdRecordFactory = TestObjectMother.metricDataFactory();
+        this.stringRecordFactory = TestObjectMother.stringFactory();
         
-        // MetricData source
-        val stringSer = new StringSerializer();
-        val mdSerializer = new JsonPojoSerializer<MetricData>();
-        this.recordFactory = new ConsumerRecordFactory<>(stringSer, mdSerializer);
-        
-        // MappedMetricData consumer
-        this.stringDeser = new StringDeserializer();
-        val mmdDeserProps = new HashMap<String, Object>();
-        mmdDeserProps.put(JsonPojoDeserializer.CK_JSON_POJO_CLASS, MappedMetricData.class);
-        this.mmdDeserializer = new JsonPojoDeserializer<>();
-        mmdDeserializer.configure(mmdDeserProps, false);
+        // MappedMetricData consumers
+        this.stringDeser = TestObjectMother.stringDeserializer();
+        this.mmdDeserializer = TestObjectMother.mappedMetricDataDeserializer();
     }
 }
