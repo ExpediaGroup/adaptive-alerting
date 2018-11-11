@@ -26,6 +26,8 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.KStream;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+
 /**
  * Kafka streams wrapper around {@link AnomalyDetectorManager}.
  *
@@ -42,12 +44,14 @@ public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
     public static void main(String[] args) {
         val tsConfig = new TypesafeConfigLoader(CK_AD_MANAGER).loadMergedConfig();
         val saConfig = new StreamsAppConfig(tsConfig);
-        new KafkaAnomalyDetectorManager(saConfig).start();
+        val manager = buildManager(saConfig);
+        new KafkaAnomalyDetectorManager(saConfig, manager).start();
     }
     
-    public KafkaAnomalyDetectorManager(StreamsAppConfig config) {
+    public KafkaAnomalyDetectorManager(StreamsAppConfig config, AnomalyDetectorManager manager) {
         super(config);
-        this.manager = buildManager(config);
+        notNull(manager, "manager can't be null");
+        this.manager = manager;
     }
     
     @Override
