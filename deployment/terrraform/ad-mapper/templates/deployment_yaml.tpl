@@ -47,15 +47,16 @@ spec:
         - name: "JAVA_XMX"
           value: "${jvm_memory_limit}m"
         ${env_vars}
-        livenessProbe:
-          exec:
-            command:
-            - grep
-            - "true"
-            - /app/isHealthy
-          initialDelaySeconds: 30
-          periodSeconds: 5
-          failureThreshold: 6
+        # FIXME Reinstate after removing haystack-commons dependency
+#        livenessProbe:
+#          exec:
+#            command:
+#            - grep
+#            - "true"
+#            - /app/isHealthy
+#          initialDelaySeconds: 30
+#          periodSeconds: 5
+#          failureThreshold: 6
       nodeSelector:
         ${node_selector_label}
       volumes:
