@@ -25,6 +25,7 @@ import com.typesafe.config.ConfigObject;
 import com.typesafe.config.ConfigValue;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,7 +40,12 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author Willie Wheeler
  */
 @Slf4j
-public final class AnomalyDetectorManager {
+public class AnomalyDetectorManager {
+    
+    /**
+     * Detectors configuration key.
+     */
+    private static final String CK_DETECTORS = "detectors";
     
     /**
      * Factories that know how to produce anomaly detectors on demand.
@@ -55,20 +61,22 @@ public final class AnomalyDetectorManager {
      * Max samples required to evaluate performance
      */
     private static final int PERFMON_SAMPLE_SIZE = 100;
-
+    
     @Getter
     private ModelServiceConnector modelServiceConnector;
-
+    
     /**
      * Creates a new anomaly detector manager.
      *
-     * @param detectorsConfig Factories config
+     * @param config                Manager config
      * @param modelServiceConnector Model service connector.
      */
-    public AnomalyDetectorManager(Config detectorsConfig, ModelServiceConnector modelServiceConnector) {
-        notNull(detectorsConfig, "detectorsConfig can't be null");
+    public AnomalyDetectorManager(Config config, ModelServiceConnector modelServiceConnector) {
+        notNull(config, "config can't be null");
+        
+        val detectorsConfig = config.getConfig(CK_DETECTORS);
         this.modelServiceConnector = modelServiceConnector;
-
+        
         this.detectorFactories = new HashMap<>();
         
         // Calling detectorsConfig.entrySet() does a recursive traversal, which isn't what we want here.
@@ -78,7 +86,7 @@ public final class AnomalyDetectorManager {
             final Config detectorFactoryAndConfig = ((ConfigObject) entry.getValue()).toConfig();
             final String detectorFactoryClassname = detectorFactoryAndConfig.getString("factory");
             final Config detectorConfig = detectorFactoryAndConfig.getConfig("config");
-
+            
             log.info("Initializing AnomalyDetectorFactory: type={}, className={}",
                     detectorType, detectorFactoryClassname);
             final AnomalyDetectorFactory factory =
@@ -86,7 +94,7 @@ public final class AnomalyDetectorManager {
             factory.init(detectorConfig, modelServiceConnector);
             log.info("Initialized AnomalyDetectorFactory: type={}, className={}",
                     detectorType, detectorFactoryClassname);
-
+            
             detectorFactories.put(detectorType, factory);
         }
     }

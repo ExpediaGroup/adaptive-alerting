@@ -43,7 +43,6 @@ public class ShingleTest {
     public void emptyConstructorTest() {
         shingle = new Shingle();
         
-        assertFalse(shingle.toValues().isPresent());
         assertFalse(shingle.isReady());
     }
     

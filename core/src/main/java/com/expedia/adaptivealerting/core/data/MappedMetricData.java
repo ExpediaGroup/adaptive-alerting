@@ -21,7 +21,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 
 import java.util.UUID;
 
@@ -40,7 +39,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
-@ToString
 public final class MappedMetricData {
     
     @NonNull

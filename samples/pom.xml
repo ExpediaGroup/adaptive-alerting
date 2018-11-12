@@ -57,10 +57,6 @@
             <artifactId>adaptive-alerting-tools</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.expedia.www</groupId>
-            <artifactId>haystack-commons</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
         </dependency>

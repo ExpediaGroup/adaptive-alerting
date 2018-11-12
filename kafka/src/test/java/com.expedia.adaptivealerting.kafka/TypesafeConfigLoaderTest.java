@@ -13,13 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.rcf;
+package com.expedia.adaptivealerting.kafka;
 
-import java.io.IOException;
+import lombok.val;
+import org.junit.Before;
+import org.junit.Test;
 
-public class FailedToLoadPropertiesException extends RuntimeException {
+import static org.junit.Assert.assertEquals;
+
+/**
+ * @author Willie Wheeler
+ */
+public class TypesafeConfigLoaderTest {
+    private TypesafeConfigLoader loader;
     
-    public FailedToLoadPropertiesException(IOException e) {
-        super(e);
+    @Before
+    public void setUp() {
+        this.loader = new TypesafeConfigLoader("ad-mapper");
+    }
+    
+    @Test
+    public void testLoadBaseConfig() {
+        val config = loader.loadBaseConfig();
+        assertEquals("kafkasvc:9092", config.getString("streams.bootstrap.servers"));
     }
 }

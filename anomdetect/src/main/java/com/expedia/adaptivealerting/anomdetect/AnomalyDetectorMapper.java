@@ -42,7 +42,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author Willie Wheeler
  */
 @Slf4j
-public final class AnomalyDetectorMapper {
+public class AnomalyDetectorMapper {
     
     @Getter
     private ModelServiceConnector modelServiceConnector;

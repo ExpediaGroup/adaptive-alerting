@@ -20,13 +20,17 @@ import com.amazonaws.services.sagemakerruntime.AmazonSageMakerRuntimeClientBuild
 import com.amazonaws.services.sagemakerruntime.model.InvokeEndpointRequest;
 import com.amazonaws.services.sagemakerruntime.model.InvokeEndpointResult;
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.metrics.MetricData;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.Data;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -41,14 +45,14 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * Anomaly detector based on the Random Cut Forest (RCF) algorithm provided by AWS Sagemaker.
  * </p>
  * <p>
- * To get a prediction if a metric point is an anomaly, endpoint in AWS needs to be invoked. It sends back score which
- * is the likeliness of a metric point to be an anomaly. A metric point is likely an anomaly if it's value is higher
- * than score_cutoff, usually set as score_cutoff = score_mean + 3 * score_std
+ * Invokes endpoint in AWS needs get an anomaly score for metric data. The received score is the likeliness of a metric
+ * point to be an anomaly. A metric point is likely an anomaly if it's value is higher than score_cutoff, usually set as
+ * score_cutoff = score_mean + 3 * score_std
  * </p>
  * <p>
- * This detector is using shingles to obtain better results with the RCF algorithm. The shingles implementation is in
- * {@link Shingle}. To do predictions, the shingle needs to be full. At start, metric data sent will just fill the
- * shingle. Anomaly scoring is executed after the queue is fully filled.
+ * This detector is using {@link Shingle} to obtain better results with the RCF algorithm. To do predictions, the shingle
+ * needs to be at full capacity . At start, metric data sent will just fill the shingle. Anomaly scoring is executed
+ * after the shingle queue is fully filled.
  * </p>
  *
  * <p>
@@ -58,48 +62,72 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  */
 @Data
 @ToString
+@RequiredArgsConstructor
+@Slf4j
 public final class RandomCutForestAnomalyDetector implements AnomalyDetector {
-    private static final String TEXT_CSV_CONTENT_TYPE = "text/csv";
-    private static final String APPLICATION_JSON_ACCEPT = "application/json";
+    private static final String CONTENT_TYPE = "text/csv";
+    private static final String ACCEPT = "application/json";
 
-    private static final String AWS_REGION = PropertiesCache.getInstance().get("aws_region");
-    private static final String ENDPOINT = PropertiesCache.getInstance().get("sagemaker_endpoint");
-    private static final int SHINGLE_SIZE = Integer.valueOf(PropertiesCache.getInstance().get("shingle_size"));
-    private static final double STRONG_SCORE_CUTOFF = Double.valueOf(PropertiesCache.getInstance().get("strong_score_cutoff"));
-    private static final double WEAK_SCORE_CUTOFF = Double.valueOf(PropertiesCache.getInstance().get("weak_score_cutoff"));
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    
+    @NonNull
+    private ObjectMapper objectMapper = new ObjectMapper();
+
     @NonNull
     private UUID uuid;
-    
+    private ModelParameters modelParameters;
+
     private final Shingle shingle;
     private final AmazonSageMakerRuntime amazonSageMaker;
-    private final InvokeEndpointRequest invokeEndpointRequest;
 
-    // TODO Consider passing endpoint, shingle size and score cutoff to constructor [TK]
-    // - If we do this, please create a Params class for these. See some of the other detectors. [WLW]
-    public RandomCutForestAnomalyDetector(UUID uuid) {
+    /**
+     * Creates a new RCF anomaly detector based on uuid and model parameters.
+     *
+     * @param uuid UUID The detector uuid.
+     * @param modelResource Model parameters containing AWS endpoint and region, shingle size, score cutoffs
+     */
+
+    public RandomCutForestAnomalyDetector(UUID uuid, ModelResource modelResource) {
         notNull(uuid, "uuid can't be null");
-        
+        notNull(modelResource, "modelResource can't be null");
+
         this.uuid = uuid;
-        this.shingle = new Shingle(SHINGLE_SIZE);
-        this.amazonSageMaker = AmazonSageMakerRuntimeClientBuilder.standard().withRegion(AWS_REGION).build();
-        this.invokeEndpointRequest = new InvokeEndpointRequest();
-        this.invokeEndpointRequest.setContentType(TEXT_CSV_CONTENT_TYPE);
+
+        this.modelParameters = new ObjectMapper().convertValue(modelResource.getParams(), ModelParameters.class);
+
+        log.info("Creating new RandomCutForestAnomalyDetector [uuid {}, modelResource {}]", uuid, modelResource);
+
+        notNull(this.modelParameters.endpoint, "Error creating RCF detector. Missing value for model parameter 'endpoint'");
+        notNull(this.modelParameters.awsRegion, "Error creating RCF detector. Missing value for model parameter 'awsRegion'");
+        notNull(this.modelParameters.shingleSize, "Error creating RCF detector. Missing value for model parameter 'shingleSize'");
+        notNull(this.modelParameters.strongScoreCutoff, "Error creating RCF detector. Missing value for model parameter 'strongScoreCutoff'");
+        notNull(this.modelParameters.weakScoreCutoff, "Error creating RCF detector. Missing value for model parameter 'weakScoreCutoff'");
+
+        this.shingle = new Shingle(modelParameters.getShingleSize());
+        this.amazonSageMaker = AmazonSageMakerRuntimeClientBuilder.standard().withRegion(modelParameters.getAwsRegion()).build();
     }
-    
+
+    /**
+     * Classifies metric data into NORMAL, WEAK, STRONG or UNKNOWN class. If shingle is not ready yet (needs
+     * to be full to successfully classify), sets the anomaly class to UNKNOWN.
+     *
+     * @param metricData Incoming metric data.
+     *
+     * @return AnomalyResult for metric data
+     */
     @Override
     public AnomalyResult classify(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
-        
+
         this.shingle.offer(metricData);
-        
+
         AnomalyLevel level = AnomalyLevel.UNKNOWN;
+        final float weakScoreCutoff = modelParameters.getWeakScoreCutoff();
+        final float strongScoreCutoff = modelParameters.getStrongScoreCutoff();
+
         if (this.shingle.isReady()) {
             final double anomalyScore = getAnomalyScore();
-            if (anomalyScore < WEAK_SCORE_CUTOFF) {
+            if (anomalyScore < weakScoreCutoff) {
                 level = AnomalyLevel.NORMAL;
-            } else if (anomalyScore < STRONG_SCORE_CUTOFF) {
+            } else if (anomalyScore < strongScoreCutoff) {
                 level = AnomalyLevel.WEAK;
             } else {
                 level = AnomalyLevel.STRONG;
@@ -109,29 +137,38 @@ public final class RandomCutForestAnomalyDetector implements AnomalyDetector {
     }
 
     /**
-     * Invokes the endpoint with the data that is held in the Shingle queue.
-     * @return AWS anomaly score as a double
+     * Invokes the endpoint with the data that is held in the Shingle queue. This version supports sending one shingle
+     * at a time to predict endpoint and getting a single score back.
+     **
+     * @return AWS anomaly score(s) as a double
      */
     private double getAnomalyScore() {
+        // TODO Note: Future versions can easily support sending multiple shingles in one request and getting multiple
+        // scores back by simple updates to this class. [TK]
         final String shingleBody = this.shingle.toCsv().get();
         final Optional<ByteBuffer> bodyBuffer =
                 Optional.of(ByteBuffer.wrap(shingleBody.getBytes(StandardCharsets.UTF_8)));
 
         if (bodyBuffer.isPresent()) {
+            InvokeEndpointRequest invokeEndpointRequest = new InvokeEndpointRequest();
+            invokeEndpointRequest.setEndpointName(modelParameters.getEndpoint());
+            invokeEndpointRequest.setContentType(CONTENT_TYPE);
             invokeEndpointRequest.setBody(bodyBuffer.get());
-            invokeEndpointRequest.setEndpointName(ENDPOINT);
-            invokeEndpointRequest.setAccept(APPLICATION_JSON_ACCEPT);
+            invokeEndpointRequest.setAccept(ACCEPT);
 
             final InvokeEndpointResult invokeEndpointResult = amazonSageMaker.invokeEndpoint(invokeEndpointRequest);
             final String bodyResponse = new String(invokeEndpointResult.getBody().array(), StandardCharsets.UTF_8);
 
+            log.info("The RCF detector score [uuid: {}] is {}", this.uuid, bodyResponse);
+
             try {
-                final Scores response = OBJECT_MAPPER.readValue(bodyResponse, Scores.class);
+                final Scores response = objectMapper.readValue(bodyResponse, Scores.class);
                 return response.getScores().get(0).getScore();
             } catch (IOException e) {
-                throw new RandomCutForestProcessingException("Error deserialising result from AWS inference endpoint", e);
+                log.error("Error deserialising result from AWS endpoint [detector uuid: {}]", uuid);
             }
         }
         return -1;
     }
+
 }

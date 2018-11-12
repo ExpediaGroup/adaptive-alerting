@@ -15,9 +15,10 @@
  */
 package com.expedia.adaptivealerting.anomdetect.individuals;
 
-import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.BasicAnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
 import lombok.NonNull;
@@ -27,6 +28,7 @@ import java.util.UUID;
 import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.*;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 import static java.lang.Math.abs;
+import static java.lang.Math.sqrt;
 
 /**
  * Anomaly detector implementation of
@@ -38,7 +40,7 @@ import static java.lang.Math.abs;
  * @see <a href="https://www.spcforexcel.com/knowledge/variable-control-charts/individuals-control-charts">https://www.spcforexcel.com/knowledge/variable-control-charts/individuals-control-charts</a>
  */
 @Data
-public final class IndividualsControlChartDetector implements AnomalyDetector {
+public final class IndividualsControlChartAnomalyDetector extends BasicAnomalyDetector<IndividualsControlChartParams> {
     private static final double R_CONTROL_CHART_CONSTANT_D4 = 3.267;
     private static final double R_CONTROL_CHART_CONSTANT_D2 = 1.128;
 
@@ -90,12 +92,21 @@ public final class IndividualsControlChartDetector implements AnomalyDetector {
     private double lowerControlLimit_X;
 
     /**
+     * Variance estimate.
+     */
+    private double variance = 0.0;
+
+    /**
      * Mean estimate.
      */
     private double mean;
 
-    public IndividualsControlChartDetector() {
+    public IndividualsControlChartAnomalyDetector() {
         this(UUID.randomUUID(), new IndividualsControlChartParams());
+    }
+
+    public IndividualsControlChartAnomalyDetector(IndividualsControlChartParams params) {
+        this(UUID.randomUUID(),params);
     }
 
     /**
@@ -104,7 +115,7 @@ public final class IndividualsControlChartDetector implements AnomalyDetector {
      * @param uuid   Detector UUID.
      * @param params Model params.
      */
-    public IndividualsControlChartDetector(UUID uuid, IndividualsControlChartParams params) {
+    public IndividualsControlChartAnomalyDetector(UUID uuid, IndividualsControlChartParams params) {
         notNull(uuid, "uuid can't be null");
         notNull(params, "params can't be null");
 
@@ -115,11 +126,32 @@ public final class IndividualsControlChartDetector implements AnomalyDetector {
     }
 
     @Override
+    protected void loadParams(IndividualsControlChartParams params) {
+        this.params = params;
+        this.mean = params.getInitMeanEstimate();
+    }
+
+    @Override
+    protected Class<IndividualsControlChartParams> getParamsClass() {
+        return IndividualsControlChartParams.class;
+    }
+
+    @Override
     public AnomalyResult classify(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
 
         final double observed = metricData.getValue();
+        final double stdDev = sqrt(this.variance);
+        //final double weakDelta = params.getWeakSigmas() * stdDev;
+        final double strongDelta = params.getStrongSigmas() * stdDev;
+
         double currentRange = Math.abs(prevValue - observed);
+
+        final AnomalyThresholds thresholds = new AnomalyThresholds(
+                this.mean + strongDelta,
+                this.mean + strongDelta,
+                this.mean - strongDelta,
+                this.mean - strongDelta);
 
         AnomalyLevel level;
 
@@ -153,7 +185,10 @@ public final class IndividualsControlChartDetector implements AnomalyDetector {
         }
         this.prevValue = observed;
 
-        return new AnomalyResult(uuid, metricData, level);
+        final AnomalyResult result = new AnomalyResult(getUuid(), metricData, level);
+        result.setPredicted(this.mean);
+        result.setThresholds(thresholds);
+        return result;
     }
 
     private double getRunningMean(double observed) {
