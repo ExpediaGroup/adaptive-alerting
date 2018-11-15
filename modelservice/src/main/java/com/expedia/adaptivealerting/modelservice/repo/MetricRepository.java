@@ -62,7 +62,7 @@ public interface MetricRepository extends PagingAndSortingRepository<Metric, Lon
      * @param key Matching key.
      * @return List of metrics by its matching key
      */
-    @Query(nativeQuery = true, value = "SELECT * FROM metric m WHERE m.ukey LIKE %:key% LIMIT 20")
+    @Query(nativeQuery = true, value = "SELECT * FROM metric m WHERE m.ukey LIKE %:key% order by m.ukey LIMIT 20")
     List<Metric> findByKeyContaining(@Param("key") String key);
 
     /**
