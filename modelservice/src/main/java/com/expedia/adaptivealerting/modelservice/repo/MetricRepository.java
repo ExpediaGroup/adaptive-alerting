@@ -55,13 +55,14 @@ public interface MetricRepository extends PagingAndSortingRepository<Metric, Lon
      */
     @Query(nativeQuery = true, value = "SELECT * FROM metric WHERE id IN (SELECT metric_id FROM metric_detector_mapping WHERE detector_id IN (SELECT id FROM detector WHERE created_by=:user))")
     List<Metric> findByCreatedBy(@Param("user") String user);
-    
-     /**
+
+    /**
      * Finds a list of metrics by its matching key.
      *
      * @param key Matching key.
      * @return List of metrics by its matching key
      */
+    @Query(nativeQuery = true, value = "SELECT * FROM metric m WHERE m.ukey LIKE %:key% order by m.ukey LIMIT 20")
     List<Metric> findByKeyContaining(@Param("key") String key);
 
     /**
