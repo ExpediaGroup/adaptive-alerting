@@ -7,7 +7,7 @@ import javax.persistence.*;
 @Data
 @Entity
 public class MetricDetectorMapping {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,6 +20,4 @@ public class MetricDetectorMapping {
     @JoinColumn(name = "detector_id")
     private Detector detector;
 
-    public static class AppInfo {
-    }
 }
