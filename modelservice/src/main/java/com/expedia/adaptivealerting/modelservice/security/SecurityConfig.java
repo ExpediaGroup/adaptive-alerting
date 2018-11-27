@@ -20,6 +20,7 @@ import com.expedia.adaptivealerting.modelservice.service.UserDetailsServiceImpl;
 @Slf4j
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 

@@ -21,6 +21,7 @@ import com.expedia.adaptivealerting.modelservice.service.UserDetailsServiceImpl;
 @Configuration
 @EnableAuthorizationServer
 public class OAuthConfig extends AuthorizationServerConfigurerAdapter {
+
     @Autowired
     @Qualifier("authenticationManagerBean")
     private AuthenticationManager authenticationManager;
