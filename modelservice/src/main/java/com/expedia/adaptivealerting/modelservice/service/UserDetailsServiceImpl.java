@@ -28,6 +28,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 
+/**
+ * User Details Service implementation
+ *
+ * @author kashah
+ */
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 

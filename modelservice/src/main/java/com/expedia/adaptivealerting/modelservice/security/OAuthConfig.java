@@ -32,7 +32,11 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import com.expedia.adaptivealerting.modelservice.service.UserDetailsServiceImpl;
 
-
+/**
+ * Configure the authorization server.
+ *
+ * @author kashah
+ */
 @Configuration
 @EnableAuthorizationServer
 public class OAuthConfig extends AuthorizationServerConfigurerAdapter {

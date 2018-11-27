@@ -30,6 +30,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import com.expedia.adaptivealerting.modelservice.service.UserDetailsServiceImpl;
 
+/**
+ * @author kashah
+ */
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true)
 @Slf4j
