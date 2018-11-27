@@ -19,5 +19,4 @@ public class MetricDetectorMapping {
     @ManyToOne
     @JoinColumn(name = "detector_id")
     private Detector detector;
-
 }
