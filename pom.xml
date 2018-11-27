@@ -109,6 +109,9 @@
         <scala.library.version>2.12.7</scala.library.version>
         <slf4j.version>1.7.25</slf4j.version>
         <spring.boot.version>2.0.5.RELEASE</spring.boot.version>
+        <spring.security.jwt.version>1.0.9.RELEASE</spring.security.jwt.version>
+        <spring.security.oauth2.version>2.3.4.RELEASE</spring.security.oauth2.version>
+
 
         <!-- Version 0.25.0.RELEASE breaks Model Service. [WLW] -->
         <!-- Caused by: org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'org.springframework.hateoas.hal.HalConfiguration' available -->
@@ -402,6 +405,21 @@
                         <artifactId>spring-boot-starter-logging</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-security</artifactId>
+                <version>${spring.boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-jwt</artifactId>
+                <version>${spring.security.jwt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security.oauth</groupId>
+                <artifactId>spring-security-oauth2</artifactId>
+                <version>${spring.security.oauth2.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.hateoas</groupId>
