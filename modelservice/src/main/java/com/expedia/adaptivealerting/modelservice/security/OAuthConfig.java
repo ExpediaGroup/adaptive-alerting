@@ -59,8 +59,10 @@ public class OAuthConfig extends AuthorizationServerConfigurerAdapter {
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         clients.inMemory()
-                .withClient(properties.getClientId()).secret((passwordEncoder().encode(properties.getSecret())))
-                .authorizedGrantTypes("password", "authorization_code", "refresh_token").scopes("read", "write")
+                .withClient(properties.getClientId())
+                .secret((passwordEncoder().encode(properties.getSecret())))
+                .authorizedGrantTypes("password", "authorization_code", "refresh_token")
+                .scopes("read", "write")
                 .autoApprove(true);
     }
 
@@ -78,7 +80,7 @@ public class OAuthConfig extends AuthorizationServerConfigurerAdapter {
     @Bean
     public JwtAccessTokenConverter defaultAccessTokenConverter() {
         JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
-        converter.setSigningKey("123");
+        converter.setSigningKey(properties.getSigningKey());
         return converter;
     }
 

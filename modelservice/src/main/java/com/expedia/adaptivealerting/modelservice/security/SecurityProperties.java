@@ -29,4 +29,5 @@ public class SecurityProperties {
 
     private String clientId;
     private String secret;
+    private String signingKey;
 }
