@@ -27,5 +27,6 @@ management:
 security:
   clientId: "id"
   secret: "secret"
+  signingKey: "key"
 server:
   port: 8008
