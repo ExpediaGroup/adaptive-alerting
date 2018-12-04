@@ -32,3 +32,5 @@ We use Travis CI to build AA Docker images and push them to Docker Hub. Here's h
 - For the release (docker push), the module-specific build script delegates to the shared
   `scripts/publish-to-docker-hub.sh` script. This script has logic to push the image to Docker Hub
   if and only if the current branch is the `master`.
+
+...
