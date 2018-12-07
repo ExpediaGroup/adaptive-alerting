@@ -68,7 +68,10 @@ public class OAuthConfig extends AuthorizationServerConfigurerAdapter {
 
     @Override
     public void configure(final AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-        endpoints.tokenStore(tokenStore()).authenticationManager(authenticationManager).accessTokenConverter(defaultAccessTokenConverter())
+        endpoints
+                .tokenStore(tokenStore())
+                .authenticationManager(authenticationManager)
+                .accessTokenConverter(defaultAccessTokenConverter())
                 .userDetailsService(userDetailsService);
     }
 
