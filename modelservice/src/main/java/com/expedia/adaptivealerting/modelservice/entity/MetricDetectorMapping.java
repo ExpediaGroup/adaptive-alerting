@@ -7,7 +7,7 @@ import javax.persistence.*;
 @Data
 @Entity
 public class MetricDetectorMapping {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

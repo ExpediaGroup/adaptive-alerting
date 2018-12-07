@@ -51,3 +51,11 @@ create table metric_detector_mapping (
   constraint detector_id_mapping_fk foreign key (detector_id) references detector (id),
   unique index (metric_id, detector_id)
 );
+
+create table user (
+  id           int unsigned primary key not null auto_increment,
+  name         varchar(100) unique not null,
+  password     varchar(100) not null,
+  role         varchar(100),
+  enabled      boolean
+);
