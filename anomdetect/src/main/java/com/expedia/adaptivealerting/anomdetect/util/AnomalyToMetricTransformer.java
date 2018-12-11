@@ -35,7 +35,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * might generalize this.
  * </p>
  *
- *
  * @author Willie Wheeler
  */
 public class AnomalyToMetricTransformer {
