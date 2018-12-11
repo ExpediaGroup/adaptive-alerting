@@ -16,30 +16,29 @@
 package com.expedia.adaptivealerting.kafka.serde;
 
 import com.expedia.metrics.MetricData;
+import com.expedia.metrics.metrictank.MessagePackSerializer;
 import org.apache.kafka.common.serialization.Deserializer;
-import org.apache.kafka.common.serialization.Serde;
-import org.apache.kafka.common.serialization.Serializer;
 
+import java.io.IOException;
 import java.util.Map;
 
-public class MetricDataSerde implements Serde<MetricData> {
+public class MetricDataDeserializer implements Deserializer<MetricData> {
+    private final static MessagePackSerializer mps = new MessagePackSerializer();
 
     @Override
     public void configure(Map<String, ?> configs, boolean isKey) {
     }
 
     @Override
+    public MetricData deserialize(String topic, byte[] metricDataBytes) {
+        try {
+            return mps.deserialize(metricDataBytes);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public void close() {
     }
-
-    @Override
-    public Serializer<MetricData> serializer() {
-        return new MetricDataSerializer();
-    }
-
-    @Override
-    public Deserializer<MetricData> deserializer() {
-        return new MetricDataDeserializer();
-    }
-    
 }

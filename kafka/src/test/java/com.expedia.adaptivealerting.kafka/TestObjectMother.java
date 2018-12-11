@@ -23,9 +23,9 @@ import com.expedia.adaptivealerting.kafka.serde.JsonPojoSerde;
 import com.expedia.adaptivealerting.kafka.serde.JsonPojoSerializer;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
+import com.expedia.metrics.TagCollection;
 import lombok.val;
 import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.Topology;
@@ -35,6 +35,7 @@ import org.apache.kafka.streams.test.ConsumerRecordFactory;
 
 import java.time.Instant;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -57,8 +58,32 @@ public final class TestObjectMother {
     private TestObjectMother() {
     }
     
+    /**
+     * Returns a set of metric tags, valid for Metrictank.
+     *
+     * @return Metrictank-valid metric tags
+     */
+    public static TagCollection metricTags() {
+        val tags = new HashMap<String, String>();
+        
+        // Metrics 2.0
+        tags.put("mtype", "gauge");
+        tags.put("unit", "");
+        
+        // Metrictank
+        tags.put("org_id", "1");
+        tags.put("interval", "1");
+        
+        return new TagCollection(tags);
+    }
+    
+    public static TagCollection metricMeta() {
+        val meta = new HashMap<String, String>();
+        return new TagCollection(meta);
+    }
+    
     public static MetricData metricData() {
-        val metricDefinition = new MetricDefinition("some-metric-key");
+        val metricDefinition = new MetricDefinition("some-metric-key", metricTags(), metricMeta());
         val now = Instant.now().getEpochSecond();
         return new MetricData(metricDefinition, 100.0, now);
     }
@@ -75,13 +100,17 @@ public final class TestObjectMother {
         return anomalyResult;
     }
     
-    public static TopologyTestDriver topologyTestDriver(Topology topology, boolean continueOnDeserException) {
+    public static TopologyTestDriver topologyTestDriver(
+            Topology topology,
+            Class<?> jsonPojoDeserializerClass,
+            boolean continueOnDeserException) {
+        
         val props = new Properties();
         props.put(StreamsConfig.APPLICATION_ID_CONFIG, "test");
         props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "dummy:1234");
         props.setProperty(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName());
         props.setProperty(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, JsonPojoSerde.class.getName());
-        props.setProperty(JsonPojoDeserializer.CK_JSON_POJO_CLASS, MetricData.class.getName());
+        props.setProperty(JsonPojoDeserializer.CK_JSON_POJO_CLASS, jsonPojoDeserializerClass.getName());
         
         if (continueOnDeserException) {
             props.setProperty(
@@ -105,8 +134,8 @@ public final class TestObjectMother {
         return new ConsumerRecordFactory<>(new StringSerializer(), new JsonPojoSerializer<>());
     }
     
-    public static StringDeserializer stringDeserializer() {
-        return new StringDeserializer();
+    public static ConsumerRecordFactory<String, AnomalyResult> anomalyResultFactory() {
+        return new ConsumerRecordFactory<>(new StringSerializer(), new JsonPojoSerializer<>());
     }
     
     public static JsonPojoDeserializer<MappedMetricData> mappedMetricDataDeserializer() {
