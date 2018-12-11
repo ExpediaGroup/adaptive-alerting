@@ -21,13 +21,20 @@ import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.TagCollection;
 import lombok.val;
 
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
+ * <p>
  * Transforms an anomaly into a metric. We do this to feed anomalies back into the metric ingest for visualization.
+ * </p>
+ * <p>
+ * The current implementation intentionally avoids value tags since Metrictank doesn't support them. In the future we
+ * might generalize this.
+ * </p>
+ *
  *
  * @author Willie Wheeler
  */
@@ -39,27 +46,21 @@ public class AnomalyToMetricTransformer {
         val metricData = anomalyResult.getMetricData();
         val metricDef = metricData.getMetricDefinition();
         val tags = metricDef.getTags();
-        val vTags = tags.getV();
         val kvTags = tags.getKv();
         val value = metricData.getValue();
         val timestamp = metricData.getTimestamp();
         
-        if (vTags.contains(AnomalyConstants.ANOMALY)) {
-            throw new IllegalArgumentException("Metric can't contain '" + AnomalyConstants.ANOMALY + " ' value tag");
+        if (kvTags.containsKey(AnomalyConstants.AA_DETECTOR_UUID)) {
+            throw new IllegalArgumentException("Metric can't contain '" + AnomalyConstants.AA_DETECTOR_UUID + "' key/value tag");
         }
-        
-        if (kvTags.containsKey(AnomalyConstants.DETECTOR_UUID)) {
-            throw new IllegalArgumentException("Metric can't contain '" + AnomalyConstants.DETECTOR_UUID + "' key/value tag");
-        }
-        
-        val newVTags = new HashSet<>(vTags);
-        newVTags.add(AnomalyConstants.ANOMALY);
         
         val newKVTags = new HashMap<>(kvTags);
-        newKVTags.put(AnomalyConstants.DETECTOR_UUID, anomalyResult.getDetectorUUID().toString());
+        newKVTags.put(AnomalyConstants.AA_DETECTOR_UUID, anomalyResult.getDetectorUUID().toString());
         
-        val newTags = new TagCollection(newKVTags, newVTags);
-        val newMetricDef = new MetricDefinition(newTags);
+        val newKey = metricDef.getKey();
+        val newTags = new TagCollection(newKVTags, Collections.EMPTY_SET);
+        val newMeta = new TagCollection(Collections.EMPTY_MAP);
+        val newMetricDef = new MetricDefinition(newKey, newTags, newMeta);
         
         return new MetricData(newMetricDef, value, timestamp);
     }

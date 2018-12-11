@@ -25,11 +25,13 @@ package com.expedia.adaptivealerting.kafka.serde;
 import com.expedia.metrics.jackson.MetricsJavaModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.Serializer;
 
 import java.util.Map;
 
+@Slf4j
 public class JsonPojoSerializer<T> implements Serializer<T> {
     private final ObjectMapper objectMapper;
 

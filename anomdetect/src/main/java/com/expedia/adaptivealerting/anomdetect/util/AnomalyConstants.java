@@ -23,12 +23,7 @@ package com.expedia.adaptivealerting.anomdetect.util;
 public interface AnomalyConstants {
     
     /**
-     * Value tag for metrics representing an anomaly.
+     * Key/value tag key for metrics representing an anomaly. The value must be the detector UUID.
      */
-    String ANOMALY = "anomaly";
-    
-    /**
-     * Key/value tag key for metrics representing an anomaly.
-     */
-    String DETECTOR_UUID = "detector_uuid";
+    String AA_DETECTOR_UUID = "aa_detector_uuid";
 }

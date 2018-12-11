@@ -24,7 +24,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Collections;
 import java.util.UUID;
 
 /**
@@ -49,8 +48,7 @@ public class AnomalyToMetricTransformerTest {
         val actualKvTags = actualTags.getKv();
         val detectorUuid = anomalyResultWithStringMetricKey.getDetectorUUID().toString();
         
-        Assert.assertTrue(actualVTags.contains(AnomalyConstants.ANOMALY));
-        Assert.assertTrue(detectorUuid.equals(actualKvTags.get(AnomalyConstants.DETECTOR_UUID)));
+        Assert.assertTrue(detectorUuid.equals(actualKvTags.get(AnomalyConstants.AA_DETECTOR_UUID)));
     }
     
     @Test(expected = IllegalArgumentException.class)
@@ -59,19 +57,9 @@ public class AnomalyToMetricTransformerTest {
     }
     
     @Test(expected = IllegalArgumentException.class)
-    public void testTransformRejectsMetricWithAnomalyTag() {
-        val vTags = Collections.singleton(AnomalyConstants.ANOMALY);
-        val metricDef = MetricUtil.metricDefinition(null, vTags);
-        val metricData = MetricUtil.metricData(metricDef);
-        val anomResult = anomalyResult(metricData);
-        
-        transformerUnderTest.transform(anomResult);
-    }
-    
-    @Test(expected = IllegalArgumentException.class)
     public void testTransformRejectsMetricWithDeploymentUuidTag() {
         val kvTags = MetricUtil.defaultKvTags();
-        kvTags.put(AnomalyConstants.DETECTOR_UUID, UUID.randomUUID().toString());
+        kvTags.put(AnomalyConstants.AA_DETECTOR_UUID, UUID.randomUUID().toString());
         
         val metricDef = MetricUtil.metricDefinition(kvTags, null);
         val metricData = MetricUtil.metricData(metricDef);
