@@ -59,3 +59,17 @@ create table user (
   role         varchar(100),
   enabled      boolean
 );
+
+create table metric_tags (
+tag_id        int NOT NULL AUTO_INCREMENT PRIMARY KEY , 
+tag_keys      varchar(255) NOT NULL, 
+tag_values    varchar(255) NOT NULL,
+unique index (tag_keys, tag_values)
+);
+
+create table metric_mapper(
+map_id        int NOT NULL auto_increment PRIMARY KEY,
+id            int NOT NULL,
+tag_id        int NOT NULL,
+unique index (id,tag_id)
+);
