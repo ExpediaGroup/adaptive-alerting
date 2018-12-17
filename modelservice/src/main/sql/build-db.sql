@@ -61,15 +61,17 @@ create table user (
 );
 
 create table metric_tags (
-tag_id        int NOT NULL AUTO_INCREMENT PRIMARY KEY , 
-tag_keys      varchar(255) NOT NULL, 
-tag_values    varchar(255) NOT NULL,
+tag_id        int primary key NOT NULL AUTO_INCREMENT, 
+tag_keys      varchar(255) unique not null, 
+tag_values    varchar(255) unique not null,
 unique index (tag_keys, tag_values)
 );
 
 create table metric_mapper(
-map_id        int NOT NULL auto_increment PRIMARY KEY,
-id            int NOT NULL,
-tag_id        int NOT NULL,
-unique index (id,tag_id)
+map_id        int primary key NOT NULL AUTO_INCREMENT,
+m_id          int unsigned NOT NULL,
+tags_id       int NOT NULL,
+constraint metric_fk_id foreign key (m_id) references metric (id),
+constraint metrictags_id_mapping_fk foreign key (tags_id) references metric_tags (tag_id),
+unique index (m_id,tags_id)
 );
