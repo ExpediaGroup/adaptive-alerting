@@ -73,7 +73,7 @@ public interface MetricRepository extends PagingAndSortingRepository<Metric, Lon
      * @param tag Matching tag value.
      * @return List of metrics by its matching tag
      */
-    @Query(nativeQuery = true, value = "SELECT * FROM (SELECT id, ukey, hash, tags, JSON_SEARCH(tags, \"all\", :tag) as tag_result FROM metric) as new_metric WHERE tag_result IS NOT NULL")
+    @Query(nativeQuery = true, value = "SELECT m.* FROM metric m INNER JOIN metric_mapper mm on mm.m_id = m.id  INNER JOIN metric_tags mt on mt.tag_id = mm.tags_id WHERE mt.tag_keys = :tag")
     List<Metric> findByTagsContaining(@Param("tag") String tag);
 
 }
