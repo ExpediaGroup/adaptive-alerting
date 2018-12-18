@@ -34,7 +34,6 @@ public class SignUpController {
      * @param user
      * @return
      */
-
     @PostMapping(path = "/signUp")
     public ResponseEntity<?> addUser(@ModelAttribute UserInfo user) {
         UserInfo newUser = signUpService.addUser(user);
