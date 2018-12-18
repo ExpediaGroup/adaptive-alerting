@@ -30,11 +30,11 @@ public interface UserDetailsRepository extends CrudRepository<UserInfo, Long> {
     /**
      * Finds a valid user by its name, if any.
      *
-     * @param userName user name.
+     * @param username username.
      * @param enabled  enabled flag.
      * @return User identified by the user name.
      */
-    UserInfo findByUserNameAndEnabled(String userName, boolean enabled);
+    UserInfo findByUsernameAndEnabled(String username, boolean enabled);
 
     /**
      * Finds a list of users by enabled flag.
@@ -43,5 +43,9 @@ public interface UserDetailsRepository extends CrudRepository<UserInfo, Long> {
      * @return List of users identified by the enabled flag.
      */
     List<UserInfo> findAllByEnabled(boolean enabled);
+
+
+    @Override
+    UserInfo save(UserInfo userInfo);
 
 }

@@ -18,31 +18,26 @@ package com.expedia.adaptivealerting.modelservice.service;
 import com.expedia.adaptivealerting.modelservice.entity.UserInfo;
 import com.expedia.adaptivealerting.modelservice.repo.UserDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-
 /**
- * User Details Service implementation
+ * Sign up service to add new users
  *
  * @author kashah
  */
 @Service
-public class UserDetailsServiceImpl implements UserDetailsService {
+public class SignUpService {
 
     @Autowired
-    private UserDetailsRepository userRepo;
+    private UserDetailsRepository userRepository;
 
-    @Override
-    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-        UserInfo userInfo = userRepo.findByUsernameAndEnabled(userName, true);
-        GrantedAuthority authority = new SimpleGrantedAuthority(userInfo.getRole());
-        return new User(userInfo.getUsername(), userInfo.getPassword(), Arrays.asList(authority));
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    public UserInfo addUser(UserInfo user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userRepository.save(user);
     }
+
 }

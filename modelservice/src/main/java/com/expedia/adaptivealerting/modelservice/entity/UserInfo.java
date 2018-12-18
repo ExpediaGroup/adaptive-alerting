@@ -35,15 +35,25 @@ import javax.persistence.Table;
 public class UserInfo {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "username")
-    private String userName;
+    private String username;
 
     private String password;
 
     private String role;
 
     private boolean enabled;
+
+    public UserInfo() {
+    }
+
+    public UserInfo(String username, String password, String role, boolean enabled) {
+        this.username = username;
+        this.password = password;
+        this.role = role;
+        this.enabled = enabled;
+    }
+
 }
