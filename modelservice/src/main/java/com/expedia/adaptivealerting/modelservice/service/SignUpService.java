@@ -37,6 +37,7 @@ public class SignUpService {
 
     public UserInfo addUser(UserInfo user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRole("USER");
         return userRepository.save(user);
     }
 

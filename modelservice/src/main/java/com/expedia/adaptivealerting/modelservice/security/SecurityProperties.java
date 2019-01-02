@@ -26,8 +26,5 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "security")
 @Data
 public class SecurityProperties {
-
-    private String clientId;
-    private String secret;
     private String signingKey;
 }
