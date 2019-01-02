@@ -22,9 +22,18 @@ import com.expedia.aquila.core.model.AquilaModelMetadata;
 import com.expedia.aquila.core.model.Classifier;
 import com.expedia.aquila.core.model.PredictionModel;
 import com.expedia.aquila.core.repo.AquilaModelRepo;
+import com.expedia.metrics.MetricDefinition;
+import com.expedia.metrics.TagCollection;
+import com.google.common.collect.ImmutableMap;
+import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.hateoas.Resource;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -40,15 +49,29 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @Service
 @Slf4j
 public final class AquilaTrainerService {
-    
-    @Autowired
+
     private DataConnector dataConnector;
-    
-    @Autowired
     private PredictionModelTrainer predictionModelTrainer;
-    
-    @Autowired
     private AquilaModelRepo modelRepo;
+    private RestTemplate restTemplate;
+    private String fetchMetricUrl;
+
+    @Autowired
+    public AquilaTrainerService(
+        DataConnector dataConnector,
+        PredictionModelTrainer predictionModelTrainer,
+        AquilaModelRepo modelRepo,
+        RestTemplate restTemplate,
+        Config connectorsConfig
+    ) {
+        this.dataConnector = dataConnector;
+        this.predictionModelTrainer = predictionModelTrainer;
+        this.modelRepo = modelRepo;
+        this.restTemplate = restTemplate;
+        this.fetchMetricUrl = connectorsConfig
+                .getConfig("modelservice")
+                .getString("fetchMetricUrl");
+    }
     
     public AquilaModel train(TrainingRequest request) {
         notNull(request, "request can't be null");
@@ -72,7 +95,37 @@ public final class AquilaTrainerService {
     
     private MetricFrame loadTrainingData(TrainingRequest request) {
         log.trace("Loading training data: request={}", request);
-        return dataConnector.load(request.getMetricDefinition(), request.getStartDate(), request.getEndDate());
+        MetricDefinition metricDefinition = request.getMetricDefinition();
+        if (metricDefinition == null) {
+            notNull(request.getMetricId(), "metricId can't be null if metricDefinition is null");
+            metricDefinition = fetchMetricDefinition(request.getMetricId());
+            notNull(metricDefinition, "metricId could not be fetched");
+        }
+        return dataConnector.load(metricDefinition, request.getStartDate(), request.getEndDate());
+    }
+
+    private MetricDefinition fetchMetricDefinition(String metricId) {
+        log.info("Invoking model service to fetch MetricDefinition for id {}", metricId);
+        try {
+            Resource<Metric> metricResource = restTemplate.exchange(
+                    fetchMetricUrl,
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<Resource<Metric>>() { },
+                    ImmutableMap.of("hash", metricId)
+            ).getBody();
+
+            Metric metricRs = metricResource == null ? null : metricResource.getContent();
+            if (metricRs != null) {
+                log.info("Received key {} and tags {} for id {}",
+                        metricRs.getKey(), metricRs.getTags(), metricId);
+                return new MetricDefinition(
+                        metricRs.getKey(), new TagCollection(metricRs.getTags()), TagCollection.EMPTY);
+            }
+        } catch (RestClientException rce) {
+            log.error("Tag fetch fail fo id=" + metricId, rce);
+        }
+        return null;
     }
     
     private AquilaModelMetadata toMetadata(TrainingRequest request) {

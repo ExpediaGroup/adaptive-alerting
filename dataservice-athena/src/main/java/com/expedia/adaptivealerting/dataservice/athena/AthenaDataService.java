@@ -36,6 +36,7 @@ import com.expedia.adaptivealerting.core.util.MetricUtil;
 import com.expedia.adaptivealerting.core.util.ThreadUtil;
 import com.expedia.adaptivealerting.dataservice.DataService;
 import com.expedia.metrics.MetricDefinition;
+import com.expedia.metrics.metrictank.MetricTankIdFactory;
 import com.typesafe.config.Config;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -67,9 +68,8 @@ public class AthenaDataService implements DataService {
     // FIXME Temporarily using a hardcoded query.
     private static final String POS_QUERY_TEMPLATE =
             "SELECT timestamp, value" +
-            " FROM bookings_lob_pos" +
-            " WHERE lob='%s'" +
-            " AND pos='%s'" +
+            " FROM aa_datasets.aa_metrics" +
+            " WHERE \"$path\" LIKE '%%%s%%'" +
             " AND timestamp BETWEEN %d AND %d" +
             " ORDER BY timestamp";
     
@@ -80,6 +80,7 @@ public class AthenaDataService implements DataService {
     private String database;
     private String outputBucket;
     private int clientExecutionTimeout = 0;
+    private MetricTankIdFactory idFactory = new MetricTankIdFactory();
     
     /**
      * Initializes the data service. Required configuration properties:
@@ -153,38 +154,38 @@ public class AthenaDataService implements DataService {
         
         // Each result represents 1 minute, so we need to move 1 minute (60 seconds) forward for each one.
         int incrSecond = 60 * ATHENA_MAX_RESULTS;
-        
-        final List<MetricFrame> frames = new ArrayList<>();
+
+        final List<String> queryIds = new ArrayList<>();
         while (currEpochSecond < endEpochSecond) {
             long nextEpochSecond = currEpochSecond + incrSecond;
             
             // TODO Run these in parallel
             final String query = buildAthenaQuery(metricDefinition, currEpochSecond, nextEpochSecond);
             final String queryExecutionId = submitAthenaQuery(query);
+            queryIds.add(queryExecutionId);
+            currEpochSecond = nextEpochSecond;
+        }
+
+        final List<MetricFrame> frames = new ArrayList<>();
+        for (String queryExecutionId : queryIds) {
             waitForQueryToComplete(queryExecutionId);
-            
+
             // Need to capture the results as part of the loop too.
             try (final InputStream in = toS3InputStream(queryExecutionId)) {
                 frames.add(MetricFrameLoader.loadCsv(metricDefinition, in, true));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            
-            currEpochSecond = nextEpochSecond;
         }
         
         return MetricUtil.merge(frames);
     }
     
     private String buildAthenaQuery(MetricDefinition metricDefinition, long startSecond, long endSecond) {
-        // FIXME Remove hardcodes
-        final String lob = metricDefinition.getTags().getKv().get("lob");
-        final String pos = metricDefinition.getTags().getKv().get("pos");
-        return String.format(POS_QUERY_TEMPLATE, lob, pos, startSecond, endSecond);
+        return String.format(POS_QUERY_TEMPLATE, idFactory.getId(metricDefinition), startSecond, endSecond);
     }
     
     private String submitAthenaQuery(String query) {
-        log.info("Executing Athena query: {}", query);
         final QueryExecutionContext context = new QueryExecutionContext().withDatabase(database);
         final ResultConfiguration conf = new ResultConfiguration()
 //                .withEncryptionConfiguration(encryptionConfiguration)
@@ -194,6 +195,7 @@ public class AthenaDataService implements DataService {
                 .withQueryExecutionContext(context)
                 .withResultConfiguration(conf);
         final StartQueryExecutionResult result = athena.startQueryExecution(request);
+        log.trace("Executing Athena query {}: {}", result.getQueryExecutionId(), query);
         return result.getQueryExecutionId();
     }
     
@@ -218,6 +220,7 @@ public class AthenaDataService implements DataService {
             }
             log.trace("Current query state: {}", state);
         }
+        log.trace("Athena query complete: {}", queryExecutionId);
     }
     
     private InputStream toS3InputStream(String queryExecutionId) {

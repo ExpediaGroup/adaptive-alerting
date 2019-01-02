@@ -15,27 +15,13 @@
  */
 package com.expedia.aquila.train.service;
 
-import com.expedia.aquila.core.model.TrainingParams;
-import com.expedia.metrics.MetricDefinition;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import java.time.Instant;
+import java.util.Map;
 
-/**
- * @author Willie Wheeler
- * @author Karan Shah
- */
-@NoArgsConstructor
-@AllArgsConstructor
 @Data
-@JsonIgnoreProperties(ignoreUnknown=true)
-public final class TrainingRequest {
-    private MetricDefinition metricDefinition;
-    private String metricId;
-    private TrainingParams params;
-    private Instant startDate;
-    private Instant endDate;
+public class Metric {
+    private String key;
+    private String hash;
+    private Map<String, String> tags;
 }

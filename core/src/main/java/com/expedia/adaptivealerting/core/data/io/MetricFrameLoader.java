@@ -84,8 +84,13 @@ public final class MetricFrameLoader {
     }
     
     private static MetricData toMetricData(MetricDefinition metricDefinition, String[] row) {
-        // FIXME Some of the CSVs use Instants, some use epoch seconds
-        return new MetricData(metricDefinition, Float.parseFloat(row[1]), Instant.parse(row[0]).getEpochSecond());
-//        return new MetricData(metricDefinition, Float.parseFloat(row[1]), Long.parseLong(row[0]));
+        // Some of the CSVs use Instants, some use epoch seconds
+        long epochSeconds;
+        try {
+            epochSeconds = Long.parseLong(row[0]);
+        } catch (NumberFormatException nfe) {
+            epochSeconds = Instant.parse(row[0]).getEpochSecond();
+        }
+        return new MetricData(metricDefinition, Float.parseFloat(row[1]), epochSeconds);
     }
 }

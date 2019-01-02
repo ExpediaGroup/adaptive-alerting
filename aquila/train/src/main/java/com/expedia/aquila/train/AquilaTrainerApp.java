@@ -19,7 +19,6 @@ import com.expedia.adaptivealerting.core.util.ReflectionUtil;
 import com.expedia.adaptivealerting.dataconnect.DataConnector;
 import com.expedia.aquila.core.repo.AquilaModelRepo;
 import com.expedia.aquila.core.repo.s3.S3AquilaModelRepo;
-import com.expedia.aquila.train.service.AquilaTrainerService;
 import com.expedia.metrics.jackson.MetricsJavaModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -29,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * @author Willie Wheeler
@@ -68,16 +68,15 @@ public class AquilaTrainerApp {
     }
     
     @Bean
-    public AquilaTrainerService aquilaTrainerService() {
-        log.trace("Creating aquilaTrainerService bean");
-        return new AquilaTrainerService();
-    }
-    
-    @Bean
     public ObjectMapper objectMapper() {
         final ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.registerModule(new MetricsJavaModule());
         return objectMapper;
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 }
