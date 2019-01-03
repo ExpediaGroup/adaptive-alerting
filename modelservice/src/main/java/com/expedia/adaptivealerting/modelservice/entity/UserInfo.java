@@ -16,9 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.entity;
 
 import lombok.Data;
-
 import javax.persistence.*;
-import java.util.List;
 
 /**
  * User info entity. There already exists a class with name User in spring security module. So, naming this entity as UserInfo.

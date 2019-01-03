@@ -40,9 +40,6 @@ import javax.sql.DataSource;
 @EnableAuthorizationServer
 public class OAuthConfig extends AuthorizationServerConfigurerAdapter {
     private static String REALM = "CRM_REALM";
-    private static final int TEN_DAYS = 60 * 60 * 24 * 10;
-    private static final int ONE_DAY = 60 * 60 * 24;
-    private static final int THIRTY_DAYS = 60 * 60 * 24 * 30;
 
     @Autowired
     private DataSource dataSource;

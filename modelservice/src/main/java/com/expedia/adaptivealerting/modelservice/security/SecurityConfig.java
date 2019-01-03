@@ -67,14 +67,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/signUp").permitAll()
-                .antMatchers("/oauth/token").permitAll()
-                .anyRequest().authenticated()
-                .and()
+                    .antMatchers("/signUp").permitAll()
+                    .antMatchers("/oauth/token").permitAll()
+                    .anyRequest().authenticated()
+                    .and()
                 .httpBasic()
                 .realmName("CRM_REALM");
     }
