@@ -21,14 +21,10 @@ import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.hateoas.Resources;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
@@ -62,17 +58,12 @@ public final class RandomCutForestAnomalyDetectorFactory implements AnomalyDetec
     public RandomCutForestAnomalyDetector create(UUID uuid) {
         notNull(uuid, "uuid can't be null");
 
-        final Resources<ModelResource> models = modelServiceConnector.findModels(uuid);
-        final Collection<ModelResource> modelResources = models.getContent();
-
-        List<ModelResource> modelResourceList = new ArrayList<>(modelResources);
-        if (modelResourceList.isEmpty()) {
+        final ModelResource modelResource = modelServiceConnector.findLatestModel(uuid);
+        log.info("Loaded model: {}", modelResource);
+        if (modelResource == null) {
             log.error("There is no RCF model associated with uuid: {}", uuid);
             throw new RandomCutForestProcessingException("Could not find model in the modelservice for uuid:" + uuid);
         }
-
-        // TODO [TK] this grabs the first model. Should we refactor here?
-        final ModelResource modelResource = modelResourceList.get(0);
 
         if (modelResource.getDetectorType().getKey().equals(RCF_DETECTOR)) {
             return new RandomCutForestAnomalyDetector(uuid, modelResource);
