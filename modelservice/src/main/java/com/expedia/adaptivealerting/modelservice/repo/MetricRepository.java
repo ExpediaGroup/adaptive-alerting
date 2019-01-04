@@ -76,4 +76,5 @@ public interface MetricRepository extends PagingAndSortingRepository<Metric, Lon
     @Query(nativeQuery = true, value = "SELECT * FROM (SELECT id, ukey, hash, tags, JSON_SEARCH(tags, \"all\", :tag) as tag_result FROM metric) as new_metric WHERE tag_result IS NOT NULL")
     List<Metric> findByTagsContaining(@Param("tag") String tag);
 
+
 }

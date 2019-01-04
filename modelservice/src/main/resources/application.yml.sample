@@ -25,8 +25,6 @@ endpoints:
 management:
   context-path: "/admin"
 security:
-  clientId: "id"
-  secret: "secret"
   signingKey: "key"
 server:
   port: 8008

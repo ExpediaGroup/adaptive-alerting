@@ -16,13 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.entity;
 
 import lombok.Data;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * User info entity. There already exists a class with name User in spring security module. So, naming this entity as UserInfo.
@@ -35,15 +29,25 @@ import javax.persistence.Table;
 public class UserInfo {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "username")
-    private String userName;
+    private String username;
 
     private String password;
 
     private String role;
 
     private boolean enabled;
+
+    public UserInfo() {
+    }
+
+    public UserInfo(String username, String password, String role, boolean enabled) {
+        this.username = username;
+        this.password = password;
+        this.role = role;
+        this.enabled = enabled;
+    }
+
 }
