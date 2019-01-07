@@ -31,10 +31,14 @@ import org.apache.kafka.streams.kstream.Produced;
 /**
  * Kafka Streams adapter for {@link com.expedia.adaptivealerting.anomdetect.util.AnomalyToMetricTransformer}.
  *
+ * Note: Currently, the input and output topics must reside on the same Kafka cluster, as noted in
+ * https://kafka.apache.org/11/documentation/streams/developer-guide/config-streams.html. Future versions of Kafka
+ * Streams will support input and output topics on different clusters.
+ *
  * @author Willie Wheeler
  */
 @Slf4j
-public final class KafkaAnomalyToMetricTransformer extends AbstractStreamsApp {
+public final class KafkaAnomalyToMetricMapper extends AbstractStreamsApp {
     private static final String CK_ANOMALY_TO_METRIC_TRANSFORMER = "anomaly-to-metric-transformer";
     
     private final AnomalyToMetricTransformer transformer = new AnomalyToMetricTransformer();
@@ -43,7 +47,7 @@ public final class KafkaAnomalyToMetricTransformer extends AbstractStreamsApp {
     public static void main(String[] args) {
         val tsConfig = new TypesafeConfigLoader(CK_ANOMALY_TO_METRIC_TRANSFORMER).loadMergedConfig();
         val saConfig = new StreamsAppConfig(tsConfig);
-        new KafkaAnomalyToMetricTransformer(saConfig).start();
+        new KafkaAnomalyToMetricMapper(saConfig).start();
     }
     
     /**
@@ -51,7 +55,7 @@ public final class KafkaAnomalyToMetricTransformer extends AbstractStreamsApp {
      *
      * @param config Streams app configuration.
      */
-    public KafkaAnomalyToMetricTransformer(StreamsAppConfig config) {
+    public KafkaAnomalyToMetricMapper(StreamsAppConfig config) {
         super(config);
     }
     

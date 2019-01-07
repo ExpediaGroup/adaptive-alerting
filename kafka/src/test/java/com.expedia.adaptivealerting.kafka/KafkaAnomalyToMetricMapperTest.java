@@ -35,13 +35,13 @@ import org.mockito.MockitoAnnotations;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit test for {@link KafkaAnomalyToMetricTransformer}. See
+ * Unit test for {@link KafkaAnomalyToMetricMapper}. See
  * https://kafka.apache.org/20/documentation/streams/developer-guide/testing.html
  *
  * @author Willie Wheeler
  */
 @Slf4j
-public class KafkaAnomalyToMetricTransformerTest {
+public class KafkaAnomalyToMetricMapperTest {
     private static final String KAFKA_KEY = "some-kafka-key";
     private static final String INBOUND_TOPIC = "anomalies";
     private static final String OUTBOUND_TOPIC = "mdm";
@@ -101,7 +101,7 @@ public class KafkaAnomalyToMetricTransformerTest {
     private void initTestMachinery() {
         
         // Topology test drivers
-        val topology = new KafkaAnomalyToMetricTransformer(saConfig).buildTopology();
+        val topology = new KafkaAnomalyToMetricMapper(saConfig).buildTopology();
         this.logAndFailDriver = TestObjectMother.topologyTestDriver(topology, MappedMetricData.class, false);
         
         // MappedMetricData producer
