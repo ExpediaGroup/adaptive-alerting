@@ -73,3 +73,19 @@ create table oauth_client_details (
   additional_information VARCHAR(4096),
   autoapprove VARCHAR(256)
 );
+
+create table tag (
+id        int primary key NOT NULL AUTO_INCREMENT,
+ukey      varchar(255) not null,
+uvalue    varchar(255) not null,
+unique index (ukey, uvalue)
+);
+
+create table metric_tag_mapper(
+id                 int primary key not null AUTO_INCREMENT,
+metric_id          int unsigned not null,
+tag_id             int not null,
+constraint metric_fk_id foreign key (metric_id) references metric (id),
+constraint metrictags_id_mapping_fk foreign key (tag_id) references tag (id),
+unique index (metric_id,tag_id)
+);

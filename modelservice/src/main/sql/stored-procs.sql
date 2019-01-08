@@ -70,4 +70,33 @@ CREATE PROCEDURE insert_mapping_wildcard_metric_targets_to_detector (
     close cur1;
   END //
 
+CREATE PROCEDURE populate_metric_tags()
+
+BEGIN
+
+  DECLARE i, metric_tag_id INT DEFAULT 0;
+  DECLARE tag, t_key, t_value varchar(4000);
+  DECLARE metric_count int;
+  DECLARE j int default 0;
+
+  SET transaction isolation level read uncommitted;
+  select max(id) from metric into metric_count;
+
+  WHILE j <= metric_count do
+  SELECT m.tags FROM metric m WHERE id = j INTO tag;
+  WHILE (length(tag) > 0 AND i < json_length(tag)) do
+    SELECT json_unquote(json_extract(json_keys(tag),CONCAT('$[',i,']'))) INTO t_key;
+    SELECT json_unquote(json_extract(json_extract(tag,'$.*'),CONCAT('$[',i,']'))) INTO t_value;
+    INSERT IGNORE INTO tag (id, ukey, uvalue) VALUES ((null),t_key,t_value);
+    SELECT id FROM tag WHERE ukey = t_key AND uvalue = t_value INTO metric_tag_id;
+   INSERT INTO metric_tag_mapper (id, metric_id, tag_id) VALUES ((null), j, metric_tag_id);
+    SELECT i + 1 INTO i;
+  END WHILE;
+  SET tag = null;
+  SET i = 0;
+  SELECT j + 1 INTO j;
+  END WHILE;
+
+END //
+
 DELIMITER ;
