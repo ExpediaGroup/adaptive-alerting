@@ -15,6 +15,8 @@
  */
 package com.expedia.adaptivealerting.kafka;
 
+import com.expedia.adaptivealerting.anomdetect.util.AnomalyToMetricTransformer;
+import com.expedia.metrics.metrictank.MetricTankIdFactory;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -31,8 +33,13 @@ import java.util.Properties;
  */
 @Slf4j
 public class KafkaMultiClusterAnomalyToMetricMapper {
+    
+    // TODO Replace with configured values
     private static final String BOOTSTRAP_SERVERS = "localhost:9092";
     private static final String TOPIC = "mdm";
+    
+    private final AnomalyToMetricTransformer transformer = new AnomalyToMetricTransformer();
+    private final MetricTankIdFactory metricTankIdFactory = new MetricTankIdFactory();
     
     public static void main(String[] args) throws Exception {
         if (args.length == 0) {
@@ -48,6 +55,7 @@ public class KafkaMultiClusterAnomalyToMetricMapper {
         
         try {
             for (long index = time; index < time + sendMessageCount; index++) {
+                // TODO Replace with logic from KafkaAnomalyToMetricMapper [WLW]
                 val record = new ProducerRecord<Long, String>(TOPIC, index, "Hi Mom " + index);
                 val meta = producer.send(record).get();
                 val elapsedTime = System.currentTimeMillis() - time;
