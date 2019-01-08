@@ -1,8 +1,24 @@
+/*
+ * Copyright 2018-2019 Expedia Group, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.expedia.adaptivealerting.modelservice.service;
 
 import com.expedia.adaptivealerting.modelservice.entity.Metric;
 import com.expedia.adaptivealerting.modelservice.entity.MetricTagMapping;
 import com.expedia.adaptivealerting.modelservice.entity.Tag;
+import com.expedia.adaptivealerting.modelservice.repo.ItemExistsException;
 import com.expedia.adaptivealerting.modelservice.repo.MetricRepository;
 import com.expedia.adaptivealerting.modelservice.repo.MetricTagMappingRepository;
 import com.expedia.adaptivealerting.modelservice.repo.TagRepository;
@@ -15,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * OnboardService Implementation
+ * OnboardServiceDetail Implementation
  *
  * @author tbahl
  */
@@ -35,27 +51,20 @@ public class OnboardServiceImpl implements OnboardService {
     @Autowired
     private MetricTagMappingRepository metricTagMappingRepository;
 
-    private String hashval = " ";
 
     @Override
-    public Boolean isOnboarded(Metric metric) {
+    public Long onboarded(Metric metric) {
         String hash = metric.getHash();
         Metric m = metricRepository.findByHash(hash);
-        hashval = String.valueOf(m);
-        if (hashval.equals("null")) {
-            return false;
+        System.out.println("Metric is: "+m);
+        if (m != null) {
+            System.out.println("Metric Exist");
+            throw new ItemExistsException(m);
         }
-        return true;
-    }
-
-    @Override
-    public Integer onboard(Metric metric) {
         List<Tag> tagList;
         Metric metricEntry;
         Tag tagEntry;
-        Integer metricID = 0;
-
-
+        Long metricID = Long.valueOf(0);
         for (Iterator<Map.Entry<String, Object>> tagIterator = metric.getTags().entrySet().iterator(); tagIterator.hasNext(); ) {
             Map.Entry<String, Object> entry = tagIterator.next();
 
@@ -67,17 +76,12 @@ public class OnboardServiceImpl implements OnboardService {
             if (tagList.size() == 0) {
                 tagEntry = tagRepository.save(new Tag(null, entry.getKey(), (String) entry.getValue()));
                 metricTagMappingRepository.save(new MetricTagMapping(null, metricEntry, tagEntry));
-                metricID = Math.toIntExact(metricEntry.getId());
+                metricID = (long) Math.toIntExact(metricEntry.getId());
             } else {
-
                 metricTagMappingRepository.save(new MetricTagMapping(null, metricEntry, tagList.get(0)));
 
             }
-
         }
         return metricID;
-
-
     }
-
 }

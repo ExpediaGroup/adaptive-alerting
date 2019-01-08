@@ -29,7 +29,6 @@ import java.util.Set;
  * @author tbahl
  */
 @Data
-@Table(name = "metric")
 @Entity
 public class Metric {
 
