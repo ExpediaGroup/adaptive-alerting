@@ -12,6 +12,8 @@ Run the following with the appropriate `mainClass`:
 
 ```bash
 mvn exec:java -Dexec.mainClass="com.expedia.adaptivealerting.kafka.KafkaAnomalyDetectorMapper
+```
+
 ## Running KStream apps in docker
 
 Need to package the app (if other modules have been updated those will need to be re-built with `mvn install`):

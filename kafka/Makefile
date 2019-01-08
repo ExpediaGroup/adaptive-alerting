@@ -5,6 +5,7 @@ MAVEN := ../mvnw
 docker_build:
 	./docker/scripts/build-ad-mapper.sh -b
 	./docker/scripts/build-ad-manager.sh -b
+	./docker/scripts/build-mc-a2m-mapper.sh -b
 
 integration_test:
 	${MAVEN} test
@@ -16,3 +17,4 @@ all: docker_build integration_test
 release: docker_build
 	./docker/scripts/build-ad-mapper.sh --release
 	./docker/scripts/build-ad-manager.sh --release
+	./docker/scripts/build-mc-a2m-mapper.sh --release

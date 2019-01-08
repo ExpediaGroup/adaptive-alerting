@@ -1,24 +1,28 @@
 locals {
-  app_name = "ad-manager"
-  config_file_path = "${path.module}/templates/ad-manager_conf.tpl"
+  app_name = "mc-a2m-mapper"
+  config_file_path = "${path.module}/templates/mc-a2m-mapper_conf.tpl"
   deployment_yaml_file_path = "${path.module}/templates/deployment_yaml.tpl"
   count = "${var.enabled?1:0}"
   checksum = "${sha1("${data.template_file.config_data.rendered}")}"
-  configmap_name = "ad-manager-${local.checksum}"
+  configmap_name = "mc-a2m-mapper-${local.checksum}"
 }
 
 data "template_file" "config_data" {
   template = "${file("${local.config_file_path}")}"
   vars {
-    kafka_endpoint = "${var.kafka_endpoint}"
-    models_region = "${var.models_region}"
-    models_bucket = "${var.models_bucket}"
-    aquila_uri = "${var.aquila_uri}"
-    modelservice_uri_template = "${var.modelservice_uri_template}"
+    kafka_input_endpoint = "${var.kafka_input_endpoint}"
+    kafka_input_topic = "${var.kafka_input_topic}"
+    kafka_input_serde_key = "${var.kafka_input_serde_key}"
+    kafka_input_serde_value = "${var.kafka_input_serde_value}"
+    kafka_input_extractor_timestamp = "${var.kafka_input_extractor_timestamp}"
+    kafka_output_endpoint = "${var.kafka_output_endpoint}"
+    kafka_output_topic = "${var.kafka_output_topic}"
+    kafka_output_serde_key = "${var.kafka_output_serde_key}"
+    kafka_output_serde_value = "${var.kafka_output_serde_value}"
   }
 }
 
-// using kubectl to craete deployment construct since its not natively support by the kubernetes provider
+// using kubectl to create deployment construct since its not natively support by the kubernetes provider
 data "template_file" "deployment_yaml" {
   template = "${file("${local.deployment_yaml_file_path}")}"
   vars {
@@ -41,19 +45,19 @@ data "template_file" "deployment_yaml" {
     # Environment
     jvm_memory_limit = "${var.jvm_memory_limit}"
     graphite_enabled = "${var.graphite_enabled}"
-    graphite_port = "${var.graphite_port}"
     graphite_host = "${var.graphite_hostname}"
+    graphite_port = "${var.graphite_port}"
     env_vars = "${indent(9,"${var.env_vars}")}"
   }
 }
 
-resource "kubernetes_config_map" "ad-manager-config" {
+resource "kubernetes_config_map" "mc-a2m-mapper-config" {
   metadata {
     name = "${local.configmap_name}"
     namespace = "${var.namespace}"
   }
   data {
-    "ad-manager.conf" = "${data.template_file.config_data.rendered}"
+    "mc-a2m-mapper.conf" = "${data.template_file.config_data.rendered}"
   }
   count = "${local.count}"
 }

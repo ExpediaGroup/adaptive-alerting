@@ -100,6 +100,44 @@ module "ad-manager" {
   modelservice_uri_template = "${var.ad-manager["modelservice_uri_template"]}"
 }
 
+module "mc-a2m-mapper" {
+  source = "mc-a2m-mapper"
+
+  # Docker
+  image = "${var.mc-a2m-mapper["image"]}"
+  image_pull_policy = "${var.mc-a2m-mapper["image_pull_policy"]}"
+
+  # Kubernetes
+  namespace = "${var.app_namespace}"
+  enabled = "${var.mc-a2m-mapper["enabled"]}"
+  replicas = "${var.mc-a2m-mapper["instances"]}"
+  cpu_limit = "${var.mc-a2m-mapper["cpu_limit"]}"
+  cpu_request = "${var.mc-a2m-mapper["cpu_request"]}"
+  memory_limit = "${var.mc-a2m-mapper["memory_limit"]}"
+  memory_request = "${var.mc-a2m-mapper["memory_request"]}"
+  node_selector_label = "${var.node_selector_label}"
+  kubectl_executable_name = "${var.kubectl_executable_name}"
+  kubectl_context_name = "${var.kubectl_context_name}"
+
+  # Environment
+  graphite_enabled = "${var.graphite_enabled}"
+  graphite_hostname = "${var.graphite_hostname}"
+  graphite_port = "${var.graphite_port}"
+  jvm_memory_limit = "${var.mc-a2m-mapper["jvm_memory_limit"]}"
+  env_vars = "${var.mc-a2m-mapper["environment_overrides"]}"
+
+  # App
+  kafka_input_endpoint = "${var.mc-a2m-mapper["kakfa_input_endpoint"]}"
+  kafka_input_topic = "${var.mc-a2m-mapper["kafka_input_topic"]}"
+  kafka_input_serde_key = "${var.mc-a2m-mapper["kafka_input_serde_key"]}"
+  kafka_input_serde_value = "${var.mc-a2m-mapper["kafka_input_serde_value"]}"
+  kafka_input_extractor_timestamp = "${var.mc-a2m-mapper["kafka_input_extractor_timestamp"]}"
+  kafka_output_endpoint = "${var.mc-a2m-mapper["kafka_output_endpoint"]}"
+  kafka_output_topic = "${var.mc-a2m-mapper["kafka_output_topic"]}"
+  kafka_output_serde_key = "${var.mc-a2m-mapper["kafka_output_serde_key"]}"
+  kafka_output_serde_value = "${var.mc-a2m-mapper["kafka_output_serde_value"]}"
+}
+
 module "notifier" {
   source = "notifier"
 
