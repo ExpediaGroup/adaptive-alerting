@@ -100,6 +100,7 @@ module "ad-manager" {
   modelservice_uri_template = "${var.ad-manager["modelservice_uri_template"]}"
 }
 
+/*
 module "mc-a2m-mapper" {
   source = "mc-a2m-mapper"
 
@@ -137,6 +138,7 @@ module "mc-a2m-mapper" {
   kafka_output_serde_key = "${var.mc-a2m-mapper["kafka_output_serde_key"]}"
   kafka_output_serde_value = "${var.mc-a2m-mapper["kafka_output_serde_value"]}"
 }
+*/
 
 module "notifier" {
   source = "notifier"
