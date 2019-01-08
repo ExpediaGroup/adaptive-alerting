@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Expedia Group, Inc.
+ * Copyright 2018-2019 Expedia Group, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.kafka;
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorManager;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.metrics.MetricData;
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -63,10 +64,10 @@ public final class KafkaAnomalyDetectorManagerTest {
     // Test machinery
     private TopologyTestDriver logAndFailDriver;
     private TopologyTestDriver logAndContinueDriver;
-    private ConsumerRecordFactory<String, MappedMetricData> mmdRecordFactory;
-    private ConsumerRecordFactory<String, String> stringRecordFactory;
-    private StringDeserializer stringDeser;
-    private Deserializer<AnomalyResult> arDeserializer;
+    private ConsumerRecordFactory<String, MappedMetricData> mappedMetricDataFactory;
+    private ConsumerRecordFactory<String, String> stringFactory;
+    private StringDeserializer stringDeserializer;
+    private Deserializer<AnomalyResult> anomalyResultDeserializer;
     
     @Before
     public void setUp() {
@@ -88,8 +89,8 @@ public final class KafkaAnomalyDetectorManagerTest {
      */
     @Test(expected = StreamsException.class)
     public void failsOnDeserializationException() {
-        logAndFailDriver.pipeInput(stringRecordFactory.create(INBOUND_TOPIC, KAFKA_KEY, "invalid_input"));
-        logAndFailDriver.readOutput(OUTBOUND_TOPIC, stringDeser, arDeserializer);
+        logAndFailDriver.pipeInput(stringFactory.create(INBOUND_TOPIC, KAFKA_KEY, "invalid_input"));
+        logAndFailDriver.readOutput(OUTBOUND_TOPIC, stringDeserializer, anomalyResultDeserializer);
     }
     
     /**
@@ -97,8 +98,8 @@ public final class KafkaAnomalyDetectorManagerTest {
      */
     @Test
     public void continuesOnDeserializationException() {
-        logAndContinueDriver.pipeInput(stringRecordFactory.create(INBOUND_TOPIC, KAFKA_KEY, "invalid_input"));
-        logAndContinueDriver.readOutput(OUTBOUND_TOPIC, stringDeser, arDeserializer);
+        logAndContinueDriver.pipeInput(stringFactory.create(INBOUND_TOPIC, KAFKA_KEY, "invalid_input"));
+        logAndContinueDriver.readOutput(OUTBOUND_TOPIC, stringDeserializer, anomalyResultDeserializer);
     }
     
     private void initConfig() {
@@ -123,15 +124,15 @@ public final class KafkaAnomalyDetectorManagerTest {
         
         // Topology test drivers
         val topology = new KafkaAnomalyDetectorManager(saConfig, manager).buildTopology();
-        this.logAndFailDriver = TestObjectMother.topologyTestDriver(topology, false);
-        this.logAndContinueDriver = TestObjectMother.topologyTestDriver(topology, true);
+        this.logAndFailDriver = TestObjectMother.topologyTestDriver(topology, MetricData.class, false);
+        this.logAndContinueDriver = TestObjectMother.topologyTestDriver(topology, MetricData.class, true);
         
         // MetricData sources
-        this.mmdRecordFactory = TestObjectMother.mappedMetricDataFactory();
-        this.stringRecordFactory = TestObjectMother.stringFactory();
+        this.mappedMetricDataFactory = TestObjectMother.mappedMetricDataFactory();
+        this.stringFactory = TestObjectMother.stringFactory();
         
         // MappedMetricData consumers
-        this.stringDeser = TestObjectMother.stringDeserializer();
-        this.arDeserializer = TestObjectMother.anomalyResultDeserializer();
+        this.stringDeserializer = new StringDeserializer();
+        this.anomalyResultDeserializer = TestObjectMother.anomalyResultDeserializer();
     }
 }

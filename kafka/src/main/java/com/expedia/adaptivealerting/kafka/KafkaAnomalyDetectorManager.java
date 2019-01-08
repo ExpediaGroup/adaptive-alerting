@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Expedia Group, Inc.
+ * Copyright 2018-2019 Expedia Group, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
         final KStream<String, MappedMetricData> stream = builder.stream(inboundTopic);
         stream
                 .mapValues(mappedMetricData -> {
-                    log.info("Processing mappedMetricData: {}", mappedMetricData);
+                    log.trace("Processing mappedMetricData: {}", mappedMetricData);
                     
                     // TODO Not sure why we would get null here--mappedMetricData are mapped to models. But in fact we
                     // are seeing this occur so let's handle it and investigate the cause. [WLW]

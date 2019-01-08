@@ -42,7 +42,7 @@ data "template_file" "deployment_yaml" {
   }
 }
 
-resource "kubernetes_config_map" "aa-config" {
+resource "kubernetes_config_map" "aquila-detect-config" {
   metadata {
     name      = "${local.configmap_name}"
     namespace = "${var.namespace}"

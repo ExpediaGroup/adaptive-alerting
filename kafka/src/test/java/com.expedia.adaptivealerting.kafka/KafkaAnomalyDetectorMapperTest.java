@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Expedia Group, Inc.
+ * Copyright 2018-2019 Expedia Group, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,9 +67,9 @@ public final class KafkaAnomalyDetectorMapperTest {
     // Test machinery
     private TopologyTestDriver logAndFailDriver;
     private TopologyTestDriver logAndContinueDriver;
-    private ConsumerRecordFactory<String, MetricData> mdRecordFactory;
-    private ConsumerRecordFactory<String, String> stringRecordFactory;
-    private StringDeserializer stringDeser;
+    private ConsumerRecordFactory<String, MetricData> metricDataFactory;
+    private ConsumerRecordFactory<String, String> stringFactory;
+    private StringDeserializer stringDeserializer;
     private Deserializer<MappedMetricData> mmdDeserializer;
     
     @Before
@@ -88,11 +88,11 @@ public final class KafkaAnomalyDetectorMapperTest {
     }
     
     @Test
-    public void metricDataToMappedMetricData() {
-        logAndFailDriver.pipeInput(mdRecordFactory.create(INBOUND_TOPIC, KAFKA_KEY, metricData));
+    public void testMetricDataToMappedMetricData() {
+        logAndFailDriver.pipeInput(metricDataFactory.create(INBOUND_TOPIC, KAFKA_KEY, metricData));
         
         // The streams app remaps the key to the detector UUID. [WLW]
-        val outputRecord = logAndFailDriver.readOutput(OUTBOUND_TOPIC, stringDeser, mmdDeserializer);
+        val outputRecord = logAndFailDriver.readOutput(OUTBOUND_TOPIC, stringDeserializer, mmdDeserializer);
         log.trace("outputRecord={}", outputRecord);
         val outputKafkaKey = mappedMetricData.getDetectorUuid().toString();
         OutputVerifier.compareKeyValue(outputRecord, outputKafkaKey, mappedMetricData);
@@ -102,18 +102,18 @@ public final class KafkaAnomalyDetectorMapperTest {
      * Addresses bug https://github.com/ExpediaDotCom/adaptive-alerting/issues/253
      */
     @Test(expected = StreamsException.class)
-    public void failsOnDeserializationException() {
-        logAndFailDriver.pipeInput(stringRecordFactory.create(INBOUND_TOPIC, KAFKA_KEY, "invalid_input"));
-        logAndFailDriver.readOutput(OUTBOUND_TOPIC, stringDeser, mmdDeserializer);
+    public void testFailsOnDeserializationException() {
+        logAndFailDriver.pipeInput(stringFactory.create(INBOUND_TOPIC, KAFKA_KEY, "invalid_input"));
+        logAndFailDriver.readOutput(OUTBOUND_TOPIC, stringDeserializer, mmdDeserializer);
     }
     
     /**
      * Addresses bug https://github.com/ExpediaDotCom/adaptive-alerting/issues/253
      */
     @Test
-    public void continuesOnDeserializationException() {
-        logAndContinueDriver.pipeInput(stringRecordFactory.create(INBOUND_TOPIC, KAFKA_KEY, "invalid_input"));
-        logAndContinueDriver.readOutput(OUTBOUND_TOPIC, stringDeser, mmdDeserializer);
+    public void testContinuesOnDeserializationException() {
+        logAndContinueDriver.pipeInput(stringFactory.create(INBOUND_TOPIC, KAFKA_KEY, "invalid_input"));
+        logAndContinueDriver.readOutput(OUTBOUND_TOPIC, stringDeserializer, mmdDeserializer);
     }
     
     private void initConfig() {
@@ -138,15 +138,18 @@ public final class KafkaAnomalyDetectorMapperTest {
     
         // Topology test drivers
         val topology = new KafkaAnomalyDetectorMapper(saConfig, mapper).buildTopology();
-        this.logAndFailDriver = TestObjectMother.topologyTestDriver(topology, false);
-        this.logAndContinueDriver = TestObjectMother.topologyTestDriver(topology, true);
+        this.logAndFailDriver = TestObjectMother.topologyTestDriver(topology, MetricData.class, false);
+        this.logAndContinueDriver = TestObjectMother.topologyTestDriver(topology, MetricData.class, true);
         
-        // MetricData sources
-        this.mdRecordFactory = TestObjectMother.metricDataFactory();
-        this.stringRecordFactory = TestObjectMother.stringFactory();
+        // MetricData producer
+        // The string record factory is just for experimenting with the drivers.
+        // It's not really part of the mapper unit test, but I wanted to see how it works anyway.
+        this.metricDataFactory = TestObjectMother.metricDataFactory();
+        this.stringFactory = TestObjectMother.stringFactory();
         
-        // MappedMetricData consumers
-        this.stringDeser = TestObjectMother.stringDeserializer();
+        // MappedMetricData consumer
+        // We consume the key and value from the outbound topic so we can validate the results.
+        this.stringDeserializer = new StringDeserializer();
         this.mmdDeserializer = TestObjectMother.mappedMetricDataDeserializer();
     }
 }

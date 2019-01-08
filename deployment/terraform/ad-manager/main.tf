@@ -7,17 +7,6 @@ locals {
   configmap_name = "ad-manager-${local.checksum}"
 }
 
-resource "kubernetes_config_map" "aa-config" {
-  metadata {
-    name = "${local.configmap_name}"
-    namespace = "${var.namespace}"
-  }
-  data {
-    "ad-manager.conf" = "${data.template_file.config_data.rendered}"
-  }
-  count = "${local.count}"
-}
-
 data "template_file" "config_data" {
   template = "${file("${local.config_file_path}")}"
   vars {
@@ -26,7 +15,6 @@ data "template_file" "config_data" {
     models_bucket = "${var.models_bucket}"
     aquila_uri = "${var.aquila_uri}"
     modelservice_uri_template = "${var.modelservice_uri_template}"
-
   }
 }
 
@@ -57,6 +45,17 @@ data "template_file" "deployment_yaml" {
     graphite_host = "${var.graphite_hostname}"
     env_vars = "${indent(9,"${var.env_vars}")}"
   }
+}
+
+resource "kubernetes_config_map" "ad-manager-config" {
+  metadata {
+    name = "${local.configmap_name}"
+    namespace = "${var.namespace}"
+  }
+  data {
+    "ad-manager.conf" = "${data.template_file.config_data.rendered}"
+  }
+  count = "${local.count}"
 }
 
 resource "null_resource" "kubectl_apply" {

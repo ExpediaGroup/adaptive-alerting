@@ -42,7 +42,7 @@ data "template_file" "deployment_yaml" {
   }
 }
 
-resource "kubernetes_config_map" "aa-config" {
+resource "kubernetes_config_map" "aquila-train-config" {
   metadata {
     name      = "${local.configmap_name}"
     namespace = "${var.namespace}"
@@ -55,7 +55,6 @@ resource "kubernetes_config_map" "aa-config" {
 }
 
 # Deployment via kubectl since the kubernetes provider doesn't natively support deployment.
-
 resource "null_resource" "kubectl_apply" {
   triggers {
     template = "${data.template_file.deployment_yaml.rendered}"
