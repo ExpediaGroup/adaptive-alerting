@@ -43,30 +43,6 @@ public class Metric {
 
     @Convert(converter = JpaConverterJson.class)
     private Map<String, Object> tags;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getHash() {
-        return hash;
-    }
-
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "metric_tag_mapper", joinColumns = @JoinColumn(name = "metric_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id"))
-    private Set<Tag> metricTags;
+    
 }
 
