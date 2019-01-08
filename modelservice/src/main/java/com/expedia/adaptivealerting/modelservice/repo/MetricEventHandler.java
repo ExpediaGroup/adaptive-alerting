@@ -16,10 +16,15 @@
 package com.expedia.adaptivealerting.modelservice.repo;
 
 import com.expedia.adaptivealerting.modelservice.entity.Metric;
+import com.expedia.adaptivealerting.modelservice.entity.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.core.annotation.HandleBeforeCreate;
 import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
 import org.springframework.stereotype.Component;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 @Component
 @RepositoryEventHandler
@@ -40,6 +45,15 @@ public class MetricEventHandler {
         if (existingMetric != null) {
             throw new ItemExistsException(existingMetric);
         }
+        Set<Tag> tags = new HashSet<>();
+        for (Map.Entry<String, Object> tagEntry : object.getTags().entrySet()) {
+            Tag tag = new Tag();
+            tag.setUkey(tagEntry.getKey());
+            tag.setUvalue(tagEntry.getValue().toString());
+            tags.add(tag);
+        }
+        object.setMetricTags(tags);
+
     }
 }
 

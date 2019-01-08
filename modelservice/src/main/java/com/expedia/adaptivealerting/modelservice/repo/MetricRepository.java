@@ -67,14 +67,8 @@ public interface MetricRepository extends PagingAndSortingRepository<Metric, Lon
     @Query(nativeQuery = true, value = "SELECT * FROM metric m WHERE m.ukey LIKE :key order by m.ukey", countQuery = "SELECT count(*) FROM metric m WHERE m.ukey LIKE :key")
     Page<Metric> findByKeyContaining(@Param("key") String key, Pageable pageable);
 
-    /**
-     * Finds a list of metrics by its matching tag. Tags has json data type and this query works only for json values and not keys.
-     *
-     * @param tag Matching tag value.
-     * @return List of metrics by its matching tag
-     */
-    @Query(nativeQuery = true, value = "SELECT * FROM (SELECT id, ukey, hash, tags, JSON_SEARCH(tags, \"all\", :tag) as tag_result FROM metric) as new_metric WHERE tag_result IS NOT NULL")
-    List<Metric> findByTagsContaining(@Param("tag") String tag);
+    @Override
+    Metric save(Metric metric);
 
     /**
      * Finds a list of metrics attached to a given detector

@@ -18,27 +18,25 @@ package com.expedia.adaptivealerting.modelservice.entity;
 import com.expedia.adaptivealerting.modelservice.util.JpaConverterJson;
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Metric entity.
  *
  * @author kashah
+ * @author tbahl
  */
 @Data
+@Table(name = "metric")
 @Entity
 public class Metric {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(name = "ukey")
     private String key;
 
@@ -46,4 +44,30 @@ public class Metric {
 
     @Convert(converter = JpaConverterJson.class)
     private Map<String, Object> tags;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public String getHash() {
+        return hash;
+    }
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "metric_tag_mapper", joinColumns = @JoinColumn(name = "metric_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id"))
+    private Set<Tag> metricTags;
 }
+
