@@ -89,7 +89,7 @@ BEGIN
     SELECT json_unquote(json_extract(json_extract(tag,'$.*'),CONCAT('$[',i,']'))) INTO t_value;
     INSERT IGNORE INTO tag (id, ukey, uvalue) VALUES ((null),t_key,t_value);
     SELECT id FROM tag WHERE ukey = t_key AND uvalue = t_value INTO metric_tag_id;
-   INSERT INTO metric_tag_mapper (id, metric_id, tag_id) VALUES ((null), j, metric_tag_id);
+   INSERT INTO metric_tag_mapping (id, metric_id, tag_id) VALUES ((null), j, metric_tag_id);
     SELECT i + 1 INTO i;
   END WHILE;
   SET tag = null;

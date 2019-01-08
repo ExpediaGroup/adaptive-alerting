@@ -81,7 +81,7 @@ uvalue    varchar(255) not null,
 unique index (ukey, uvalue)
 );
 
-create table metric_tag_mapper(
+create table metric_tag_mapping(
 id                 int primary key not null AUTO_INCREMENT,
 metric_id          int unsigned not null,
 tag_id             int not null,
