@@ -44,4 +44,8 @@ public class MetricTagMapping {
     @JoinColumn(name = "tag_id")
     private Tag tag;
 
+    public MetricTagMapping(Metric metric, Tag tag) {
+        this.metric = metric;
+        this.tag = tag;
+    }
 }

@@ -16,9 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.web;
 
 import com.expedia.adaptivealerting.modelservice.entity.Metric;
-import com.expedia.adaptivealerting.modelservice.repo.TagRepository;
 import com.expedia.adaptivealerting.modelservice.service.OnboardService;
-import com.expedia.adaptivealerting.modelservice.util.JpaConverterJson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,9 +35,9 @@ public class OnboardController {
     @Autowired
     private OnboardService onboardService;
 
-    @PostMapping(path = "/onboarded")
-    public Long onboarded(@RequestBody Metric metric) {
-        return onboardService.onboarded(metric);
+    @PostMapping(path = "/onboard")
+    private Metric onboard(@RequestBody Metric metric) {
+        return onboardService.onboard(metric);
     }
 }
 

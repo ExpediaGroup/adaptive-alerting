@@ -26,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -35,8 +36,6 @@ import java.util.Map;
  *
  * @author tbahl
  */
-
-
 @Service
 @Slf4j
 public class OnboardServiceImpl implements OnboardService {
@@ -51,37 +50,28 @@ public class OnboardServiceImpl implements OnboardService {
     @Autowired
     private MetricTagMappingRepository metricTagMappingRepository;
 
-
     @Override
-    public Long onboarded(Metric metric) {
+    public Metric onboard(Metric metric) {
+        List<Tag> tagList = new ArrayList<>();
+        Metric metricEntry = null;
+        Tag tagEntry;
         String hash = metric.getHash();
         Metric m = metricRepository.findByHash(hash);
-        System.out.println("Metric is: "+m);
         if (m != null) {
-            System.out.println("Metric Exist");
             throw new ItemExistsException(m);
         }
-        List<Tag> tagList;
-        Metric metricEntry;
-        Tag tagEntry;
-        Long metricID = Long.valueOf(0);
         for (Iterator<Map.Entry<String, Object>> tagIterator = metric.getTags().entrySet().iterator(); tagIterator.hasNext(); ) {
             Map.Entry<String, Object> entry = tagIterator.next();
 
             metricRepository.save(metric);
             metricEntry = metricRepository.findByHash(metric.getHash());
-
             tagList = tagRepository.findByUkeyContainingAndUvalueContaining(entry.getKey(), (String) entry.getValue());
 
             if (tagList.size() == 0) {
-                tagEntry = tagRepository.save(new Tag(null, entry.getKey(), (String) entry.getValue()));
-                metricTagMappingRepository.save(new MetricTagMapping(null, metricEntry, tagEntry));
-                metricID = (long) Math.toIntExact(metricEntry.getId());
-            } else {
-                metricTagMappingRepository.save(new MetricTagMapping(null, metricEntry, tagList.get(0)));
-
-            }
+                tagEntry = tagRepository.save(new Tag(entry.getKey(), (String) entry.getValue()));
+                metricTagMappingRepository.save(new MetricTagMapping(metricEntry, tagEntry));
+            } else { metricTagMappingRepository.save(new MetricTagMapping(metricEntry, tagList.get(0))); }
         }
-        return metricID;
+        return metricEntry;
     }
 }

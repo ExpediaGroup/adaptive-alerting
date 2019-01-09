@@ -44,6 +44,9 @@ public class Tag {
     @Column(name = "uvalue")
     private String uvalue;
 
-
+    public Tag(String ukey, String uvalue) {
+        this.ukey = ukey;
+        this.uvalue = uvalue;
+    }
 }
 
