@@ -52,17 +52,19 @@ public class OnboardServiceImpl implements OnboardService {
 
     @Override
     public Metric onboard(Metric metric) {
-        List<Tag> tagList = new ArrayList<>();
-        Metric metricEntry = null;
-        Tag tagEntry;
-        String hash = metric.getHash();
-        Metric m = metricRepository.findByHash(hash);
+        Metric m = metricRepository.findByHash(metric.getHash());
         if (m != null) {
             throw new ItemExistsException(m);
         }
-        for (Iterator<Map.Entry<String, Object>> tagIterator = metric.getTags().entrySet().iterator(); tagIterator.hasNext(); ) {
-            Map.Entry<String, Object> entry = tagIterator.next();
 
+        List<Tag> tagList = new ArrayList<>();
+        Metric metricEntry = new Metric();
+        Tag tagEntry = new Tag();
+        Map<String, Object> tag = metric.getTags();
+        Iterator<Map.Entry<String, Object>> tagiterator = tag.entrySet().iterator();
+
+        for(Iterator<Map.Entry<String, Object>> iterator = tagiterator;  iterator.hasNext();) {
+            Map.Entry<String, Object> entry = iterator.next();
             metricRepository.save(metric);
             metricEntry = metricRepository.findByHash(metric.getHash());
             tagList = tagRepository.findByUkeyContainingAndUvalueContaining(entry.getKey(), (String) entry.getValue());
@@ -70,7 +72,8 @@ public class OnboardServiceImpl implements OnboardService {
             if (tagList.size() == 0) {
                 tagEntry = tagRepository.save(new Tag(entry.getKey(), (String) entry.getValue()));
                 metricTagMappingRepository.save(new MetricTagMapping(metricEntry, tagEntry));
-            } else { metricTagMappingRepository.save(new MetricTagMapping(metricEntry, tagList.get(0))); }
+            }
+            metricTagMappingRepository.save(new MetricTagMapping(metricEntry, tagList.get(0)));
         }
         return metricEntry;
     }
