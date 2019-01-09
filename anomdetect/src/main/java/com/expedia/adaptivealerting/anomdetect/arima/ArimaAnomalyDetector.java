@@ -14,8 +14,22 @@ import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.*;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
- *
- * */
+ ** <a href="https://people.duke.edu/~rnau/411arim.htm">ARIMA models for time series forecasting</a>
+ **
+ ** ARIMA models for time series forecasting the most general
+ ** class of models for forecasting a time series which can be made to be “stationary” by differencing(if necessary),
+ ** perhaps in conjunction with nonlinear transformations such as logging or deflating(if necessary).
+ **
+ ** Anomaly detector implementation of ARIMA(0,1,1)with constant=simple exponential smoothing with growth:
+ **
+ ** The ARIMA(0,1,1)model with constant has the prediction equation:
+ **
+ ** Ŷt = μ + Yt-1 - θ1*et-1
+ **
+ ** μ is calculated as the function of mean of differences and a coefficient.
+ **
+ **
+ */
 @Data
 public final class ArimaAnomalyDetector extends BasicAnomalyDetector<ArimaParams> {
 
