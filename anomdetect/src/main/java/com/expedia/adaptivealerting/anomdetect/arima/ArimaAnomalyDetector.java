@@ -21,6 +21,16 @@ import static java.lang.Math.sqrt;
  * the most general class of models for forecasting a time series which can be made to be “stationary” by differencing (if necessary),
  * perhaps in conjunction with nonlinear transformations such as logging or deflating (if necessary).
  *
+ * ARIMA(0,1,1) with constant = simple exponential smoothing with growth: By implementing the SES model as an ARIMA model,
+ * first of all, the estimated MA(1) coefficient is allowed to be negative: this corresponds to a smoothing factor larger than 1 in an SES model,
+ * which is usually not allowed by the SES model-fitting procedure.
+ * Second, you have the option of including a constant term in the ARIMA model in order to estimate an average non-zero trend.
+ * The ARIMA(0,1,1) model with constant has the prediction equation:
+ *
+ * Ŷt   =  μ  + Yt-1  - θ1et-1
+ *
+ * The one-period-ahead forecasts from this model are qualitatively similar to those of the SES model, except that the
+ * trajectory of the long-term forecasts is typically a sloping line (whose slope is equal to mu) rather than a horizontal line.
  * @author ddivakar
  * @see <a href="https://people.duke.edu/~rnau/411arim.htm">https://people.duke.edu/~rnau/411arim.htm</a>
  */
