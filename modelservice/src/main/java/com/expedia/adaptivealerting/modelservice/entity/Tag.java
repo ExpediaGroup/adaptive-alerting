@@ -31,7 +31,6 @@ import java.util.Set;
  */
 @Data
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 public class Tag {
     @Id
@@ -39,14 +38,14 @@ public class Tag {
     private Long id;
 
     @Column(name = "ukey")
-    private String ukey;
+    private String tagKey;
 
     @Column(name = "uvalue")
-    private String uvalue;
+    private String tagValue;
 
-    public Tag(String ukey, String uvalue) {
-        this.ukey = ukey;
-        this.uvalue = uvalue;
+    public Tag(String tagKey, String tagValue) {
+        this.tagKey = tagKey;
+        this.tagValue = tagValue;
     }
 }
 
