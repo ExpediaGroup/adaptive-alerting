@@ -57,24 +57,20 @@ public class OnboardServiceImpl implements OnboardService {
             throw new ItemExistsException(m);
         }
 
-        List<Tag> tagList = new ArrayList<>();
-        Metric metricEntry = new Metric();
-        Tag tagEntry = new Tag();
+        List<Tag> tagArrayList = new ArrayList<>();
+        Metric newMetric = new Metric();
         Map<String, Object> tag = metric.getTags();
         Iterator<Map.Entry<String, Object>> tagiterator = tag.entrySet().iterator();
 
-        for(Iterator<Map.Entry<String, Object>> iterator = tagiterator;  iterator.hasNext();) {
+        for (Iterator<Map.Entry<String, Object>> iterator = tagiterator; iterator.hasNext(); ) {
             Map.Entry<String, Object> entry = iterator.next();
             metricRepository.save(metric);
-            metricEntry = metricRepository.findByHash(metric.getHash());
-            tagList = tagRepository.findByUkeyContainingAndUvalueContaining(entry.getKey(), (String) entry.getValue());
+            newMetric = metricRepository.findByHash(metric.getHash());
+            tagArrayList = tagRepository.findByTagKeyContainingAndTagValueContaining(entry.getKey(), (String) entry.getValue());
 
-            if (tagList.size() == 0) {
-                tagEntry = tagRepository.save(new Tag(entry.getKey(), (String) entry.getValue()));
-                metricTagMappingRepository.save(new MetricTagMapping(metricEntry, tagEntry));
-            }
-            metricTagMappingRepository.save(new MetricTagMapping(metricEntry, tagList.get(0)));
+            if (tagArrayList.size() == 0) tagRepository.save(new Tag(entry.getKey(), (String) entry.getValue()));
+            metricTagMappingRepository.save(new MetricTagMapping(newMetric, tagArrayList.get(0)));
         }
-        return metricEntry;
+        return newMetric;
     }
 }

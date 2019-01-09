@@ -24,7 +24,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Controller for OnboardService.
+ * This controller is for checking whether metric is onboarded
+ * or it has to be onboarded.
  *
  * @author tbahl
  */
