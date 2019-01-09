@@ -24,6 +24,6 @@ import com.expedia.adaptivealerting.modelservice.entity.Metric;
  */
 public interface OnboardService {
 
-    Long onboarded(Metric metric);
+    Metric onboard(Metric metric);
 
 }

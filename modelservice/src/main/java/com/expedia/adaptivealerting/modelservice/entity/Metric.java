@@ -43,6 +43,6 @@ public class Metric {
 
     @Convert(converter = JpaConverterJson.class)
     private Map<String, Object> tags;
-    
+
 }
 
