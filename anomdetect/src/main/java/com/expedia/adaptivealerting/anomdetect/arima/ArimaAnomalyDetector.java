@@ -140,6 +140,7 @@ public final class ArimaAnomalyDetector extends BasicAnomalyDetector<ArimaParams
         AnomalyLevel level;
         if (totalDataPoints > params.getWarmUpPeriod()) {
             level = NORMAL;
+            // currently the band used is sample mean * (1 +- limits) instead of the ideal sample mean +- 1.96 S.E.
             switch (params.getType()) {
                 case LEFT_TAILED:
                     if (observed < (this.mean * (1 - strongDelta))) {
