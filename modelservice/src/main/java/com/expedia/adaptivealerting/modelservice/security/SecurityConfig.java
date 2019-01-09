@@ -69,6 +69,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement()
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
+                .cors()
+                    .and()
                 .csrf().disable()
                 .authorizeRequests()
                     .antMatchers("/signUp").permitAll()
