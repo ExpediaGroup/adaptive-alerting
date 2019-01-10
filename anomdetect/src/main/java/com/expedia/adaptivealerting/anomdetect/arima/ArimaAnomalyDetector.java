@@ -22,7 +22,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  **
  ** Anomaly detector implementation of ARIMA(0,1,1)with constant=simple exponential smoothing with growth:
  **
- ** The ARIMA(0,1,1)model with constant has the prediction equation:
+ ** The ARIMA(0,1,1) model with constant has the prediction equation:
  **
  ** Ŷt = μ + Yt-1 - θ1*et-1
  **
@@ -206,6 +206,7 @@ public final class ArimaAnomalyDetector extends BasicAnomalyDetector<ArimaParams
     }
 
     private double getSES(double MA_1) {
+        //θ1 = MA(1) or MA_1
         //ARIMA(0,1,1) with constant = simple exponential smoothing with growth
         // It follows that the average age of the data in the 1-period-ahead forecasts of an ARIMA(0,1,1)-without-constant model is 1/(1-θ1).
         // et-1 = Yt-1 - Ŷt-1
