@@ -3,7 +3,7 @@ spring:
     web-environment: true
     show-banner: false
   datasource:
-    driver-class-name: "com.mysql.cj.jdbc.Driver"
+    driverClassName: "com.mysql.cj.jdbc.Driver"
     url: "jdbc:mysql://localhost:3306/aa_model_service?autoReconnect=true"
     username: "root"
     password: ""

@@ -40,8 +40,6 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
-import javax.sql.DataSource;
-
 /**
  * @author kashah
  */
@@ -68,6 +66,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .sessionManagement()
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .and()
+                .cors()
                     .and()
                 .csrf().disable()
                 .authorizeRequests()
