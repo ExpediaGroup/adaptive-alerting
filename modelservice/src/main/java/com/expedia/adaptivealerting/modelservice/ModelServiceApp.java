@@ -51,6 +51,7 @@ public class ModelServiceApp {
         return new CorsFilter(source);
     }
 
+    //Adding a custom data source bean to avoid conflicting dataSource bean error. [KS]
     @Bean(name = "customDataSource")
     public DataSource dataSource() {
         DataSource dataSource = new DataSource();
