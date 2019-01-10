@@ -15,15 +15,24 @@
  */
 package com.expedia.adaptivealerting.modelservice;
 
+import org.apache.tomcat.jdbc.pool.DataSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
+import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 @SpringBootApplication
 public class ModelServiceApp {
+
+    @Autowired
+    private DatabaseSettings settings;
 
     public static void main(String[] args) {
         SpringApplication.run(ModelServiceApp.class, args);
@@ -44,5 +53,15 @@ public class ModelServiceApp {
         source.registerCorsConfiguration("/**", config);
 
         return new CorsFilter(source);
+    }
+
+    @Bean(name = "customDataSource")
+    public DataSource dataSource() {
+        DataSource dataSource = new DataSource();
+        dataSource.setDriverClassName(settings.getDriverClassName());
+        dataSource.setUrl(settings.getUrl());
+        dataSource.setUsername(settings.getUsername());
+        dataSource.setPassword(settings.getPassword());
+        return dataSource;
     }
 }

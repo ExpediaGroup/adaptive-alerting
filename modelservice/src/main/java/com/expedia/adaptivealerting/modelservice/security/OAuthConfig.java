@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.modelservice.security;
 
+import org.apache.tomcat.jdbc.pool.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
@@ -29,7 +30,6 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import com.expedia.adaptivealerting.modelservice.service.UserDetailsServiceImpl;
 
-import javax.sql.DataSource;
 
 /**
  * Configure the authorization server.
@@ -41,6 +41,7 @@ import javax.sql.DataSource;
 public class OAuthConfig extends AuthorizationServerConfigurerAdapter {
     private static String REALM = "CRM_REALM";
 
+    @Qualifier("customDataSource")
     @Autowired
     private DataSource dataSource;
 
