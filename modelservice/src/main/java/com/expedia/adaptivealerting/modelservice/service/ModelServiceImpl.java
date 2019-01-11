@@ -24,12 +24,14 @@ import com.expedia.adaptivealerting.modelservice.repo.MetricTagMappingRepository
 import com.expedia.adaptivealerting.modelservice.repo.TagRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * OnboardServiceDetail Implementation
@@ -38,7 +40,7 @@ import java.util.Map;
  */
 @Service
 @Slf4j
-public class OnboardServiceImpl implements OnboardService {
+public class ModelServiceImpl implements ModelService {
 
     @Autowired
     private TagRepository tagRepository;
@@ -72,5 +74,25 @@ public class OnboardServiceImpl implements OnboardService {
             metricTagMappingRepository.save(new MetricTagMapping(newMetric, tagArrayList.get(0)));
         }
         return newMetric;
+    }
+
+    @Override
+    public List metricfinder(List<Tag> tagList){
+        Map<String,Object> tagMap = null;
+        List<Metric> metricList;
+        Iterator iterator = tagList.iterator();
+        String key = null;
+        String value = null;
+        while(iterator.hasNext()) {
+            iterator.next();
+            tagMap = tagList.stream().collect(Collectors.toMap(Tag::getTagKey, Tag::getTagValue, (oldValue, newValue)-> oldValue));
+        }
+
+        for (Map.Entry<String, Object> tag : tagMap.entrySet()) {
+            key = tag.getKey();
+            value = (String) tag.getValue();
+        }
+        metricList = metricRepository.findByTagContaining(key, (String) value, Pageable.unpaged());
+        return metricList;
     }
 }
