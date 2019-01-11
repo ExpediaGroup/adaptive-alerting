@@ -58,10 +58,13 @@ public class ArimaAnomalyDetectorTest {
         final ArimaAnomalyDetector detector = new ArimaAnomalyDetector(detectorUUID, params);
 
         int noOfDataPoints = 1;
+        int noOfDataPointsExceedingTolerance = 0;
 
         while (testRows.hasNext()) {
             final ArimaTestRow testRow = testRows.next();
             final double observed = testRow.getObserved();
+            // difference of predicted values between used model and statsmodels.tsa.arima_model as a fraction of observed
+            final double tolerance = (testRow.getPredictedstatsmodelstsaarimamodel() - testRow.getForecast())/testRow.getObserved();
 
             final MetricData metricData = new MetricData(metricDefinition, observed, epochSecond);
             final AnomalyLevel level = detector.classify(metricData).getAnomalyLevel();
@@ -69,8 +72,14 @@ public class ArimaAnomalyDetectorTest {
             assertEquals((testRow.getMu()), detector.getLong_term_forecast_mu());
             assertEquals((testRow.getForecast()), detector.getTarget());
             assertEquals(AnomalyLevel.valueOf(testRow.getAnomalyLevel()), level);
+            if ((testRow.getAnomalyLevel() != "MODEL_WARMUP") && (tolerance > 0.25)) {
+                noOfDataPointsExceedingTolerance += 1;
+            }
             noOfDataPoints += 1;
         }
+        System.out.printf("Total values in series: %d", noOfDataPoints);
+        System.out.printf("\nWarmup: %d", detector.getParams().getWarmUpPeriod());
+        System.out.printf("\nValues with tolerance higher than 25/100 for series against library ARIMA model: %d", noOfDataPointsExceedingTolerance);
     }
 
     private static void readDataFromCsv() {

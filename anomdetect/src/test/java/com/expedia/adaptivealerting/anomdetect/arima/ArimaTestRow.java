@@ -27,4 +27,7 @@ public class ArimaTestRow {
 
     @CsvBindByName
     private String anomalyLevel;
+
+    @CsvBindByName
+    private double predictedstatsmodelstsaarimamodel;
 }
