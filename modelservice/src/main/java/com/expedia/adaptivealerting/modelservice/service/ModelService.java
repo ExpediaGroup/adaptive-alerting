@@ -16,14 +16,18 @@
 package com.expedia.adaptivealerting.modelservice.service;
 
 import com.expedia.adaptivealerting.modelservice.entity.Metric;
+import com.expedia.adaptivealerting.modelservice.entity.Tag;
+
+import java.util.List;
 
 /**
  * This Service helps in on-boarding metrics to model service.
  *
  * @author tbahl
  */
-public interface OnboardService {
+public interface ModelService {
 
     Metric onboard(Metric metric);
+    List metricfinder(List<Tag> tagList);
 
 }

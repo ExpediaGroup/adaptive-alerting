@@ -15,18 +15,45 @@
  */
 package com.expedia.adaptivealerting.modelservice.web;
 
+import com.expedia.adaptivealerting.modelservice.entity.Metric;
+import com.expedia.adaptivealerting.modelservice.entity.Tag;
 import com.expedia.adaptivealerting.modelservice.entity.UserInfo;
+import com.expedia.adaptivealerting.modelservice.service.ModelService;
 import com.expedia.adaptivealerting.modelservice.service.SignUpService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
 
 @RestController
-public class SignUpController {
+public class ModelServiceController {
+
+    @Autowired
+    private ModelService modelService;
+
+    @Autowired
+    private ModelService metricFinder;
 
     @Autowired
     private SignUpService signUpService;
+
+    /**
+     * This controller is for checking whether metric is onboarded
+     * or it has to be onboarded.
+     *
+     * @author tbahl
+     */
+    @PostMapping(path = "/onboard")
+    private Metric onboard(@RequestBody Metric metric) {
+        return modelService.onboard(metric);
+    }
 
     /**
      * New user sign up
@@ -39,4 +66,14 @@ public class SignUpController {
         UserInfo newUser = signUpService.addUser(user);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
+
+    /**
+     * Metric Search with list of tags.
+     *
+     * @param tagList
+     * @return
+     */
+    @PostMapping(path="/metricSearch")
+    private List metricfinder(@RequestBody List<Tag> tagList){return metricFinder.metricfinder(tagList);}
 }
+
