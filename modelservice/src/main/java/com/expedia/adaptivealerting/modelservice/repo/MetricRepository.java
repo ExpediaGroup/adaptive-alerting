@@ -86,6 +86,14 @@ public interface MetricRepository extends PagingAndSortingRepository<Metric, Lon
     @Query("select mmm.metric from MetricDetectorMapping mmm where mmm.detector.uuid = :uuid")
     List<Metric> findByDetectorUuid(@Param("uuid") String uuid);
 
+    /**
+     * Finds metric on the basis of tagId.
+     * @param tagId
+     * @return
+     */
+    @Query(nativeQuery = true, value = "SELECT * FROM metric WHERE id=:tagId")
+    Metric findById(@Param("tagId") Integer tagId);
+
     @Override
     Metric save(Metric metric);
 
