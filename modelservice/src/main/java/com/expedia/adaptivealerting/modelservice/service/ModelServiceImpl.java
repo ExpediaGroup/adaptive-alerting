@@ -61,18 +61,18 @@ public class ModelServiceImpl implements ModelService {
         }
         metricRepository.save(metric);
         Metric newMetric = metricRepository.findByHash(metric.getHash());
+        System.out.println("Entry Set for Tags: " + newMetric.getTags().entrySet());
 
-        //insert tag
-        for (Map.Entry<String, Object> tag : newMetric.getTags().entrySet()) {
-
+        for (Iterator<Map.Entry<String, Object>> entryIterator = newMetric.getTags().entrySet().iterator(); entryIterator.hasNext(); ) {
+            Map.Entry<String, Object> tag = entryIterator.next();
             String key = tag.getKey();
             String value = (String) tag.getValue();
+            List<Tag> tagArrayList = tagRepository.findByTagKeyContainsAndTagValueContains(key, value);
 
-            List<Tag> tagArrayList = tagRepository.findByTagKeyContainingAndTagValueContaining(key, value);
-
+            //insert tag
             if (tagArrayList.size() == 0) {
                 tagRepository.save(new Tag(key, value));
-                tagArrayList = tagRepository.findByTagKeyContainingAndTagValueContaining(key, value);
+                tagArrayList = tagRepository.findByTagKeyContainsAndTagValueContains(key, value);
             }
             metricTagMappingRepository.save(new MetricTagMapping(newMetric, tagArrayList.get(0)));
         }
@@ -95,7 +95,7 @@ public class ModelServiceImpl implements ModelService {
         for (Map.Entry<String, Object> tagEntry : tagMap.entrySet()) {
             key = tagEntry.getKey();
             value = (String) tagEntry.getValue();
-            List<Tag> tag = tagRepository.findByTagKeyContainingAndTagValueContaining(key, value);
+            List<Tag> tag = tagRepository.findByTagKeyContainsAndTagValueContains(key, value);
             tagIds.add(tag.get(0).getId());
         }
 
@@ -106,7 +106,6 @@ public class ModelServiceImpl implements ModelService {
 
             metricList.add(metricRepository.findById(iterator.next()));
         }
-
         return metricList;
     }
 }
