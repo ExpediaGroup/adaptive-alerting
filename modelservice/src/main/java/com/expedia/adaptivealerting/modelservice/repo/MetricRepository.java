@@ -29,6 +29,7 @@ import java.util.List;
  *
  * @author kashah
  * @author Willie Wheeler
+ * @author tbahl
  */
 public interface MetricRepository extends PagingAndSortingRepository<Metric, Long> {
 
@@ -88,10 +89,10 @@ public interface MetricRepository extends PagingAndSortingRepository<Metric, Lon
 
     /**
      * Find a metric using metric id.
-     * @param metricId
+     * @param id
      * @return
      */
-    Metric findById(@Param("metricId") Integer metricId);
+    Metric findById(@Param("id") Integer id);
 
     @Override
     Metric save(Metric metric);

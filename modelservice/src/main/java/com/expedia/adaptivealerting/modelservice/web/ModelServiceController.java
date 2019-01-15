@@ -50,7 +50,7 @@ public class ModelServiceController {
      * @param metric
      * @return
      */
-    @PostMapping(path = "/api/metrics")
+    @PostMapping(path = "/onboard")
     private Metric onboard(@RequestBody Metric metric) {
         return modelService.onboard(metric);
     }
@@ -73,7 +73,7 @@ public class ModelServiceController {
      * @param tagList
      * @return
      */
-    @PostMapping(path="/metricSearch")
+    @PostMapping(path="/findMetricsByTags")
     private List metricfinder(@RequestBody List<Tag> tagList){return metricFinder.metricfinder(tagList);}
 }
 

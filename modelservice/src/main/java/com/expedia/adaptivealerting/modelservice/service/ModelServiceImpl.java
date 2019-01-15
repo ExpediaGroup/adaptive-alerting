@@ -31,7 +31,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * OnboardServiceDetail Implementation
+ * ModelServiceDetail Implementation
  *
  * @author tbahl
  */
@@ -42,7 +42,6 @@ public class ModelServiceImpl implements ModelService {
     @Autowired
     private TagRepository tagRepository;
 
-
     @Autowired
     private MetricRepository metricRepository;
 
@@ -51,26 +50,22 @@ public class ModelServiceImpl implements ModelService {
 
     @Override
     public Metric onboard(Metric metric) {
-        // insert metric
         Metric m = metricRepository.findByHash(metric.getHash());
         if (m != null) {
             throw new ItemExistsException(m);
         }
         metricRepository.save(metric);
         Metric newMetric = metricRepository.findByHash(metric.getHash());
-        System.out.println("Entry Set for Tags: " + newMetric.getTags().entrySet());
 
-        for (Iterator<Map.Entry<String, Object>> entryIterator = newMetric.getTags().entrySet().iterator(); entryIterator.hasNext(); ) {
-            Map.Entry<String, Object> tag = entryIterator.next();
+        for (Map.Entry<String,Object> tag : newMetric.getTags().entrySet() ) {
             String key = tag.getKey();
             String value = (String) tag.getValue();
             List<Tag> tagArrayList = tagRepository.findByTagKeyContainsAndTagValueContains(key, value);
 
-            //insert tag
             if (tagArrayList.size() == 0) {
                 tagRepository.save(new Tag(key, value));
-                tagArrayList = tagRepository.findByTagKeyContainsAndTagValueContains(key, value);
             }
+            tagArrayList = tagRepository.findByTagKeyContainsAndTagValueContains(key, value);
             metricTagMappingRepository.save(new MetricTagMapping(newMetric, tagArrayList.get(0)));
         }
         return newMetric;
@@ -81,16 +76,12 @@ public class ModelServiceImpl implements ModelService {
         List<Optional<Metric>> metricList= new ArrayList<>();
         List<Integer> IdList;
 
-        Map<String,Object>tagMap = tagList.stream().collect(Collectors.toMap(Tag::getTagKey, Tag::getTagValue, (oldValue, newValue)-> oldValue));
-
         List<Long> tagIds = new ArrayList<>();
 
-        for (Map.Entry<String, Object> tagEntry : tagMap.entrySet()) {
-            String key = tagEntry.getKey();
-            String value = (String) tagEntry.getValue();
-            List<Tag> tag = tagRepository.findByTagKeyContainsAndTagValueContains(key, value);
+        for (Tag tagEntry : tagList) {
+            List<Tag> tag = tagRepository.findByTagKeyContainsAndTagValueContains(tagEntry.getTagKey(), tagEntry.getTagValue());
             if(tag.size()==0){
-                return metricList;
+                return metricList; // immediate returns an empty list if not found matching key value pair.
             }
             tagIds.add(tag.get(0).getId());
         }

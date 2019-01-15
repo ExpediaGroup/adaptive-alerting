@@ -33,7 +33,9 @@ public interface TagRepository extends PagingAndSortingRepository<Tag, Long> {
     /**
      * Finds a tag when matched with ukey and uvalue
      */
-    List<Tag> findByTagKeyContainsAndTagValueContains(String tagKey, String tagValue);
+    List<Tag> findByTagKeyContainsAndTagValueContains(String key, String value);
+
+    Tag findFirstByTagKeyContainsAndTagValueContains(String key, String value);
 
     @Override
     Tag save(Tag tag);
