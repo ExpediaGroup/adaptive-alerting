@@ -27,10 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -80,22 +77,21 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
-    public List metricfinder(List<Tag> tagList){
-
-        Map<String,Object> tagMap = null;
-        List<Metric> metricList= new ArrayList<>();
+    public List metricfinder(List<Tag> tagList) {
+        List<Optional<Metric>> metricList= new ArrayList<>();
         List<Integer> IdList;
-        String key = null;
-        String value = null;
 
-        tagMap = tagList.stream().collect(Collectors.toMap(Tag::getTagKey, Tag::getTagValue, (oldValue, newValue)-> oldValue));
+        Map<String,Object>tagMap = tagList.stream().collect(Collectors.toMap(Tag::getTagKey, Tag::getTagValue, (oldValue, newValue)-> oldValue));
 
         List<Long> tagIds = new ArrayList<>();
 
         for (Map.Entry<String, Object> tagEntry : tagMap.entrySet()) {
-            key = tagEntry.getKey();
-            value = (String) tagEntry.getValue();
+            String key = tagEntry.getKey();
+            String value = (String) tagEntry.getValue();
             List<Tag> tag = tagRepository.findByTagKeyContainsAndTagValueContains(key, value);
+            if(tag.size()==0){
+                return metricList;
+            }
             tagIds.add(tag.get(0).getId());
         }
 
@@ -103,8 +99,7 @@ public class ModelServiceImpl implements ModelService {
         Iterator<Integer> iterator = IdList.iterator();
 
         while(iterator.hasNext()) {
-
-            metricList.add(metricRepository.findById(iterator.next()));
+            metricList.add(metricRepository.findById(Long.valueOf((iterator.next()))));
         }
         return metricList;
     }
