@@ -96,14 +96,4 @@ public interface MetricRepository extends PagingAndSortingRepository<Metric, Lon
     @Override
     Metric save(Metric metric);
 
-    /**
-     * Finds a list of metrics attached to a given detector
-     *
-     * @param uuid Detector uuid.
-     * @return List of metrics attached to the provided detector uuid
-     */
-    @Query("select mmm.metric from MetricDetectorMapping mmm where mmm.detector.uuid = :uuid")
-    List<Metric> findByDetectorUuid(@Param("uuid") String uuid);
-
-
 }
