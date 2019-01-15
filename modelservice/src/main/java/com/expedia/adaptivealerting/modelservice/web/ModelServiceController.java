@@ -48,7 +48,7 @@ public class ModelServiceController {
      * This controller is for checking whether metric is onboarded
      * or it has to be onboarded.
      * @param metric
-     * @return 
+     * @return
      */
     @PostMapping(path = "/api/metrics")
     private Metric onboard(@RequestBody Metric metric) {
