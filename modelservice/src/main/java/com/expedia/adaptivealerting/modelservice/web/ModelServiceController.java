@@ -47,8 +47,8 @@ public class ModelServiceController {
     /**
      * This controller is for checking whether metric is onboarded
      * or it has to be onboarded.
-     *
-     * @author tbahl
+     * @param metric
+     * @return 
      */
     @PostMapping(path = "/api/metrics")
     private Metric onboard(@RequestBody Metric metric) {
