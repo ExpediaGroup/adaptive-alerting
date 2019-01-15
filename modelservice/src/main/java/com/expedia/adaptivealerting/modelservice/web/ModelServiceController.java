@@ -50,7 +50,7 @@ public class ModelServiceController {
      *
      * @author tbahl
      */
-    @PostMapping(path = "/onboard")
+    @PostMapping(path = "/api/metrics")
     private Metric onboard(@RequestBody Metric metric) {
         return modelService.onboard(metric);
     }
