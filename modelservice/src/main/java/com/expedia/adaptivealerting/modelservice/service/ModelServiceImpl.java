@@ -57,33 +57,38 @@ public class ModelServiceImpl implements ModelService {
         metricRepository.save(metric);
         Metric newMetric = metricRepository.findByHash(metric.getHash());
 
-        for (Map.Entry<String,Object> tag : newMetric.getTags().entrySet() ) {
+        for (Map.Entry<String, Object> tag : newMetric.getTags().entrySet()) {
             String key = tag.getKey();
             String value = (String) tag.getValue();
-            List<Tag> tagArrayList = tagRepository.findByTagKeyContainsAndTagValueContains(key, value);
 
-            if (tagArrayList.size() == 0) {
+            Tag tagList = tagRepository.findFirstByTagKeyContainsAndTagValueContains(key, value);
+
+            if (tagList == null) {
                 tagRepository.save(new Tag(key, value));
             }
-            tagArrayList = tagRepository.findByTagKeyContainsAndTagValueContains(key, value);
-            metricTagMappingRepository.save(new MetricTagMapping(newMetric, tagArrayList.get(0)));
+            tagList = tagRepository.findFirstByTagKeyContainsAndTagValueContains(key, value);
+            metricTagMappingRepository.save(new MetricTagMapping(newMetric, tagList));
         }
         return newMetric;
     }
 
     @Override
     public List metricfinder(List<Tag> tagList) {
-        List<Optional<Metric>> metricList= new ArrayList<>();
+        List<Optional<Metric>> metricList = new ArrayList<>();
         List<Integer> IdList;
 
         List<Long> tagIds = new ArrayList<>();
 
         for (Tag tagEntry : tagList) {
-            List<Tag> tag = tagRepository.findByTagKeyContainsAndTagValueContains(tagEntry.getTagKey(), tagEntry.getTagValue());
-            if(tag.size()==0){
+            String key = tagEntry.getTagKey();
+            String value = tagEntry.getTagValue();
+
+            Tag tag = tagRepository.findFirstByTagKeyContainsAndTagValueContains(key, value);
+
+            if (tag == null) {
                 return metricList; // immediate returns an empty list if not found matching key value pair.
             }
-            tagIds.add(tag.get(0).getId());
+            tagIds.add(tag.getId());
         }
 
         IdList = metricTagMappingRepository.findById(tagIds, tagIds.size());

@@ -31,10 +31,8 @@ import java.util.List;
 public interface TagRepository extends PagingAndSortingRepository<Tag, Long> {
 
     /**
-     * Finds a tag when matched with ukey and uvalue
+     * Finds a tag when matched first with ukey and uvalue.
      */
-    List<Tag> findByTagKeyContainsAndTagValueContains(String key, String value);
-
     Tag findFirstByTagKeyContainsAndTagValueContains(String key, String value);
 
     @Override
