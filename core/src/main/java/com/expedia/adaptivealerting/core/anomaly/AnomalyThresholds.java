@@ -47,16 +47,16 @@ public class AnomalyThresholds {
                 "At least one of the thresholds must be not null");
         
         if (upperStrong != null) {
-            isTrue(upperWeak == null || upperStrong >= upperWeak, "Required: upperStrong >= upperWeak");
-            isTrue(lowerWeak == null || upperStrong >= lowerWeak, "Required: upperStrong >= lowerWeak");
-            isTrue(lowerStrong == null || upperStrong >= lowerStrong, "Required: upperStrong >= lowerStrong");
+            isTrue(upperWeak == null || upperStrong >= upperWeak, String.format("Required: upperStrong (%f) >= upperWeak (%f)", upperStrong, upperWeak));
+            isTrue(lowerWeak == null || upperStrong >= lowerWeak, String.format("Required: upperStrong (%f) >= lowerWeak (%f)", upperStrong, lowerWeak));
+            isTrue(lowerStrong == null || upperStrong >= lowerStrong, String.format("Required: upperStrong (%f) >= lowerStrong (%f)", upperStrong, lowerStrong));
         }
         if (upperWeak != null) {
-            isTrue(lowerWeak == null || upperWeak >= lowerWeak, "Required: upperWeak >= lowerWeak");
-            isTrue(lowerStrong == null || upperWeak >= lowerStrong, "Required: upperWeak >= lowerStrong");
+            isTrue(lowerWeak == null || upperWeak >= lowerWeak, String.format("Required: upperWeak (%f) >= lowerWeak (%f)", upperWeak, lowerWeak));
+            isTrue(lowerStrong == null || upperWeak >= lowerStrong, String.format("Required: upperWeak (%f) >= lowerStrong (%f)", upperWeak, lowerStrong));
         }
         if (lowerWeak != null) {
-            isTrue(lowerStrong == null || lowerWeak >= lowerStrong, "Required: lowerWeak >= lowerStrong");
+            isTrue(lowerStrong == null || lowerWeak >= lowerStrong, String.format("Required: lowerWeak (%f) >= lowerStrong (%f)", lowerWeak, lowerStrong));
         }
     
         this.upperStrong = upperStrong;
