@@ -73,7 +73,7 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
-    public List metricfinder(List<Tag> tagList) {
+    public List findMetricsByTags(List<Tag> tagList) {
         List<Optional<Metric>> metricList = new ArrayList<>();
         List<Integer> IdList;
 

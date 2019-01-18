@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.modelservice.repo;
 import com.expedia.adaptivealerting.modelservice.entity.Tag;
 import com.expedia.adaptivealerting.modelservice.entity.projection.InlineType;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.util.List;
@@ -34,6 +35,11 @@ public interface TagRepository extends PagingAndSortingRepository<Tag, Long> {
      * Finds a tag when matched first with ukey and uvalue.
      */
     Tag findFirstByTagKeyContainsAndTagValueContains(String key, String value);
+
+    /**
+     *Finds a matching key for provided tagKey
+     */
+    List<Tag> findByTagKeyContainsOrderById(@Param("tagKey") String tagKey);
 
     @Override
     Tag save(Tag tag);

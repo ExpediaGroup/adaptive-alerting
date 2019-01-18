@@ -74,6 +74,6 @@ public class ModelServiceController {
      * @return
      */
     @PostMapping(path="/findMetricsByTags")
-    private List metricfinder(@RequestBody List<Tag> tagList){return metricFinder.metricfinder(tagList);}
+    private List findMetricsByTags(@RequestBody List<Tag> tagList){return metricFinder.findMetricsByTags(tagList);}
 }
 

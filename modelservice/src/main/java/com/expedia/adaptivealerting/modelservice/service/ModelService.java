@@ -28,6 +28,6 @@ import java.util.List;
 public interface ModelService {
 
     Metric onboard(Metric metric);
-    List metricfinder(List<Tag> tagList);
+    List findMetricsByTags(List<Tag> tagList);
 
 }
