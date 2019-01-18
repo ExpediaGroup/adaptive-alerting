@@ -87,10 +87,9 @@ public class ModelServiceImpl implements ModelService {
         }
 
         IdList = metricTagMappingRepository.findById(tagIds, tagIds.size());
-        Iterator<Integer> iterator = IdList.iterator();
 
-        while(iterator.hasNext()) {
-            metricList.add(metricRepository.findById(Long.valueOf((iterator.next()))));
+        for (Integer integer : IdList) {
+            metricList.add(metricRepository.findById(Long.valueOf((integer))));
         }
         return metricList;
     }
