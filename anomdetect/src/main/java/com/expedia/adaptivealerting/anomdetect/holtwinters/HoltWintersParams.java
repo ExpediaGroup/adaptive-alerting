@@ -18,15 +18,20 @@ package com.expedia.adaptivealerting.anomdetect.holtwinters;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.util.Arrays;
+
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isBetween;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * @author Matt Callanan
+ * @see <a href="https://otexts.org/fpp2/holt-winters.html">Holt-Winters' Seasonal Method</a>
  */
 @Data
 @Accessors(chain = true)
 public final class HoltWintersParams {
+    private static double TOLERANCE = 0.1;
 
     /**
      * SeasonalityType parameter used to determine which Seasonality method (Multiplicative or Additive) to use.
@@ -39,7 +44,6 @@ public final class HoltWintersParams {
      * E.g.  7 = data is provided in daily samples and seasons are represented as single weeks.
      * E.g. 12 = data is provided in monthly samples and seasons are represented as single years.
      * E.g.  4 = data is provided in quarterly samples and seasons are represented as single years.
-     *
      */
     private int period = 0;
 
@@ -48,9 +52,9 @@ public final class HoltWintersParams {
      * A double between 0-1 inclusive.
      */
     private double alpha = 0.15;
-    
+
     /**
-     * Beta smoothing parameter used for "trend" calculation.
+     * Beta smoothing parameter used for "base" or "trend" calculation.
      * A double between 0-1 inclusive.
      */
     private double beta = 0.15;
@@ -65,17 +69,36 @@ public final class HoltWintersParams {
      * Weak threshold sigmas.
      */
     private double weakSigmas = 3.0;
-    
+
     /**
      * Strong threshold sigmas.
      */
     private double strongSigmas = 4.0;
-    
+
     /**
-     * Initial mean estimate.
+     * Initial estimate for Level component.  If not set, then 1.0 will be used for MULTIPLICATIVE seasonality and 0.0 for ADDITIVE seasonality.
      */
-    private double initMeanEstimate = 0.0;
-    
+    private double initLevelEstimate = Double.NaN;
+
+    /**
+     * Initial estimate for Base component.  If not set, then 1.0 will be used for MULTIPLICATIVE seasonality and 0.0 for ADDITIVE seasonality.
+     */
+    private double initBaseEstimate = Double.NaN;
+
+    /**
+     * Initial estimates for Seasonal components. n=period values must be provided.
+     */
+    private double[] initSeasonalEstimates;
+
+    /**
+     * Initial estimate for the forecast for first tick.
+     */
+    private double initForecastEstimate = 0.0;
+
+    public boolean isMultiplicative() {
+        return seasonalityType.equals(SeasonalityType.MULTIPLICATIVE);
+    }
+
     public void validate() {
         notNull(seasonalityType, String.format("Required: seasonalityType one of %s", SeasonalityType.values()));
         isTrue(0 < period, "Required: period value greater than 0");
@@ -84,5 +107,25 @@ public final class HoltWintersParams {
         isTrue(0.0 <= gamma && gamma <= 1.0, "Required: gamma in the range [0, 1]");
         isTrue(weakSigmas > 0.0, "Required: weakSigmas > 0.0");
         isTrue(strongSigmas > weakSigmas, "Required: strongSigmas > weakSigmas");
+        validateInitSeasonalEstimates();
+
     }
+
+    private void validateInitSeasonalEstimates() {
+        notNull(initSeasonalEstimates, String.format("Required: initSeasonalEstimates array of n=period initial estimates for seasonal component", SeasonalityType.values()));
+
+        double seasonalSum = Arrays.stream(initSeasonalEstimates, 0, period).sum();
+        if (isMultiplicative()) {
+            // "With the multiplicative method, the seasonal component is expressed in relative terms (percentages).
+            //  Within each year, the seasonal component will sum up to approximately m (number of periods)."
+            // (from https://otexts.org/fpp2/holt-winters.html)
+            isBetween(seasonalSum, period - TOLERANCE, period + TOLERANCE, String.format("Invalid: Sum of initSeasonalEstimates (%.2f) should be approximately equal to period (%d) for MULTIPLICATIVE seasonality type.", seasonalSum, period));
+        } else {
+            // "With the additive method, the seasonal component is expressed in absolute terms in the scale of the observed series.
+            //  Within each year, the seasonal component will add up to approximately zero."
+            // (from https://otexts.org/fpp2/holt-winters.html)
+            isBetween(seasonalSum, -TOLERANCE, TOLERANCE, String.format("Invalid: Sum of initSeasonalEstimates (%.2f) should approximately equal 0 for ADDITIVE seasonality type.", seasonalSum));
+        }
+    }
+
 }
