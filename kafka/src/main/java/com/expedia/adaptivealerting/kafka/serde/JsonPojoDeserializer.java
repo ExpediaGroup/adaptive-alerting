@@ -63,16 +63,18 @@ public final class JsonPojoDeserializer<T> implements Deserializer<T> {
         if (bytes == null) {
             return null;
         }
-        
-        T data;
         try {
-            data = objectMapper.readValue(bytes, tClass);
+            return objectMapper.readValue(bytes, tClass);
         } catch (IOException e) {
             // TODO Is it correct to throw a SerializationException while deserializing? [WLW]
+            //
+            // Update:
+            // It's not: https://kafka.apache.org/11/javadoc/org/apache/kafka/common/errors/SerializationException.html
+            //
+            // But Spring Kafka does the same thing:
+            // https://github.com/spring-projects/spring-kafka/blob/master/spring-kafka/src/main/java/org/springframework/kafka/support/serializer/JsonDeserializer.java
             throw new SerializationException(e);
         }
-        
-        return data;
     }
     
     @Override

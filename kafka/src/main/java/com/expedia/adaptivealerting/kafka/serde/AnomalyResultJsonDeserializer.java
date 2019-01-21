@@ -13,28 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka;
+package com.expedia.adaptivealerting.kafka.serde;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.MockitoAnnotations;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 
 /**
+ * Kafka deserializer to read {@link AnomalyResult}s from JSON.
+ *
  * @author Willie Wheeler
  */
-public class KafkaMultiClusterAnomalyToMetricMapperTest {
+public class AnomalyResultJsonDeserializer extends AbstractJsonDeserializer<AnomalyResult> {
     
-    // Class under test
-    private KafkaMultiClusterAnomalyToMetricMapper transformer;
-    
-    @Before
-    public void setUp() {
-        this.transformer = new KafkaMultiClusterAnomalyToMetricMapper();
-        MockitoAnnotations.initMocks(this);
-    }
-    
-    @Test
-    public void testTransform() {
-//        Assert.fail();
+    public AnomalyResultJsonDeserializer() {
+        super(AnomalyResult.class);
     }
 }

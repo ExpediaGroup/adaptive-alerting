@@ -16,64 +16,89 @@
 package com.expedia.adaptivealerting.kafka;
 
 import com.expedia.adaptivealerting.anomdetect.util.AnomalyToMetricTransformer;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.metrics.MetricData;
 import com.expedia.metrics.metrictank.MetricTankIdFactory;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.serialization.LongSerializer;
-import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.util.Properties;
 
 /**
+ * Maps anomalies to metrics.
+ *
  * @author Willie Wheeler
  */
 @Slf4j
-public class KafkaMultiClusterAnomalyToMetricMapper {
+public class KafkaMultiClusterAnomalyToMetricMapper implements Runnable {
+    private static final String CONFIG_PATH = "/config/mc-a2m-mapper.conf";
     
-    // TODO Replace with configured values
-    private static final String BOOTSTRAP_SERVERS = "localhost:9092";
-    private static final String TOPIC = "mdm";
+    private final Consumer<String, AnomalyResult> anomalyConsumer;
+    private final Producer<String, MetricData> metricProducer;
     
     private final AnomalyToMetricTransformer transformer = new AnomalyToMetricTransformer();
     private final MetricTankIdFactory metricTankIdFactory = new MetricTankIdFactory();
     
-    public static void main(String[] args) throws Exception {
-        if (args.length == 0) {
-            runProducer(5);
-        } else {
-            runProducer(Integer.parseInt(args[0]));
-        }
+    public static void main(String[] args) {
+        val config = ConfigFactory.load(CONFIG_PATH);
+        val mapper = new KafkaMultiClusterAnomalyToMetricMapper(config);
+        mapper.run();
     }
     
-    public static void runProducer(final int sendMessageCount) throws Exception {
-        val producer = createProducer();
-        val time = System.currentTimeMillis();
+    public KafkaMultiClusterAnomalyToMetricMapper(Config config) {
+        this.anomalyConsumer = createAnomalyConsumer(config.getConfig("anomaly-consumer"));
+        this.metricProducer = createMetricProducer(config.getConfig("metric-producer"));
+    }
+    
+    @Override
+    public void run() {
+        log.info("Starting KafkaMultiClusterAnomalyToMetricMapper");
         
         try {
-            for (long index = time; index < time + sendMessageCount; index++) {
-                // TODO Replace with logic from KafkaAnomalyToMetricMapper [WLW]
-                val record = new ProducerRecord<Long, String>(TOPIC, index, "Hi Mom " + index);
-                val meta = producer.send(record).get();
-                val elapsedTime = System.currentTimeMillis() - time;
-                log.info("Sent record(key={}, value={}) meta(partition={}, offset={}) time={}",
-                        record.key(), record.value(), meta.partition(), meta.offset(), elapsedTime);
+            while (true) {
+                val anomalyRecords = anomalyConsumer.poll(1000);
+                for (val anomalyRecord : anomalyRecords) {
+                    val anomalyResult = anomalyRecord.value();
+                    val metricData = transformer.transform(anomalyResult);
+                    val metricDef = metricData.getMetricDefinition();
+                    val metricId = metricTankIdFactory.getId(metricDef);
+                    val metricRecord = new ProducerRecord<String, MetricData>(metricId, metricData);
+                    metricProducer.send(metricRecord);
+                }
             }
+        } catch (RuntimeException e) {
+            log.error("Stopping KafkaMultiClusterAnomalyToMetricMapper", e);
         } finally {
-            producer.flush();
-            producer.close();
+            anomalyConsumer.close();
+            metricProducer.flush();
+            metricProducer.close();
         }
     }
     
-    private static Producer<Long, String> createProducer() {
+    private Consumer<String, AnomalyResult> createAnomalyConsumer(Config config) {
         val props = new Properties();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
-        props.put(ProducerConfig.CLIENT_ID_CONFIG, "KafkaExampleProducer");
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, LongSerializer.class.getName());
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, config.getString("bootstrap.servers"));
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, config.getString("group.id"));
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, config.getString("key.deserializer"));
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, config.getString("value.deserializer"));
+        return new KafkaConsumer<>(props);
+    }
+    
+    private Producer<String, MetricData> createMetricProducer(Config config) {
+        val props = new Properties();
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, config.getString("bootstrap.servers"));
+        props.put(ProducerConfig.CLIENT_ID_CONFIG, config.getString("client.id"));
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, config.getString("key.serializer"));
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, config.getString("value.serializer"));
         return new KafkaProducer<>(props);
     }
 }

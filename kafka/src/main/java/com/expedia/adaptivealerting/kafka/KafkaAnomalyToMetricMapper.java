@@ -74,8 +74,8 @@ public final class KafkaAnomalyToMetricMapper extends AbstractStreamsApp {
                     val anomalyResult = mappedMetricData.getAnomalyResult();
                     val metricData = transformer.transform(anomalyResult);
                     val metricDef = metricData.getMetricDefinition();
-                    val metricHash = metricTankIdFactory.getId(metricDef);
-                    return KeyValue.pair(metricHash, metricData);
+                    val metricId = metricTankIdFactory.getId(metricDef);
+                    return KeyValue.pair(metricId, metricData);
                 })
                 // TODO Make outbound serde configurable. [WLW]
                 .to(outboundTopic, Produced.with(new Serdes.StringSerde(), new MetricDataSerde()));
