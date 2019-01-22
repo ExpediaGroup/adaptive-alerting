@@ -70,7 +70,6 @@ public final class ConstantThresholdAnomalyDetector extends BasicAnomalyDetector
         notNull(metricData, "metricData can't be null");
         final AnomalyThresholds thresholds = params.getThresholds();
         final AnomalyType.Type type = params.getType().getType();
-
         final AnomalyLevel level = thresholds.classify(type, metricData.getValue());
         return new AnomalyResult(getUuid(), metricData, level);
     }
