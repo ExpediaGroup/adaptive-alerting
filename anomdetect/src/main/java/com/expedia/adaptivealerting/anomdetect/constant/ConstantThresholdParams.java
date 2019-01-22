@@ -25,5 +25,17 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class ConstantThresholdParams {
-    private AnomalyThresholds thresholds;
+
+    public enum Type {
+        LEFT_TAILED,
+        RIGHT_TAILED,
+        TWO_TAILED
+    }
+
+    /**
+     * Detector type: left-, right- or two-tailed.
+     */
+    private Type type = Type.LEFT_TAILED;
+    private ConstantThresholds thresholds;
+
 }

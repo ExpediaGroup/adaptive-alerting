@@ -31,6 +31,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 @Data
 @ToString
 public class AnomalyThresholds {
+
     private Double upperStrong;
     private Double upperWeak;
     private Double lowerStrong;
@@ -58,7 +59,7 @@ public class AnomalyThresholds {
         if (lowerWeak != null) {
             isTrue(lowerStrong == null || lowerWeak >= lowerStrong, "Required: lowerWeak >= lowerStrong");
         }
-    
+
         this.upperStrong = upperStrong;
         this.upperWeak = upperWeak;
         this.lowerStrong = lowerStrong;
