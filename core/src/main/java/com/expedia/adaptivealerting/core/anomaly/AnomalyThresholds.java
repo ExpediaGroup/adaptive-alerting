@@ -79,6 +79,7 @@ public class AnomalyThresholds {
         }
     }
 
+    //Method to classify values for detectors which use tails. [KS]
     public AnomalyLevel classify(AnomalyType.Type type, double value) {
         switch (type) {
             case LEFT_TAILED:
@@ -109,7 +110,7 @@ public class AnomalyThresholds {
                 throw new IllegalStateException("Illegal type: " + type);
         }
     }
-
+    
     /**
      * Legacy classification to handle exclusive bounds, since some of the detectors were using this previously, and
      * hence have unit tests that expect it.
