@@ -18,7 +18,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 @Data
 @ToString
 public class ConstantThresholds {
-
     private Double upperStrong;
     private Double upperWeak;
     private Double lowerStrong;
