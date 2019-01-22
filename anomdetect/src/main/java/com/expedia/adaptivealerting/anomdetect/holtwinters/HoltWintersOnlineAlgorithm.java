@@ -22,10 +22,12 @@ public class HoltWintersOnlineAlgorithm {
         double gamma = params.getGamma();
         boolean multiplicative = params.isMultiplicative();
         // Retrieve model's component values from previous observations (t - 1)
+        // TODO HW: Consider "prev" instead of "last"
         double lastLevel = components.getLevel();
         double lastBase = components.getBase();
         int seasonalIdx = components.currentSeasonalIndex();
         // We get the last seasonal component that relates to the current season we're observing for time t (i.e. seasonalIdx = (t - period) % period)
+        // TODO HW: Think about a better name:
         double lastSeason = components.getSeasonal(seasonalIdx);
 
         double newLevel, newBase, newSeason, newForecast;

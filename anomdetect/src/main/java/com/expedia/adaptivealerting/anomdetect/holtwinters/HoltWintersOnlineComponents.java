@@ -78,7 +78,7 @@ public class HoltWintersOnlineComponents {
     }
 
     /**
-     * @return Index into seasonal components, ranges from 0 to period-1.  Increments whenever addValue() is called.  Wraps back to 0 after period+1 ticks.
+     * @return Index into seasonal components, ranges from 0 to period-1.  Increments whenever addValue() is called.  Wraps back to 0 after period ticks.
      */
     public int currentSeasonalIndex() {
         return (int) (getN() % params.getPeriod());

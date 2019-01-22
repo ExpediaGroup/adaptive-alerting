@@ -124,6 +124,7 @@ public final class HoltWintersParams {
             // "With the additive method, the seasonal component is expressed in absolute terms in the scale of the observed series.
             //  Within each year, the seasonal component will add up to approximately zero."
             // (from https://otexts.org/fpp2/holt-winters.html)
+            // TODO HW: Determine valid tolerance
             isBetween(seasonalSum, -TOLERANCE, TOLERANCE, String.format("Invalid: Sum of initSeasonalEstimates (%.2f) should approximately equal 0 for ADDITIVE seasonality type.", seasonalSum));
         }
     }

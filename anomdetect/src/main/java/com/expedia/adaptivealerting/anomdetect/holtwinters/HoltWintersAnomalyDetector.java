@@ -28,8 +28,6 @@ import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
-// TODO Add model warmup param and anomaly level. See e.g. CUSUM, Individuals, PEWMA. [WLW]
-
 /**
  * Anomaly detector based on the Holt-Winters method, a forecasting method (a.k.a. "Triple Exponential Smoothing"). Used to capture seasonality.
  *
@@ -90,6 +88,8 @@ public final class HoltWintersAnomalyDetector extends BasicAnomalyDetector<HoltW
         double lastForecast = components.getForecast();
 
         // Identify thresholds based on previously observed values
+        // TODO HW: Look at options for configuring how bands are defined
+        // TODO HW: Add model warmup param and anomaly level. See e.g. CUSUM, Individuals, PEWMA. [WLW]
         double stddev = components.getSeasonalStandardDeviation(components.currentSeasonalIndex());
         final double weakDelta = params.getWeakSigmas() * stddev;
         final double strongDelta = params.getStrongSigmas() * stddev;
