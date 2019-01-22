@@ -53,35 +53,34 @@ public class ConstantThresholds {
     }
 
     public AnomalyLevel classify(ConstantThresholdParams.Type type, double value) {
-        AnomalyLevel level = NORMAL;
-
         switch (type) {
             case LEFT_TAILED:
                 if (lowerStrong != null && value <= lowerStrong) {
-                    level = AnomalyLevel.STRONG;
+                    return AnomalyLevel.STRONG;
                 } else if (lowerWeak != null && value <= lowerWeak) {
-                    level = AnomalyLevel.WEAK;
+                    return AnomalyLevel.WEAK;
+                } else {
+                    return AnomalyLevel.NORMAL;
                 }
-                break;
-
             case RIGHT_TAILED:
                 if (upperStrong != null && value >= upperStrong) {
-                    level = AnomalyLevel.STRONG;
+                    return AnomalyLevel.STRONG;
                 } else if (upperWeak != null && value >= upperWeak) {
-                    level = AnomalyLevel.WEAK;
+                    return AnomalyLevel.WEAK;
+                } else {
+                    return AnomalyLevel.NORMAL;
                 }
-                break;
             case TWO_TAILED:
                 if ((upperStrong != null && value >= upperStrong) || (lowerStrong != null && value <= lowerStrong)) {
-                    level = AnomalyLevel.STRONG;
+                    return AnomalyLevel.STRONG;
                 } else if ((upperWeak != null && value >= upperWeak) || (lowerWeak != null && value <= lowerWeak)) {
-                    level = AnomalyLevel.WEAK;
+                    return AnomalyLevel.WEAK;
+                } else {
+                    return AnomalyLevel.NORMAL;
                 }
-                break;
             default:
                 throw new IllegalStateException("Illegal type: " + type);
         }
-        return level;
     }
 }
 
