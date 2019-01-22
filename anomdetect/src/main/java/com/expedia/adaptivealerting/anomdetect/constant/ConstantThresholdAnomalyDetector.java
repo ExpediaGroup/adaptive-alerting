@@ -19,6 +19,7 @@ import com.expedia.adaptivealerting.anomdetect.BasicAnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
 import lombok.NonNull;
@@ -68,7 +69,9 @@ public final class ConstantThresholdAnomalyDetector extends BasicAnomalyDetector
     public AnomalyResult classify(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
         final AnomalyThresholds thresholds = params.getThresholds();
-        final AnomalyLevel level = thresholds.classify(params.getType().getType(), metricData.getValue());
+        final AnomalyType.Type type = params.getType().getType();
+
+        final AnomalyLevel level = thresholds.classify(type, metricData.getValue());
         return new AnomalyResult(getUuid(), metricData, level);
     }
 }
