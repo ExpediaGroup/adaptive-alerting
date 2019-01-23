@@ -16,6 +16,8 @@
 package com.expedia.adaptivealerting.kafka.serde;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.metrics.jackson.MetricsJavaModule;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 
 /**
  * Kafka deserializer to read {@link AnomalyResult}s from JSON.
@@ -26,5 +28,8 @@ public class AnomalyResultJsonDeserializer extends AbstractJsonDeserializer<Anom
     
     public AnomalyResultJsonDeserializer() {
         super(AnomalyResult.class);
+        getObjectMapper()
+                .registerModule(new MetricsJavaModule())
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 }
