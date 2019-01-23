@@ -1,17 +1,25 @@
 package com.expedia.adaptivealerting.core.anomaly;
 
-import lombok.Data;
-
-@Data
-public class AnomalyType {
-    public enum Type {
-        LEFT_TAILED,
-        RIGHT_TAILED,
-        TWO_TAILED
-    }
+/**
+ * Anomaly Type enum.
+ *
+ * @author kashah
+ */
+public enum AnomalyType {
 
     /**
-     * Detector type: left-, right- or two-tailed.
+     * Left tail. Generate alerts below the threshold.
      */
-    private Type type = Type.LEFT_TAILED;
+    LEFT_TAILED,
+
+    /**
+     * Right tail. Generate alerts above the threshold.
+     */
+    RIGHT_TAILED,
+
+    /**
+     * Both tails. Includes both left and right tails.
+     */
+    TWO_TAILED
+
 }
