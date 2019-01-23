@@ -42,6 +42,7 @@ public class ModelServiceImpl implements ModelService {
     @Autowired
     private TagRepository tagRepository;
 
+
     @Autowired
     private MetricRepository metricRepository;
 
@@ -69,14 +70,14 @@ public class ModelServiceImpl implements ModelService {
             tagList = tagRepository.findFirstByTagKeyContainsAndTagValueContains(key, value);
             metricTagMappingRepository.save(new MetricTagMapping(newMetric, tagList));
         }
+        System.out.println("Type is: "+newMetric.getClass().getName());
         return newMetric;
     }
 
     @Override
-    public List findMetricsByTags(List<Tag> tagList) {
+    public List<Optional<Metric>> findMetricsByTags(List<Tag> tagList) {
         List<Optional<Metric>> metricList = new ArrayList<>();
         List<Integer> IdList;
-
         List<Long> tagIds = new ArrayList<>();
 
         for (Tag tagEntry : tagList) {
