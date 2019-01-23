@@ -43,6 +43,11 @@ spec:
             secretKeyRef:
               name: modelservice-secret
               key: username
+        - name: "SIGNING_KEY"
+          valueFrom:
+            secretKeyRef:
+              name: modelservice-secret
+              key: signing_key     
         - name: "AA_GRAPHITE_HOST"
           value: "${graphite_host}"
         - name: "AA_GRAPHITE_PORT"

@@ -13,10 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.security;
+package com.expedia.adaptivealerting.core.anomaly;
 
-import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
+/**
+ * Anomaly Type enum.
+ *
+ * @author kashah
+ */
+public enum AnomalyType {
 
-public class SecurityWebApplicationInitializer extends AbstractSecurityWebApplicationInitializer {
+    /**
+     * Left tail. Generate alerts below the threshold.
+     */
+    LEFT_TAILED,
+
+    /**
+     * Right tail. Generate alerts above the threshold.
+     */
+    RIGHT_TAILED,
+
+    /**
+     * Both tails. Includes both left and right tails.
+     */
+    TWO_TAILED
 
 }
