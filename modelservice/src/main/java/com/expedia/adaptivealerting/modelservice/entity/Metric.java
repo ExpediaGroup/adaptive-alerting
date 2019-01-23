@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.entity;
 
 import com.expedia.adaptivealerting.modelservice.util.JpaConverterJson;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -30,6 +31,7 @@ import java.util.Set;
  */
 @Data
 @Entity
+@AllArgsConstructor
 public class Metric {
 
     @Id
@@ -44,5 +46,8 @@ public class Metric {
     @Convert(converter = JpaConverterJson.class)
     private Map<String, Object> tags;
 
+    public Metric() {
+
+    }
 }
 
