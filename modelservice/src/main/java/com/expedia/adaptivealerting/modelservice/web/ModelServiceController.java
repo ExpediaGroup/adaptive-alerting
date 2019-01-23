@@ -17,9 +17,7 @@ package com.expedia.adaptivealerting.modelservice.web;
 
 import com.expedia.adaptivealerting.modelservice.entity.Metric;
 import com.expedia.adaptivealerting.modelservice.entity.Tag;
-import com.expedia.adaptivealerting.modelservice.entity.UserInfo;
 import com.expedia.adaptivealerting.modelservice.service.ModelService;
-import com.expedia.adaptivealerting.modelservice.service.SignUpService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -41,8 +39,6 @@ public class ModelServiceController {
     @Autowired
     private ModelService metricFinder;
 
-    @Autowired
-    private SignUpService signUpService;
 
     /**
      * This controller is for checking whether metric is onboarded
@@ -53,18 +49,6 @@ public class ModelServiceController {
     @PostMapping(path = "/onboard")
     private Metric onboard(@RequestBody Metric metric) {
         return modelService.onboard(metric);
-    }
-
-    /**
-     * New user sign up
-     *
-     * @param user
-     * @return
-     */
-    @PostMapping(path = "/signUp")
-    public ResponseEntity<?> addUser(@ModelAttribute UserInfo user) {
-        UserInfo newUser = signUpService.addUser(user);
-        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     /**
