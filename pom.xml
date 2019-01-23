@@ -96,7 +96,7 @@
         <kafka.streams.version>1.1.1</kafka.streams.version>
 
         <lombok.version>1.18.2</lombok.version>
-        <metrics.java.version>0.6.0</metrics.java.version>
+        <metrics.java.version>0.6.2</metrics.java.version>
         <msgpack.version>0.8.13</msgpack.version>
         <mockito.version>2.23.0</mockito.version>
         <mysql.connector.version>8.0.11</mysql.connector.version>

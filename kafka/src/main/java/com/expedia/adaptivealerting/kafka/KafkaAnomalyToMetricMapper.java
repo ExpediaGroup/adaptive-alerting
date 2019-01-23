@@ -39,13 +39,13 @@ import org.apache.kafka.streams.kstream.Produced;
  */
 @Slf4j
 public final class KafkaAnomalyToMetricMapper extends AbstractStreamsApp {
-    private static final String CK_ANOMALY_TO_METRIC_TRANSFORMER = "anomaly-to-metric-transformer";
+    private static final String APP_ID = "a2m-mapper";
     
     private final AnomalyToMetricTransformer transformer = new AnomalyToMetricTransformer();
     private final MetricTankIdFactory metricTankIdFactory = new MetricTankIdFactory();
     
     public static void main(String[] args) {
-        val tsConfig = new TypesafeConfigLoader(CK_ANOMALY_TO_METRIC_TRANSFORMER).loadMergedConfig();
+        val tsConfig = new TypesafeConfigLoader(APP_ID).loadMergedConfig();
         val saConfig = new StreamsAppConfig(tsConfig);
         new KafkaAnomalyToMetricMapper(saConfig).start();
     }
