@@ -37,7 +37,7 @@ public class ModelServiceTest {
     }
 
     @Test
-    public void onboardMetricCheck(){
+    public void onboardMetricCheck() {
         Metric onboardMetric = new Metric();
         onboardMetric.setId(Long.valueOf("138"));
         onboardMetric.setKey("test49");
@@ -58,7 +58,7 @@ public class ModelServiceTest {
     }
 
     @Test
-    public void newMetricOnboard(){
+    public void newMetricOnboard() {
         Metric newOnboardMetric = new Metric();
         newOnboardMetric.setId(Long.valueOf("139"));
         newOnboardMetric.setKey("test50");
@@ -74,7 +74,7 @@ public class ModelServiceTest {
         }
         newOnboardMetric.setTags(tagsMap);
         Metric newMetric = getModelServiceimpl.onboard(newOnboardMetric);
-        try{
+        try {
             assertEquals(newOnboardMetric, newMetric);
         } catch (AssertionError e) {
             log.info("Metric not onboarded");
@@ -82,7 +82,7 @@ public class ModelServiceTest {
         }
     }
 
-    private Metric exisitingMetric(){
+    private Metric exisitingMetric() {
         Metric newMetric = new Metric();
         newMetric.setId(Long.valueOf("138"));
         newMetric.setKey("test49");
@@ -115,7 +115,7 @@ public class ModelServiceTest {
         List<Optional<Metric>> metricList = new ArrayList<>();
         metricList.add(Optional.of(new Metric((long) 17, "karmalab.stats.gauges.AirBoss.chelappabo001.karmalab.net.java.nio.BufferPool.direct.MemoryUsed", "1.36585c5f53807a5785787b9fa0a66c83", tagsMap)));
         metricCheckList = getModelServiceimpl.findMetricsByTags(anyList());
-        assertEquals(metricCheckList, metricList); // Test will pass as both the metric entity are same.
+        assertEquals(metricCheckList, metricList);
     }
 
     @Test
@@ -133,11 +133,11 @@ public class ModelServiceTest {
         List<Optional<Metric>> metricList = new ArrayList<>();
         metricList.add(Optional.of(new Metric((long) 17, "karmalab.stats.gauges.AirBoss.chelappabo001.karmalab.net.java.nio.BufferPool.direct.MemoryUsed", "1.36585c5f53807a5785787b9fa0a66c83", tagsMap)));
         metricCheckList = getModelServiceimpl.findMetricsByTags(anyList());
-        assertEquals(metricCheckList, metricList); // Test will fail as tags contains wrong keys which doesn't exists.
+        assertEquals(metricCheckList, metricList);
     }
 
 
-    private List<Optional<Metric>> existingMetric(){
+    private List<Optional<Metric>> existingMetric() {
         Map<String, Object> tagsMap = new LinkedHashMap<>();
         String tags = "{\"unit\":\"unknown\", \"mtype\":\"gauge\", \"org_id\":\"1\", \"interval\":\"30\"}";
         ObjectMapper mapper = new ObjectMapper();
@@ -151,15 +151,14 @@ public class ModelServiceTest {
         metricList.add(Optional.of(new Metric((long) 17, "karmalab.stats.gauges.AirBoss.chelappabo001.karmalab.net.java.nio.BufferPool.direct.MemoryUsed", "1.36585c5f53807a5785787b9fa0a66c83", tagsMap)));
         List<Tag> tagList = new ArrayList<>();
         tagList.add(new Tag("unit", "unknown"));
-        tagList.add(new Tag("mtype","gauge"));
-        tagList.add(new Tag("org_id","1"));
+        tagList.add(new Tag("mtype", "gauge"));
+        tagList.add(new Tag("org_id", "1"));
         tagList.add(new Tag("interval", "30"));
 
         return metricList;
     }
 
     private void initDependencies() {
-
         when(getModelServiceimpl.onboard(metric)).thenReturn(exisitingMetric());
         when(getModelServiceimpl.findMetricsByTags(anyList())).thenReturn(existingMetric());
     }
