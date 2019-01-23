@@ -15,19 +15,15 @@
  */
 package com.expedia.adaptivealerting.anomdetect.constant;
 
-import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorModel;
 import com.expedia.adaptivealerting.anomdetect.BasicAnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.metrics.MetricData;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
-import java.util.Map;
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -68,12 +64,13 @@ public final class ConstantThresholdAnomalyDetector extends BasicAnomalyDetector
     protected void loadParams(ConstantThresholdParams params) {
         this.params = params;
     }
-    
+
     @Override
     public AnomalyResult classify(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
         final AnomalyThresholds thresholds = params.getThresholds();
-        final AnomalyLevel level = thresholds.classify(metricData.getValue());
+        final AnomalyType type = params.getType();
+        final AnomalyLevel level = thresholds.classify(type, metricData.getValue());
         return new AnomalyResult(getUuid(), metricData, level);
     }
 }

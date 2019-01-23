@@ -21,6 +21,7 @@ import com.expedia.adaptivealerting.anomdetect.ewma.EwmaAnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.ewma.EwmaParams;
 import com.expedia.adaptivealerting.anomdetect.pewma.PewmaAnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.pewma.PewmaParams;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.adaptivealerting.core.data.io.MetricFrameLoader;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
@@ -63,7 +64,7 @@ public final class Sample001 {
         final AnomalyDetectorFilter pewmaADF = new AnomalyDetectorFilter(pewmaAD);
         
         final CusumParams cusumParams = new CusumParams()
-                .setType(CusumParams.Type.RIGHT_TAILED)
+                .setType(AnomalyType.RIGHT_TAILED)
                 .setTargetValue(20_000_000)
                 .setWeakSigmas(3.0)
                 .setStrongSigmas(4.0)

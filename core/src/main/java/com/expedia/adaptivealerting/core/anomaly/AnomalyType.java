@@ -13,25 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.constant;
-
-import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
-import lombok.Data;
-import lombok.experimental.Accessors;
+package com.expedia.adaptivealerting.core.anomaly;
 
 /**
- * @author Willie Wheeler
+ * Anomaly Type enum.
+ *
+ * @author kashah
  */
-@Data
-@Accessors(chain = true)
-public class ConstantThresholdParams {
+public enum AnomalyType {
 
     /**
-     * Detector type: left-, right- or two-tailed.
+     * Left tail. Generate alerts below the threshold.
      */
-    private AnomalyType type;
-    
-    private AnomalyThresholds thresholds;
+    LEFT_TAILED,
+
+    /**
+     * Right tail. Generate alerts above the threshold.
+     */
+    RIGHT_TAILED,
+
+    /**
+     * Both tails. Includes both left and right tails.
+     */
+    TWO_TAILED
 
 }
