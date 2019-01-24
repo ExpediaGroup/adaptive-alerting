@@ -79,6 +79,14 @@ public interface MetricRepository extends PagingAndSortingRepository<Metric, Lon
     List<Metric> findByTagContaining(@Param("tagKey") String tagKey, @Param("tagValue") String tagValue, Pageable pageable);
 
     /**
+     * Finds a list of metrics on the basis of tagKey.
+     * @param tagKey
+     * @return List of metrics containing tagKey
+     */
+    @Query(nativeQuery = true, value = "SELECT m.* FROM metric m INNER JOIN metric_tag_mapping mm on mm.metric_id = m.id  INNER JOIN tag t on t.id = mm.tag_id WHERE t.ukey = :tagKey")
+    List<Metric> findMetricByTagKey(@Param("tagKey") String tagKey, Pageable pageable);
+
+    /**
      * Finds a list of metrics attached to a given detector
      *
      * @param uuid Detector uuid.
