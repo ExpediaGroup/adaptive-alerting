@@ -20,16 +20,10 @@ spring:
   data:
     rest:
       base-path: /api     
-
 endpoints:
   health:
     sensitive: false
-
 management:
   context-path: "/admin"
-  
 security:
   signingKey: $${SIGNING_KEY}
-  
-server:
-  port: 8080

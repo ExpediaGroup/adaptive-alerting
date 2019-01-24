@@ -100,7 +100,6 @@ module "ad-manager" {
   modelservice_uri_template = "${var.ad-manager["modelservice_uri_template"]}"
 }
 
-/*
 module "mc-a2m-mapper" {
   source = "mc-a2m-mapper"
 
@@ -128,7 +127,7 @@ module "mc-a2m-mapper" {
   env_vars = "${var.mc-a2m-mapper["environment_overrides"]}"
 
   # App
-  kafka_input_endpoint = "${var.mc-a2m-mapper["kakfa_input_endpoint"]}"
+  kafka_input_endpoint = "${var.mc-a2m-mapper["kafka_input_endpoint"]}"
   kafka_input_topic = "${var.mc-a2m-mapper["kafka_input_topic"]}"
   kafka_input_serde_key = "${var.mc-a2m-mapper["kafka_input_serde_key"]}"
   kafka_input_serde_value = "${var.mc-a2m-mapper["kafka_input_serde_value"]}"
@@ -138,7 +137,6 @@ module "mc-a2m-mapper" {
   kafka_output_serde_key = "${var.mc-a2m-mapper["kafka_output_serde_key"]}"
   kafka_output_serde_value = "${var.mc-a2m-mapper["kafka_output_serde_value"]}"
 }
-*/
 
 module "notifier" {
   source = "notifier"

@@ -16,13 +16,12 @@
 package com.expedia.adaptivealerting.core.anomaly;
 
 import com.expedia.metrics.MetricData;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 
-import java.util.List;
 import java.util.UUID;
 
 // TODO Currently including the prediction and thresholds because the tools module requires these to render the model
@@ -37,7 +36,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
-@ToString
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AnomalyResult {
     
     @NonNull
@@ -55,6 +54,6 @@ public class AnomalyResult {
     @Deprecated
     private AnomalyThresholds thresholds;
     
-    @Deprecated
-    private List<InvestigationResult> investigationResults;
+//    @Deprecated
+//    private List<InvestigationResult> investigationResults;
 }
