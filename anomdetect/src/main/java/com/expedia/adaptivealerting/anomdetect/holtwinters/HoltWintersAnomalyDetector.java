@@ -26,6 +26,7 @@ import lombok.NonNull;
 
 import java.util.UUID;
 
+import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.MODEL_WARMUP;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
@@ -62,6 +63,8 @@ public final class HoltWintersAnomalyDetector extends BasicAnomalyDetector<HoltW
         loadParams(params);
         components = new HoltWintersOnlineComponents(params);
         holtWintersOnlineAlgorithm = new HoltWintersOnlineAlgorithm();
+        double initForecast = holtWintersOnlineAlgorithm.getForecast(params.getSeasonalityType(), components.getLevel(), components.getBase(), components.getSeasonal(components.getCurrentSeasonalIndex()));
+        components.setForecast(initForecast);
     }
 
     @Override
@@ -89,8 +92,7 @@ public final class HoltWintersAnomalyDetector extends BasicAnomalyDetector<HoltW
 
         // Identify thresholds based on previously observed values
         // TODO HW: Look at options for configuring how bands are defined
-        // TODO HW: Add model warmup param and anomaly level. See e.g. CUSUM, Individuals, PEWMA. [WLW]
-        double stddev = components.getSeasonalStandardDeviation(components.currentSeasonalIndex());
+        double stddev = components.getSeasonalStandardDeviation(components.getCurrentSeasonalIndex());
         final double weakDelta = params.getWeakSigmas() * stddev;
         final double strongDelta = params.getStrongSigmas() * stddev;
 
@@ -106,33 +108,44 @@ public final class HoltWintersAnomalyDetector extends BasicAnomalyDetector<HoltW
         // TODO HW: The first n=period observations will result in STRONG level anomalies due to stddev = 0.0 - should we ignore them and report NORMAL?  This is the same for Ewma
         // TODO HW: Should we provide the ability to use the first n=period observations as the initial estimates for the seasonal components?  E.g. Provide a boolean 'learnInitSeasonalEstimates' parameter.
 
-        final AnomalyLevel anomalyLevel = thresholds.classifyExclusiveBounds(observed);
+        final AnomalyLevel anomalyLevel;
+        if (stillWarmingUp()) {
+            anomalyLevel = MODEL_WARMUP;
+        } else {
+            anomalyLevel = thresholds.classify(observed);
+        }
+
         AnomalyResult anomalyResult = new AnomalyResult(getUuid(), metricData, anomalyLevel);
         if (debug) printStats(observed, weakDelta, strongDelta, lastForecast, newForecast, stddev, anomalyLevel);
         return anomalyResult;
     }
 
+    private boolean stillWarmingUp() {
+        return components.getN() <= params.getWarmUpPeriod();
+    }
+
+    // TODO HW: Remove this method
     private void printStats(double observed, double weakDelta, double strongDelta, double oldForecast, double newForecast, double stddev, AnomalyLevel anomalyLevel) {
         if (headerNotPrinted) {
             System.out.println(
                     "         n, " +
-                    "         y, " +
-                    "         l, " +
-                    "         b, " +
-                    "         s, " +
-                    "         i, " +
-                    "  prevPred, " +
-                    "      pred, " +
-                    " anomLevel, " +
-                    "  upperStr, " +
-                    " upperWeak, " +
-                    "  lowerStr, " +
-                    " lowerWeak, " +
-                    "       min, " +
-                    "       max, " +
-                    "      mean, " +
-                    "         var, " +
-                    "     stdev");
+                            "         y, " +
+                            "         l, " +
+                            "         b, " +
+                            "         s, " +
+                            "         i, " +
+                            "  prevPred, " +
+                            "      pred, " +
+                            " anomLevel, " +
+                            "  upperStr, " +
+                            " upperWeak, " +
+                            "  lowerStr, " +
+                            " lowerWeak, " +
+                            "       min, " +
+                            "       max, " +
+                            "      mean, " +
+                            "         var, " +
+                            "     stdev");
             headerNotPrinted = false;
         }
         System.out.printf("%10d, " +

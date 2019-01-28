@@ -1,5 +1,7 @@
 package com.expedia.adaptivealerting.anomdetect.holtwinters;
 
+import static com.expedia.adaptivealerting.anomdetect.holtwinters.SeasonalityType.MULTIPLICATIVE;
+
 /**
  * Encapsulates the algorithm for forecasting one-step ahead estimate using Holt-Winters (Triple-Exponential Smoothing) method.
  *
@@ -21,41 +23,56 @@ public class HoltWintersOnlineAlgorithm {
         double beta = params.getBeta();
         double gamma = params.getGamma();
         boolean multiplicative = params.isMultiplicative();
-        // Retrieve model's component values from previous observations (t - 1)
-        // TODO HW: Consider "prev" instead of "last"
-        double lastLevel = components.getLevel();
-        double lastBase = components.getBase();
-        int seasonalIdx = components.currentSeasonalIndex();
-        // We get the last seasonal component that relates to the current season we're observing for time t (i.e. seasonalIdx = (t - period) % period)
-        // TODO HW: Think about a better name:
-        double lastSeason = components.getSeasonal(seasonalIdx);
+        // Retrieve model's level and base component values from previous observation (t - 1)
+        double prevLevel = components.getLevel();
+        double prevBase = components.getBase();
+        // Retrieve model's seasonal component that relates to the current season we're observing for time t (i.e. "period" seasons ago)
+        int seasonalIdx = components.getCurrentSeasonalIndex();
+        double season = components.getSeasonal(seasonalIdx);
 
-        double newLevel, newBase, newSeason, newForecast;
+        double newLevel, newBase, newSeason;
 
-        // Calculate new components given y_t (current observed value) and generate new forecast for y_t+1 (to be compared with next observed value)
+        // Calculate new components given y_t (current observed value) and generate new forecast for y_t+1
         if (multiplicative) {
-            newLevel = alpha * (y / lastSeason) + (1 - alpha) * (lastLevel + lastBase);
-            newBase = beta * (newLevel - lastLevel) + (1 - beta) * lastBase;
-            newSeason = gamma * (y / (lastLevel + lastBase)) + (1 - gamma) * lastSeason;
-            newForecast = (newLevel + newBase) * newSeason;
+            newLevel = alpha * (y / season) + (1 - alpha) * (prevLevel + prevBase);
+            newBase = beta * (newLevel - prevLevel) + (1 - beta) * prevBase;
+            newSeason = gamma * (y / (prevLevel + prevBase)) + (1 - gamma) * season;
         } else {
-            newLevel = alpha * (y - lastSeason) + (1 - alpha) * (lastLevel + lastBase);
-            newBase = beta * (newLevel - lastLevel) + (1 - beta) * lastBase;
-            newSeason = gamma * (y - (lastLevel - lastBase)) + (1 - gamma) * lastSeason;
-            newForecast = newLevel + newBase + newSeason;
+            newLevel = alpha * (y - season) + (1 - alpha) * (prevLevel + prevBase);
+            newBase = beta * (newLevel - prevLevel) + (1 - beta) * prevBase;
+            newSeason = gamma * (y - prevLevel - prevBase) + (1 - gamma) * season;
         }
 
-        // Store the forecast to be compared with next metric observation and update the model's components
-        updateComponents(components, y, newLevel, newBase, newSeason, seasonalIdx, newForecast);
+        // Update the model's components
+        updateComponents(components, y, newLevel, newBase, newSeason, seasonalIdx);
+
+        // Record observation of y
+        observeValue(components, y);
+
+        double nextSeason = components.getSeasonal(components.getCurrentSeasonalIndex());
+        // Forecast the value for next season
+        updateForecast(components, getForecast(params.getSeasonalityType(), newLevel, newBase, nextSeason));
+    }
+
+    public double getForecast(SeasonalityType seasonalityType, double level, double base, double season) {
+        return MULTIPLICATIVE.equals(seasonalityType)
+                ? (level + base) * season
+                : level + base + season;
     }
 
 
-    private void updateComponents(HoltWintersOnlineComponents components, double y, double newLevel, double newBase, double newSeason, int seasonalIdx, double newForecast) {
-        components.addValue(y);
+    private void updateComponents(HoltWintersOnlineComponents components, double y, double newLevel, double newBase, double newSeason, int seasonalIdx) {
         components.setLevel(newLevel);
         components.setBase(newBase);
         components.setSeasonal(seasonalIdx, newSeason, y);
+    }
+
+    private void updateForecast(HoltWintersOnlineComponents components, double newForecast) {
         components.setForecast(newForecast);
+    }
+
+    private void observeValue(HoltWintersOnlineComponents components, double y) {
+        components.addValue(y);
     }
 
 }

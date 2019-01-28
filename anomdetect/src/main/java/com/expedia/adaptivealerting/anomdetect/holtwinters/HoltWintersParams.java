@@ -66,6 +66,13 @@ public final class HoltWintersParams {
     private double gamma = 0.15;
 
     /**
+     * Minimum number of data points required before the anomaly detector is ready for use.
+     * A value of 0 means the detector could begin emitting anomalies immediately on first observation.
+     * A minimum equivalent to "period" is suggested, with 2 * period being ideal for a lot of scenarios.
+     */
+    private int warmUpPeriod = 0;
+
+    /**
      * Weak threshold sigmas.
      */
     private double weakSigmas = 3.0;
@@ -89,11 +96,6 @@ public final class HoltWintersParams {
      * Initial estimates for Seasonal components. n=period values must be provided.
      */
     private double[] initSeasonalEstimates;
-
-    /**
-     * Initial estimate for the forecast for first tick.
-     */
-    private double initForecastEstimate = 0.0;
 
     public boolean isMultiplicative() {
         return seasonalityType.equals(SeasonalityType.MULTIPLICATIVE);

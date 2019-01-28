@@ -29,7 +29,6 @@ public class HoltWintersOnlineComponents {
         initBaseFromParams(params);
         initSeasonalsFromParams(params);
         initSeasonalStatistics(params);
-        initForecastFromParams(params);
     }
 
     public long getN() {
@@ -38,6 +37,24 @@ public class HoltWintersOnlineComponents {
 
     public double getSeasonal(int seasonalIdx) {
         return seasonal[seasonalIdx];
+    }
+
+    /**
+     * Return n=period seasonal components in reverse order, starting with the current season.
+     * E.g. if period=4 and we've most recently observed the 2nd season (s2), the seasonal components will be returned in the following order: seasonal[1], seasonal[0], seasonal[3], seasonal[2]
+     *
+     * Makes for easy comparison with R-generated datasets.
+     *
+     * @return seasonal components in reverse order
+     */
+    public double[] getReverseHistorySeasonals() {
+        int currentIdx = getCurrentSeasonalIndex();
+        int m = getParams().getPeriod();
+        double[] result = new double[m];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = getSeasonal((currentIdx + m - i - 1) % m);
+        }
+        return result;
     }
 
     public void setSeasonal(int seasonalIdx, double seasonalValue, double observed) {
@@ -80,7 +97,7 @@ public class HoltWintersOnlineComponents {
     /**
      * @return Index into seasonal components, ranges from 0 to period-1.  Increments whenever addValue() is called.  Wraps back to 0 after period ticks.
      */
-    public int currentSeasonalIndex() {
+    public int getCurrentSeasonalIndex() {
         return (int) (getN() % params.getPeriod());
     }
 
@@ -88,7 +105,7 @@ public class HoltWintersOnlineComponents {
      * @return The index for the last season (wraps around to period-1 if current index = 0)
      */
     public int previousSeasonalIndex() {
-        return (currentSeasonalIndex() + params.getPeriod() - 1) % params.getPeriod();
+        return (getCurrentSeasonalIndex() + params.getPeriod() - 1) % params.getPeriod();
     }
 
     @Override
@@ -141,10 +158,6 @@ public class HoltWintersOnlineComponents {
             seasonalSummaryStatistics[i] = new SummaryStatistics();
             seasonalSummaryStatistics[i].addValue(seasonal[i]);
         }
-    }
-
-    private void initForecastFromParams(HoltWintersParams params) {
-        this.forecast = Double.isNaN(params.getInitForecastEstimate()) ? seasonalityIdentity() : params.getInitForecastEstimate();
     }
 
 }
