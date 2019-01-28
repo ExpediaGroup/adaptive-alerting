@@ -96,12 +96,9 @@ public class HoltWintersOnlineComponents {
     private void initSeasonalsFromParams(HoltWintersParams params) {
         int s = params.getInitSeasonalEstimates().length;
         if (s == 0) {
-            // TODO HW: Test this
             fillSeasonalsWithIdentity();
         } else if (s != params.getPeriod()) {
-            // TODO HW: Test this
-            // TODO HW: Use strongly typed exception
-            throw new IllegalArgumentException(String.format("initSeasonalEstimates array is not the same size (%d) as period (%d)", s, params.getPeriod()));
+            throw new IllegalStateException(String.format("Invalid: initSeasonalEstimates array is not the same size (%d) as period (%d). Ensure only valid parameters are used.", s, params.getPeriod()));
         } else {
             this.seasonal = Arrays.copyOf(params.getInitSeasonalEstimates(), params.getPeriod());
         }

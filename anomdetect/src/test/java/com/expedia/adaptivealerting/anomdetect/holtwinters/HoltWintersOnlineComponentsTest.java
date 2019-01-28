@@ -66,4 +66,13 @@ public class HoltWintersOnlineComponentsTest {
         HoltWintersOnlineComponents subject = new HoltWintersOnlineComponents(params);
         assertArrayEquals(ADDITIVE_IDENTITY_SEASONALS, subject.getSeasonal(), TOLERANCE);
     }
+
+    @Test(expected = IllegalStateException.class)
+    public void testConstructorWithInvalidSeasonals() {
+        double initLevelEstimate = 80000;
+        double initBaseEstimate = 2;
+        double[] initSeasonalEstimates = {1, 2, 3};
+        final HoltWintersParams params = buildAustouristsParams(MULTIPLICATIVE, initLevelEstimate, initBaseEstimate, initSeasonalEstimates);
+        new HoltWintersOnlineComponents(params);
+    }
 }
