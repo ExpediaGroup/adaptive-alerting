@@ -1,6 +1,7 @@
 package com.expedia.adaptivealerting.anomdetect.holtwinters;
 
 import lombok.Data;
+import lombok.NonNull;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 import java.util.Arrays;
@@ -15,9 +16,11 @@ import java.util.Arrays;
 public class HoltWintersOnlineComponents {
     private static final double MULTIPLICATIVE_IDENTITY = 1;
     private static final double ADDITIVE_IDENTITY = 0;
+    @NonNull
     private final HoltWintersParams params;
     private double level = 0;
     private double base = 0;
+    @NonNull
     private double[] seasonal;
     private SummaryStatistics overallSummaryStatistics = new SummaryStatistics();
     private SummaryStatistics[] seasonalSummaryStatistics;
@@ -66,32 +69,8 @@ public class HoltWintersOnlineComponents {
         overallSummaryStatistics.addValue(observed);
     }
 
-    public double getMean() {
-        return overallSummaryStatistics.getMean();
-    }
-
-    public double getMin() {
-        return overallSummaryStatistics.getMin();
-    }
-
-    public double getMax() {
-        return overallSummaryStatistics.getMax();
-    }
-
-    public double getVariance() {
-        return overallSummaryStatistics.getVariance();
-    }
-
-    public double getStandardDeviation() {
-        return overallSummaryStatistics.getStandardDeviation();
-    }
-
     public double getSeasonalStandardDeviation(int seasonalIdx) {
         return seasonalSummaryStatistics[seasonalIdx].getStandardDeviation();
-    }
-
-    public double getSeasonalMean(int seasonalIdx) {
-        return seasonalSummaryStatistics[seasonalIdx].getMean();
     }
 
     /**
@@ -100,28 +79,6 @@ public class HoltWintersOnlineComponents {
     public int getCurrentSeasonalIndex() {
         return (int) (getN() % params.getPeriod());
     }
-
-    /**
-     * @return The index for the last season (wraps around to period-1 if current index = 0)
-     */
-    public int previousSeasonalIndex() {
-        return (getCurrentSeasonalIndex() + params.getPeriod() - 1) % params.getPeriod();
-    }
-
-    @Override
-    public String toString() {
-        return "HoltWintersOnlineComponents{" +
-                "params=" + params +
-                ", level=" + level +
-                ", base=" + base +
-                ", seasonal=" + Arrays.toString(seasonal) +
-                ", n=" + getN() +
-                ", mean=" + getMean() +
-                '}';
-    }
-
-
-    // TODO HW: Test cases
 
     private void initLevelFromParams(HoltWintersParams params) {
         this.level = Double.isNaN(params.getInitLevelEstimate()) ? seasonalityIdentity() : params.getInitLevelEstimate();
@@ -134,8 +91,10 @@ public class HoltWintersOnlineComponents {
     private void initSeasonalsFromParams(HoltWintersParams params) {
         int s = params.getInitSeasonalEstimates().length;
         if (s == 0) {
+            // TODO HW: Test this
             fillSeasonalsWithIdentity();
         } else if (s != params.getPeriod()) {
+            // TODO HW: Test this
             // TODO HW: Use strongly typed exception
             throw new IllegalArgumentException(String.format("initSeasonalEstimates array is not the same size (%d) as period (%d)", s, params.getPeriod()));
         } else {
@@ -149,7 +108,9 @@ public class HoltWintersOnlineComponents {
     }
 
     private double seasonalityIdentity() {
-        return params.getSeasonalityType() == SeasonalityType.MULTIPLICATIVE ? MULTIPLICATIVE_IDENTITY : ADDITIVE_IDENTITY;
+        return params.getSeasonalityType() == SeasonalityType.MULTIPLICATIVE
+                ? MULTIPLICATIVE_IDENTITY
+                : ADDITIVE_IDENTITY;
     }
 
     private void initSeasonalStatistics(HoltWintersParams params) {

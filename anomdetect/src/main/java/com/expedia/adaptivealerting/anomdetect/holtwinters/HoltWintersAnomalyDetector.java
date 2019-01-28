@@ -41,9 +41,10 @@ public final class HoltWintersAnomalyDetector extends BasicAnomalyDetector<HoltW
 
     @NonNull
     private HoltWintersParams params;
+    @NonNull
     private HoltWintersOnlineComponents components;
+    @NonNull
     private HoltWintersOnlineAlgorithm holtWintersOnlineAlgorithm;
-    private boolean headerNotPrinted = true;
 
     public HoltWintersAnomalyDetector() {
         this(UUID.randomUUID(), new HoltWintersParams());
@@ -79,11 +80,6 @@ public final class HoltWintersAnomalyDetector extends BasicAnomalyDetector<HoltW
 
     @Override
     public AnomalyResult classify(MetricData metricData) {
-        return classify(metricData, false);
-    }
-
-    // TODO HW: Remove 'debug' param
-    public AnomalyResult classify(MetricData metricData, boolean debug) {
         notNull(metricData, "metricData can't be null");
 
         final double observed = metricData.getValue();
@@ -115,50 +111,10 @@ public final class HoltWintersAnomalyDetector extends BasicAnomalyDetector<HoltW
         }
 
         AnomalyResult anomalyResult = new AnomalyResult(getUuid(), metricData, anomalyLevel);
-        if (debug) printStats(observed, weakDelta, strongDelta, lastForecast, newForecast, stddev, anomalyLevel);
         return anomalyResult;
     }
 
     private boolean stillWarmingUp() {
         return components.getN() <= params.getWarmUpPeriod();
     }
-
-    // TODO HW: Remove this method
-    private void printStats(double observed, double weakDelta, double strongDelta, double oldForecast, double newForecast, double stddev, AnomalyLevel anomalyLevel) {
-        if (headerNotPrinted) {
-            System.out.println(
-                    "         n, " +
-                            "         y, " +
-                            "         l, " +
-                            "         b, " +
-                            "         s, " +
-                            "         i, " +
-                            "  prevPred, " +
-                            "      pred, " +
-                            " anomLevel, " +
-                            "  upperStr, " +
-                            " upperWeak, " +
-                            "  lowerStr, " +
-                            " lowerWeak, " +
-                            "       min, " +
-                            "       max, " +
-                            "      mean, " +
-                            "         var, " +
-                            "     stdev");
-            headerNotPrinted = false;
-        }
-        System.out.printf("%10d, " +
-                        "%10.0f, " +
-                        "%10.2f, %10.2f, %10.2f, %10d, " +
-                        "%10.2f, %10.2f, %10s, " +
-                        "%10.2f, %10.2f, %10.2f, %10.2f, " +
-                        "%10.0f, %10.0f, %10.2f, %12.2f, %10.2f\n",
-                components.getN(),
-                observed,
-                components.getLevel(), components.getBase(), components.getSeasonal(components.previousSeasonalIndex()), components.previousSeasonalIndex(),
-                oldForecast, newForecast, anomalyLevel,
-                components.getMean() + strongDelta, components.getMean() + weakDelta, components.getMean() - strongDelta, components.getMean() - weakDelta,
-                components.getMin(), components.getMax(), components.getMean(), components.getVariance(), stddev);
-    }
-
 }
