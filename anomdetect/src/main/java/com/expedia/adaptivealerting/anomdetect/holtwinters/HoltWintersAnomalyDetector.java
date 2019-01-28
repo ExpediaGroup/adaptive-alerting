@@ -105,7 +105,6 @@ public final class HoltWintersAnomalyDetector extends BasicAnomalyDetector<HoltW
         holtWintersOnlineAlgorithm.observeValueAndUpdateForecast(observed, params, components);
         double newForecast = components.getForecast();
 
-        // TODO HW: The first n=period observations will result in STRONG level anomalies due to stddev = 0.0 - should we ignore them and report NORMAL?  This is the same for Ewma
         // TODO HW: Should we provide the ability to use the first n=period observations as the initial estimates for the seasonal components?  E.g. Provide a boolean 'learnInitSeasonalEstimates' parameter.
 
         final AnomalyLevel anomalyLevel;

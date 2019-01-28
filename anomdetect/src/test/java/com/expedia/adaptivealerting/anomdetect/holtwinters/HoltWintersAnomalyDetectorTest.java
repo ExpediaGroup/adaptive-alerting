@@ -36,7 +36,6 @@ import static com.expedia.adaptivealerting.anomdetect.util.CsvToBeanFileReader.r
  */
 public class HoltWintersAnomalyDetectorTest {
     private static final double TOLERANCE = 0.001;
-    // private static final int ADS_PERIOD = 24;
     private static final int AUSTOURISTS_PERIOD = 4;
     public static final double AUSTOURISTS_ALPHA = 0.441;
     public static final double AUSTOURISTS_BETA = 0.030;
@@ -45,8 +44,6 @@ public class HoltWintersAnomalyDetectorTest {
     private UUID detectorUUID;
     private MetricDefinition metricDefinition;
     private long epochSecond;
-    // private static List<HoltWintersTestRowAds> ADS_ADDITIVE_TEST_DATA = readData("tests/ads-tests-holtwinters-additive.csv", HoltWintersTestRowAds.class);
-    // private static List<HoltWintersTestRowAds> ADS_MULTIPLICATIVE_TEST_DATA = readData("tests/ads-tests-holtwinters-multiplicative.csv", HoltWintersTestRowAds.class);
     public static final String AUSTOURISTS_ADD_FILE = "tests/austourists-tests-holtwinters-additive.csv";
     public static final String AUSTOURISTS_MULT_FILE = "tests/austourists-tests-holtwinters-multiplicative.csv";
     private static List<HoltWintersTestRowAustourists> AUSTOURISTS_ADD_DATA = readData(AUSTOURISTS_ADD_FILE, HoltWintersTestRowAustourists.class);
@@ -124,66 +121,10 @@ public class HoltWintersAnomalyDetectorTest {
         Assert.assertEquals(testRow.getB(), components.getBase(), TOLERANCE);
         double[] expectedReverseSeasonals = {testRow.getS1(), testRow.getS2(), testRow.getS3(), testRow.getS4()};
         double[] actualReverseHistorySeasonals = components.getReverseHistorySeasonals();
-//            System.out.println("expectedReverseSeasonals      = " + Arrays.toString(expectedReverseSeasonals));
-//            System.out.println("actualReverseHistorySeasonals = " + Arrays.toString(actualReverseHistorySeasonals));
         Assert.assertArrayEquals(expectedReverseSeasonals, actualReverseHistorySeasonals, TOLERANCE);
         // TODO: Record expected anomaly level in R test gen code
         // Assert.assertEquals(testRow.getExpectedLevel(), result.getAnomalyLevel());
         Assert.assertEquals(testRow.getYHat(), forecastBeforeObservation, TOLERANCE);
     }
-
-
-//    @Test
-//    public void testAdditiveAds() {
-//        final ListIterator<HoltWintersTestRowAds> testRows = ADS_ADDITIVE_TEST_DATA.listIterator();
-//        // These values were copied from the initial 24 values generated the first time the model was run
-//        double[] initSeasonal = {-43253.33333, -43483.33333, -34043.33333, -21438.33333, -1738.333333, -6893.333333, -16873.33333, -20573.33333, -15313.33333, -7243.333333, 7661.666667, 25651.66667, 34221.66667, 27346.66667, 25926.66667, 26731.66667, 21411.66667, 27321.66667, 40471.66667, 42866.66667, 16151.66667, -17473.33333, -26588.33333, -40848.3333};
-//        testAdsClassification(testRows, ADS_PERIOD, initSeasonal, SeasonalityType.ADDITIVE);
-//    }
-
-//    @Test
-//    public void testMultiplicativeAds() {
-//        final ListIterator<HoltWintersTestRowAds> testRows = ADS_MULTIPLICATIVE_TEST_DATA.listIterator();
-//        // These values were copied from the initial 24 values generated the first time the model was run
-//        double[] initSeasonal = {0.649396793, 0.647532457, 0.724051283, 0.82622499, 0.985909404, 0.944123965, 0.863228003, 0.833236514, 0.875873063, 0.941286932, 1.062103998, 1.20792748, 1.277394253, 1.221666824, 1.210156577, 1.216681752, 1.173558855, 1.221464179, 1.328055552, 1.347468962, 1.130922306, 0.858364518, 0.78448008, 0.66889126};
-//        testAdsClassification(testRows, ADS_PERIOD, initSeasonal, SeasonalityType.MULTIPLICATIVE);
-//    }
-
-//    private void testAdsClassification(ListIterator<HoltWintersTestRowAds> testRows, int PERIOD, double[] initSeasonal, SeasonalityType seasonalityType) {
-//        final HoltWintersParams params = new HoltWintersParams()
-//                .setPeriod(PERIOD)
-//                .setAlpha(0.05)
-//                .setSeasonalityType(seasonalityType)
-//                .setInitLevelEstimate(164500)
-//                .setInitBaseEstimate(4200)
-//                .setInitSeasonalEstimates(initSeasonal)
-//                .setInitForecastEstimate(80000);
-//        final HoltWintersAnomalyDetector detector = new HoltWintersAnomalyDetector(detectorUUID, params);
-//
-//        System.out.print("Forecast, expectedForecast, ");
-//        boolean firstRow = true;
-//        while (testRows.hasNext()) {
-//            final HoltWintersTestRowAds testRow = testRows.next();
-//            final int observed = testRow.getObserved();
-//            final MetricData metricData = new MetricData(metricDefinition, observed, epochSecond);
-//
-//            System.out.println("testRow = " + testRow);
-////            BigDecimal roundedForecast = roundDecimalTwoPlaces(detector.getComponents().getForecast());
-//            double forecast = detector.getComponents().getForecast();
-//            System.out.println("forecast = " + forecast);
-//            Assert.assertEquals(testRow.getExpectedForecast(), forecast, TOLERANCE);
-//            System.out.print(String.format("%f, %f, ", forecast, testRow.getExpectedForecast()));
-//            AnomalyResult result = detector.classify(metricData, true);
-//
-//            BigDecimal roundedMean = roundDecimalTwoPlaces(detector.getComponents().getMean());
-//            Assert.assertEquals(testRow.getExpectedMean(), roundedMean.doubleValue(), TOLERANCE);
-//            Assert.assertEquals(testRow.getExpectedLevel(), result.getAnomalyLevel());
-//            firstRow = false;
-//        }
-//    }
-
-//    private BigDecimal roundDecimalTwoPlaces(double overallMean) {
-//        return new BigDecimal(String.valueOf(overallMean)).setScale(2, BigDecimal.ROUND_HALF_UP);
-//    }
 
 }

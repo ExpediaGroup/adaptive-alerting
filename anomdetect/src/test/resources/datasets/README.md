@@ -8,11 +8,8 @@ These are public datasets for machine learning.
 - **Dataset:** https://archive.ics.uci.edu/ml/datasets/CalIt2+Building+People+Counts
 - **Notes:** The original `CalIt2.data` file contains both the inflows and outflows, but here we do only inflows. Note that the original `CalIt2.data` data file contains two extra CRs that need to be removed.
 
-## ads.csv
-- **Source:** From the "mlcourse.ai – Open Machine Learning Course"
-- **Dataset:** https://github.com/Yorko/mlcourse.ai/blob/5d2a1b73ce381a9548720b57d6331014abe1eacb/data/ads.csv
-
 ## austourists.csv
+
 - **Source:** 'fpp2' forecasting package - Rob Hyndman
 - **Dataset:** Generated (time-series data converted to CSV) by ../scripts/GenerateAustouristsDataset.R
 - **Notes:** 
