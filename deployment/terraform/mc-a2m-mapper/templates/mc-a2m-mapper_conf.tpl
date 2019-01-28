@@ -1,12 +1,16 @@
-# Input topic
-kafka.input.endpoint=${kafka_input_endpoint}
-kafka.input.topic=${kafka_input_topic}
-kafka.input.serde.key=${kafka_input_serde_key}
-kafka.input.serde.value=${kafka_input_serde_value}
-kafka.input.extractor.timestamp=${kafka_input_extractor_timestamp}
-
-# Output topic
-kafka.output.endpoint=${kafka_output_endpoint}
-kafka.output.topic=${kafka_output_topic}
-kafka.output.serde.key=${kafka_output_serde_key}
-kafka.output.serde.value=${kafka_output_serde_value}
+mc-a2m-mapper {
+  anomaly-consumer {
+    bootstrap.servers = "kafka-service.haystack-apps.svc.cluster.local:9092"
+    group.id = "mc-a2m-mapper"
+    topic = "anomalies"
+    key.deserializer = "org.apache.kafka.common.serialization.StringDeserializer"
+    value.deserializer = "com.expedia.adaptivealerting.kafka.serde.AnomalyResultJsonDeserializer"
+  }
+  metric-producer {
+    bootstrap.servers = "kafka-service.haystack-apps.svc.cluster.local:9092"
+    client.id = "mc-a2m-mapper"
+    topic = "metrics"
+    key.serializer = "org.apache.kafka.common.serialization.StringSerializer"
+    value.serializer = "com.expedia.adaptivealerting.kafka.serde.MetricDataSerializer"
+  }
+}

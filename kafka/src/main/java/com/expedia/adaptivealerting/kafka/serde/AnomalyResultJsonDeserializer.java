@@ -13,25 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.constant;
+package com.expedia.adaptivealerting.kafka.serde;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
-import lombok.Data;
-import lombok.experimental.Accessors;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.metrics.jackson.MetricsJavaModule;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 
 /**
+ * Kafka deserializer to read {@link AnomalyResult}s from JSON.
+ *
  * @author Willie Wheeler
  */
-@Data
-@Accessors(chain = true)
-public class ConstantThresholdParams {
-
-    /**
-     * Detector type: left-, right- or two-tailed.
-     */
-    private AnomalyType type;
+public class AnomalyResultJsonDeserializer extends AbstractJsonDeserializer<AnomalyResult> {
     
-    private AnomalyThresholds thresholds;
-
+    public AnomalyResultJsonDeserializer() {
+        super(AnomalyResult.class);
+        getObjectMapper()
+                .registerModule(new MetricsJavaModule())
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
 }
