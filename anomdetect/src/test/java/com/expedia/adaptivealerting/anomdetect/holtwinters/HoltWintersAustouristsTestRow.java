@@ -19,7 +19,7 @@ import com.opencsv.bean.CsvBindByName;
 import lombok.Data;
 
 @Data
-public class HoltWintersTestRowAustourists {
+public class HoltWintersAustouristsTestRow {
     
     @CsvBindByName
     private double y;

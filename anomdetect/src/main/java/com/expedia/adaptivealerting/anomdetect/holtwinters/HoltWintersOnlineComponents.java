@@ -8,6 +8,7 @@ import java.util.Arrays;
 
 /**
  * Encapsulates the values that represent the components for the {@link HoltWintersOnlineAlgorithm} logic.
+ * This represents the model's online data as opposed to {@link HoltWintersParams} which represents the users values for the model's parameters.
  *
  * @author Matt Callanan
  * @see <a href="https://otexts.org/fpp2/holt-winters.html">Holt-Winters' Seasonal Method</a>
@@ -24,8 +25,12 @@ public class HoltWintersOnlineComponents {
     private double[] seasonal;
     private SummaryStatistics overallSummaryStatistics = new SummaryStatistics();
     private SummaryStatistics[] seasonalSummaryStatistics;
-    private double forecast;
+    private double forecast = Double.NaN;
 
+    /**
+     * Constructs HoltWintersOnlineComponents object
+     * @param params User-supplied parameters for the model.  Assumed to be valid.
+     */
     public HoltWintersOnlineComponents(HoltWintersParams params) {
         this.params = params;
         initLevelFromParams(params);

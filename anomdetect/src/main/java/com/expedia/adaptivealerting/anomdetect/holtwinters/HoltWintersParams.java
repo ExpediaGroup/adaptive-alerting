@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.holtwinters;
 
+import com.expedia.adaptivealerting.core.util.AssertUtil;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -95,7 +96,7 @@ public final class HoltWintersParams {
     /**
      * Initial estimates for Seasonal components. n=period values must be provided.
      */
-    private double[] initSeasonalEstimates;
+    private double[] initSeasonalEstimates = new double[]{};
 
     public boolean isMultiplicative() {
         return seasonalityType.equals(SeasonalityType.MULTIPLICATIVE);
@@ -115,7 +116,7 @@ public final class HoltWintersParams {
 
     private void validateInitSeasonalEstimates() {
         notNull(initSeasonalEstimates, String.format("Required: initSeasonalEstimates array of n=period initial estimates for seasonal component", SeasonalityType.values()));
-
+        AssertUtil.isEqual(initSeasonalEstimates.length, period, String.format("initSeasonalEstimates size (%d) must equal period (%d)", initSeasonalEstimates.length, period));
         double seasonalSum = Arrays.stream(initSeasonalEstimates, 0, period).sum();
         if (isMultiplicative()) {
             // "With the multiplicative method, the seasonal component is expressed in relative terms (percentages).
