@@ -70,6 +70,9 @@ public final class HoltWintersParams {
      * Minimum number of data points required before the anomaly detector is ready for use.
      * A value of 0 means the detector could begin emitting anomalies immediately on first observation.
      * A minimum equivalent to "period" is suggested, with 2 * period being ideal for a lot of scenarios.
+     * If no initial Base/Level/Seasonal estimate parameters are supplied, then warmUpPeriod = (2 * period) is an ideal minimum
+     * - it allows the detector to "warm up" the seasonal components with at least 2 observations each, providing the ability
+     * to calculate a standard deviation.
      */
     private int warmUpPeriod = 0;
 

@@ -1,7 +1,5 @@
 library(fpp2)
 library(forecast)
-source("./HoltWintersNew.R")
-source("./ets.R")
 
 # Read data
 data <- read.table("../datasets/austourists.csv", header = TRUE, sep = ",")

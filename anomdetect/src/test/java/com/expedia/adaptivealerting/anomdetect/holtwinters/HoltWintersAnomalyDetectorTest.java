@@ -107,7 +107,7 @@ public class HoltWintersAnomalyDetectorTest {
         double[] expectedReverseSeasonals = {testRow.getS1(), testRow.getS2(), testRow.getS3(), testRow.getS4()};
         double[] actualReverseHistorySeasonals = components.getReverseHistorySeasonals();
         assertArrayEquals(expectedReverseSeasonals, actualReverseHistorySeasonals, TOLERANCE);
-        // TODO: Record expected anomaly level in R test gen code
+        // TODO HW: Record expected anomaly level in R test gen code
         // Assert.assertEquals(testRow.getExpectedLevel(), result.getAnomalyLevel());
         assertEquals(testRow.getYHat(), forecastBeforeObservation, TOLERANCE);
     }
