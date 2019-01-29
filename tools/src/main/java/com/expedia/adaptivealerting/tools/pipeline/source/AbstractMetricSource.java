@@ -44,6 +44,7 @@ public abstract class AbstractMetricSource implements MetricSource {
      * @param metricKey Metric key.
      * @param periodMs  Timer period in milliseconds.
      */
+    // TODO: Remove unused metricKey parameter
     public AbstractMetricSource(String metricKey, long periodMs) {
         notNull(metricKey, "metricKey can't be null");
         isTrue(periodMs > 0, "periodMs must be > 0");

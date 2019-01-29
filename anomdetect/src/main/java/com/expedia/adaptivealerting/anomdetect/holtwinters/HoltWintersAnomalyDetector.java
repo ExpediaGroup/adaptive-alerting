@@ -110,11 +110,15 @@ public final class HoltWintersAnomalyDetector extends BasicAnomalyDetector<HoltW
         // TODO HW: Add a 'initialLearningMethod' parameter. To begin with there will be two accepted values:
         //   "NONE" that uses either the user-provided init*Estimate params or the default values if none provided for initial l, b, and s components
         //   "SIMPLE" that implements Hyndman's "simple" method for selecting initial state values.
+        //            (https://github.com/robjhyndman/forecast/blob/master/R/HoltWintersNew.R#L61-L67)
         //            I.e. it uses the first 2 seasons to calculate what the l, b, and s components were for the season immediately preceding the
         //            first observation. Need to ensure that warmUpPeriod is >= (period * 2) to ensure no anomalies are emitted during learning period.
         // Other learning methods may be added to this enum at a later time.
 
-        return new AnomalyResult(getUuid(), metricData, anomalyLevel);
+        AnomalyResult result = new AnomalyResult(getUuid(), metricData, anomalyLevel);
+        result.setPredicted(components.getForecast());
+        result.setThresholds(thresholds);
+        return result;
     }
 
     private boolean stillWarmingUp() {

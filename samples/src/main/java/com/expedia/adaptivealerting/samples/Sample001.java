@@ -22,18 +22,14 @@ import com.expedia.adaptivealerting.anomdetect.ewma.EwmaParams;
 import com.expedia.adaptivealerting.anomdetect.pewma.PewmaAnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.pewma.PewmaParams;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
-import com.expedia.adaptivealerting.core.data.MetricFrame;
-import com.expedia.adaptivealerting.core.data.io.MetricFrameLoader;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartSink;
 import com.expedia.adaptivealerting.tools.pipeline.source.MetricFrameMetricSource;
 import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
-import com.expedia.metrics.MetricDefinition;
 
-import java.io.InputStream;
-
+import static com.expedia.adaptivealerting.samples.MetricGenerationHelper.buildMetricFrameMetricSource;
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.createChartFrame;
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showChartFrame;
 
@@ -41,28 +37,24 @@ import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showCha
  * @author Willie Wheeler
  */
 public final class Sample001 {
-    
+
     public static void main(String[] args) throws Exception {
-        
-        // TODO Use the FileDataConnector rather than the MetricFrameLoader. [WLW]
-        final InputStream is = ClassLoader.getSystemResourceAsStream("samples/sample001.csv");
-        final MetricFrame frame = MetricFrameLoader.loadCsv(new MetricDefinition("csv"), is, true);
-        final MetricFrameMetricSource source = new MetricFrameMetricSource(frame, "data", 200L);
-        
+        MetricFrameMetricSource source = buildMetricFrameMetricSource("samples/sample001.csv", 200L);
+
         final EwmaParams ewmaParams = new EwmaParams()
                 .setAlpha(0.20)
                 .setWeakSigmas(4.5)
                 .setStrongSigmas(5.5);
         final EwmaAnomalyDetector ewmaAD = new EwmaAnomalyDetector(ewmaParams);
         final AnomalyDetectorFilter ewmaADF = new AnomalyDetectorFilter(ewmaAD);
-    
+
         final PewmaParams pewmaParams = new PewmaParams()
                 .setAlpha(0.20)
                 .setWeakSigmas(5.0)
                 .setStrongSigmas(6.0);
         final PewmaAnomalyDetector pewmaAD = new PewmaAnomalyDetector(pewmaParams);
         final AnomalyDetectorFilter pewmaADF = new AnomalyDetectorFilter(pewmaAD);
-        
+
         final CusumParams cusumParams = new CusumParams()
                 .setType(AnomalyType.RIGHT_TAILED)
                 .setTargetValue(20_000_000)
@@ -71,27 +63,27 @@ public final class Sample001 {
                 .setInitMeanEstimate(13_000_000);
         final CusumAnomalyDetector cusumAD = new CusumAnomalyDetector(cusumParams);
         final AnomalyDetectorFilter cusumADF = new AnomalyDetectorFilter(cusumAD);
-        
+
         final EvaluatorFilter ewmaEval = new EvaluatorFilter(new RmseEvaluator());
         final EvaluatorFilter pewmaEval = new EvaluatorFilter(new RmseEvaluator());
-        
+
         final AnomalyChartSink ewmaChart = PipelineFactory.createChartSink("EWMA");
         final AnomalyChartSink pewmaChart = PipelineFactory.createChartSink("PEWMA");
         final AnomalyChartSink cusumChart = PipelineFactory.createChartSink("CUSUM");
-        
+
         source.addSubscriber(ewmaADF);
         ewmaADF.addSubscriber(ewmaEval);
         ewmaADF.addSubscriber(ewmaChart);
         ewmaEval.addSubscriber(ewmaChart);
-        
+
         source.addSubscriber(pewmaADF);
         pewmaADF.addSubscriber(pewmaEval);
         pewmaADF.addSubscriber(pewmaChart);
         pewmaEval.addSubscriber(pewmaChart);
-        
+
         source.addSubscriber(cusumADF);
         cusumADF.addSubscriber(cusumChart);
-        
+
         showChartFrame(createChartFrame(
                 "Sample001.csv",
                 ewmaChart.getChart(),
