@@ -1,16 +1,16 @@
 mc-a2m-mapper {
   anomaly-consumer {
-    bootstrap.servers = "kafka-service.haystack-apps.svc.cluster.local:9092"
-    group.id = "mc-a2m-mapper"
-    topic = "anomalies"
-    key.deserializer = "org.apache.kafka.common.serialization.StringDeserializer"
-    value.deserializer = "com.expedia.adaptivealerting.kafka.serde.AnomalyResultJsonDeserializer"
+    bootstrap.servers = "${anomaly_consumer_bootstrap_servers}"
+    group.id = "${anomaly_consumer_group_id}"
+    topic = "${anomaly_consumer_topic}"
+    key.deserializer = "${anomaly_consumer_key_deserializer}"
+    value.deserializer = "${anomaly_consumer_value_deserializer}"
   }
   metric-producer {
-    bootstrap.servers = "kafka-service.haystack-apps.svc.cluster.local:9092"
-    client.id = "mc-a2m-mapper"
-    topic = "metrics"
-    key.serializer = "org.apache.kafka.common.serialization.StringSerializer"
-    value.serializer = "com.expedia.adaptivealerting.kafka.serde.MetricDataSerializer"
+    bootstrap.servers = "${metric_producer_bootstrap_servers}"
+    client.id = "${metric_producer_client_id}"
+    topic = "${metric_producer_topic}"
+    key.serializer = "${metric_producer_key_serializer}"
+    value.serializer = "${metric_producer_value_serializer}"
   }
 }
