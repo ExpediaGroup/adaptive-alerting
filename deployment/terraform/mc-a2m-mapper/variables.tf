@@ -24,12 +24,13 @@ variable "graphite_enabled" {}
 variable "env_vars" {}
 
 # App
-variable "kafka_input_endpoint" {}
-variable "kafka_input_topic" {}
-variable "kafka_input_serde_key" {}
-variable "kafka_input_serde_value" {}
-variable "kafka_input_extractor_timestamp" {}
-variable "kafka_output_endpoint" {}
-variable "kafka_output_topic" {}
-variable "kafka_output_serde_key" {}
-variable "kafka_output_serde_value" {}
+variable "anomaly_consumer_bootstrap_servers" {}
+variable "anomaly_consumer_group_id" {}
+variable "anomaly_consumer_topic" {}
+variable "anomaly_consumer_key_deserializer" {}
+variable "anomaly_consumer_value_deserializer" {}
+variable "metric_producer_bootstrap_servers" {}
+variable "metric_producer_client_id" {}
+variable "metric_producer_topic" {}
+variable "metric_producer_key_serializer" {}
+variable "metric_producer_value_serializer" {}

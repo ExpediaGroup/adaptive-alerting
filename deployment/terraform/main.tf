@@ -127,15 +127,17 @@ module "mc-a2m-mapper" {
   env_vars = "${var.mc-a2m-mapper["environment_overrides"]}"
 
   # App
-  kafka_input_endpoint = "${var.mc-a2m-mapper["kafka_input_endpoint"]}"
-  kafka_input_topic = "${var.mc-a2m-mapper["kafka_input_topic"]}"
-  kafka_input_serde_key = "${var.mc-a2m-mapper["kafka_input_serde_key"]}"
-  kafka_input_serde_value = "${var.mc-a2m-mapper["kafka_input_serde_value"]}"
-  kafka_input_extractor_timestamp = "${var.mc-a2m-mapper["kafka_input_extractor_timestamp"]}"
-  kafka_output_endpoint = "${var.mc-a2m-mapper["kafka_output_endpoint"]}"
-  kafka_output_topic = "${var.mc-a2m-mapper["kafka_output_topic"]}"
-  kafka_output_serde_key = "${var.mc-a2m-mapper["kafka_output_serde_key"]}"
-  kafka_output_serde_value = "${var.mc-a2m-mapper["kafka_output_serde_value"]}"
+  anomaly_consumer_bootstrap_servers = "${var.mc-a2m-mapper["anomaly_consumer_bootstrap_servers"]}"
+  anomaly_consumer_group_id = "${var.mc-a2m-mapper["anomaly_consumer_group_id"]}"
+  anomaly_consumer_topic = "${var.mc-a2m-mapper["anomaly_consumer_topic"]}"
+  anomaly_consumer_key_deserializer = "${var.mc-a2m-mapper["anomaly_consumer_key_deserializer"]}"
+  anomaly_consumer_value_deserializer = "${var.mc-a2m-mapper["anomaly_consumer_value_deserializer"]}"
+  metric_producer_bootstrap_servers = "${var.mc-a2m-mapper["metric_producer_bootstrap_servers"]}"
+  metric_producer_client_id = "${var.mc-a2m-mapper["metric_producer_client_id"]}"
+  metric_producer_topic = "${var.mc-a2m-mapper["metric_producer_topic"]}"
+  metric_producer_key_serializer = "${var.mc-a2m-mapper["metric_producer_key_serializer"]}"
+  metric_producer_value_serializer = "${var.mc-a2m-mapper["metric_producer_value_serializer"]}"
+
 }
 
 module "notifier" {

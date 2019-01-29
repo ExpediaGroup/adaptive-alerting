@@ -38,69 +38,71 @@ import static junit.framework.TestCase.assertEquals;
  */
 public class EwmaAnomalyDetectorTest {
     private static final double TOLERANCE = 0.001;
-    
+
     private UUID detectorUUID;
     private MetricDefinition metricDefinition;
     private long epochSecond;
     private static List<EwmaTestRow> data;
-    
+
     @BeforeClass
     public static void setUpClass() {
         readData_calInflow();
     }
-    
+
     @Before
     public void setUp() {
         this.detectorUUID = UUID.randomUUID();
         this.metricDefinition = new MetricDefinition("some-key");
         this.epochSecond = Instant.now().getEpochSecond();
     }
-    
+
     @Test(expected = IllegalArgumentException.class)
     public void testConstructor_alphaOutOfRange() {
         final EwmaParams params = new EwmaParams()
                 .setAlpha(2.0);
         new EwmaAnomalyDetector(detectorUUID, params);
     }
-    
+
     @Test
     public void testEvaluate() {
         final ListIterator<EwmaTestRow> testRows = data.listIterator();
         final EwmaTestRow testRow0 = testRows.next();
         final double observed0 = testRow0.getObserved();
-        
+
         final EwmaParams params = new EwmaParams()
                 .setAlpha(0.05)
                 .setInitMeanEstimate(observed0);
         final EwmaAnomalyDetector detector = new EwmaAnomalyDetector(detectorUUID, params);
-        
+
         assertEquals(observed0, detector.getMean());
         assertEquals(0.0, detector.getVariance());
-        
+
         while (testRows.hasNext()) {
             final EwmaTestRow testRow = testRows.next();
             final int observed = testRow.getObserved();
-            
+
             final MetricData metricData = new MetricData(metricDefinition, observed, epochSecond);
             detector.classify(metricData);
-            
+
+            // TODO: Move this to GenerateCalInflowTestsEwma.R
             assertApproxEqual(testRow.getKnownMean(), testRow.getMean());
+
             assertApproxEqual(testRow.getMean(), detector.getMean());
             assertApproxEqual(testRow.getVar(), detector.getVariance());
-            // TODO Assert AnomalyLevel
+            // TODO: Assert AnomalyResult.getAnomalyLevel matches expected
         }
     }
-    
+
     private static void readData_calInflow() {
         final InputStream is = ClassLoader.getSystemResourceAsStream("tests/cal-inflow-tests-ewma.csv");
         data = new CsvToBeanBuilder<EwmaTestRow>(new InputStreamReader(is))
                 .withType(EwmaTestRow.class)
                 .build()
                 .parse();
-        
     }
-    
+
     private static void assertApproxEqual(double d1, double d2) {
+        // TODO: This could use Assert.assertEquals(double expected, double actual, double delta)
         TestCase.assertTrue(MathUtil.isApproximatelyEqual(d1, d2, TOLERANCE));
     }
 }

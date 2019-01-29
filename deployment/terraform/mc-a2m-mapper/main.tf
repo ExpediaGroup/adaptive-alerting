@@ -10,15 +10,16 @@ locals {
 data "template_file" "config_data" {
   template = "${file("${local.config_file_path}")}"
   vars {
-    kafka_input_endpoint = "${var.kafka_input_endpoint}"
-    kafka_input_topic = "${var.kafka_input_topic}"
-    kafka_input_serde_key = "${var.kafka_input_serde_key}"
-    kafka_input_serde_value = "${var.kafka_input_serde_value}"
-    kafka_input_extractor_timestamp = "${var.kafka_input_extractor_timestamp}"
-    kafka_output_endpoint = "${var.kafka_output_endpoint}"
-    kafka_output_topic = "${var.kafka_output_topic}"
-    kafka_output_serde_key = "${var.kafka_output_serde_key}"
-    kafka_output_serde_value = "${var.kafka_output_serde_value}"
+    anomaly_consumer_bootstrap_servers = "${var.anomaly_consumer_bootstrap_servers}"
+    anomaly_consumer_group_id = "${var.anomaly_consumer_group_id}"
+    anomaly_consumer_topic = "${var.anomaly_consumer_topic}"
+    anomaly_consumer_key_deserializer = "${var.anomaly_consumer_key_deserializer}"
+    anomaly_consumer_value_deserializer = "${var.anomaly_consumer_value_deserializer}"
+    metric_producer_bootstrap_servers = "${var.metric_producer_bootstrap_servers}"
+    metric_producer_client_id = "${var.metric_producer_client_id}"
+    metric_producer_topic = "${var.metric_producer_topic}"
+    metric_producer_key_serializer = "${var.metric_producer_key_serializer}"
+    metric_producer_value_serializer = "${var.metric_producer_value_serializer}"
   }
 }
 

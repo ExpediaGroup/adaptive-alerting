@@ -26,6 +26,9 @@ import org.springframework.hateoas.hal.Jackson2HalModule;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -94,4 +97,11 @@ public class ModelServiceConnector {
         }
     }
 
+    public ModelResource findLatestModel(UUID detectorUuid) {
+        final Resources<ModelResource> modelResources = findModels(detectorUuid);
+        final Collection<ModelResource> modelResourceCollection = modelResources.getContent();
+        List<ModelResource> modelResourceList = new ArrayList<>(modelResourceCollection);
+
+        return modelResourceList.isEmpty() ? null : modelResourceList.get(0);
+    }
 }
