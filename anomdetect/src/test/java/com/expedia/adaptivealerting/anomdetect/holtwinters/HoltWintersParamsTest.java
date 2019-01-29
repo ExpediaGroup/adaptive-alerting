@@ -50,9 +50,16 @@ public class HoltWintersParamsTest {
         subject.validate();
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testEmptySeasonalEstimates() {
+    @Test
+    public void testEmptySeasonalEstimatesIsValid() {
         subject.setPeriod(DUMMY_PERIOD);
+        subject.validate();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvalidSeasonalEstimatesLength() {
+        subject.setPeriod(DUMMY_PERIOD);
+        subject.setInitSeasonalEstimates(new double[]{1, 2, 3});
         subject.validate();
     }
 

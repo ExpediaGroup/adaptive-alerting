@@ -84,7 +84,7 @@ public final class HoltWintersAnomalyDetector extends BasicAnomalyDetector<HoltW
 
         final double observed = metricData.getValue();
         // components holds the forecast previously predicted for this observation
-        double lastForecast = components.getForecast();
+        double prevForecast = components.getForecast();
 
         // Identify thresholds based on previously observed values
         // TODO HW: Look at options for configuring how bands are defined
@@ -93,13 +93,12 @@ public final class HoltWintersAnomalyDetector extends BasicAnomalyDetector<HoltW
         final double strongDelta = params.getStrongSigmas() * stddev;
 
         final AnomalyThresholds thresholds = new AnomalyThresholds(
-                lastForecast + strongDelta,
-                lastForecast + weakDelta,
-                lastForecast - strongDelta,
-                lastForecast - weakDelta);
+                prevForecast + strongDelta,
+                prevForecast + weakDelta,
+                prevForecast - strongDelta,
+                prevForecast - weakDelta);
 
         holtWintersOnlineAlgorithm.observeValueAndUpdateForecast(observed, params, components);
-        double newForecast = components.getForecast();
 
         final AnomalyLevel anomalyLevel;
         if (stillWarmingUp()) {
@@ -108,8 +107,14 @@ public final class HoltWintersAnomalyDetector extends BasicAnomalyDetector<HoltW
             anomalyLevel = thresholds.classify(observed);
         }
 
-        AnomalyResult anomalyResult = new AnomalyResult(getUuid(), metricData, anomalyLevel);
-        return anomalyResult;
+        // TODO HW: Add a 'initialLearningMethod' parameter. To begin with there will be two accepted values:
+        //   "NONE" that uses either the user-provided init*Estimate params or the default values if none provided for initial l, b, and s components
+        //   "SIMPLE" that implements Hyndman's "simple" method for selecting initial state values.
+        //            I.e. it uses the first 2 seasons to calculate what the l, b, and s components were for the season immediately preceding the
+        //            first observation. Need to ensure that warmUpPeriod is >= (period * 2) to ensure no anomalies are emitted during learning period.
+        // Other learning methods may be added to this enum at a later time.
+
+        return new AnomalyResult(getUuid(), metricData, anomalyLevel);
     }
 
     private boolean stillWarmingUp() {

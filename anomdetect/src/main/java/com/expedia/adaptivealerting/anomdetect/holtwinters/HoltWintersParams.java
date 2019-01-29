@@ -114,25 +114,32 @@ public final class HoltWintersParams {
         isTrue(weakSigmas > 0.0, "Required: weakSigmas > 0.0");
         isTrue(strongSigmas > weakSigmas, "Required: strongSigmas > weakSigmas");
         validateInitSeasonalEstimates();
-
     }
 
     private void validateInitSeasonalEstimates() {
-        notNull(initSeasonalEstimates, String.format("Required: initSeasonalEstimates array of n=period initial estimates for seasonal component", SeasonalityType.values()));
-        AssertUtil.isEqual(initSeasonalEstimates.length, period, String.format("initSeasonalEstimates size (%d) must equal period (%d)", initSeasonalEstimates.length, period));
-        double seasonalSum = Arrays.stream(initSeasonalEstimates, 0, period).sum();
-        if (isMultiplicative()) {
-            // "With the multiplicative method, the seasonal component is expressed in relative terms (percentages).
-            //  Within each year, the seasonal component will sum up to approximately m (number of periods)."
-            // (from https://otexts.org/fpp2/holt-winters.html)
-            isBetween(seasonalSum, period - TOLERANCE, period + TOLERANCE, String.format("Invalid: Sum of initSeasonalEstimates (%.2f) should be approximately equal to period (%d) for MULTIPLICATIVE seasonality type.", seasonalSum, period));
-        } else {
-            // "With the additive method, the seasonal component is expressed in absolute terms in the scale of the observed series.
-            //  Within each year, the seasonal component will add up to approximately zero."
-            // (from https://otexts.org/fpp2/holt-winters.html)
-            // TODO HW: Determine valid tolerance
-            isBetween(seasonalSum, -TOLERANCE, TOLERANCE, String.format("Invalid: Sum of initSeasonalEstimates (%.2f) should approximately equal 0 for ADDITIVE seasonality type.", seasonalSum));
+        notNull(initSeasonalEstimates, "Required: initSeasonalEstimates must be either an empty array " +
+                "or an array of n=period initial estimates for seasonal components.");
+        if (initSeasonalEstimates.length > 0) {
+            AssertUtil.isEqual(initSeasonalEstimates.length, period,
+                    String.format("Invalid: initSeasonalEstimates size (%d) must equal period (%d)", initSeasonalEstimates.length, period));
+            double seasonalSum = Arrays.stream(initSeasonalEstimates, 0, period).sum();
+            if (isMultiplicative()) {
+                // "With the multiplicative method, the seasonal component is expressed in relative terms (percentages).
+                //  Within each year, the seasonal component will sum up to approximately m (number of periods)."
+                // (from https://otexts.org/fpp2/holt-winters.html)
+                // TODO HW: Determine valid tolerance, e.g. a tolerance of 0.1 means very different things for sums of 123456789.0 vs 0.1234567890
+                isBetween(seasonalSum, period - TOLERANCE, period + TOLERANCE,
+                        String.format("Invalid: Sum of initSeasonalEstimates (%.2f) should be approximately equal to period (%d) " +
+                                "for MULTIPLICATIVE seasonality type.", seasonalSum, period));
+            } else {
+                // "With the additive method, the seasonal component is expressed in absolute terms in the scale of the observed series.
+                //  Within each year, the seasonal component will add up to approximately zero."
+                // (from https://otexts.org/fpp2/holt-winters.html)
+                // TODO HW: Determine valid tolerance, e.g. a tolerance of 0.1 means very different things for sums of 123456789.0 vs 0.1234567890
+                isBetween(seasonalSum, -TOLERANCE, TOLERANCE,
+                        String.format("Invalid: Sum of initSeasonalEstimates (%.2f) should approximately equal 0 " +
+                                "for ADDITIVE seasonality type.", seasonalSum));
+            }
         }
     }
-
 }
