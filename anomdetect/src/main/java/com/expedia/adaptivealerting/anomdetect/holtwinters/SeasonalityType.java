@@ -24,13 +24,4 @@ public enum SeasonalityType {
         this.name = name;
     }
 
-    /**
-     * Return the english-formatted name of the SeasonalityType
-     *
-     * @return English representation of SeasonalityType
-     */
-    public String getName() {
-        return this.name;
-    }
-
 }
