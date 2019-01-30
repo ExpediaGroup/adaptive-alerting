@@ -15,8 +15,7 @@
  */
 package com.expedia.adaptivealerting.kafka;
 
-import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorManager;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.DetectorMapper;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.metrics.MetricData;
 import com.typesafe.config.Config;
@@ -27,29 +26,33 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.streams.TopologyTestDriver;
 import org.apache.kafka.streams.errors.StreamsException;
 import org.apache.kafka.streams.test.ConsumerRecordFactory;
+import org.apache.kafka.streams.test.OutputVerifier;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Collections;
+
 import static com.expedia.adaptivealerting.kafka.KafkaAnomalyDetectorMapper.CK_MODEL_SERVICE_URI_TEMPLATE;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit test for {@link KafkaAnomalyDetectorManager}. See
+ * Unit test for {@link KafkaAnomalyDetectorMapper}. See
  * https://kafka.apache.org/20/documentation/streams/developer-guide/testing.html
  *
  * @author Willie Wheeler
  */
 @Slf4j
-public final class KafkaAnomalyDetectorManagerTest {
+public final class KafkaDetectorMapperTest {
     private static final String KAFKA_KEY = "some-kafka-key";
-    private static final String INBOUND_TOPIC = "mapped-metrics";
-    private static final String OUTBOUND_TOPIC = "anomalies";
+    private static final String INBOUND_TOPIC = "metrics";
+    private static final String OUTBOUND_TOPIC = "mapped-metrics";
     
     @Mock
-    private AnomalyDetectorManager manager;
+    private DetectorMapper mapper;
     
     @Mock
     private StreamsAppConfig saConfig;
@@ -58,16 +61,16 @@ public final class KafkaAnomalyDetectorManagerTest {
     private Config tsConfig;
     
     // Test objects
+    private MetricData metricData;
     private MappedMetricData mappedMetricData;
-    private AnomalyResult anomalyResult;
     
     // Test machinery
     private TopologyTestDriver logAndFailDriver;
     private TopologyTestDriver logAndContinueDriver;
-    private ConsumerRecordFactory<String, MappedMetricData> mappedMetricDataFactory;
+    private ConsumerRecordFactory<String, MetricData> metricDataFactory;
     private ConsumerRecordFactory<String, String> stringFactory;
     private StringDeserializer stringDeserializer;
-    private Deserializer<AnomalyResult> anomalyResultDeserializer;
+    private Deserializer<MappedMetricData> mmdDeserializer;
     
     @Before
     public void setUp() {
@@ -84,22 +87,33 @@ public final class KafkaAnomalyDetectorManagerTest {
         logAndContinueDriver.close();
     }
     
-    /**
-     * Addresses bug https://github.com/ExpediaDotCom/adaptive-alerting/issues/245
-     */
-    @Test(expected = StreamsException.class)
-    public void failsOnDeserializationException() {
-        logAndFailDriver.pipeInput(stringFactory.create(INBOUND_TOPIC, KAFKA_KEY, "invalid_input"));
-        logAndFailDriver.readOutput(OUTBOUND_TOPIC, stringDeserializer, anomalyResultDeserializer);
+    @Test
+    public void testMetricDataToMappedMetricData() {
+        logAndFailDriver.pipeInput(metricDataFactory.create(INBOUND_TOPIC, KAFKA_KEY, metricData));
+        
+        // The streams app remaps the key to the detector UUID. [WLW]
+        val outputRecord = logAndFailDriver.readOutput(OUTBOUND_TOPIC, stringDeserializer, mmdDeserializer);
+        log.trace("outputRecord={}", outputRecord);
+        val outputKafkaKey = mappedMetricData.getDetectorUuid().toString();
+        OutputVerifier.compareKeyValue(outputRecord, outputKafkaKey, mappedMetricData);
     }
     
     /**
-     * Addresses bug https://github.com/ExpediaDotCom/adaptive-alerting/issues/245
+     * Addresses bug https://github.com/ExpediaDotCom/adaptive-alerting/issues/253
+     */
+    @Test(expected = StreamsException.class)
+    public void testFailsOnDeserializationException() {
+        logAndFailDriver.pipeInput(stringFactory.create(INBOUND_TOPIC, KAFKA_KEY, "invalid_input"));
+        logAndFailDriver.readOutput(OUTBOUND_TOPIC, stringDeserializer, mmdDeserializer);
+    }
+    
+    /**
+     * Addresses bug https://github.com/ExpediaDotCom/adaptive-alerting/issues/253
      */
     @Test
-    public void continuesOnDeserializationException() {
+    public void testContinuesOnDeserializationException() {
         logAndContinueDriver.pipeInput(stringFactory.create(INBOUND_TOPIC, KAFKA_KEY, "invalid_input"));
-        logAndContinueDriver.readOutput(OUTBOUND_TOPIC, stringDeserializer, anomalyResultDeserializer);
+        logAndContinueDriver.readOutput(OUTBOUND_TOPIC, stringDeserializer, mmdDeserializer);
     }
     
     private void initConfig() {
@@ -111,28 +125,31 @@ public final class KafkaAnomalyDetectorManagerTest {
     }
     
     private void initTestObjects() {
-        val metricData = TestObjectMother.metricData();
+        this.metricData = TestObjectMother.metricData();
         this.mappedMetricData = TestObjectMother.mappedMetricData(metricData);
     }
     
     private void initDependencies() {
-//        when(mapper.map(any(MetricData.class)))
-//                .thenReturn(Collections.singleton(mappedMetricData));
+        when(mapper.map(any(MetricData.class)))
+                .thenReturn(Collections.singleton(mappedMetricData));
     }
     
     private void initTestMachinery() {
-        
+    
         // Topology test drivers
-        val topology = new KafkaAnomalyDetectorManager(saConfig, manager).buildTopology();
+        val topology = new KafkaAnomalyDetectorMapper(saConfig, mapper).buildTopology();
         this.logAndFailDriver = TestObjectMother.topologyTestDriver(topology, MetricData.class, false);
         this.logAndContinueDriver = TestObjectMother.topologyTestDriver(topology, MetricData.class, true);
         
-        // MetricData sources
-        this.mappedMetricDataFactory = TestObjectMother.mappedMetricDataFactory();
+        // MetricData producer
+        // The string record factory is just for experimenting with the drivers.
+        // It's not really part of the mapper unit test, but I wanted to see how it works anyway.
+        this.metricDataFactory = TestObjectMother.metricDataFactory();
         this.stringFactory = TestObjectMother.stringFactory();
         
-        // MappedMetricData consumers
+        // MappedMetricData consumer
+        // We consume the key and value from the outbound topic so we can validate the results.
         this.stringDeserializer = new StringDeserializer();
-        this.anomalyResultDeserializer = TestObjectMother.anomalyResultDeserializer();
+        this.mmdDeserializer = TestObjectMother.mappedMetricDataDeserializer();
     }
 }

@@ -37,6 +37,9 @@ import static java.lang.Math.sqrt;
  * data comes in.
  * </p>
  * <p>
+ * EWMA is also called "Single Exponential Smoothing", "Simple Exponential Smoothing" or "Basic Exponential Smoothing".
+ * </p>
+ * <p>
  * It takes a little while before the internal mean and variance estimates converge to something that makes sense. As a
  * rule of thumb, feed the detector 10 data points or so before using it for actual anomaly detection.
  * </p>

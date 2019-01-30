@@ -16,11 +16,10 @@
 package com.expedia.adaptivealerting.anomdetect.source;
 
 import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
-import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 import java.util.UUID;
 
@@ -34,30 +33,43 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @Slf4j
 public final class DefaultDetectorFactory<T extends AbstractAnomalyDetector> implements DetectorFactory<T> {
     private Class<T> detectorClass;
-    private ModelServiceConnector modelServiceConnector;
+    
+    // TODO Currently require a specific implementation because this factory class is the one that contains the detector
+    // creation logic, rather than the DefaultDetectorSource itself containing it. So we just load the backing model
+    // using the DefaultDetectorSource. But we want to push the detector creation logic back to the
+    // DefaultDetectorSource. [WLW]
+    private DefaultDetectorSource detectorSource;
 
     @Override
-    public void init(Config config, ModelServiceConnector modelServiceConnector) {
+    public void init(Config config, DetectorSource detectorSource) {
         notNull(config, "config can't be null");
-        notNull(modelServiceConnector, "modelServiceConnector can't be null");
-
+        notNull(detectorSource, "detectorSource can't be null");
+        
+        if (!(detectorSource instanceof DefaultDetectorSource)) {
+            throw new IllegalArgumentException("Currently, detectorSource must be a DefaultDetectorSource");
+        }
+        
         this.detectorClass = ReflectionUtil.classForName(config.getString("detectorClass"));
-        this.modelServiceConnector = modelServiceConnector;
+        this.detectorSource = (DefaultDetectorSource) detectorSource;
         
         log.info("Initialized factory: detectorClass={}", detectorClass.getName());
     }
 
     @Override
-    public T create(UUID uuid) {
-        notNull(uuid, "uuid can't be null");
-
-        final ModelResource model = modelServiceConnector.findLatestModel(uuid);
-        log.info("Loaded model: {}", model);
+    public T create(UUID detectorUuid) {
+        notNull(detectorUuid, "detectorUuid can't be null");
+        
+        val model = detectorSource.findModelByDetectorUuid(detectorUuid);
+        
         if (model == null) {
-            log.error("No model found for uuid = {}", uuid);
-            return null; // TODO: decide how to deal with this.
+            log.error("No model found for detectorUuid={}", detectorUuid);
+            
+            // TODO Is this how we want to handle this? [WLW]
+            return null;
         }
-
+    
+        log.info("Loaded model for detectorUuid={}: {}", detectorUuid, model);
+        
         T detector = ReflectionUtil.newInstance(detectorClass);
         detector.init(model);
         return detector;

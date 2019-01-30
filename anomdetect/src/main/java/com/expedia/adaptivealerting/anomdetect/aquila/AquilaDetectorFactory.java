@@ -16,16 +16,13 @@
 package com.expedia.adaptivealerting.anomdetect.aquila;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorFactory;
-import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
-import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
 import com.expedia.metrics.jackson.MetricsJavaModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.UUID;
-
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 // TODO Move this class to the Aquila repo. [WLW]
 
@@ -38,25 +35,28 @@ public class AquilaDetectorFactory implements DetectorFactory<AquilaAnomalyDetec
 
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new MetricsJavaModule());
     private String uri;
-    private ModelServiceConnector modelServiceConnector;
+    private DetectorSource detectorSource;
     
     @Override
-    public void init(Config config, ModelServiceConnector modelServiceConnector) {
+    public void init(Config config, DetectorSource detectorSource) {
         this.uri = config.getString("uri");
-        this.modelServiceConnector = modelServiceConnector;
+        this.detectorSource = detectorSource;
         log.info("Initialized AquilaFactory: uri={}", uri);
     }
     
     @Override
-    public AquilaAnomalyDetector create(UUID uuid) {
-        notNull(uuid, "uuid can't be null");
-
-        final ModelResource model = modelServiceConnector.findLatestModel(uuid);
+    public AquilaAnomalyDetector create(UUID detectorUuid) {
+        /*
+        notNull(detectorUuid, "uuid can't be null");
+        
+        // TODO
+        final ModelResource model = modelServiceConnector.findLatestModel(detectorUuid);
+        
         log.info("Loaded model: {}", model);
         if (model == null
                 || model.getParams() == null
                 || model.getParams().get(MODEL_UUID_PARAM) == null) {
-            throw new RuntimeException("Valid model not found for uuid=" + uuid);
+            throw new RuntimeException("Valid model not found for uuid=" + detectorUuid);
         }
 
         return new AquilaAnomalyDetector(
@@ -64,5 +64,9 @@ public class AquilaDetectorFactory implements DetectorFactory<AquilaAnomalyDetec
                 uri,
                 UUID.fromString(model.getParams().get(MODEL_UUID_PARAM).toString())
         );
+        */
+        
+        // TODO Externalize this detector. [WLW]
+        throw new UnsupportedOperationException("Not currently supported");
     }
 }

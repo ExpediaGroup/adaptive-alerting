@@ -16,14 +16,13 @@
 package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorFactory;
-import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigObject;
 import com.typesafe.config.ConfigValue;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -40,57 +39,29 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author Willie Wheeler
  */
 @Slf4j
-public class AnomalyDetectorManager {
-    
-    /**
-     * Detectors configuration key.
-     */
-    private static final String CK_DETECTORS = "detectors";
+public class DetectorManager {
     
     /**
      * Factories that know how to produce anomaly detectors on demand.
      */
-    private final Map<String, DetectorFactory> detectorFactories;
+    private final Map<String, DetectorFactory> detectorFactories = new HashMap<>();
     
     /**
      * The managed detectors.
      */
     private final Map<UUID, AnomalyDetector> detectors = new HashMap<>();
     
-    @Getter
-    private ModelServiceConnector modelServiceConnector;
-    
     /**
      * Creates a new anomaly detector manager.
      *
-     * @param config                Manager config
-     * @param modelServiceConnector Model service connector.
+     * @param config         Manager config.
+     * @param detectorSource Detector source.
      */
-    public AnomalyDetectorManager(Config config, ModelServiceConnector modelServiceConnector) {
+    public DetectorManager(Config config, DetectorSource detectorSource) {
         notNull(config, "config can't be null");
+        notNull(detectorSource, "detectorSource can't be null");
         
-        val detectorsConfig = config.getConfig(CK_DETECTORS);
-        this.modelServiceConnector = modelServiceConnector;
-        
-        this.detectorFactories = new HashMap<>();
-        
-        // Calling detectorsConfig.entrySet() does a recursive traversal, which isn't what we want here.
-        // Whereas detectorsConfig.root().entrySet() returns only the direct children.
-        for (Map.Entry<String, ConfigValue> entry : detectorsConfig.root().entrySet()) {
-            val detectorType = entry.getKey();
-            val detectorFactoryAndConfig = ((ConfigObject) entry.getValue()).toConfig();
-            val detectorFactoryClassname = detectorFactoryAndConfig.getString("factory");
-            val detectorConfig = detectorFactoryAndConfig.getConfig("config");
-            
-            log.info("Initializing DetectorFactory: type={}, className={}",
-                    detectorType, detectorFactoryClassname);
-            val factory = (DetectorFactory) ReflectionUtil.newInstance(detectorFactoryClassname);
-            factory.init(detectorConfig, modelServiceConnector);
-            log.info("Initialized DetectorFactory: type={}, className={}",
-                    detectorType, detectorFactoryClassname);
-            
-            detectorFactories.put(detectorType, factory);
-        }
+        initDetectorFactories(detectorSource, config.getConfig("detectors"));
     }
     
     /**
@@ -118,6 +89,27 @@ public class AnomalyDetectorManager {
         return detector.classify(metricData);
     }
     
+    private void initDetectorFactories(DetectorSource detectorSource, Config detectorsConfig) {
+        
+        // Calling detectorsConfig.entrySet() does a recursive traversal, which isn't what we want here.
+        // Whereas detectorsConfig.root().entrySet() returns only the direct children.
+        for (Map.Entry<String, ConfigValue> entry : detectorsConfig.root().entrySet()) {
+            val detectorType = entry.getKey();
+            val detectorFactoryAndConfig = ((ConfigObject) entry.getValue()).toConfig();
+            val detectorFactoryClassname = detectorFactoryAndConfig.getString("factory");
+            val detectorConfig = detectorFactoryAndConfig.getConfig("config");
+            
+            log.info("Initializing DetectorFactory: type={}, className={}",
+                    detectorType, detectorFactoryClassname);
+            val factory = (DetectorFactory) ReflectionUtil.newInstance(detectorFactoryClassname);
+            factory.init(detectorConfig, detectorSource);
+            log.info("Initialized DetectorFactory: type={}, className={}",
+                    detectorType, detectorFactoryClassname);
+            
+            detectorFactories.put(detectorType, factory);
+        }
+    }
+    
     /**
      * Gets the anomaly detector for the given metric point, creating it if absent. Returns {@code null} if there's no
      * {@link DetectorFactory} defined for the mapped metric data's detector type.
@@ -129,16 +121,17 @@ public class AnomalyDetectorManager {
     private AnomalyDetector detectorFor(MappedMetricData mappedMetricData) {
         notNull(mappedMetricData, "mappedMetricData can't be null");
         val detectorUuid = mappedMetricData.getDetectorUuid();
-        val detector = detectors.get(detectorUuid);
+        AnomalyDetector detector = detectors.get(detectorUuid);
         if (detector == null) {
             val detectorType = mappedMetricData.getDetectorType();
             val factory = detectorFactories.get(detectorType);
             if (factory == null) {
                 log.warn("No DetectorFactory registered for detectorType={}", detectorType);
             } else {
+                // This loads the detector from the database.
                 log.info("Creating anomaly detector: uuid={}, type={}", detectorUuid, detectorType);
-                val innerDetector = factory.create(detectorUuid);
-                detectors.put(detectorUuid, innerDetector);
+                detector = factory.create(detectorUuid);
+                detectors.put(detectorUuid, detector);
             }
         }
         return detector;

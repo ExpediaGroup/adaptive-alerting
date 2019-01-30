@@ -36,12 +36,12 @@ import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.when;
 
 /**
- * {@link AnomalyDetectorMapper} unit tests.
+ * {@link DetectorMapper} unit tests.
  *
  * @author Willie Wheeler
  */
-public final class AnomalyDetectorMapperTest {
-    private AnomalyDetectorMapper mapper;
+public final class DetectorMapperTest {
+    private DetectorMapper mapper;
     
     @Mock
     private DetectorSource detectorSource;
@@ -63,7 +63,7 @@ public final class AnomalyDetectorMapperTest {
         MockitoAnnotations.initMocks(this);
         initTestObjects();
         initDependencies();
-        this.mapper = new AnomalyDetectorMapper(detectorSource);
+        this.mapper = new DetectorMapper(detectorSource);
     }
     
     @Test
@@ -73,7 +73,7 @@ public final class AnomalyDetectorMapperTest {
     
     @Test(expected = NullPointerException.class)
     public void testModelServiceConnectorNotNull() {
-        new AnomalyDetectorMapper(null);
+        new DetectorMapper(null);
     }
     
     @Test

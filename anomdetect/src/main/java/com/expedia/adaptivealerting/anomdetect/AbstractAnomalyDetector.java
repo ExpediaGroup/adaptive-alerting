@@ -18,12 +18,13 @@ package com.expedia.adaptivealerting.anomdetect;
 import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
-import org.springframework.util.Assert;
 
 import java.util.UUID;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+
 /**
- * Basic anomaly detector abstract class. A basic anomaly detector is one that generally has a single fixed model.
+ * Abstract base class for anomaly detector implementations.
  *
  * @author Willie Wheeler
  */
@@ -38,7 +39,7 @@ public abstract class AbstractAnomalyDetector<T> implements AnomalyDetector {
      * @param modelResource Model resource.
      */
     public void init(ModelResource modelResource) {
-        Assert.notNull(modelResource, "modelResource can't be null");
+        notNull(modelResource, "modelResource can't be null");
         this.uuid = modelResource.getUuid();
         
         T params = new ObjectMapper().convertValue(modelResource.getParams(), getParamsClass());

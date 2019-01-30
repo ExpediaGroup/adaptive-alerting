@@ -16,6 +16,8 @@
 package com.expedia.adaptivealerting.anomdetect.source;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.DetectorManager;
+import com.expedia.adaptivealerting.anomdetect.DetectorMapper;
 import com.expedia.adaptivealerting.anomdetect.util.DetectorMeta;
 import com.expedia.metrics.MetricDefinition;
 
@@ -27,9 +29,9 @@ import java.util.UUID;
  *
  * <ul>
  *     <li>mapping a metric definition to a list of detector metas (required by
- *     {@link com.expedia.adaptivealerting.anomdetect.AnomalyDetectorMapper}), and</li>
+ *     {@link DetectorMapper}), and</li>
  *     <li>mapping a detector UUID to the associated detector (required by
- *     {@link com.expedia.adaptivealerting.anomdetect.AnomalyDetectorManager}).</li>
+ *     {@link DetectorManager}).</li>
  * </ul>
  *
  * @author Willie Wheeler

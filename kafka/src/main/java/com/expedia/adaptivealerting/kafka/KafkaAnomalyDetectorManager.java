@@ -15,7 +15,8 @@
  */
 package com.expedia.adaptivealerting.kafka;
 
-import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorManager;
+import com.expedia.adaptivealerting.anomdetect.DetectorManager;
+import com.expedia.adaptivealerting.anomdetect.source.DefaultDetectorSource;
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
@@ -29,7 +30,7 @@ import org.apache.kafka.streams.kstream.KStream;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
- * Kafka streams wrapper around {@link AnomalyDetectorManager}.
+ * Kafka streams wrapper around {@link DetectorManager}.
  *
  * @author David Sutherland
  * @author Willie Wheeler
@@ -39,7 +40,7 @@ public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
     private static final String CK_AD_MANAGER = "ad-manager";
     private static final String CK_MODEL_SERVICE_URI_TEMPLATE = "model-service-uri-template";
     
-    private final AnomalyDetectorManager manager;
+    private final DetectorManager manager;
     
     public static void main(String[] args) {
         val tsConfig = new TypesafeConfigLoader(CK_AD_MANAGER).loadMergedConfig();
@@ -48,7 +49,7 @@ public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
         new KafkaAnomalyDetectorManager(saConfig, manager).start();
     }
     
-    public KafkaAnomalyDetectorManager(StreamsAppConfig config, AnomalyDetectorManager manager) {
+    public KafkaAnomalyDetectorManager(StreamsAppConfig config, DetectorManager manager) {
         super(config);
         notNull(manager, "manager can't be null");
         this.manager = manager;
@@ -90,11 +91,12 @@ public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
         return builder.build();
     }
 
-    private static AnomalyDetectorManager buildManager(StreamsAppConfig appConfig) {
+    private static DetectorManager buildManager(StreamsAppConfig appConfig) {
         val managerConfig = appConfig.getTypesafeConfig();
         val httpClient = new HttpClientWrapper();
-        val modelServiceUriTemplate = managerConfig.getString(CK_MODEL_SERVICE_URI_TEMPLATE);
-        val connector = new ModelServiceConnector(httpClient, modelServiceUriTemplate);
-        return new AnomalyDetectorManager(managerConfig, connector);
+        val uriTemplate = managerConfig.getString(CK_MODEL_SERVICE_URI_TEMPLATE);
+        val connector = new ModelServiceConnector(httpClient, uriTemplate);
+        val detectorSource = new DefaultDetectorSource(connector);
+        return new DetectorManager(managerConfig, detectorSource);
     }
 }

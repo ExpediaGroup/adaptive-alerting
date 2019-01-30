@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.util;
 
+import com.expedia.adaptivealerting.anomdetect.DetectorMapper;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.metrictank.MetricTankIdFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,7 +41,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * <p>
  * For now this is just part of the
  * {@link com.expedia.adaptivealerting.anomdetect} package as the only thing using it is the
- * {@link com.expedia.adaptivealerting.anomdetect.AnomalyDetectorMapper}. If we find others needing to use it then we
+ * {@link DetectorMapper}. If we find others needing to use it then we
  * might end up moving it into some common location.
  * </p>
  *

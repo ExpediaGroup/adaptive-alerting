@@ -37,7 +37,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  */
 @RequiredArgsConstructor
 @Slf4j
-public class AnomalyDetectorMapper {
+public class DetectorMapper {
     
     @Getter
     @NonNull

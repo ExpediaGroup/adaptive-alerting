@@ -16,7 +16,6 @@
 package com.expedia.adaptivealerting.anomdetect.source;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.typesafe.config.Config;
 
 import java.util.UUID;
@@ -31,18 +30,18 @@ public interface DetectorFactory<T extends AnomalyDetector> {
     /**
      * Initializes the factory.
      *
-     * @param config                Factory configuration.
-     * @param modelServiceConnector Model service connector.
+     * @param config         Factory configuration.
+     * @param detectorSource Detector source.
      */
-    void init(Config config, ModelServiceConnector modelServiceConnector);
+    void init(Config config, DetectorSource detectorSource);
     
     /**
      * Creates an anomaly detector. This would usually involve looking up at least the model parameters from persistent
      * storages, based on automated model selection and autotuning. In many cases it would involve looking up a
      * pretrained model.
      *
-     * @param uuid Detector UUID.
+     * @param detectorUuid Detector UUID.
      * @return Anomaly detector, or {@literal null} if the creation attempt failed.
      */
-    T create(UUID uuid);
+    T create(UUID detectorUuid);
 }

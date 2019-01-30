@@ -16,17 +16,13 @@
 package com.expedia.adaptivealerting.anomdetect.rcf;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorFactory;
-import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
-import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
-
-import java.util.UUID;
-
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import java.util.UUID;
 
 /**
  * @author Willie Wheeler
@@ -40,35 +36,42 @@ public final class RandomCutForestDetectorFactory implements DetectorFactory<Ran
     @NonNull
     private ObjectMapper objectMapper;
 
-    private ModelServiceConnector modelServiceConnector;
+    private DetectorSource detectorSource;
 
     @Override
-    public void init(Config config, ModelServiceConnector modelServiceConnector) {
-        this.modelServiceConnector = modelServiceConnector;
+    public void init(Config config, DetectorSource detectorSource) {
+        this.detectorSource = detectorSource;
     }
 
     /**
      * Create a new RCF anomaly detector.
      *
-     * @param uuid A new detector UUID
+     * @param detectorUuid A new detector UUID
      *
      * @return A new anomaly detector
      */
     @Override
-    public RandomCutForestAnomalyDetector create(UUID uuid) {
-        notNull(uuid, "uuid can't be null");
-
-        final ModelResource modelResource = modelServiceConnector.findLatestModel(uuid);
+    public RandomCutForestAnomalyDetector create(UUID detectorUuid) {
+        /*
+        notNull(detectorUuid, "uuid can't be null");
+        
+        // TODO
+        final ModelResource modelResource = modelServiceConnector.findLatestModel(detectorUuid);
+        
         log.info("Loaded model: {}", modelResource);
         if (modelResource == null) {
-            log.error("There is no RCF model associated with uuid: {}", uuid);
-            throw new RandomCutForestProcessingException("Could not find model in the modelservice for uuid:" + uuid);
+            log.error("There is no RCF model associated with uuid: {}", detectorUuid);
+            throw new RandomCutForestProcessingException("Could not find model in the modelservice for uuid:" + detectorUuid);
         }
 
         if (modelResource.getDetectorType().getKey().equals(RCF_DETECTOR)) {
-            return new RandomCutForestAnomalyDetector(uuid, modelResource);
+            return new RandomCutForestAnomalyDetector(detectorUuid, modelResource);
         }
 
-        throw new RandomCutForestProcessingException("Wrong detector type for model with uuid:" + uuid);
+        throw new RandomCutForestProcessingException("Wrong detector type for model with uuid:" + detectorUuid);
+        */
+    
+        // TODO Externalize this detector. [WLW]
+        throw new UnsupportedOperationException("Not currently supported");
     }
 }
