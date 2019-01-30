@@ -15,25 +15,17 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
 import java.util.UUID;
 
 /**
  * @author Willie Wheeler
  */
-public final class AnomalyDetectorMeta {
+@Data
+@AllArgsConstructor
+public final class DetectorMeta {
     private UUID uuid;
     private String type;
-    
-    public AnomalyDetectorMeta(UUID uuid, String type) {
-        this.uuid = uuid;
-        this.type = type;
-    }
-    
-    public UUID getUuid() {
-        return uuid;
-    }
-    
-    public String getType() {
-        return type;
-    }
 }

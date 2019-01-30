@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.source;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.DetectorMeta;
 import com.expedia.adaptivealerting.anomdetect.ewma.EwmaAnomalyDetector;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.metrictank.MetricTankIdFactory;
@@ -35,24 +36,27 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author Willie Wheeler
  */
 public final class BasicDetectorSource implements DetectorSource {
+    private static final String EWMA = "ewma-detector";
+    
     private MetricTankIdFactory idFactory = new MetricTankIdFactory();
     private Map<UUID, AnomalyDetector> detectorMap = new HashMap<>();
     
     @Override
-    public List<UUID> findDetectorUUIDs(MetricDefinition metricDefinition) {
+    public List<DetectorMeta> findDetectorMetas(MetricDefinition metricDefinition) {
         notNull(metricDefinition, "metricDefinition can't be null");
-        val id = idFactory.getId(metricDefinition);
-        val uuid = UUID.nameUUIDFromBytes(id.getBytes());
-        return Collections.singletonList(uuid);
+        val metricId = idFactory.getId(metricDefinition);
+        val detectorUuid = UUID.nameUUIDFromBytes(metricId.getBytes());
+        val detectorMeta = new DetectorMeta(detectorUuid, EWMA);
+        return Collections.singletonList(detectorMeta);
     }
     
     @Override
-    public AnomalyDetector findDetector(UUID uuid) {
-        notNull(uuid, "uuid can't be null");
-        AnomalyDetector detector = detectorMap.get(uuid);
+    public AnomalyDetector findDetector(UUID detectorUuid) {
+        notNull(detectorUuid, "detectorUUID can't be null");
+        AnomalyDetector detector = detectorMap.get(detectorUuid);
         if (detector == null) {
-            detector = new EwmaAnomalyDetector(uuid);
-            detectorMap.put(uuid, detector);
+            detector = new EwmaAnomalyDetector(detectorUuid);
+            detectorMap.put(detectorUuid, detector);
         }
         return detector;
     }

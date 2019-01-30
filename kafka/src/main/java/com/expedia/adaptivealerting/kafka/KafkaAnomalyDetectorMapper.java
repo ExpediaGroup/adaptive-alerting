@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.kafka;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorMapper;
+import com.expedia.adaptivealerting.anomdetect.source.ModelServiceDetectorSource;
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.expedia.adaptivealerting.kafka.serde.JsonPojoSerde;
@@ -97,6 +98,7 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
         val httpClient = new HttpClientWrapper();
         val modelServiceUriTemplate = config.getString(CK_MODEL_SERVICE_URI_TEMPLATE);
         val connector = new ModelServiceConnector(httpClient, modelServiceUriTemplate);
-        return new AnomalyDetectorMapper(connector);
+        val detectorSource = new ModelServiceDetectorSource(connector);
+        return new AnomalyDetectorMapper(detectorSource);
     }
 }

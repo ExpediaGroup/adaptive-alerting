@@ -16,20 +16,48 @@
 package com.expedia.adaptivealerting.anomdetect.source;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.DetectorMeta;
+import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.expedia.metrics.MetricDefinition;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
-public class ModelServiceDetectorSource implements DetectorSource {
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+
+/**
+ * A {@link DetectorSource} backed by the Model Service.
+ *
+ * @author Willie Wheeler
+ */
+@RequiredArgsConstructor
+public final class ModelServiceDetectorSource implements DetectorSource {
+    
+    @Getter
+    @NonNull
+    private ModelServiceConnector connector;
     
     @Override
-    public List<UUID> findDetectorUUIDs(MetricDefinition metricDefinition) {
-        return null;
+    public List<DetectorMeta> findDetectorMetas(MetricDefinition metricDefinition) {
+        notNull(metricDefinition, "metricDefinition can't be null");
+        return connector
+                .findDetectors(metricDefinition)
+                .getContent()
+                .stream()
+                .map(resource -> new DetectorMeta(
+                        UUID.fromString(resource.getUuid()),
+                        resource.getType().getKey()))
+                .collect(Collectors.toList());
     }
     
     @Override
-    public AnomalyDetector findDetector(UUID uuid) {
+    public AnomalyDetector findDetector(UUID detectorUuid) {
+        notNull(detectorUuid, "detectorUUID can't be null");
+        
         return null;
     }
 }

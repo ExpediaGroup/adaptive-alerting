@@ -41,8 +41,8 @@ public final class BasicDetectorSourceTest {
     
     @Test
     public void testFindDetectorUUIDs_sameMetricHasSameUUID() {
-        val results1 = source.findDetectorUUIDs(metricDef1);
-        val results2 = source.findDetectorUUIDs(metricDef1);
+        val results1 = source.findDetectorMetas(metricDef1);
+        val results2 = source.findDetectorMetas(metricDef1);
     
         assertEquals(1, results1.size());
         assertEquals(1, results2.size());
@@ -59,8 +59,8 @@ public final class BasicDetectorSourceTest {
     
     @Test
     public void testFindDetectorUUIDs_differentMetricsHaveDifferentUUIDs() {
-        val results1 = source.findDetectorUUIDs(metricDef1);
-        val results2 = source.findDetectorUUIDs(metricDef2);
+        val results1 = source.findDetectorMetas(metricDef1);
+        val results2 = source.findDetectorMetas(metricDef2);
         
         assertEquals(1, results1.size());
         assertEquals(1, results2.size());
