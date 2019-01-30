@@ -16,11 +16,10 @@
 package com.expedia.adaptivealerting.kafka;
 
 import com.expedia.adaptivealerting.anomdetect.DetectorManager;
-import com.expedia.adaptivealerting.anomdetect.source.DefaultDetectorSource;
-import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
-import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
+import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.kafka.streams.StreamsBuilder;
@@ -45,7 +44,7 @@ public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
     public static void main(String[] args) {
         val tsConfig = new TypesafeConfigLoader(CK_AD_MANAGER).loadMergedConfig();
         val saConfig = new StreamsAppConfig(tsConfig);
-        val manager = buildManager(saConfig);
+        val manager = buildManager(tsConfig);
         new KafkaAnomalyDetectorManager(saConfig, manager).start();
     }
     
@@ -91,12 +90,8 @@ public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
         return builder.build();
     }
 
-    private static DetectorManager buildManager(StreamsAppConfig appConfig) {
-        val managerConfig = appConfig.getTypesafeConfig();
-        val httpClient = new HttpClientWrapper();
-        val uriTemplate = managerConfig.getString(CK_MODEL_SERVICE_URI_TEMPLATE);
-        val connector = new ModelServiceConnector(httpClient, uriTemplate);
-        val detectorSource = new DefaultDetectorSource(connector);
-        return new DetectorManager(managerConfig, detectorSource);
+    private static DetectorManager buildManager(Config config) {
+        val detectorSource = DetectorUtil.buildDetectorSource(config);
+        return new DetectorManager(config, detectorSource);
     }
 }
