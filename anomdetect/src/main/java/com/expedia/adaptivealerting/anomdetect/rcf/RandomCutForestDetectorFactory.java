@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.rcf;
 
-import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorFactory;
 import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
 import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,7 +33,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author Tatjana Kamenov
  */
 @Slf4j
-public final class RandomCutForestAnomalyDetectorFactory implements AnomalyDetectorFactory<RandomCutForestAnomalyDetector> {
+public final class RandomCutForestDetectorFactory implements DetectorFactory<RandomCutForestAnomalyDetector> {
 
     private static final String RCF_DETECTOR = "rcf-detector";
 

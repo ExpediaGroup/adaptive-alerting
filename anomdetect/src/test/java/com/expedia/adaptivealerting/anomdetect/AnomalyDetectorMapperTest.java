@@ -99,9 +99,7 @@ public final class AnomalyDetectorMapperTest {
     }
     
     private void initDependencies() {
-        when(detectorSource.findDetectorMetas(mappedDefinition))
-                .thenReturn(detectorMetas);
-        when(detectorSource.findDetectorMetas(unmappedDefinition))
-                .thenReturn(emptyDetectorMetas);
+        when(detectorSource.findDetectorMetas(mappedDefinition)).thenReturn(detectorMetas);
+        when(detectorSource.findDetectorMetas(unmappedDefinition)).thenReturn(emptyDetectorMetas);
     }
 }

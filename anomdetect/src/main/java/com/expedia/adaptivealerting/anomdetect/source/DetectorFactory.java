@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect;
+package com.expedia.adaptivealerting.anomdetect.source;
 
+import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.typesafe.config.Config;
 
@@ -25,7 +26,7 @@ import java.util.UUID;
  *
  * @author Willie Wheeler
  */
-public interface AnomalyDetectorFactory<T extends AnomalyDetector> {
+public interface DetectorFactory<T extends AnomalyDetector> {
     
     /**
      * Initializes the factory.

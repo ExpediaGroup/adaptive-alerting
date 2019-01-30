@@ -38,8 +38,8 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 public final class BasicDetectorSource implements DetectorSource {
     private static final String EWMA = "ewma-detector";
     
-    private MetricTankIdFactory idFactory = new MetricTankIdFactory();
-    private Map<UUID, AnomalyDetector> detectorMap = new HashMap<>();
+    private final MetricTankIdFactory idFactory = new MetricTankIdFactory();
+    private final Map<UUID, AnomalyDetector> detectorMap = new HashMap<>();
     
     @Override
     public List<DetectorMeta> findDetectorMetas(MetricDefinition metricDefinition) {

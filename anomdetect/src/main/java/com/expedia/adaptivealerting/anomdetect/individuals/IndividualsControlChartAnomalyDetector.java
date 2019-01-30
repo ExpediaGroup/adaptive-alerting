@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.individuals;
 
-import com.expedia.adaptivealerting.anomdetect.BasicAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
@@ -40,7 +40,7 @@ import static java.lang.Math.sqrt;
  * @see <a href="https://www.spcforexcel.com/knowledge/variable-control-charts/individuals-control-charts">https://www.spcforexcel.com/knowledge/variable-control-charts/individuals-control-charts</a>
  */
 @Data
-public final class IndividualsControlChartAnomalyDetector extends BasicAnomalyDetector<IndividualsControlChartParams> {
+public final class IndividualsControlChartAnomalyDetector extends AbstractAnomalyDetector<IndividualsControlChartParams> {
     private static final double R_CONTROL_CHART_CONSTANT_D4 = 3.267;
     private static final double R_CONTROL_CHART_CONSTANT_D2 = 1.128;
 

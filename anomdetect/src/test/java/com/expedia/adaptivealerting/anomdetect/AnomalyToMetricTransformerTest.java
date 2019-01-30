@@ -13,18 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.util;
+package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.util.MetricUtil;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import lombok.val;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.UUID;
+
+import static com.expedia.adaptivealerting.anomdetect.AnomalyToMetricTransformer.AA_DETECTOR_UUID;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Willie Wheeler
@@ -48,7 +50,7 @@ public class AnomalyToMetricTransformerTest {
         val actualKvTags = actualTags.getKv();
         val detectorUuid = anomalyResultWithStringMetricKey.getDetectorUUID().toString();
         
-        Assert.assertTrue(detectorUuid.equals(actualKvTags.get(AnomalyConstants.AA_DETECTOR_UUID)));
+        assertTrue(detectorUuid.equals(actualKvTags.get(AA_DETECTOR_UUID)));
     }
     
     @Test(expected = IllegalArgumentException.class)
@@ -59,7 +61,7 @@ public class AnomalyToMetricTransformerTest {
     @Test(expected = IllegalArgumentException.class)
     public void testTransformRejectsMetricWithDeploymentUuidTag() {
         val kvTags = MetricUtil.defaultKvTags();
-        kvTags.put(AnomalyConstants.AA_DETECTOR_UUID, UUID.randomUUID().toString());
+        kvTags.put(AA_DETECTOR_UUID, UUID.randomUUID().toString());
         
         val metricDef = MetricUtil.metricDefinition(kvTags, null);
         val metricData = MetricUtil.metricData(metricDef);

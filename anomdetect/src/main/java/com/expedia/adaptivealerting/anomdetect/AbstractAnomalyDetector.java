@@ -27,9 +27,7 @@ import java.util.UUID;
  *
  * @author Willie Wheeler
  */
-public abstract class BasicAnomalyDetector<T> implements AnomalyDetector {
-    protected abstract Class<T> getParamsClass();
-    protected abstract void loadParams(T params);
+public abstract class AbstractAnomalyDetector<T> implements AnomalyDetector {
     
     @Getter
     private UUID uuid;
@@ -50,4 +48,8 @@ public abstract class BasicAnomalyDetector<T> implements AnomalyDetector {
     protected void setUuid(UUID uuid) {
         this.uuid = uuid;
     }
+    
+    protected abstract Class<T> getParamsClass();
+    
+    protected abstract void loadParams(T params);
 }

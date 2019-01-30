@@ -35,7 +35,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author Willie Wheeler
  */
 @RequiredArgsConstructor
-public final class ModelServiceDetectorSource implements DetectorSource {
+public final class DefaultDetectorSource implements DetectorSource {
     
     @Getter
     @NonNull

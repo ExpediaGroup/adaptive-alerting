@@ -15,11 +15,11 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
+import com.expedia.adaptivealerting.anomdetect.source.DetectorFactory;
 import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
-import com.expedia.metrics.MetricData;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigObject;
 import com.typesafe.config.ConfigValue;
@@ -50,17 +50,12 @@ public class AnomalyDetectorManager {
     /**
      * Factories that know how to produce anomaly detectors on demand.
      */
-    private final Map<String, AnomalyDetectorFactory> detectorFactories;
+    private final Map<String, DetectorFactory> detectorFactories;
     
     /**
      * The managed detectors.
      */
     private final Map<UUID, AnomalyDetector> detectors = new HashMap<>();
-    
-    /**
-     * Max samples required to evaluate performance
-     */
-    private static final int PERFMON_SAMPLE_SIZE = 100;
     
     @Getter
     private ModelServiceConnector modelServiceConnector;
@@ -82,17 +77,16 @@ public class AnomalyDetectorManager {
         // Calling detectorsConfig.entrySet() does a recursive traversal, which isn't what we want here.
         // Whereas detectorsConfig.root().entrySet() returns only the direct children.
         for (Map.Entry<String, ConfigValue> entry : detectorsConfig.root().entrySet()) {
-            final String detectorType = entry.getKey();
-            final Config detectorFactoryAndConfig = ((ConfigObject) entry.getValue()).toConfig();
-            final String detectorFactoryClassname = detectorFactoryAndConfig.getString("factory");
-            final Config detectorConfig = detectorFactoryAndConfig.getConfig("config");
+            val detectorType = entry.getKey();
+            val detectorFactoryAndConfig = ((ConfigObject) entry.getValue()).toConfig();
+            val detectorFactoryClassname = detectorFactoryAndConfig.getString("factory");
+            val detectorConfig = detectorFactoryAndConfig.getConfig("config");
             
-            log.info("Initializing AnomalyDetectorFactory: type={}, className={}",
+            log.info("Initializing DetectorFactory: type={}, className={}",
                     detectorType, detectorFactoryClassname);
-            final AnomalyDetectorFactory factory =
-                    (AnomalyDetectorFactory) ReflectionUtil.newInstance(detectorFactoryClassname);
+            val factory = (DetectorFactory) ReflectionUtil.newInstance(detectorFactoryClassname);
             factory.init(detectorConfig, modelServiceConnector);
-            log.info("Initialized AnomalyDetectorFactory: type={}, className={}",
+            log.info("Initialized DetectorFactory: type={}, className={}",
                     detectorType, detectorFactoryClassname);
             
             detectorFactories.put(detectorType, factory);
@@ -115,18 +109,18 @@ public class AnomalyDetectorManager {
         notNull(mappedMetricData, "mappedMetricData can't be null");
         
         log.info("Classifying mappedMetricData={}", mappedMetricData);
-        final AnomalyDetector detector = detectorFor(mappedMetricData);
+        val detector = detectorFor(mappedMetricData);
         if (detector == null) {
             log.warn("No detector for mappedMetricData={}", mappedMetricData);
             return null;
         }
-        final MetricData metricData = mappedMetricData.getMetricData();
+        val metricData = mappedMetricData.getMetricData();
         return detector.classify(metricData);
     }
     
     /**
      * Gets the anomaly detector for the given metric point, creating it if absent. Returns {@code null} if there's no
-     * {@link AnomalyDetectorFactory} defined for the mapped metric data's detector type.
+     * {@link DetectorFactory} defined for the mapped metric data's detector type.
      *
      * @param mappedMetricData Mapped metric point.
      * @return Anomaly detector for the given metric point, or {@code null} if there's some problem loading the
@@ -134,23 +128,16 @@ public class AnomalyDetectorManager {
      */
     private AnomalyDetector detectorFor(MappedMetricData mappedMetricData) {
         notNull(mappedMetricData, "mappedMetricData can't be null");
-        final UUID detectorUuid = mappedMetricData.getDetectorUuid();
-        final AnomalyDetector detector = detectors.get(detectorUuid);
+        val detectorUuid = mappedMetricData.getDetectorUuid();
+        val detector = detectors.get(detectorUuid);
         if (detector == null) {
-            final String detectorType = mappedMetricData.getDetectorType();
-            final AnomalyDetectorFactory factory = detectorFactories.get(detectorType);
+            val detectorType = mappedMetricData.getDetectorType();
+            val factory = detectorFactories.get(detectorType);
             if (factory == null) {
-                log.warn("No AnomalyDetectorFactory registered for detectorType={}", detectorType);
+                log.warn("No DetectorFactory registered for detectorType={}", detectorType);
             } else {
                 log.info("Creating anomaly detector: uuid={}, type={}", detectorUuid, detectorType);
-                final AnomalyDetector innerDetector = factory.create(detectorUuid);
-                
-                // TODO Temporarily commenting this out because it's causing a problem
-                // for the RandomCutForest detector (NPE). We can reinstate after we
-                // figure out how we want to address this. [WLW]
-//                final PerformanceMonitor perfMonitor = new PerformanceMonitor(new PerfMonHandler(), new RmseEvaluator(), PERFMON_SAMPLE_SIZE);
-//                detector = new MonitoredDetector(innerDetector, perfMonitor);
-//                detectors.put(detectorUuid, detector);
+                val innerDetector = factory.create(detectorUuid);
                 detectors.put(detectorUuid, innerDetector);
             }
         }

@@ -13,61 +13,56 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect;
+package com.expedia.adaptivealerting.anomdetect.aquila;
 
+import com.expedia.adaptivealerting.anomdetect.source.DetectorFactory;
 import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
 import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
-import com.expedia.adaptivealerting.core.util.ReflectionUtil;
+import com.expedia.metrics.jackson.MetricsJavaModule;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.hateoas.Resources;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
+// TODO Move this class to the Aquila repo. [WLW]
+
 /**
- * <p>
- * A basic anomaly detector factory that reads anomaly detector models as JSON from Amazon S3.
- * </p>
- * <p>
- * At some point we'll decouple this from Amazon, but for now this is fine.
- * </p>
- *
  * @author Willie Wheeler
  */
 @Slf4j
-public final class BasicAnomalyDetectorFactory<T extends BasicAnomalyDetector> implements AnomalyDetectorFactory<T> {
-    private Class<T> detectorClass;
-    private ModelServiceConnector modelServiceConnector;
+public class AquilaDetectorFactory implements DetectorFactory<AquilaAnomalyDetector> {
+    private static final String MODEL_UUID_PARAM = "modelUuid";
 
+    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new MetricsJavaModule());
+    private String uri;
+    private ModelServiceConnector modelServiceConnector;
+    
     @Override
     public void init(Config config, ModelServiceConnector modelServiceConnector) {
-        notNull(config, "config can't be null");
-        notNull(modelServiceConnector, "modelServiceConnector can't be null");
-
-        this.detectorClass = ReflectionUtil.classForName(config.getString("detectorClass"));
+        this.uri = config.getString("uri");
         this.modelServiceConnector = modelServiceConnector;
-        
-        log.info("Initialized factory: detectorClass={}", detectorClass.getName());
+        log.info("Initialized AquilaFactory: uri={}", uri);
     }
-
+    
     @Override
-    public T create(UUID uuid) {
+    public AquilaAnomalyDetector create(UUID uuid) {
         notNull(uuid, "uuid can't be null");
 
         final ModelResource model = modelServiceConnector.findLatestModel(uuid);
         log.info("Loaded model: {}", model);
-        if (model == null) {
-            log.error("No model found for uuid = {}", uuid);
-            return  null; // TODO: decide how to deal with this.
+        if (model == null
+                || model.getParams() == null
+                || model.getParams().get(MODEL_UUID_PARAM) == null) {
+            throw new RuntimeException("Valid model not found for uuid=" + uuid);
         }
 
-        T detector = ReflectionUtil.newInstance(detectorClass);
-        detector.init(model);
-        return detector;
+        return new AquilaAnomalyDetector(
+                objectMapper,
+                uri,
+                UUID.fromString(model.getParams().get(MODEL_UUID_PARAM).toString())
+        );
     }
 }
