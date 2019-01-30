@@ -116,7 +116,7 @@ public final class HoltWintersAnomalyDetector extends BasicAnomalyDetector<HoltW
         // Other learning methods may be added to this enum at a later time.
 
         AnomalyResult result = new AnomalyResult(getUuid(), metricData, anomalyLevel);
-        result.setPredicted(components.getForecast());
+        result.setPredicted(prevForecast);
         result.setThresholds(thresholds);
         return result;
     }
