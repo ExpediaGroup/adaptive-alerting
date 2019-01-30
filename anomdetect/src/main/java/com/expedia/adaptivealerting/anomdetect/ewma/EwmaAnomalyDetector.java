@@ -66,6 +66,10 @@ public final class EwmaAnomalyDetector extends BasicAnomalyDetector<EwmaParams> 
         this(UUID.randomUUID(), new EwmaParams());
     }
     
+    public EwmaAnomalyDetector(UUID uuid) {
+        this(uuid, new EwmaParams());
+    }
+    
     public EwmaAnomalyDetector(EwmaParams params) {
         this(UUID.randomUUID(), params);
     }
