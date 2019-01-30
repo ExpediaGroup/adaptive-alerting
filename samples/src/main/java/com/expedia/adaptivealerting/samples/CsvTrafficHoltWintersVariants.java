@@ -24,9 +24,11 @@ import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartSink;
 import com.expedia.adaptivealerting.tools.pipeline.source.MetricFrameMetricSource;
 import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jfree.chart.JFreeChart;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.expedia.adaptivealerting.anomdetect.holtwinters.SeasonalityType.ADDITIVE;
@@ -36,58 +38,91 @@ import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.createC
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showChartFrame;
 
 /**
+ * Data for samples/austourists.csv was taken from austourists-tests-holtwinters-multiplicative/additive.csv files in anomdetect.
+ * The first row was converted to the LEVEL, BASE, and M/A_SEASONAL constants below.
+ * The "y" values from the remaining rows became the "observed" values in sample/austourists.csv
+ *
  * @author Matt Callanan
  */
 public class CsvTrafficHoltWintersVariants {
-    public static final int AUSTOURISTS_PERIOD = 4;
-    public static final double AUSTOURISTS_ALPHA = 0.441;
-    public static final double AUSTOURISTS_BETA = 0.030;
-    public static final double AUSTOURISTS_GAMMA = 0.002;
-    public static final double AUSTOURISTS_LEVEL = 25.5275345;
-    public static final double AUSTOURISTS_BASE = 1.06587325;
-    public static final double[] AUSTOURISTS_M_SEASONAL = new double[]{1.17725873605224, 0.750111453184012, 0.991779758440832, 1.08085005232291};
-    public static final double[] AUSTOURISTS_A_SEASONAL = new double[]{4.5249785, -6.3790385, -0.209842500000001, 2.0639025};
+    public static final int PERIOD = 4;
+    public static final double ALPHA_HIGH = 0.441;
+    public static final double ALPHA_LOW = 0.004;
+    public static final double BETA = 0.030;
+    public static final double GAMMA_LOW = 0.002;
+    public static final double GAMMA_HIGH = 0.4;
+    public static final double LEVEL = 25.5275345;
+    public static final double BASE = 1.06587325;
+    public static final double[] M_SEASONAL = new double[]{1.17725873605224, 0.750111453184012, 0.991779758440832, 1.08085005232291};
+    public static final double[] A_SEASONAL = new double[]{4.5249785, -6.3790385, -0.209842500000001, 2.0639025};
     public static final SeasonalityType M = MULTIPLICATIVE;
     public static final SeasonalityType A = ADDITIVE;
+    public static final double WEAK_SIGMAS = 2.0;
+    public static final double STRONG_SIGMAS = 3.0;
 
     public static void main(String[] args) throws Exception {
         MetricFrameMetricSource source = buildMetricFrameMetricSource("samples/austourists.csv", 200L);
 
         List<JFreeChart> charts = new ArrayList<>();
 
-        charts.add(buildChart(source, M, AUSTOURISTS_M_SEASONAL, 2.0, 3.0).getChart());
-        charts.add(buildChart(source, A, AUSTOURISTS_A_SEASONAL, 2.0, 3.0).getChart());
+        charts.add(buildChartWithInitEstimates(source, A, A_SEASONAL, ALPHA_HIGH, BETA, GAMMA_LOW).getChart());
+        charts.add(buildChartWithInitEstimates(source, M, M_SEASONAL, ALPHA_HIGH, BETA, GAMMA_LOW).getChart());
+//        charts.add(buildChartWithoutInitEstimates(source, M, ALPHA_HIGH, BETA, GAMMA_LOW, "No Estimates").getChart());
+        charts.add(buildChartWithoutInitEstimates(source, M, ALPHA_LOW, BETA, GAMMA_LOW, "No Estimates", "Low Alpha").getChart());
+        charts.add(buildChartWithoutInitEstimates(source, M, ALPHA_LOW, BETA, GAMMA_HIGH, "No Estimates", "High Gamma").getChart());
+//        charts.add(buildChartWithoutInitEstimates(source, M, ALPHA_LOW, BETA, GAMMA_HIGH, "No Estimates", "Low Alpha", "High Gamma").getChart());
 
         showChartFrame(createChartFrame("Australian Tourists", charts.toArray(new JFreeChart[]{})));
         source.start();
     }
 
-    private static AnomalyChartSink buildChart(MetricFrameMetricSource austouristsSource, SeasonalityType seasonalityType, double[] seasonal,
-                                               double weakSigmas, double strongSigmas) {
-        final HoltWintersParams params1 = buildHoltWintersParams(seasonalityType, AUSTOURISTS_LEVEL, AUSTOURISTS_BASE, seasonal)
-                .setWeakSigmas(weakSigmas)
-                .setStrongSigmas(strongSigmas);
-        final AnomalyDetectorFilter ad1 = new AnomalyDetectorFilter(new HoltWintersAnomalyDetector(params1));
-        final EvaluatorFilter eval1 = new EvaluatorFilter(new RmseEvaluator());
-        final AnomalyChartSink chart1 = PipelineFactory.createChartSink(String.format("HoltWinters %s: alpha=%s, beta=%s, gamma=%s", seasonalityType,
-                AUSTOURISTS_ALPHA, AUSTOURISTS_BETA, AUSTOURISTS_GAMMA));
-        austouristsSource.addSubscriber(ad1);
-        ad1.addSubscriber(eval1);
-        ad1.addSubscriber(chart1);
-        eval1.addSubscriber(chart1);
-        return chart1;
+    private static AnomalyChartSink buildChartWithInitEstimates(MetricFrameMetricSource source, SeasonalityType seasonalityType,
+                                                                double[] seasonal, double alpha, double beta, double gamma, String... titleSuffix) {
+        final HoltWintersParams params = buildHoltWintersParamsWithInitEstimates(seasonalityType, LEVEL, BASE, seasonal,
+                alpha, beta, gamma)
+                .setWeakSigmas(WEAK_SIGMAS)
+                .setStrongSigmas(STRONG_SIGMAS);
+        String[] suffix = ArrayUtils.addAll(titleSuffix, "l: " + LEVEL, "b: " + BASE, String.format("s: %s", Arrays.asList(ArrayUtils.toObject(seasonal))));
+        return buildChart(source, seasonalityType, params, alpha, beta, gamma, suffix);
     }
 
-    private static HoltWintersParams buildHoltWintersParams(SeasonalityType seasonalityType, double level, double base, double[] seasonal) {
-        return new HoltWintersParams()
-                .setPeriod(AUSTOURISTS_PERIOD)
-                .setAlpha(AUSTOURISTS_ALPHA)
-                .setBeta(AUSTOURISTS_BETA)
-                .setGamma(AUSTOURISTS_GAMMA)
-                .setSeasonalityType(seasonalityType)
-                .setWarmUpPeriod(AUSTOURISTS_PERIOD)
+    private static AnomalyChartSink buildChartWithoutInitEstimates(MetricFrameMetricSource source, SeasonalityType seasonalityType,
+                                                                   double alpha, double beta, double gamma, String... titleSuffix) {
+        final HoltWintersParams params = buildHoltWintersParams(seasonalityType, alpha, beta, gamma)
+                .setWeakSigmas(WEAK_SIGMAS)
+                .setStrongSigmas(STRONG_SIGMAS);
+        return buildChart(source, seasonalityType, params, alpha, beta, gamma, titleSuffix);
+    }
+
+    private static HoltWintersParams buildHoltWintersParamsWithInitEstimates(SeasonalityType seasonalityType,
+                                                                             double level, double base, double[] seasonal,
+                                                                             double alpha, double beta, double gamma) {
+        return buildHoltWintersParams(seasonalityType, alpha, beta, gamma)
                 .setInitLevelEstimate(level)
                 .setInitBaseEstimate(base)
                 .setInitSeasonalEstimates(seasonal);
+    }
+
+    private static HoltWintersParams buildHoltWintersParams(SeasonalityType seasonalityType, double alpha, double beta, double gamma) {
+        return new HoltWintersParams()
+                .setPeriod(PERIOD)
+                .setAlpha(alpha)
+                .setBeta(beta)
+                .setGamma(gamma)
+                .setSeasonalityType(seasonalityType)
+                .setWarmUpPeriod(PERIOD);
+    }
+
+    private static AnomalyChartSink buildChart(MetricFrameMetricSource source, SeasonalityType seasonalityType, HoltWintersParams params,
+                                               double alpha, double beta, double gammaLow, String... titleSuffix) {
+        final AnomalyDetectorFilter adf = new AnomalyDetectorFilter(new HoltWintersAnomalyDetector(params));
+        final EvaluatorFilter eval = new EvaluatorFilter(new RmseEvaluator());
+        final AnomalyChartSink chartSink = PipelineFactory.createChartSink(String.format("HoltWinters %s: alpha=%s, beta=%s, gamma=%s %s", seasonalityType,
+                alpha, beta, gammaLow, Arrays.asList(titleSuffix)));
+        source.addSubscriber(adf);
+        adf.addSubscriber(eval);
+        adf.addSubscriber(chartSink);
+        eval.addSubscriber(chartSink);
+        return chartSink;
     }
 }
