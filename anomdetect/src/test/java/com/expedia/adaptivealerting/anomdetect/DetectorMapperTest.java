@@ -30,13 +30,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 /**
- * {@link DetectorMapper} unit tests.
+ * {@link DetectorMapper} unit test.
  *
  * @author Willie Wheeler
  */

@@ -22,7 +22,6 @@ import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigObject;
-import com.typesafe.config.ConfigValue;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -40,6 +39,9 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  */
 @Slf4j
 public class DetectorManager {
+    static final String CK_CONFIG = "config";
+    static final String CK_DETECTORS = "detectors";
+    static final String CK_FACTORY = "factory";
     
     /**
      * Factories that know how to produce anomaly detectors on demand.
@@ -54,14 +56,14 @@ public class DetectorManager {
     /**
      * Creates a new anomaly detector manager.
      *
-     * @param config         Manager config.
+     * @param config         Detector manager config.
      * @param detectorSource Detector source.
      */
     public DetectorManager(Config config, DetectorSource detectorSource) {
         notNull(config, "config can't be null");
         notNull(detectorSource, "detectorSource can't be null");
         
-        initDetectorFactories(detectorSource, config.getConfig("detectors"));
+        initDetectorFactories(config.getConfig(CK_DETECTORS), detectorSource);
     }
     
     /**
@@ -89,15 +91,15 @@ public class DetectorManager {
         return detector.classify(metricData);
     }
     
-    private void initDetectorFactories(DetectorSource detectorSource, Config detectorsConfig) {
+    private void initDetectorFactories(Config detectorsConfig, DetectorSource detectorSource) {
         
         // Calling detectorsConfig.entrySet() does a recursive traversal, which isn't what we want here.
         // Whereas detectorsConfig.root().entrySet() returns only the direct children.
-        for (Map.Entry<String, ConfigValue> entry : detectorsConfig.root().entrySet()) {
+        for (val entry : detectorsConfig.root().entrySet()) {
             val detectorType = entry.getKey();
             val detectorFactoryAndConfig = ((ConfigObject) entry.getValue()).toConfig();
-            val detectorFactoryClassname = detectorFactoryAndConfig.getString("factory");
-            val detectorConfig = detectorFactoryAndConfig.getConfig("config");
+            val detectorFactoryClassname = detectorFactoryAndConfig.getString(CK_FACTORY);
+            val detectorConfig = detectorFactoryAndConfig.getConfig(CK_CONFIG);
             
             log.info("Initializing DetectorFactory: type={}, className={}",
                     detectorType, detectorFactoryClassname);

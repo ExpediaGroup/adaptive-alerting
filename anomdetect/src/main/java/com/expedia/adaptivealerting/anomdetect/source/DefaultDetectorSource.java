@@ -31,6 +31,8 @@ import java.util.stream.Collectors;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
+// Non-final because we currently need to mock this in DetectorManagerTest. [WLW]
+
 /**
  * A {@link DetectorSource} backed by the Model Service.
  *
@@ -38,7 +40,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  */
 @RequiredArgsConstructor
 @Slf4j
-public final class DefaultDetectorSource implements DetectorSource {
+public class DefaultDetectorSource implements DetectorSource {
     
     @Getter
     @NonNull
