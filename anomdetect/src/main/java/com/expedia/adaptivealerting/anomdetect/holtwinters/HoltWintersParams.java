@@ -18,9 +18,11 @@ package com.expedia.adaptivealerting.anomdetect.holtwinters;
 import com.expedia.adaptivealerting.core.util.AssertUtil;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
 
+import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersTrainingMethod.SIMPLE;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.isBetween;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -31,6 +33,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  */
 @Data
 @Accessors(chain = true)
+@Slf4j
 public final class HoltWintersParams {
     private static double TOLERANCE = 0.1;
 
@@ -99,21 +102,44 @@ public final class HoltWintersParams {
     /**
      * Initial estimates for Seasonal components. n=period values must be provided.
      */
-    private double[] initSeasonalEstimates = new double[]{};
+    private double[] initSeasonalEstimates = {};
+
+    /**
+     * Initial training method to use. See {@link HoltWintersTrainingMethod} for details.
+     */
+    private HoltWintersTrainingMethod initTrainingMethod = HoltWintersTrainingMethod.NONE;
 
     public boolean isMultiplicative() {
         return seasonalityType.equals(SeasonalityType.MULTIPLICATIVE);
     }
 
+    public int getInitTrainingPeriod() {
+        return (initTrainingMethod == SIMPLE) ? (period * 2) : 0;
+    }
+
     public void validate() {
-        notNull(seasonalityType, String.format("Required: seasonalityType one of %s", SeasonalityType.values()));
+        notNull(seasonalityType, "Required: seasonalityType one of " + Arrays.toString(SeasonalityType.values()));
+        notNull(initTrainingMethod, "Required: initTrainingMethod one of " + Arrays.toString(HoltWintersTrainingMethod.values()));
         isTrue(0 < period, "Required: period value greater than 0");
         isTrue(0.0 <= alpha && alpha <= 1.0, "Required: alpha in the range [0, 1]");
         isTrue(0.0 <= beta && beta <= 1.0, "Required: beta in the range [0, 1]");
         isTrue(0.0 <= gamma && gamma <= 1.0, "Required: gamma in the range [0, 1]");
         isTrue(weakSigmas > 0.0, "Required: weakSigmas > 0.0");
         isTrue(strongSigmas > weakSigmas, "Required: strongSigmas > weakSigmas");
+        validateInitTrainingMethod();
         validateInitSeasonalEstimates();
+    }
+
+    private void validateInitTrainingMethod() {
+        if (initTrainingMethod == SIMPLE) {
+            int minWarmUpPeriod = getInitTrainingPeriod();
+            if (warmUpPeriod < minWarmUpPeriod) {
+                log.warn(String.format("warmUpPeriod (%d) should be greater than or equal to (period * 2) (%d) " +
+                                "as the detector will not emit anomalies during training. Setting warmUpPeriod to %d.",
+                        warmUpPeriod, minWarmUpPeriod, minWarmUpPeriod));
+                warmUpPeriod = minWarmUpPeriod;
+            }
+        }
     }
 
     private void validateInitSeasonalEstimates() {

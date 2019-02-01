@@ -75,7 +75,6 @@ public class HoltWintersOnlineAlgorithm {
                 : level + base + season;
     }
 
-
     private void updateComponents(HoltWintersOnlineComponents components, double y, double newLevel, double newBase, double newSeason, int seasonalIdx) {
         components.setLevel(newLevel);
         components.setBase(newBase);
