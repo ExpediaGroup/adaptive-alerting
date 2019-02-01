@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.anomdetect.source;
 
 import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
+import com.expedia.metrics.MetricDefinition;
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -56,7 +57,7 @@ public final class DefaultDetectorFactory<T extends AbstractAnomalyDetector> imp
     }
 
     @Override
-    public T create(UUID detectorUuid) {
+    public T create(UUID detectorUuid, MetricDefinition metricDef) {
         notNull(detectorUuid, "detectorUuid can't be null");
         
         val model = detectorSource.findModelByDetectorUuid(detectorUuid);

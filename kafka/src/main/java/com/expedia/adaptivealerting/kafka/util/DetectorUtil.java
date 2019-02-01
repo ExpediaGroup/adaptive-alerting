@@ -15,33 +15,23 @@
  */
 package com.expedia.adaptivealerting.kafka.util;
 
-import com.expedia.adaptivealerting.anomdetect.source.BasicDetectorSource;
 import com.expedia.adaptivealerting.anomdetect.source.DefaultDetectorSource;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
-import com.expedia.adaptivealerting.anomdetect.source.MultiDetectorSource;
+import com.expedia.adaptivealerting.anomdetect.source.TempHaystackAwareDetectorSource;
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.typesafe.config.Config;
 import lombok.val;
 
-import java.util.Arrays;
-
 public final class DetectorUtil {
     private static final String CK_MODEL_SERVICE_URI_TEMPLATE = "model-service-uri-template";
     
     public static DetectorSource buildDetectorSource(Config config) {
-        
-        // TODO Make the detector source configurable. [WLW]
         val httpClient = new HttpClientWrapper();
         val uriTemplate = config.getString(CK_MODEL_SERVICE_URI_TEMPLATE);
         val connector = new ModelServiceConnector(httpClient, uriTemplate);
         
-        // TODO Hm, not sure I want a basic detector fallback for _every_ metric.
-        // Probably want to limit this to Haystack metrics for the time being. [WLW]
         val defaultDetectorSource = new DefaultDetectorSource(connector);
-        val basicDetectorSource = new BasicDetectorSource();
-        val multiDetectorSource = new MultiDetectorSource(Arrays.asList(defaultDetectorSource, basicDetectorSource));
-        
-        return multiDetectorSource;
+        return new TempHaystackAwareDetectorSource(defaultDetectorSource);
     }
 }

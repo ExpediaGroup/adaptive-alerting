@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.anomdetect.aquila;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorFactory;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
+import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.jackson.MetricsJavaModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
@@ -45,7 +46,7 @@ public class AquilaDetectorFactory implements DetectorFactory<AquilaAnomalyDetec
     }
     
     @Override
-    public AquilaAnomalyDetector create(UUID detectorUuid) {
+    public AquilaAnomalyDetector create(UUID detectorUuid, MetricDefinition metricDef) {
         /*
         notNull(detectorUuid, "uuid can't be null");
         

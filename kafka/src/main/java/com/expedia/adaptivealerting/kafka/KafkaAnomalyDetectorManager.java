@@ -37,7 +37,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @Slf4j
 public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
     private static final String CK_AD_MANAGER = "ad-manager";
-    private static final String CK_MODEL_SERVICE_URI_TEMPLATE = "model-service-uri-template";
     
     private final DetectorManager manager;
     

@@ -28,10 +28,10 @@ import java.util.UUID;
  * Detector source interfaces, supporting two major functions:
  *
  * <ul>
- *     <li>mapping a metric definition to a list of detector metas (required by
- *     {@link DetectorMapper}), and</li>
- *     <li>mapping a detector UUID to the associated detector (required by
- *     {@link DetectorManager}).</li>
+ * <li>mapping a metric definition to a list of detector metas (required by
+ * {@link DetectorMapper}), and</li>
+ * <li>mapping a detector UUID to the associated detector (required by
+ * {@link DetectorManager}).</li>
  * </ul>
  *
  * @author Willie Wheeler
@@ -41,16 +41,17 @@ public interface DetectorSource {
     /**
      * Finds the list of detector UUIDs for a given metric.
      *
-     * @param metricDefinition The metric.
+     * @param metricDef The metric.
      * @return The mapped detector metas.
      */
-    List<DetectorMeta> findDetectorMetas(MetricDefinition metricDefinition);
+    List<DetectorMeta> findDetectorMetas(MetricDefinition metricDef);
     
     /**
      * Finds the detector for a given detector UUID.
      *
      * @param detectorUuid The detector UUID.
+     * @param metricDef    Optional metric definition, for implementations that create detectors dynamically.
      * @return The associated detector.
      */
-    AnomalyDetector findDetector(UUID detectorUuid);
+    AnomalyDetector findDetector(UUID detectorUuid, MetricDefinition metricDef);
 }

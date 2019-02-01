@@ -41,7 +41,7 @@ import static org.mockito.Mockito.when;
  *
  * @author Willie Wheeler
  */
-public class DetectorManagerTest {
+public final class DetectorManagerTest {
     private static final String CONF_FILE_PATH = "config/detector-manager.conf";
     private static final String DETECTOR_TYPE = "ewma-detector";
     

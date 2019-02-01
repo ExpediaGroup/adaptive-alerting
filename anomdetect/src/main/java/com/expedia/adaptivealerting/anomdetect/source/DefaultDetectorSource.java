@@ -47,10 +47,10 @@ public class DefaultDetectorSource implements DetectorSource {
     private ModelServiceConnector connector;
     
     @Override
-    public List<DetectorMeta> findDetectorMetas(MetricDefinition metricDefinition) {
-        notNull(metricDefinition, "metricDefinition can't be null");
+    public List<DetectorMeta> findDetectorMetas(MetricDefinition metricDef) {
+        notNull(metricDef, "metricDefinition can't be null");
         return connector
-                .findDetectors(metricDefinition)
+                .findDetectors(metricDef)
                 .getContent()
                 .stream()
                 .map(resource -> new DetectorMeta(
@@ -60,7 +60,7 @@ public class DefaultDetectorSource implements DetectorSource {
     }
     
     @Override
-    public AnomalyDetector findDetector(UUID detectorUuid) {
+    public AnomalyDetector findDetector(UUID detectorUuid, MetricDefinition metricDef) {
         
         // TODO Move detector creation logic from DefaultDetectorFactory to the current class. [WLW]
         throw new UnsupportedOperationException("Not currently implemented");

@@ -33,7 +33,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 @Slf4j
-public class DefaultDetectorSourceTest {
+public final class DefaultDetectorSourceTest {
     private static final String DETECTOR_UUID = "90c37a3c-f6bb-4c00-b41b-191909cccfb7";
     private static final String DETECTOR_TYPE = "ewma-detector";
     

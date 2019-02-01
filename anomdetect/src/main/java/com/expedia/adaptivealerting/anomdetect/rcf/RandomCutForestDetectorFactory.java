@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.anomdetect.rcf;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorFactory;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
+import com.expedia.metrics.MetricDefinition;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import lombok.NonNull;
@@ -51,7 +52,7 @@ public final class RandomCutForestDetectorFactory implements DetectorFactory<Ran
      * @return A new anomaly detector
      */
     @Override
-    public RandomCutForestAnomalyDetector create(UUID detectorUuid) {
+    public RandomCutForestAnomalyDetector create(UUID detectorUuid, MetricDefinition metricDef) {
         /*
         notNull(detectorUuid, "uuid can't be null");
         

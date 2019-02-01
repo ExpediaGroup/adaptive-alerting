@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.source;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
+import com.expedia.metrics.MetricDefinition;
 import com.typesafe.config.Config;
 
 import java.util.UUID;
@@ -37,11 +38,13 @@ public interface DetectorFactory<T extends AnomalyDetector> {
     
     /**
      * Creates an anomaly detector. This would usually involve looking up at least the model parameters from persistent
-     * storages, based on automated model selection and autotuning. In many cases it would involve looking up a
+     * storage, based on automated model selection and autotuning. In many cases it would involve looking up a
      * pretrained model.
      *
-     * @param detectorUuid Detector UUID.
+     * @param detectorUuid Detector UUID
+     * @param metricDef    An optional metric definition, for implementations that create detectors dynamically based on
+     *                     the metric in question
      * @return Anomaly detector, or {@literal null} if the creation attempt failed.
      */
-    T create(UUID detectorUuid);
+    T create(UUID detectorUuid, MetricDefinition metricDef);
 }

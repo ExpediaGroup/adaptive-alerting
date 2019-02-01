@@ -122,17 +122,19 @@ public class DetectorManager {
      */
     private AnomalyDetector detectorFor(MappedMetricData mappedMetricData) {
         notNull(mappedMetricData, "mappedMetricData can't be null");
+        
         val detectorUuid = mappedMetricData.getDetectorUuid();
+        val metricDef = mappedMetricData.getMetricData().getMetricDefinition();
+        
         AnomalyDetector detector = detectors.get(detectorUuid);
         if (detector == null) {
             val detectorType = mappedMetricData.getDetectorType();
-            val factory = detectorFactories.get(detectorType);
-            if (factory == null) {
-                log.warn("No DetectorFactory registered for detectorType={}", detectorType);
+            val detectorFactory = detectorFactories.get(detectorType);
+            if (detectorFactory == null) {
+                log.warn("No detector factory registered for detectorType={}", detectorType);
             } else {
-                // This loads the detector from the database.
-                log.info("Creating anomaly detector: uuid={}, type={}", detectorUuid, detectorType);
-                detector = factory.create(detectorUuid);
+                log.info("Instantiating detector: detectorUuid={}, type={}", detectorUuid, detectorType);
+                detector = detectorFactory.create(detectorUuid, metricDef);
                 detectors.put(detectorUuid, detector);
             }
         }
