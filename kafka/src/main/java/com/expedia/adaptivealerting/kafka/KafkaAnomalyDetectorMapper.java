@@ -19,7 +19,6 @@ import com.expedia.adaptivealerting.anomdetect.DetectorMapper;
 import com.expedia.adaptivealerting.kafka.serde.JsonPojoSerde;
 import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
 import com.expedia.metrics.MetricData;
-import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.kafka.common.serialization.Serdes;
@@ -41,15 +40,15 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  */
 @Slf4j
 public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
-    static final String CK_AD_MAPPER = "ad-mapper";
-    static final String CK_MODEL_SERVICE_URI_TEMPLATE = "model-service-uri-template";
+    private static final String CK_AD_MAPPER = "ad-mapper";
     
     private final DetectorMapper mapper;
     
     public static void main(String[] args) {
-        val tsConfig = new TypesafeConfigLoader(CK_AD_MAPPER).loadMergedConfig();
-        val saConfig = new StreamsAppConfig(tsConfig);
-        val mapper = buildMapper(tsConfig);
+        val config = new TypesafeConfigLoader(CK_AD_MAPPER).loadMergedConfig();
+        val saConfig = new StreamsAppConfig(config);
+        val detectorSource = DetectorUtil.buildDetectorSource(config);
+        val mapper = new DetectorMapper(detectorSource);
         new KafkaAnomalyDetectorMapper(saConfig, mapper).start();
     }
     
@@ -90,10 +89,5 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
                 .to(outboundTopic, Produced.with(new Serdes.StringSerde(), new JsonPojoSerde<>()));
         
         return builder.build();
-    }
-    
-    private static DetectorMapper buildMapper(Config config) {
-        val detectorSource = DetectorUtil.buildDetectorSource(config);
-        return new DetectorMapper(detectorSource);
     }
 }

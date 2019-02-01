@@ -89,10 +89,9 @@ public final class TempHaystackAwareDetectorSourceTest {
     
     @Test
     public void testFindDetector() {
-        val detectorUuid = UUID.randomUUID();
-        val detector = source.findDetector(detectorUuid, haystackMetricDef);
-        
-        assertEquals(detectorUuid, detector.getUuid());
+        val detectorMeta = new DetectorMeta(UUID.randomUUID(), "ewma-detector");
+        val detector = source.findDetector(detectorMeta, haystackMetricDef);
+        assertEquals(detectorMeta.getUuid(), detector.getUuid());
     }
     
     private void initTestObjects() {

@@ -18,20 +18,13 @@ package com.expedia.adaptivealerting.kafka.util;
 import com.expedia.adaptivealerting.anomdetect.source.DefaultDetectorSource;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
 import com.expedia.adaptivealerting.anomdetect.source.TempHaystackAwareDetectorSource;
-import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
-import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.typesafe.config.Config;
-import lombok.val;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public final class DetectorUtil {
-    private static final String CK_MODEL_SERVICE_URI_TEMPLATE = "model-service-uri-template";
     
     public static DetectorSource buildDetectorSource(Config config) {
-        val httpClient = new HttpClientWrapper();
-        val uriTemplate = config.getString(CK_MODEL_SERVICE_URI_TEMPLATE);
-        val connector = new ModelServiceConnector(httpClient, uriTemplate);
-        
-        val defaultDetectorSource = new DefaultDetectorSource(connector);
-        return new TempHaystackAwareDetectorSource(defaultDetectorSource);
+        return new TempHaystackAwareDetectorSource(new DefaultDetectorSource(config));
     }
 }

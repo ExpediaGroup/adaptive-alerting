@@ -68,17 +68,17 @@ public final class TempHaystackAwareDetectorSource implements DetectorSource {
     }
     
     @Override
-    public AnomalyDetector findDetector(UUID detectorUuid, MetricDefinition metricDef) {
-        notNull(detectorUuid, "detectorUUID can't be null");
+    public AnomalyDetector findDetector(DetectorMeta detectorMeta, MetricDefinition metricDef) {
+        notNull(detectorMeta, "detectorMeta can't be null");
         
-        val detector = primaryDetectorSource.findDetector(detectorUuid, metricDef);
+        val detector = primaryDetectorSource.findDetector(detectorMeta, metricDef);
         
         if (detector != null) {
             return detector;
         }
         
         return isHaystackMetric(metricDef) ?
-                createHaystackDetector(detectorUuid) :
+                createHaystackDetector(detectorMeta.getUuid()) :
                 null;
     }
     

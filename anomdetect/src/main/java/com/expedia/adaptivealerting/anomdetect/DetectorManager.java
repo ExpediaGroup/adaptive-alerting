@@ -15,13 +15,13 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.anomdetect.source.DetectorFactory;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
+import com.expedia.adaptivealerting.anomdetect.util.DetectorMeta;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.adaptivealerting.core.util.ReflectionUtil;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigObject;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -37,34 +37,15 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author David Sutherland
  * @author Willie Wheeler
  */
+@RequiredArgsConstructor
 @Slf4j
 public class DetectorManager {
-    static final String CK_CONFIG = "config";
-    static final String CK_DETECTORS = "detectors";
-    static final String CK_FACTORY = "factory";
     
-    /**
-     * Factories that know how to produce anomaly detectors on demand.
-     */
-    private final Map<String, DetectorFactory> detectorFactories = new HashMap<>();
+    @Getter
+    @NonNull
+    private DetectorSource detectorSource;
     
-    /**
-     * The managed detectors.
-     */
-    private final Map<UUID, AnomalyDetector> detectors = new HashMap<>();
-    
-    /**
-     * Creates a new anomaly detector manager.
-     *
-     * @param config         Detector manager config.
-     * @param detectorSource Detector source.
-     */
-    public DetectorManager(Config config, DetectorSource detectorSource) {
-        notNull(config, "config can't be null");
-        notNull(detectorSource, "detectorSource can't be null");
-        
-        initDetectorFactories(config.getConfig(CK_DETECTORS), detectorSource);
-    }
+    private final Map<UUID, AnomalyDetector> cachedDetectors = new HashMap<>();
     
     /**
      * <p>
@@ -91,52 +72,18 @@ public class DetectorManager {
         return detector.classify(metricData);
     }
     
-    private void initDetectorFactories(Config detectorsConfig, DetectorSource detectorSource) {
-        
-        // Calling detectorsConfig.entrySet() does a recursive traversal, which isn't what we want here.
-        // Whereas detectorsConfig.root().entrySet() returns only the direct children.
-        for (val entry : detectorsConfig.root().entrySet()) {
-            val detectorType = entry.getKey();
-            val detectorFactoryAndConfig = ((ConfigObject) entry.getValue()).toConfig();
-            val detectorFactoryClassname = detectorFactoryAndConfig.getString(CK_FACTORY);
-            val detectorConfig = detectorFactoryAndConfig.getConfig(CK_CONFIG);
-            
-            log.info("Initializing DetectorFactory: type={}, className={}",
-                    detectorType, detectorFactoryClassname);
-            val factory = (DetectorFactory) ReflectionUtil.newInstance(detectorFactoryClassname);
-            factory.init(detectorConfig, detectorSource);
-            log.info("Initialized DetectorFactory: type={}, className={}",
-                    detectorType, detectorFactoryClassname);
-            
-            detectorFactories.put(detectorType, factory);
-        }
-    }
-    
-    /**
-     * Gets the anomaly detector for the given metric point, creating it if absent. Returns {@code null} if there's no
-     * {@link DetectorFactory} defined for the mapped metric data's detector type.
-     *
-     * @param mappedMetricData Mapped metric point.
-     * @return Anomaly detector for the given metric point, or {@code null} if there's some problem loading the
-     * detector.
-     */
     private AnomalyDetector detectorFor(MappedMetricData mappedMetricData) {
         notNull(mappedMetricData, "mappedMetricData can't be null");
         
         val detectorUuid = mappedMetricData.getDetectorUuid();
+        val detectorType = mappedMetricData.getDetectorType();
         val metricDef = mappedMetricData.getMetricData().getMetricDefinition();
         
-        AnomalyDetector detector = detectors.get(detectorUuid);
+        AnomalyDetector detector = cachedDetectors.get(detectorUuid);
         if (detector == null) {
-            val detectorType = mappedMetricData.getDetectorType();
-            val detectorFactory = detectorFactories.get(detectorType);
-            if (detectorFactory == null) {
-                log.warn("No detector factory registered for detectorType={}", detectorType);
-            } else {
-                log.info("Instantiating detector: detectorUuid={}, type={}", detectorUuid, detectorType);
-                detector = detectorFactory.create(detectorUuid, metricDef);
-                detectors.put(detectorUuid, detector);
-            }
+            val detectorMeta = new DetectorMeta(detectorUuid, detectorType);
+            detector = detectorSource.findDetector(detectorMeta, metricDef);
+            cachedDetectors.put(detectorUuid, detector);
         }
         return detector;
     }

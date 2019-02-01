@@ -6,45 +6,14 @@ ad-manager {
     JsonPojoClass = "com.expedia.adaptivealerting.core.data.MappedMetricData"
     default.timestamp.extractor = "com.expedia.adaptivealerting.kafka.serde.MappedMetricDataTimestampExtractor"
   }
-  detectors {
-    aquila-detector {
-      factory = "com.expedia.adaptivealerting.anomdetect.aquila.AquilaDetectorFactory"
-      config {
-        uri = "${aquila_uri}"
-      }
-    }
-    constant-detector {
-      factory = "com.expedia.adaptivealerting.anomdetect.source.DefaultDetectorFactory"
-      config {
-        detectorClass = "com.expedia.adaptivealerting.anomdetect.constant.ConstantThresholdAnomalyDetector"
-      }
-    }
-    cusum-detector {
-      factory = "com.expedia.adaptivealerting.anomdetect.source.DefaultDetectorFactory"
-      config {
-        detectorClass = "com.expedia.adaptivealerting.anomdetect.cusum.CusumAnomalyDetector"
-      }
-    }
-    ewma-detector {
-      factory = "com.expedia.adaptivealerting.anomdetect.source.DefaultDetectorFactory"
-      config {
-        detectorClass = "com.expedia.adaptivealerting.anomdetect.ewma.EwmaAnomalyDetector"
-      }
-    }
-    pewma-detector {
-      factory = "com.expedia.adaptivealerting.anomdetect.source.DefaultDetectorFactory"
-      config {
-        detectorClass = "com.expedia.adaptivealerting.anomdetect.pewma.PewmaAnomalyDetector"
-      }
-    }
-    rcf-detector {
-      factory = "com.expedia.adaptivealerting.anomdetect.rcf.RandomCutForestDetectorFactory"
-      config {
-      }
-    }
-  }
   health.status.path = "/app/isHealthy"
   inbound-topic = "mapped-metrics"
   outbound-topic = "anomalies"
+  detector-class-map {
+    constant-detector = "com.expedia.adaptivealerting.anomdetect.constant.ConstantThresholdAnomalyDetector"
+    cusum-detector = "com.expedia.adaptivealerting.anomdetect.cusum.CusumAnomalyDetector"
+    ewma-detector = "com.expedia.adaptivealerting.anomdetect.ewma.EwmaAnomalyDetector"
+    pewma-detector = "com.expedia.adaptivealerting.anomdetect.pewma.PewmaAnomalyDetector"
+  }
   model-service-uri-template = "${modelservice_uri_template}"
 }

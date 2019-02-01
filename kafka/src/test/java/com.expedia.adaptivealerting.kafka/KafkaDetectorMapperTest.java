@@ -35,7 +35,6 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Collections;
 
-import static com.expedia.adaptivealerting.kafka.KafkaAnomalyDetectorMapper.CK_MODEL_SERVICE_URI_TEMPLATE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -117,7 +116,7 @@ public final class KafkaDetectorMapperTest {
     }
     
     private void initConfig() {
-        when(tsConfig.getString(CK_MODEL_SERVICE_URI_TEMPLATE)).thenReturn("https://example.com/");
+//        when(tsConfig.getString(CK_MODEL_SERVICE_URI_TEMPLATE)).thenReturn("https://example.com/");
         
         when(saConfig.getTypesafeConfig()).thenReturn(tsConfig);
         when(saConfig.getInboundTopic()).thenReturn(INBOUND_TOPIC);

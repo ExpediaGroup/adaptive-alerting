@@ -19,7 +19,6 @@ import com.expedia.adaptivealerting.anomdetect.DetectorManager;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
-import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.kafka.streams.StreamsBuilder;
@@ -41,9 +40,10 @@ public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
     private final DetectorManager manager;
     
     public static void main(String[] args) {
-        val tsConfig = new TypesafeConfigLoader(CK_AD_MANAGER).loadMergedConfig();
-        val saConfig = new StreamsAppConfig(tsConfig);
-        val manager = buildManager(tsConfig);
+        val config = new TypesafeConfigLoader(CK_AD_MANAGER).loadMergedConfig();
+        val saConfig = new StreamsAppConfig(config);
+        val detectorSource = DetectorUtil.buildDetectorSource(config);
+        val manager = new DetectorManager(detectorSource);
         new KafkaAnomalyDetectorManager(saConfig, manager).start();
     }
     
@@ -87,10 +87,5 @@ public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
                 .filter((key, mappedMetricData) -> mappedMetricData != null)
                 .to(outboundTopic);
         return builder.build();
-    }
-
-    private static DetectorManager buildManager(Config config) {
-        val detectorSource = DetectorUtil.buildDetectorSource(config);
-        return new DetectorManager(config, detectorSource);
     }
 }
