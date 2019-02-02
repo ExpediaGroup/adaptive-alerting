@@ -16,22 +16,24 @@
 package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
-import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
+import com.expedia.adaptivealerting.anomdetect.util.DetectorMeta;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import lombok.val;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.UUID;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 /**
  * {@link DetectorManager} unit test.
@@ -47,8 +49,12 @@ public final class DetectorManagerTest {
     private DetectorSource detectorSource;
     
     private MappedMetricData mappedMetricData;
-    private UUID detectorUuid;
-    private ModelResource model;
+    
+    @Mock
+    private AnomalyDetector detector;
+    
+    @Mock
+    private AnomalyResult anomalyResult;
     
     @Before
     public void setUp() {
@@ -59,26 +65,22 @@ public final class DetectorManagerTest {
     }
     
     @Test
-    @Ignore
     public void testClassify() {
         val result = manager.classify(mappedMetricData);
         assertNotNull(result);
+        assertSame(anomalyResult, result);
     }
     
     private void initTestObjects() {
-        this.detectorUuid = UUID.randomUUID();
-        
         val metricDef = new MetricDefinition("my-metric");
         val metricData = new MetricData(metricDef, 100.0, Instant.now().getEpochSecond());
-        this.mappedMetricData = new MappedMetricData(metricData, detectorUuid, DETECTOR_TYPE);
+        this.mappedMetricData = new MappedMetricData(metricData, UUID.randomUUID(), DETECTOR_TYPE);
         
-        this.model = new ModelResource();
-        model.setUuid(detectorUuid);
-        model.setParams(new HashMap<>());
+        when(detector.classify(metricData)).thenReturn(anomalyResult);
     }
     
     private void initDependencies() {
-//        when(detectorSource.findDetector(any(DetectorMeta.class), any(MetricDefinition.class)))
-//                .thenReturn(model);
+        when(detectorSource.findDetector(any(DetectorMeta.class), any(MetricDefinition.class)))
+                .thenReturn(detector);
     }
 }

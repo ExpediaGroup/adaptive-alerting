@@ -48,28 +48,24 @@ public class DetectorManager {
     private final Map<UUID, AnomalyDetector> cachedDetectors = new HashMap<>();
     
     /**
-     * <p>
-     * Convenience method to classify the mapped metric point, performing detector lookup behind the scenes. Note that
-     * this method has a side-effect in that it updates the passed mapped metric data itself.
-     * </p>
-     * <p>
-     * Returns {@code null} if there's no detector defined for the given mapped metric data.
-     * </p>
+     * Classifies the mapped metric data, performing detector lookup behind the scenes. Returns {@code null} if there's
+     * no detector defined for the given mapped metric data.
      *
-     * @param mappedMetricData Mapped metric point.
-     * @return The mapped metric point, or {@code null} if there's no associated detector.
+     * @param mappedMetricData Mapped metric data.
+     * @return The anomaly result, or {@code null} if there's no associated detector.
      */
     public AnomalyResult classify(MappedMetricData mappedMetricData) {
         notNull(mappedMetricData, "mappedMetricData can't be null");
         
-        log.info("Classifying mappedMetricData={}", mappedMetricData);
         val detector = detectorFor(mappedMetricData);
         if (detector == null) {
-            log.warn("No detector for mappedMetricData={}", mappedMetricData);
+            log.warn("No detector: mappedMetricData={}", mappedMetricData);
             return null;
         }
         val metricData = mappedMetricData.getMetricData();
-        return detector.classify(metricData);
+        val anomalyResult = detector.classify(metricData);
+        log.info("metricData={}, anomalyResult={}", metricData, anomalyResult);
+        return anomalyResult;
     }
     
     private AnomalyDetector detectorFor(MappedMetricData mappedMetricData) {

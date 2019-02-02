@@ -11,14 +11,10 @@ data "template_file" "config_data" {
   template = "${file("${local.config_file_path}")}"
   vars {
     kafka_endpoint = "${var.kafka_endpoint}"
-    models_region = "${var.models_region}"
-    models_bucket = "${var.models_bucket}"
-    aquila_uri = "${var.aquila_uri}"
     modelservice_uri_template = "${var.modelservice_uri_template}"
   }
 }
 
-// using kubectl to create deployment construct since its not natively support by the kubernetes provider
 data "template_file" "deployment_yaml" {
   template = "${file("${local.deployment_yaml_file_path}")}"
   vars {
@@ -58,6 +54,7 @@ resource "kubernetes_config_map" "ad-manager-config" {
   count = "${local.count}"
 }
 
+// The k8s provider doesn't natively support deployment, so we use kubectl.
 resource "null_resource" "kubectl_apply" {
   triggers {
     template = "${data.template_file.deployment_yaml.rendered}"
