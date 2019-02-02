@@ -8,11 +8,6 @@ variable "kubectl_executable_name" {}
 variable "app_namespace" {}
 variable "node_selector_label"{}
 
-# TODO Why is this part of Adaptive Alerting?
-variable "metrictank" {
-  type = "map"
-}
-
 variable "alerting" {
   type = "map"
 }
@@ -25,11 +20,11 @@ variable "ad-manager" {
   type = "map"
 }
 
-variable "mc-a2m-mapper" {
+variable "modelservice" {
   type = "map"
 }
 
-variable "modelservice" {
+variable "mc-a2m-mapper" {
   type = "map"
 }
 

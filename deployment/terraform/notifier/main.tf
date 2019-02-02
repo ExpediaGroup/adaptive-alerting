@@ -5,7 +5,6 @@ locals {
   count = "${var.enabled?1:0}"
   checksum = "${sha1("${data.template_file.config_data.rendered}")}"
   configmap_name = "notifier-${local.checksum}"
-
 }
 
 // using kubectl to create deployment construct since its not natively support by the kubernetes provider
