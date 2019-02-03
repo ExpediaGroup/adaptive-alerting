@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersTrainingMethod.SIMPLE;
 import static com.expedia.adaptivealerting.anomdetect.holtwinters.SeasonalityType.ADDITIVE;
 import static com.expedia.adaptivealerting.anomdetect.holtwinters.SeasonalityType.MULTIPLICATIVE;
 import static com.expedia.adaptivealerting.samples.MetricGenerationHelper.buildMetricFrameMetricSource;
@@ -46,10 +47,10 @@ import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showCha
  */
 public class CsvTrafficHoltWintersVariants {
     public static final int PERIOD = 4;
-    public static final double ALPHA_HIGH = 0.441;
+    public static final double ALPHA = 0.441;
     public static final double ALPHA_LOW = 0.004;
     public static final double BETA = 0.030;
-    public static final double GAMMA_LOW = 0.002;
+    public static final double GAMMA = 0.002;
     public static final double GAMMA_HIGH = 0.4;
     public static final double LEVEL = 25.5275345;
     public static final double BASE = 1.06587325;
@@ -65,24 +66,33 @@ public class CsvTrafficHoltWintersVariants {
 
         List<JFreeChart> charts = new ArrayList<>();
 
-        charts.add(buildChartWithInitEstimates(source, A, A_SEASONAL, ALPHA_HIGH, BETA, GAMMA_LOW).getChart());
-        charts.add(buildChartWithInitEstimates(source, M, M_SEASONAL, ALPHA_HIGH, BETA, GAMMA_LOW).getChart());
-//        charts.add(buildChartWithoutInitEstimates(source, M, ALPHA_HIGH, BETA, GAMMA_LOW, "No Estimates").getChart());
-        charts.add(buildChartWithoutInitEstimates(source, M, ALPHA_LOW, BETA, GAMMA_LOW, "No Estimates", "Low Alpha").getChart());
-        charts.add(buildChartWithoutInitEstimates(source, M, ALPHA_LOW, BETA, GAMMA_HIGH, "No Estimates", "High Gamma").getChart());
+        charts.add(buildChartWithInitialEstimates(source, A, A_SEASONAL, ALPHA, BETA, GAMMA).getChart());
+        charts.add(buildChartWithInitialTrainings(source, A, ALPHA, BETA, GAMMA).getChart());
+        charts.add(buildChartWithInitialEstimates(source, M, M_SEASONAL, ALPHA, BETA, GAMMA).getChart());
+        charts.add(buildChartWithInitialTrainings(source, M, ALPHA, BETA, GAMMA).getChart());
+
+//        charts.add(buildChartWithInitialTrainings(source, M, ALPHA,     BETA, GAMMA,      "No Estimates").getChart());
+//        charts.add(buildChartWithoutInitEstimates(source, M, ALPHA,     BETA, GAMMA,      "No Estimates").getChart());
+
+        charts.add(buildChartWithoutInitEstimates(source, M, ALPHA_LOW, BETA, GAMMA,      "No Estimates", "Low Alpha").getChart());
+        charts.add(buildChartWithInitialTrainings(source, M, ALPHA_LOW, BETA, GAMMA,      "Low Alpha").getChart());
+
+//        charts.add(buildChartWithoutInitEstimates(source, M, ALPHA_LOW, BETA, GAMMA_HIGH, "No Estimates", "High Gamma").getChart());
 //        charts.add(buildChartWithoutInitEstimates(source, M, ALPHA_LOW, BETA, GAMMA_HIGH, "No Estimates", "Low Alpha", "High Gamma").getChart());
+//        charts.add(buildChartWithInitialTrainings(source, M, ALPHA_LOW, BETA, GAMMA_HIGH, "No Estimates", "High Gamma").getChart());
+
 
         showChartFrame(createChartFrame("Australian Tourists", charts.toArray(new JFreeChart[]{})));
         source.start();
     }
 
-    private static AnomalyChartSink buildChartWithInitEstimates(MetricFrameMetricSource source, SeasonalityType seasonalityType,
-                                                                double[] seasonal, double alpha, double beta, double gamma, String... titleSuffix) {
+    private static AnomalyChartSink buildChartWithInitialEstimates(MetricFrameMetricSource source, SeasonalityType seasonalityType,
+                                                                   double[] seasonal, double alpha, double beta, double gamma, String... titleSuffix) {
         final HoltWintersParams params = buildHoltWintersParamsWithInitEstimates(seasonalityType, LEVEL, BASE, seasonal,
                 alpha, beta, gamma)
                 .setWeakSigmas(WEAK_SIGMAS)
                 .setStrongSigmas(STRONG_SIGMAS);
-        String[] suffix = ArrayUtils.addAll(titleSuffix, "l: " + LEVEL, "b: " + BASE, String.format("s: %s", Arrays.asList(ArrayUtils.toObject(seasonal))));
+        String[] suffix = ArrayUtils.addAll(titleSuffix, "Init Estimates: ", "l=" + LEVEL, "b=" + BASE, String.format("s=%s", Arrays.asList(ArrayUtils.toObject(seasonal))));
         return buildChart(source, seasonalityType, params, alpha, beta, gamma, suffix);
     }
 
@@ -91,7 +101,18 @@ public class CsvTrafficHoltWintersVariants {
         final HoltWintersParams params = buildHoltWintersParams(seasonalityType, alpha, beta, gamma)
                 .setWeakSigmas(WEAK_SIGMAS)
                 .setStrongSigmas(STRONG_SIGMAS);
+        String[] suffix = ArrayUtils.addAll(titleSuffix, "No Init Estimates");
         return buildChart(source, seasonalityType, params, alpha, beta, gamma, titleSuffix);
+    }
+
+    private static AnomalyChartSink buildChartWithInitialTrainings(MetricFrameMetricSource source, SeasonalityType seasonalityType,
+                                                                   double alpha, double beta, double gamma, String... titleSuffix) {
+        final HoltWintersParams params = buildHoltWintersParams(seasonalityType, alpha, beta, gamma)
+                .setWeakSigmas(WEAK_SIGMAS)
+                .setStrongSigmas(STRONG_SIGMAS)
+                .setInitTrainingMethod(SIMPLE);
+        String[] suffix = ArrayUtils.addAll(titleSuffix, "With Training");
+        return buildChart(source, seasonalityType, params, alpha, beta, gamma, suffix);
     }
 
     private static HoltWintersParams buildHoltWintersParamsWithInitEstimates(SeasonalityType seasonalityType,
