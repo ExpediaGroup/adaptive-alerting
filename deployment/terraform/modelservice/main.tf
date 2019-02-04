@@ -8,10 +8,15 @@ locals {
 
 }
 
-//using kubectl to craete deployment construct since its not natively support by the kubernetes provider
+data "template_file" "config_data" {
+  template = "${file("${local.application_yaml_file_path}")}"
+  vars {
+    db_endpoint = "${var.db_endpoint}"
+  }
+}
+
 data "template_file" "deployment_yaml" {
   template = "${file("${local.deployment_yaml_file_path}")}"
-
   vars {
     app_name = "${local.app_name}"
     namespace = "${var.namespace}"
@@ -20,6 +25,7 @@ data "template_file" "deployment_yaml" {
     graphite_enabled = "${var.graphite_enabled}"
     node_selector_label = "${var.node_selector_label}"
     image = "${var.image}"
+    image_pull_policy = "${var.image_pull_policy}"
     replicas = "${var.replicas}"
     memory_limit = "${var.memory_limit}"
     memory_request = "${var.memory_request}"
@@ -33,38 +39,24 @@ data "template_file" "deployment_yaml" {
   }
 }
 
-
-data "template_file" "config_data" {
-  template = "${file("${local.application_yaml_file_path}")}"
-
-  vars {
-    db_endpoint = "${var.db_endpoint}"
-  }
-}
-
 resource "kubernetes_config_map" "aa-config" {
   metadata {
-    name      = "${local.configmap_name}"
+    name = "${local.configmap_name}"
     namespace = "${var.namespace}"
   }
-
   data {
     "application.yml" = "${data.template_file.config_data.rendered}"
   }
-
   count = "${local.count}"
 }
-
 
 resource "null_resource" "kubectl_apply" {
   triggers {
     template = "${data.template_file.deployment_yaml.rendered}"
   }
-
   provisioner "local-exec" {
     command = "echo '${data.template_file.deployment_yaml.rendered}' | ${var.kubectl_executable_name} apply -f - --context ${var.kubectl_context_name}"
   }
-
   count = "${local.count}"
 }
 
@@ -73,6 +65,5 @@ resource "null_resource" "kubectl_destroy" {
     command = "echo '${data.template_file.deployment_yaml.rendered}' | ${var.kubectl_executable_name} delete -f - --context ${var.kubectl_context_name}"
     when = "destroy"
   }
-
   count = "${local.count}"
 }
