@@ -25,3 +25,4 @@ release: all
 	cd notifier && $(MAKE) release && cd ..
 	cd aquila/train && $(MAKE) release && cd ../..
 	cd aquila/detect && $(MAKE) release && cd ../..
+	./.travis/deploy.sh
