@@ -87,6 +87,7 @@ spec:
     targetPort: ${container_port}
   selector:
     k8s-app: ${app_name}
+---
 # ------------------- Ingress ------------------- #
 apiVersion: extensions/v1beta1
 kind: Ingress
