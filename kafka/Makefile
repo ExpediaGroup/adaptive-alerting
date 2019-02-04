@@ -6,6 +6,7 @@ docker_build:
 	./docker/scripts/build-ad-mapper.sh -b
 	./docker/scripts/build-ad-manager.sh -b
 	./docker/scripts/build-mc-a2m-mapper.sh -b
+	./docker/scripts/build-a2a-mapper.sh -b
 
 integration_test:
 	${MAVEN} test
