@@ -56,6 +56,7 @@ resource "kubernetes_config_map" "aa-config" {
   count = "${local.count}"
 }
 
+# Deploying via kubectl since Terraform k8s provider doesn't natively support deployment.
 resource "null_resource" "kubectl_apply" {
   triggers {
     template = "${data.template_file.deployment_yaml.rendered}"
