@@ -54,7 +54,7 @@ resource "kubernetes_config_map" "ad-manager-config" {
   count = "${local.count}"
 }
 
-// The k8s provider doesn't natively support deployment, so we use kubectl.
+# Deploying via kubectl since Terraform k8s provider doesn't natively support deployment.
 resource "null_resource" "kubectl_apply" {
   triggers {
     template = "${data.template_file.deployment_yaml.rendered}"
