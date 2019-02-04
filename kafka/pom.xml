@@ -72,7 +72,7 @@
             <artifactId>metrics-java-metrictank</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.expedia.alertmanager</groupId>
+            <groupId>com.expedia</groupId>
             <artifactId>alert-manager-api</artifactId>
         </dependency>
 
