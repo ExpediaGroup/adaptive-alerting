@@ -31,11 +31,3 @@ variable "mc-a2m-mapper" {
 variable "notifier" {
   type = "map"
 }
-
-variable "aquila-detector" {
-  type = "map"
-}
-
-variable "aquila-trainer" {
-  type = "map"
-}
