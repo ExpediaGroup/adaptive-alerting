@@ -9,7 +9,6 @@ INSERT INTO `metric` (`ukey`, `hash`, `tags`) VALUES
 
 
 INSERT INTO `model_type` (`ukey`) VALUES
-  ('aquila-detector'),
   ('constant-detector'),
   ('cusum-detector'),
   ('ewma-detector'),
@@ -20,7 +19,6 @@ INSERT INTO `model_type` (`ukey`) VALUES
 
 CALL insert_detector('3ec81aa2-2cdc-415e-b4f3-c1beb223ae60','cusum-detector');
 CALL insert_detector('2cdc1aa2-2cdc-355e-b4f3-d2beb223ae60','constant-detector');
-
 
 CALL insert_model('3ec81aa2-2cdc-415e-b4f3-c1beb223ae60','{"alpha":40,"beta":30}', '2018-10-10 10:02:04');
 CALL insert_model('3ec81aa2-2cdc-415e-b4f3-c1beb223ae60','{"alpha":100,"beta":455}','2018-10-12 17:01:04');

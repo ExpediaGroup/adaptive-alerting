@@ -23,7 +23,6 @@ data "template_file" "config_data" {
   }
 }
 
-// using kubectl to create deployment construct since its not natively support by the kubernetes provider
 data "template_file" "deployment_yaml" {
   template = "${file("${local.deployment_yaml_file_path}")}"
   vars {
@@ -63,6 +62,7 @@ resource "kubernetes_config_map" "mc-a2m-mapper-config" {
   count = "${local.count}"
 }
 
+# Deploying via kubectl since Terraform k8s provider doesn't natively support deployment.
 resource "null_resource" "kubectl_apply" {
   triggers {
     template = "${data.template_file.deployment_yaml.rendered}"
