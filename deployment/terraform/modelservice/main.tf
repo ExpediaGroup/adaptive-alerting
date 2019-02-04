@@ -19,23 +19,29 @@ data "template_file" "deployment_yaml" {
   template = "${file("${local.deployment_yaml_file_path}")}"
   vars {
     app_name = "${local.app_name}"
-    namespace = "${var.namespace}"
-    graphite_port = "${var.graphite_port}"
-    graphite_host = "${var.graphite_hostname}"
-    graphite_enabled = "${var.graphite_enabled}"
-    node_selector_label = "${var.node_selector_label}"
+
+    # Docker
     image = "${var.image}"
     image_pull_policy = "${var.image_pull_policy}"
+
+    # Kubernetes
+    namespace = "${var.namespace}"
     replicas = "${var.replicas}"
-    memory_limit = "${var.memory_limit}"
-    memory_request = "${var.memory_request}"
-    jvm_memory_limit = "${var.jvm_memory_limit}"
     cpu_limit = "${var.cpu_limit}"
     cpu_request = "${var.cpu_request}"
+    memory_limit = "${var.memory_limit}"
+    memory_request = "${var.memory_request}"
+    node_selector_label = "${var.node_selector_label}"
     configmap_name = "${local.configmap_name}"
-    env_vars = "${indent(9,"${var.env_vars}")}"
     service_port = "${var.service_port}"
     container_port = "${var.container_port}"
+
+    # Environment
+    jvm_memory_limit = "${var.jvm_memory_limit}"
+    graphite_enabled = "${var.graphite_enabled}"
+    graphite_port = "${var.graphite_port}"
+    graphite_host = "${var.graphite_hostname}"
+    env_vars = "${indent(9,"${var.env_vars}")}"
   }
 }
 
