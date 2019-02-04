@@ -101,8 +101,8 @@ public class ModelResourceServiceConnectorTest {
         this.metricDefinition = new MetricDefinition("some-key", new TagCollection(tags), TagCollection.EMPTY);
         
         final List<DetectorResource> models = new ArrayList<>();
+        models.add(new DetectorResource("3217d4be-9c33-490f-828e-c976b393b000", new ModelTypeResource("constant-detector")));
         models.add(new DetectorResource("90c37a3c-f6bb-4c00-b41b-191909cccfb7", new ModelTypeResource("ewma-detector")));
-        models.add(new DetectorResource("3217d4be-9c33-490f-828e-c976b393b000", new ModelTypeResource("aquila-detector")));
         
         this.detectorResources = new Resources<>(models);
         

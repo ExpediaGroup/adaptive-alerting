@@ -11,9 +11,6 @@ data "template_file" "config_data" {
   template = "${file("${local.config_file_path}")}"
   vars {
     kafka_endpoint = "${var.kafka_endpoint}"
-    models_region = "${var.models_region}"
-    models_bucket = "${var.models_bucket}"
-    aquila_uri = "${var.aquila_uri}"
     modelservice_uri_template = "${var.modelservice_uri_template}"
   }
 }

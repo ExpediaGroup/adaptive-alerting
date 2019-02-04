@@ -94,9 +94,6 @@ module "ad-manager" {
 
   # App
   kafka_endpoint = "${local.kafka_endpoint}"
-  aquila_uri = "${var.ad-manager["aquila_uri"]}"
-  models_region = "${var.ad-manager["models_region"]}"
-  models_bucket = "${var.ad-manager["models_bucket"]}"
   modelservice_uri_template = "${var.ad-manager["modelservice_uri_template"]}"
 }
 
