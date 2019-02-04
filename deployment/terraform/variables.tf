@@ -36,11 +36,3 @@ variable "modelservice" {
 variable "notifier" {
   type = "map"
 }
-
-variable "aquila-detector" {
-  type = "map"
-}
-
-variable "aquila-trainer" {
-  type = "map"
-}

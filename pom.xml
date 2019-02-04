@@ -46,11 +46,6 @@
 
     <modules>
         <module>anomdetect</module>
-
-        <!-- TODO Temporary, move this out after we are pushing AA to Maven Central. -->
-        <!-- Or else decouple Aquila from AA, which is probably even better. [WLW] -->
-        <module>aquila</module>
-
         <module>core</module>
         <module>dataconnect</module>
         <module>dataservice</module>

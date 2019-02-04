@@ -7,12 +7,6 @@ ad-manager {
     default.timestamp.extractor = "com.expedia.adaptivealerting.kafka.serde.MappedMetricDataTimestampExtractor"
   }
   detectors {
-    aquila-detector {
-      factory = "com.expedia.adaptivealerting.anomdetect.aquila.AquilaAnomalyDetectorFactory"
-      config {
-        uri = "${aquila_uri}"
-      }
-    }
     constant-detector {
       factory = "com.expedia.adaptivealerting.anomdetect.BasicAnomalyDetectorFactory"
       config {
