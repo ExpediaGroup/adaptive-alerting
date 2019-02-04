@@ -10,7 +10,8 @@ module "modelservice" {
   source = "modelservice"
 
   # Docker
-  image = "expediadotcom/adaptive-alerting-modelservice:${var.alerting["version"]}"
+  image = "${var.modelservice["image"]}"
+  image_pull_policy = "${var.modelservice["image_pull_policy"]}"
 
   # Kubernetes
   namespace = "${var.app_namespace}"
