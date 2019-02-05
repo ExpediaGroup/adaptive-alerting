@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.anomdetect.util.AnomalyConstants;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
