@@ -20,11 +20,11 @@ variable "ad-manager" {
   type = "map"
 }
 
-variable "mc-a2m-mapper" {
+variable "modelservice" {
   type = "map"
 }
 
-variable "modelservice" {
+variable "mc-a2m-mapper" {
   type = "map"
 }
 

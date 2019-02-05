@@ -6,7 +6,13 @@ ad-mapper {
     default.timestamp.extractor = "com.expedia.adaptivealerting.kafka.serde.MetricDataTimestampExtractor"
   }
   health.status.path = "/app/isHealthy"
-  model-service-uri-template = "${modelservice_uri_template}"
   inbound-topic = "aa-metrics"
   outbound-topic = "mapped-metrics"
+  detector-class-map {
+    constant-detector = "com.expedia.adaptivealerting.anomdetect.constant.ConstantThresholdAnomalyDetector"
+    cusum-detector = "com.expedia.adaptivealerting.anomdetect.cusum.CusumAnomalyDetector"
+    ewma-detector = "com.expedia.adaptivealerting.anomdetect.ewma.EwmaAnomalyDetector"
+    pewma-detector = "com.expedia.adaptivealerting.anomdetect.pewma.PewmaAnomalyDetector"
+  }
+  model-service-uri-template = "${modelservice_uri_template}"
 }

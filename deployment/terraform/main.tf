@@ -6,36 +6,6 @@ locals {
 # Adaptive Alerting
 # ========================================
 
-module "modelservice" {
-  source = "modelservice"
-
-  # Docker
-  image = "${var.modelservice["image"]}"
-  image_pull_policy = "${var.modelservice["image_pull_policy"]}"
-
-  # Kubernetes
-  namespace = "${var.app_namespace}"
-  enabled = "${var.modelservice["enabled"]}"
-  replicas = "${var.modelservice["instances"]}"
-  cpu_limit = "${var.modelservice["cpu_limit"]}"
-  cpu_request = "${var.modelservice["cpu_request"]}"
-  memory_limit = "${var.modelservice["memory_limit"]}"
-  memory_request = "${var.modelservice["memory_request"]}"
-  node_selector_label = "${var.node_selector_label}"
-  kubectl_executable_name = "${var.kubectl_executable_name}"
-  kubectl_context_name = "${var.kubectl_context_name}"
-
-  # Environment
-  jvm_memory_limit = "${var.modelservice["jvm_memory_limit"]}"
-  graphite_hostname = "${var.graphite_hostname}"
-  graphite_port = "${var.graphite_port}"
-  graphite_enabled = "${var.graphite_enabled}"
-  env_vars = "${var.modelservice["environment_overrides"]}"
-
-  # App
-  db_endpoint = "${var.modelservice["db_endpoint"]}"
-}
-
 module "ad-mapper" {
   source = "ad-mapper"
 
@@ -98,6 +68,36 @@ module "ad-manager" {
   modelservice_uri_template = "${var.ad-manager["modelservice_uri_template"]}"
 }
 
+module "modelservice" {
+  source = "modelservice"
+
+  # Docker
+  image = "${var.modelservice["image"]}"
+  image_pull_policy = "${var.modelservice["image_pull_policy"]}"
+
+  # Kubernetes
+  namespace = "${var.app_namespace}"
+  enabled = "${var.modelservice["enabled"]}"
+  replicas = "${var.modelservice["instances"]}"
+  cpu_limit = "${var.modelservice["cpu_limit"]}"
+  cpu_request = "${var.modelservice["cpu_request"]}"
+  memory_limit = "${var.modelservice["memory_limit"]}"
+  memory_request = "${var.modelservice["memory_request"]}"
+  node_selector_label = "${var.node_selector_label}"
+  kubectl_executable_name = "${var.kubectl_executable_name}"
+  kubectl_context_name = "${var.kubectl_context_name}"
+
+  # Environment
+  jvm_memory_limit = "${var.modelservice["jvm_memory_limit"]}"
+  graphite_hostname = "${var.graphite_hostname}"
+  graphite_port = "${var.graphite_port}"
+  graphite_enabled = "${var.graphite_enabled}"
+  env_vars = "${var.modelservice["environment_overrides"]}"
+
+  # App
+  db_endpoint = "${var.modelservice["db_endpoint"]}"
+}
+
 module "mc-a2m-mapper" {
   source = "mc-a2m-mapper"
 
@@ -135,13 +135,13 @@ module "mc-a2m-mapper" {
   metric_producer_topic = "${var.mc-a2m-mapper["metric_producer_topic"]}"
   metric_producer_key_serializer = "${var.mc-a2m-mapper["metric_producer_key_serializer"]}"
   metric_producer_value_serializer = "${var.mc-a2m-mapper["metric_producer_value_serializer"]}"
-
 }
 
 module "notifier" {
   source = "notifier"
 
   # Docker
+  # TODO Update the image to source from var.notifier["image"]
   image = "expediadotcom/adaptive-alerting-notifier:${var.alerting["version"]}"
   image_pull_policy = "${var.notifier["image_pull_policy"]}"
 

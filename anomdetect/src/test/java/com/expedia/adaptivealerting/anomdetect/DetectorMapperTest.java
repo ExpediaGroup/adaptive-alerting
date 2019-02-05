@@ -15,10 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.anomdetect.util.DetectorResource;
-import com.expedia.adaptivealerting.anomdetect.util.DetectorResources;
-import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
-import com.expedia.adaptivealerting.anomdetect.util.ModelTypeResource;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
+import com.expedia.adaptivealerting.anomdetect.util.DetectorMeta;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
@@ -28,29 +26,23 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 /**
- * {@link AnomalyDetectorMapper} unit tests.
+ * {@link DetectorMapper} unit test.
  *
  * @author Willie Wheeler
  */
-public final class AnomalyDetectorMapperTest {
-    
-    // Class under test
-    private AnomalyDetectorMapper mapper;
-    
-    // Dependencies
+public final class DetectorMapperTest {
+    private DetectorMapper mapper;
     
     @Mock
-    private ModelServiceConnector modelServiceConnector;
-    
-    // Test objects
+    private DetectorSource detectorSource;
     
     @Mock
     private MetricDefinition mappedDefinition;
@@ -60,26 +52,26 @@ public final class AnomalyDetectorMapperTest {
     
     private MetricData mappedData;
     private MetricData unmappedData;
-    private DetectorResource detectorResource;
-    private DetectorResources detectorResources;
-    private DetectorResources emptyDetectorResources;
+    private DetectorMeta detectorMeta;
+    private List<DetectorMeta> detectorMetas;
+    private List<DetectorMeta> emptyDetectorMetas;
     
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         initTestObjects();
         initDependencies();
-        this.mapper = new AnomalyDetectorMapper(modelServiceConnector);
+        this.mapper = new DetectorMapper(detectorSource);
     }
     
     @Test
     public void testConstructorInjection() {
-        assertSame(modelServiceConnector, mapper.getModelServiceConnector());
+        assertSame(detectorSource, mapper.getDetectorSource());
     }
     
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void testModelServiceConnectorNotNull() {
-        new AnomalyDetectorMapper(null);
+        new DetectorMapper(null);
     }
     
     @Test
@@ -98,18 +90,15 @@ public final class AnomalyDetectorMapperTest {
         this.mappedData = new MetricData(mappedDefinition, 9, System.currentTimeMillis());
         this.unmappedData = new MetricData(unmappedDefinition, 9, System.currentTimeMillis());
         
-        this.detectorResource = new DetectorResource(
-                "7629c28a-5958-4ca7-9aaa-49b95d3481ff",
-                new ModelTypeResource("ewma-detector"));
-        
-        this.detectorResources = new DetectorResources(Collections.singletonList(detectorResource));
-        this.emptyDetectorResources = new DetectorResources(Collections.EMPTY_LIST);
+        this.detectorMeta = new DetectorMeta(
+                UUID.fromString("7629c28a-5958-4ca7-9aaa-49b95d3481ff"),
+                "ewma-detector");
+        this.detectorMetas = Collections.singletonList(detectorMeta);
+        this.emptyDetectorMetas = Collections.EMPTY_LIST;
     }
     
     private void initDependencies() {
-        when(modelServiceConnector.findDetectors(mappedDefinition))
-                .thenReturn(detectorResources);
-        when(modelServiceConnector.findDetectors(unmappedDefinition))
-                .thenReturn(emptyDetectorResources);
+        when(detectorSource.findDetectorMetas(mappedDefinition)).thenReturn(detectorMetas);
+        when(detectorSource.findDetectorMetas(unmappedDefinition)).thenReturn(emptyDetectorMetas);
     }
 }

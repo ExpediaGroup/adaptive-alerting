@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.pewma;
 
-import com.expedia.adaptivealerting.anomdetect.BasicAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
@@ -46,7 +46,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @author David Sutherland
  */
 @Data
-public final class PewmaAnomalyDetector extends BasicAnomalyDetector<PewmaParams> {
+public final class PewmaAnomalyDetector extends AbstractAnomalyDetector<PewmaParams> {
     
     @NonNull
     private PewmaParams params;

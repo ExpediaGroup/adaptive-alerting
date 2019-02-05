@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.kafka;
 
-import com.expedia.adaptivealerting.anomdetect.util.AnomalyToMetricTransformer;
+import com.expedia.adaptivealerting.anomdetect.AnomalyToMetricTransformer;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.kafka.serde.MetricDataSerde;
 import com.expedia.metrics.metrictank.MetricTankIdFactory;
@@ -29,7 +29,7 @@ import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Produced;
 
 /**
- * Kafka Streams adapter for {@link com.expedia.adaptivealerting.anomdetect.util.AnomalyToMetricTransformer}.
+ * Kafka Streams adapter for {@link AnomalyToMetricTransformer}.
  *
  * Note: Currently, the input and output topics must reside on the same Kafka cluster, as noted in
  * https://kafka.apache.org/11/documentation/streams/developer-guide/config-streams.html. Future versions of Kafka

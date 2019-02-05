@@ -16,21 +16,12 @@
 
 package com.expedia.adaptivealerting.anomdetect.util;
 
-import lombok.NoArgsConstructor;
 import org.springframework.hateoas.Resources;
-
-import java.util.Collection;
-
 
 /**
  * Model resources.
  *
  * @author Shubham Sethi
  */
-@NoArgsConstructor
 public class ModelResources extends Resources<ModelResource> {
-
-    public ModelResources(Collection<ModelResource> modelResources) {
-        super(modelResources);
-    }
 }

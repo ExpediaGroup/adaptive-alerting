@@ -15,20 +15,12 @@
  */
 package com.expedia.adaptivealerting.anomdetect.util;
 
-import lombok.NoArgsConstructor;
 import org.springframework.hateoas.Resources;
-
-import java.util.Collection;
 
 /**
  * Detector resources.
  *
  * @author Willie Wheeler
  */
-@NoArgsConstructor
 public class DetectorResources extends Resources<DetectorResource> {
-    
-    public DetectorResources(Collection<DetectorResource> detectorResources) {
-        super(detectorResources);
-    }
 }

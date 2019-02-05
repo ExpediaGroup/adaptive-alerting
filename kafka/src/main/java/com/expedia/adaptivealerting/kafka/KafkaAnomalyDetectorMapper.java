@@ -15,12 +15,10 @@
  */
 package com.expedia.adaptivealerting.kafka;
 
-import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorMapper;
-import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
-import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
+import com.expedia.adaptivealerting.anomdetect.DetectorMapper;
 import com.expedia.adaptivealerting.kafka.serde.JsonPojoSerde;
+import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
 import com.expedia.metrics.MetricData;
-import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.kafka.common.serialization.Serdes;
@@ -35,32 +33,32 @@ import java.util.stream.Collectors;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
- * Kafka Streams adapter for {@link AnomalyDetectorMapper}.
+ * Kafka Streams adapter for {@link DetectorMapper}.
  *
  * @author David Sutherland
  * @author Willie Wheeler
  */
 @Slf4j
 public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
-    static final String CK_AD_MAPPER = "ad-mapper";
-    static final String CK_MODEL_SERVICE_URI_TEMPLATE = "model-service-uri-template";
+    private static final String CK_AD_MAPPER = "ad-mapper";
     
-    private final AnomalyDetectorMapper mapper;
+    private final DetectorMapper mapper;
     
     public static void main(String[] args) {
-        val tsConfig = new TypesafeConfigLoader(CK_AD_MAPPER).loadMergedConfig();
-        val saConfig = new StreamsAppConfig(tsConfig);
-        val mapper = buildMapper(tsConfig);
+        val config = new TypesafeConfigLoader(CK_AD_MAPPER).loadMergedConfig();
+        val saConfig = new StreamsAppConfig(config);
+        val detectorSource = DetectorUtil.buildDetectorSource(config);
+        val mapper = new DetectorMapper(detectorSource);
         new KafkaAnomalyDetectorMapper(saConfig, mapper).start();
     }
     
     /**
-     * Creates a new Kafka Streams adapter for the {@link AnomalyDetectorMapper}.
+     * Creates a new Kafka Streams adapter for the {@link DetectorMapper}.
      *
      * @param config Streams app configuration.
      * @param mapper Anomaly detector mapper.
      */
-    public KafkaAnomalyDetectorMapper(StreamsAppConfig config, AnomalyDetectorMapper mapper) {
+    public KafkaAnomalyDetectorMapper(StreamsAppConfig config, DetectorMapper mapper) {
         super(config);
         notNull(mapper, "mapper can't be null");
         this.mapper = mapper;
@@ -91,12 +89,5 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
                 .to(outboundTopic, Produced.with(new Serdes.StringSerde(), new JsonPojoSerde<>()));
         
         return builder.build();
-    }
-    
-    private static AnomalyDetectorMapper buildMapper(Config config) {
-        val httpClient = new HttpClientWrapper();
-        val modelServiceUriTemplate = config.getString(CK_MODEL_SERVICE_URI_TEMPLATE);
-        val connector = new ModelServiceConnector(httpClient, modelServiceUriTemplate);
-        return new AnomalyDetectorMapper(connector);
     }
 }

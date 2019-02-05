@@ -13,23 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.source;
+package com.expedia.adaptivealerting.anomdetect.util;
 
-import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
-import com.expedia.metrics.MetricDefinition;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-import java.util.List;
 import java.util.UUID;
 
-public class ModelServiceDetectorSource implements DetectorSource {
-    
-    @Override
-    public List<UUID> findDetectorUUIDs(MetricDefinition metricDefinition) {
-        return null;
-    }
-    
-    @Override
-    public AnomalyDetector findDetector(UUID uuid) {
-        return null;
-    }
+/**
+ * @author Willie Wheeler
+ */
+@Data
+@AllArgsConstructor
+public final class DetectorMeta {
+    private UUID uuid;
+    private String type;
 }

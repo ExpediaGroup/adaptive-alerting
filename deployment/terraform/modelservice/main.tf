@@ -5,7 +5,6 @@ locals {
   count = "${var.enabled?1:0}"
   checksum = "${sha1("${data.template_file.config_data.rendered}")}"
   configmap_name = "modelservice-${local.checksum}"
-
 }
 
 data "template_file" "config_data" {
@@ -31,21 +30,21 @@ data "template_file" "deployment_yaml" {
     cpu_request = "${var.cpu_request}"
     memory_limit = "${var.memory_limit}"
     memory_request = "${var.memory_request}"
-    node_selector_label = "${var.node_selector_label}"
-    configmap_name = "${local.configmap_name}"
     service_port = "${var.service_port}"
     container_port = "${var.container_port}"
+    node_selector_label = "${var.node_selector_label}"
+    configmap_name = "${local.configmap_name}"
 
     # Environment
     jvm_memory_limit = "${var.jvm_memory_limit}"
-    graphite_enabled = "${var.graphite_enabled}"
     graphite_port = "${var.graphite_port}"
     graphite_host = "${var.graphite_hostname}"
+    graphite_enabled = "${var.graphite_enabled}"
     env_vars = "${indent(9,"${var.env_vars}")}"
   }
 }
 
-resource "kubernetes_config_map" "aa-config" {
+resource "kubernetes_config_map" "model-service-config" {
   metadata {
     name = "${local.configmap_name}"
     namespace = "${var.namespace}"

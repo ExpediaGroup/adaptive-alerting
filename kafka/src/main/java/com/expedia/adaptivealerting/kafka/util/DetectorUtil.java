@@ -13,25 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.perf;
+package com.expedia.adaptivealerting.kafka.util;
 
-import com.opencsv.bean.CsvBindByName;
-import lombok.Data;
-import lombok.ToString;
+import com.expedia.adaptivealerting.anomdetect.source.DefaultDetectorSource;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
+import com.expedia.adaptivealerting.anomdetect.source.TempHaystackAwareDetectorSource;
+import com.typesafe.config.Config;
+import lombok.extern.slf4j.Slf4j;
 
-/**
- * @author kashah
- */
-@Data
-@ToString
-public class PerfMonitorTestRow {
-
-    @CsvBindByName
-    private double observed;
-
-    @CsvBindByName
-    private double predicted;
-
-    @CsvBindByName
-    private double score;
+@Slf4j
+public final class DetectorUtil {
+    
+    public static DetectorSource buildDetectorSource(Config config) {
+        return new TempHaystackAwareDetectorSource(new DefaultDetectorSource(config));
+    }
 }

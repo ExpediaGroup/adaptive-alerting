@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.holtwinters;
 
-import com.expedia.adaptivealerting.anomdetect.BasicAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
@@ -37,7 +37,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public final class HoltWintersAnomalyDetector extends BasicAnomalyDetector<HoltWintersParams> {
+public final class HoltWintersAnomalyDetector extends AbstractAnomalyDetector<HoltWintersParams> {
 
     @NonNull
     private HoltWintersParams params;
