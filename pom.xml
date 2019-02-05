@@ -91,7 +91,6 @@
         <jfreechart.version>1.0.19</jfreechart.version>
         <jopt.version>4.9</jopt.version>
         <junit.version>4.12</junit.version>
-        <!--<alert-manager.version>1.0.0-20190129.021249-8</alert-manager.version>-->
         <alert-manager.version>1.0.0-SNAPSHOT</alert-manager.version>
 
         <!-- TODO Upgrade to 2.0.0 -->
