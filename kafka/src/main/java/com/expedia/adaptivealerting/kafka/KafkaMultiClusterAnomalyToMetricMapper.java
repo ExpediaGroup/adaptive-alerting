@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.kafka;
 
-import com.expedia.adaptivealerting.anomdetect.util.AnomalyToMetricTransformer;
+import com.expedia.adaptivealerting.anomdetect.AnomalyToMetricTransformer;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.metrictank.MetricTankIdFactory;
