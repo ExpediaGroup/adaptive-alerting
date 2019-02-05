@@ -19,7 +19,6 @@ data "template_file" "deployment_yaml" {
   template = "${file("${local.deployment_yaml_file_path}")}"
   vars {
     app_name = "${local.app_name}"
-    aa_cname = "${var.aa_cname}"
 
     # Docker
     image = "${var.image}"

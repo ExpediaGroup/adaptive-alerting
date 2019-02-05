@@ -34,7 +34,6 @@ module "modelservice" {
 
   # App
   db_endpoint = "${var.modelservice["db_endpoint"]}"
-  aa_cname = "${var.aa_cname}"
 }
 
 module "ad-mapper" {
