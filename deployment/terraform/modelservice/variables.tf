@@ -31,6 +31,7 @@ variable "env_vars" {}
 
 # App
 variable "db_endpoint" {}
+variable "aa_cname"{}
 
 # Unsure what this is, but we don't seem to be using it.
 #variable "termination_grace_period" {

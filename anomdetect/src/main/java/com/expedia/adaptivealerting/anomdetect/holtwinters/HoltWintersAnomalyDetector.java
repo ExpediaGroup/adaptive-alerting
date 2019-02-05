@@ -44,6 +44,8 @@ public final class HoltWintersAnomalyDetector extends AbstractAnomalyDetector<Ho
     @NonNull
     private HoltWintersOnlineComponents components;
     @NonNull
+    private HoltWintersSimpleTrainingModel holtWintersSimpleTrainingModel;
+    @NonNull
     private HoltWintersOnlineAlgorithm holtWintersOnlineAlgorithm;
 
     public HoltWintersAnomalyDetector() {
@@ -64,6 +66,7 @@ public final class HoltWintersAnomalyDetector extends AbstractAnomalyDetector<Ho
         loadParams(params);
         components = new HoltWintersOnlineComponents(params);
         holtWintersOnlineAlgorithm = new HoltWintersOnlineAlgorithm();
+        holtWintersSimpleTrainingModel = new HoltWintersSimpleTrainingModel(params);
         double initForecast = holtWintersOnlineAlgorithm.getForecast(params.getSeasonalityType(), components.getLevel(), components.getBase(), components.getSeasonal(components.getCurrentSeasonalIndex()));
         components.setForecast(initForecast);
     }
@@ -81,44 +84,56 @@ public final class HoltWintersAnomalyDetector extends AbstractAnomalyDetector<Ho
     @Override
     public AnomalyResult classify(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
-
-        final double observed = metricData.getValue();
-        // components holds the forecast previously predicted for this observation
         double prevForecast = components.getForecast();
+        trainOrObserve(metricData.getValue());
+        return buildAnomalyResult(metricData, prevForecast);
+    }
 
-        // Identify thresholds based on previously observed values
+    private void trainOrObserve(double observed) {
+        if (!isInitialTrainingComplete()) {
+            holtWintersSimpleTrainingModel.observeAndTrain(observed, params, components);
+        } else {
+            holtWintersOnlineAlgorithm.observeValueAndUpdateForecast(observed, params, components);
+        }
+    }
+
+    public boolean isInitialTrainingComplete() {
+        switch (params.getInitTrainingMethod()) {
+            case NONE: return true;
+            case SIMPLE: return holtWintersSimpleTrainingModel.isTrainingComplete(params);
+            default: throw new IllegalStateException(String.format("Unexpected training method '%s'", params.getInitTrainingMethod()));
+        }
+    }
+
+    private AnomalyResult buildAnomalyResult(MetricData metricData, double prevForecast) {
+        return stillWarmingUp()
+                ? new AnomalyResult(getUuid(), metricData, MODEL_WARMUP)
+                : classifyAnomaly(metricData, prevForecast);
+    }
+
+    private AnomalyResult classifyAnomaly(MetricData metricData, double prevForecast) {
+        AnomalyThresholds thresholds = buildAnomalyThresholds(prevForecast);
+        AnomalyLevel level = thresholds.classify(metricData.getValue());
+        AnomalyResult result = new AnomalyResult(getUuid(), metricData, level);
+        result.setPredicted(prevForecast);
+        result.setThresholds(thresholds);
+        return result;
+    }
+
+    /**
+     * Identify thresholds based on previous forecast.
+     */
+    private AnomalyThresholds buildAnomalyThresholds(double prevForecast) {
         // TODO HW: Look at options for configuring how bands are defined
         double stddev = components.getSeasonalStandardDeviation(components.getCurrentSeasonalIndex());
         final double weakDelta = params.getWeakSigmas() * stddev;
         final double strongDelta = params.getStrongSigmas() * stddev;
 
-        final AnomalyThresholds thresholds = new AnomalyThresholds(
+        return new AnomalyThresholds(
                 prevForecast + strongDelta,
                 prevForecast + weakDelta,
                 prevForecast - strongDelta,
                 prevForecast - weakDelta);
-
-        holtWintersOnlineAlgorithm.observeValueAndUpdateForecast(observed, params, components);
-
-        final AnomalyLevel anomalyLevel;
-        if (stillWarmingUp()) {
-            anomalyLevel = MODEL_WARMUP;
-        } else {
-            anomalyLevel = thresholds.classify(observed);
-        }
-
-        // TODO HW: Add a 'initialLearningMethod' parameter. To begin with there will be two accepted values:
-        //   "NONE" that uses either the user-provided init*Estimate params or the default values if none provided for initial l, b, and s components
-        //   "SIMPLE" that implements Hyndman's "simple" method for selecting initial state values.
-        //            (https://github.com/robjhyndman/forecast/blob/master/R/HoltWintersNew.R#L61-L67)
-        //            I.e. it uses the first 2 seasons to calculate what the l, b, and s components were for the season immediately preceding the
-        //            first observation. Need to ensure that warmUpPeriod is >= (period * 2) to ensure no anomalies are emitted during learning period.
-        // Other learning methods may be added to this enum at a later time.
-
-        AnomalyResult result = new AnomalyResult(getUuid(), metricData, anomalyLevel);
-        result.setPredicted(prevForecast);
-        result.setThresholds(thresholds);
-        return result;
     }
 
     private boolean stillWarmingUp() {
