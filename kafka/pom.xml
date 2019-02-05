@@ -71,6 +71,10 @@
             <groupId>com.expedia</groupId>
             <artifactId>metrics-java-metrictank</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.expedia.alertmanager</groupId>
+            <artifactId>alert-manager-api</artifactId>
+        </dependency>
 
         <!-- Test -->
         <dependency>
