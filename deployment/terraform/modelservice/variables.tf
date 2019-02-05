@@ -27,6 +27,7 @@ variable "jvm_memory_limit" {}
 variable "graphite_hostname" {}
 variable "graphite_port" {}
 variable "graphite_enabled" {}
+variable "graphite_prefix" {}
 variable "env_vars" {}
 
 # App
