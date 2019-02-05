@@ -87,3 +87,22 @@ spec:
     targetPort: ${container_port}
   selector:
     k8s-app: ${app_name}
+---
+# ------------------- Ingress ------------------- #
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: traefik-modelservice
+  namespace: ${namespace}
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.frontend.rule.type: PathPrefixStrip
+spec:
+  rules:
+   - host: ${aa_cname}
+     http:
+        paths:
+         - path: /modelservice
+           backend:
+             serviceName: modelservice
+             servicePort: 80
