@@ -47,7 +47,7 @@ public class KafkaAnomalyToAlertMapper extends AbstractStreamsApp {
     }
 
     /**
-     * Creates a new Kafka Streams adapter for the {@link AnomalyToMetricTransformer}.
+     * Creates a new Kafka Streams adapter to map anomalies to alerts.
      *
      * @param config Streams app configuration.
      */
