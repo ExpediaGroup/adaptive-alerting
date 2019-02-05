@@ -30,6 +30,7 @@ module "ad-mapper" {
   graphite_hostname = "${var.graphite_hostname}"
   graphite_port = "${var.graphite_port}"
   graphite_enabled = "${var.graphite_enabled}"
+  graphite_prefix = "${var.graphite_prefix}"
   env_vars = "${var.ad-mapper["environment_overrides"]}"
 
   # App
@@ -61,6 +62,7 @@ module "ad-manager" {
   graphite_enabled = "${var.graphite_enabled}"
   graphite_hostname = "${var.graphite_hostname}"
   graphite_port = "${var.graphite_port}"
+  graphite_prefix = "${var.graphite_prefix}"
   env_vars = "${var.ad-manager["environment_overrides"]}"
 
   # App
@@ -92,6 +94,7 @@ module "modelservice" {
   graphite_hostname = "${var.graphite_hostname}"
   graphite_port = "${var.graphite_port}"
   graphite_enabled = "${var.graphite_enabled}"
+  graphite_prefix = "${var.graphite_prefix}"
   env_vars = "${var.modelservice["environment_overrides"]}"
 
   # App
