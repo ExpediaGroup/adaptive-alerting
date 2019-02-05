@@ -229,7 +229,7 @@
                 <version>${aa.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.expedia</groupId>
+                <groupId>com.expedia.alertmanager</groupId>
                 <artifactId>alert-manager-api</artifactId>
                 <version>${alert-manager.version}</version>
             </dependency>
