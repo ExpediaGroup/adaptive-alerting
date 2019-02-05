@@ -31,7 +31,7 @@ JAVA_OPTS="${JAVA_OPTS} \
     -Dapplication.home=${APP_HOME}"
 
 
-if [[ -z "${SPRING_CONFIG_LOCATION}" ]]; then
+if [ -z "${SPRING_CONFIG_LOCATION}" ]; then
     exec java ${JAVA_OPTS} -jar "${APP_HOME}/adaptive-alerting-modelservice.jar" --spring.config.location=/config/application.yml
 else
     exec java ${JAVA_OPTS} -jar "${APP_HOME}/adaptive-alerting-modelservice.jar"
