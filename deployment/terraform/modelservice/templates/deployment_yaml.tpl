@@ -54,6 +54,8 @@ spec:
           value: "${graphite_port}"
         - name: "AA_GRAPHITE_ENABLED"
           value: "${graphite_enabled}"
+        - name: "GRAPHITE_PREFIX"
+          value: "${graphite_prefix}"
         - name: "JAVA_XMS"
           value: "${jvm_memory_limit}m"
         - name: "JAVA_XMX"

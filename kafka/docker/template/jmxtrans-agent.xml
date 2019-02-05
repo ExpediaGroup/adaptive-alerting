@@ -108,7 +108,7 @@
         <host>${AA_GRAPHITE_HOST:metrics}</host>
         <port>${AA_GRAPHITE_PORT:2003}</port>
         <enabled>${AA_GRAPHITE_ENABLED:true}</enabled>
-        <namePrefix>stats.gauges.adaptive-alerting.{{{DOTTED_APP_NAME}}}.#hostname#.</namePrefix>
+        <namePrefix>${GRAPHITE_PREFIX}adaptive-alerting.{{{DOTTED_APP_NAME}}}.#hostname#.</namePrefix>
     </outputWriter>
     <collectIntervalInSeconds>60</collectIntervalInSeconds>
 </jmxtrans-agent>

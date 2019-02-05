@@ -4,6 +4,9 @@ variable "kafka_port" {}
 variable "graphite_hostname" {}
 variable "graphite_port" {}
 variable "graphite_enabled" {}
+variable "graphite_prefix" {
+  default = ""
+}
 variable "node_selector_label"{}
 variable "kubectl_context_name" {}
 variable "kubectl_executable_name" {}
