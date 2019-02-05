@@ -27,6 +27,8 @@ import java.util.Arrays;
  *
  * @author Matt Callanan
  * @see <a href="https://otexts.org/fpp2/holt-winters.html">Holt-Winters' Seasonal Method</a>
+ * and <a href="https://robjhyndman.com/hyndsight/seasonal-periods/">https://robjhyndman.com/hyndsight/seasonal-periods/</a> for naming conventions
+ * (e.g. usage of "frequency" and "cycle").
  */
 @Data
 public class HoltWintersOnlineComponents {
@@ -63,8 +65,9 @@ public class HoltWintersOnlineComponents {
     }
 
     /**
-     * Return n=period seasonal components in reverse order, starting with the current season.
-     * E.g. if period=4 and we've most recently observed the 2nd season (s2), the seasonal components will be returned in the following order: seasonal[1], seasonal[0], seasonal[3], seasonal[2]
+     * Return n=frequency seasonal components in reverse order, starting with the current season.
+     * E.g. if frequency=4 and we've most recently observed the 2nd season (s2), the seasonal components will be returned in the following order:
+     *      seasonal[1], seasonal[0], seasonal[3], seasonal[2]
      *
      * Makes for easy comparison with R-generated datasets.
      *
@@ -72,7 +75,7 @@ public class HoltWintersOnlineComponents {
      */
     public double[] getReverseHistorySeasonals() {
         int currentIdx = getCurrentSeasonalIndex();
-        int m = getParams().getPeriod();
+        int m = getParams().getFrequency();
         double[] result = new double[m];
         for (int i = 0; i < result.length; i++) {
             result[i] = getSeasonal((currentIdx + m - i - 1) % m);
@@ -94,10 +97,10 @@ public class HoltWintersOnlineComponents {
     }
 
     /**
-     * @return Index into seasonal components, ranges from 0 to period-1.  Increments whenever addValue() is called.  Wraps back to 0 after period ticks.
+     * @return Index into seasonal components, ranges from 0 to frequency-1.  Increments whenever addValue() is called.  Wraps back to 0 after frequency ticks.
      */
     public int getCurrentSeasonalIndex() {
-        return (int) (getN() % params.getPeriod());
+        return (int) (getN() % params.getFrequency());
     }
 
     private void initLevelFromParams(HoltWintersParams params) {
@@ -112,15 +115,15 @@ public class HoltWintersOnlineComponents {
         int s = params.getInitSeasonalEstimates().length;
         if (s == 0) {
             fillSeasonalsWithIdentity();
-        } else if (s != params.getPeriod()) {
-            throw new IllegalStateException(String.format("Invalid: initSeasonalEstimates array is not the same size (%d) as period (%d). Ensure only valid parameters are used.", s, params.getPeriod()));
+        } else if (s != params.getFrequency()) {
+            throw new IllegalStateException(String.format("Invalid: initSeasonalEstimates array is not the same size (%d) as frequency (%d). Ensure only valid parameters are used.", s, params.getFrequency()));
         } else {
-            this.seasonal = Arrays.copyOf(params.getInitSeasonalEstimates(), params.getPeriod());
+            this.seasonal = Arrays.copyOf(params.getInitSeasonalEstimates(), params.getFrequency());
         }
     }
 
     private void fillSeasonalsWithIdentity() {
-        seasonal = new double[params.getPeriod()];
+        seasonal = new double[params.getFrequency()];
         Arrays.fill(seasonal, seasonalityIdentity());
     }
 
@@ -131,8 +134,8 @@ public class HoltWintersOnlineComponents {
     }
 
     private void initSeasonalStatistics(HoltWintersParams params) {
-        seasonalSummaryStatistics = new SummaryStatistics[params.getPeriod()];
-        for (int i = 0; i < params.getPeriod(); i++) {
+        seasonalSummaryStatistics = new SummaryStatistics[params.getFrequency()];
+        for (int i = 0; i < params.getFrequency(); i++) {
             seasonalSummaryStatistics[i] = new SummaryStatistics();
             seasonalSummaryStatistics[i].addValue(seasonal[i]);
         }

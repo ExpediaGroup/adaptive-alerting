@@ -15,12 +15,17 @@
  */
 package com.expedia.adaptivealerting.anomdetect.util;
 
-import org.springframework.hateoas.Resources;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import java.util.UUID;
 
 /**
- * Detector resources.
- *
  * @author Willie Wheeler
  */
-public class DetectorResources extends Resources<DetectorResource> {
+@Data
+@AllArgsConstructor
+public final class DetectorMeta {
+    private UUID uuid;
+    private String type;
 }

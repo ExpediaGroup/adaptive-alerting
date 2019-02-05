@@ -15,11 +15,10 @@
  */
 package com.expedia.adaptivealerting.kafka;
 
-import com.expedia.adaptivealerting.anomdetect.AnomalyDetectorManager;
-import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
-import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
+import com.expedia.adaptivealerting.anomdetect.DetectorManager;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.kafka.streams.StreamsBuilder;
@@ -29,7 +28,7 @@ import org.apache.kafka.streams.kstream.KStream;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
- * Kafka streams wrapper around {@link AnomalyDetectorManager}.
+ * Kafka streams wrapper around {@link DetectorManager}.
  *
  * @author David Sutherland
  * @author Willie Wheeler
@@ -37,18 +36,18 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @Slf4j
 public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
     private static final String CK_AD_MANAGER = "ad-manager";
-    private static final String CK_MODEL_SERVICE_URI_TEMPLATE = "model-service-uri-template";
     
-    private final AnomalyDetectorManager manager;
+    private final DetectorManager manager;
     
     public static void main(String[] args) {
-        val tsConfig = new TypesafeConfigLoader(CK_AD_MANAGER).loadMergedConfig();
-        val saConfig = new StreamsAppConfig(tsConfig);
-        val manager = buildManager(saConfig);
+        val config = new TypesafeConfigLoader(CK_AD_MANAGER).loadMergedConfig();
+        val saConfig = new StreamsAppConfig(config);
+        val detectorSource = DetectorUtil.buildDetectorSource(config);
+        val manager = new DetectorManager(detectorSource);
         new KafkaAnomalyDetectorManager(saConfig, manager).start();
     }
     
-    public KafkaAnomalyDetectorManager(StreamsAppConfig config, AnomalyDetectorManager manager) {
+    public KafkaAnomalyDetectorManager(StreamsAppConfig config, DetectorManager manager) {
         super(config);
         notNull(manager, "manager can't be null");
         this.manager = manager;
@@ -88,13 +87,5 @@ public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
                 .filter((key, mappedMetricData) -> mappedMetricData != null)
                 .to(outboundTopic);
         return builder.build();
-    }
-
-    private static AnomalyDetectorManager buildManager(StreamsAppConfig appConfig) {
-        val managerConfig = appConfig.getTypesafeConfig();
-        val httpClient = new HttpClientWrapper();
-        val modelServiceUriTemplate = managerConfig.getString(CK_MODEL_SERVICE_URI_TEMPLATE);
-        val connector = new ModelServiceConnector(httpClient, modelServiceUriTemplate);
-        return new AnomalyDetectorManager(managerConfig, connector);
     }
 }

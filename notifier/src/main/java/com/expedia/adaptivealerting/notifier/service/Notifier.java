@@ -35,10 +35,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PreDestroy;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
-import javax.annotation.PreDestroy;
+
+// TODO Isolate the notification logic from the Kafka code and move Kafka to the Kafka module. [WLW]
 
 @Component
 @Slf4j

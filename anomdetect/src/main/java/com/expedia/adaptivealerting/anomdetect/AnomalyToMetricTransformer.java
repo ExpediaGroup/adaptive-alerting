@@ -40,6 +40,11 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  */
 public class AnomalyToMetricTransformer {
     
+    /**
+     * Key/value tag key for metrics representing an anomaly. The value must be the detector UUID.
+     */
+    public static String AA_DETECTOR_UUID = "aa_detector_uuid";
+    
     public MetricData transform(AnomalyResult anomalyResult) {
         notNull(anomalyResult, "anomalyResult can't be null");
         
@@ -50,12 +55,12 @@ public class AnomalyToMetricTransformer {
         val value = metricData.getValue();
         val timestamp = metricData.getTimestamp();
         
-        if (kvTags.containsKey(AnomalyConstants.AA_DETECTOR_UUID)) {
-            throw new IllegalArgumentException("Metric can't contain '" + AnomalyConstants.AA_DETECTOR_UUID + "' key/value tag");
+        if (kvTags.containsKey(AA_DETECTOR_UUID)) {
+            throw new IllegalArgumentException("Metric can't contain '" + AA_DETECTOR_UUID + "' key/value tag");
         }
         
         val newKVTags = new HashMap<>(kvTags);
-        newKVTags.put(AnomalyConstants.AA_DETECTOR_UUID, anomalyResult.getDetectorUUID().toString());
+        newKVTags.put(AA_DETECTOR_UUID, anomalyResult.getDetectorUUID().toString());
         
         val newKey = metricDef.getKey();
         val newTags = new TagCollection(newKVTags, Collections.EMPTY_SET);

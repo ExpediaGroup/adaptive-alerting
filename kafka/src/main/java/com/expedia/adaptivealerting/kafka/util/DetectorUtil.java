@@ -13,14 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.util;
+package com.expedia.adaptivealerting.kafka.util;
 
-import org.springframework.hateoas.Resources;
+import com.expedia.adaptivealerting.anomdetect.source.DefaultDetectorSource;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
+import com.expedia.adaptivealerting.anomdetect.source.TempHaystackAwareDetectorSource;
+import com.typesafe.config.Config;
+import lombok.extern.slf4j.Slf4j;
 
-/**
- * Detector resources.
- *
- * @author Willie Wheeler
- */
-public class DetectorResources extends Resources<DetectorResource> {
+@Slf4j
+public final class DetectorUtil {
+    
+    public static DetectorSource buildDetectorSource(Config config) {
+        return new TempHaystackAwareDetectorSource(new DefaultDetectorSource(config));
+    }
 }

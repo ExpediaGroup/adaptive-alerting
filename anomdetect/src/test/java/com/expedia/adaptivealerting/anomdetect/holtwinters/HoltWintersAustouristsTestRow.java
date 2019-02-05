@@ -20,28 +20,52 @@ import lombok.Data;
 
 @Data
 public class HoltWintersAustouristsTestRow {
-    
+
+    /**
+     * The observed metric value.
+     */
     @CsvBindByName
     private double y;
-    
+
+    /**
+     * y-hat: The value predicted for y after the last observation.
+     */
     @CsvBindByName(column = "y.hat")
     private double yHat;
 
+    /**
+     * Level
+     */
     @CsvBindByName
     private double l;
 
+    /**
+     * Base
+     */
     @CsvBindByName
     private double b;
 
+    /**
+     * 1 season ago: seasonal component for t-1
+     */
     @CsvBindByName
     private double s1;
 
+    /**
+     * 2 seasons ago: seasonal component for t-2
+     */
     @CsvBindByName
     private double s2;
 
+    /**
+     * 3 seasons ago: seasonal component for t-3
+     */
     @CsvBindByName
     private double s3;
 
+    /**
+     * 4 seasons ago: seasonal component for t-4
+     */
     @CsvBindByName
     private double s4;
 
