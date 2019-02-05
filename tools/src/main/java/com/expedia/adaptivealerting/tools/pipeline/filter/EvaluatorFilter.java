@@ -43,7 +43,8 @@ public final class EvaluatorFilter implements AnomalyResultSubscriber {
     @Override
     public void next(AnomalyResult anomalyResult) {
         notNull(anomalyResult, "anomalyResult can't be null");
-        evaluator.update(anomalyResult.getMetricData().getValue(), anomalyResult.getPredicted());
+        // getPredicted() can return null during warm up; convert null to 0
+        evaluator.update(anomalyResult.getMetricData().getValue(), getPredicted(anomalyResult));
         publish(evaluator.evaluate());
     }
     
@@ -57,6 +58,11 @@ public final class EvaluatorFilter implements AnomalyResultSubscriber {
         subscribers.remove(subscriber);
     }
     
+    private Double getPredicted(AnomalyResult anomalyResult) {
+        // getPredicted() can return null during warm up; convert null to 0
+        return (anomalyResult.getPredicted() == null ? 0 : anomalyResult.getPredicted());
+    }
+
     private void publish(ModelEvaluation modelEvaluation) {
         subscribers.stream().forEach(subscriber -> subscriber.next(modelEvaluation));
     }
