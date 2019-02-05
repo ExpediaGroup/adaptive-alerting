@@ -4,7 +4,7 @@ spring:
     show-banner: false
   datasource:
     driverClassName: "com.mysql.cj.jdbc.Driver"
-    url: "jdbc:mysql://localhost:3306/aa_model_service?autoReconnect=true"
+    url: "jdbc:mysql://database:3306/aa_model_service?autoReconnect=true"
     username: "root"
     password: ""
     maximum-pool-size: 8
