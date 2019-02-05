@@ -61,7 +61,7 @@ public class HoltWintersAnomalyDetectorTest {
     @Test(expected = IllegalArgumentException.class)
     public void testConstructor_alphaOutOfRange() {
         final HoltWintersParams params = new HoltWintersParams()
-                .setPeriod(24)
+                .setFrequency(24)
                 .setAlpha(2.0);
         new HoltWintersAnomalyDetector(detectorUUID, params);
     }

@@ -23,7 +23,7 @@ import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersAus
 import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersAustouristsTestHelper.ADD_LEVEL;
 import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersAustouristsTestHelper.ADD_SEASONAL;
 import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersAustouristsTestHelper.AUSTOURISTS_FIRST_TWO_SEASONS;
-import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersAustouristsTestHelper.AUSTOURISTS_PERIOD;
+import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersAustouristsTestHelper.AUSTOURISTS_FREQUENCY;
 import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersAustouristsTestHelper.MULT_BASE;
 import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersAustouristsTestHelper.MULT_LEVEL;
 import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersAustouristsTestHelper.MULT_SEASONAL;
@@ -77,8 +77,8 @@ public class HoltWintersSimpleTrainingModelTest {
     public void testExcessTrainingFails() {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage(String.format(
-                "Training invoked %d times which is greater than the training window of period * 2 (%d * 2 = %d) observations.",
-                (AUSTOURISTS_PERIOD * 2) + 1, AUSTOURISTS_PERIOD, AUSTOURISTS_PERIOD * 2));
+                "Training invoked %d times which is greater than the training window of frequency * 2 (%d * 2 = %d) observations.",
+                (AUSTOURISTS_FREQUENCY * 2) + 1, AUSTOURISTS_FREQUENCY, AUSTOURISTS_FREQUENCY * 2));
         HoltWintersParams params = buildAustouristsParams(MULTIPLICATIVE)
                 .setInitTrainingMethod(SIMPLE);
         HoltWintersOnlineComponents components = new HoltWintersOnlineComponents(params);

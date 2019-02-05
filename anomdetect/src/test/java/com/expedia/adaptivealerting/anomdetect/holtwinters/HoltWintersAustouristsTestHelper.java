@@ -22,7 +22,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.CsvToBeanFileReader.r
 public class HoltWintersAustouristsTestHelper {
     public static final double[] ADDITIVE_IDENTITY_SEASONALS = {0, 0, 0, 0};
     public static final double[] MULTIPLICATIVE_IDENTITY_SEASONALS = {1, 1, 1, 1};
-    public static final int AUSTOURISTS_PERIOD = 4;
+    public static final int AUSTOURISTS_FREQUENCY = 4;
     public static final double AUSTOURISTS_ALPHA = 0.441;
     public static final double AUSTOURISTS_BETA = 0.030;
     public static final double AUSTOURISTS_GAMMA = 0.002;
@@ -42,22 +42,22 @@ public class HoltWintersAustouristsTestHelper {
 
     public static HoltWintersParams buildAustouristsParams(SeasonalityType seasonalityType) {
         return new HoltWintersParams()
-                .setPeriod(AUSTOURISTS_PERIOD)
+                .setFrequency(AUSTOURISTS_FREQUENCY)
                 .setAlpha(AUSTOURISTS_ALPHA)
                 .setBeta(AUSTOURISTS_BETA)
                 .setGamma(AUSTOURISTS_GAMMA)
                 .setSeasonalityType(seasonalityType)
-                .setWarmUpPeriod(AUSTOURISTS_PERIOD);
+                .setWarmUpPeriod(AUSTOURISTS_FREQUENCY);
     }
 
     public static HoltWintersParams buildAustouristsParams(SeasonalityType seasonalityType, double level, double base, double[] seasonal) {
         return new HoltWintersParams()
-                .setPeriod(AUSTOURISTS_PERIOD)
+                .setFrequency(AUSTOURISTS_FREQUENCY)
                 .setAlpha(AUSTOURISTS_ALPHA)
                 .setBeta(AUSTOURISTS_BETA)
                 .setGamma(AUSTOURISTS_GAMMA)
                 .setSeasonalityType(seasonalityType)
-                .setWarmUpPeriod(AUSTOURISTS_PERIOD)
+                .setWarmUpPeriod(AUSTOURISTS_FREQUENCY)
                 .setInitLevelEstimate(level)
                 .setInitBaseEstimate(base)
                 .setInitSeasonalEstimates(seasonal);

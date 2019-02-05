@@ -24,7 +24,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 import static java.util.stream.DoubleStream.concat;
 
 /**
- * Implements an online model to train the HoltWintersComponents values based on the first two periods of data.
+ * Implements an online model to train the HoltWintersComponents values based on the first two cycles of observations.
  * <p>
  * See the "simple" value for the "initial" argument to <a href="https://www.rdocumentation.org/packages/forecast/versions/8.5/topics/ses#l_arguments">ses</a> in the R "forecast" package.
  * <br>
@@ -32,22 +32,22 @@ import static java.util.stream.DoubleStream.concat;
  */
 public class HoltWintersSimpleTrainingModel {
     private int n = 0;
-    private final double[] firstPeriod;
-    private final double[] secondPeriod;
+    private final double[] firstCycle;
+    private final double[] secondCycle;
 
     public HoltWintersSimpleTrainingModel(HoltWintersParams params) {
-        this.firstPeriod = new double[params.getPeriod()];
-        this.secondPeriod = new double[params.getPeriod()];
+        this.firstCycle = new double[params.getFrequency()];
+        this.secondCycle = new double[params.getFrequency()];
     }
 
     /**
-     * SIMPLE training method requires 2 complete periods of data to finish training the initial level, base and seasonal components (l, b, s).
-     * l and s can be calculated after the first period, b can only be determined after the 2nd season. This object stores those 2 periods as the
-     * firstPeriod and secondPeriod array fields.
+     * SIMPLE training method requires 2 complete cycles of observations to finish training the initial level, base and seasonal components (l, b, s).
+     * l and s can be calculated after the first cycle, b can only be determined after the 2nd season. This object stores those 2 cycles as the
+     * firstCycle and secondCycle array fields.
      *
-     * E.g. if period=4, then on the 8th observation, the model will complete its training of l, b, s.
+     * E.g. if frequency=4, then on the 8th observation, the model will complete its training of l, b, s.
      * Furthermore, on the 8th observation this method will then fit the model to the 8 initial observations, by running through those 8 stored data
-     * points (in firstPeriod and secondPeriod) one at a time, to retrospectively apply the smoothing parameters (alpha, beta, gamma) to l, b, s.
+     * points (in firstCycle and secondCycle) one at a time, to retrospectively apply the smoothing parameters (alpha, beta, gamma) to l, b, s.
      *
      * After the 8th observation, the components.getForecast() returns the correct forecast for the 9th observation which is the first non-training
      * observation that can be used to detect anomalies.
@@ -56,13 +56,13 @@ public class HoltWintersSimpleTrainingModel {
         checkNulls(params, components);
         checkTrainingMethod(params);
         checkStillInInitialTraining(params);
-        int period = params.getPeriod();
+        int frequency = params.getFrequency();
 
         // Capture data points
-        if (isBetween(n, 0, period - 1)) {
-            firstPeriod[n] = y;
+        if (isBetween(n, 0, frequency - 1)) {
+            firstCycle[n] = y;
         } else {
-            secondPeriod[n - period] = y;
+            secondCycle[n - frequency] = y;
         }
         // Train
         if (n == params.getInitTrainingPeriod() - 1) {
@@ -83,23 +83,23 @@ public class HoltWintersSimpleTrainingModel {
      */
     private void updateComponentsAndForecast(HoltWintersParams params, HoltWintersOnlineComponents components) {
         HoltWintersOnlineAlgorithm algorithm = new HoltWintersOnlineAlgorithm();
-        concat(Arrays.stream(firstPeriod), Arrays.stream(secondPeriod)).forEach(y -> algorithm.observeValueAndUpdateForecast(y, params, components));
+        concat(Arrays.stream(firstCycle), Arrays.stream(secondCycle)).forEach(y -> algorithm.observeValueAndUpdateForecast(y, params, components));
     }
 
     private void setLevel(HoltWintersOnlineComponents components) {
-        components.setLevel(mean(firstPeriod));
+        components.setLevel(mean(firstCycle));
     }
 
     private void setBase(HoltWintersParams params, HoltWintersOnlineComponents components) {
-        double base = (mean(secondPeriod) - components.getLevel()) / params.getPeriod();
+        double base = (mean(secondCycle) - components.getLevel()) / params.getFrequency();
         components.setBase(base);
     }
 
     private void setSeasonals(double y, HoltWintersParams params, HoltWintersOnlineComponents components) {
-        for (int i = 0; i < params.getPeriod(); i++) {
+        for (int i = 0; i < params.getFrequency(); i++) {
             double s = params.isMultiplicative()
-                    ? firstPeriod[i] / components.getLevel()
-                    : firstPeriod[i] - components.getLevel();
+                    ? firstCycle[i] / components.getLevel()
+                    : firstCycle[i] - components.getLevel();
             components.setSeasonal(i, s, y);
         }
     }
@@ -116,8 +116,8 @@ public class HoltWintersSimpleTrainingModel {
 
     private void checkStillInInitialTraining(HoltWintersParams params) {
         isFalse(isTrainingComplete(params),
-                String.format("Training invoked %d times which is greater than the training window of period * 2 (%d * 2 = %d) observations.",
-                        n + 1, params.getPeriod(), params.getInitTrainingPeriod()));
+                String.format("Training invoked %d times which is greater than the training window of frequency * 2 (%d * 2 = %d) observations.",
+                        n + 1, params.getFrequency(), params.getInitTrainingPeriod()));
     }
 
     // TODO HW: Potential reuse opportunity

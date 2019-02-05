@@ -41,7 +41,7 @@ public class HoltWintersOnlineAlgorithm {
         // Retrieve model's level and base component values from previous observation (t - 1)
         double prevLevel = components.getLevel();
         double prevBase = components.getBase();
-        // Retrieve model's seasonal component that relates to the current season we're observing for time t (i.e. "period" seasons ago)
+        // Retrieve model's seasonal component that relates to the current season we're observing for time t (i.e. "frequency" seasons ago)
         int seasonalIdx = components.getCurrentSeasonalIndex();
         double season = components.getSeasonal(seasonalIdx);
 

@@ -27,7 +27,7 @@ public enum HoltWintersTrainingMethod {
      * Use the first 2 seasons to calculate the implied level, base and seasonal components for the observation immediately preceding the first
      * observation.
      * Implements Hyndman's "simple" method for selecting initial state values.
-     * Ensure that warmUpPeriod gte (period * 2) to ensure no anomalies are emitted during training period.
+     * Ensure that warmUpPeriod gte (frequency * 2) to ensure no anomalies are emitted during training period.
      * @see <a href="https://github.com/robjhyndman/forecast/blob/master/R/HoltWintersNew.R#L61-L67">HoltWintersNew.R</a>
      */
     SIMPLE("simple");

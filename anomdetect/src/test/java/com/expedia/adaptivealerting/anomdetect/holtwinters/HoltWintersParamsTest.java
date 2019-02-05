@@ -29,8 +29,8 @@ import static org.junit.Assert.assertEquals;
 public class HoltWintersParamsTest {
     public static final int INITIAL_WARM_UP_PERIOD = 0;
     public static final HoltWintersTrainingMethod INITIAL_TRAINING_METHOD = NONE;
-    private static int DUMMY_PERIOD = 4;
-    private static double[] VALID_MULTIPLICATIVE_SEASONAL_COMPONENT = {1.0, 1.0, 1.0, 1.0};                // Elements add up to period (4)
+    private static int DUMMY_FREQUENCY = 4;
+    private static double[] VALID_MULTIPLICATIVE_SEASONAL_COMPONENT = {1.0, 1.0, 1.0, 1.0};                // Elements add up to frequency (4)
     private static double[] INVALID_ADDITIVE_SEASONAL_COMPONENT = VALID_MULTIPLICATIVE_SEASONAL_COMPONENT;
     private static double[] VALID_ADDITIVE_SEASONAL_COMPONENT = {-1.0, -1.0, 1.0, 1.0};                    // Elements add up to 0.0
     private static double[] INVALID_MULTIPLICATIVE_SEASONAL_COMPONENT = VALID_ADDITIVE_SEASONAL_COMPONENT;
@@ -77,7 +77,7 @@ public class HoltWintersParamsTest {
 
     @Test
     public void testEmptySeasonalEstimatesIsValid() {
-        subject.setPeriod(DUMMY_PERIOD);
+        subject.setFrequency(DUMMY_FREQUENCY);
         subject.validate();
     }
 
@@ -85,8 +85,8 @@ public class HoltWintersParamsTest {
     public void testInvalidSeasonalEstimatesLength() {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("Invalid: initSeasonalEstimates size (" + INSUFFICIENT_SEASONAL_ESTIMATES.length +
-                ") must equal period (" + DUMMY_PERIOD + ")");
-        subject.setPeriod(DUMMY_PERIOD);
+                ") must equal frequency (" + DUMMY_FREQUENCY + ")");
+        subject.setFrequency(DUMMY_FREQUENCY);
         subject.setInitSeasonalEstimates(INSUFFICIENT_SEASONAL_ESTIMATES);
         subject.validate();
     }
@@ -94,8 +94,8 @@ public class HoltWintersParamsTest {
     @Test
     public void testInvalidPeriod() {
         expectedEx.expect(IllegalArgumentException.class);
-        expectedEx.expectMessage("Required: period value greater than 0");
-        subject.setPeriod(-1);
+        expectedEx.expectMessage("Required: frequency value greater than 0");
+        subject.setFrequency(-1);
         subject.validate();
     }
 
@@ -167,7 +167,7 @@ public class HoltWintersParamsTest {
     @Test
     public void testInvalidInitSeasonalEstimateMultiplicative() {
         expectedEx.expect(IllegalArgumentException.class);
-        expectedEx.expectMessage("Invalid: Sum of initSeasonalEstimates (0.00) should be approximately equal to period (4) for " +
+        expectedEx.expectMessage("Invalid: Sum of initSeasonalEstimates (0.00) should be approximately equal to frequency (4) for " +
                 "MULTIPLICATIVE seasonality type.");
         setUpMinimalValid();
         subject.setSeasonalityType(SeasonalityType.MULTIPLICATIVE);
@@ -200,20 +200,20 @@ public class HoltWintersParamsTest {
         assertEquals(INITIAL_WARM_UP_PERIOD, subject.getWarmUpPeriod());
         subject.setInitTrainingMethod(SIMPLE);
         subject.validate();
-        assertEquals(subject.getPeriod() * 2, subject.getWarmUpPeriod());
+        assertEquals(subject.getFrequency() * 2, subject.getWarmUpPeriod());
     }
 
     @Test
     public void testGetInitTrainingPeriod() {
-        subject.setPeriod(DUMMY_PERIOD);
+        subject.setFrequency(DUMMY_FREQUENCY);
         subject.setInitTrainingMethod(NONE);
         assertEquals(0, subject.getInitTrainingPeriod());
         subject.setInitTrainingMethod(SIMPLE);
-        assertEquals(DUMMY_PERIOD * 2, subject.getInitTrainingPeriod());
+        assertEquals(DUMMY_FREQUENCY * 2, subject.getInitTrainingPeriod());
     }
 
     private void setUpMinimalValid() {
-        subject.setPeriod(DUMMY_PERIOD);
+        subject.setFrequency(DUMMY_FREQUENCY);
         subject.setInitSeasonalEstimates(VALID_MULTIPLICATIVE_SEASONAL_COMPONENT);
     }
 }

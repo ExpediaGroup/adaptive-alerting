@@ -126,7 +126,7 @@ public class CsvTrafficHoltWintersVariants {
 
     private static HoltWintersParams buildHoltWintersParams(SeasonalityType seasonalityType, double alpha, double beta, double gamma) {
         return new HoltWintersParams()
-                .setPeriod(PERIOD)
+                .setFrequency(PERIOD)
                 .setAlpha(alpha)
                 .setBeta(beta)
                 .setGamma(gamma)
