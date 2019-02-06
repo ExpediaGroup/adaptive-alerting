@@ -38,7 +38,7 @@
         <host>${AA_GRAPHITE_HOST:monitoring-influxdb-graphite.kube-system.svc}</host>
         <port>${AA_GRAPHITE_PORT:2003}</port>
         <enabled>${AA_GRAPHITE_ENABLED:true}</enabled>
-        <namePrefix>adaptive-alerting-notifier.#hostname#.</namePrefix>
+        <namePrefix>${GRAPHITE_PREFIX:}adaptive-alerting-notifier.#hostname#.</namePrefix>
     </outputWriter>
     <collectIntervalInSeconds>60</collectIntervalInSeconds>
 </jmxtrans-agent>
