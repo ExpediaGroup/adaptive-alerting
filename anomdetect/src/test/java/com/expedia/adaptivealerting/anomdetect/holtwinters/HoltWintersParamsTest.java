@@ -27,19 +27,16 @@ import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersTra
 import static org.junit.Assert.assertEquals;
 
 public class HoltWintersParamsTest {
-    public static final int INITIAL_WARM_UP_PERIOD = 0;
-    public static final HoltWintersTrainingMethod INITIAL_TRAINING_METHOD = NONE;
-    private static int DUMMY_FREQUENCY = 4;
-    private static double[] VALID_MULTIPLICATIVE_SEASONAL_COMPONENT = {1.0, 1.0, 1.0, 1.0};                // Elements add up to frequency (4)
-    private static double[] INVALID_ADDITIVE_SEASONAL_COMPONENT = VALID_MULTIPLICATIVE_SEASONAL_COMPONENT;
-    private static double[] VALID_ADDITIVE_SEASONAL_COMPONENT = {-1.0, -1.0, 1.0, 1.0};                    // Elements add up to 0.0
-    private static double[] INVALID_MULTIPLICATIVE_SEASONAL_COMPONENT = VALID_ADDITIVE_SEASONAL_COMPONENT;
+    private static final HoltWintersTrainingMethod INITIAL_TRAINING_METHOD = NONE;
+    private static final double[] INSUFFICIENT_SEASONAL_ESTIMATES = {1, 2, 3};
+    private static final double[] DUMMY_SEASONAL_ESTIMATES = {1.1, 0.9, 0.9, 1.1};
+    private static final int INITIAL_WARM_UP_PERIOD = 0;
+    private static final int DUMMY_FREQUENCY = 4;
 
     private HoltWintersParams subject;
 
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
-    public static final double[] INSUFFICIENT_SEASONAL_ESTIMATES = new double[]{1, 2, 3};
 
     @Before
     public void setUp() {
@@ -154,44 +151,6 @@ public class HoltWintersParamsTest {
     }
 
     @Test
-    public void testInvalidInitSeasonalEstimateAdditive() {
-        expectedEx.expect(IllegalArgumentException.class);
-        expectedEx.expectMessage("Invalid: Sum of initSeasonalEstimates (4.00) should approximately equal 0 for " +
-                "ADDITIVE seasonality type.");
-        setUpMinimalValid();
-        subject.setSeasonalityType(SeasonalityType.ADDITIVE);
-        subject.setInitSeasonalEstimates(INVALID_ADDITIVE_SEASONAL_COMPONENT);
-        subject.validate();
-    }
-
-    @Test
-    public void testInvalidInitSeasonalEstimateMultiplicative() {
-        expectedEx.expect(IllegalArgumentException.class);
-        expectedEx.expectMessage("Invalid: Sum of initSeasonalEstimates (0.00) should be approximately equal to frequency (4) for " +
-                "MULTIPLICATIVE seasonality type.");
-        setUpMinimalValid();
-        subject.setSeasonalityType(SeasonalityType.MULTIPLICATIVE);
-        subject.setInitSeasonalEstimates(INVALID_MULTIPLICATIVE_SEASONAL_COMPONENT);
-        subject.validate();
-    }
-
-    @Test
-    public void testValidInitSeasonalEstimateAdditive() {
-        setUpMinimalValid();
-        subject.setSeasonalityType(SeasonalityType.ADDITIVE);
-        subject.setInitSeasonalEstimates(VALID_ADDITIVE_SEASONAL_COMPONENT);
-        subject.validate();
-    }
-
-    @Test
-    public void testValidInitSeasonalEstimateMultiplicative() {
-        setUpMinimalValid();
-        subject.setSeasonalityType(SeasonalityType.MULTIPLICATIVE);
-        subject.setInitSeasonalEstimates(VALID_MULTIPLICATIVE_SEASONAL_COMPONENT);
-        subject.validate();
-    }
-
-    @Test
     public void testWarmUpPeriodOverriddenForTrainingMethod() {
         setUpMinimalValid();
         assertEquals(INITIAL_WARM_UP_PERIOD, subject.getWarmUpPeriod());
@@ -207,13 +166,13 @@ public class HoltWintersParamsTest {
     public void testGetInitTrainingPeriod() {
         subject.setFrequency(DUMMY_FREQUENCY);
         subject.setInitTrainingMethod(NONE);
-        assertEquals(0, subject.getInitTrainingPeriod());
+        assertEquals(0, subject.calculateInitTrainingPeriod());
         subject.setInitTrainingMethod(SIMPLE);
-        assertEquals(DUMMY_FREQUENCY * 2, subject.getInitTrainingPeriod());
+        assertEquals(DUMMY_FREQUENCY * 2, subject.calculateInitTrainingPeriod());
     }
 
     private void setUpMinimalValid() {
         subject.setFrequency(DUMMY_FREQUENCY);
-        subject.setInitSeasonalEstimates(VALID_MULTIPLICATIVE_SEASONAL_COMPONENT);
+        subject.setInitSeasonalEstimates(DUMMY_SEASONAL_ESTIMATES);
     }
 }

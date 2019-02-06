@@ -42,7 +42,7 @@ public class HoltWintersSimpleTrainingModel {
 
     /**
      * SIMPLE training method requires 2 complete cycles of observations to finish training the initial level, base and seasonal components (l, b, s).
-     * l and s can be calculated after the first cycle, b can only be determined after the 2nd season. This object stores those 2 cycles as the
+     * l and s can be calculated after the first cycle, b can only be determined after the 2nd cycle. This object stores those 2 cycles as the
      * firstCycle and secondCycle array fields.
      *
      * E.g. if frequency=4, then on the 8th observation, the model will complete its training of l, b, s.
@@ -65,7 +65,7 @@ public class HoltWintersSimpleTrainingModel {
             secondCycle[n - frequency] = y;
         }
         // Train
-        if (n == params.getInitTrainingPeriod() - 1) {
+        if (n == params.calculateInitTrainingPeriod() - 1) {
             setLevel(components);
             setSeasonals(y, params, components);
             setBase(params, components);
@@ -75,7 +75,7 @@ public class HoltWintersSimpleTrainingModel {
     }
 
     public boolean isTrainingComplete(HoltWintersParams params) {
-        return n >= (params.getInitTrainingPeriod());
+        return n >= (params.calculateInitTrainingPeriod());
     }
 
     /**
@@ -117,7 +117,7 @@ public class HoltWintersSimpleTrainingModel {
     private void checkStillInInitialTraining(HoltWintersParams params) {
         isFalse(isTrainingComplete(params),
                 String.format("Training invoked %d times which is greater than the training window of frequency * 2 (%d * 2 = %d) observations.",
-                        n + 1, params.getFrequency(), params.getInitTrainingPeriod()));
+                        n + 1, params.getFrequency(), params.calculateInitTrainingPeriod()));
     }
 
     // TODO HW: Potential reuse opportunity

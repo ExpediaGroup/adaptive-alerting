@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.holtwinters;
 
-import com.expedia.adaptivealerting.core.util.AssertUtil;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Arrays;
 
 import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersTrainingMethod.SIMPLE;
-import static com.expedia.adaptivealerting.core.util.AssertUtil.isBetween;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
@@ -37,8 +35,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @Accessors(chain = true)
 @Slf4j
 public final class HoltWintersParams {
-    private static double TOLERANCE = 0.1;
-
     /**
      * SeasonalityType parameter used to determine which Seasonality method (Multiplicative or Additive) to use.
      */
@@ -110,6 +106,7 @@ public final class HoltWintersParams {
      * Initial training method to use. See {@link HoltWintersTrainingMethod} for details.
      */
     private HoltWintersTrainingMethod initTrainingMethod = HoltWintersTrainingMethod.NONE;
+    private final HoltWintersSeasonalEstimatesValidator seasonalEstimatesValidator = new HoltWintersSeasonalEstimatesValidator();
 
     public boolean isMultiplicative() {
         return seasonalityType.equals(SeasonalityType.MULTIPLICATIVE);
@@ -118,9 +115,10 @@ public final class HoltWintersParams {
     /**
      * Calculates the initial training period (if applicable) based on initTrainingMethod and frequency.
      * Used to determine whether to perform training or forecasting on an observation.
+     *
      * @return Length of initial training period in number of observations.
      */
-    public int getInitTrainingPeriod() {
+    public int calculateInitTrainingPeriod() {
         return (initTrainingMethod == SIMPLE) ? (frequency * 2) : 0;
     }
 
@@ -139,9 +137,9 @@ public final class HoltWintersParams {
 
     private void validateInitTrainingMethod() {
         if (initTrainingMethod == SIMPLE) {
-            int minWarmUpPeriod = getInitTrainingPeriod();
+            int minWarmUpPeriod = calculateInitTrainingPeriod();
             if (warmUpPeriod < minWarmUpPeriod) {
-                log.warn(String.format("warmUpPeriod (%d) should be greater than or equal to (frequency * 2) (%d) " +
+                log.warn(String.format("warmUpPeriod (%d) should be greater than or equal to (frequency * 2) (%d), " +
                                 "as the detector will not emit anomalies during training. Setting warmUpPeriod to %d.",
                         warmUpPeriod, minWarmUpPeriod, minWarmUpPeriod));
                 warmUpPeriod = minWarmUpPeriod;
@@ -150,29 +148,7 @@ public final class HoltWintersParams {
     }
 
     private void validateInitSeasonalEstimates() {
-        notNull(initSeasonalEstimates, "Required: initSeasonalEstimates must be either an empty array " +
-                "or an array of n=frequency initial estimates for seasonal components.");
-        if (initSeasonalEstimates.length > 0) {
-            AssertUtil.isEqual(initSeasonalEstimates.length, frequency,
-                    String.format("Invalid: initSeasonalEstimates size (%d) must equal frequency (%d)", initSeasonalEstimates.length, frequency));
-            double seasonalSum = Arrays.stream(initSeasonalEstimates, 0, frequency).sum();
-            if (isMultiplicative()) {
-                // "With the multiplicative method, the seasonal component is expressed in relative terms (percentages).
-                //  Within each year, the seasonal component will sum up to approximately m (frequency)."
-                // (from https://otexts.org/fpp2/holt-winters.html)
-                // TODO HW: Determine valid tolerance, e.g. a tolerance of 0.1 means very different things for sums of 123456789.0 vs 0.1234567890
-                isBetween(seasonalSum, frequency - TOLERANCE, frequency + TOLERANCE,
-                        String.format("Invalid: Sum of initSeasonalEstimates (%.2f) should be approximately equal to frequency (%d) " +
-                                "for MULTIPLICATIVE seasonality type.", seasonalSum, frequency));
-            } else {
-                // "With the additive method, the seasonal component is expressed in absolute terms in the scale of the observed series.
-                //  Within each year, the seasonal component will add up to approximately zero."
-                // (from https://otexts.org/fpp2/holt-winters.html)
-                // TODO HW: Determine valid tolerance, e.g. a tolerance of 0.1 means very different things for sums of 123456789.0 vs 0.1234567890
-                isBetween(seasonalSum, -TOLERANCE, TOLERANCE,
-                        String.format("Invalid: Sum of initSeasonalEstimates (%.2f) should approximately equal 0 " +
-                                "for ADDITIVE seasonality type.", seasonalSum));
-            }
-        }
+        seasonalEstimatesValidator.validate(initSeasonalEstimates, frequency, seasonalityType);
     }
+
 }
