@@ -24,6 +24,8 @@ endpoints:
     sensitive: false
 management:
   context-path: "/admin"
+graphite:
+  urlTemplate: "https://graphite.test.monitoring.expedia.com/render?from=-168hours&format=json&maxDataPoints=1008&target={target}"
 security:
   signingKey: "key"
 server:
