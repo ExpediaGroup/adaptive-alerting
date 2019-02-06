@@ -5,8 +5,8 @@ spring:
   datasource:
     driverClassName: "com.mysql.cj.jdbc.Driver"
     url: "jdbc:mysql://database:3306/aa_model_service?autoReconnect=true"
-    username: "root"
-    password: ""
+    username: ${USERNAME:"root"}
+    password: ${PASSWORD:""}
     maximum-pool-size: 8
     minimum-idle: 0
   jpa:
