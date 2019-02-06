@@ -29,7 +29,6 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GraphiteRequest {
-
     private String target;
 
     public Map<String, Object> toParams() {
