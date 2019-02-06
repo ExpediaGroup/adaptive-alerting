@@ -3,7 +3,7 @@ spring:
     web-environment: true
     show-banner: false
   datasource:
-    driverClassName: "com.mysql.cj.jdbc.Driver"
+    driver-class-name: "com.mysql.cj.jdbc.Driver"
     url: "jdbc:mysql://database:3306/aa_model_service?autoReconnect=true"
     username: ${USERNAME:"root"}
     password: ${PASSWORD:""}
@@ -25,6 +25,8 @@ endpoints:
 management:
   context-path: "/admin"
 security:
-  signingKey: "key"
+  clientId: "id"
+  secret: "secret"
+  signingKey: "1234"
 server:
   port: 8008
