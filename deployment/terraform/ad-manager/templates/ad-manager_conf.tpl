@@ -14,6 +14,7 @@ ad-manager {
     cusum-detector = "com.expedia.adaptivealerting.anomdetect.cusum.CusumAnomalyDetector"
     ewma-detector = "com.expedia.adaptivealerting.anomdetect.ewma.EwmaAnomalyDetector"
     pewma-detector = "com.expedia.adaptivealerting.anomdetect.pewma.PewmaAnomalyDetector"
+    holtwinters-detector = "com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersAnomalyDetector"
   }
   model-service-uri-template = "${modelservice_uri_template}"
 }
