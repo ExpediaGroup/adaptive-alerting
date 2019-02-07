@@ -88,17 +88,23 @@ public final class HoltWintersParams {
     private double strongSigmas = 4.0;
 
     /**
-     * Initial estimate for Level component.  If not set, then 1.0 will be used for MULTIPLICATIVE seasonality and 0.0 for ADDITIVE seasonality.
+     * Initial estimate for Level component.
+     * Only applies if initTrainingMethod = HoltWintersTrainingMethod.NONE.
+     * If not set, then 1.0 will be used for MULTIPLICATIVE seasonality and 0.0 for ADDITIVE seasonality.
      */
     private double initLevelEstimate = Double.NaN;
 
     /**
-     * Initial estimate for Base component.  If not set, then 1.0 will be used for MULTIPLICATIVE seasonality and 0.0 for ADDITIVE seasonality.
+     * Initial estimate for Base component.
+     * Only applies if initTrainingMethod = HoltWintersTrainingMethod.NONE.
+     * If not set, then 1.0 will be used for MULTIPLICATIVE seasonality and 0.0 for ADDITIVE seasonality.
      */
     private double initBaseEstimate = Double.NaN;
 
     /**
-     * Initial estimates for Seasonal components. n=frequency values must be provided.
+     * Initial estimates for Seasonal components.
+     * Only applies if initTrainingMethod = HoltWintersTrainingMethod.NONE.
+     * Either 0 or n=frequency values must be provided.
      */
     private double[] initSeasonalEstimates = {};
 
@@ -106,6 +112,7 @@ public final class HoltWintersParams {
      * Initial training method to use. See {@link HoltWintersTrainingMethod} for details.
      */
     private HoltWintersTrainingMethod initTrainingMethod = HoltWintersTrainingMethod.NONE;
+
     private final HoltWintersSeasonalEstimatesValidator seasonalEstimatesValidator = new HoltWintersSeasonalEstimatesValidator();
 
     public boolean isMultiplicative() {
