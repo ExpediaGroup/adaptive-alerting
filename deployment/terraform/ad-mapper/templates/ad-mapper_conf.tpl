@@ -8,12 +8,5 @@ ad-mapper {
   health.status.path = "/app/isHealthy"
   inbound-topic = "aa-metrics"
   outbound-topic = "mapped-metrics"
-  detector-class-map {
-    constant-detector = "com.expedia.adaptivealerting.anomdetect.constant.ConstantThresholdAnomalyDetector"
-    cusum-detector = "com.expedia.adaptivealerting.anomdetect.cusum.CusumAnomalyDetector"
-    ewma-detector = "com.expedia.adaptivealerting.anomdetect.ewma.EwmaAnomalyDetector"
-    pewma-detector = "com.expedia.adaptivealerting.anomdetect.pewma.PewmaAnomalyDetector"
-    holtwinters-detector = "com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersAnomalyDetector"
-  }
   model-service-uri-template = "${modelservice_uri_template}"
 }

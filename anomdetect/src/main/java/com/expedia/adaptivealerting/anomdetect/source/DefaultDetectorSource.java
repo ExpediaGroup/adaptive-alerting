@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.anomdetect.source;
 
 import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.DetectorLookup;
 import com.expedia.adaptivealerting.anomdetect.util.DetectorMeta;
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
@@ -29,9 +30,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -47,22 +46,15 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @RequiredArgsConstructor
 @Slf4j
 public class DefaultDetectorSource implements DetectorSource {
-    private static final String CK_DETECTOR_CLASS_MAP = "detector-class-map";
     private static final String CK_MODEL_SERVICE_URI_TEMPLATE = "model-service-uri-template";
     
-    /**
-     * Detector class lookup table. E.g., ewma-detector -> EwmaDetector.class.
-     */
-    @Getter
-    @NonNull
-    private Map<String, Class> detectorClassMap;
+    private final DetectorLookup detectorLookup = new DetectorLookup();
     
     @Getter
     @NonNull
     private ModelServiceConnector connector;
     
     public DefaultDetectorSource(Config config) {
-        this.detectorClassMap = buildDetectorClassMap(config);
         this.connector = buildConnector(config);
     }
     
@@ -99,27 +91,11 @@ public class DefaultDetectorSource implements DetectorSource {
             return null;
         }
     
-        val detectorClass = detectorClassMap.get(detectorType);
+        val detectorClass = detectorLookup.getDetector(detectorType);
         val detector = (AbstractAnomalyDetector) ReflectionUtil.newInstance(detectorClass);
         detector.init(model);
         log.info("Found detector: {}", detector);
         return detector;
-    }
-    
-    private Map<String, Class> buildDetectorClassMap(Config config) {
-        val mapConfig = config.getConfig(CK_DETECTOR_CLASS_MAP);
-        val map = new HashMap<String, Class>();
-    
-        // Calling mapConfig.entrySet() does a recursive traversal, which isn't what we want here.
-        // Whereas mapConfig.root().entrySet() returns only the direct children.
-        for (val entry : mapConfig.root().entrySet()) {
-            val detectorType = entry.getKey();
-            val detectorClassname = (String) entry.getValue().unwrapped();
-            val detectorClass = ReflectionUtil.classForName(detectorClassname);
-            map.put(detectorType, detectorClass);
-        }
-    
-        return map;
     }
     
     private ModelServiceConnector buildConnector(Config config) {
