@@ -136,7 +136,6 @@ public final class TestObjectMother {
                     StreamsConfig.DEFAULT_DESERIALIZATION_EXCEPTION_HANDLER_CLASS_CONFIG,
                     LogAndContinueExceptionHandler.class.getName());
         }
-        
         return new TopologyTestDriver(topology, props);
     }
     

@@ -63,8 +63,6 @@ public class KafkaAnomalyToAlertMapperTest {
     private StringDeserializer stringDeserializer;
     private Deserializer<Alert> alertDeserializer;
 
-
-
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
