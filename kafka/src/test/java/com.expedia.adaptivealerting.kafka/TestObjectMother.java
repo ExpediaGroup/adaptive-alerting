@@ -109,12 +109,12 @@ public final class TestObjectMother {
         annotations.put("anomalyLevel","STRONG");
         annotations.put("value","100.0");
         annotations.put("timestamp", String.valueOf(timestamp/1000));
-        HashMap<String,String> labels = new HashMap<>();
-        labels.put("mtype", "gauge");
-        labels.put("unit","");
-        labels.put("org_id", "1");
-        labels.put("interval","1");
-        alert.setLabels(labels);
+        HashMap<String,String> label = new HashMap<>();
+        label.put("mtype", "gauge");
+        label.put("unit","");
+        label.put("org_id", "1");
+        label.put("interval","1");
+        alert.setLabels(label);
         alert.setAnnotations(annotations);
         return alert;
     }

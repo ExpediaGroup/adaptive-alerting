@@ -82,7 +82,7 @@ public class KafkaAnomalyToAlertMapperTest {
 
         val outputRecord = logAndFailDriver.readOutput(OUTBOUND_TOPIC, stringDeserializer, alertDeserializer);
         val expectedKey = mappedMetricData.getDetectorUuid().toString();
-        log.trace("output record={}", outputRecord.toString());
+        log.trace("Output Record={}", outputRecord.toString());
 
         OutputVerifier.compareKeyValue(outputRecord, expectedKey, alert);
     }
@@ -98,7 +98,7 @@ public class KafkaAnomalyToAlertMapperTest {
         this.anomalyResult = TestObjectMother.anomalyResult(metricData);
         this.mappedMetricData = TestObjectMother.mappedMetricData(metricData);
         mappedMetricData.setAnomalyResult(anomalyResult);
-        log.trace("alert={}", ObjectMapperUtil.writeValueAsString(new ObjectMapper(), alert));
+        log.trace("Alert={}", ObjectMapperUtil.writeValueAsString(new ObjectMapper(), alert));
     }
 
     private void initTestMachinery() {
