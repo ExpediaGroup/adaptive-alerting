@@ -15,21 +15,25 @@
  */
 package com.expedia.adaptivealerting.kafka;
 
+import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.adaptivealerting.core.util.jackson.ObjectMapperUtil;
+import com.expedia.alertmanager.model.Alert;
 import com.expedia.metrics.MetricData;
-import com.expedia.metrics.TagCollection;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.kafka.common.serialization.Deserializer;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.streams.TopologyTestDriver;
+import org.apache.kafka.streams.test.ConsumerRecordFactory;
+import org.apache.kafka.streams.test.OutputVerifier;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.HashMap;
-
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 /**
@@ -40,36 +44,49 @@ import static org.mockito.Mockito.when;
  */
 @Slf4j
 public class KafkaAnomalyToAlertMapperTest {
+    private static final String KAFKA_KEY = "some-kafka-key";
     private static final String INBOUND_TOPIC = "anomalies";
-    private static final String OUTBOUND_TOPIC = "mdm";
+    private static final String OUTBOUND_TOPIC = "alert";
 
     @Mock
     private StreamsAppConfig streamsAppConfig;
 
-    private MetricData metricData;
+    //Test Objects
+    private Alert alert;
     private MappedMetricData mappedMetricData;
-    private TopologyTestDriver topologyTestDriver;
+    private AnomalyResult anomalyResult;
+    private MetricData metricData;
+
+    //Test machinery
+    private TopologyTestDriver logAndFailDriver;
+    private ConsumerRecordFactory<String, MappedMetricData> mappedMetricDataFactory;
+    private StringDeserializer stringDeserializer;
+    private Deserializer<Alert> alertDeserializer;
+
 
 
     @Before
     public void setUp() {
-        this.metricData = TestObjectMother.metricData();
-        this.mappedMetricData = TestObjectMother.mappedMetricData(metricData);
         MockitoAnnotations.initMocks(this);
         initConfig();
-        initTestTopology();
+        initTestObjects();
+        initTestMachinery();
     }
 
     @After
     public void tearDown() {
-        topologyTestDriver.close();
+        logAndFailDriver.close();
     }
 
     @Test
     public void testTransform() {
-            assertEquals(getOutputMetricKey(),"some-metric-key");
-            assertEquals(getTestObjectValue(), 100.0, 0);
-            assertEquals(tagCollection(), getTagMap());
+        logAndFailDriver.pipeInput(mappedMetricDataFactory.create(INBOUND_TOPIC, KAFKA_KEY, mappedMetricData));
+
+        val outputRecord = logAndFailDriver.readOutput(OUTBOUND_TOPIC, stringDeserializer, alertDeserializer);
+        val expectedKey = mappedMetricData.getDetectorUuid().toString();
+        log.trace("output record={}", outputRecord.toString());
+
+        OutputVerifier.compareKeyValue(outputRecord, expectedKey, alert);
     }
 
     private void initConfig() {
@@ -77,29 +94,20 @@ public class KafkaAnomalyToAlertMapperTest {
         when(streamsAppConfig.getOutboundTopic()).thenReturn(OUTBOUND_TOPIC);
     }
 
-    private void initTestTopology(){
+    private void initTestObjects(){
+        this.alert = TestObjectMother.alert();
+        this.metricData = TestObjectMother.metricData();
+        this.anomalyResult = TestObjectMother.anomalyResult(metricData);
+        this.mappedMetricData = TestObjectMother.mappedMetricData(metricData);
+        mappedMetricData.setAnomalyResult(anomalyResult);
+        log.trace("alert={}", ObjectMapperUtil.writeValueAsString(new ObjectMapper(), alert));
+    }
+
+    private void initTestMachinery() {
         val topology = new KafkaAnomalyToAlertMapper(streamsAppConfig).buildTopology();
-        this.topologyTestDriver = TestObjectMother.topologyTestDriver(topology, MappedMetricData.class, false);
-    }
-
-    private TagCollection tagCollection(){
-        val tags = new HashMap<String, String>();
-        tags.put("mtype", "gauge");
-        tags.put("unit", "");
-        tags.put("interval","1");
-        tags.put("org_id","1");
-        return new TagCollection(tags);
-    }
-
-    private String getOutputMetricKey() {
-        return mappedMetricData.getMetricData().getMetricDefinition().getKey();
-    }
-
-    private TagCollection getTagMap() {
-        return (TagCollection) mappedMetricData.getMetricData().getMetricDefinition().getTags();
-    }
-
-    private double getTestObjectValue(){
-        return metricData.getValue();
+        this.logAndFailDriver = TestObjectMother.topologyTestDriver(topology, MappedMetricData.class, false);
+        this.mappedMetricDataFactory = TestObjectMother.mappedMetricDataFactory();
+        this.stringDeserializer = new StringDeserializer();
+        this.alertDeserializer = TestObjectMother.alertDeserializer();
     }
 }
