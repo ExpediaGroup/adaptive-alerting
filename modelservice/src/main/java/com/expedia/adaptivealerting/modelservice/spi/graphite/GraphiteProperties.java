@@ -13,20 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.graphite;
+package com.expedia.adaptivealerting.modelservice.spi.graphite;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.client.RestTemplate;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
+import lombok.Data;
 
 /**
  * @author kashah
  */
-@Configuration
-public class GraphiteConfig {
-
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
+@Data
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class GraphiteProperties {
+    @JsonProperty("graphite")
+    private JsonNode graphite;
 }

@@ -29,13 +29,13 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.adaptivealerting.core.util.MetricUtil;
 import com.expedia.adaptivealerting.modelservice.entity.Metric;
-import com.expedia.adaptivealerting.modelservice.graphite.GraphiteResult;
-import com.expedia.adaptivealerting.modelservice.graphite.GraphiteTemplate;
 import com.expedia.adaptivealerting.modelservice.repo.MetricRepository;
+import com.expedia.adaptivealerting.modelservice.spi.*;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -50,10 +50,11 @@ import java.util.Map;
 public class AnomalyService {
 
     @Autowired
-    private GraphiteTemplate graphiteTemplate;
+    private MetricRepository metricRepository;
 
     @Autowired
-    private MetricRepository metricRepository;
+    @Qualifier("metricSourceServiceListFactoryBean")
+    private List metricSources;
 
     public List<ModifiedAnomalyResult> getAnomalies(AnomalyRequest request) {
         return findAnomaliesInTrainingData(request);
@@ -61,18 +62,19 @@ public class AnomalyService {
 
     private List<ModifiedAnomalyResult> findAnomaliesInTrainingData(AnomalyRequest request) {
 
-        List<ModifiedAnomalyResult> modifiedAnomalyResults = new ArrayList<ModifiedAnomalyResult>();
+        List<ModifiedAnomalyResult> modifiedAnomalyResults = new ArrayList<>();
         Metric metric = metricRepository.findByHash(request.getHash());
-        GraphiteResult result = graphiteTemplate.getMetricData(metric.getKey())[0];
 
-        String[][] metricValues = result.getDatapoints();
-
-        AnomalyDetector detector = getDetector(request.getDetectorType(), request.getDetectorParams());
-        for (String[] metricValue : metricValues) {
-            MetricData metricData = toMetricData(metricValue);
-            AnomalyResult anomalyResult = detector.classify(metricData);
-            modifiedAnomalyResults.add(new ModifiedAnomalyResult(metricData.getTimestamp(), anomalyResult.getAnomalyLevel(), metricData.getValue(), anomalyResult.getPredicted()));
-        }
+        ((List<MetricSource>) metricSources)
+                .forEach(metricSource -> {
+                    List<MetricSourceResult> results = metricSource.getMetricData(metric.getKey());
+                    AnomalyDetector detector = getDetector(request.getDetectorType(), request.getDetectorParams());
+                    for (MetricSourceResult result : results) {
+                        MetricData metricData = toMetricData(result);
+                        AnomalyResult anomalyResult = detector.classify(metricData);
+                        modifiedAnomalyResults.add(new ModifiedAnomalyResult(metricData.getTimestamp(), anomalyResult.getAnomalyLevel(), metricData.getValue(), anomalyResult.getPredicted()));
+                    }
+                });
         return modifiedAnomalyResults;
     }
 
@@ -136,8 +138,8 @@ public class AnomalyService {
         }
     }
 
-    private MetricData toMetricData(String[] metricValue) {
+    private MetricData toMetricData(MetricSourceResult result) {
         MetricDefinition metricDefinition = MetricUtil.metricDefinition(null, null);
-        return MetricUtil.metricData(metricDefinition, Double.parseDouble(metricValue[0]), Long.parseLong(metricValue[1]));
+        return MetricUtil.metricData(metricDefinition, result.getDataPoint(), result.getEpochSecond());
     }
 }

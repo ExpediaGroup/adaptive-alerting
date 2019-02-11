@@ -13,18 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.graphite;
+package com.expedia.adaptivealerting.modelservice.spi.graphite;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * @author kashah
  */
-@Configuration
-@ConfigurationProperties(prefix = "graphite")
 @Data
-public class GraphiteProperties {
-    private String urlTemplate;
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class GraphiteResult {
+    private String[][] datapoints;
+    private String target;
+    private Tags tags;
 }

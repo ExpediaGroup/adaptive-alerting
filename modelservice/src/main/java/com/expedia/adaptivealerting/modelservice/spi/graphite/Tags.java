@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.graphite;
+package com.expedia.adaptivealerting.modelservice.spi.graphite;
 
 import lombok.Data;
 

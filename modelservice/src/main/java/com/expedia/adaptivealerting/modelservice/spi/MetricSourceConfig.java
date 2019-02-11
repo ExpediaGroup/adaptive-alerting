@@ -13,27 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.graphite;
+package com.expedia.adaptivealerting.modelservice.spi;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.beans.factory.serviceloader.ServiceListFactoryBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @author kashah
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class GraphiteRequest {
-    private String target;
-
-    public Map<String, Object> toParams() {
-        Map<String, Object> params = new HashMap<>();
-        params.put("target", target);
-        return params;
+@Configuration
+public class MetricSourceConfig {
+    @Bean
+    public ServiceListFactoryBean metricSourceServiceListFactoryBean() {
+        ServiceListFactoryBean serviceListFactoryBean = new ServiceListFactoryBean();
+        serviceListFactoryBean.setServiceType(MetricSource.class);
+        return serviceListFactoryBean;
     }
 }

@@ -4,7 +4,7 @@ spring:
     show-banner: false
   datasource:
     driverClassName: "com.mysql.cj.jdbc.Driver"
-    url: "jdbc:mysql://database:3306/aa_model_service?autoReconnect=true"
+    url: "jdbc:mysql://localhost:3306/aa_model_service?autoReconnect=true"
     username: "root"
     password: ""
     maximum-pool-size: 8
@@ -27,6 +27,6 @@ management:
 graphite:
   urlTemplate: "https://graphite.test.monitoring.expedia.com/render?from=-168hours&format=json&maxDataPoints=1008&target={target}"
 security:
-  signingKey: "key"
+  signingKey: "m0de!S3rvIc3"
 server:
   port: 8008
