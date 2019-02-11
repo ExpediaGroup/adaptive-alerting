@@ -54,17 +54,15 @@ public class AnomalyService {
 
     @Autowired
     @Qualifier("metricSourceServiceListFactoryBean")
-    private List metricSources;
+    private List metricSources; //Changing this to (List<MetricSource> breaks it. [KS]
 
     public List<ModifiedAnomalyResult> getAnomalies(AnomalyRequest request) {
         return findAnomaliesInTrainingData(request);
     }
 
     private List<ModifiedAnomalyResult> findAnomaliesInTrainingData(AnomalyRequest request) {
-
         List<ModifiedAnomalyResult> modifiedAnomalyResults = new ArrayList<>();
         Metric metric = metricRepository.findByHash(request.getHash());
-
         ((List<MetricSource>) metricSources)
                 .forEach(metricSource -> {
                     List<MetricSourceResult> results = metricSource.getMetricData(metric.getKey());
