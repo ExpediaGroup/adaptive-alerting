@@ -35,6 +35,7 @@ public class KafkaAnomalyToAlertMapper extends AbstractStreamsApp {
     private static final String APP_ID = "a2a-mapper";
 
     private static final String VALUE = "value";
+    private static final String KEY = "key";
     private static final String TIMESTAMP = "timestamp";
     private static final String ANOMALY_LEVEL = "anomalyLevel";
 
@@ -67,20 +68,23 @@ public class KafkaAnomalyToAlertMapper extends AbstractStreamsApp {
         final KStream<String, MappedMetricData> stream = builder.stream(inboundTopic);
         stream.filter((key, mappedMetricData) -> AnomalyLevel.STRONG.equals(mappedMetricData.getAnomalyResult().getAnomalyLevel()) ||
                 AnomalyLevel.WEAK.equals(mappedMetricData.getAnomalyResult().getAnomalyLevel()))
-              .map((key, mappedMetricData) -> {
+                .map((key, mappedMetricData) -> {
                     val alert = new Alert();
                     alert.setName(mappedMetricData.getMetricData().getMetricDefinition().getKey());
-                    alert.setLabels(mappedMetricData.getMetricData().getMetricDefinition().getTags().getKv());
+                    val tags = mappedMetricData.getMetricData().getMetricDefinition().getTags().getKv();
+                    val labels = new HashMap<String, String>(tags);
+                    labels.put(KEY, mappedMetricData.getMetricData().getMetricDefinition().getKey());
+                    alert.setLabels(labels);
                     Double value = mappedMetricData.getMetricData().getValue();
                     Long timestamp = mappedMetricData.getMetricData().getTimestamp();
                     AnomalyLevel anomalyLevel = mappedMetricData.getAnomalyResult().getAnomalyLevel();
-                    val annotations = new HashMap<String, String>(){{
+                    val annotations = new HashMap<String, String>() {{
                         put(VALUE, value.toString());
                         put(TIMESTAMP, timestamp.toString());
                         put(ANOMALY_LEVEL, anomalyLevel.toString());
                     }};
                     alert.setAnnotations(annotations);
-                    return KeyValue.pair(mappedMetricData.getDetectorUuid().toString(),alert);
+                    return KeyValue.pair(mappedMetricData.getDetectorUuid().toString(), alert);
                 })
                 .to(outboundTopic, Produced.with(new Serdes.StringSerde(), new JsonPojoSerde<>()));
 
