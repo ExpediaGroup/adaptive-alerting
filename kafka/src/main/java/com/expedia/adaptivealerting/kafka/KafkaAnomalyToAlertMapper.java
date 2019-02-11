@@ -35,6 +35,9 @@ public class KafkaAnomalyToAlertMapper extends AbstractStreamsApp {
     private static final String APP_ID = "a2a-mapper";
 
     private static final String VALUE = "value";
+    // The metric definition key should be added as part of labels for subscription service to be create / apply subscription
+    // on top of it.
+    // If the tags contain `metric_key` as key, it will be overridden by metric definition key.
     private static final String METRIC_KEY = "metric_key";
     private static final String TIMESTAMP = "timestamp";
     private static final String ANOMALY_LEVEL = "anomalyLevel";
