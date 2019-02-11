@@ -35,6 +35,10 @@ public class KafkaAnomalyToAlertMapper extends AbstractStreamsApp {
     private static final String APP_ID = "a2a-mapper";
 
     private static final String VALUE = "value";
+    // The metric definition key should be added as part of labels for subscription service to be create / apply subscription
+    // on top of it.
+    // If the tags contain `metric_key` as key, it will be overridden by metric definition key.
+    private static final String METRIC_KEY = "metric_key";
     private static final String TIMESTAMP = "timestamp";
     private static final String ANOMALY_LEVEL = "anomalyLevel";
 
@@ -67,20 +71,22 @@ public class KafkaAnomalyToAlertMapper extends AbstractStreamsApp {
         final KStream<String, MappedMetricData> stream = builder.stream(inboundTopic);
         stream.filter((key, mappedMetricData) -> AnomalyLevel.STRONG.equals(mappedMetricData.getAnomalyResult().getAnomalyLevel()) ||
                 AnomalyLevel.WEAK.equals(mappedMetricData.getAnomalyResult().getAnomalyLevel()))
-              .map((key, mappedMetricData) -> {
+                .map((key, mappedMetricData) -> {
                     val alert = new Alert();
                     alert.setName(mappedMetricData.getMetricData().getMetricDefinition().getKey());
-                    alert.setLabels(mappedMetricData.getMetricData().getMetricDefinition().getTags().getKv());
+                    val tags = mappedMetricData.getMetricData().getMetricDefinition().getTags().getKv();
+                    val labels = new HashMap<String, String>(tags);
+                    labels.put(METRIC_KEY, mappedMetricData.getMetricData().getMetricDefinition().getKey());
+                    alert.setLabels(labels);
                     Double value = mappedMetricData.getMetricData().getValue();
                     Long timestamp = mappedMetricData.getMetricData().getTimestamp();
                     AnomalyLevel anomalyLevel = mappedMetricData.getAnomalyResult().getAnomalyLevel();
-                    val annotations = new HashMap<String, String>(){{
-                        put(VALUE, value.toString());
-                        put(TIMESTAMP, timestamp.toString());
-                        put(ANOMALY_LEVEL, anomalyLevel.toString());
-                    }};
+                    val annotations = new HashMap<String, String>();
+                    annotations.put(VALUE, value.toString());
+                    annotations.put(TIMESTAMP, timestamp.toString());
+                    annotations.put(ANOMALY_LEVEL, anomalyLevel.toString());
                     alert.setAnnotations(annotations);
-                    return KeyValue.pair(mappedMetricData.getDetectorUuid().toString(),alert);
+                    return KeyValue.pair(mappedMetricData.getDetectorUuid().toString(), alert);
                 })
                 .to(outboundTopic, Produced.with(new Serdes.StringSerde(), new JsonPojoSerde<>()));
 
