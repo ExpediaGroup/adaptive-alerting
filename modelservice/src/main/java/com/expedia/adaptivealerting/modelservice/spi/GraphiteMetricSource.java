@@ -48,7 +48,7 @@ public class GraphiteMetricSource implements MetricSource {
         List<MetricSourceResult> results = new ArrayList<>();
         for (String[] dataPoint : dataPoints) {
             Double dataPointValue = Double.parseDouble(dataPoint[0]);
-            Long epochSeconds = Long.parseLong(dataPoint[1]);
+            long epochSeconds = Long.parseLong(dataPoint[1]);
             MetricSourceResult result = new MetricSourceResult(dataPointValue, epochSeconds);
             results.add(result);
         }
