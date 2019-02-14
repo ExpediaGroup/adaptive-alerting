@@ -21,6 +21,7 @@ import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.kafka.serde.JsonPojoDeserializer;
 import com.expedia.adaptivealerting.kafka.serde.JsonPojoSerde;
 import com.expedia.adaptivealerting.kafka.serde.JsonPojoSerializer;
+import com.expedia.alertmanager.model.Alert;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.TagCollection;
@@ -99,6 +100,24 @@ public final class TestObjectMother {
         anomalyResult.setAnomalyLevel(AnomalyLevel.STRONG);
         return anomalyResult;
     }
+
+    public static Alert alert() {
+        val alert = new Alert();
+        long timestamp = System.currentTimeMillis();
+        alert.setName("some-metric-key");
+        HashMap<String,String> annotations = new HashMap<>();
+        annotations.put("anomalyLevel","STRONG");
+        annotations.put("value","100.0");
+        annotations.put("timestamp", String.valueOf(timestamp/1000));
+        HashMap<String,String> label = new HashMap<>();
+        label.put("mtype", "gauge");
+        label.put("unit","");
+        label.put("org_id", "1");
+        label.put("interval","1");
+        alert.setLabels(label);
+        alert.setAnnotations(annotations);
+        return alert;
+    }
     
     public static TopologyTestDriver topologyTestDriver(
             Topology topology,
@@ -117,7 +136,6 @@ public final class TestObjectMother {
                     StreamsConfig.DEFAULT_DESERIALIZATION_EXCEPTION_HANDLER_CLASS_CONFIG,
                     LogAndContinueExceptionHandler.class.getName());
         }
-        
         return new TopologyTestDriver(topology, props);
     }
     
@@ -133,11 +151,7 @@ public final class TestObjectMother {
     public static ConsumerRecordFactory<String, MappedMetricData> mappedMetricDataFactory() {
         return new ConsumerRecordFactory<>(new StringSerializer(), new JsonPojoSerializer<>());
     }
-    
-    public static ConsumerRecordFactory<String, AnomalyResult> anomalyResultFactory() {
-        return new ConsumerRecordFactory<>(new StringSerializer(), new JsonPojoSerializer<>());
-    }
-    
+
     public static JsonPojoDeserializer<MappedMetricData> mappedMetricDataDeserializer() {
         val deserializer = new JsonPojoDeserializer<MappedMetricData>();
         deserializer.configure(
@@ -150,6 +164,14 @@ public final class TestObjectMother {
         val deserializer = new JsonPojoDeserializer<AnomalyResult>();
         deserializer.configure(
                 Collections.singletonMap(JsonPojoDeserializer.CK_JSON_POJO_CLASS, AnomalyResult.class),
+                false);
+        return deserializer;
+    }
+
+    public static JsonPojoDeserializer<Alert> alertDeserializer() {
+        val deserializer = new JsonPojoDeserializer<Alert>();
+        deserializer.configure(
+                Collections.singletonMap(JsonPojoDeserializer.CK_JSON_POJO_CLASS, Alert.class),
                 false);
         return deserializer;
     }
