@@ -106,14 +106,15 @@ public final class TestObjectMother {
         long timestamp = System.currentTimeMillis();
         alert.setName("some-metric-key");
         HashMap<String,String> annotations = new HashMap<>();
-        annotations.put("anomalyLevel","STRONG");
         annotations.put("value","100.0");
         annotations.put("timestamp", String.valueOf(timestamp/1000));
         HashMap<String,String> label = new HashMap<>();
+        label.put("metric_key", "some-metric-key"); //Please Note: metric key can override a tag if it has the same name.
         label.put("mtype", "gauge");
         label.put("unit","");
         label.put("org_id", "1");
         label.put("interval","1");
+        label.put("anomalyLevel","STRONG");
         alert.setLabels(label);
         alert.setAnnotations(annotations);
         return alert;

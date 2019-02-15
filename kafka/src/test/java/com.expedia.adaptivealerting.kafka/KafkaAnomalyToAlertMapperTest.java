@@ -78,7 +78,6 @@ public class KafkaAnomalyToAlertMapperTest {
         logAndFailDriver.close();
     }
 
-    @Ignore
     @Test
     public void testTransform() {
         logAndFailDriver.pipeInput(mappedMetricDataFactory.create(INBOUND_TOPIC, KAFKA_KEY, mappedMetricData));
