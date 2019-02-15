@@ -30,6 +30,7 @@ import org.apache.kafka.streams.test.ConsumerRecordFactory;
 import org.apache.kafka.streams.test.OutputVerifier;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -42,6 +43,7 @@ import static org.mockito.Mockito.when;
  *
  * @author tbahl
  */
+@Ignore
 @Slf4j
 public class KafkaAnomalyToAlertMapperTest {
     private static final String KAFKA_KEY = "some-kafka-key";
@@ -76,6 +78,7 @@ public class KafkaAnomalyToAlertMapperTest {
         logAndFailDriver.close();
     }
 
+    @Ignore
     @Test
     public void testTransform() {
         logAndFailDriver.pipeInput(mappedMetricDataFactory.create(INBOUND_TOPIC, KAFKA_KEY, mappedMetricData));
