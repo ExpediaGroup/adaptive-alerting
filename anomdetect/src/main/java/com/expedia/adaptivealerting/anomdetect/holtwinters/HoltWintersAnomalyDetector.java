@@ -28,6 +28,7 @@ import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.MODEL_WARMUP;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static java.lang.String.format;
 
 /**
  * Anomaly detector based on the Holt-Winters method, a forecasting method (a.k.a. "Triple Exponential Smoothing"). Used to capture seasonality.
@@ -84,9 +85,13 @@ public final class HoltWintersAnomalyDetector extends AbstractAnomalyDetector<Ho
     @Override
     public AnomalyResult classify(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
-        double prevForecast = components.getForecast();
-        trainOrObserve(metricData.getValue());
-        return buildAnomalyResult(metricData, prevForecast);
+        try {
+            double prevForecast = components.getForecast();
+            trainOrObserve(metricData.getValue());
+            return buildAnomalyResult(metricData, prevForecast);
+        } catch (Exception e) {
+            throw new HoltWintersClassificationException(format("Exception occurred during classification. %s: \"%s\"", e.getClass(), e.getMessage()), e);
+        }
     }
 
     private void trainOrObserve(double observed) {
@@ -101,7 +106,7 @@ public final class HoltWintersAnomalyDetector extends AbstractAnomalyDetector<Ho
         switch (params.getInitTrainingMethod()) {
             case NONE: return true;
             case SIMPLE: return holtWintersSimpleTrainingModel.isTrainingComplete(params);
-            default: throw new IllegalStateException(String.format("Unexpected training method '%s'", params.getInitTrainingMethod()));
+            default: throw new IllegalStateException(format("Unexpected training method '%s'", params.getInitTrainingMethod()));
         }
     }
 
