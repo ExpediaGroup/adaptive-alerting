@@ -110,6 +110,7 @@ public final class TestObjectMother {
         annotations.put("value","100.0");
         annotations.put("timestamp", String.valueOf(timestamp/1000));
         HashMap<String,String> label = new HashMap<>();
+        label.put("metric_key", "some-metric-key"); //Please Note: metric key can override a tag if it has the same name.
         label.put("mtype", "gauge");
         label.put("unit","");
         label.put("org_id", "1");
