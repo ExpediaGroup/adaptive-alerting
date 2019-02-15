@@ -79,9 +79,9 @@ public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
                         anomalyResult = manager.classify(mappedMetricData);
                     } catch (Exception e) {
                         log.error(
-                                "Error while classifying [{}]. mappedMetricData={}",
-                                e.getMessage(),
-                                mappedMetricData
+                                "Encountered error while classifying {}. {}",
+                                mappedMetricData,
+                                exceptionDetails(e)
                         );
                     }
                     
@@ -92,5 +92,10 @@ public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
                 .filter((key, mappedMetricData) -> mappedMetricData != null)
                 .to(outboundTopic);
         return builder.build();
+    }
+
+    private String exceptionDetails(Exception e) {
+        // TODO Reduce this to the class, the message, and the first line of stack trace.
+        return e.toString();
     }
 }
