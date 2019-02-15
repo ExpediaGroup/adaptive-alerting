@@ -43,7 +43,7 @@ import static org.mockito.Mockito.when;
  *
  * @author tbahl
  */
-@Ignore
+
 @Slf4j
 public class KafkaAnomalyToAlertMapperTest {
     private static final String KAFKA_KEY = "some-kafka-key";
