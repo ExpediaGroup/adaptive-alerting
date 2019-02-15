@@ -106,7 +106,6 @@ public final class TestObjectMother {
         long timestamp = System.currentTimeMillis();
         alert.setName("some-metric-key");
         HashMap<String,String> annotations = new HashMap<>();
-        annotations.put("anomalyLevel","STRONG");
         annotations.put("value","100.0");
         annotations.put("timestamp", String.valueOf(timestamp/1000));
         HashMap<String,String> label = new HashMap<>();
@@ -115,6 +114,7 @@ public final class TestObjectMother {
         label.put("unit","");
         label.put("org_id", "1");
         label.put("interval","1");
+        label.put("anomalyLevel","STRONG");
         alert.setLabels(label);
         alert.setAnnotations(annotations);
         return alert;

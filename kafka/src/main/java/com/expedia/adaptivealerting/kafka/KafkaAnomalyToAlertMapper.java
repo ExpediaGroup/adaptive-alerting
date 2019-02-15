@@ -75,16 +75,16 @@ public class KafkaAnomalyToAlertMapper extends AbstractStreamsApp {
                     val alert = new Alert();
                     alert.setName(mappedMetricData.getMetricData().getMetricDefinition().getKey());
                     val tags = mappedMetricData.getMetricData().getMetricDefinition().getTags().getKv();
+                    AnomalyLevel anomalyLevel = mappedMetricData.getAnomalyResult().getAnomalyLevel();
                     val labels = new HashMap<String, String>(tags);
                     labels.put(METRIC_KEY, mappedMetricData.getMetricData().getMetricDefinition().getKey());
+                    labels.put(ANOMALY_LEVEL, anomalyLevel.toString());
                     alert.setLabels(labels);
                     Double value = mappedMetricData.getMetricData().getValue();
                     Long timestamp = mappedMetricData.getMetricData().getTimestamp();
-                    AnomalyLevel anomalyLevel = mappedMetricData.getAnomalyResult().getAnomalyLevel();
                     val annotations = new HashMap<String, String>();
                     annotations.put(VALUE, value.toString());
                     annotations.put(TIMESTAMP, timestamp.toString());
-                    annotations.put(ANOMALY_LEVEL, anomalyLevel.toString());
                     alert.setAnnotations(annotations);
                     return KeyValue.pair(mappedMetricData.getDetectorUuid().toString(), alert);
                 })
