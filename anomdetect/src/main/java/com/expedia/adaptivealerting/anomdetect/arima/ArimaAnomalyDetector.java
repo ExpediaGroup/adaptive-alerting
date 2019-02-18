@@ -1,9 +1,32 @@
 package com.expedia.adaptivealerting.anomdetect.arima;
 
+/* This package uses https://github.com/Workday/timeseries-forecast Java open source library.
+ * Adding the copyright notice and permission notice as required by the libary's license.
+
+ * Copyright 2017 Workday, Inc.
+
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+ * documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the following conditions:
+
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the
+ * Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ * WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+ * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+*/
+import com.workday.insights.timeseries.arima.Arima;
+import com.workday.insights.timeseries.arima.struct.ForecastResult;
+import com.workday.insights.timeseries.arima.struct.ArimaParams;
+import com.workday.insights.timeseries.arima.struct.ArimaModel;
+import com.workday.insights.timeseries.arima.ArimaSolver;
 import com.expedia.adaptivealerting.anomdetect.BasicAnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
 import lombok.NonNull;
@@ -12,6 +35,8 @@ import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.*;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import java.util.ArrayList;
+
 
 /**
  ** <a href="https://people.duke.edu/~rnau/411arim.htm">ARIMA models for time series forecasting</a>
@@ -20,85 +45,46 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  ** class of models for forecasting a time series which can be made to be “stationary” by differencing(if necessary),
  ** perhaps in conjunction with nonlinear transformations such as logging or deflating(if necessary).
  **
- ** Anomaly detector implementation of ARIMA(0,1,1)with constant=simple exponential smoothing with growth:
- **
- ** The ARIMA(0,1,1) model with constant has the prediction equation:
- **
- ** Ŷt = μ + Yt-1 - θ1*et-1
- **
- ** μ is calculated as the function of mean of differences and a coefficient.
- **
+ ** Anomaly detector implementation of ARIMA(0,1,1) for default input parameters.
  **
  */
 @Data
-public final class ArimaAnomalyDetector extends BasicAnomalyDetector<ArimaParams> {
+public final class ArimaAnomalyDetector extends BasicAnomalyDetector<ArimaDetectorParams> {
 
 
     @NonNull
     private UUID uuid;
 
     @NonNull
-    private ArimaParams params;
+    private ArimaDetectorParams params;
 
     /**
-     * Sum of First Order Differenced Series.
-     */
-    private double FirstOrderDifferencedSeriesSum = 0.0;
-
-    /**
-     *  Series Sum.
-     */
-    private double SeriesSum = 0.0;
-
-    /**
-     * Target predicted from average mean.
+     * Target predicted.
      */
     private double target = 0.0;
 
     /**
-     * Target t-1 predicted from average mean.
+     *  Check for number of history points, update dataset accordingly.
      */
-    private double prevtarget = 0.0;
+    private int historylengthchecker = 0;
+
+    /*Anomalies have to be validated agianst previous limits for the observation
+    * as the current observation is not yet loaded/known.
+    */
+    double previousupper = 0.0;
+    double previouslower = 0.0;
 
     /**
-     * Previous value.
+     *  Input data for training and prediction.
      */
-    private double prevValue = 0.0;
-
-    /**
-     * Previous Difference between observed and estimated.
-     */
-
-    private double prevDiff = 0.0;
-
-    /**
-     * Total number of received data points.
-     */
-    private int totalDataPoints = 1;
-
-    /**
-     * Mean value of the seasonally differenced series.
-     */
-    private double meanofdifferences = 0.0;
-
-    /**
-     * Mean value of the series.
-     */
-    private double mean = 0.0;
-
-    /**
-     * μ denotes the CONSTANT  in the forecasting equation, whose estimated value is
-     * mean times 1 minus the AR(1) coefficient
-     */
-
-    private double long_term_forecast_mu = 0.0;
+    private ArrayList<Double> dataArray = new ArrayList<Double> ();
 
 
     public ArimaAnomalyDetector() {
-        this(UUID.randomUUID(), new ArimaParams());
+        this(UUID.randomUUID(), new ArimaDetectorParams());
     }
 
-    public ArimaAnomalyDetector(ArimaParams params) {
+    public ArimaAnomalyDetector(ArimaDetectorParams params) {
         this(UUID.randomUUID(), params);
     }
 
@@ -108,26 +94,25 @@ public final class ArimaAnomalyDetector extends BasicAnomalyDetector<ArimaParams
      * @param uuid   Detector UUID.
      * @param params Model params.
      */
-    public ArimaAnomalyDetector(UUID uuid, ArimaParams params) {
+
+    public ArimaAnomalyDetector(UUID uuid, ArimaDetectorParams params) {
         notNull(uuid, "uuid can't be null");
         notNull(params, "params can't be null");
 
         this.uuid = uuid;
         this.params = params;
-        this.prevValue = params.getInitValue();
         this.target = params.getInitValue();
     }
 
     @Override
-    protected void loadParams(ArimaParams params) {
+    protected void loadParams(ArimaDetectorParams params) {
         this.params = params;
-        this.meanofdifferences = params.getInitMeanOfDifferencesEstimate();
-        this.mean = params.getInitMeanEstimate();
     }
 
+
     @Override
-    protected Class<ArimaParams> getParamsClass() {
-        return ArimaParams.class;
+    protected Class<ArimaDetectorParams> getParamsClass() {
+        return ArimaDetectorParams.class;
     }
 
     @Override
@@ -135,83 +120,115 @@ public final class ArimaAnomalyDetector extends BasicAnomalyDetector<ArimaParams
         notNull(metricData, "metricData can't be null");
 
         final double observed = metricData.getValue();
+        final int historylength = params.getHistorylength();
+        System.out.println("Less than or not");
+        System.out.println(historylengthchecker);
+        System.out.println(historylength);
+        System.out.println("Less than or not");
 
-        final double strongDelta = params.getStrongLimit();
-        final double MA_1 = params.getMA_1();
-        final double AR_1 = params.getAR_1();
-        final double weakDelta = params.getWeakLimit();
+        if (historylengthchecker < historylength) {
+            System.out.printf("adding data: %f", observed);
+            dataArray.add(observed);
+            historylengthchecker++;
+        }
+        else {
+            dataArray.remove(0);
+            dataArray.add(observed);
+        }
 
-        this.target = getSES(MA_1);
+        final double strongDelta = params.getStrongLimitMultiplier();
+        final double weakDelta = params.getWeakLimitMultiplier();
 
+        final int p = params.getP();
+        final int d = params.getD();
+        final int q = params.getQ();
+        final int P = params.getSeasonalp();
+        final int D = params.getSeasonald();
+        final int Q = params.getSeasonalq();
+        final int m = params.getM();
+        final int forecastSize = params.getForecastsize();
+        /*seasonal parameters P,D,Q,m. If D or m is less than 1,
+        * then the model is understood to be non-seasonal and the seasonal parameters P,D,Q,m will have no effect.
+        */
+
+        ArimaParams arimamodelparams = new ArimaParams(p,d,q,P,D,Q,m);
         AnomalyLevel level;
-        if (totalDataPoints > params.getWarmUpPeriod()) {
+
+        if (historylengthchecker > params.getWarmUpPeriod()) {
             level = NORMAL;
-            // currently the band used is sample mean * (1 +- limits) instead of the ideal sample mean +- 1.96 S.E.
-            switch (params.getType()) {
-                case LEFT_TAILED:
-                    if (observed < (this.mean * (1 - strongDelta))) {
-                        level = STRONG;
-                    }
-                    else if (observed < (this.mean * (1 - weakDelta))) {
-                        level = WEAK;
-                    }
-                    break;
-                case RIGHT_TAILED:
-                    if (observed > (this.mean * (1 + strongDelta))) {
-                        level = STRONG;
-                    }
-                    else if (observed > (this.mean * (1 + weakDelta))) {
-                        level = WEAK;
-                    }
-                    break;
-                case TWO_TAILED:
-                    if ((observed > (this.mean * (1 + strongDelta))) || (observed < (this.mean * (1 - strongDelta)))) {
-                        level = STRONG;
-                    }
-                    else if ((observed > (this.mean * (1 + weakDelta))) || (observed < (this.mean * (1 - weakDelta)))) {
-                        level = WEAK;
-                    }
-                    break;
-                default:
-                    throw new IllegalStateException("Illegal type: " + params.getType());
+            double[] dataArrayfromList = new double[dataArray.size()];
+            for (int i = 0; i < dataArrayfromList.length; i++) {
+                dataArrayfromList[i] = dataArray.get(i);
             }
-        } else {
+
+            System.out.println("Original data");
+            for (int j = 0; j < dataArray.size(); j++) {
+                System.out.println(dataArray.get(j));
+            }
+            System.out.println("End of original data");
+
+            for (int k = 0; k < dataArrayfromList.length; k++) {
+                System.out.println(dataArrayfromList[k]);
+            }
+            System.out.println("End of data");
+
+
+            final ArimaModel fittedModel = ArimaSolver.estimateARIMA(arimamodelparams, dataArrayfromList, dataArrayfromList.length,
+                    dataArrayfromList.length + 1);
+            ForecastResult forecastResult = Arima.forecast_arima(dataArrayfromList, forecastSize, arimamodelparams);
+
+            // Read forecast values
+            double[] forecastData = forecastResult.getForecast();
+            this.target = forecastData[0];
+
+            if (params.getType() == ArimaDetectorParams.Type.TWO_TAILED) {
+                if (observed > previousupper || observed < previouslower) {
+                    level = WEAK;
+                }
+                if (observed > (previousupper* strongDelta) || observed < (previouslower * weakDelta)) {
+                    level = STRONG;
+                }
+            }
+            else if (params.getType() == ArimaDetectorParams.Type.RIGHT_TAILED) {
+                System.out.printf("lower: %f\n",(previouslower* strongDelta));
+                System.out.println(observed);
+                System.out.printf("upper: %f\n",(previousupper* strongDelta));
+                if (observed > (previouslower * strongDelta)) {
+                    level = WEAK;
+                }
+                if (observed > (previousupper * strongDelta) ) {
+                    level = STRONG;
+                }
+            }
+            else {
+                if (observed < (previousupper * weakDelta)) {
+                    level = WEAK;
+                }
+                if (observed < (previousupper * weakDelta) ) {
+                    level = STRONG;
+                }
+            }
+            // Obtain upper- and lower-bounds of confidence intervals on forecast values.
+            // By default, it computes at 95%-confidence level. This value can be adjusted in ForecastUtil.java in library.
+            double[] uppers = forecastResult.getForecastUpperConf();
+            double[] lowers = forecastResult.getForecastLowerConf();
+            previousupper = uppers[0];
+            previouslower = lowers[0];
+
+            System.out.printf("%s\n", params.getType());
+        }
+        else {
             level = MODEL_WARMUP;
         }
 
-        // update values
-        this.FirstOrderDifferencedSeriesSum = this.FirstOrderDifferencedSeriesSum + this.prevDiff;
-        this.SeriesSum = this.SeriesSum + observed;
-        this.totalDataPoints++;
-        this.meanofdifferences = getMeanFirstOrderDifferencedSeries();
-        this.mean = getMean();
-        long_term_forecast_mu = this.meanofdifferences * (1 - AR_1);
-
-        this.prevDiff = observed - this.prevValue;
-        this.prevValue = observed;
-        this.prevtarget = this.target;
-
+        if (historylengthchecker == (params.getWarmUpPeriod()+1)) {
+            level = MODEL_WARMUP; // first observation after training cannot be marked as anomaly against limits.
+        }
 
         final AnomalyResult result = new AnomalyResult(getUuid(), metricData, level);
         result.setPredicted(this.target);
         return result;
+
     }
 
-    private double getMean() {
-        return SeriesSum / Math.max(1, totalDataPoints - 1);
-    }
-
-    private double getMeanFirstOrderDifferencedSeries() {
-        return FirstOrderDifferencedSeriesSum / Math.max(1, totalDataPoints - 1);
-    }
-
-    private double getSES(double MA_1) {
-        //θ1 = MA(1) or MA_1
-        //ARIMA(0,1,1) with constant = simple exponential smoothing with growth
-        // It follows that the average age of the data in the 1-period-ahead forecasts of an ARIMA(0,1,1)-without-constant model is 1/(1-θ1).
-        // et-1 = Yt-1 - Ŷt-1
-        // Ŷt   =  mu + Yt-1  - θ1*et-1
-        // mu = meanofdifferencesofseries * (1 - AR(1)), default AR(1) = 0
-        return long_term_forecast_mu + this.prevValue - (MA_1 * (this.prevValue - this.prevtarget));
-    }
 }

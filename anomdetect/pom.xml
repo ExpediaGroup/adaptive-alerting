@@ -75,5 +75,10 @@
             <groupId>org.springframework.hateoas</groupId>
             <artifactId>spring-hateoas</artifactId>
         </dependency>
+        <!-- Workday timeseries-forecast-->
+         <dependency>
+             <groupId>com.workday</groupId>
+             <artifactId>timeseries-forecast</artifactId>
+        </dependency>
     </dependencies>
 </project>

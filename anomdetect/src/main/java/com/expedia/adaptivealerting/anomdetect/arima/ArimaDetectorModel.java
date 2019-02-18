@@ -20,12 +20,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 /**
- * @author Willie Wheeler
+ * @author Dinil Divakar
  */
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public final class ArimaModel implements AnomalyDetectorModel {
+public final class ArimaDetectorModel implements AnomalyDetectorModel {
     private String uuid;
     private String type;
-    private ArimaParams params;
+    private ArimaDetectorParams params;
 }
