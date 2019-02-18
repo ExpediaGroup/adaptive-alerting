@@ -25,6 +25,7 @@ import lombok.val;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
@@ -43,6 +44,10 @@ public class DetectorLookup {
         detectorMap.put("holtwinters-detector", HoltWintersAnomalyDetector.class);
         detectorMap.put("individuals-detector", IndividualsControlChartAnomalyDetector.class);
         detectorMap.put("pewma-detector", PewmaAnomalyDetector.class);
+    }
+    
+    public Set<String> getDetectorTypes() {
+        return detectorMap.keySet();
     }
     
     public Class<? extends AnomalyDetector> getDetector(String key) {

@@ -16,12 +16,11 @@
 package com.expedia.adaptivealerting.kafka;
 
 import com.expedia.adaptivealerting.anomdetect.DetectorManager;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.metrics.MetricData;
-import com.google.common.collect.ImmutableMap;
 import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.kafka.common.serialization.Deserializer;
@@ -35,7 +34,9 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static com.expedia.adaptivealerting.kafka.KafkaAnomalyDetectorManager.CK_DETECTOR_CLASS_MAP;
+import java.util.Arrays;
+import java.util.HashSet;
+
 import static org.mockito.Mockito.when;
 
 /**
@@ -51,7 +52,10 @@ public final class KafkaDetectorManagerTest {
     private static final String OUTBOUND_TOPIC = "anomalies";
     
     @Mock
-    private DetectorManager manager;
+    private DetectorSource detectorSource;
+    
+    @Mock
+    private DetectorManager detectorManager;
     
     @Mock
     private StreamsAppConfig saConfig;
@@ -110,8 +114,6 @@ public final class KafkaDetectorManagerTest {
         when(saConfig.getTypesafeConfig()).thenReturn(tsConfig);
         when(saConfig.getInboundTopic()).thenReturn(INBOUND_TOPIC);
         when(saConfig.getOutboundTopic()).thenReturn(OUTBOUND_TOPIC);
-        when(tsConfig.getConfig(CK_DETECTOR_CLASS_MAP))
-                .thenReturn(ConfigFactory.parseMap(ImmutableMap.of("foo-detector", "foo.Bar")));
     }
     
     private void initTestObjects() {
@@ -120,14 +122,16 @@ public final class KafkaDetectorManagerTest {
     }
     
     private void initDependencies() {
-//        when(mapper.map(any(MetricData.class)))
-//                .thenReturn(Collections.singleton(mappedMetricData));
+        when(detectorSource.findDetectorTypes())
+                .thenReturn(new HashSet<>(Arrays.asList("constant-detector", "ewma-detector")));
+        when(detectorManager.getDetectorSource())
+                .thenReturn(detectorSource);
     }
     
     private void initTestMachinery() {
         
         // Topology test drivers
-        val topology = new KafkaAnomalyDetectorManager(saConfig, manager).buildTopology();
+        val topology = new KafkaAnomalyDetectorManager(saConfig, detectorManager).buildTopology();
         this.logAndFailDriver = TestObjectMother.topologyTestDriver(topology, MetricData.class, false);
         this.logAndContinueDriver = TestObjectMother.topologyTestDriver(topology, MetricData.class, true);
         

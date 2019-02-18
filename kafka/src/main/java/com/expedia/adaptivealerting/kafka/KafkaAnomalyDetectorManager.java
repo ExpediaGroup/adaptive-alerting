@@ -36,7 +36,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @Slf4j
 public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
     private static final String CK_AD_MANAGER = "ad-manager";
-    static final String CK_DETECTOR_CLASS_MAP = "detector-class-map";
     
     private final DetectorManager manager;
     
@@ -59,8 +58,7 @@ public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
         val config = getConfig();
         val inboundTopic = config.getInboundTopic();
         val outboundTopic = config.getOutboundTopic();
-        val detectorTypes = config.getTypesafeConfig().getConfig(CK_DETECTOR_CLASS_MAP)
-                .root().keySet();
+        val detectorTypes = manager.getDetectorSource().findDetectorTypes();
     
         log.info("Initializing: inboundTopic={}, outboundTopic={}", inboundTopic, outboundTopic);
         
