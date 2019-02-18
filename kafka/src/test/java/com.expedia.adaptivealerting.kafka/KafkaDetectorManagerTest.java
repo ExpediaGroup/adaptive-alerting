@@ -16,7 +16,6 @@
 package com.expedia.adaptivealerting.kafka;
 
 import com.expedia.adaptivealerting.anomdetect.DetectorManager;
-import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.metrics.MetricData;
@@ -50,9 +49,6 @@ public final class KafkaDetectorManagerTest {
     private static final String KAFKA_KEY = "some-kafka-key";
     private static final String INBOUND_TOPIC = "mapped-metrics";
     private static final String OUTBOUND_TOPIC = "anomalies";
-    
-    @Mock
-    private DetectorSource detectorSource;
     
     @Mock
     private DetectorManager detectorManager;
@@ -109,8 +105,6 @@ public final class KafkaDetectorManagerTest {
     }
     
     private void initConfig() {
-//        when(tsConfig.getString(CK_MODEL_SERVICE_URI_TEMPLATE)).thenReturn("https://example.com/");
-        
         when(saConfig.getTypesafeConfig()).thenReturn(tsConfig);
         when(saConfig.getInboundTopic()).thenReturn(INBOUND_TOPIC);
         when(saConfig.getOutboundTopic()).thenReturn(OUTBOUND_TOPIC);
@@ -122,10 +116,8 @@ public final class KafkaDetectorManagerTest {
     }
     
     private void initDependencies() {
-        when(detectorSource.findDetectorTypes())
+        when(detectorManager.getDetectorTypes())
                 .thenReturn(new HashSet<>(Arrays.asList("constant-detector", "ewma-detector")));
-        when(detectorManager.getDetectorSource())
-                .thenReturn(detectorSource);
     }
     
     private void initTestMachinery() {
