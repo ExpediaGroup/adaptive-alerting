@@ -22,6 +22,7 @@ import com.expedia.adaptivealerting.anomdetect.util.DetectorMeta;
 import com.expedia.metrics.MetricDefinition;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Detector source interfaces, supporting two major functions:
@@ -36,6 +37,8 @@ import java.util.List;
  * @author Willie Wheeler
  */
 public interface DetectorSource {
+    
+    Set<String> findDetectorTypes();
     
     /**
      * Finds the list of detector UUIDs for a given metric.

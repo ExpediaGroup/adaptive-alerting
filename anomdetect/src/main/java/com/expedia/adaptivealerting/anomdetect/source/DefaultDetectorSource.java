@@ -31,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -56,6 +57,11 @@ public class DefaultDetectorSource implements DetectorSource {
     
     public DefaultDetectorSource(Config config) {
         this.connector = buildConnector(config);
+    }
+    
+    @Override
+    public Set<String> findDetectorTypes() {
+        return detectorLookup.getDetectorTypes();
     }
     
     @Override

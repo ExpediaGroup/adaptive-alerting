@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -50,6 +51,11 @@ public final class TempHaystackAwareDetectorSource implements DetectorSource {
     public TempHaystackAwareDetectorSource(DetectorSource primaryDetectorSource) {
         notNull(primaryDetectorSource, "primaryDetectorSource can't be null");
         this.primaryDetectorSource = primaryDetectorSource;
+    }
+    
+    @Override
+    public Set<String> findDetectorTypes() {
+        return primaryDetectorSource.findDetectorTypes();
     }
     
     @Override
