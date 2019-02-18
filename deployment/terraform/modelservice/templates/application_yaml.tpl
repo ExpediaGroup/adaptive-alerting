@@ -23,7 +23,14 @@ spring:
 endpoints:
   health:
     sensitive: false
-management:
-  context-path: "/admin"
+metrics:
+    export:
+      jmx:
+        domain: com.expedia.adaptivealerting.modelservice.metrics
+    enable:
+      jvm: false
+      tomcat: false
+      system: false
+      process: false
 security:
   signingKey: $${SIGNING_KEY}
