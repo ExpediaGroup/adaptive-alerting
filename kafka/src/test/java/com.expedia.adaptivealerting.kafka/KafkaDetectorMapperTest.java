@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.kafka;
 
 import com.expedia.adaptivealerting.anomdetect.DetectorMapper;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.adaptivealerting.kafka.util.TestObjectMother;
 import com.expedia.metrics.MetricData;
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;

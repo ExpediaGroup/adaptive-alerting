@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.notifier;
+package com.expedia.adaptivealerting.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.charithe.kafka.EphemeralKafkaBroker;
@@ -21,6 +21,7 @@ import com.github.charithe.kafka.KafkaJunitRule;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
+import org.assertj.core.api.Assertions;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,15 +33,14 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.support.TestPropertySourceUtils;
 
-import static com.expedia.adaptivealerting.notifier.TestHelper.bootstrapServers;
-import static com.expedia.adaptivealerting.notifier.TestHelper.newMappedMetricData;
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.expedia.adaptivealerting.kafka.util.TestHelper.bootstrapServers;
+import static com.expedia.adaptivealerting.kafka.util.TestHelper.newMappedMetricData;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(
     classes = {
-        NotifierApplication.class,
-        NotifierApplicationTest.ServiceDependencies.class
+        KafkaNotifier.class,
+        KafkaNotifierTest.ServiceDependencies.class
     },
     webEnvironment = SpringBootTest.WebEnvironment.MOCK,
     properties = { // Set the only required properties
@@ -49,9 +49,9 @@ import static org.assertj.core.api.Assertions.assertThat;
     }
 )
 @ContextConfiguration(initializers = {
-    NotifierApplicationTest.ServiceDependencies.class
+    KafkaNotifierTest.ServiceDependencies.class
 })
-public class NotifierApplicationTest {
+public class KafkaNotifierTest {
 
     @ClassRule public static KafkaJunitRule kafka = new KafkaJunitRule(EphemeralKafkaBroker.create());
     @ClassRule public static MockWebServer webhook = new MockWebServer();
@@ -69,9 +69,9 @@ public class NotifierApplicationTest {
 
         // Then, the notifier POSTs the json from the message into the webhook
         RecordedRequest webhookRequest = webhook.takeRequest();
-        assertThat(webhookRequest.getMethod())
+        Assertions.assertThat(webhookRequest.getMethod())
             .isEqualTo("POST");
-        assertThat(webhookRequest.getBody().readUtf8())
+        Assertions.assertThat(webhookRequest.getBody().readUtf8())
             .isEqualTo(json);
     }
 

@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.notifier.service;
+package com.expedia.adaptivealerting.kafka.notifier;
 
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.adaptivealerting.notifier.config.AppConfig;
-import com.expedia.adaptivealerting.notifier.util.MetricsMonitor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +38,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-// TODO Isolate the notification logic from the Kafka code and move Kafka to the Kafka module. [WLW]
+// TODO Extract the domain logic and move it to the notifier module. [WLW]
 
 @Component
 @Slf4j
@@ -48,18 +46,18 @@ public class Notifier implements ApplicationListener<ApplicationReadyEvent> {
 
     private long TIME_OUT = 10_000;
     private final ObjectMapper objectMapper;
-    private final AppConfig appConfig;
+    private final NotifierConfig notifierConfig;
     private final RestTemplate restTemplate;
     private final String webhookUrl;
 
     final AtomicBoolean running = new AtomicBoolean(); // Visible for testing
 
     @Autowired
-    public Notifier(AppConfig appConfig, ObjectMapper objectMapper, RestTemplate restTemplate) {
-        this.appConfig = appConfig;
+    public Notifier(NotifierConfig notifierConfig, ObjectMapper objectMapper, RestTemplate restTemplate) {
+        this.notifierConfig = notifierConfig;
         this.objectMapper = objectMapper;
         this.restTemplate = restTemplate;
-        this.webhookUrl = appConfig.getWebhookUrl();
+        this.webhookUrl = notifierConfig.getWebhookUrl();
     }
 
     @PreDestroy
@@ -83,8 +81,8 @@ public class Notifier implements ApplicationListener<ApplicationReadyEvent> {
 
     private void loopUntilShutdown() {
         try (KafkaConsumer<String, MappedMetricData> kafkaConsumer =
-                 new KafkaConsumer<>(appConfig.getKafkaConsumerConfig())) {
-            kafkaConsumer.subscribe(Arrays.asList(appConfig.getKafkaTopic()));
+                 new KafkaConsumer<>(notifierConfig.getKafkaConsumerConfig())) {
+            kafkaConsumer.subscribe(Arrays.asList(notifierConfig.getKafkaTopic()));
 
             while (running.get()) {
                 processAlerts(kafkaConsumer);
