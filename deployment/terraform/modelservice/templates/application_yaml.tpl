@@ -28,7 +28,7 @@ management:
   metrics:
     export:
       jmx:
-        domain: com.expedia.adaptivealerting.modelservice.metrics
+        domain: spring
     enable:
       jvm: false
       tomcat: false
