@@ -23,7 +23,9 @@ spring:
 endpoints:
   health:
     sensitive: false
-metrics:
+management:
+  context-path: "/admin"
+  metrics:
     export:
       jmx:
         domain: com.expedia.adaptivealerting.modelservice.metrics
