@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Expedia Group, Inc.
+ * Copyright 2018-2019 Expedia Group, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,10 @@ import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.TagCollection;
 import com.github.charithe.kafka.KafkaJunitRule;
 import com.google.common.collect.ImmutableMap;
+import org.apache.kafka.clients.CommonClientConfigs;
+
 import java.time.Instant;
 import java.util.UUID;
-import org.apache.kafka.clients.CommonClientConfigs;
 
 import static com.expedia.metrics.MetricDefinition.MTYPE;
 import static com.expedia.metrics.MetricDefinition.UNIT;
@@ -37,7 +38,7 @@ public class TestHelper {
         MetricDefinition def = new MetricDefinition("latency", tags, TagCollection.EMPTY);
         MetricData data = new MetricData(def, 2.0f, Instant.now().getEpochSecond());
         UUID detectorUUID = UUID.randomUUID();
-        MappedMetricData mappedData = new MappedMetricData(data, detectorUUID, "aquila-detector");
+        MappedMetricData mappedData = new MappedMetricData(data, detectorUUID, "ewma-detector");
         mappedData.setAnomalyResult(new AnomalyResult(detectorUUID, data, AnomalyLevel.NORMAL));
         return mappedData;
     }

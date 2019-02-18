@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Expedia Group, Inc.
+ * Copyright 2018-2019 Expedia Group, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,12 @@
 
 package com.expedia.adaptivealerting.anomdetect.util;
 
-import lombok.NoArgsConstructor;
 import org.springframework.hateoas.Resources;
-
-import java.util.Collection;
-
 
 /**
  * Model resources.
  *
  * @author Shubham Sethi
  */
-@NoArgsConstructor
 public class ModelResources extends Resources<ModelResource> {
-
-    public ModelResources(Collection<ModelResource> modelResources) {
-        super(modelResources);
-    }
 }

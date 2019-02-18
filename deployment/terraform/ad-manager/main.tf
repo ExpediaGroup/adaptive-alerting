@@ -7,30 +7,14 @@ locals {
   configmap_name = "ad-manager-${local.checksum}"
 }
 
-resource "kubernetes_config_map" "aa-config" {
-  metadata {
-    name = "${local.configmap_name}"
-    namespace = "${var.namespace}"
-  }
-  data {
-    "ad-manager.conf" = "${data.template_file.config_data.rendered}"
-  }
-  count = "${local.count}"
-}
-
 data "template_file" "config_data" {
   template = "${file("${local.config_file_path}")}"
   vars {
     kafka_endpoint = "${var.kafka_endpoint}"
-    models_region = "${var.models_region}"
-    models_bucket = "${var.models_bucket}"
-    aquila_uri = "${var.aquila_uri}"
     modelservice_uri_template = "${var.modelservice_uri_template}"
-
   }
 }
 
-// using kubectl to craete deployment construct since its not natively support by the kubernetes provider
 data "template_file" "deployment_yaml" {
   template = "${file("${local.deployment_yaml_file_path}")}"
   vars {
@@ -55,10 +39,23 @@ data "template_file" "deployment_yaml" {
     graphite_enabled = "${var.graphite_enabled}"
     graphite_port = "${var.graphite_port}"
     graphite_host = "${var.graphite_hostname}"
+    graphite_prefix = "${var.graphite_prefix}"
     env_vars = "${indent(9,"${var.env_vars}")}"
   }
 }
 
+resource "kubernetes_config_map" "ad-manager-config" {
+  metadata {
+    name = "${local.configmap_name}"
+    namespace = "${var.namespace}"
+  }
+  data {
+    "ad-manager.conf" = "${data.template_file.config_data.rendered}"
+  }
+  count = "${local.count}"
+}
+
+# Deploying via kubectl since Terraform k8s provider doesn't natively support deployment.
 resource "null_resource" "kubectl_apply" {
   triggers {
     template = "${data.template_file.deployment_yaml.rendered}"

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Expedia Group, Inc.
+ * Copyright 2018-2019 Expedia Group, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@ public abstract class AbstractMetricSource implements MetricSource {
      * @param metricKey Metric key.
      * @param periodMs  Timer period in milliseconds.
      */
+    // TODO: Remove unused metricKey parameter
     public AbstractMetricSource(String metricKey, long periodMs) {
         notNull(metricKey, "metricKey can't be null");
         isTrue(periodMs > 0, "periodMs must be > 0");

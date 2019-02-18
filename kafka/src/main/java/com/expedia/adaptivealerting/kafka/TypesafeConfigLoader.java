@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Expedia Group, Inc.
+ * Copyright 2018-2019 Expedia Group, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ public class TypesafeConfigLoader {
     /**
      * Fallback configuration key.
      */
-    private static final String CK_DEFAULT_APP_CONFIG = "kstream.app.default";
+    private static final String CK_KSTREAM_APP_DEFAULT_CONFIG = "kstream.app.default";
     
     /**
      * Overrides configuration path environment variable.
@@ -57,7 +57,7 @@ public class TypesafeConfigLoader {
     public Config loadBaseConfig() {
         log.info("Loading base configuration: appKey={}", appKey);
         val baseAppConfigs = ConfigFactory.load(BASE_APP_CONFIG_PATH);
-        val defaultAppConfig = baseAppConfigs.getConfig(CK_DEFAULT_APP_CONFIG);
+        val defaultAppConfig = baseAppConfigs.getConfig(CK_KSTREAM_APP_DEFAULT_CONFIG);
         return baseAppConfigs.getConfig(appKey).withFallback(defaultAppConfig);
     }
     

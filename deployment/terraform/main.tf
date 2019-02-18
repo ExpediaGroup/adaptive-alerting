@@ -6,35 +6,6 @@ locals {
 # Adaptive Alerting
 # ========================================
 
-module "modelservice" {
-  source = "modelservice"
-
-  # Docker
-  image = "expediadotcom/adaptive-alerting-modelservice:${var.alerting["version"]}"
-
-  # Kubernetes
-  namespace = "${var.app_namespace}"
-  enabled = "${var.modelservice["enabled"]}"
-  replicas = "${var.modelservice["instances"]}"
-  cpu_limit = "${var.modelservice["cpu_limit"]}"
-  cpu_request = "${var.modelservice["cpu_request"]}"
-  memory_limit = "${var.modelservice["memory_limit"]}"
-  memory_request = "${var.modelservice["memory_request"]}"
-  node_selector_label = "${var.node_selector_label}"
-  kubectl_executable_name = "${var.kubectl_executable_name}"
-  kubectl_context_name = "${var.kubectl_context_name}"
-
-  # Environment
-  jvm_memory_limit = "${var.modelservice["jvm_memory_limit"]}"
-  graphite_hostname = "${var.graphite_hostname}"
-  graphite_port = "${var.graphite_port}"
-  graphite_enabled = "${var.graphite_enabled}"
-  env_vars = "${var.modelservice["environment_overrides"]}"
-
-  # App
-  db_endpoint = "${var.modelservice["db_endpoint"]}"
-}
-
 module "ad-mapper" {
   source = "ad-mapper"
 
@@ -59,6 +30,7 @@ module "ad-mapper" {
   graphite_hostname = "${var.graphite_hostname}"
   graphite_port = "${var.graphite_port}"
   graphite_enabled = "${var.graphite_enabled}"
+  graphite_prefix = "${var.graphite_prefix}"
   env_vars = "${var.ad-mapper["environment_overrides"]}"
 
   # App
@@ -90,20 +62,89 @@ module "ad-manager" {
   graphite_enabled = "${var.graphite_enabled}"
   graphite_hostname = "${var.graphite_hostname}"
   graphite_port = "${var.graphite_port}"
+  graphite_prefix = "${var.graphite_prefix}"
   env_vars = "${var.ad-manager["environment_overrides"]}"
 
   # App
   kafka_endpoint = "${local.kafka_endpoint}"
-  aquila_uri = "${var.ad-manager["aquila_uri"]}"
-  models_region = "${var.ad-manager["models_region"]}"
-  models_bucket = "${var.ad-manager["models_bucket"]}"
   modelservice_uri_template = "${var.ad-manager["modelservice_uri_template"]}"
+}
+
+module "modelservice" {
+  source = "modelservice"
+
+  # Docker
+  image = "${var.modelservice["image"]}"
+  image_pull_policy = "${var.modelservice["image_pull_policy"]}"
+
+  # Kubernetes
+  namespace = "${var.app_namespace}"
+  enabled = "${var.modelservice["enabled"]}"
+  replicas = "${var.modelservice["instances"]}"
+  cpu_limit = "${var.modelservice["cpu_limit"]}"
+  cpu_request = "${var.modelservice["cpu_request"]}"
+  memory_limit = "${var.modelservice["memory_limit"]}"
+  memory_request = "${var.modelservice["memory_request"]}"
+  node_selector_label = "${var.node_selector_label}"
+  kubectl_executable_name = "${var.kubectl_executable_name}"
+  kubectl_context_name = "${var.kubectl_context_name}"
+
+  # Environment
+  jvm_memory_limit = "${var.modelservice["jvm_memory_limit"]}"
+  graphite_hostname = "${var.graphite_hostname}"
+  graphite_port = "${var.graphite_port}"
+  graphite_enabled = "${var.graphite_enabled}"
+  graphite_prefix = "${var.graphite_prefix}"
+  env_vars = "${var.modelservice["environment_overrides"]}"
+
+  # App
+  db_endpoint = "${var.modelservice["db_endpoint"]}"
+}
+
+module "mc-a2m-mapper" {
+  source = "mc-a2m-mapper"
+
+  # Docker
+  image = "${var.mc-a2m-mapper["image"]}"
+  image_pull_policy = "${var.mc-a2m-mapper["image_pull_policy"]}"
+
+  # Kubernetes
+  namespace = "${var.app_namespace}"
+  enabled = "${var.mc-a2m-mapper["enabled"]}"
+  replicas = "${var.mc-a2m-mapper["instances"]}"
+  cpu_limit = "${var.mc-a2m-mapper["cpu_limit"]}"
+  cpu_request = "${var.mc-a2m-mapper["cpu_request"]}"
+  memory_limit = "${var.mc-a2m-mapper["memory_limit"]}"
+  memory_request = "${var.mc-a2m-mapper["memory_request"]}"
+  node_selector_label = "${var.node_selector_label}"
+  kubectl_executable_name = "${var.kubectl_executable_name}"
+  kubectl_context_name = "${var.kubectl_context_name}"
+
+  # Environment
+  graphite_enabled = "${var.graphite_enabled}"
+  graphite_hostname = "${var.graphite_hostname}"
+  graphite_port = "${var.graphite_port}"
+  jvm_memory_limit = "${var.mc-a2m-mapper["jvm_memory_limit"]}"
+  env_vars = "${var.mc-a2m-mapper["environment_overrides"]}"
+
+  # App
+  anomaly_consumer_bootstrap_servers = "${var.mc-a2m-mapper["anomaly_consumer_bootstrap_servers"]}"
+  anomaly_consumer_group_id = "${var.mc-a2m-mapper["anomaly_consumer_group_id"]}"
+  anomaly_consumer_topic = "${var.mc-a2m-mapper["anomaly_consumer_topic"]}"
+  anomaly_consumer_key_deserializer = "${var.mc-a2m-mapper["anomaly_consumer_key_deserializer"]}"
+  anomaly_consumer_value_deserializer = "${var.mc-a2m-mapper["anomaly_consumer_value_deserializer"]}"
+  metric_producer_bootstrap_servers = "${var.mc-a2m-mapper["metric_producer_bootstrap_servers"]}"
+  metric_producer_client_id = "${var.mc-a2m-mapper["metric_producer_client_id"]}"
+  metric_producer_topic = "${var.mc-a2m-mapper["metric_producer_topic"]}"
+  metric_producer_key_serializer = "${var.mc-a2m-mapper["metric_producer_key_serializer"]}"
+  metric_producer_value_serializer = "${var.mc-a2m-mapper["metric_producer_value_serializer"]}"
 }
 
 module "notifier" {
   source = "notifier"
 
   # Docker
+  # TODO Update the image to source from var.notifier["image"]
   image = "expediadotcom/adaptive-alerting-notifier:${var.alerting["version"]}"
   image_pull_policy = "${var.notifier["image_pull_policy"]}"
 
@@ -129,62 +170,4 @@ module "notifier" {
   # App
   kafka_endpoint = "${local.kafka_endpoint}"
   webhook_url = "${var.notifier["webhook_url"]}"
-}
-
-# ========================================
-# Aquila
-# ========================================
-
-module "aquila-detector" {
-  source = "aquila-detect"
-
-  # Docker
-  image = "${var.aquila-detector["image"]}"
-  image_pull_policy = "${var.aquila-detector["image_pull_policy"]}"
-
-  # Kubernetes
-  namespace = "${var.app_namespace}"
-  enabled = "${var.aquila-detector["enabled"]}"
-  replicas = "${var.aquila-detector["instances"]}"
-  cpu_limit = "${var.aquila-detector["cpu_limit"]}"
-  cpu_request = "${var.aquila-detector["cpu_request"]}"
-  memory_limit = "${var.aquila-detector["memory_limit"]}"
-  memory_request = "${var.aquila-detector["memory_request"]}"
-  node_selector_label = "${var.node_selector_label}"
-  kubectl_executable_name = "${var.kubectl_executable_name}"
-  kubectl_context_name = "${var.kubectl_context_name}"
-
-  # Environment
-  jvm_memory_limit = "${var.aquila-detector["jvm_memory_limit"]}"
-  graphite_hostname = "${var.graphite_hostname}"
-  graphite_port = "${var.graphite_port}"
-  graphite_enabled = "${var.graphite_enabled}"
-  env_vars = "${var.aquila-detector["environment_overrides"]}"
-}
-
-module "aquila-trainer" {
-  source = "aquila-train"
-
-  # Docker
-  image = "${var.aquila-trainer["image"]}"
-  image_pull_policy = "${var.aquila-trainer["image_pull_policy"]}"
-
-  # Kubernetes
-  namespace = "${var.app_namespace}"
-  enabled = "${var.aquila-trainer["enabled"]}"
-  replicas = "${var.aquila-trainer["instances"]}"
-  cpu_limit = "${var.aquila-trainer["cpu_limit"]}"
-  cpu_request = "${var.aquila-trainer["cpu_request"]}"
-  memory_limit = "${var.aquila-trainer["memory_limit"]}"
-  memory_request = "${var.aquila-trainer["memory_request"]}"
-  node_selector_label = "${var.node_selector_label}"
-  kubectl_executable_name = "${var.kubectl_executable_name}"
-  kubectl_context_name = "${var.kubectl_context_name}"
-
-  # Environment
-  jvm_memory_limit = "${var.aquila-trainer["jvm_memory_limit"]}"
-  graphite_hostname = "${var.graphite_hostname}"
-  graphite_port = "${var.graphite_port}"
-  graphite_enabled = "${var.graphite_enabled}"
-  env_vars = "${var.aquila-trainer["environment_overrides"]}"
 }

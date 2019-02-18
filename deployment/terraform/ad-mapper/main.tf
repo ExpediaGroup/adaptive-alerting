@@ -7,17 +7,6 @@ locals {
   configmap_name = "ad-mapper-${local.checksum}"
 }
 
-resource "kubernetes_config_map" "aa-config" {
-  metadata {
-    name = "${local.configmap_name}"
-    namespace = "${var.namespace}"
-  }
-  data {
-    "ad-mapper.conf" = "${data.template_file.config_data.rendered}"
-  }
-  count = "${local.count}"
-}
-
 data "template_file" "config_data" {
   template = "${file("${local.config_file_path}")}"
   vars {
@@ -26,7 +15,6 @@ data "template_file" "config_data" {
   }
 }
 
-// using kubectl to craete deployment construct since its not natively support by the kubernetes provider
 data "template_file" "deployment_yaml" {
   template = "${file("${local.deployment_yaml_file_path}")}"
   vars {
@@ -51,10 +39,23 @@ data "template_file" "deployment_yaml" {
     graphite_enabled = "${var.graphite_enabled}"
     graphite_host = "${var.graphite_hostname}"
     graphite_port = "${var.graphite_port}"
+    graphite_prefix = "${var.graphite_prefix}"
     env_vars = "${indent(9,"${var.env_vars}")}"
   }
 }
 
+resource "kubernetes_config_map" "ad-mapper-config" {
+  metadata {
+    name = "${local.configmap_name}"
+    namespace = "${var.namespace}"
+  }
+  data {
+    "ad-mapper.conf" = "${data.template_file.config_data.rendered}"
+  }
+  count = "${local.count}"
+}
+
+# Deploying via kubectl since Terraform k8s provider doesn't natively support deployment.
 resource "null_resource" "kubectl_apply" {
   triggers {
     template = "${data.template_file.deployment_yaml.rendered}"

@@ -6,7 +6,7 @@ ewma.filter <- function(alpha, values) {
 
 # My far less elegant implementation, but one that generates the running variance.
 # I include the known.mean as a sanity check.
-build.tests <- function(alpha, small.mult, large.mult, data, known.mean) {
+build.tests <- function(alpha, data, known.mean) {
   n <- nrow(data)
 
   date <- data$date
@@ -31,17 +31,13 @@ build.tests <- function(alpha, small.mult, large.mult, data, known.mean) {
 
 # Read data
 data <- read.table("../datasets/cal-inflow.csv", header = TRUE, sep = ",")
-date <- data$date
-observed <- data$observed
 
 # Model params
 alpha <- 0.05
-small.mult <- 2
-large.mult <- 3
 
 # Tests
 known.mean <- ewma.filter(alpha, data$observed)
-tests <- build.tests(alpha, small.mult, large.mult, data, known.mean)
+tests <- build.tests(alpha, data, known.mean)
 
 # Plot
 plot(data$observed[1:480], type="l", col="blue")

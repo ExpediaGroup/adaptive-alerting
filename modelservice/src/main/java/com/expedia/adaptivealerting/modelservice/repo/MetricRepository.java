@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Expedia Group, Inc.
+ * Copyright 2018-2019 Expedia Group, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,5 +75,15 @@ public interface MetricRepository extends PagingAndSortingRepository<Metric, Lon
      */
     @Query(nativeQuery = true, value = "SELECT * FROM (SELECT id, ukey, hash, tags, JSON_SEARCH(tags, \"all\", :tag) as tag_result FROM metric) as new_metric WHERE tag_result IS NOT NULL")
     List<Metric> findByTagsContaining(@Param("tag") String tag);
+
+    /**
+     * Finds a list of metrics attached to a given detector
+     *
+     * @param uuid Detector uuid.
+     * @return List of metrics attached to the provided detector uuid
+     */
+    @Query("select mmm.metric from MetricDetectorMapping mmm where mmm.detector.uuid = :uuid")
+    List<Metric> findByDetectorUuid(@Param("uuid") String uuid);
+
 
 }

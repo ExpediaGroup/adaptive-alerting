@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Expedia Group, Inc.
+ * Copyright 2018-2019 Expedia Group, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.util;
 
+import com.expedia.adaptivealerting.anomdetect.DetectorMapper;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.metrictank.MetricTankIdFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,6 +27,9 @@ import org.springframework.hateoas.hal.Jackson2HalModule;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -37,7 +41,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * <p>
  * For now this is just part of the
  * {@link com.expedia.adaptivealerting.anomdetect} package as the only thing using it is the
- * {@link com.expedia.adaptivealerting.anomdetect.AnomalyDetectorMapper}. If we find others needing to use it then we
+ * {@link DetectorMapper}. If we find others needing to use it then we
  * might end up moving it into some common location.
  * </p>
  *
@@ -94,4 +98,11 @@ public class ModelServiceConnector {
         }
     }
 
+    public ModelResource findLatestModel(UUID detectorUuid) {
+        final Resources<ModelResource> modelResources = findModels(detectorUuid);
+        final Collection<ModelResource> modelResourceCollection = modelResources.getContent();
+        List<ModelResource> modelResourceList = new ArrayList<>(modelResourceCollection);
+
+        return modelResourceList.isEmpty() ? null : modelResourceList.get(0);
+    }
 }

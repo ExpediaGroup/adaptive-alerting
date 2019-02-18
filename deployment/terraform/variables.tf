@@ -1,17 +1,15 @@
-variable "kubectl_context_name" {}
+variable "app_namespace" {}
 variable "kafka_hostname" {}
 variable "kafka_port" {}
 variable "graphite_hostname" {}
 variable "graphite_port" {}
 variable "graphite_enabled" {}
-variable "kubectl_executable_name" {}
-variable "app_namespace" {}
-variable "node_selector_label"{}
-
-# TODO Why is this part of Adaptive Alerting?
-variable "metrictank" {
-  type = "map"
+variable "graphite_prefix" {
+  default = ""
 }
+variable "node_selector_label"{}
+variable "kubectl_context_name" {}
+variable "kubectl_executable_name" {}
 
 variable "alerting" {
   type = "map"
@@ -29,14 +27,10 @@ variable "modelservice" {
   type = "map"
 }
 
+variable "mc-a2m-mapper" {
+  type = "map"
+}
+
 variable "notifier" {
-  type = "map"
-}
-
-variable "aquila-detector" {
-  type = "map"
-}
-
-variable "aquila-trainer" {
   type = "map"
 }

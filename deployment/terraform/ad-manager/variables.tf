@@ -21,11 +21,11 @@ variable "jvm_memory_limit" {}
 variable "graphite_hostname" {}
 variable "graphite_port" {}
 variable "graphite_enabled" {}
+variable "graphite_prefix" {
+  default = ""
+}
 variable "env_vars" {}
 
 # App
 variable "kafka_endpoint" {}
-variable "models_region" {}
-variable "models_bucket" {}
-variable "aquila_uri" {}
 variable "modelservice_uri_template" {}

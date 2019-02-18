@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Expedia Group, Inc.
+ * Copyright 2018-2019 Expedia Group, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,13 +45,13 @@ public interface ModelRepository extends PagingAndSortingRepository<Model, Long>
             "where m1.detector_id = filtered_table.detector_id\n" +
             "  and m1.date_created = filtered_table.max_date_created;")
     List<Model> findByMetricHash(@Param("hash") String hash);
-    
+
     @RestResource(rel = "findByDetectorId", path = "findByDetectorId")
     List<Model> findByDetectorIdOrderByDateCreatedDesc(@Param("detectorId") Long detectorId);
-    
+
     @Query(nativeQuery = true, value = "SELECT m1.* FROM  model m1, detector d1  where d1.id=m1.detector_id and d1.uuid=:uuid ORDER BY m1.date_created DESC LIMIT 1;")
     Model findByDetectorUuid(@Param("uuid") String uuid);
-    
+
     // FIXME Shouldn't this return a single model? [WLW]
     @RestResource(rel = "findLatestByDetectorUuid", path = "findLatestByDetectorUuid")
     List<Model> findTopByDetectorUuidOrderByDateCreatedDesc(@Param("uuid") String uuid);

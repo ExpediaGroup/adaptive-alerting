@@ -1,0 +1,32 @@
+spring:
+  main:
+    web-environment: true
+    show-banner: false
+  datasource:
+    url: "jdbc:mysql://database:3306/aa_model_service?autoReconnect=true"
+    username: ${USERNAME:root}
+    password: ${PASSWORD:""}
+    maximum-pool-size: 8
+    minimum-idle: 0
+    driver-class-name: "com.mysql.cj.jdbc.Driver"
+  jpa:
+    openInView: true
+    database: "MYSQL"
+    show-sql: false
+    generate-ddl: false
+    hibernate:
+      naming_strategy: "org.hibernate.cfg.ImprovedNamingStrategy"
+  data:
+    rest:
+      base-path: "/api"
+endpoints:
+  health:
+    sensitive: false
+management:
+  context-path: "/admin"
+security:
+  clientId: "id"
+  secret: "secret"
+  signingKey: "1234"
+server:
+  port: 8008

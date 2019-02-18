@@ -51,3 +51,25 @@ create table metric_detector_mapping (
   constraint detector_id_mapping_fk foreign key (detector_id) references detector (id),
   unique index (metric_id, detector_id)
 );
+
+create table user (
+  id           int unsigned primary key not null auto_increment,
+  username     varchar(100) unique not null,
+  password     varchar(100) not null,
+  role         varchar(100),
+  enabled      boolean
+);
+
+create table oauth_client_details (
+  client_id VARCHAR(256) PRIMARY KEY,
+  resource_ids VARCHAR(256),
+  client_secret VARCHAR(256),
+  scope VARCHAR(256),
+  authorized_grant_types VARCHAR(256),
+  web_server_redirect_uri VARCHAR(256),
+  authorities VARCHAR(256),
+  access_token_validity INTEGER,
+  refresh_token_validity INTEGER,
+  additional_information VARCHAR(4096),
+  autoapprove VARCHAR(256)
+);

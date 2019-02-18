@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Expedia Group, Inc.
+ * Copyright 2018-2019 Expedia Group, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.cusum;
 
+import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -25,42 +26,37 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public final class CusumParams {
-    public enum Type {
-        LEFT_TAILED,
-        RIGHT_TAILED,
-        TWO_TAILED
-    }
-    
+
     /**
      * Detector type: left-, right- or two-tailed.
      */
-    private Type type = Type.LEFT_TAILED;
-    
+    private AnomalyType type;
+
     /**
      * Target value (i.e., the set point).
      */
     private double targetValue = 0.0;
-    
+
     /**
      * Weak threshold sigmas.
      */
     private double weakSigmas = 3.0;
-    
+
     /**
      * Strong threshold sigmas.
      */
     private double strongSigmas = 4.0;
-    
+
     /**
      * Slack param to calculate slack value k where k = slack_param * stdev.
      */
     private double slackParam = 0.5;
-    
+
     /**
      * Initial mean estimate.
      */
     private double initMeanEstimate = 0.0;
-    
+
     /**
      * Minimum number of data points required before this anomaly detector is available for use.
      */

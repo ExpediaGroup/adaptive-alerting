@@ -21,6 +21,7 @@ spec:
       containers:
       - name: ${app_name}
         image: ${image}
+        imagePullPolicy: ${image_pull_policy}
         volumeMounts:
           # Create on-disk volume to store exec logs
         - mountPath: /config
@@ -43,12 +44,19 @@ spec:
             secretKeyRef:
               name: modelservice-secret
               key: username
+        - name: "SIGNING_KEY"
+          valueFrom:
+            secretKeyRef:
+              name: modelservice-secret
+              key: signing_key     
         - name: "AA_GRAPHITE_HOST"
           value: "${graphite_host}"
         - name: "AA_GRAPHITE_PORT"
           value: "${graphite_port}"
         - name: "AA_GRAPHITE_ENABLED"
           value: "${graphite_enabled}"
+        - name: "GRAPHITE_PREFIX"
+          value: "${graphite_prefix}"
         - name: "JAVA_XMS"
           value: "${jvm_memory_limit}m"
         - name: "JAVA_XMX"

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Expedia Group, Inc.
+ * Copyright 2018-2019 Expedia Group, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,12 @@ import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.kafka.serde.JsonPojoDeserializer;
 import com.expedia.adaptivealerting.kafka.serde.JsonPojoSerde;
 import com.expedia.adaptivealerting.kafka.serde.JsonPojoSerializer;
+import com.expedia.alertmanager.model.Alert;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
+import com.expedia.metrics.TagCollection;
 import lombok.val;
 import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.Topology;
@@ -35,6 +36,7 @@ import org.apache.kafka.streams.test.ConsumerRecordFactory;
 
 import java.time.Instant;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -57,8 +59,32 @@ public final class TestObjectMother {
     private TestObjectMother() {
     }
     
+    /**
+     * Returns a set of metric tags, valid for Metrictank.
+     *
+     * @return Metrictank-valid metric tags
+     */
+    public static TagCollection metricTags() {
+        val tags = new HashMap<String, String>();
+        
+        // Metrics 2.0
+        tags.put("mtype", "gauge");
+        tags.put("unit", "");
+        
+        // Metrictank
+        tags.put("org_id", "1");
+        tags.put("interval", "1");
+        
+        return new TagCollection(tags);
+    }
+    
+    public static TagCollection metricMeta() {
+        val meta = new HashMap<String, String>();
+        return new TagCollection(meta);
+    }
+    
     public static MetricData metricData() {
-        val metricDefinition = new MetricDefinition("some-metric-key");
+        val metricDefinition = new MetricDefinition("some-metric-key", metricTags(), metricMeta());
         val now = Instant.now().getEpochSecond();
         return new MetricData(metricDefinition, 100.0, now);
     }
@@ -74,21 +100,43 @@ public final class TestObjectMother {
         anomalyResult.setAnomalyLevel(AnomalyLevel.STRONG);
         return anomalyResult;
     }
+
+    public static Alert alert() {
+        val alert = new Alert();
+        long timestamp = System.currentTimeMillis();
+        alert.setName("some-metric-key");
+        HashMap<String,String> annotations = new HashMap<>();
+        annotations.put("value","100.0");
+        annotations.put("timestamp", String.valueOf(timestamp/1000));
+        HashMap<String,String> label = new HashMap<>();
+        label.put("metric_key", "some-metric-key"); //Please Note: metric key can override a tag if it has the same name.
+        label.put("mtype", "gauge");
+        label.put("unit","");
+        label.put("org_id", "1");
+        label.put("interval","1");
+        label.put("anomalyLevel","STRONG");
+        alert.setLabels(label);
+        alert.setAnnotations(annotations);
+        return alert;
+    }
     
-    public static TopologyTestDriver topologyTestDriver(Topology topology, boolean continueOnDeserException) {
+    public static TopologyTestDriver topologyTestDriver(
+            Topology topology,
+            Class<?> jsonPojoDeserializerClass,
+            boolean continueOnDeserException) {
+        
         val props = new Properties();
         props.put(StreamsConfig.APPLICATION_ID_CONFIG, "test");
         props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "dummy:1234");
         props.setProperty(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName());
         props.setProperty(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, JsonPojoSerde.class.getName());
-        props.setProperty(JsonPojoDeserializer.CK_JSON_POJO_CLASS, MetricData.class.getName());
+        props.setProperty(JsonPojoDeserializer.CK_JSON_POJO_CLASS, jsonPojoDeserializerClass.getName());
         
         if (continueOnDeserException) {
             props.setProperty(
                     StreamsConfig.DEFAULT_DESERIALIZATION_EXCEPTION_HANDLER_CLASS_CONFIG,
                     LogAndContinueExceptionHandler.class.getName());
         }
-        
         return new TopologyTestDriver(topology, props);
     }
     
@@ -104,11 +152,7 @@ public final class TestObjectMother {
     public static ConsumerRecordFactory<String, MappedMetricData> mappedMetricDataFactory() {
         return new ConsumerRecordFactory<>(new StringSerializer(), new JsonPojoSerializer<>());
     }
-    
-    public static StringDeserializer stringDeserializer() {
-        return new StringDeserializer();
-    }
-    
+
     public static JsonPojoDeserializer<MappedMetricData> mappedMetricDataDeserializer() {
         val deserializer = new JsonPojoDeserializer<MappedMetricData>();
         deserializer.configure(
@@ -121,6 +165,14 @@ public final class TestObjectMother {
         val deserializer = new JsonPojoDeserializer<AnomalyResult>();
         deserializer.configure(
                 Collections.singletonMap(JsonPojoDeserializer.CK_JSON_POJO_CLASS, AnomalyResult.class),
+                false);
+        return deserializer;
+    }
+
+    public static JsonPojoDeserializer<Alert> alertDeserializer() {
+        val deserializer = new JsonPojoDeserializer<Alert>();
+        deserializer.configure(
+                Collections.singletonMap(JsonPojoDeserializer.CK_JSON_POJO_CLASS, Alert.class),
                 false);
         return deserializer;
     }

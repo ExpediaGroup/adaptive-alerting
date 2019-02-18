@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Expedia Group, Inc.
+ * Copyright 2018-2019 Expedia Group, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.cusum;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.adaptivealerting.core.util.MathUtil;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
@@ -66,7 +67,7 @@ public class CusumAnomalyDetectorTest {
         final CusumTestRow testRow0 = testRows.next();
         
         final CusumParams params = new CusumParams()
-                .setType(CusumParams.Type.RIGHT_TAILED)
+                .setType(AnomalyType.RIGHT_TAILED)
                 .setTargetValue(0.16)
                 .setWeakSigmas(WEAK_SIGMAS)
                 .setStrongSigmas(STRONG_SIGMAS)

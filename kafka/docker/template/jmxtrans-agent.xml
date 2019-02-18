@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright 2018 Expedia Group, Inc.
+  ~ Copyright 2018-2019 Expedia Group, Inc.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
             resultAlias="jvm.nonHeapMemoryUsage.used"/>
         <query objectName="java.lang:type=Memory" attribute="NonHeapMemoryUsage" key="committed"
             resultAlias="jvm.nonHeapMemoryUsage.committed"/>
+        <query objectName="java.lang:type=Threading" attribute="ThreadCount" resultAlias="jvm.thread"/>
         <!--<query objectName="java.lang:type=GarbageCollector,name=ParNew" resultAlias="gc.young.#attribute#"/>-->
         <!--<query objectName="java.lang:type=GarbageCollector,name=ConcurrentMarkSweep" resultAlias="gc.old.#attribute#"/>-->
         <!--<query objectName="java.lang:type=ClassLoading" attribute="LoadedClassCount" resultAlias="jvm.loadedClasses"/>-->
@@ -50,7 +51,7 @@
         <query objectName="kafka.consumer:type=consumer-metrics,client-id=*" attribute="incoming-byte-rate" resultAlias="kafka-consumer-%client-id%.incoming-byte.rate"/>
         <query objectName="kafka.consumer:type=consumer-fetch-manager-metrics,client-id=*" attribute="records-lag-max" resultAlias="kafka-consumer-%client-id%.records-lag.max"/>
         <query objectName="kafka.consumer:type=consumer-fetch-manager-metrics,client-id=*" attribute="records-consumed-rate" resultAlias="kafka-consumer-%client-id%.records-consumed.rate"/>
-
+      
         <!-- commented to control the number of metrics/series in influxDb.
              Uncomment them, if required, to troubleshoot any KStreams related issue -->
         <!-- kafka streams mbeans -->
@@ -105,10 +106,10 @@
 
     </queries>
     <outputWriter class="org.jmxtrans.agent.GraphitePlainTextTcpOutputWriter">
-        <host>${AA_GRAPHITE_HOST:monitoring-influxdb-graphite.kube-system.svc}</host>
+        <host>${AA_GRAPHITE_HOST:metrics}</host>
         <port>${AA_GRAPHITE_PORT:2003}</port>
         <enabled>${AA_GRAPHITE_ENABLED:true}</enabled>
-        <namePrefix>adaptive-alerting.{{{DOTTED_APP_NAME}}}.#hostname#.</namePrefix>
+        <namePrefix>${GRAPHITE_PREFIX:}{{{APP_NAME}}}.#hostname#.</namePrefix>
     </outputWriter>
     <collectIntervalInSeconds>60</collectIntervalInSeconds>
 </jmxtrans-agent>

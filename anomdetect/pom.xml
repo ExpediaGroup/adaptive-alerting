@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  ~ Copyright 2018 Expedia Group, Inc.
+  ~ Copyright 2018-2019 Expedia Group, Inc.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -75,10 +75,16 @@
             <groupId>org.springframework.hateoas</groupId>
             <artifactId>spring-hateoas</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>RELEASE</version>
+            <scope>compile</scope>
+        </dependency>
         <!-- Workday timeseries-forecast-->
          <dependency>
              <groupId>com.workday</groupId>
              <artifactId>timeseries-forecast</artifactId>
         </dependency>
-    </dependencies>
+        </dependencies>
 </project>

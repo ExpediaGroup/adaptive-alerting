@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Expedia Group, Inc.
+ * Copyright 2018-2019 Expedia Group, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,27 +21,27 @@ import com.amazonaws.services.athena.AmazonAthena;
 import com.amazonaws.services.athena.AmazonAthenaClientBuilder;
 import com.amazonaws.services.athena.model.GetQueryExecutionRequest;
 import com.amazonaws.services.athena.model.GetQueryExecutionResult;
+import com.amazonaws.services.athena.model.GetQueryResultsRequest;
+import com.amazonaws.services.athena.model.GetQueryResultsResult;
 import com.amazonaws.services.athena.model.QueryExecutionContext;
 import com.amazonaws.services.athena.model.QueryExecutionState;
 import com.amazonaws.services.athena.model.QueryExecutionStatus;
 import com.amazonaws.services.athena.model.ResultConfiguration;
+import com.amazonaws.services.athena.model.Row;
 import com.amazonaws.services.athena.model.StartQueryExecutionRequest;
 import com.amazonaws.services.athena.model.StartQueryExecutionResult;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.S3Object;
 import com.expedia.adaptivealerting.core.data.MetricFrame;
-import com.expedia.adaptivealerting.core.data.io.MetricFrameLoader;
-import com.expedia.adaptivealerting.core.util.MetricUtil;
 import com.expedia.adaptivealerting.core.util.ThreadUtil;
 import com.expedia.adaptivealerting.dataservice.DataService;
+import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
+import com.expedia.metrics.metrictank.MetricTankIdFactory;
 import com.typesafe.config.Config;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,14 +62,11 @@ public class AthenaDataService implements DataService {
     private static final String CONFIG_KEY_OUTPUT_BUCKET = "outputBucket";
     private static final String CONFIG_KEY_CLIENT_EXECUTION_TIMEOUT = "clientExecutionTimeout";
     
-    private static final int ATHENA_MAX_RESULTS = 1000;
-    
     // FIXME Temporarily using a hardcoded query.
     private static final String POS_QUERY_TEMPLATE =
             "SELECT timestamp, value" +
-            " FROM bookings_lob_pos" +
-            " WHERE lob='%s'" +
-            " AND pos='%s'" +
+            " FROM aa_datasets.aa_metrics" +
+            " WHERE \"$path\" LIKE '%%%s%%'" +
             " AND timestamp BETWEEN %d AND %d" +
             " ORDER BY timestamp";
     
@@ -80,6 +77,7 @@ public class AthenaDataService implements DataService {
     private String database;
     private String outputBucket;
     private int clientExecutionTimeout = 0;
+    private MetricTankIdFactory idFactory = new MetricTankIdFactory();
     
     /**
      * Initializes the data service. Required configuration properties:
@@ -143,48 +141,19 @@ public class AthenaDataService implements DataService {
         notNull(startDate, "startDate can't be null");
         notNull(endDate, "endDate can't be null");
         isTrue(!startDate.isAfter(endDate), "startDate cannot be after endDate");
-        
-        // TODO Athena returns a maximum of 1,000 query results. So in general we need to make multiple queries.
-        // The metrics are currently stored every minute. At some point this will likely change (it will be different
-        // for different metrics), but until then we can assume it's one per minute. [WLW]
-        
-        long endEpochSecond = endDate.getEpochSecond();
-        long currEpochSecond = startDate.getEpochSecond();
-        
-        // Each result represents 1 minute, so we need to move 1 minute (60 seconds) forward for each one.
-        int incrSecond = 60 * ATHENA_MAX_RESULTS;
-        
-        final List<MetricFrame> frames = new ArrayList<>();
-        while (currEpochSecond < endEpochSecond) {
-            long nextEpochSecond = currEpochSecond + incrSecond;
-            
-            // TODO Run these in parallel
-            final String query = buildAthenaQuery(metricDefinition, currEpochSecond, nextEpochSecond);
-            final String queryExecutionId = submitAthenaQuery(query);
-            waitForQueryToComplete(queryExecutionId);
-            
-            // Need to capture the results as part of the loop too.
-            try (final InputStream in = toS3InputStream(queryExecutionId)) {
-                frames.add(MetricFrameLoader.loadCsv(metricDefinition, in, true));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            
-            currEpochSecond = nextEpochSecond;
-        }
-        
-        return MetricUtil.merge(frames);
+
+        final String query = buildAthenaQuery(metricDefinition, startDate.getEpochSecond(), endDate.getEpochSecond());
+        final String queryExecutionId = submitAthenaQuery(query);
+
+        waitForQueryToComplete(queryExecutionId);
+        return fetchResults(queryExecutionId, metricDefinition);
     }
     
     private String buildAthenaQuery(MetricDefinition metricDefinition, long startSecond, long endSecond) {
-        // FIXME Remove hardcodes
-        final String lob = metricDefinition.getTags().getKv().get("lob");
-        final String pos = metricDefinition.getTags().getKv().get("pos");
-        return String.format(POS_QUERY_TEMPLATE, lob, pos, startSecond, endSecond);
+        return String.format(POS_QUERY_TEMPLATE, idFactory.getId(metricDefinition), startSecond, endSecond);
     }
     
     private String submitAthenaQuery(String query) {
-        log.info("Executing Athena query: {}", query);
         final QueryExecutionContext context = new QueryExecutionContext().withDatabase(database);
         final ResultConfiguration conf = new ResultConfiguration()
 //                .withEncryptionConfiguration(encryptionConfiguration)
@@ -194,6 +163,7 @@ public class AthenaDataService implements DataService {
                 .withQueryExecutionContext(context)
                 .withResultConfiguration(conf);
         final StartQueryExecutionResult result = athena.startQueryExecution(request);
+        log.trace("Executing Athena query {}: {}", result.getQueryExecutionId(), query);
         return result.getQueryExecutionId();
     }
     
@@ -218,13 +188,41 @@ public class AthenaDataService implements DataService {
             }
             log.trace("Current query state: {}", state);
         }
+        log.trace("Athena query complete: {}", queryExecutionId);
     }
-    
-    private InputStream toS3InputStream(String queryExecutionId) {
-        // TODO Consider using the defaults here. They are nice because they make it easier to clean up old results.
-        // https://docs.aws.amazon.com/athena/latest/ug/querying.html
-        final String path = queryExecutionId + ".csv";
-        final S3Object s3Obj = s3.getObject(outputBucket, path);
-        return s3Obj.getObjectContent();
+
+    private MetricFrame fetchResults(String queryExecutionId, MetricDefinition metricDefinition) {
+        GetQueryResultsRequest getQueryResultsRequest = new GetQueryResultsRequest()
+                .withQueryExecutionId(queryExecutionId);
+
+        GetQueryResultsResult getQueryResultsResult = athena.getQueryResults(getQueryResultsRequest);
+
+        boolean first = true;
+        List<MetricData> data = new ArrayList<>();
+        while (true) {
+            for (Row row : getQueryResultsResult.getResultSet().getRows()) {
+
+                // The first row of the first page holds the column names.
+                if (first) {
+                    first = false;
+                } else {
+                    data.add(extractData(row, metricDefinition));
+                }
+            }
+
+            // If nextToken is null, there are no more pages to read. Break out of the loop.
+            if (getQueryResultsResult.getNextToken() == null) {
+                break;
+            }
+            getQueryResultsResult = athena.getQueryResults(
+                    getQueryResultsRequest.withNextToken(getQueryResultsResult.getNextToken()));
+        }
+        return new MetricFrame(data.toArray(new MetricData[0]));
+    }
+
+    private MetricData extractData(Row row, MetricDefinition metricDefinition) {
+        long epochSeconds = Long.parseLong(row.getData().get(0).getVarCharValue());
+        double value = Double.parseDouble(row.getData().get(1).getVarCharValue());
+        return new MetricData(metricDefinition, value, epochSeconds);
     }
 }

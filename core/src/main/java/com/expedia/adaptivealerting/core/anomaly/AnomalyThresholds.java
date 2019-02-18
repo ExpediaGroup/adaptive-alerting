@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Expedia Group, Inc.
+ * Copyright 2018-2019 Expedia Group, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,36 +35,36 @@ public class AnomalyThresholds {
     private Double upperWeak;
     private Double lowerStrong;
     private Double lowerWeak;
-    
+
     @JsonCreator
     public AnomalyThresholds(
             @JsonProperty("upperStrong") Double upperStrong,
             @JsonProperty("upperWeak") Double upperWeak,
             @JsonProperty("lowerStrong") Double lowerStrong,
             @JsonProperty("lowerWeak") Double lowerWeak) {
-        
+
         isFalse(upperStrong == null && upperWeak == null && lowerWeak == null && lowerStrong == null,
                 "At least one of the thresholds must be not null");
-        
+
         if (upperStrong != null) {
-            isTrue(upperWeak == null || upperStrong >= upperWeak, "Required: upperStrong >= upperWeak");
-            isTrue(lowerWeak == null || upperStrong >= lowerWeak, "Required: upperStrong >= lowerWeak");
-            isTrue(lowerStrong == null || upperStrong >= lowerStrong, "Required: upperStrong >= lowerStrong");
+            isTrue(upperWeak == null || upperStrong >= upperWeak, String.format("Required: upperStrong (%f) >= upperWeak (%f)", upperStrong, upperWeak));
+            isTrue(lowerWeak == null || upperStrong >= lowerWeak, String.format("Required: upperStrong (%f) >= lowerWeak (%f)", upperStrong, lowerWeak));
+            isTrue(lowerStrong == null || upperStrong >= lowerStrong, String.format("Required: upperStrong (%f) >= lowerStrong (%f)", upperStrong, lowerStrong));
         }
         if (upperWeak != null) {
-            isTrue(lowerWeak == null || upperWeak >= lowerWeak, "Required: upperWeak >= lowerWeak");
-            isTrue(lowerStrong == null || upperWeak >= lowerStrong, "Required: upperWeak >= lowerStrong");
+            isTrue(lowerWeak == null || upperWeak >= lowerWeak, String.format("Required: upperWeak (%f) >= lowerWeak (%f)", upperWeak, lowerWeak));
+            isTrue(lowerStrong == null || upperWeak >= lowerStrong, String.format("Required: upperWeak (%f) >= lowerStrong (%f)", upperWeak, lowerStrong));
         }
         if (lowerWeak != null) {
-            isTrue(lowerStrong == null || lowerWeak >= lowerStrong, "Required: lowerWeak >= lowerStrong");
+            isTrue(lowerStrong == null || lowerWeak >= lowerStrong, String.format("Required: lowerWeak (%f) >= lowerStrong (%f)", lowerWeak, lowerStrong));
         }
-    
+
         this.upperStrong = upperStrong;
         this.upperWeak = upperWeak;
         this.lowerStrong = lowerStrong;
         this.lowerWeak = lowerWeak;
     }
-    
+
     public AnomalyLevel classify(double value) {
         if (upperStrong != null && value >= upperStrong) {
             return AnomalyLevel.STRONG;
@@ -78,7 +78,39 @@ public class AnomalyThresholds {
             return AnomalyLevel.NORMAL;
         }
     }
-    
+
+    //Method to classify values for detectors which use tails. [KS]
+    public AnomalyLevel classify(AnomalyType type, double value) {
+        switch (type) {
+            case LEFT_TAILED:
+                if (lowerStrong != null && value <= lowerStrong) {
+                    return AnomalyLevel.STRONG;
+                } else if (lowerWeak != null && value <= lowerWeak) {
+                    return AnomalyLevel.WEAK;
+                } else {
+                    return AnomalyLevel.NORMAL;
+                }
+            case RIGHT_TAILED:
+                if (upperStrong != null && value >= upperStrong) {
+                    return AnomalyLevel.STRONG;
+                } else if (upperWeak != null && value >= upperWeak) {
+                    return AnomalyLevel.WEAK;
+                } else {
+                    return AnomalyLevel.NORMAL;
+                }
+            case TWO_TAILED:
+                if ((upperStrong != null && value >= upperStrong) || (lowerStrong != null && value <= lowerStrong)) {
+                    return AnomalyLevel.STRONG;
+                } else if ((upperWeak != null && value >= upperWeak) || (lowerWeak != null && value <= lowerWeak)) {
+                    return AnomalyLevel.WEAK;
+                } else {
+                    return AnomalyLevel.NORMAL;
+                }
+            default:
+                throw new IllegalStateException("Illegal type: " + type);
+        }
+    }
+
     /**
      * Legacy classification to handle exclusive bounds, since some of the detectors were using this previously, and
      * hence have unit tests that expect it.

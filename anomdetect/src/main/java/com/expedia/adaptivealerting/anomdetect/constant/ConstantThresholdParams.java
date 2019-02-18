@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Expedia Group, Inc.
+ * Copyright 2018-2019 Expedia Group, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.constant;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -25,5 +26,12 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class ConstantThresholdParams {
+
+    /**
+     * Detector type: left-, right- or two-tailed.
+     */
+    private AnomalyType type;
+    
     private AnomalyThresholds thresholds;
+
 }

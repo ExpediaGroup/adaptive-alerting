@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  ~ Copyright 2018 Expedia Group, Inc.
+  ~ Copyright 2018-2019 Expedia Group, Inc.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -46,11 +46,6 @@
 
     <modules>
         <module>anomdetect</module>
-
-        <!-- TODO Temporary, move this out after we are pushing AA to Maven Central. -->
-        <!-- Or else decouple Aquila from AA, which is probably even better. [WLW] -->
-        <module>aquila</module>
-
         <module>core</module>
         <module>dataconnect</module>
         <module>dataservice</module>
@@ -87,16 +82,17 @@
         <apache.commons.version>3.7</apache.commons.version>
         <codahale.metrics.version>3.0.2</codahale.metrics.version>
         <apache.httpcomponents.version>4.5.6</apache.httpcomponents.version>
-        <jackson.version>2.9.6</jackson.version>
+        <jackson.version>2.9.8</jackson.version>
         <jfreechart.version>1.0.19</jfreechart.version>
         <jopt.version>4.9</jopt.version>
         <junit.version>4.12</junit.version>
+        <alert-manager.version>1.0.0-SNAPSHOT</alert-manager.version>
 
         <!-- TODO Upgrade to 2.0.0 -->
         <kafka.streams.version>1.1.1</kafka.streams.version>
 
         <lombok.version>1.18.2</lombok.version>
-        <metrics.java.version>0.6.0</metrics.java.version>
+        <metrics.java.version>0.10.1</metrics.java.version>
         <msgpack.version>0.8.13</msgpack.version>
         <mockito.version>2.23.0</mockito.version>
         <mysql.connector.version>8.0.11</mysql.connector.version>
@@ -109,6 +105,9 @@
         <scala.library.version>2.12.7</scala.library.version>
         <slf4j.version>1.7.25</slf4j.version>
         <spring.boot.version>2.0.5.RELEASE</spring.boot.version>
+        <spring.security.jwt.version>1.0.9.RELEASE</spring.security.jwt.version>
+        <spring.security.oauth2.version>2.3.4.RELEASE</spring.security.oauth2.version>
+
 
         <!-- Version 0.25.0.RELEASE breaks Model Service. [WLW] -->
         <!-- Caused by: org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'org.springframework.hateoas.hal.HalConfiguration' available -->
@@ -222,6 +221,11 @@
                 <groupId>com.expedia.adaptivealerting</groupId>
                 <artifactId>adaptive-alerting-tools</artifactId>
                 <version>${aa.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.expedia.alertmanager</groupId>
+                <artifactId>alert-manager-api</artifactId>
+                <version>${alert-manager.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
@@ -402,6 +406,21 @@
                         <artifactId>spring-boot-starter-logging</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-security</artifactId>
+                <version>${spring.boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-jwt</artifactId>
+                <version>${spring.security.jwt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security.oauth</groupId>
+                <artifactId>spring-security-oauth2</artifactId>
+                <version>${spring.security.oauth2.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.hateoas</groupId>
