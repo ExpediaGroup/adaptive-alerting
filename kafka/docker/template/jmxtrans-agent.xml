@@ -51,18 +51,6 @@
         <query objectName="kafka.consumer:type=consumer-metrics,client-id=*" attribute="incoming-byte-rate" resultAlias="kafka-consumer-%client-id%.incoming-byte.rate"/>
         <query objectName="kafka.consumer:type=consumer-fetch-manager-metrics,client-id=*" attribute="records-lag-max" resultAlias="kafka-consumer-%client-id%.records-lag.max"/>
         <query objectName="kafka.consumer:type=consumer-fetch-manager-metrics,client-id=*" attribute="records-consumed-rate" resultAlias="kafka-consumer-%client-id%.records-consumed.rate"/>
-
-       <!-- TOMCAT -->
-        <query objectName="Catalina:type=GlobalRequestProcessor,name=*" attribute="requestCount"
-               resultAlias="tomcat.requestCount"/>
-        <query objectName="Catalina:type=GlobalRequestProcessor,name=*" attribute="errorCount"
-               resultAlias="tomcat.errorCount"/>
-        <query objectName="Catalina:type=GlobalRequestProcessor,name=*" attribute="processingTime"
-               resultAlias="tomcat.processingTime"/>
-        <query objectName="Catalina:type=GlobalRequestProcessor,name=*" attribute="bytesSent"
-               resultAlias="tomcat.bytesSent"/>
-        <query objectName="Catalina:type=GlobalRequestProcessor,name=*" attribute="bytesReceived"
-               resultAlias="tomcat.bytesReceived"/>
       
         <!-- commented to control the number of metrics/series in influxDb.
              Uncomment them, if required, to troubleshoot any KStreams related issue -->
