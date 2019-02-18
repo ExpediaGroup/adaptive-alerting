@@ -58,7 +58,7 @@ public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
         val config = getConfig();
         val inboundTopic = config.getInboundTopic();
         val outboundTopic = config.getOutboundTopic();
-        val detectorTypes = manager.getDetectorSource().findDetectorTypes();
+        val detectorTypes = manager.getDetectorTypes();
     
         log.info("Initializing: inboundTopic={}, outboundTopic={}", inboundTopic, outboundTopic);
         

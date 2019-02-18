@@ -27,6 +27,7 @@ import lombok.val;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -46,6 +47,15 @@ public class DetectorManager {
     private DetectorSource detectorSource;
     
     private final Map<UUID, AnomalyDetector> cachedDetectors = new HashMap<>();
+    
+    /**
+     * Returns the managed detector types.
+     *
+     * @return Managed detector types.
+     */
+    public Set<String> getDetectorTypes() {
+        return detectorSource.findDetectorTypes();
+    }
     
     /**
      * Classifies the mapped metric data, performing detector lookup behind the scenes. Returns {@code null} if there's
