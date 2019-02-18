@@ -19,12 +19,9 @@ import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.DetectorLookup;
 import com.expedia.adaptivealerting.anomdetect.util.DetectorMeta;
-import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
 import com.expedia.metrics.MetricDefinition;
-import com.typesafe.config.Config;
-import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,17 +44,10 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @RequiredArgsConstructor
 @Slf4j
 public class DefaultDetectorSource implements DetectorSource {
-    private static final String CK_MODEL_SERVICE_URI_TEMPLATE = "model-service-uri-template";
-    
     private final DetectorLookup detectorLookup = new DetectorLookup();
     
-    @Getter
     @NonNull
-    private ModelServiceConnector connector;
-    
-    public DefaultDetectorSource(Config config) {
-        this.connector = buildConnector(config);
-    }
+    private final ModelServiceConnector connector;
     
     @Override
     public Set<String> findDetectorTypes() {
@@ -102,11 +92,5 @@ public class DefaultDetectorSource implements DetectorSource {
         detector.init(model);
         log.info("Found detector: {}", detector);
         return detector;
-    }
-    
-    private ModelServiceConnector buildConnector(Config config) {
-        val httpClient = new HttpClientWrapper();
-        val uriTemplate = config.getString(CK_MODEL_SERVICE_URI_TEMPLATE);
-        return new ModelServiceConnector(httpClient, uriTemplate);
     }
 }
