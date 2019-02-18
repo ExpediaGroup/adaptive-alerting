@@ -52,7 +52,6 @@
         <module>dataservice-athena</module>
         <module>kafka</module>
         <module>modelservice</module>
-        <module>notifier</module>
         <module>samples</module>
         <module>tools</module>
     </modules>
@@ -487,6 +486,16 @@
                 <version>${kafka.streams.version}</version>
                 <scope>test</scope>
             </dependency>
+
+            <!-- TODO This fixes a Zookeeper version conflict in the Kafka unit tests.
+                 Would like to get rid of it. [WLW] -->
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper</artifactId>
+                <version>3.5.3-beta</version>
+                <scope>test</scope>
+            </dependency>
+
             <dependency>
                 <groupId>org.scala-lang</groupId>
                 <artifactId>scala-library</artifactId>

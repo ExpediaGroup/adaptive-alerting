@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.notifier.config;
+package com.expedia.adaptivealerting.kafka.notifier;
 
 import com.expedia.metrics.jackson.MetricsJavaModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,7 +26,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Properties;
 
 @Configuration
-public class AppConfig {
+public class NotifierConfig {
 
     @Bean
     public RestTemplate restTemplate() {
@@ -58,11 +58,12 @@ public class AppConfig {
     private String heartBeatInterval;
     @Value("${kafka.consumer.request.timeout.ms:40000}")
     private String reqTimeout;
-
+    
     /**
-    * Kafka Configs.
-    * @return properties
-    */
+     * Kafka Configs.
+     *
+     * @return properties
+     */
     public Properties getKafkaConsumerConfig() {
         final Properties properties = new Properties();
         properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, this.bootstrapServer);

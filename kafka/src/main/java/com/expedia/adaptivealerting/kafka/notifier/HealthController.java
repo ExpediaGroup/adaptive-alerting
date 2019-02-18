@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.notifier;
+package com.expedia.adaptivealerting.kafka.notifier;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@SpringBootApplication
-public class NotifierApplication {
+@RestController
+public class HealthController {
 
-	public static void main(String[] args) {
-		SpringApplication.run(NotifierApplication.class, args);
-	}
+    @GetMapping(value = "/isActive")
+    public Boolean isActive() {
+        return true;
+    }
 }

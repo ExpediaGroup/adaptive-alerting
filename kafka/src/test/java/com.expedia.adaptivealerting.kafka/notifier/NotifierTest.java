@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.notifier.service;
+package com.expedia.adaptivealerting.kafka.notifier;
 
-import com.expedia.adaptivealerting.notifier.config.AppConfig;
 import com.github.charithe.kafka.EphemeralKafkaBroker;
 import com.github.charithe.kafka.KafkaJunitRule;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
+import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -29,9 +29,8 @@ import org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoCon
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import static com.expedia.adaptivealerting.notifier.TestHelper.bootstrapServers;
-import static com.expedia.adaptivealerting.notifier.TestHelper.newMappedMetricData;
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.expedia.adaptivealerting.kafka.util.TestHelper.bootstrapServers;
+import static com.expedia.adaptivealerting.kafka.util.TestHelper.newMappedMetricData;
 import static org.mockito.Mockito.mock;
 import static org.springframework.boot.test.util.EnvironmentTestUtils.addEnvironment;
 
@@ -44,7 +43,7 @@ public class NotifierTest {
     AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
 
     Notifier notifier;
-    AppConfig appConfig;
+    NotifierConfig notifierConfig;
 
     @Before
     public void init() {
@@ -54,10 +53,10 @@ public class NotifierTest {
         );
 
         context.register(
-            PropertyPlaceholderAutoConfiguration.class, AppConfig.class, Notifier.class);
+            PropertyPlaceholderAutoConfiguration.class, NotifierConfig.class, Notifier.class);
         context.refresh();
         notifier = context.getBean(Notifier.class);
-        appConfig = context.getBean(AppConfig.class);
+        notifierConfig = context.getBean(NotifierConfig.class);
     }
 
     @After
@@ -67,11 +66,11 @@ public class NotifierTest {
 
     @Test
     public void applicationReadyEvent_startsNotifier() {
-        assertThat(notifier.running).isFalse();
+        Assertions.assertThat(notifier.running).isFalse();
 
         notifier.onApplicationEvent(mock(ApplicationReadyEvent.class));
 
-        assertThat(notifier.running).isTrue();
+        Assertions.assertThat(notifier.running).isTrue();
     }
 
     @Test
@@ -80,7 +79,7 @@ public class NotifierTest {
 
         context.close();
 
-        assertThat(notifier.running).isFalse();
+        Assertions.assertThat(notifier.running).isFalse();
     }
 
     @Test
@@ -91,14 +90,14 @@ public class NotifierTest {
         webhook.enqueue(new MockResponse());
 
         // When a mapped metric is sent in json to the kafka topic
-        String json = appConfig.objectMapper().writeValueAsString(newMappedMetricData());
-        kafka.helper().produceStrings(appConfig.getKafkaTopic(), json);
+        String json = notifierConfig.objectMapper().writeValueAsString(newMappedMetricData());
+        kafka.helper().produceStrings(notifierConfig.getKafkaTopic(), json);
 
         // Then, the notifier POSTs the json from the message into the webhook
         RecordedRequest webhookRequest = webhook.takeRequest();
-        assertThat(webhookRequest.getMethod())
+        Assertions.assertThat(webhookRequest.getMethod())
                 .isEqualTo("POST");
-        assertThat(webhookRequest.getBody().readUtf8())
+        Assertions.assertThat(webhookRequest.getBody().readUtf8())
                 .isEqualTo(json);
     }
 }
