@@ -19,6 +19,7 @@ import com.expedia.adaptivealerting.anomdetect.DetectorManager;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
+import com.expedia.adaptivealerting.core.util.ErrorUtil;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.kafka.streams.StreamsBuilder;
@@ -79,7 +80,7 @@ public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
                         log.error(
                                 "Encountered error while classifying {}. {}",
                                 mappedMetricData,
-                                exceptionDetails(e)
+                                ErrorUtil.fullExceptionDetails(e)
                         );
                     }
                     
@@ -92,8 +93,4 @@ public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
         return builder.build();
     }
 
-    private String exceptionDetails(Exception e) {
-        // TODO Reduce this to the class, the message, and the first line of stack trace.
-        return e.toString();
-    }
 }
