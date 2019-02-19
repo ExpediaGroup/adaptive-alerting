@@ -43,12 +43,10 @@
                resultAlias="tomcat.bytesReceived"/>
       
         <!-- HTTP -->
-        <query objectName="spring:name=httpServerRequests.exception.None.method.GET.status.200.uri./\*\*" attribute="Count"
+       <query objectName="spring:name=httpServerRequests.exception.None.method.GET.status.200.uri./api/{repository}" attribute="Count"
                resultAlias="http.get.200Count"/>
-        <query objectName="spring:name=httpServerRequests.exception.None.method.GET.status.404.uri./\*\*" attribute="Count"
-               resultAlias="http.get.404Count"/>
-        <query objectName="spring:name=httpServerRequests.exception.None.method.GET.status.500.uri./\*\*" attribute="Count"
-               resultAlias="http.get.500Count"/>    
+       <query objectName="spring:name=&quot;httpServerRequests.exception.None.method.GET.status.404.uri./\*\*&quot;" attribute="Count"
+               resultAlias="http.get.404Count"/>   
     </queries>
     <outputWriter class="org.jmxtrans.agent.GraphitePlainTextTcpOutputWriter">
         <host>${AA_GRAPHITE_HOST:metrics}</host>
