@@ -7,7 +7,6 @@ docker_build:
 	./docker/scripts/build-ad-manager.sh -b
 	./docker/scripts/build-mc-a2m-mapper.sh -b
 	./docker/scripts/build-a2a-mapper.sh -b
-	./docker/scripts/build-notifier.sh -b
 
 integration_test:
 	${MAVEN} test
@@ -21,4 +20,3 @@ release: docker_build
 	./docker/scripts/build-ad-manager.sh --release
 	./docker/scripts/build-mc-a2m-mapper.sh --release
 	./docker/scripts/build-a2a-mapper.sh --release
-	./docker/scripts/build-notifier.sh --release

@@ -198,10 +198,15 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- FIXME This is causing the other apps to show up in the BOOT-INF directory in the JAR,
+                 preventing them from being found. [WLW] -->
+            <!--
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            -->
         </plugins>
     </build>
 </project>
