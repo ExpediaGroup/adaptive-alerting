@@ -38,6 +38,8 @@
         <maven.scala.plugin.version>3.4.2</maven.scala.plugin.version>
         <maven.build.helper.plugin.version>3.0.0</maven.build.helper.plugin.version>
         <maven.assembly.plugin.version>3.1.0</maven.assembly.plugin.version>
+        <jacoco-percentage>0.5</jacoco-percentage>
+        <jacoco-branch-percentage>0.18</jacoco-branch-percentage>
     </properties>
 
     <dependencies>
@@ -207,6 +209,38 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
             -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>jacoco-check</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>INSTRUCTION</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>${jacoco-percentage}</minimum>
+                                        </limit>
+                                        <limit>
+                                            <counter>BRANCH</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>${jacoco-branch-percentage}</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
