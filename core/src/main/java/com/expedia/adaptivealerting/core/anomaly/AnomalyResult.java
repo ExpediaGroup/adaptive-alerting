@@ -53,7 +53,4 @@ public class AnomalyResult {
     
     @Deprecated
     private AnomalyThresholds thresholds;
-    
-//    @Deprecated
-//    private List<InvestigationResult> investigationResults;
 }
