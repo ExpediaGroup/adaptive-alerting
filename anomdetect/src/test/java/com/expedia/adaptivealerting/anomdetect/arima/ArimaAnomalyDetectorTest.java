@@ -83,22 +83,13 @@ public class ArimaAnomalyDetectorTest {
         while (testRows.hasNext()) {
             final ArimaTestRow testRow = testRows.next();
             final double observed = testRow.getObserved();
-            System.out.printf("Data picked up from csv: %f",observed);
             final MetricData metricData = new MetricData(metricDefinition, observed, epochSecond);
             final AnomalyLevel level = detector.classify(metricData).getAnomalyLevel();
 
             if (noOfDataPoints < WARMUP_PERIOD) {
-                System.out.println(noOfDataPoints);
-                System.out.println(testRow.getObserved());
-                System.out.println(testRow.getAnomalyLevel());
                 assertEquals(AnomalyLevel.MODEL_WARMUP, level);
             }
             else {
-                System.out.println("comparing forecast and expected:");
-                System.out.println(testRow.getForecast());
-                System.out.println(detector.getTarget());
-                System.out.println(testRow.getAnomalyLevel());
-
                 assertApproxEqual((testRow.getForecast()), detector.getTarget());
                 assertEquals(AnomalyLevel.valueOf(testRow.getAnomalyLevel()), level);
             }

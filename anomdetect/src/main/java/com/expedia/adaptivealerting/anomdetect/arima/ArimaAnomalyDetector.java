@@ -24,7 +24,7 @@ import com.workday.insights.timeseries.arima.struct.ForecastResult;
 import com.workday.insights.timeseries.arima.struct.ArimaParams;
 import com.workday.insights.timeseries.arima.struct.ArimaModel;
 import com.workday.insights.timeseries.arima.ArimaSolver;
-import com.expedia.adaptivealerting.anomdetect.BasicAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.metrics.MetricData;
@@ -49,7 +49,7 @@ import java.util.ArrayList;
  **
  */
 @Data
-public final class ArimaAnomalyDetector extends BasicAnomalyDetector<ArimaDetectorParams> {
+public final class ArimaAnomalyDetector extends AbstractAnomalyDetector<ArimaDetectorParams> {
 
 
     @NonNull
@@ -121,13 +121,8 @@ public final class ArimaAnomalyDetector extends BasicAnomalyDetector<ArimaDetect
 
         final double observed = metricData.getValue();
         final int historylength = params.getHistorylength();
-        System.out.println("Less than or not");
-        System.out.println(historylengthchecker);
-        System.out.println(historylength);
-        System.out.println("Less than or not");
 
         if (historylengthchecker < historylength) {
-            System.out.printf("adding data: %f", observed);
             dataArray.add(observed);
             historylengthchecker++;
         }
@@ -160,19 +155,6 @@ public final class ArimaAnomalyDetector extends BasicAnomalyDetector<ArimaDetect
             for (int i = 0; i < dataArrayfromList.length; i++) {
                 dataArrayfromList[i] = dataArray.get(i);
             }
-
-            System.out.println("Original data");
-            for (int j = 0; j < dataArray.size(); j++) {
-                System.out.println(dataArray.get(j));
-            }
-            System.out.println("End of original data");
-
-            for (int k = 0; k < dataArrayfromList.length; k++) {
-                System.out.println(dataArrayfromList[k]);
-            }
-            System.out.println("End of data");
-
-
             final ArimaModel fittedModel = ArimaSolver.estimateARIMA(arimamodelparams, dataArrayfromList, dataArrayfromList.length,
                     dataArrayfromList.length + 1);
             ForecastResult forecastResult = Arima.forecast_arima(dataArrayfromList, forecastSize, arimamodelparams);
@@ -190,9 +172,6 @@ public final class ArimaAnomalyDetector extends BasicAnomalyDetector<ArimaDetect
                 }
             }
             else if (params.getType() == ArimaDetectorParams.Type.RIGHT_TAILED) {
-                System.out.printf("lower: %f\n",(previouslower* strongDelta));
-                System.out.println(observed);
-                System.out.printf("upper: %f\n",(previousupper* strongDelta));
                 if (observed > (previouslower * strongDelta)) {
                     level = WEAK;
                 }
@@ -215,7 +194,6 @@ public final class ArimaAnomalyDetector extends BasicAnomalyDetector<ArimaDetect
             previousupper = uppers[0];
             previouslower = lowers[0];
 
-            System.out.printf("%s\n", params.getType());
         }
         else {
             level = MODEL_WARMUP;
