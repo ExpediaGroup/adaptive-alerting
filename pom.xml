@@ -47,9 +47,6 @@
     <modules>
         <module>anomdetect</module>
         <module>core</module>
-        <module>dataconnect</module>
-        <module>dataservice</module>
-        <module>dataservice-athena</module>
         <module>kafka</module>
         <module>modelservice</module>
         <module>samples</module>
@@ -137,19 +134,11 @@
         <dependencies>
 
             <!-- Compile -->
-            <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk-athena</artifactId>
-                <version>${amazonaws.version}</version>
-            </dependency>
+
+            <!-- TODO Get rid of AWS dependencies once we move RCF out [WLW] -->
             <dependency>
                 <groupId>com.amazonaws</groupId>
                 <artifactId>aws-java-sdk-core</artifactId>
-                <version>${amazonaws.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk-rds</artifactId>
                 <version>${amazonaws.version}</version>
             </dependency>
             <dependency>
@@ -162,6 +151,7 @@
                 <artifactId>aws-java-sdk-sagemakerruntime</artifactId>
                 <version>${amazonaws.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>com.codahale.metrics</groupId>
                 <artifactId>metrics-core</artifactId>
