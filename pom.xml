@@ -47,12 +47,8 @@
     <modules>
         <module>anomdetect</module>
         <module>core</module>
-        <module>dataconnect</module>
-        <module>dataservice</module>
-        <module>dataservice-athena</module>
         <module>kafka</module>
         <module>modelservice</module>
-        <module>notifier</module>
         <module>samples</module>
         <module>tools</module>
     </modules>
@@ -93,8 +89,9 @@
 
         <lombok.version>1.18.2</lombok.version>
         <metrics.java.version>0.10.1</metrics.java.version>
-        <msgpack.version>0.8.13</msgpack.version>
+        <micrometer.version>1.1.3</micrometer.version>
         <mockito.version>2.23.0</mockito.version>
+        <msgpack.version>0.8.13</msgpack.version>
         <mysql.connector.version>8.0.11</mysql.connector.version>
         <opencsv.version>4.1</opencsv.version>
         <pegdown.version>1.6.0</pegdown.version>
@@ -137,19 +134,11 @@
         <dependencies>
 
             <!-- Compile -->
-            <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk-athena</artifactId>
-                <version>${amazonaws.version}</version>
-            </dependency>
+
+            <!-- TODO Get rid of AWS dependencies once we move RCF out [WLW] -->
             <dependency>
                 <groupId>com.amazonaws</groupId>
                 <artifactId>aws-java-sdk-core</artifactId>
-                <version>${amazonaws.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk-rds</artifactId>
                 <version>${amazonaws.version}</version>
             </dependency>
             <dependency>
@@ -162,6 +151,7 @@
                 <artifactId>aws-java-sdk-sagemakerruntime</artifactId>
                 <version>${amazonaws.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>com.codahale.metrics</groupId>
                 <artifactId>metrics-core</artifactId>
@@ -377,6 +367,17 @@
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-actuator</artifactId>
+                <version>${spring.boot.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-starter-logging</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-data-jpa</artifactId>
                 <version>${spring.boot.version}</version>
                 <exclusions>
@@ -487,6 +488,16 @@
                 <version>${kafka.streams.version}</version>
                 <scope>test</scope>
             </dependency>
+
+            <!-- TODO This fixes a Zookeeper version conflict in the Kafka unit tests.
+                 Would like to get rid of it. [WLW] -->
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper</artifactId>
+                <version>3.5.3-beta</version>
+                <scope>test</scope>
+            </dependency>
+
             <dependency>
                 <groupId>org.scala-lang</groupId>
                 <artifactId>scala-library</artifactId>
@@ -530,6 +541,11 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-jmx</artifactId>
+            <version>${micrometer.version}</version>
         </dependency>
 
         <!-- Test -->

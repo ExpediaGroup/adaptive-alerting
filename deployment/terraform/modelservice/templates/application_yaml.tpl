@@ -25,5 +25,14 @@ endpoints:
     sensitive: false
 management:
   context-path: "/admin"
+  metrics:
+    export:
+      jmx:
+        domain: spring
+    enable:
+      jvm: false
+      tomcat: false
+      system: false
+      process: false
 security:
   signingKey: $${SIGNING_KEY}

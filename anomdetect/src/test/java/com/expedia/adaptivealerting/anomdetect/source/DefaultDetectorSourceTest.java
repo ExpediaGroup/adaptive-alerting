@@ -22,9 +22,9 @@ import com.expedia.metrics.MetricDefinition;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.hateoas.Resources;
 
 import java.util.Collections;
@@ -37,6 +37,7 @@ public final class DefaultDetectorSourceTest {
     private static final String DETECTOR_UUID = "90c37a3c-f6bb-4c00-b41b-191909cccfb7";
     private static final String DETECTOR_TYPE = "ewma-detector";
     
+    // Class under test
     private DefaultDetectorSource source;
     
     @Mock
@@ -47,14 +48,13 @@ public final class DefaultDetectorSourceTest {
     
     @Before
     public void setUp() {
-//        MockitoAnnotations.initMocks(this);
-//        this.source = new DefaultDetectorSource(connector);
-//        initTestObjects();
-//        initDependencies();
+        MockitoAnnotations.initMocks(this);
+        this.source = new DefaultDetectorSource(connector);
+        initTestObjects();
+        initDependencies();
     }
     
     @Test
-    @Ignore
     public void testFindDetectorMetas() {
         val results = source.findDetectorMetas(metricDef);
         assertEquals(1, results.size());

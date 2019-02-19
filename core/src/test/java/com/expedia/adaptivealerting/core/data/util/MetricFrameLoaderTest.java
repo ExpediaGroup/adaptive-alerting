@@ -19,7 +19,6 @@ import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.adaptivealerting.core.data.io.MetricFrameLoader;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.TagCollection;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.InputStream;
@@ -33,9 +32,7 @@ import static org.junit.Assert.*;
 public final class MetricFrameLoaderTest {
     private static final double TOLERANCE = 0.001;
     
-    // FIXME Temporarily ignoring since the loader currently assumes epoch seconds. [WLW]
     @Test
-    @Ignore
     public void testLoadCsv() throws Exception {
         final MetricDefinition metric = new MetricDefinition(new TagCollection(new HashMap<String, String>() {{
             put("unit", "dummy");
