@@ -76,8 +76,8 @@
         <aa.version>1.0.0-SNAPSHOT</aa.version>
         <amazonaws.version>1.11.402</amazonaws.version>
         <apache.commons.version>3.7</apache.commons.version>
-        <codahale.metrics.version>3.0.2</codahale.metrics.version>
         <apache.httpcomponents.version>4.5.6</apache.httpcomponents.version>
+        <codahale.metrics.version>3.0.2</codahale.metrics.version>
         <jackson.version>2.9.8</jackson.version>
         <jfreechart.version>1.0.19</jfreechart.version>
         <jopt.version>4.9</jopt.version>
@@ -122,7 +122,6 @@
         <jacoco-branch-percentage>0.99</jacoco-branch-percentage>
 
         <!-- Maven plugins -->
-        <cobertura.maven.plugin.version>2.7</cobertura.maven.plugin.version>
         <maven.compiler.plugin.version>3.8.0</maven.compiler.plugin.version>
         <maven.exec.plugin.version>1.6.0</maven.exec.plugin.version>
         <maven.failsafe.plugin.version>2.22.1</maven.failsafe.plugin.version>
@@ -183,22 +182,7 @@
             </dependency>
             <dependency>
                 <groupId>com.expedia.adaptivealerting</groupId>
-                <artifactId>adaptive-alerting-anomvalidate</artifactId>
-                <version>${aa.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.expedia.adaptivealerting</groupId>
                 <artifactId>adaptive-alerting-core</artifactId>
-                <version>${aa.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.expedia.adaptivealerting</groupId>
-                <artifactId>adaptive-alerting-dataconnect</artifactId>
-                <version>${aa.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.expedia.adaptivealerting</groupId>
-                <artifactId>adaptive-alerting-dataservice</artifactId>
                 <version>${aa.version}</version>
             </dependency>
             <dependency>

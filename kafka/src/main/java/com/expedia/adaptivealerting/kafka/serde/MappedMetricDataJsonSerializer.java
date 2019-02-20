@@ -15,21 +15,20 @@
  */
 package com.expedia.adaptivealerting.kafka.serde;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.metrics.jackson.MetricsJavaModule;
-import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
- * Kafka deserializer to read {@link AnomalyResult}s from JSON.
+ * Kafka serializer to write {@link MappedMetricData}s to JSON.
  *
  * @author Willie Wheeler
  */
-public class AnomalyResultJsonDeserializer extends AbstractJsonDeserializer<AnomalyResult> {
+public class MappedMetricDataJsonSerializer extends AbstractJsonSerializer<MappedMetricData> {
     
-    public AnomalyResultJsonDeserializer() {
-        super(AnomalyResult.class);
+    public MappedMetricDataJsonSerializer() {
         getObjectMapper()
                 .registerModule(new MetricsJavaModule())
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
     }
 }

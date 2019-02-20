@@ -36,11 +36,10 @@ public abstract class AbstractJsonDeserializer<T> implements Deserializer<T> {
     private Class<T> targetClass;
     
     @Getter
-    private ObjectMapper objectMapper;
+    private ObjectMapper objectMapper = new ObjectMapper();
     
     public AbstractJsonDeserializer(Class<T> targetClass) {
         this.targetClass = targetClass;
-        this.objectMapper = new ObjectMapper();
     }
     
     @Override

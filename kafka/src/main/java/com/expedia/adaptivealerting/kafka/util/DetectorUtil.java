@@ -24,6 +24,11 @@ import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
+/**
+ * Detector utilities.
+ *
+ * @author Willie Wheeler
+ */
 @Slf4j
 public final class DetectorUtil {
     private static final String CK_MODEL_SERVICE_URI_TEMPLATE = "model-service-uri-template";
