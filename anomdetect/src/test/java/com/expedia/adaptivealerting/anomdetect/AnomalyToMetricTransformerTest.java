@@ -28,9 +28,6 @@ import java.util.UUID;
 import static com.expedia.adaptivealerting.anomdetect.AnomalyToMetricTransformer.AA_DETECTOR_UUID;
 import static org.junit.Assert.assertTrue;
 
-/**
- * @author Willie Wheeler
- */
 public class AnomalyToMetricTransformerTest {
     private AnomalyToMetricTransformer transformerUnderTest;
     private AnomalyResult anomalyResultWithStringMetricKey;

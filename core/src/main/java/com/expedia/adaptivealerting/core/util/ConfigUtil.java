@@ -21,9 +21,6 @@ import java.util.Properties;
 
 /**
  * Configuration utilities.
- *
- * @author David Sutherland
- * @author Willie Wheeler
  */
 public final class ConfigUtil {
     

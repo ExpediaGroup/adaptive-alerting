@@ -26,8 +26,6 @@ import lombok.val;
 
 /**
  * Detector utilities.
- *
- * @author Willie Wheeler
  */
 @Slf4j
 public final class DetectorUtil {

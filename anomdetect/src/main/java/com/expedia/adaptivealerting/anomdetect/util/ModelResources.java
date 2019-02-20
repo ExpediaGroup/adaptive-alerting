@@ -20,8 +20,6 @@ import org.springframework.hateoas.Resources;
 
 /**
  * Model resources.
- *
- * @author Shubham Sethi
  */
 public class ModelResources extends Resources<ModelResource> {
 }

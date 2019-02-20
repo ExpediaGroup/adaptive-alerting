@@ -31,9 +31,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 /**
  * Entry into the Adaptive Alerting runtime. Its job is find for any incoming {@link MetricData} the corresponding set
  * of mapped detectors, creating a {@link MappedMetricData} for each.
- *
- * @author David Sutherland
- * @author Willie Wheeler
  */
 @RequiredArgsConstructor
 @Slf4j

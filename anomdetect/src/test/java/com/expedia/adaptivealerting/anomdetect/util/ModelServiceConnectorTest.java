@@ -37,8 +37,6 @@ import static org.mockito.Mockito.when;
 
 /**
  * {@link ModelServiceConnector} unit tests.
- *
- * @author Willie Wheeler
  */
 public class ModelServiceConnectorTest {
     private static final String URI_TEMPLATE = "http://example.com/%s";

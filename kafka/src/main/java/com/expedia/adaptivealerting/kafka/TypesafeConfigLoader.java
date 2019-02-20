@@ -26,8 +26,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * Loads the Typesafe base configuration from the classpath.
- *
- * @author Willie Wheeler
  */
 @Slf4j
 public class TypesafeConfigLoader {

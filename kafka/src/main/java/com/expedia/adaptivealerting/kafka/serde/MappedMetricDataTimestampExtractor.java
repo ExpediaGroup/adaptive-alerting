@@ -23,9 +23,6 @@ import org.apache.kafka.streams.processor.TimestampExtractor;
 /**
  * Timestamp extractor for {@link MetricData}, similar to
  * {@link org.apache.kafka.streams.processor.LogAndSkipOnInvalidTimestamp}.
- *
- * @author Shubham Sethi
- * @author Willie Wheeler
  */
 public final class MappedMetricDataTimestampExtractor implements TimestampExtractor {
     

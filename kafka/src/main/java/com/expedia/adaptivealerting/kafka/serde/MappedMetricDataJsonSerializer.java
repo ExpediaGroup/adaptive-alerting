@@ -20,8 +20,6 @@ import com.expedia.metrics.jackson.MetricsJavaModule;
 
 /**
  * Kafka serializer to write {@link MappedMetricData}s to JSON.
- *
- * @author Willie Wheeler
  */
 public class MappedMetricDataJsonSerializer extends AbstractJsonSerializer<MappedMetricData> {
     

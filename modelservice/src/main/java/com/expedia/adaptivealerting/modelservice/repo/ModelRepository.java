@@ -27,8 +27,6 @@ import java.util.List;
 
 /**
  * Spring Data repository for anomaly detection models.
- *
- * @author kashah
  */
 @RepositoryRestResource(excerptProjection = ModelProjection.class)
 public interface ModelRepository extends PagingAndSortingRepository<Model, Long> {

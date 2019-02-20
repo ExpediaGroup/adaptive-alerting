@@ -42,8 +42,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * See https://www.ll.mit.edu/mission/cybersec/publications/publication-files/full_papers/2012_08_05_Carter_IEEESSP_FP.pdf.
  * Implementation based off code from here https://aws.amazon.com/blogs/iot/anomaly-detection-using-aws-iot-and-aws-lambda/.
  * </p>
- *
- * @author David Sutherland
  */
 @Data
 public final class PewmaAnomalyDetector extends AbstractAnomalyDetector<PewmaParams> {

@@ -33,9 +33,6 @@ import static com.expedia.adaptivealerting.samples.MetricGenerationHelper.buildM
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.createChartFrame;
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showChartFrame;
 
-/**
- * @author Willie Wheeler
- */
 public final class Sample001 {
 
     public static void main(String[] args) throws Exception {

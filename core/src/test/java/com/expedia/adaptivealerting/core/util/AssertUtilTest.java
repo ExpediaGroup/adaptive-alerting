@@ -21,9 +21,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.isBetween;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
-/**
- * @author Willie Wheeler
- */
 public final class AssertUtilTest {
     
     @Test

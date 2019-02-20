@@ -25,8 +25,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 
 /**
  * Weak and strong thresholds to support both one- and two-tailed tests.
- *
- * @author Willie Wheeler
  */
 @Data
 @ToString

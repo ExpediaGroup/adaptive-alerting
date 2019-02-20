@@ -20,9 +20,6 @@ import lombok.experimental.Accessors;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 
-/**
- * @author Willie Wheeler
- */
 @Data
 @Accessors(chain = true)
 public final class EwmaParams {

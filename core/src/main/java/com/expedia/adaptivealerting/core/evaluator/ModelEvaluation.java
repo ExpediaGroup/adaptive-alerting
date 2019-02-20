@@ -17,8 +17,6 @@ package com.expedia.adaptivealerting.core.evaluator;
 
 /**
  * Model Evaluation
- * 
- * @author kashah
  */
 public class ModelEvaluation {
 

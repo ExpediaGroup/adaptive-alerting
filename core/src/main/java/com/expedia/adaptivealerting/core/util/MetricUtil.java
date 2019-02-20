@@ -33,8 +33,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * Metric utilities.
- *
- * @author Willie Wheeler
  */
 public final class MetricUtil {
     

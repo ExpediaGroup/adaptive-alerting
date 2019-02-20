@@ -29,8 +29,6 @@ import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showCha
 
 /**
  * Sample pipeline based on a random walk with EWMA and PEWMA filters.
- *
- * @author Willie Wheeler
  */
 public class RandomWalkEwmaVsPewma {
     

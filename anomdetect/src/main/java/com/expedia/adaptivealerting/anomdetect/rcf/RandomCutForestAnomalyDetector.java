@@ -57,8 +57,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  *
  * <p>
  * See: https://aws.amazon.com/blogs/machine-learning/use-the-built-in-amazon-sagemaker-random-cut-forest-algorithm-for-anomaly-detection/
- *
- * @author Tatjana Kamenov
  */
 @Data
 @ToString

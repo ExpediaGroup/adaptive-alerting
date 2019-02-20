@@ -31,8 +31,6 @@ import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showCha
 
 /**
  * This is a sample pipeline to calculate RMSE
- *
- * @author Karan Shah
  */
 public class WhiteNoiseRmse {
     

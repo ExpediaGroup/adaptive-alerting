@@ -28,8 +28,6 @@ import java.util.Map;
 
 /**
  * Metric entity.
- *
- * @author kashah
  */
 @Data
 @Entity

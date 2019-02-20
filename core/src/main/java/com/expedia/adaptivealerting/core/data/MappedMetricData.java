@@ -33,8 +33,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * <p>
  * By contract the {@link MetricData} must be set.
  * </p>
- *
- * @author Willie Wheeler
  */
 @Data
 @NoArgsConstructor

@@ -37,8 +37,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * Chart utilities.
- *
- * @author Willie Wheeler
  */
 public class ChartUtil {
     private static final Color STRONG_OUTLIER_COLOR = Color.RED;

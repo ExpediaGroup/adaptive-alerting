@@ -15,13 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect.rcf;
 
-
 /**
- * <p>
  * Exception reserved for errors while processing requests to Random Cut Forest endpoint in AWS.
- * </p>
- *
- * @author Tatjana Kamenov
  */
 public class RandomCutForestProcessingException extends RuntimeException
 {

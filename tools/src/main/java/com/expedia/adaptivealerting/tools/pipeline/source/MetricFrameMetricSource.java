@@ -22,8 +22,6 @@ import java.util.ListIterator;
 
 /**
  * Metric source backed by a {@link MetricFrame}.
- *
- * @author Willie Wheeler
  */
 public final class MetricFrameMetricSource extends AbstractMetricSource {
     private ListIterator<MetricData> metricDataIterator;

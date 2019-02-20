@@ -35,8 +35,6 @@ import static org.mockito.Mockito.when;
 
 /**
  * {@link DetectorMapper} unit test.
- *
- * @author Willie Wheeler
  */
 public final class DetectorMapperTest {
     private DetectorMapper mapper;

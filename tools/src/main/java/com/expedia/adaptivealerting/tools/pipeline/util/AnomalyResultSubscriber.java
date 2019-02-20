@@ -19,8 +19,6 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 
 /**
  * Interface for processors that subscribe to an anomaly result channel.
- *
- * @author Willie Wheeler
  */
 public interface AnomalyResultSubscriber {
     

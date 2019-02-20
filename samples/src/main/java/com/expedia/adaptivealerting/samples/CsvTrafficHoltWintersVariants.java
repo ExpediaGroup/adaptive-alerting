@@ -42,8 +42,6 @@ import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showCha
  * Data for samples/austourists.csv was taken from austourists-tests-holtwinters-multiplicative/additive.csv files in anomdetect.
  * The first row was converted to the LEVEL, BASE, and M/A_SEASONAL constants below.
  * The "y" values from the remaining rows became the "observed" values in sample/austourists.csv
- *
- * @author Matt Callanan
  */
 public class CsvTrafficHoltWintersVariants {
     public static final int PERIOD = 4;

@@ -38,8 +38,6 @@ import static org.mockito.Mockito.when;
 /**
  * Unit test for {@link KafkaAnomalyToMetricMapper}. See
  * https://kafka.apache.org/20/documentation/streams/developer-guide/testing.html
- *
- * @author Willie Wheeler
  */
 @Slf4j
 public class KafkaAnomalyToMetricMapperTest {

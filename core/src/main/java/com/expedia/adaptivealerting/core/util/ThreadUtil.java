@@ -19,8 +19,6 @@ import lombok.SneakyThrows;
 
 /**
  * Thread utilities.
- *
- * @author Willie Wheeler
  */
 public final class ThreadUtil {
     

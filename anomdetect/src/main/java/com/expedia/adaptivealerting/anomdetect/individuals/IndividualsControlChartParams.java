@@ -18,10 +18,6 @@ package com.expedia.adaptivealerting.anomdetect.individuals;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-/**
- * @author shsethi
- * @author Willie Wheeler
- */
 @Data
 @Accessors(chain = true)
 public final class IndividualsControlChartParams {

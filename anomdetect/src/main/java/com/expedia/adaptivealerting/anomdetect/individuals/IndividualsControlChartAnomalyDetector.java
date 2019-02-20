@@ -36,7 +36,6 @@ import static java.lang.Math.sqrt;
  * It uses the moving range (R) and the individual samples (X) to observe long-term and short-term variation in input
  * stream of data.
  *
- * @author shsethi
  * @see <a href="https://www.spcforexcel.com/knowledge/variable-control-charts/individuals-control-charts">https://www.spcforexcel.com/knowledge/variable-control-charts/individuals-control-charts</a>
  */
 @Data

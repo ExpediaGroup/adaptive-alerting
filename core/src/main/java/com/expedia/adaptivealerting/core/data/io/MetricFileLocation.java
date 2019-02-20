@@ -21,9 +21,6 @@ import java.time.format.DateTimeFormatter;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
-/**
- * @author Willie Wheeler
- */
 public final class MetricFileLocation {
     private String metricDir;
     private String datePattern;

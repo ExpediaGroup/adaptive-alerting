@@ -32,9 +32,6 @@ import java.util.UUID;
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertSame;
 
-/**
- * @author Willie Wheeler
- */
 public class ConstantThresholdAnomalyDetectorTest {
     private UUID detectorUUID;
     private MetricDefinition metricDefinition;

@@ -28,8 +28,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * Abstract base class for implementing metric sources. Uses a timer to simulate timing behavior.
- *
- * @author Willie Wheeler
  */
 public abstract class AbstractMetricSource implements MetricSource {
 //    private final MetricDefinition metricDefinition;

@@ -22,8 +22,6 @@ import lombok.ToString;
 
 /**
  * The type Individual chart test row.
- *
- * @author shsethi
  */
 @Data
 @ToString

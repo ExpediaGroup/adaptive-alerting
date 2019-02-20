@@ -17,8 +17,6 @@ package com.expedia.adaptivealerting.core.anomaly;
 
 /**
  * Anomaly Type enum.
- *
- * @author kashah
  */
 public enum AnomalyType {
 

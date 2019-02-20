@@ -48,8 +48,6 @@ import java.util.UUID;
  * Fine to use this for a small number of objects. If this class gets too big then we would want to switch to the
  * builder pattern.
  * </p>
- *
- * @author Willie Wheeler
  */
 public final class TestObjectMother {
     

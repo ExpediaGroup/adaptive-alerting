@@ -36,7 +36,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * find detectors from a primary detector source (think {@link DefaultDetectorSource}), and if we don't find a detector
  * there, then we just create them dynamically and manage them in memory.
  *
- * @author Willie Wheeler
  * @deprecated Don't want Haystack-specific code, but doing this just to get things started.
  */
 public final class TempHaystackAwareDetectorSource implements DetectorSource {

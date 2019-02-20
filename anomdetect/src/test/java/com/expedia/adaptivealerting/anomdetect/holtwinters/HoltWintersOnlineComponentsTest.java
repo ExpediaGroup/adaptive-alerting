@@ -25,9 +25,6 @@ import static com.expedia.adaptivealerting.anomdetect.holtwinters.SeasonalityTyp
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-/**
- * @author Matt Callanan
- */
 public class HoltWintersOnlineComponentsTest {
     private static final double TOLERANCE = 0;
 

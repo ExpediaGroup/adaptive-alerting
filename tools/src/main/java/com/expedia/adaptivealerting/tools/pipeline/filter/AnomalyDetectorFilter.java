@@ -29,8 +29,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * Stream filter that applies an outlier detector to metrics and generates outlier detector results.
- *
- * @author Willie Wheeler
  */
 @Slf4j
 public final class AnomalyDetectorFilter implements MetricDataSubscriber {

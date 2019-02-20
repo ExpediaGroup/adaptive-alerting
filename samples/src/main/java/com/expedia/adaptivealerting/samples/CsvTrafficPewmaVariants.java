@@ -32,9 +32,6 @@ import java.io.InputStream;
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.createChartFrame;
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showChartFrame;
 
-/**
- * @author Willie Wheeler
- */
 public class CsvTrafficPewmaVariants {
     
     public static void main(String[] args) throws Exception {

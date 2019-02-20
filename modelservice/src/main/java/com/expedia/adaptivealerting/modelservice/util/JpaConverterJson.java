@@ -15,22 +15,16 @@
  */
 package com.expedia.adaptivealerting.modelservice.util;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.persistence.AttributeConverter;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.HibernateException;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-/**
- * @author kashah
- */
+import javax.persistence.AttributeConverter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class JpaConverterJson implements AttributeConverter<Object, String> {

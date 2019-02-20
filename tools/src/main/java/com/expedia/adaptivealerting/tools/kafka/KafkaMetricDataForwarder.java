@@ -35,8 +35,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * Forwards data from a metric source to a single Kafka topic.
- *
- * @author Willie Wheeler
  */
 @Slf4j
 public final class KafkaMetricDataForwarder {

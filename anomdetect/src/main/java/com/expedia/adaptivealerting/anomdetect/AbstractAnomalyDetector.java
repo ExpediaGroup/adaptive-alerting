@@ -25,8 +25,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * Abstract base class for anomaly detector implementations.
- *
- * @author Willie Wheeler
  */
 public abstract class AbstractAnomalyDetector<T> implements AnomalyDetector {
     

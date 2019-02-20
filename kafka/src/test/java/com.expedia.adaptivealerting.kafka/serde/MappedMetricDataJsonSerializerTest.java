@@ -27,8 +27,6 @@ import static org.junit.Assert.assertArrayEquals;
 
 /**
  * {@link MappedMetricDataJsonSerializer} unit test.
- *
- * @author Willie Wheeler
  */
 public final class MappedMetricDataJsonSerializerTest {
     private MappedMetricDataJsonSerializer serializer;

@@ -35,9 +35,6 @@ import java.util.UUID;
 
 import static junit.framework.TestCase.assertEquals;
 
-/**
- * @author kashah
- */
 public class CusumAnomalyDetectorTest {
     private static final double WEAK_SIGMAS = 3.0;
     private static final double STRONG_SIGMAS = 4.0;

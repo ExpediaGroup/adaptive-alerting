@@ -26,8 +26,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * Data frame for time series metric data.
- *
- * @author Willie Wheeler
  */
 public class MetricFrame {
     private final List<MetricData> metricDataPoints;

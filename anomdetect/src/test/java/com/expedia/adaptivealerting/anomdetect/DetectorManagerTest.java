@@ -37,8 +37,6 @@ import static org.mockito.Mockito.when;
 
 /**
  * {@link DetectorManager} unit test.
- *
- * @author Willie Wheeler
  */
 public final class DetectorManagerTest {
     private static final String DETECTOR_TYPE = "ewma-detector";

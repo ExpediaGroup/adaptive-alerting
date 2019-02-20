@@ -22,8 +22,6 @@ import java.io.IOException;
 
 /**
  * Simple wrapper around Apache's fluent HTTP client, intended to support mockability.
- *
- * @author Willie Wheeler
  */
 public class HttpClientWrapper {
     

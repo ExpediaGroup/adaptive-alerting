@@ -24,8 +24,6 @@ import java.util.Properties;
 
 /**
  * Kafka configuration utilities.
- *
- * @author Willie Wheeler
  */
 public final class ConfigUtil {
     

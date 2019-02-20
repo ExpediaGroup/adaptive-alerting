@@ -17,8 +17,6 @@ package com.expedia.adaptivealerting.core.util;
 
 /**
  * Assertion utilities.
- *
- * @author Willie Wheeler
  */
 public class AssertUtil {
     

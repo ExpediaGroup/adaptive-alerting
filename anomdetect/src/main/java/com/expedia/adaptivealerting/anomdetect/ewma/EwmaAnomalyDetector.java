@@ -44,7 +44,6 @@ import static java.lang.Math.sqrt;
  * rule of thumb, feed the detector 10 data points or so before using it for actual anomaly detection.
  * </p>
  *
- * @author Willie Wheeler
  * @see <a href="https://en.wikipedia.org/wiki/EWMA_chart">EWMA chart</a>
  * @see <a href="https://en.wikipedia.org/wiki/Moving_average#Exponentially_weighted_moving_variance_and_standard_deviation">Exponentially weighted moving average and standard deviation</a>
  * @see <a href="https://www.itl.nist.gov/div898/handbook/pmc/section3/pmc324.htm">EWMA Control Charts</a>

@@ -20,17 +20,8 @@ import com.expedia.metrics.MetricData;
 
 /**
  * Metric source interface.
- *
- * @author Willie Wheeler
  */
 public interface MetricSource {
-    
-//    /**
-//     * Returns the metric definition.
-//     *
-//     * @return Metric definition.
-//     */
-//    MetricDefinition getMetricDefinition();
     
     /**
      * Adds a metric point subscriber to this source.

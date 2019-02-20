@@ -21,8 +21,6 @@ import org.springframework.data.repository.query.Param;
 
 /**
  * Spring Data repository for model types.
- *
- * @author Willie Wheeler
  */
 public interface ModelTypeRepository extends PagingAndSortingRepository<ModelType, Long> {
     

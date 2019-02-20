@@ -20,9 +20,6 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-/**
- * @author Willie Wheeler
- */
 @Data
 @Accessors(chain = true)
 public class ConstantThresholdParams {

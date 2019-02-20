@@ -20,7 +20,6 @@ import static com.expedia.adaptivealerting.anomdetect.holtwinters.SeasonalityTyp
 /**
  * Encapsulates the algorithm for forecasting one-step ahead estimate using Holt-Winters (Triple-Exponential Smoothing) method.
  *
- * @author Matt Callanan
  * @see <a href="https://otexts.org/fpp2/holt-winters.html">Holt-Winters' Seasonal Method</a>
  */
 public class HoltWintersOnlineAlgorithm {

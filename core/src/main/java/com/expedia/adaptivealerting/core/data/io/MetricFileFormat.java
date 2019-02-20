@@ -17,8 +17,6 @@ package com.expedia.adaptivealerting.core.data.io;
 
 /**
  * Metric file format metadata.
- *
- * @author Willie Wheeler
  */
 public class MetricFileFormat {
     private boolean hasHeader;

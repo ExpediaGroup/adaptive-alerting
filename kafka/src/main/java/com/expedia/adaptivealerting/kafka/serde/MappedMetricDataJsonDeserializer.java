@@ -20,8 +20,6 @@ import com.expedia.metrics.jackson.MetricsJavaModule;
 
 /**
  * Kafka deserializer to read {@link MappedMetricData}s from JSON.
- *
- * @author Willie Wheeler
  */
 public class MappedMetricDataJsonDeserializer extends AbstractJsonDeserializer<MappedMetricData> {
     
