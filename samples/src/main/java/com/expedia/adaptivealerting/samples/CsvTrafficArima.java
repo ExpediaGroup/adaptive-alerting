@@ -60,9 +60,8 @@ public final class CsvTrafficArima {
 
         // TODO Use the FileDataConnector rather than the MetricFrameLoader. [WLW]
         /* The arima model works best with data that appear to have a stationary mean and variance after an order of differencing the series,
-             in this implementation its first order with constant - simple exponential smoothing with growth, here suitable-dataset.csv is just
-             a placeholder name to be replaced by applicable data.
-        */
+         *  here suitable-dataset.csv is a placeholder name to be replaced by applicable data.
+         */
         final InputStream is = ClassLoader.getSystemResourceAsStream("samples/suitable-dataset.csv");
         final MetricFrame frame = MetricFrameLoader.loadCsv(new MetricDefinition("csv"), is, true);
         final MetricFrameMetricSource source = new MetricFrameMetricSource(frame, "data", 200L);
