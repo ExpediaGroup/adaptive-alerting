@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/ExpediaDotCom/adaptive-alerting.svg?branch=master)](https://travis-ci.org/ExpediaDotCom/adaptive-alerting)
+[![codecov](https://codecov.io/gh/ExpediaDotCom/adaptive-alerting/branch/master/graph/badge.svg)](https://codecov.io/gh/ExpediaDotCom/adaptive-alerting)
 [![License](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg)](https://github.com/ExpediaDotCom/adaptive-alerting/blob/master/LICENSE)
 
 # Adaptive Alerting (AA)

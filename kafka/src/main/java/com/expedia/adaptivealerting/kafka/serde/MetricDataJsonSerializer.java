@@ -13,28 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.anomaly;
+package com.expedia.adaptivealerting.kafka.serde;
 
-import java.util.Map;
+import com.expedia.metrics.MetricData;
+import com.expedia.metrics.jackson.MetricsJavaModule;
 
-@Deprecated
-public class InvestigationResult {
-    private boolean result; //TODO: review this name.
-    private Map<String, Object> details; // TODO: think about structure.
-
-    public boolean isResult() {
-        return result;
-    }
-
-    public void setResult(boolean result) {
-        this.result = result;
-    }
-
-    public Map<String, Object> getDetails() {
-        return details;
-    }
-
-    public void setDetails(Map<String, Object> details) {
-        this.details = details;
+/**
+ * Kafka serializer to write {@link MetricData}s to JSON.
+ *
+ * @author Willie Wheeler
+ */
+public class MetricDataJsonSerializer extends AbstractJsonSerializer<MetricData> {
+    
+    public MetricDataJsonSerializer() {
+        getObjectMapper().registerModule(new MetricsJavaModule());
     }
 }

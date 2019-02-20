@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.kafka.serde;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -36,11 +37,11 @@ public abstract class AbstractJsonDeserializer<T> implements Deserializer<T> {
     private Class<T> targetClass;
     
     @Getter
-    private ObjectMapper objectMapper;
+    private ObjectMapper objectMapper = new ObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     
     public AbstractJsonDeserializer(Class<T> targetClass) {
         this.targetClass = targetClass;
-        this.objectMapper = new ObjectMapper();
     }
     
     @Override

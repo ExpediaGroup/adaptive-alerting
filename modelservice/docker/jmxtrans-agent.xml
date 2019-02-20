@@ -29,6 +29,7 @@
         <!--<query objectName="java.lang:type=GarbageCollector,name=ParNew" resultAlias="gc.young.#attribute#"/>-->
         <!--<query objectName="java.lang:type=GarbageCollector,name=ConcurrentMarkSweep" resultAlias="gc.old.#attribute#"/>-->
         <!--<query objectName="java.lang:type=ClassLoading" attribute="LoadedClassCount" resultAlias="jvm.loadedClasses"/>-->
+      
         <!-- TOMCAT -->
         <query objectName="Tomcat:type=GlobalRequestProcessor,name=*" attribute="requestCount"
                resultAlias="tomcat.requestCount"/>
@@ -40,6 +41,13 @@
                resultAlias="tomcat.bytesSent"/>
         <query objectName="Tomcat:type=GlobalRequestProcessor,name=*" attribute="bytesReceived"
                resultAlias="tomcat.bytesReceived"/>
+      
+       <!-- HTTP -->
+       <!-- FIXME. Just trying out with this URI. Will make a more generic URI later on. [KS] -->
+       <query objectName="spring:name=httpServerRequests.exception.None.method.GET.status.200.uri./api/{repository}" attribute="Count"
+               resultAlias="http.get.200Count"/>
+       <query objectName="spring:name=&quot;httpServerRequests.exception.None.method.GET.status.404.uri./\*\*&quot;" attribute="Count"
+               resultAlias="http.get.404Count"/>   
     </queries>
     <outputWriter class="org.jmxtrans.agent.GraphitePlainTextTcpOutputWriter">
         <host>${AA_GRAPHITE_HOST:metrics}</host>

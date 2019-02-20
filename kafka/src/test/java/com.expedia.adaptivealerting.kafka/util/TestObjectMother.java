@@ -89,8 +89,23 @@ public final class TestObjectMother {
         return new MetricData(metricDefinition, 100.0, now);
     }
     
+    public static MappedMetricData mappedMetricData() {
+        return mappedMetricData(metricData());
+    }
+    
     public static MappedMetricData mappedMetricData(MetricData metricData) {
         return new MappedMetricData(metricData, UUID.randomUUID(), "some-detector-type");
+    }
+    
+    public static MappedMetricData mappedMetricDataWithAnomalyResult() {
+        val metricData = metricData();
+        val mmd = mappedMetricData(metricData);
+        mmd.setAnomalyResult(anomalyResult(metricData));
+        return mmd;
+    }
+    
+    public static AnomalyResult anomalyResult() {
+        return anomalyResult(metricData());
     }
     
     public static AnomalyResult anomalyResult(MetricData metricData) {

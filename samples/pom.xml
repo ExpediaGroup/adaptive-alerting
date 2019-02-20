@@ -46,10 +46,6 @@
         </dependency>
         <dependency>
             <groupId>com.expedia.adaptivealerting</groupId>
-            <artifactId>adaptive-alerting-dataconnect</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.expedia.adaptivealerting</groupId>
             <artifactId>adaptive-alerting-kafka</artifactId>
         </dependency>
         <dependency>

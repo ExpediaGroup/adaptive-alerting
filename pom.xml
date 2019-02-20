@@ -76,8 +76,8 @@
         <aa.version>1.0.0-SNAPSHOT</aa.version>
         <amazonaws.version>1.11.402</amazonaws.version>
         <apache.commons.version>3.7</apache.commons.version>
-        <codahale.metrics.version>3.0.2</codahale.metrics.version>
         <apache.httpcomponents.version>4.5.6</apache.httpcomponents.version>
+        <codahale.metrics.version>3.0.2</codahale.metrics.version>
         <jackson.version>2.9.8</jackson.version>
         <jfreechart.version>1.0.19</jfreechart.version>
         <jopt.version>4.9</jopt.version>
@@ -116,8 +116,12 @@
         <typesafe.config.version>1.3.3</typesafe.config.version>
         <wiremock.version>2.18.0</wiremock.version>
 
+        <coveralls-maven-plugin-version>4.3.0</coveralls-maven-plugin-version>
+        <jacoco-maven-plugin-version>0.8.3</jacoco-maven-plugin-version>
+        <jacoco-percentage>0.99</jacoco-percentage>
+        <jacoco-branch-percentage>0.99</jacoco-branch-percentage>
+
         <!-- Maven plugins -->
-        <cobertura.maven.plugin.version>2.7</cobertura.maven.plugin.version>
         <maven.compiler.plugin.version>3.8.0</maven.compiler.plugin.version>
         <maven.exec.plugin.version>1.6.0</maven.exec.plugin.version>
         <maven.failsafe.plugin.version>2.22.1</maven.failsafe.plugin.version>
@@ -151,7 +155,6 @@
                 <artifactId>aws-java-sdk-sagemakerruntime</artifactId>
                 <version>${amazonaws.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>com.codahale.metrics</groupId>
                 <artifactId>metrics-core</artifactId>
@@ -179,22 +182,7 @@
             </dependency>
             <dependency>
                 <groupId>com.expedia.adaptivealerting</groupId>
-                <artifactId>adaptive-alerting-anomvalidate</artifactId>
-                <version>${aa.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.expedia.adaptivealerting</groupId>
                 <artifactId>adaptive-alerting-core</artifactId>
-                <version>${aa.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.expedia.adaptivealerting</groupId>
-                <artifactId>adaptive-alerting-dataconnect</artifactId>
-                <version>${aa.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.expedia.adaptivealerting</groupId>
-                <artifactId>adaptive-alerting-dataservice</artifactId>
                 <version>${aa.version}</version>
             </dependency>
             <dependency>
@@ -708,6 +696,60 @@
                     <serverId>ossrh</serverId>
                     <nexusUrl>https://oss.sonatype.org/</nexusUrl>
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco-maven-plugin-version}</version>
+                <executions>
+                    <execution>
+                        <id>jacoco-initialize</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>jacoco-report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>jacoco-check</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>INSTRUCTION</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>${jacoco-percentage}</minimum>
+                                        </limit>
+                                        <limit>
+                                            <counter>BRANCH</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>${jacoco-branch-percentage}</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.eluder.coveralls</groupId>
+                <artifactId>coveralls-maven-plugin</artifactId>
+                <version>${coveralls-maven-plugin-version}</version>
+                <configuration>
+                    <repoToken>ey58OJMj1cGwAsmdQAb5bZuTpQ9oZ95bY</repoToken>
                 </configuration>
             </plugin>
         </plugins>

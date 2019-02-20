@@ -21,6 +21,10 @@ import org.apache.kafka.common.serialization.Serializer;
 
 import java.util.Map;
 
+/**
+ * @param <T>
+ * @deprecated See {@link JsonPojoDeserializer} for more information.
+ */
 public class JsonPojoSerde<T> implements Serde<T> {
     final private JsonPojoSerializer<T> serializer;
     final private JsonPojoDeserializer<T> deserializer;

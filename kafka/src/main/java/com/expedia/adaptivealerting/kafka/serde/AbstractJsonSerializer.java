@@ -15,10 +15,9 @@
  */
 package com.expedia.adaptivealerting.kafka.serde;
 
-
-import com.expedia.metrics.jackson.MetricsJavaModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.Serializer;
@@ -26,40 +25,37 @@ import org.apache.kafka.common.serialization.Serializer;
 import java.util.Map;
 
 /**
- * @param <T>
- * @deprecated See {@link JsonPojoDeserializer} for more information.
+ * Abstract base class for implementing JSON-based Kafka serializers.
+ *
+ * @author Willie Wheeler
+ * @param <T> Serialization target class.
  */
 @Slf4j
-public class JsonPojoSerializer<T> implements Serializer<T> {
-    private final ObjectMapper objectMapper;
-
-    /**
-     * Default constructor needed by Kafka
-     */
-    public JsonPojoSerializer() {
-        this.objectMapper = new ObjectMapper()
-                .registerModule(new MetricsJavaModule())
-                .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-    }
-
+public class AbstractJsonSerializer<T> implements Serializer<T> {
+    
+    @Getter
+    private ObjectMapper objectMapper = new ObjectMapper()
+            .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+    
     @Override
-    public void configure(Map<String, ?> props, boolean isKey) {
+    public void configure(Map<String, ?> map, boolean b) {
+        // Nothing to configure
     }
-
+    
     @Override
     public byte[] serialize(String topic, T data) {
         if (data == null) {
             return null;
         }
-
         try {
             return objectMapper.writeValueAsBytes(data);
         } catch (Exception e) {
-            throw new SerializationException("Error serializing JSON message", e);
+            throw new SerializationException("Error serializing data to JSON", e);
         }
     }
-
+    
     @Override
     public void close() {
+        // Nothing to close
     }
 }

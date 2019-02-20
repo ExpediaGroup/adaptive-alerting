@@ -22,6 +22,8 @@ import org.apache.kafka.common.serialization.Deserializer;
 import java.io.IOException;
 import java.util.Map;
 
+// TODO Rename this to MetricDataMessagePackDeserializer [WLW]
+
 public class MetricDataDeserializer implements Deserializer<MetricData> {
     private final static MessagePackSerializer mps = new MessagePackSerializer();
 
