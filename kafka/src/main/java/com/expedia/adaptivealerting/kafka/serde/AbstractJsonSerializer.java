@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.kafka.serde;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.errors.SerializationException;
@@ -33,7 +34,8 @@ import java.util.Map;
 public class AbstractJsonSerializer<T> implements Serializer<T> {
     
     @Getter
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper = new ObjectMapper()
+            .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
     
     @Override
     public void configure(Map<String, ?> map, boolean b) {

@@ -102,11 +102,18 @@ public class KafkaMultiClusterAnomalyToMetricMapper implements Runnable {
         try {
             while (true) {
                 val records = anomalyConsumer.poll(POLL_PERIOD);
-                log.trace("numRecords={}", records.count());
-                records.forEach(record -> metricProducer.send(toMetricDataRecord(record)));
+                log.trace("Read {} records from topic={}", records.count(), anomalyTopic);
+                try {
+                    records.forEach(record -> metricProducer.send(toMetricDataRecord(record)));
+                } catch (WakeupException e) {
+                    throw e;
+                } catch (Exception e) {
+                    log.error("Error processing records", e);
+                }
             }
         } catch (WakeupException e) {
             // Ignore for shutdown
+            log.info("anomalyConsumer is awake");
         } finally {
             anomalyConsumer.close();
             metricProducer.flush();

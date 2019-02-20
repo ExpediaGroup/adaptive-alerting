@@ -25,10 +25,11 @@ import org.apache.kafka.common.serialization.Serializer;
 
 import java.util.Map;
 
-// Deprecated - see JsonPojoDeserializer
-
+/**
+ * @param <T>
+ * @deprecated See {@link JsonPojoDeserializer} for more information.
+ */
 @Slf4j
-@Deprecated
 public class JsonPojoSerializer<T> implements Serializer<T> {
     private final ObjectMapper objectMapper;
 

@@ -17,7 +17,6 @@ package com.expedia.adaptivealerting.kafka.serde;
 
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.jackson.MetricsJavaModule;
-import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
  * Kafka serializer to write {@link MetricData}s to JSON.
@@ -27,8 +26,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 public class MetricDataJsonSerializer extends AbstractJsonSerializer<MetricData> {
     
     public MetricDataJsonSerializer() {
-        getObjectMapper()
-                .registerModule(new MetricsJavaModule())
-                .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        getObjectMapper().registerModule(new MetricsJavaModule());
     }
 }

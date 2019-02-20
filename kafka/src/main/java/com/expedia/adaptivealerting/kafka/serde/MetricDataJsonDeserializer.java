@@ -17,7 +17,6 @@ package com.expedia.adaptivealerting.kafka.serde;
 
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.jackson.MetricsJavaModule;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 
 /**
  * Kafka deserializer to read {@link MetricData}s from JSON.
@@ -28,8 +27,6 @@ public class MetricDataJsonDeserializer extends AbstractJsonDeserializer<MetricD
     
     public MetricDataJsonDeserializer() {
         super(MetricData.class);
-        getObjectMapper()
-                .registerModule(new MetricsJavaModule())
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        getObjectMapper().registerModule(new MetricsJavaModule());
     }
 }

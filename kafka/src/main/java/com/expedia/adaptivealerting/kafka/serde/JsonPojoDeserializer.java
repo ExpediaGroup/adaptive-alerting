@@ -24,17 +24,20 @@ import org.apache.kafka.common.serialization.Deserializer;
 import java.io.IOException;
 import java.util.Map;
 
-// Deprecated as the class takes a type param, but is actually designed to read the type from
-// configuration properties after it's already been typed. To me it looks like serializers and
-// deserializers should be concrete as they ProducerConfig and ConsumerConfig set them by
-// classname. For example
-//
-//   config.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
-//       "com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonDeserializer");
-//
-// The config is just expecting a deserializer class that's already typed. [WLW]
-
-@Deprecated
+/**
+ * Deprecated as the class takes a type param, but is actually designed to read the type from
+ * configuration properties after it's already been typed. To me it looks like serializers and
+ * deserializers should be concrete as they ProducerConfig and ConsumerConfig set them by
+ * classname. For example
+ *
+ *    config.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+ *        "com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonDeserializer");
+ *
+ * The config is just expecting a deserializer class that's already typed. [WLW]
+ *
+ * @param <T>
+ * @deprecated Superseded by {@link AbstractJsonDeserializer}.
+ */
 public final class JsonPojoDeserializer<T> implements Deserializer<T> {
     
     /**
