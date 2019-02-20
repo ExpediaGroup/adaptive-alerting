@@ -24,6 +24,20 @@ import org.apache.kafka.common.serialization.Deserializer;
 import java.io.IOException;
 import java.util.Map;
 
+/**
+ * Deprecated as the class takes a type param, but is actually designed to read the type from
+ * configuration properties after it's already been typed. To me it looks like serializers and
+ * deserializers should be concrete as they ProducerConfig and ConsumerConfig set them by
+ * classname. For example
+ *
+ *    config.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+ *        "com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonDeserializer");
+ *
+ * The config is just expecting a deserializer class that's already typed. [WLW]
+ *
+ * @param <T>
+ * @deprecated Superseded by {@link AbstractJsonDeserializer}.
+ */
 public final class JsonPojoDeserializer<T> implements Deserializer<T> {
     
     /**
@@ -66,13 +80,6 @@ public final class JsonPojoDeserializer<T> implements Deserializer<T> {
         try {
             return objectMapper.readValue(bytes, tClass);
         } catch (IOException e) {
-            // TODO Is it correct to throw a SerializationException while deserializing? [WLW]
-            //
-            // Update:
-            // It's not: https://kafka.apache.org/11/javadoc/org/apache/kafka/common/errors/SerializationException.html
-            //
-            // But Spring Kafka does the same thing:
-            // https://github.com/spring-projects/spring-kafka/blob/master/spring-kafka/src/main/java/org/springframework/kafka/support/serializer/JsonDeserializer.java
             throw new SerializationException(e);
         }
     }

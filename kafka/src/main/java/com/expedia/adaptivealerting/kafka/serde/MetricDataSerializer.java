@@ -22,6 +22,8 @@ import org.apache.kafka.common.serialization.Serializer;
 import java.io.IOException;
 import java.util.Map;
 
+// TODO Rename this to MetricDataMessagePackSerializer [WLW]
+
 public class MetricDataSerializer implements Serializer<MetricData> {
     private final static MessagePackSerializer mps = new MessagePackSerializer();
     
@@ -34,6 +36,7 @@ public class MetricDataSerializer implements Serializer<MetricData> {
         try {
             return mps.serialize(metricData);
         } catch (IOException e) {
+            // FIXME This should be SerializationException. [WLW]
             throw new RuntimeException(e);
         }
     }
