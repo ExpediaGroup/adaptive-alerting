@@ -34,8 +34,6 @@ import org.apache.kafka.common.errors.WakeupException;
 
 import java.util.Collections;
 
-// FIXME The input type is wrong. The anomalies topic contains MappedMetricData, not AnomalyResult. [WLW]
-
 /**
  * Maps anomalies to metrics. Note that the input topic actually contains {@link MappedMetricData} rather than
  * {@link AnomalyResult}.
