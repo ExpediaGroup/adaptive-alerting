@@ -74,6 +74,7 @@
 
         <!-- Dependencies -->
         <aa.version>1.0.0-SNAPSHOT</aa.version>
+        <alert-manager.version>1.0.0-SNAPSHOT</alert-manager.version>
         <amazonaws.version>1.11.402</amazonaws.version>
         <apache.commons.version>3.7</apache.commons.version>
         <apache.httpcomponents.version>4.5.6</apache.httpcomponents.version>
@@ -82,13 +83,12 @@
         <jfreechart.version>1.0.19</jfreechart.version>
         <jopt.version>4.9</jopt.version>
         <junit.version>4.12</junit.version>
-        <alert-manager.version>1.0.0-SNAPSHOT</alert-manager.version>
 
         <!-- TODO Upgrade to 2.0.0 -->
         <kafka.streams.version>1.1.1</kafka.streams.version>
 
         <lombok.version>1.18.2</lombok.version>
-        <metrics.java.version>0.10.1</metrics.java.version>
+        <metrics.java.version>0.11.0</metrics.java.version>
         <micrometer.version>1.1.3</micrometer.version>
         <mockito.version>2.23.0</mockito.version>
         <msgpack.version>0.8.13</msgpack.version>
@@ -105,7 +105,6 @@
         <spring.security.jwt.version>1.0.9.RELEASE</spring.security.jwt.version>
         <spring.security.oauth2.version>2.3.4.RELEASE</spring.security.oauth2.version>
 
-
         <!-- Version 0.25.0.RELEASE breaks Model Service. [WLW] -->
         <!-- Caused by: org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'org.springframework.hateoas.hal.HalConfiguration' available -->
         <!--spring.hateoas.version>0.25.0.RELEASE</spring.hateoas.version-->
@@ -116,12 +115,11 @@
         <typesafe.config.version>1.3.3</typesafe.config.version>
         <wiremock.version>2.18.0</wiremock.version>
 
+        <!-- Maven plugins -->
         <coveralls-maven-plugin-version>4.3.0</coveralls-maven-plugin-version>
         <jacoco-maven-plugin-version>0.8.3</jacoco-maven-plugin-version>
         <jacoco-percentage>0.99</jacoco-percentage>
         <jacoco-branch-percentage>0.99</jacoco-branch-percentage>
-
-        <!-- Maven plugins -->
         <maven.compiler.plugin.version>3.8.0</maven.compiler.plugin.version>
         <maven.exec.plugin.version>1.6.0</maven.exec.plugin.version>
         <maven.failsafe.plugin.version>2.22.1</maven.failsafe.plugin.version>
