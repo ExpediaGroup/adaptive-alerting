@@ -29,8 +29,6 @@ import java.util.stream.Collectors;
  * <p>
  * See: https://aws.amazon.com/blogs/machine-learning/use-the-built-in-amazon-sagemaker-random-cut-forest-algorithm-for-anomaly-detection/
  * </p>
- *
- * @author Tatjana Kamenov
  */
 public class Shingle {
     

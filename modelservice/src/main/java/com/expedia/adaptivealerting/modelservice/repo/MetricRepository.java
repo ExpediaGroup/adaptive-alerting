@@ -26,9 +26,6 @@ import java.util.List;
 
 /**
  * Spring Data repository for metrics.
- *
- * @author kashah
- * @author Willie Wheeler
  */
 public interface MetricRepository extends PagingAndSortingRepository<Metric, Long> {
 

@@ -23,8 +23,6 @@ import static org.junit.Assert.assertNotNull;
 
 /**
  * {@link DetectorUtil} unit test.
- *
- * @author Willie Wheeler
  */
 public final class DetectorUtilTest {
     

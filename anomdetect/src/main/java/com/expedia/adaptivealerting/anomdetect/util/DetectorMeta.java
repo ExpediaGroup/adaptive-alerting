@@ -20,9 +20,6 @@ import lombok.Data;
 
 import java.util.UUID;
 
-/**
- * @author Willie Wheeler
- */
 @Data
 @AllArgsConstructor
 public final class DetectorMeta {

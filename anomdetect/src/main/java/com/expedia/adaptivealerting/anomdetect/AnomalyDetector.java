@@ -22,8 +22,6 @@ import java.util.UUID;
 
 /**
  * Anomaly detector interface.
- *
- * @author Willie Wheeler
  */
 public interface AnomalyDetector {
     

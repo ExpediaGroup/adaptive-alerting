@@ -44,8 +44,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * {@link DetectorMapper}. If we find others needing to use it then we
  * might end up moving it into some common location.
  * </p>
- *
- * @author Willie Wheeler
  */
 @Slf4j
 public class ModelServiceConnector {

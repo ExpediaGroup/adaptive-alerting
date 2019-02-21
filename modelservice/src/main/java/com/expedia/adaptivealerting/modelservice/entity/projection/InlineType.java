@@ -25,8 +25,6 @@ import java.util.Map;
 
 /**
  * Projection for finding models by metric.
- *
- * @author Willie Wheeler
  */
 @Projection(name = "inlineType", types = Detector.class)
 public interface InlineType {

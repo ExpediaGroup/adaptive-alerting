@@ -30,9 +30,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * Kafka streams wrapper around {@link DetectorManager}.
- *
- * @author David Sutherland
- * @author Willie Wheeler
  */
 @Slf4j
 public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {

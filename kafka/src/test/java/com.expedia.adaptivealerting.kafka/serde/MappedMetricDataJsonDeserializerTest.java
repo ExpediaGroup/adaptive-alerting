@@ -26,8 +26,6 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * {@link MappedMetricDataJsonDeserializer} unit test.
- *
- * @author Willie Wheeler
  */
 public final class MappedMetricDataJsonDeserializerTest {
     private MappedMetricDataJsonDeserializer deserializer;

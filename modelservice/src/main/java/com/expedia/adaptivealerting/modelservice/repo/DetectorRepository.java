@@ -24,9 +24,6 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.util.List;
 
-/**
- * @author shsethi
- */
 @RepositoryRestResource(excerptProjection = InlineType.class)
 public interface DetectorRepository extends PagingAndSortingRepository<Detector, Long> {
 

@@ -22,9 +22,6 @@ import org.jfree.chart.JFreeChart;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
-/**
- * @author Willie Wheeler
- */
 public final class PipelineFactory {
     
     public static AnomalyChartSink createChartSink(String title) {

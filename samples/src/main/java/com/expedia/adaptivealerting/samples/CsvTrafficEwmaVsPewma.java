@@ -35,8 +35,6 @@ import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showCha
 /**
  * Sample that creates a pipeline for traffic data sourced from a CSV file. We have both EWMA and PEWMA charts, both
  * with RMSE evaluators.
- *
- * @author Willie Wheeler
  */
 public final class CsvTrafficEwmaVsPewma {
     

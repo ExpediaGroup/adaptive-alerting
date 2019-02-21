@@ -28,9 +28,6 @@ import java.util.ListIterator;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * @author kashah
- */
 public class RmseEvaluatorTest {
 
     private static List<RmseTestRow> calInflowTestRows;

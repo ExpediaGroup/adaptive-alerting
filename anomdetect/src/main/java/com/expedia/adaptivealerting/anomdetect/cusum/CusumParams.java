@@ -19,10 +19,6 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-/**
- * @author Karan Shah
- * @author Willie Wheeler
- */
 @Data
 @Accessors(chain = true)
 public final class CusumParams {

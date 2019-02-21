@@ -23,8 +23,6 @@ import java.util.Random;
 
 /**
  * Generates an infinite series based on a <a href="https://en.wikipedia.org/wiki/Random_walk">random walk</a>.
- *
- * @author Willie Wheeler
  */
 public final class RandomWalkMetricSource extends AbstractMetricSource {
     private MetricDefinition metricDefinition = new MetricDefinition("random-walk-metric");

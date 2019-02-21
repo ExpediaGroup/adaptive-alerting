@@ -33,7 +33,6 @@ import static java.lang.String.format;
 /**
  * Anomaly detector based on the Holt-Winters method, a forecasting method (a.k.a. "Triple Exponential Smoothing"). Used to capture seasonality.
  *
- * @author Matt Callanan
  * @see <a href="https://otexts.org/fpp2/holt-winters.html">Holt-Winters' Seasonal Method</a>
  */
 @EqualsAndHashCode(callSuper = true)

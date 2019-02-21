@@ -19,9 +19,6 @@ import com.expedia.metrics.MetricDefinition;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
-/**
- * @author Willie Wheeler
- */
 public class MetricNotFoundException extends RuntimeException {
     private MetricDefinition metric;
     

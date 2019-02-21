@@ -37,8 +37,6 @@ import java.util.Collections;
 /**
  * Maps anomalies to metrics. Note that the input topic actually contains {@link MappedMetricData} rather than
  * {@link AnomalyResult}.
- *
- * @author Willie Wheeler
  */
 @Slf4j
 public class KafkaMultiClusterAnomalyToMetricMapper implements Runnable {

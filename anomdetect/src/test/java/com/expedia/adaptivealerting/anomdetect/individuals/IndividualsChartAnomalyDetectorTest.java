@@ -34,9 +34,6 @@ import java.util.UUID;
 
 import static junit.framework.TestCase.assertEquals;
 
-/**
- * @author shsethi
- */
 public class IndividualsChartAnomalyDetectorTest {
     private static final int WARMUP_PERIOD = 25;
     

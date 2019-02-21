@@ -21,9 +21,6 @@ import java.time.Instant;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * @author Willie Wheeler
- */
 public final class DateUtilTest {
     
     @Test

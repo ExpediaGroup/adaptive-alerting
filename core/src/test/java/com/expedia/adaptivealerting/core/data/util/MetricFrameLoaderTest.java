@@ -26,9 +26,6 @@ import java.util.HashMap;
 
 import static org.junit.Assert.*;
 
-/**
- * @author Willie Wheeler
- */
 public final class MetricFrameLoaderTest {
     private static final double TOLERANCE = 0.001;
     

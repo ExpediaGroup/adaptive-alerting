@@ -17,13 +17,8 @@ package com.expedia.adaptivealerting.anomdetect.cusum;
 
 import com.opencsv.bean.CsvBindByName;
 import lombok.Data;
-import lombok.ToString;
 
-/**
- * @author kashah
- */
 @Data
-@ToString
 public class CusumTestRow {
 
     @CsvBindByName

@@ -23,8 +23,6 @@ import java.io.InputStream;
 
 /**
  * Object mapper utilities.
- *
- * @author Willie Wheeler
  */
 public final class ObjectMapperUtil {
     

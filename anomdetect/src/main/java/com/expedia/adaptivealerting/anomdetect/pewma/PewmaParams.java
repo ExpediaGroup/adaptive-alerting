@@ -18,10 +18,6 @@ package com.expedia.adaptivealerting.anomdetect.pewma;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-/**
- * @author David Sutherland
- * @author Willie Wheeler
- */
 @Data
 @Accessors(chain = true)
 public final class PewmaParams {

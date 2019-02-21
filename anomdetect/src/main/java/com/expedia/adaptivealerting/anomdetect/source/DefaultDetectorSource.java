@@ -38,8 +38,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * A {@link DetectorSource} backed by the Model Service.
- *
- * @author Willie Wheeler
  */
 @RequiredArgsConstructor
 @Slf4j

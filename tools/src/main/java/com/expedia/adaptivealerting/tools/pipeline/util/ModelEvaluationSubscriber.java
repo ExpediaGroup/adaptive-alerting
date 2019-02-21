@@ -19,8 +19,6 @@ import com.expedia.adaptivealerting.core.evaluator.ModelEvaluation;
 
 /**
  * Interface for processors that subscribe to a model evaluation channel.
- *
- * @author kashah
  */
 public interface ModelEvaluationSubscriber {
     

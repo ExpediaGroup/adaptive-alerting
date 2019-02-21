@@ -22,8 +22,6 @@ import org.springframework.hateoas.ResourceSupport;
 
 /**
  * Model type resource.
- *
- * @author Willie Wheeler
  */
 @Data
 @NoArgsConstructor

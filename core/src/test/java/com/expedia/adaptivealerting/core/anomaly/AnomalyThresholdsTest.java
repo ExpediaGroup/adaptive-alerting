@@ -19,9 +19,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * @author Willie Wheeler
- */
 public class AnomalyThresholdsTest {
     
     @Test

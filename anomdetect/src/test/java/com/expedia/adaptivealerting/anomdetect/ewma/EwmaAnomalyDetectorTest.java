@@ -33,9 +33,6 @@ import java.util.UUID;
 
 import static junit.framework.TestCase.assertEquals;
 
-/**
- * @author Willie Wheeler
- */
 public class EwmaAnomalyDetectorTest {
     private static final double TOLERANCE = 0.001;
 

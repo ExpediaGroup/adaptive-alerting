@@ -27,7 +27,6 @@ import java.util.Map;
 /**
  * Abstract base class for implementing JSON-based Kafka serializers.
  *
- * @author Willie Wheeler
  * @param <T> Serialization target class.
  */
 @Slf4j

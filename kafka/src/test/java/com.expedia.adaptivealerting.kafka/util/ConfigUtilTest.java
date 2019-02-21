@@ -23,9 +23,6 @@ import org.junit.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author Willie Wheeler
- */
 public final class ConfigUtilTest {
     private static final String BOOTSTRAP_SERVERS = "kafkasvc:9092";
     private static final String GROUP_ID = "my-group";

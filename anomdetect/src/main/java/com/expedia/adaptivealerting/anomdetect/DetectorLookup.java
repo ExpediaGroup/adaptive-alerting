@@ -31,8 +31,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * Detector lookup table.
- *
- * @author Willie Wheeler
  */
 public class DetectorLookup {
     private final Map<String, Class<? extends AnomalyDetector>> detectorMap = new HashMap<>();

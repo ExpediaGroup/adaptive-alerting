@@ -17,8 +17,6 @@ package com.expedia.adaptivealerting.core.util;
 
 /**
  * Math utilities.
- *
- * @author Willie Wheeler
  */
 public final class MathUtil {
     

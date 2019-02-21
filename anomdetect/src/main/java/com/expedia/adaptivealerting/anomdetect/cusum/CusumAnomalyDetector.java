@@ -35,8 +35,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * <p>
  * https://www.spcforexcel.com/knowledge/variable-control-charts/keeping-process-target-cusum-charts
  * </p>
- *
- * @author kashah
  */
 @Data
 public final class CusumAnomalyDetector extends AbstractAnomalyDetector<CusumParams> {

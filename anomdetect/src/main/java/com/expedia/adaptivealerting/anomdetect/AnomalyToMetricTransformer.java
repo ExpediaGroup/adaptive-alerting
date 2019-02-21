@@ -34,8 +34,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * The current implementation intentionally avoids value tags since Metrictank doesn't support them. In the future we
  * might generalize this.
  * </p>
- *
- * @author Willie Wheeler
  */
 public class AnomalyToMetricTransformer {
     

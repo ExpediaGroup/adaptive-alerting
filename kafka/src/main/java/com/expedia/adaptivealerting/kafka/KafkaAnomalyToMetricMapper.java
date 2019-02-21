@@ -34,8 +34,6 @@ import org.apache.kafka.streams.kstream.Produced;
  * Note: Currently, the input and output topics must reside on the same Kafka cluster, as noted in
  * https://kafka.apache.org/11/documentation/streams/developer-guide/config-streams.html. Future versions of Kafka
  * Streams will support input and output topics on different clusters.
- *
- * @author Willie Wheeler
  */
 @Slf4j
 public final class KafkaAnomalyToMetricMapper extends AbstractStreamsApp {

@@ -30,8 +30,6 @@ import java.util.UUID;
 
 /**
  * Anomaly result.
- *
- * @author Willie Wheeler
  */
 @Data
 @NoArgsConstructor

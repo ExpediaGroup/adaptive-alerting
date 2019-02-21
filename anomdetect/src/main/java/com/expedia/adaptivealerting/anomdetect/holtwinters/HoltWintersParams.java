@@ -26,7 +26,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
- * @author Matt Callanan
  * @see <a href="https://otexts.org/fpp2/holt-winters.html">Holt-Winters' Seasonal Method</a>
  * and <a href="https://robjhyndman.com/hyndsight/seasonal-periods/">https://robjhyndman.com/hyndsight/seasonal-periods/</a> for naming conventions
  * (e.g. usage of "frequency" and "cycle").

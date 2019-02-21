@@ -38,8 +38,6 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * {@link KafkaMultiClusterAnomalyToMetricMapper} unit test.
- *
- * @author Willie Wheeler
  */
 @Slf4j
 public class KafkaMultiClusterAnomalyToMetricMapperTest {

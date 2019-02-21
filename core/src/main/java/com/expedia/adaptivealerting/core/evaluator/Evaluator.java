@@ -17,8 +17,6 @@ package com.expedia.adaptivealerting.core.evaluator;
 
 /**
  * Interface for components that evaluate model performance, using measures such as RMSE, MAPE, sMAPE, etc.
- *
- * @author kashah
  */
 public interface Evaluator {
     

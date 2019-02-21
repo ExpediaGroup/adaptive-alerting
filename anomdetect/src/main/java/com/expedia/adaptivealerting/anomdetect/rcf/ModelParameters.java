@@ -20,9 +20,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-/**
- * @author Tatjana Kamenov
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

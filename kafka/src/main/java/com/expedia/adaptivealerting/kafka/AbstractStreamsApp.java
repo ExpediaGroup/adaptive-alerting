@@ -30,8 +30,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * https://kafka.apache.org/10/documentation/streams/developer-guide/write-streams
  *
  * for more information on writing streams apps.
- *
- * @author Willie Wheeler
  */
 public abstract class AbstractStreamsApp {
     

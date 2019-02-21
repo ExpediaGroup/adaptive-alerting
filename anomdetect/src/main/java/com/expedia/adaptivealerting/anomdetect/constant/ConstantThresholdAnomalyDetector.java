@@ -30,8 +30,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * Anomaly detector with constant thresholds for weak and strong anomalies. Supports both one- and two-tailed tests.
- *
- * @author Willie Wheeler
  */
 @Data
 public final class ConstantThresholdAnomalyDetector extends AbstractAnomalyDetector<ConstantThresholdParams> {

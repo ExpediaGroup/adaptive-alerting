@@ -25,8 +25,6 @@ import static java.lang.Math.sqrt;
 
 /**
  * Generates an infinite series of white noise at a given rate. The data distribution is Gaussian and configurable.
- *
- * @author Willie Wheeler
  */
 public final class WhiteNoiseMetricSource extends AbstractMetricSource {
     private MetricDefinition metricDefinition = new MetricDefinition("white-noise-metric");

@@ -19,8 +19,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * Reflection utilities.
- *
- * @author Willie Wheeler
  */
 public final class ReflectionUtil {
     

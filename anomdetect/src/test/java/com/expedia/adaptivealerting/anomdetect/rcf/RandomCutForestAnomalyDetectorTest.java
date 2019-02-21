@@ -20,22 +20,13 @@ import com.expedia.adaptivealerting.anomdetect.util.ModelTypeResource;
 import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBeanBuilder;
 import org.junit.Before;
-import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.sql.Timestamp;
-import java.util.HashMap;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.UUID;
 
-import static junit.framework.TestCase.assertNotNull;
-
-/**
- * @author Tatjana Kamenov
- */
 public class RandomCutForestAnomalyDetectorTest {
     private UUID detectorUUID;
     private DetectorResource detectorResource;

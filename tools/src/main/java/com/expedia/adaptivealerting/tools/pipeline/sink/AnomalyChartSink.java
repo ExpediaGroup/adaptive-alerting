@@ -35,9 +35,6 @@ import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.WEAK;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.toSecond;
 
-/**
- * @author Willie Wheeler
- */
 public final class AnomalyChartSink implements AnomalyResultSubscriber, ModelEvaluationSubscriber {
     
     @Getter

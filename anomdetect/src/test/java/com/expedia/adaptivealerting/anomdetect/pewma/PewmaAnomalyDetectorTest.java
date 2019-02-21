@@ -38,9 +38,6 @@ import java.util.UUID;
 import static java.lang.Math.sqrt;
 import static junit.framework.TestCase.assertEquals;
 
-/**
- * @author David Sutherland
- */
 public class PewmaAnomalyDetectorTest {
     private static final double WEAK_SIGMAS = 2.0;
     private static final double STRONG_SIGMAS = 3.0;

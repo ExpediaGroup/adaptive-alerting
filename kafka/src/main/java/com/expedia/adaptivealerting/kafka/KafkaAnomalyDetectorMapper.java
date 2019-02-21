@@ -34,9 +34,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * Kafka Streams adapter for {@link DetectorMapper}.
- *
- * @author David Sutherland
- * @author Willie Wheeler
  */
 @Slf4j
 public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {

@@ -31,7 +31,6 @@ import org.apache.kafka.streams.test.ConsumerRecordFactory;
 import org.apache.kafka.streams.test.OutputVerifier;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -41,10 +40,7 @@ import static org.mockito.Mockito.when;
 /**
  * Unit test for {@link KafkaAnomalyToAlertMapper}. See
  * https://kafka.apache.org/20/documentation/streams/developer-guide/testing.html
- *
- * @author tbahl
  */
-
 @Slf4j
 public class KafkaAnomalyToAlertMapperTest {
     private static final String KAFKA_KEY = "some-kafka-key";

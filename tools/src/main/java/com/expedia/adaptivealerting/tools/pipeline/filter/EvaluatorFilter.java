@@ -28,8 +28,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * Stream filter that applies model evaluator to metrics and publishes the score.
- *
- * @author kashah
  */
 public final class EvaluatorFilter implements AnomalyResultSubscriber {
     private final Evaluator evaluator;

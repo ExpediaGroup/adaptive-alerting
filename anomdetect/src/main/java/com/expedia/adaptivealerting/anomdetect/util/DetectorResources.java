@@ -19,8 +19,6 @@ import org.springframework.hateoas.Resources;
 
 /**
  * Detector resources.
- *
- * @author Willie Wheeler
  */
 public class DetectorResources extends Resources<DetectorResource> {
 }

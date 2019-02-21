@@ -25,8 +25,6 @@ import javax.persistence.Id;
 
 /**
  * Model type.
- *
- * @author Willie Wheeler
  */
 @Data
 @Entity

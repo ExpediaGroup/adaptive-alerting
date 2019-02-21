@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.modelservice.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -28,11 +29,6 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-/**
- * @author kashah
- */
 public class JpaConverterJsonTest {
 
     /* Class under test */

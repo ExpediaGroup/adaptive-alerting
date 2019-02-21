@@ -19,10 +19,6 @@ import com.expedia.metrics.MetricData;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.streams.processor.TimestampExtractor;
 
-/**
- * @author Shubham Sethi
- * @author Willie Wheeler
- */
 public final class MetricDataTimestampExtractor implements TimestampExtractor {
     
     @Override

@@ -23,8 +23,6 @@ import java.util.Map;
 
 /**
  * Detector entity.
- *
- * @author shsethi
  */
 @Data
 @Entity

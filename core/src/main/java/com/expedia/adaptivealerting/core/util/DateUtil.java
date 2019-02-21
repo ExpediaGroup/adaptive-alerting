@@ -26,8 +26,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * Date and time utilities.
- *
- * @author Willie Wheeler
  */
 public final class DateUtil {
     private static final int MILLIS_PER_MINUTE = 60 * 1000;

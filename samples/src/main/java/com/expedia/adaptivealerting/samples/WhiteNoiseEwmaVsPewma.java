@@ -27,8 +27,6 @@ import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showCha
 
 /**
  * Sample pipeline based on white noise with EWMA and PEWMA filters.
- *
- * @author Willie Wheeler
  */
 public class WhiteNoiseEwmaVsPewma {
     

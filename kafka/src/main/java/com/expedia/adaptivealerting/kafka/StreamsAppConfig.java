@@ -26,8 +26,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * Kafka streams application configuration. Consolidates both Typesafe Config and Streams Config.
- *
- * @author Willie Wheeler
  */
 public class StreamsAppConfig {
     

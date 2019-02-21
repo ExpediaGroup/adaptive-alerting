@@ -22,8 +22,6 @@ import org.springframework.hateoas.ResourceSupport;
 
 /**
  * Detector resource.
- *
- * @author Willie Wheeler
  */
 @Data
 @NoArgsConstructor

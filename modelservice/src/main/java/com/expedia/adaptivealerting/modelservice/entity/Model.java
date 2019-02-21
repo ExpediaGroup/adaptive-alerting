@@ -31,8 +31,6 @@ import java.util.Map;
 
 /**
  * Anomaly detection model.
- *
- * @author kashah
  */
 @Data
 @Entity

@@ -19,8 +19,6 @@ import org.jfree.data.time.TimeSeries;
 
 /**
  * Time series container.
- *
- * @author Willie Wheeler
  */
 public class ChartSeries {
     private final TimeSeries observed = new TimeSeries("observed");

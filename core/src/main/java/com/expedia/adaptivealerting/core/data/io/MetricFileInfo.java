@@ -15,9 +15,6 @@
  */
 package com.expedia.adaptivealerting.core.data.io;
 
-/**
- * @author Willie Wheeler
- */
 public final class MetricFileInfo {
     private MetricFileLocation location;
     private MetricFileFormat format;

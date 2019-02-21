@@ -42,8 +42,6 @@ import static org.mockito.Mockito.when;
 /**
  * Unit test for {@link KafkaAnomalyDetectorManager}. See
  * https://kafka.apache.org/20/documentation/streams/developer-guide/testing.html
- *
- * @author Willie Wheeler
  */
 @Slf4j
 public final class KafkaDetectorManagerTest {

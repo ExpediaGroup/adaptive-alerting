@@ -17,8 +17,6 @@ package com.expedia.adaptivealerting.core.anomaly;
 
 /**
  * Anomaly level enum.
- *
- * @author Willie Wheeler
  */
 public enum AnomalyLevel {
 

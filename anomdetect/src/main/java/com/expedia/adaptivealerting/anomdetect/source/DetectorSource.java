@@ -33,8 +33,6 @@ import java.util.Set;
  * <li>mapping a detector UUID to the associated detector (required by
  * {@link DetectorManager}).</li>
  * </ul>
- *
- * @author Willie Wheeler
  */
 public interface DetectorSource {
     
