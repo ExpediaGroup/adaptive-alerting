@@ -13,21 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.spi;
+package com.expedia.adaptivealerting.modelservice.providers.graphite;
 
-import com.expedia.adaptivealerting.modelservice.spi.graphite.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.expedia.adaptivealerting.modelservice.spi.MetricSource;
+import com.expedia.adaptivealerting.modelservice.spi.MetricSourceResult;
+import com.expedia.adaptivealerting.modelservice.util.BeanUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 /**
  * @author kashah
@@ -41,9 +39,12 @@ public class GraphiteMetricSource implements MetricSource {
 
     @Override
     public List<MetricSourceResult> getMetricData(String metricName) {
-        GraphiteRequest request = new GraphiteRequest(metricName);
+        GraphiteProperties props = BeanUtil.getBean(GraphiteProperties.class);
+        GraphiteRequest request = new GraphiteRequest("karmalab.stats.gauges.airsupply.shopping.search.cheiassint002.metrics.jvm.memory.total.used.Value");
         Map<String, Object> params = request.toParams();
-        GraphiteResult graphiteResult = restTemplate.getForObject(getGraphiteUrl(), GraphiteResult[].class, params)[0];
+        log.info("props:{}", props);
+
+        GraphiteResult graphiteResult = restTemplate.getForObject(props.getUrlTemplate(), GraphiteResult[].class, params)[0];
         String[][] dataPoints = graphiteResult.getDatapoints();
         List<MetricSourceResult> results = new ArrayList<>();
         for (String[] dataPoint : dataPoints) {
@@ -53,16 +54,5 @@ public class GraphiteMetricSource implements MetricSource {
             results.add(result);
         }
         return results;
-    }
-
-    private String getGraphiteUrl() {
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        GraphiteProperties properties = null;
-        try {
-            properties = mapper.readValue(new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/application.yml"))), GraphiteProperties.class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return properties.getGraphite().get("urlTemplate").textValue();
     }
 }

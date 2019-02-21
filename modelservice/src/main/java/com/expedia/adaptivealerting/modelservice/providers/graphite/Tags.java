@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.spi.graphite;
+package com.expedia.adaptivealerting.modelservice.providers.graphite;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 
 /**
  * @author kashah
  */
 @Data
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class GraphiteProperties {
-    @JsonProperty("graphite")
-    private JsonNode graphite;
+public class Tags {
+
+    private String name;
+
+    @Override
+    public String toString() {
+        return "Tags [name = " + name + "]";
+    }
 }

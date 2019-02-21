@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.spi.graphite;
+package com.expedia.adaptivealerting.modelservice.providers.graphite;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author kashah
@@ -27,10 +28,12 @@ import lombok.ToString;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class GraphiteResult {
-    private String[][] datapoints;
+public class GraphiteRequest {
     private String target;
-    private Tags tags;
+
+    public Map<String, Object> toParams() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("target", target);
+        return params;
+    }
 }

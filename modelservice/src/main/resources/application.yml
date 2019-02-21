@@ -1,14 +1,16 @@
 spring:
+  application:
+    name: model-service
   main:
     web-environment: true
     show-banner: false
   datasource:
-    url: "jdbc:mysql://database:3306/aa_model_service?autoReconnect=true"
-    username: ${USERNAME:root}
-    password: ${PASSWORD:""}
+    driverClassName: "com.mysql.cj.jdbc.Driver"
+    url: "jdbc:mysql://localhost:3306/aa_model_service?autoReconnect=true"
+    username: "root"
+    password: ""
     maximum-pool-size: 8
     minimum-idle: 0
-    driver-class-name: "com.mysql.cj.jdbc.Driver"
   jpa:
     openInView: true
     database: "MYSQL"
@@ -24,12 +26,19 @@ endpoints:
     sensitive: false
 management:
   context-path: "/admin"
-graphite:
-  urlTemplate: "https://graphite.test.monitoring.expedia.com/render?from=-168hours&format=json&maxDataPoints=1008&target={target}"
-security:
-  clientId: "id"
-  secret: "secret"
-  signingKey: "1234"
-server:
-  port: 8008
+  metrics:
+    export:
+      jmx:
+        domain: com.expedia.adaptivealerting.modelservice.metrics
+    enable:
+      jvm: false
+      tomcat: false
+      system: false
+      process: false
 
+graphite:
+  urlTemplate: "https://graphite.test.monitoring.expedia.com/render?from=-24hours&format=json&maxDataPoints=144&target={target}"
+security:
+  signingKey: "m0de!S3rvIc3"
+server:
+  port: 8080
