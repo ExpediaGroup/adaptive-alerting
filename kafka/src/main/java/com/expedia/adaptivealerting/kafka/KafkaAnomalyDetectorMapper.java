@@ -16,11 +16,13 @@
 package com.expedia.adaptivealerting.kafka;
 
 import com.expedia.adaptivealerting.anomdetect.DetectorMapper;
-import com.expedia.adaptivealerting.kafka.serde.JsonPojoSerde;
+import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde;
 import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
 import com.expedia.metrics.MetricData;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
@@ -33,13 +35,18 @@ import java.util.stream.Collectors;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
- * Kafka Streams adapter for {@link DetectorMapper}.
+ * Kafka Streams adapter for {@link DetectorMapper}. Reads metric data from an input topic, classifies individual metric
+ * data points, and publishes the classifications to an anomalies output topic.
  */
 @Slf4j
 public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
     private static final String CK_AD_MAPPER = "ad-mapper";
     
     private final DetectorMapper mapper;
+    
+    // TODO Make these configurable. [WLW]
+    private Serde<String> outputKeySerde = new Serdes.StringSerde();
+    private Serde<MappedMetricData> outputValueSerde = new MappedMetricDataJsonSerde();
     
     public static void main(String[] args) {
         val config = new TypesafeConfigLoader(CK_AD_MAPPER).loadMergedConfig();
@@ -72,19 +79,25 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
         val builder = new StreamsBuilder();
         final KStream<String, MetricData> stream = builder.stream(inboundTopic);
         stream
-                .flatMap((key, metricData) -> {
-                    log.trace("Mapping key={}, metricData={}", key, metricData);
-                    val mappedMetricDataSet = mapper.map(metricData);
-                    return mappedMetricDataSet.stream()
-                            .map(mappedMetricData -> {
-                                val newKey = mappedMetricData.getDetectorUuid().toString();
-                                return KeyValue.pair(newKey, mappedMetricData);
-                            })
-                            .collect(Collectors.toSet());
-                })
-                // TODO Make outbound serde configurable. [WLW]
-                .to(outboundTopic, Produced.with(new Serdes.StringSerde(), new JsonPojoSerde<>()));
-        
+                .filter((key, md) -> md != null)
+                .flatMap(this::metricsByDetector)
+                .to(outboundTopic, Produced.with(outputKeySerde, outputValueSerde));
         return builder.build();
+    }
+    
+    private Iterable<? extends KeyValue<String, MappedMetricData>> metricsByDetector(
+            String key,
+            MetricData metricData) {
+        
+        assert metricData != null;
+        log.trace("Mapping key={}, metricData={}", key, metricData);
+        
+        val mmdSet = mapper.map(metricData);
+        return mmdSet.stream()
+                .map(mmd -> {
+                    val newKey = mmd.getDetectorUuid().toString();
+                    return KeyValue.pair(newKey, mmd);
+                })
+                .collect(Collectors.toSet());
     }
 }

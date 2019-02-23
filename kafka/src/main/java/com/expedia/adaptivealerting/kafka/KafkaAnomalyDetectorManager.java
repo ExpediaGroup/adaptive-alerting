@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.kafka;
 
 import com.expedia.adaptivealerting.anomdetect.DetectorManager;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
@@ -56,38 +57,41 @@ public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
         val config = getConfig();
         val inboundTopic = config.getInboundTopic();
         val outboundTopic = config.getOutboundTopic();
-        val detectorTypes = manager.getDetectorTypes();
     
         log.info("Initializing: inboundTopic={}, outboundTopic={}", inboundTopic, outboundTopic);
         
         val builder = new StreamsBuilder();
         final KStream<String, MappedMetricData> stream = builder.stream(inboundTopic);
         stream
-                .filter((key, mappedMetricData) -> mappedMetricData != null
-                        && detectorTypes.contains(mappedMetricData.getDetectorType()))
-                .mapValues(mappedMetricData -> {
-                    log.trace("Processing mappedMetricData: {}", mappedMetricData);
-                    
-                    // TODO Not sure why we would get null here--mappedMetricData are mapped to models. But in fact we
-                    // are seeing this occur so let's handle it and investigate the cause. [WLW]
-                    AnomalyResult anomalyResult = null;
-                    try {
-                        anomalyResult = manager.classify(mappedMetricData);
-                    } catch (Exception e) {
-                        log.error(
-                                "Encountered error while classifying {}. {}",
-                                mappedMetricData,
-                                ErrorUtil.fullExceptionDetails(e)
-                        );
-                    }
-                    
-                    log.info("anomalyResult={}", anomalyResult);
-                    
-                    return anomalyResult == null ? null : new MappedMetricData(mappedMetricData, anomalyResult);
-                })
-                .filter((key, mappedMetricData) -> mappedMetricData != null)
+                .filter((key, mmd) -> mmd != null)
+                .filter((key, mmd) -> hasManagedDetector(mmd))
+                .mapValues(this::toAnomaly)
+                .filter((key, mmd) -> mmd != null)
+                .filter((key, mmd) -> isWeakOrStrongAnomaly(mmd))
                 .to(outboundTopic);
         return builder.build();
     }
-
+    
+    private boolean hasManagedDetector(MappedMetricData mmd) {
+        assert mmd != null;
+        return manager.getDetectorTypes().contains(mmd.getDetectorType());
+    }
+    
+    private MappedMetricData toAnomaly(MappedMetricData mmd) {
+        assert mmd != null;
+        AnomalyResult anomalyResult = null;
+        try {
+            anomalyResult = manager.classify(mmd);
+            log.info("anomalyResult={}", anomalyResult);
+        } catch (Exception e) {
+            log.error("Classification error: mmd={}, error={}", mmd, ErrorUtil.fullExceptionDetails(e));
+        }
+        return anomalyResult == null ? null : new MappedMetricData(mmd, anomalyResult);
+    }
+    
+    private boolean isWeakOrStrongAnomaly(MappedMetricData mmd) {
+        assert mmd != null;
+        val level = mmd.getAnomalyResult().getAnomalyLevel();
+        return level == AnomalyLevel.WEAK || level == AnomalyLevel.STRONG;
+    }
 }

@@ -22,23 +22,23 @@ import org.apache.kafka.common.serialization.Serializer;
 
 import java.util.Map;
 
-public class MetricDataSerde implements Serde<MetricData> {
-
+public final class MetricDataJsonSerde implements Serde<MetricData> {
+    
     @Override
-    public void configure(Map<String, ?> configs, boolean isKey) {
+    public void configure(Map<String, ?> map, boolean b) {
     }
-
+    
     @Override
     public void close() {
     }
-
+    
     @Override
     public Serializer<MetricData> serializer() {
-        return new MetricDataSerializer();
+        return new MetricDataJsonSerializer();
     }
-
+    
     @Override
     public Deserializer<MetricData> deserializer() {
-        return new MetricDataDeserializer();
+        return new MetricDataJsonDeserializer();
     }
 }

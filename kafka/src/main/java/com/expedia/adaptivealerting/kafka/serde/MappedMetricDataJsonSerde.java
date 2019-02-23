@@ -15,30 +15,30 @@
  */
 package com.expedia.adaptivealerting.kafka.serde;
 
-import com.expedia.metrics.MetricData;
+import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serializer;
 
 import java.util.Map;
 
-public class MetricDataSerde implements Serde<MetricData> {
-
+public final class MappedMetricDataJsonSerde implements Serde<MappedMetricData> {
+    
     @Override
-    public void configure(Map<String, ?> configs, boolean isKey) {
+    public void configure(Map<String, ?> map, boolean b) {
     }
-
+    
     @Override
     public void close() {
     }
-
+    
     @Override
-    public Serializer<MetricData> serializer() {
-        return new MetricDataSerializer();
+    public Serializer<MappedMetricData> serializer() {
+        return new MappedMetricDataJsonSerializer();
     }
-
+    
     @Override
-    public Deserializer<MetricData> deserializer() {
-        return new MetricDataDeserializer();
+    public Deserializer<MappedMetricData> deserializer() {
+        return new MappedMetricDataJsonDeserializer();
     }
 }

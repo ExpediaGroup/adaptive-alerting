@@ -17,6 +17,8 @@ package com.expedia.adaptivealerting.kafka;
 
 import com.expedia.adaptivealerting.anomdetect.DetectorMapper;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonDeserializer;
+import com.expedia.adaptivealerting.kafka.serde.MetricDataJsonSerde;
 import com.expedia.adaptivealerting.kafka.util.TestObjectMother;
 import com.expedia.metrics.MetricData;
 import com.typesafe.config.Config;
@@ -25,7 +27,6 @@ import lombok.val;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.streams.TopologyTestDriver;
-import org.apache.kafka.streams.errors.StreamsException;
 import org.apache.kafka.streams.test.ConsumerRecordFactory;
 import org.apache.kafka.streams.test.OutputVerifier;
 import org.junit.After;
@@ -36,6 +37,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Collections;
 
+import static junit.framework.TestCase.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -48,6 +50,7 @@ public final class KafkaDetectorMapperTest {
     private static final String KAFKA_KEY = "some-kafka-key";
     private static final String INBOUND_TOPIC = "metrics";
     private static final String OUTBOUND_TOPIC = "mapped-metrics";
+    private static final String INVALID_INPUT = "invalid-input";
     
     @Mock
     private DetectorMapper mapper;
@@ -98,25 +101,27 @@ public final class KafkaDetectorMapperTest {
     
     /**
      * Addresses bug https://github.com/ExpediaDotCom/adaptive-alerting/issues/253
+     * See also https://stackoverflow.com/questions/51136942/how-to-handle-serializationexception-after-deserialization
      */
-    @Test(expected = StreamsException.class)
-    public void testFailsOnDeserializationException() {
-        logAndFailDriver.pipeInput(stringFactory.create(INBOUND_TOPIC, KAFKA_KEY, "invalid_input"));
-        logAndFailDriver.readOutput(OUTBOUND_TOPIC, stringDeserializer, mmdDeserializer);
+    @Test
+    public void nullOnDeserExceptionWithLogAndFailDriver() {
+        logAndFailDriver.pipeInput(stringFactory.create(INBOUND_TOPIC, KAFKA_KEY, INVALID_INPUT));
+        val record = logAndFailDriver.readOutput(OUTBOUND_TOPIC, stringDeserializer, mmdDeserializer);
+        assertNull(record);
     }
     
     /**
      * Addresses bug https://github.com/ExpediaDotCom/adaptive-alerting/issues/253
+     * See also https://stackoverflow.com/questions/51136942/how-to-handle-serializationexception-after-deserialization
      */
     @Test
-    public void testContinuesOnDeserializationException() {
-        logAndContinueDriver.pipeInput(stringFactory.create(INBOUND_TOPIC, KAFKA_KEY, "invalid_input"));
-        logAndContinueDriver.readOutput(OUTBOUND_TOPIC, stringDeserializer, mmdDeserializer);
+    public void nullOnDeserExceptionWithLogAndContinueDriver() {
+        logAndContinueDriver.pipeInput(stringFactory.create(INBOUND_TOPIC, KAFKA_KEY, INVALID_INPUT));
+        val record = logAndContinueDriver.readOutput(OUTBOUND_TOPIC, stringDeserializer, mmdDeserializer);
+        assertNull(record);
     }
     
     private void initConfig() {
-//        when(tsConfig.getString(CK_MODEL_SERVICE_URI_TEMPLATE)).thenReturn("https://example.com/");
-        
         when(saConfig.getTypesafeConfig()).thenReturn(tsConfig);
         when(saConfig.getInboundTopic()).thenReturn(INBOUND_TOPIC);
         when(saConfig.getOutboundTopic()).thenReturn(OUTBOUND_TOPIC);
@@ -136,8 +141,8 @@ public final class KafkaDetectorMapperTest {
     
         // Topology test drivers
         val topology = new KafkaAnomalyDetectorMapper(saConfig, mapper).buildTopology();
-        this.logAndFailDriver = TestObjectMother.topologyTestDriver(topology, MetricData.class, false);
-        this.logAndContinueDriver = TestObjectMother.topologyTestDriver(topology, MetricData.class, true);
+        this.logAndFailDriver = TestObjectMother.topologyTestDriver(topology, MetricDataJsonSerde.class, false);
+        this.logAndContinueDriver = TestObjectMother.topologyTestDriver(topology, MetricDataJsonSerde.class, true);
         
         // MetricData producer
         // The string record factory is just for experimenting with the drivers.
@@ -148,6 +153,6 @@ public final class KafkaDetectorMapperTest {
         // MappedMetricData consumer
         // We consume the key and value from the outbound topic so we can validate the results.
         this.stringDeserializer = new StringDeserializer();
-        this.mmdDeserializer = TestObjectMother.mappedMetricDataDeserializer();
+        this.mmdDeserializer = new MappedMetricDataJsonDeserializer();
     }
 }

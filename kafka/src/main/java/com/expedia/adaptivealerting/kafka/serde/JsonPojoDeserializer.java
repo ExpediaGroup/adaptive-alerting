@@ -80,6 +80,8 @@ public final class JsonPojoDeserializer<T> implements Deserializer<T> {
         try {
             return objectMapper.readValue(bytes, tClass);
         } catch (IOException e) {
+            // FIXME This differs from AbstractJsonDeserializer, which returns null.
+            // See https://stackoverflow.com/questions/51136942/how-to-handle-serializationexception-after-deserialization
             throw new SerializationException(e);
         }
     }
