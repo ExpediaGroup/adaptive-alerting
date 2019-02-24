@@ -71,17 +71,16 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
     @Override
     protected Topology buildTopology() {
         val config = getConfig();
-        val inboundTopic = config.getInboundTopic();
-        val outboundTopic = config.getOutboundTopic();
-        
-        log.info("Initializing: inboundTopic={}, outboundTopic={}", inboundTopic, outboundTopic);
+        val inputTopic = config.getInboundTopic();
+        val outputTopic = config.getOutboundTopic();
+        log.info("Initializing: inputTopic={}, outputTopic={}", inputTopic, outputTopic);
         
         val builder = new StreamsBuilder();
-        final KStream<String, MetricData> stream = builder.stream(inboundTopic);
+        final KStream<String, MetricData> stream = builder.stream(inputTopic);
         stream
                 .filter((key, md) -> md != null)
                 .flatMap(this::metricsByDetector)
-                .to(outboundTopic, Produced.with(outputKeySerde, outputValueSerde));
+                .to(outputTopic, Produced.with(outputKeySerde, outputValueSerde));
         return builder.build();
     }
     

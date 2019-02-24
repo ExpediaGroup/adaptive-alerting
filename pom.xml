@@ -77,6 +77,7 @@
         <alert-manager.version>1.0.0-SNAPSHOT</alert-manager.version>
         <amazonaws.version>1.11.402</amazonaws.version>
         <apache.commons.version>3.7</apache.commons.version>
+        <apache.commons.math.version>3.6.1</apache.commons.math.version>
         <apache.httpcomponents.version>4.5.6</apache.httpcomponents.version>
         <codahale.metrics.version>3.0.2</codahale.metrics.version>
         <jackson.version>2.9.8</jackson.version>
@@ -153,6 +154,7 @@
                 <artifactId>aws-java-sdk-sagemakerruntime</artifactId>
                 <version>${amazonaws.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>com.codahale.metrics</groupId>
                 <artifactId>metrics-core</artifactId>
@@ -249,6 +251,11 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${apache.commons.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-math3</artifactId>
+                <version>${apache.commons.math.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>

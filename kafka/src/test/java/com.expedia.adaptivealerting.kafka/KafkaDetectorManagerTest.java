@@ -35,9 +35,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.Collections;
-
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 /**
@@ -91,8 +90,8 @@ public final class KafkaDetectorManagerTest {
     }
     
     @Test
-    public void doesNotPublishNormalMetricData() {
-        doesNotPublishAnomaly(metric_normalAnomaly);
+    public void publishesNormalAnomalies() {
+        publishesAnomaly(metric_normalAnomaly, AnomalyLevel.NORMAL);
     }
     
     @Test
@@ -106,13 +105,13 @@ public final class KafkaDetectorManagerTest {
     }
     
     @Test
-    public void doesNotPublishWarmUpMetricData() {
-        doesNotPublishAnomaly(metric_modelWarmup);
+    public void publishesWarmupAnomalies() {
+        publishesAnomaly(metric_modelWarmup, AnomalyLevel.MODEL_WARMUP);
     }
     
     @Test
-    public void doesNotPublishUnknownMetricData() {
-        doesNotPublishAnomaly(metric_unknownAnomaly);
+    public void publishesUnknownAnomalies() {
+        publishesAnomaly(metric_unknownAnomaly, AnomalyLevel.UNKNOWN);
     }
     
     /**
@@ -152,8 +151,7 @@ public final class KafkaDetectorManagerTest {
     }
     
     private void initDependencies() {
-        when(detectorManager.getDetectorTypes())
-                .thenReturn(Collections.singleton("constant-detector"));
+        when(detectorManager.hasDetectorType(anyString())).thenReturn(true);
         
         when(detectorManager.classify(metric_normalAnomaly))
                 .thenReturn(TestObjectMother.anomalyResult(AnomalyLevel.NORMAL));
@@ -190,6 +188,7 @@ public final class KafkaDetectorManagerTest {
         assertEquals(anomalyLevel, anomaly.getAnomalyResult().getAnomalyLevel());
     }
     
+    @SuppressWarnings("unused")
     private void doesNotPublishAnomaly(MappedMetricData metric) {
         assertNull(getAnomalyRecord(metric));
     }
