@@ -20,7 +20,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Helps in integrating with the above Service Loader via the factory beans
+ * Helps in integrating with the Service Loader via the factory beans
  */
 @Configuration
 public class MetricSourceConfig {
