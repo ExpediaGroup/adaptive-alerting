@@ -40,7 +40,7 @@ public class GraphiteMetricSource implements MetricSource {
     @Override
     public List<MetricSourceResult> getMetricData(String metricName) {
         GraphiteProperties props = BeanUtil.getBean(GraphiteProperties.class);
-        GraphiteRequest request = new GraphiteRequest(metricName);
+        GraphiteRequest request = new GraphiteRequest("karmalab.stats.gauges.airsupply.shopping.search.cheiassint002.metrics.jvm.memory.total.used.Value");
         Map<String, Object> params = request.toParams();
 
         GraphiteResult graphiteResult = restTemplate.getForObject(props.getUrlTemplate(), GraphiteResult[].class, params)[0];
