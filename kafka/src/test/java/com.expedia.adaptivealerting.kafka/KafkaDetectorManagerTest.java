@@ -46,9 +46,9 @@ import static org.mockito.Mockito.when;
 @Slf4j
 public final class KafkaDetectorManagerTest {
     private static final String KAFKA_KEY = "some-kafka-key";
-    private static final String INBOUND_TOPIC = "mapped-metrics";
-    private static final String OUTBOUND_TOPIC = "anomalies";
-    private static final String INVALID_VALUE = "invalid-value";
+    private static final String INPUT_TOPIC = "mapped-metrics";
+    private static final String OUTPUT_TOPIC = "anomalies";
+    private static final String INVALID_INPUT_VALUE = "invalid-input-value";
     
     @Mock
     private DetectorManager detectorManager;
@@ -120,9 +120,7 @@ public final class KafkaDetectorManagerTest {
      */
     @Test
     public void nullOnDeserExceptionWithLogAndFailDriver() {
-        logAndFailDriver.pipeInput(stringFactory.create(INBOUND_TOPIC, KAFKA_KEY, INVALID_VALUE));
-        val record = logAndFailDriver.readOutput(OUTBOUND_TOPIC, stringDeser, anomalyDeser);
-        assertNull(record);
+        nullOnDeserException(logAndFailDriver);
     }
     
     /**
@@ -131,15 +129,13 @@ public final class KafkaDetectorManagerTest {
      */
     @Test
     public void nullOnDeserExceptionWithLogAndContinueDriver() {
-        logAndContinueDriver.pipeInput(stringFactory.create(INBOUND_TOPIC, KAFKA_KEY, INVALID_VALUE));
-        val record = logAndContinueDriver.readOutput(OUTBOUND_TOPIC, stringDeser, anomalyDeser);
-        assertNull(record);
+        nullOnDeserException(logAndContinueDriver);
     }
     
     private void initConfig() {
         when(saConfig.getTypesafeConfig()).thenReturn(tsConfig);
-        when(saConfig.getInboundTopic()).thenReturn(INBOUND_TOPIC);
-        when(saConfig.getOutboundTopic()).thenReturn(OUTBOUND_TOPIC);
+        when(saConfig.getInboundTopic()).thenReturn(INPUT_TOPIC);
+        when(saConfig.getOutboundTopic()).thenReturn(OUTPUT_TOPIC);
     }
     
     private void initTestObjects() {
@@ -194,8 +190,14 @@ public final class KafkaDetectorManagerTest {
     }
     
     private ProducerRecord<String, MappedMetricData> getAnomalyRecord(MappedMetricData metric) {
-        val metricRecord = metricFactory.create(INBOUND_TOPIC, KAFKA_KEY, metric);
+        val metricRecord = metricFactory.create(INPUT_TOPIC, KAFKA_KEY, metric);
         logAndFailDriver.pipeInput(metricRecord);
-        return logAndFailDriver.readOutput(OUTBOUND_TOPIC, stringDeser, anomalyDeser);
+        return logAndFailDriver.readOutput(OUTPUT_TOPIC, stringDeser, anomalyDeser);
+    }
+    
+    private void nullOnDeserException(TopologyTestDriver driver) {
+        driver.pipeInput(stringFactory.create(INPUT_TOPIC, KAFKA_KEY, INVALID_INPUT_VALUE));
+        val record = driver.readOutput(OUTPUT_TOPIC, stringDeser, anomalyDeser);
+        assertNull(record);
     }
 }

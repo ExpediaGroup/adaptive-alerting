@@ -30,6 +30,7 @@ import org.apache.kafka.streams.TopologyTestDriver;
 import org.apache.kafka.streams.test.ConsumerRecordFactory;
 import org.apache.kafka.streams.test.OutputVerifier;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -37,7 +38,6 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Collections;
 
-import static junit.framework.TestCase.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -48,9 +48,9 @@ import static org.mockito.Mockito.when;
 @Slf4j
 public final class KafkaDetectorMapperTest {
     private static final String KAFKA_KEY = "some-kafka-key";
-    private static final String INBOUND_TOPIC = "metrics";
-    private static final String OUTBOUND_TOPIC = "mapped-metrics";
-    private static final String INVALID_INPUT = "invalid-input";
+    private static final String INPUT_TOPIC = "metrics";
+    private static final String OUTPUT_TOPIC = "mapped-metrics";
+    private static final String INVALID_INPUT_VALUE = "invalid-input-value";
     
     @Mock
     private DetectorMapper mapper;
@@ -70,8 +70,8 @@ public final class KafkaDetectorMapperTest {
     private TopologyTestDriver logAndContinueDriver;
     private ConsumerRecordFactory<String, MetricData> metricDataFactory;
     private ConsumerRecordFactory<String, String> stringFactory;
-    private StringDeserializer stringDeserializer;
-    private Deserializer<MappedMetricData> mmdDeserializer;
+    private StringDeserializer stringDeser;
+    private Deserializer<MappedMetricData> mmdDeser;
     
     @Before
     public void setUp() {
@@ -90,10 +90,10 @@ public final class KafkaDetectorMapperTest {
     
     @Test
     public void testMetricDataToMappedMetricData() {
-        logAndFailDriver.pipeInput(metricDataFactory.create(INBOUND_TOPIC, KAFKA_KEY, metricData));
+        logAndFailDriver.pipeInput(metricDataFactory.create(INPUT_TOPIC, KAFKA_KEY, metricData));
         
         // The streams app remaps the key to the detector UUID. [WLW]
-        val outputRecord = logAndFailDriver.readOutput(OUTBOUND_TOPIC, stringDeserializer, mmdDeserializer);
+        val outputRecord = logAndFailDriver.readOutput(OUTPUT_TOPIC, stringDeser, mmdDeser);
         log.trace("outputRecord={}", outputRecord);
         val outputKafkaKey = mappedMetricData.getDetectorUuid().toString();
         OutputVerifier.compareKeyValue(outputRecord, outputKafkaKey, mappedMetricData);
@@ -105,9 +105,7 @@ public final class KafkaDetectorMapperTest {
      */
     @Test
     public void nullOnDeserExceptionWithLogAndFailDriver() {
-        logAndFailDriver.pipeInput(stringFactory.create(INBOUND_TOPIC, KAFKA_KEY, INVALID_INPUT));
-        val record = logAndFailDriver.readOutput(OUTBOUND_TOPIC, stringDeserializer, mmdDeserializer);
-        assertNull(record);
+        nullOnDeserException(logAndFailDriver);
     }
     
     /**
@@ -116,15 +114,13 @@ public final class KafkaDetectorMapperTest {
      */
     @Test
     public void nullOnDeserExceptionWithLogAndContinueDriver() {
-        logAndContinueDriver.pipeInput(stringFactory.create(INBOUND_TOPIC, KAFKA_KEY, INVALID_INPUT));
-        val record = logAndContinueDriver.readOutput(OUTBOUND_TOPIC, stringDeserializer, mmdDeserializer);
-        assertNull(record);
+        nullOnDeserException(logAndContinueDriver);
     }
     
     private void initConfig() {
         when(saConfig.getTypesafeConfig()).thenReturn(tsConfig);
-        when(saConfig.getInboundTopic()).thenReturn(INBOUND_TOPIC);
-        when(saConfig.getOutboundTopic()).thenReturn(OUTBOUND_TOPIC);
+        when(saConfig.getInboundTopic()).thenReturn(INPUT_TOPIC);
+        when(saConfig.getOutboundTopic()).thenReturn(OUTPUT_TOPIC);
     }
     
     private void initTestObjects() {
@@ -152,7 +148,13 @@ public final class KafkaDetectorMapperTest {
         
         // MappedMetricData consumer
         // We consume the key and value from the outbound topic so we can validate the results.
-        this.stringDeserializer = new StringDeserializer();
-        this.mmdDeserializer = new MappedMetricDataJsonDeserializer();
+        this.stringDeser = new StringDeserializer();
+        this.mmdDeser = new MappedMetricDataJsonDeserializer();
+    }
+    
+    private void nullOnDeserException(TopologyTestDriver driver) {
+        driver.pipeInput(stringFactory.create(INPUT_TOPIC, KAFKA_KEY, INVALID_INPUT_VALUE));
+        val record = driver.readOutput(OUTPUT_TOPIC, stringDeser, mmdDeser);
+        Assert.assertNull(record);
     }
 }
