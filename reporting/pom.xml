@@ -18,6 +18,7 @@
 
 <!-- For multi-module JaCoCo. See: -->
 <!-- https://github.com/jacoco/jacoco/wiki/MavenMultiModule -->
+<!-- https://github.com/jacoco/jacoco/tree/master/jacoco-maven-plugin.test/it/it-report-aggregate -->
 <!-- http://janejieblog.blogspot.com/2017/12/code-coverage-jacoco-with-maven-multi.html -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -32,7 +33,6 @@
     </parent>
 
     <artifactId>adaptive-alerting-reporting</artifactId>
-    <packaging>pom</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Adaptive Alerting reporting module.</description>
