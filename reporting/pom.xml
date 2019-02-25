@@ -32,15 +32,13 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
+    <groupId>com.expedia.adaptivealerting</groupId>
     <artifactId>adaptive-alerting-reporting</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Adaptive Alerting reporting module.</description>
-
-    <properties>
-        <jacoco-percentage>0.0</jacoco-percentage>
-        <jacoco-branch-percentage>0.0</jacoco-branch-percentage>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -68,6 +66,10 @@
 
     <build>
         <plugins>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven.jar.plugin.version}</version>
+            </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
