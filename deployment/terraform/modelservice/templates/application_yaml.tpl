@@ -34,5 +34,7 @@ management:
       tomcat: false
       system: false
       process: false
+graphite:
+  urlTemplate: "https://graphite.test.monitoring.expedia.com/render?from=-24hours&format=json&maxDataPoints=144&target={target}"
 security:
   signingKey: $${SIGNING_KEY}
