@@ -28,10 +28,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.UUID;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -63,6 +63,22 @@ public final class DetectorManagerTest {
     }
     
     @Test
+    public void testGetDetectorTypes() {
+        val detectorTypes = manager.getDetectorTypes();
+        assertTrue(detectorTypes.contains(DETECTOR_TYPE));
+    }
+    
+    @Test
+    public void testHasDetectorType() {
+        assertTrue(manager.hasDetectorType(DETECTOR_TYPE));
+    }
+    
+    @Test
+    public void testDoesNotHaveDetectorType() {
+        assertFalse(manager.hasDetectorType("some-nonexistent-type"));
+    }
+    
+    @Test
     public void testClassify() {
         val result = manager.classify(mappedMetricData);
         assertNotNull(result);
@@ -78,6 +94,9 @@ public final class DetectorManagerTest {
     }
     
     private void initDependencies() {
+        when(detectorSource.findDetectorTypes())
+                .thenReturn(Collections.singleton(DETECTOR_TYPE));
+        
         when(detectorSource.findDetector(any(DetectorMeta.class), any(MetricDefinition.class)))
                 .thenReturn(detector);
     }
