@@ -32,7 +32,7 @@
     </parent>
 
     <artifactId>adaptive-alerting-reporting</artifactId>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Adaptive Alerting reporting module.</description>
