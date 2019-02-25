@@ -15,12 +15,6 @@
  */
 package reporting;
 
-import org.junit.Test;
-
-public class ReportingTest {
-    
-    @Test
-    public void test() {
-        new Reporting();
-    }
+// Dummy class to avoid Maven JAR plugin issue
+public class Reporting {
 }

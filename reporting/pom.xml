@@ -37,6 +37,11 @@
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Adaptive Alerting reporting module.</description>
 
+    <properties>
+        <jacoco-percentage>0.0</jacoco-percentage>
+        <jacoco-branch-percentage>0.0</jacoco-branch-percentage>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.expedia.adaptivealerting</groupId>
