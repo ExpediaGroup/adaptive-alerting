@@ -51,6 +51,10 @@
         <module>modelservice</module>
         <module>samples</module>
         <module>tools</module>
+
+        <!-- For multi-module JaCoCo -->
+        <!-- See https://github.com/jacoco/jacoco/wiki/MavenMultiModule -->
+        <module>reporting</module>
     </modules>
     <scm>
         <connection>scm:git:git://github.com/ExpediaDotCom/adaptive-alerting.git</connection>
@@ -116,7 +120,6 @@
         <wiremock.version>2.18.0</wiremock.version>
 
         <!-- Maven plugins -->
-        <!--coveralls-maven-plugin-version>4.3.0</coveralls-maven-plugin-version-->
         <jacoco-maven-plugin-version>0.8.3</jacoco-maven-plugin-version>
         <jacoco-percentage>0.99</jacoco-percentage>
         <jacoco-branch-percentage>0.99</jacoco-branch-percentage>
@@ -676,6 +679,8 @@
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>
+
+            <!-- https://github.com/codecov/example-java -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
@@ -722,18 +727,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <!-- TODO Do we need this? We are already using codecov. [WLW] -->
-            <!--
-            <plugin>
-                <groupId>org.eluder.coveralls</groupId>
-                <artifactId>coveralls-maven-plugin</artifactId>
-                <version>${coveralls-maven-plugin-version}</version>
-                <configuration>
-                    <repoToken>ey58OJMj1cGwAsmdQAb5bZuTpQ9oZ95bY</repoToken>
-                </configuration>
-            </plugin>
-            -->
         </plugins>
     </build>
 </project>
