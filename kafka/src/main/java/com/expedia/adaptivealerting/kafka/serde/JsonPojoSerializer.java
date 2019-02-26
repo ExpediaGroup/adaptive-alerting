@@ -26,7 +26,7 @@ import org.apache.kafka.common.serialization.Serializer;
 import java.util.Map;
 
 /**
- * @param <T>
+ * @param <T> POJO type
  * @deprecated See {@link JsonPojoDeserializer} for more information.
  */
 @Slf4j

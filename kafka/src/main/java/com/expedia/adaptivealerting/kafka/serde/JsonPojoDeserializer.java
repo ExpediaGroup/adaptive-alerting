@@ -35,7 +35,7 @@ import java.util.Map;
  *
  * The config is just expecting a deserializer class that's already typed. [WLW]
  *
- * @param <T>
+ * @param <T> POJO type
  * @deprecated Superseded by {@link AbstractJsonDeserializer}.
  */
 public final class JsonPojoDeserializer<T> implements Deserializer<T> {
