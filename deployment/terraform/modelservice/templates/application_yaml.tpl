@@ -35,6 +35,6 @@ management:
       system: false
       process: false
 graphite:
-  urlTemplate: "https://graphite/render?from=-24hours&format=json&maxDataPoints=144&target={target}"
+  urlTemplate: "${graphite_url}"
 security:
   signingKey: $${SIGNING_KEY}
