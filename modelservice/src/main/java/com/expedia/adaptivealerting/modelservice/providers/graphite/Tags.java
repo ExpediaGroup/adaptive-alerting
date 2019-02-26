@@ -21,9 +21,4 @@ import lombok.Data;
 public class Tags {
 
     private String name;
-
-    @Override
-    public String toString() {
-        return "Tags [name = " + name + "]";
-    }
 }

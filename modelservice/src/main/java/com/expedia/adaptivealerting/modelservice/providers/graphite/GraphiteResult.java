@@ -24,7 +24,6 @@ import lombok.ToString;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GraphiteResult {
     private String[][] datapoints;
