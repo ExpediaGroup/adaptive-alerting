@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -40,8 +41,7 @@ public class GraphiteMetricSource implements MetricSource {
     @Override
     public List<MetricSourceResult> getMetricData(String metricName) {
         GraphiteProperties props = BeanUtil.getBean(GraphiteProperties.class);
-        GraphiteRequest request = new GraphiteRequest(metricName);
-        Map<String, Object> params = request.toParams();
+        Map<String, Object> params = Collections.singletonMap("target", metricName);
 
         GraphiteResult graphiteResult = restTemplate.getForObject(props.getUrlTemplate(), GraphiteResult[].class, params)[0];
         String[][] dataPoints = graphiteResult.getDatapoints();

@@ -2,12 +2,9 @@ package com.expedia.adaptivealerting.modelservice.service;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.modelservice.entity.Metric;
-import com.expedia.adaptivealerting.modelservice.providers.graphite.*;
 import com.expedia.adaptivealerting.modelservice.repo.MetricRepository;
 import com.expedia.adaptivealerting.modelservice.spi.MetricSource;
-import com.expedia.adaptivealerting.modelservice.spi.MetricSourceResult;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
-import com.expedia.adaptivealerting.modelservice.util.BeanUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,7 +14,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.*;
