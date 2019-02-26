@@ -121,8 +121,10 @@
 
         <!-- Maven plugins -->
         <jacoco-maven-plugin-version>0.8.3</jacoco-maven-plugin-version>
+        <jacoco-report-path>${project.basedir}/../target/jacoco.exec</jacoco-report-path>
         <jacoco-percentage>0.99</jacoco-percentage>
         <jacoco-branch-percentage>0.99</jacoco-branch-percentage>
+
         <maven.compiler.plugin.version>3.8.0</maven.compiler.plugin.version>
         <maven.exec.plugin.version>1.6.0</maven.exec.plugin.version>
         <maven.failsafe.plugin.version>2.22.1</maven.failsafe.plugin.version>
@@ -691,6 +693,11 @@
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
+                        <!-- https://stackoverflow.com/questions/39634478/maven-jacoco-configuration-for-multi-module-projects -->
+                        <configuration>
+                            <append>true</append>
+                            <destFile>${jacoco-report-path}</destFile>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>jacoco-report</id>
