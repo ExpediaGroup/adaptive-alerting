@@ -26,6 +26,7 @@ import org.junit.Test;
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.anomdetect.AnomalyToMetricTransformer.AA_DETECTOR_UUID;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class AnomalyToMetricTransformerTest {
@@ -55,8 +56,8 @@ public class AnomalyToMetricTransformerTest {
         transformerUnderTest.transform(null);
     }
     
-    @Test(expected = IllegalArgumentException.class)
-    public void testTransformRejectsMetricWithDeploymentUuidTag() {
+    @Test
+    public void testTransformReturnsNullIfDetectorUuidTagIsSet() {
         val kvTags = MetricUtil.defaultKvTags();
         kvTags.put(AA_DETECTOR_UUID, UUID.randomUUID().toString());
         
@@ -64,7 +65,8 @@ public class AnomalyToMetricTransformerTest {
         val metricData = MetricUtil.metricData(metricDef);
         val anomResult = anomalyResult(metricData);
         
-        transformerUnderTest.transform(anomResult);
+        val metricResult = transformerUnderTest.transform(anomResult);
+        assertNull(metricResult);
     }
     
     private void initTestObjects() {

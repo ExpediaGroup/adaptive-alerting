@@ -53,7 +53,9 @@ public class AnomalyToMetricTransformer {
         val timestamp = metricData.getTimestamp();
         
         if (kvTags.containsKey(AA_DETECTOR_UUID)) {
-            throw new IllegalArgumentException("Metric can't contain '" + AA_DETECTOR_UUID + "' key/value tag");
+            // We return a null here to avoid generating an infinite series of anomalies.
+            // This means that we can push first-order anomaly metrics but not higher-order. [WLW]
+            return null;
         }
         
         val newKVTags = new HashMap<>(kvTags);

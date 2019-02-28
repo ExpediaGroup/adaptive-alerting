@@ -18,6 +18,8 @@ package com.expedia.adaptivealerting.kafka;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.kafka.util.TestObjectMother;
 import com.expedia.metrics.MetricData;
+import com.expedia.metrics.MetricDefinition;
+import com.expedia.metrics.TagCollection;
 import com.expedia.metrics.jackson.MetricsJavaModule;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,6 +35,9 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 
@@ -95,7 +100,7 @@ public class KafkaMultiClusterAnomalyToMetricMapperTest {
         
         val mapperThread = new Thread(a2mMapper);
         mapperThread.start();
-        mapperThread.join(10000L);
+        mapperThread.join(5000L);
         a2mMapper.getAnomalyConsumer().wakeup();
 
         val metrics = kafka.helper().consumeStrings(METRIC_TOPIC, NUM_MESSAGES).get();
@@ -105,7 +110,63 @@ public class KafkaMultiClusterAnomalyToMetricMapperTest {
             log.info("metric={}", metric);
         }
     }
-    
+
+    @Test
+    public void testRunSkipsAnomaliesWithDetectorUuid() throws Exception {
+        val tagsWithDetectorUuid = TestObjectMother.metricTagsWithDetectorUuid();
+        val metricDefWithDetectorUuid = new MetricDefinition("some-metric-key", tagsWithDetectorUuid, TagCollection.EMPTY);
+        val metricDataWithDetectorUuid = TestObjectMother.metricData(metricDefWithDetectorUuid, 100.0);
+
+        val anomalyWithDetectorUuid = TestObjectMother.mappedMetricDataWithAnomalyResult(metricDataWithDetectorUuid);
+        val anomalyWithoutDetectorUuid = TestObjectMother.mappedMetricDataWithAnomalyResult();
+
+        val anomalyWithDetectorUuidJson = objectMapper.writeValueAsString(anomalyWithDetectorUuid);
+        val anomalyWithoutDetectorUuidJson = objectMapper.writeValueAsString(anomalyWithoutDetectorUuid);
+
+        // TODO The test passes with 1, 1, but with 2, 4 I get a "duplicate key" error. (See below.)
+        val withArr = new String[2];
+        val withoutArr = new String[4];
+
+        Arrays.fill(withArr, anomalyWithDetectorUuidJson);
+        Arrays.fill(withoutArr, anomalyWithoutDetectorUuidJson);
+
+        // Push onto input topic
+        // TODO Figure out why passing the whole array in doesn't work (duplicate key error, see above).
+        for (val json : withArr) {
+            kafka.helper().produceStrings(ANOMALY_TOPIC, json);
+        }
+        for (val json : withoutArr) {
+            kafka.helper().produceStrings(ANOMALY_TOPIC, json);
+        }
+
+        // Run the processor
+        val mapperThread = new Thread(a2mMapper);
+        mapperThread.start();
+        mapperThread.join(5000L);
+        a2mMapper.getAnomalyConsumer().wakeup();
+
+        // Read from the output topic.
+        // Run on a separate thread so we can join if it blocks forever.
+        val metrics = new ArrayList<String>();
+        val consumerThread = new Thread(() -> {
+            while (true) {
+                try {
+                    metrics.addAll(kafka.helper().consumeStrings(METRIC_TOPIC, withoutArr.length).get());
+                } catch (Exception e) {
+                    // Do nothing
+                }
+            }
+        });
+        consumerThread.start();
+        consumerThread.join(5000L);
+
+        assertEquals(withoutArr.length, metrics.size());
+
+        for (val metric : metrics) {
+            log.info("metric={}", metric);
+        }
+    }
+
     private KafkaConsumer<String, MappedMetricData> buildAnomalyConsumer() {
         val config = kafka.helper().consumerConfig();
         config.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, STRING_DESER);

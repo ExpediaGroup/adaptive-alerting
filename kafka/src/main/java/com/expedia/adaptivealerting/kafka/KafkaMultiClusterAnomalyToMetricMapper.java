@@ -100,9 +100,14 @@ public class KafkaMultiClusterAnomalyToMetricMapper implements Runnable {
         try {
             while (true) {
                 try {
-                    val records = anomalyConsumer.poll(POLL_PERIOD);
-                    log.trace("Read {} records from topic={}", records.count(), anomalyTopic);
-                    records.forEach(record -> metricProducer.send(toMetricDataRecord(record)));
+                    val anomalyRecords = anomalyConsumer.poll(POLL_PERIOD);
+                    log.trace("Read {} anomalyRecords from topic={}", anomalyRecords.count(), anomalyTopic);
+                    anomalyRecords.forEach(record -> {
+                        val metricDataRecord = toMetricDataRecord(record);
+                        if (metricDataRecord != null) {
+                            metricProducer.send(metricDataRecord);
+                        }
+                    });
                 } catch (WakeupException e) {
                     throw e;
                 } catch (Exception e) {
@@ -123,6 +128,11 @@ public class KafkaMultiClusterAnomalyToMetricMapper implements Runnable {
         val mappedMetricData = record.value();
         val anomalyResult = mappedMetricData.getAnomalyResult();
         val metricData = transformer.transform(anomalyResult);
+
+        if (metricData == null) {
+            return null;
+        }
+
         val metricDef = metricData.getMetricDefinition();
         val metricId = metricTankIdFactory.getId(metricDef);
         return new ProducerRecord<>(metricTopic, metricId, metricData);
