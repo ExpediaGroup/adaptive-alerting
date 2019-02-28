@@ -10,7 +10,7 @@ Streaming anomaly detection with automated model selection and autotuning.
 
 ## Build
 
-To build the Maven project:
+To build the Maven project: 
 
 ```
 $ ./mvnw clean verify
