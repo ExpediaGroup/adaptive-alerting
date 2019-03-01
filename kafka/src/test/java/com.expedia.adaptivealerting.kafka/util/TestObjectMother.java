@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.kafka.util;
 
-import com.expedia.adaptivealerting.anomdetect.AnomalyToMetricTransformer;
+import com.expedia.adaptivealerting.anomdetect.AnomalyToMetricMapper;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
@@ -83,7 +83,7 @@ public final class TestObjectMother {
         tags.put("unit", "");
         tags.put("org_id", "1");
         tags.put("interval", "1");
-        tags.put(AnomalyToMetricTransformer.AA_DETECTOR_UUID, UUID.randomUUID().toString());
+        tags.put(AnomalyToMetricMapper.AA_DETECTOR_UUID, UUID.randomUUID().toString());
         return new TagCollection(tags);
     }
 

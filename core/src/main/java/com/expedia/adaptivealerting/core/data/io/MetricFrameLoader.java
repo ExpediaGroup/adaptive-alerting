@@ -77,7 +77,6 @@ public final class MetricFrameLoader {
             metricData[i] = toMetricData(metricDefinition, rows.get(i));
         }
         
-        
         return new MetricFrame(metricData);
     }
     

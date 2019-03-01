@@ -25,23 +25,22 @@ import org.junit.Test;
 
 import java.util.UUID;
 
-import static com.expedia.adaptivealerting.anomdetect.AnomalyToMetricTransformer.AA_DETECTOR_UUID;
-import static org.junit.Assert.assertNull;
+import static com.expedia.adaptivealerting.anomdetect.AnomalyToMetricMapper.AA_DETECTOR_UUID;
 import static org.junit.Assert.assertTrue;
 
-public class AnomalyToMetricTransformerTest {
-    private AnomalyToMetricTransformer transformerUnderTest;
+public class AnomalyToMetricMapperTest {
+    private AnomalyToMetricMapper mapperUnderTest;
     private AnomalyResult anomalyResultWithStringMetricKey;
     
     @Before
     public void setUp() {
-        this.transformerUnderTest = new AnomalyToMetricTransformer();
+        this.mapperUnderTest = new AnomalyToMetricMapper();
         initTestObjects();
     }
     
     @Test
     public void testTransformWithStringMetricKey() {
-        val actualMetric = transformerUnderTest.transform(anomalyResultWithStringMetricKey);
+        val actualMetric = mapperUnderTest.toMetricData(anomalyResultWithStringMetricKey);
         val actualMetricDef = actualMetric.getMetricDefinition();
         val actualTags = actualMetricDef.getTags();
         val actualVTags = actualTags.getV();
@@ -53,11 +52,11 @@ public class AnomalyToMetricTransformerTest {
     
     @Test(expected = IllegalArgumentException.class)
     public void testTransformRejectsNullAnomalyResult() {
-        transformerUnderTest.transform(null);
+        mapperUnderTest.toMetricData(null);
     }
     
-    @Test
-    public void testTransformReturnsNullIfDetectorUuidTagIsSet() {
+    @Test(expected = IllegalArgumentException.class)
+    public void testTransformRejectsDetectorUuidTag() {
         val kvTags = MetricUtil.defaultKvTags();
         kvTags.put(AA_DETECTOR_UUID, UUID.randomUUID().toString());
         
@@ -65,8 +64,7 @@ public class AnomalyToMetricTransformerTest {
         val metricData = MetricUtil.metricData(metricDef);
         val anomResult = anomalyResult(metricData);
         
-        val metricResult = transformerUnderTest.transform(anomResult);
-        assertNull(metricResult);
+        mapperUnderTest.toMetricData(anomResult);
     }
     
     private void initTestObjects() {
