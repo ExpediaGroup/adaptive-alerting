@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.kafka;
 
-import com.expedia.adaptivealerting.anomdetect.AnomalyToMetricTransformer;
+import com.expedia.adaptivealerting.anomdetect.AnomalyToMetricMapper;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.kafka.util.ConfigUtil;
@@ -46,7 +46,7 @@ public class KafkaMultiClusterAnomalyToMetricMapper implements Runnable {
     private static final String TOPIC = "topic";
     private static final long POLL_PERIOD = 1000L;
     
-    private final AnomalyToMetricTransformer transformer = new AnomalyToMetricTransformer();
+    private final AnomalyToMetricMapper mapper = new AnomalyToMetricMapper();
     
     // TODO Replace this with the non-MetricTank version. [WLW]
     private final MetricTankIdFactory metricTankIdFactory = new MetricTankIdFactory();
@@ -100,9 +100,14 @@ public class KafkaMultiClusterAnomalyToMetricMapper implements Runnable {
         try {
             while (true) {
                 try {
-                    val records = anomalyConsumer.poll(POLL_PERIOD);
-                    log.trace("Read {} records from topic={}", records.count(), anomalyTopic);
-                    records.forEach(record -> metricProducer.send(toMetricDataRecord(record)));
+                    val anomalyRecords = anomalyConsumer.poll(POLL_PERIOD);
+                    log.trace("Read {} anomalyRecords from topic={}", anomalyRecords.count(), anomalyTopic);
+                    anomalyRecords.forEach(anomalyRecord -> {
+                        val metricDataRecord = toMetricDataRecord(anomalyRecord);
+                        if (metricDataRecord != null) {
+                            metricProducer.send(metricDataRecord);
+                        }
+                    });
                 } catch (WakeupException e) {
                     throw e;
                 } catch (Exception e) {
@@ -121,10 +126,24 @@ public class KafkaMultiClusterAnomalyToMetricMapper implements Runnable {
     
     private ProducerRecord<String, MetricData> toMetricDataRecord(ConsumerRecord<String, MappedMetricData> record) {
         val mappedMetricData = record.value();
-        val anomalyResult = mappedMetricData.getAnomalyResult();
-        val metricData = transformer.transform(anomalyResult);
+        val metricData = mappedMetricData.getMetricData();
         val metricDef = metricData.getMetricDefinition();
-        val metricId = metricTankIdFactory.getId(metricDef);
-        return new ProducerRecord<>(metricTopic, metricId, metricData);
+        val tags = metricDef.getTags();
+        val kv = tags.getKv();
+
+        if (kv.containsKey(AnomalyToMetricMapper.AA_DETECTOR_UUID)) {
+            return null;
+        }
+
+        val anomalyResult = mappedMetricData.getAnomalyResult();
+        val newMetricData = mapper.toMetricData(anomalyResult);
+
+        if (newMetricData == null) {
+            return null;
+        }
+
+        val newMetricDef = newMetricData.getMetricDefinition();
+        val newMetricId = metricTankIdFactory.getId(newMetricDef);
+        return new ProducerRecord<>(metricTopic, newMetricId, newMetricData);
     }
 }

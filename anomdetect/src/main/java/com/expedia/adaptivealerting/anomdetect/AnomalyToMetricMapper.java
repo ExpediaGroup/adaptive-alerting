@@ -24,6 +24,7 @@ import lombok.val;
 import java.util.Collections;
 import java.util.HashMap;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isFalse;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
@@ -35,35 +36,39 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * might generalize this.
  * </p>
  */
-public class AnomalyToMetricTransformer {
-    
+public class AnomalyToMetricMapper {
+
     /**
      * Key/value tag key for metrics representing an anomaly. The value must be the detector UUID.
      */
     public static String AA_DETECTOR_UUID = "aa_detector_uuid";
-    
-    public MetricData transform(AnomalyResult anomalyResult) {
+
+    /**
+     * Transforms the given anomaly result.
+     *
+     * @param anomalyResult anomaly result to transform into a metric
+     * @return the anomaly result as metric data
+     * @throws IllegalArgumentException if anomalyResult is null or contains the "aa_detector_uuid" tag
+     */
+    public MetricData toMetricData(AnomalyResult anomalyResult) {
         notNull(anomalyResult, "anomalyResult can't be null");
-        
+
         val metricData = anomalyResult.getMetricData();
         val metricDef = metricData.getMetricDefinition();
         val tags = metricDef.getTags();
         val kvTags = tags.getKv();
-        val value = metricData.getValue();
-        val timestamp = metricData.getTimestamp();
-        
-        if (kvTags.containsKey(AA_DETECTOR_UUID)) {
-            throw new IllegalArgumentException("Metric can't contain '" + AA_DETECTOR_UUID + "' key/value tag");
-        }
-        
+        isFalse(kvTags.containsKey(AA_DETECTOR_UUID), "Tag " + AA_DETECTOR_UUID + " not allowed");
+
         val newKVTags = new HashMap<>(kvTags);
         newKVTags.put(AA_DETECTOR_UUID, anomalyResult.getDetectorUUID().toString());
-        
+
         val newKey = metricDef.getKey();
         val newTags = new TagCollection(newKVTags, Collections.EMPTY_SET);
         val newMeta = new TagCollection(Collections.EMPTY_MAP);
         val newMetricDef = new MetricDefinition(newKey, newTags, newMeta);
-        
+        val value = metricData.getValue();
+        val timestamp = metricData.getTimestamp();
+
         return new MetricData(newMetricDef, value, timestamp);
     }
 }

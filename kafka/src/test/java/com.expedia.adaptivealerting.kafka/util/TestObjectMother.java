@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.kafka.util;
 
+import com.expedia.adaptivealerting.anomdetect.AnomalyToMetricMapper;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
@@ -75,7 +76,17 @@ public final class TestObjectMother {
         
         return new TagCollection(tags);
     }
-    
+
+    public static TagCollection metricTagsWithDetectorUuid() {
+        val tags = new HashMap<String, String>();
+        tags.put("mtype", "gauge");
+        tags.put("unit", "");
+        tags.put("org_id", "1");
+        tags.put("interval", "1");
+        tags.put(AnomalyToMetricMapper.AA_DETECTOR_UUID, UUID.randomUUID().toString());
+        return new TagCollection(tags);
+    }
+
     public static TagCollection metricMeta() {
         val meta = new HashMap<String, String>();
         return new TagCollection(meta);
@@ -87,6 +98,10 @@ public final class TestObjectMother {
     
     public static MetricData metricData(double value) {
         val metricDef = new MetricDefinition("some-metric-key", metricTags(), metricMeta());
+        return metricData(metricDef, value);
+    }
+
+    public static MetricData metricData(MetricDefinition metricDef, double value) {
         val now = Instant.now().getEpochSecond();
         return new MetricData(metricDef, value, now);
     }
@@ -112,7 +127,10 @@ public final class TestObjectMother {
     }
     
     public static MappedMetricData mappedMetricDataWithAnomalyResult() {
-        val metricData = metricData();
+        return mappedMetricDataWithAnomalyResult(metricData());
+    }
+
+    public static MappedMetricData mappedMetricDataWithAnomalyResult(MetricData metricData) {
         val mmd = mappedMetricData(metricData);
         mmd.setAnomalyResult(anomalyResult(metricData));
         return mmd;
