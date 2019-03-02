@@ -19,6 +19,7 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.util.MetricUtil;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,6 +29,7 @@ import java.util.UUID;
 import static com.expedia.adaptivealerting.anomdetect.AnomalyToMetricMapper.AA_DETECTOR_UUID;
 import static org.junit.Assert.assertTrue;
 
+@Slf4j
 public class AnomalyToMetricMapperTest {
     private AnomalyToMetricMapper mapperUnderTest;
     private AnomalyResult anomalyResultWithStringMetricKey;
@@ -39,7 +41,7 @@ public class AnomalyToMetricMapperTest {
     }
     
     @Test
-    public void testTransformWithStringMetricKey() {
+    public void toMetricDataWithStringMetricKey() {
         val actualMetric = mapperUnderTest.toMetricData(anomalyResultWithStringMetricKey);
         val actualMetricDef = actualMetric.getMetricDefinition();
         val actualTags = actualMetricDef.getTags();
@@ -51,12 +53,12 @@ public class AnomalyToMetricMapperTest {
     }
     
     @Test(expected = IllegalArgumentException.class)
-    public void testTransformRejectsNullAnomalyResult() {
+    public void toMetricDataRejectsNullAnomalyResult() {
         mapperUnderTest.toMetricData(null);
     }
     
     @Test(expected = IllegalArgumentException.class)
-    public void testTransformRejectsDetectorUuidTag() {
+    public void toMetricDataRejectsAADetectorUuidTag() {
         val kvTags = MetricUtil.defaultKvTags();
         kvTags.put(AA_DETECTOR_UUID, UUID.randomUUID().toString());
         
@@ -66,7 +68,7 @@ public class AnomalyToMetricMapperTest {
         
         mapperUnderTest.toMetricData(anomResult);
     }
-    
+
     private void initTestObjects() {
         val metricDef = new MetricDefinition("someKey");
         val metricData = MetricUtil.metricData(metricDef);

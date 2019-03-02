@@ -85,7 +85,7 @@ public class KafkaMultiClusterAnomalyToMetricMapperTest {
     }
     
     @Test
-    public void testRun() throws Exception {
+    public void run() throws Exception {
         
         // TODO This mapped metric data represents an anomaly. It's a little confusing because there's a class called
         // AnomalyResult, which seems more like an anomaly. Want to revisit whether we need to put the whole MMD on the
@@ -112,7 +112,7 @@ public class KafkaMultiClusterAnomalyToMetricMapperTest {
     }
 
     @Test
-    public void testRunSkipsAnomaliesWithDetectorUuid() throws Exception {
+    public void runSkipsAnomaliesWithAADetectorUuid() throws Exception {
         val tagsWithDetectorUuid = TestObjectMother.metricTagsWithDetectorUuid();
         val metricDefWithDetectorUuid = new MetricDefinition("some-metric-key", tagsWithDetectorUuid, TagCollection.EMPTY);
         val metricDataWithDetectorUuid = TestObjectMother.metricData(metricDefWithDetectorUuid, 100.0);
@@ -165,6 +165,11 @@ public class KafkaMultiClusterAnomalyToMetricMapperTest {
         for (val metric : metrics) {
             log.info("metric={}", metric);
         }
+    }
+
+    @Test
+    public void runSkipsAnomaliesHavingTagWithNullValue() {
+        // TODO Do this after improving runSkipsAnomaliesWithAADetectorUuid()
     }
 
     private KafkaConsumer<String, MappedMetricData> buildAnomalyConsumer() {
