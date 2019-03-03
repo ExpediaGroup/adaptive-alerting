@@ -26,9 +26,7 @@
         <query objectName="java.lang:type=Memory" attribute="NonHeapMemoryUsage" key="committed"
                resultAlias="jvm.nonHeapMemoryUsage.committed"/>
         <query objectName="java.lang:type=Threading" attribute="ThreadCount" resultAlias="jvm.thread"/>
-        <!--<query objectName="java.lang:type=GarbageCollector,name=ParNew" resultAlias="gc.young.#attribute#"/>-->
-        <!--<query objectName="java.lang:type=GarbageCollector,name=ConcurrentMarkSweep" resultAlias="gc.old.#attribute#"/>-->
-        <!--<query objectName="java.lang:type=ClassLoading" attribute="LoadedClassCount" resultAlias="jvm.loadedClasses"/>-->
+        <query objectName="java.lang:type=OperatingSystem" attribute="SystemCpuLoad" resultAlias="jvm.cpu.usage"/>
       
         <!-- TOMCAT -->
         <query objectName="Tomcat:type=GlobalRequestProcessor,name=*" attribute="requestCount"
