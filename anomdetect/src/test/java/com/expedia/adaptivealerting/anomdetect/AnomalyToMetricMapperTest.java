@@ -19,7 +19,6 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.util.MetricUtil;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +28,6 @@ import java.util.UUID;
 import static com.expedia.adaptivealerting.anomdetect.AnomalyToMetricMapper.AA_DETECTOR_UUID;
 import static org.junit.Assert.assertTrue;
 
-@Slf4j
 public class AnomalyToMetricMapperTest {
     private AnomalyToMetricMapper mapperUnderTest;
     private AnomalyResult anomalyResultWithStringMetricKey;
