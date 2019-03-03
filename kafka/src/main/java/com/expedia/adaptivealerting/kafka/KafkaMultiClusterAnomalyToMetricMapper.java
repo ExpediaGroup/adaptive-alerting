@@ -61,24 +61,23 @@ public class KafkaMultiClusterAnomalyToMetricMapper implements Runnable {
     private String metricTopic;
     
     public static void main(String[] args) {
-        
         // TODO Refactor the loader such that it's not tied to Kafka Streams. [WLW]
         val config = new TypesafeConfigLoader(APP_ID).loadMergedConfig();
-        
+
         val consumerConfig = config.getConfig(ANOMALY_CONSUMER);
         val consumerTopic = consumerConfig.getString(TOPIC);
         val consumerProps = ConfigUtil.toConsumerConfig(consumerConfig);
         val consumer = new KafkaConsumer<String, MappedMetricData>(consumerProps);
-        
+
         val producerConfig = config.getConfig(METRIC_PRODUCER);
         val producerTopic = producerConfig.getString(TOPIC);
         val producerProps = ConfigUtil.toProducerConfig(producerConfig);
         val producer = new KafkaProducer<String, MetricData>(producerProps);
-        
+
         val mapper = new KafkaMultiClusterAnomalyToMetricMapper(consumer, producer, consumerTopic, producerTopic);
         mapper.run();
     }
-    
+
     public KafkaMultiClusterAnomalyToMetricMapper(
             Consumer<String, MappedMetricData> anomalyConsumer,
             Producer<String, MetricData> metricProducer,
@@ -123,14 +122,20 @@ public class KafkaMultiClusterAnomalyToMetricMapper implements Runnable {
             metricProducer.close();
         }
     }
-    
-    private ProducerRecord<String, MetricData> toMetricDataRecord(ConsumerRecord<String, MappedMetricData> record) {
-        val mappedMetricData = record.value();
+
+    private ProducerRecord<String, MetricData> toMetricDataRecord(
+            ConsumerRecord<String, MappedMetricData> consumerRecord) {
+
+        assert(consumerRecord != null);
+
+        val mappedMetricData = consumerRecord.value();
         val metricData = mappedMetricData.getMetricData();
         val metricDef = metricData.getMetricDefinition();
         val tags = metricDef.getTags();
         val kv = tags.getKv();
 
+        // IMPORTANT: This check avoids generating an infinite sequence of MetricDatas.
+        // Without it, this mapper would generate new MetricDatas from its own outputs.
         if (kv.containsKey(AnomalyToMetricMapper.AA_DETECTOR_UUID)) {
             return null;
         }
@@ -143,7 +148,18 @@ public class KafkaMultiClusterAnomalyToMetricMapper implements Runnable {
         }
 
         val newMetricDef = newMetricData.getMetricDefinition();
-        val newMetricId = metricTankIdFactory.getId(newMetricDef);
+
+        // Calling metricTankIdFactory.getId() fails when the metric definition contains tags having values that are
+        // null or empty, or contain semicolons. We do see this in production. Hence this check. Would be better though
+        // if we can limit or eliminate such metric definitions since we'd like to avoid unnecessary exceptions.
+        String newMetricId;
+        try {
+            newMetricId = metricTankIdFactory.getId(newMetricDef);
+        } catch (IllegalArgumentException e) {
+            log.warn("IllegalArgumentException: message={}, newMetricDef={}", e.getMessage(), newMetricDef);
+            return null;
+        }
+
         return new ProducerRecord<>(metricTopic, newMetricId, newMetricData);
     }
 }

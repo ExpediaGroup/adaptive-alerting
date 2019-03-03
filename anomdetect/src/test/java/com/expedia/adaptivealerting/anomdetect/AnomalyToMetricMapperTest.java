@@ -39,7 +39,7 @@ public class AnomalyToMetricMapperTest {
     }
     
     @Test
-    public void testTransformWithStringMetricKey() {
+    public void toMetricDataWithStringMetricKey() {
         val actualMetric = mapperUnderTest.toMetricData(anomalyResultWithStringMetricKey);
         val actualMetricDef = actualMetric.getMetricDefinition();
         val actualTags = actualMetricDef.getTags();
@@ -51,12 +51,12 @@ public class AnomalyToMetricMapperTest {
     }
     
     @Test(expected = IllegalArgumentException.class)
-    public void testTransformRejectsNullAnomalyResult() {
+    public void toMetricDataRejectsNullAnomalyResult() {
         mapperUnderTest.toMetricData(null);
     }
     
     @Test(expected = IllegalArgumentException.class)
-    public void testTransformRejectsDetectorUuidTag() {
+    public void toMetricDataRejectsAADetectorUuidTag() {
         val kvTags = MetricUtil.defaultKvTags();
         kvTags.put(AA_DETECTOR_UUID, UUID.randomUUID().toString());
         
@@ -66,7 +66,7 @@ public class AnomalyToMetricMapperTest {
         
         mapperUnderTest.toMetricData(anomResult);
     }
-    
+
     private void initTestObjects() {
         val metricDef = new MetricDefinition("someKey");
         val metricData = MetricUtil.metricData(metricDef);

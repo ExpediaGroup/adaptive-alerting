@@ -77,13 +77,23 @@ public final class TestObjectMother {
         return new TagCollection(tags);
     }
 
-    public static TagCollection metricTagsWithDetectorUuid() {
+    public static TagCollection metricTagsWithAADetectorUuid() {
         val tags = new HashMap<String, String>();
         tags.put("mtype", "gauge");
         tags.put("unit", "");
         tags.put("org_id", "1");
         tags.put("interval", "1");
         tags.put(AnomalyToMetricMapper.AA_DETECTOR_UUID, UUID.randomUUID().toString());
+        return new TagCollection(tags);
+    }
+
+    public static TagCollection metricTagsWithNullTagValue() {
+        val tags = new HashMap<String, String>();
+        tags.put("mtype", "gauge");
+        tags.put("unit", "");
+        tags.put("org_id", "1");
+        tags.put("interval", "1");
+        tags.put("some-tag-key", null);
         return new TagCollection(tags);
     }
 
@@ -135,7 +145,21 @@ public final class TestObjectMother {
         mmd.setAnomalyResult(anomalyResult(metricData));
         return mmd;
     }
-    
+
+    public static MappedMetricData mappedMetricDataWithAnomalyResultAndAADetectorUuid() {
+        val tags = metricTagsWithAADetectorUuid();
+        val metricDef = new MetricDefinition("some-metric-key", tags, TagCollection.EMPTY);
+        val metricData = metricData(metricDef, 100.0);
+        return mappedMetricDataWithAnomalyResult(metricData);
+    }
+
+    public static MappedMetricData mappedMetricDataWithAnomalyResultAndNullTagValue() {
+        val tags = metricTagsWithNullTagValue();
+        val metricDef = new MetricDefinition("some-metric-key", tags, TagCollection.EMPTY);
+        val metricData = metricData(metricDef, 100.0);
+        return mappedMetricDataWithAnomalyResult(metricData);
+    }
+
     public static AnomalyResult anomalyResult(MetricData metricData) {
         return anomalyResult(metricData, AnomalyLevel.STRONG);
     }

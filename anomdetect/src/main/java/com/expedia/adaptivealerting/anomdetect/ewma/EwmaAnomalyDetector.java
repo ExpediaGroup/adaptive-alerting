@@ -20,7 +20,7 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.metrics.MetricData;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NonNull;
 
 import java.util.UUID;
@@ -48,20 +48,22 @@ import static java.lang.Math.sqrt;
  * @see <a href="https://en.wikipedia.org/wiki/Moving_average#Exponentially_weighted_moving_variance_and_standard_deviation">Exponentially weighted moving average and standard deviation</a>
  * @see <a href="https://www.itl.nist.gov/div898/handbook/pmc/section3/pmc324.htm">EWMA Control Charts</a>
  */
-@Data
 public final class EwmaAnomalyDetector extends AbstractAnomalyDetector<EwmaParams> {
 
+    @Getter
     @NonNull
     private EwmaParams params;
 
     /**
      * Mean estimate.
      */
+    @Getter
     private double mean = 0.0;
 
     /**
      * Variance estimate.
      */
+    @Getter
     private double variance = 0.0;
     
     public EwmaAnomalyDetector() {
