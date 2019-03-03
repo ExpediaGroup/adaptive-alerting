@@ -25,7 +25,7 @@ public class EwmaTestRow {
     private String date;
     
     @CsvBindByName
-    private int observed;
+    private double observed;
     
     @CsvBindByName
     private double mean;
