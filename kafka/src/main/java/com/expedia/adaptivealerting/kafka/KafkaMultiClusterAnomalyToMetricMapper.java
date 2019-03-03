@@ -61,24 +61,26 @@ public class KafkaMultiClusterAnomalyToMetricMapper implements Runnable {
     private String metricTopic;
     
     public static void main(String[] args) {
-        
+        buildKafkaMultiClusterAnomalyToMetricMapper().run();
+    }
+
+    static KafkaMultiClusterAnomalyToMetricMapper buildKafkaMultiClusterAnomalyToMetricMapper() {
         // TODO Refactor the loader such that it's not tied to Kafka Streams. [WLW]
         val config = new TypesafeConfigLoader(APP_ID).loadMergedConfig();
-        
+
         val consumerConfig = config.getConfig(ANOMALY_CONSUMER);
         val consumerTopic = consumerConfig.getString(TOPIC);
         val consumerProps = ConfigUtil.toConsumerConfig(consumerConfig);
         val consumer = new KafkaConsumer<String, MappedMetricData>(consumerProps);
-        
+
         val producerConfig = config.getConfig(METRIC_PRODUCER);
         val producerTopic = producerConfig.getString(TOPIC);
         val producerProps = ConfigUtil.toProducerConfig(producerConfig);
         val producer = new KafkaProducer<String, MetricData>(producerProps);
-        
-        val mapper = new KafkaMultiClusterAnomalyToMetricMapper(consumer, producer, consumerTopic, producerTopic);
-        mapper.run();
+
+        return new KafkaMultiClusterAnomalyToMetricMapper(consumer, producer, consumerTopic, producerTopic);
     }
-    
+
     public KafkaMultiClusterAnomalyToMetricMapper(
             Consumer<String, MappedMetricData> anomalyConsumer,
             Producer<String, MetricData> metricProducer,

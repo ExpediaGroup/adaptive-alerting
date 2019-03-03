@@ -37,7 +37,9 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import static com.expedia.adaptivealerting.kafka.KafkaMultiClusterAnomalyToMetricMapper.buildKafkaMultiClusterAnomalyToMetricMapper;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * {@link KafkaMultiClusterAnomalyToMetricMapper} unit test.
@@ -84,9 +86,18 @@ public class KafkaMultiClusterAnomalyToMetricMapperTest {
                 .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
-    
+
     @Test
-    public void run() throws Exception {
+    public void testBuildKafkaMultiClusterAnomalyToMetricMapper() {
+        // This is its own method for code coverage.
+        val mapper = buildKafkaMultiClusterAnomalyToMetricMapper();
+        assertNotNull(mapper);
+        assertNotNull(mapper.getAnomalyConsumer());
+        assertNotNull(mapper.getMetricProducer());
+    }
+
+    @Test
+    public void testRun() throws Exception {
         
         // TODO This mapped metric data represents an anomaly. It's a little confusing because there's a class called
         // AnomalyResult, which seems more like an anomaly. Want to revisit whether we need to put the whole MMD on the
@@ -113,13 +124,13 @@ public class KafkaMultiClusterAnomalyToMetricMapperTest {
     }
 
     @Test
-    public void runSkipsAnomaliesWithAADetectorUuid() throws Exception {
+    public void testRunSkipsAnomaliesWithAADetectorUuid() throws Exception {
         val invalidAnomaly = TestObjectMother.mappedMetricDataWithAnomalyResultAndAADetectorUuid();
         runSkipsInvalidAnomalies(invalidAnomaly);
     }
 
     @Test
-    public void runSkipsAnomaliesHavingTagWithNullValue() throws Exception {
+    public void testRunSkipsAnomaliesHavingTagWithNullValue() throws Exception {
         val invalidAnomaly = TestObjectMother.mappedMetricDataWithAnomalyResultAndNullTagValue();
         runSkipsInvalidAnomalies(invalidAnomaly);
     }
