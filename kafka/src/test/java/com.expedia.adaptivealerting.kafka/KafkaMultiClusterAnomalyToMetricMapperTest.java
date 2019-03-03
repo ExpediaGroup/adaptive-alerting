@@ -37,9 +37,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static com.expedia.adaptivealerting.kafka.KafkaMultiClusterAnomalyToMetricMapper.buildKafkaMultiClusterAnomalyToMetricMapper;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 /**
  * {@link KafkaMultiClusterAnomalyToMetricMapper} unit test.
@@ -85,15 +83,6 @@ public class KafkaMultiClusterAnomalyToMetricMapperTest {
                 .registerModule(new MetricsJavaModule())
                 .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    }
-
-    @Test
-    public void testBuildKafkaMultiClusterAnomalyToMetricMapper() {
-        // This is its own method for code coverage.
-        val mapper = buildKafkaMultiClusterAnomalyToMetricMapper();
-        assertNotNull(mapper);
-        assertNotNull(mapper.getAnomalyConsumer());
-        assertNotNull(mapper.getMetricProducer());
     }
 
     @Test
