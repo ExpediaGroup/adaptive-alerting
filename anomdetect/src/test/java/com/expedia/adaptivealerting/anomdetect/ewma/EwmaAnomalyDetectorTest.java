@@ -20,23 +20,21 @@ import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.opencsv.bean.CsvToBeanBuilder;
 import junit.framework.TestCase;
+import lombok.val;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.time.Instant;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.UUID;
 
 import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class EwmaAnomalyDetectorTest {
     private static final double TOLERANCE = 0.001;
 
-    private UUID detectorUUID;
     private MetricDefinition metricDefinition;
     private long epochSecond;
     private static List<EwmaTestRow> data;
@@ -48,37 +46,42 @@ public class EwmaAnomalyDetectorTest {
 
     @Before
     public void setUp() {
-        this.detectorUUID = UUID.randomUUID();
         this.metricDefinition = new MetricDefinition("some-key");
         this.epochSecond = Instant.now().getEpochSecond();
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructor_alphaOutOfRange() {
-        final EwmaParams params = new EwmaParams()
-                .setAlpha(2.0);
-        new EwmaAnomalyDetector(detectorUUID, params);
+        new EwmaAnomalyDetector(new EwmaParams().setAlpha(2.0));
     }
 
     @Test
-    public void testEvaluate() {
-        final ListIterator<EwmaTestRow> testRows = data.listIterator();
-        final EwmaTestRow testRow0 = testRows.next();
-        final double observed0 = testRow0.getObserved();
+    public void noArgConstructor() {
+        val detector = new EwmaAnomalyDetector();
+        assertNotNull(detector.getUuid());
+        assertNotNull(detector.getParams());
+        assertEquals(EwmaParams.class, detector.getParamsClass());
+    }
 
-        final EwmaParams params = new EwmaParams()
+    @Test
+    public void classify() {
+        val testRows = data.listIterator();
+        val testRow0 = testRows.next();
+        val observed0 = testRow0.getObserved();
+
+        val params = new EwmaParams()
                 .setAlpha(0.05)
                 .setInitMeanEstimate(observed0);
-        final EwmaAnomalyDetector detector = new EwmaAnomalyDetector(detectorUUID, params);
+        val detector = new EwmaAnomalyDetector(params);
 
         assertEquals(observed0, detector.getMean());
         assertEquals(0.0, detector.getVariance());
 
         while (testRows.hasNext()) {
-            final EwmaTestRow testRow = testRows.next();
-            final int observed = testRow.getObserved();
+            val testRow = testRows.next();
+            val observed = testRow.getObserved();
 
-            final MetricData metricData = new MetricData(metricDefinition, observed, epochSecond);
+            val metricData = new MetricData(metricDefinition, observed, epochSecond);
             detector.classify(metricData);
 
             // TODO: Move this to GenerateCalInflowTestsEwma.R
@@ -91,7 +94,7 @@ public class EwmaAnomalyDetectorTest {
     }
 
     private static void readData_calInflow() {
-        final InputStream is = ClassLoader.getSystemResourceAsStream("tests/cal-inflow-tests-ewma.csv");
+        val is = ClassLoader.getSystemResourceAsStream("tests/cal-inflow-tests-ewma.csv");
         data = new CsvToBeanBuilder<EwmaTestRow>(new InputStreamReader(is))
                 .withType(EwmaTestRow.class)
                 .build()
