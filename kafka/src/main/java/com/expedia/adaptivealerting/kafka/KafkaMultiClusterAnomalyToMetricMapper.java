@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.kafka;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyToMetricMapper;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.kafka.util.ConfigUtil;
@@ -45,36 +46,40 @@ public class KafkaMultiClusterAnomalyToMetricMapper implements Runnable {
     private static final String METRIC_PRODUCER = "metric-producer";
     private static final String TOPIC = "topic";
     private static final long POLL_PERIOD = 1000L;
-    
+
     private final AnomalyToMetricMapper mapper = new AnomalyToMetricMapper();
-    
+
     // TODO Replace this with the non-MetricTank version. [WLW]
     private final MetricTankIdFactory metricTankIdFactory = new MetricTankIdFactory();
-    
+
     @Getter
     private final Consumer<String, MappedMetricData> anomalyConsumer;
-    
+
     @Getter
     private final Producer<String, MetricData> metricProducer;
-    
+
     private String anomalyTopic;
     private String metricTopic;
-    
+
     public static void main(String[] args) {
+
         // TODO Refactor the loader such that it's not tied to Kafka Streams. [WLW]
         val config = new TypesafeConfigLoader(APP_ID).loadMergedConfig();
 
-        val consumerConfig = config.getConfig(ANOMALY_CONSUMER);
-        val consumerTopic = consumerConfig.getString(TOPIC);
-        val consumerProps = ConfigUtil.toConsumerConfig(consumerConfig);
-        val consumer = new KafkaConsumer<String, MappedMetricData>(consumerProps);
+        val anomalyConsumerConfig = config.getConfig(ANOMALY_CONSUMER);
+        val anomalyConsumerTopic = anomalyConsumerConfig.getString(TOPIC);
+        val anomalyConsumerProps = ConfigUtil.toConsumerConfig(anomalyConsumerConfig);
+        val anomalyConsumer = new KafkaConsumer<String, MappedMetricData>(anomalyConsumerProps);
 
-        val producerConfig = config.getConfig(METRIC_PRODUCER);
-        val producerTopic = producerConfig.getString(TOPIC);
-        val producerProps = ConfigUtil.toProducerConfig(producerConfig);
-        val producer = new KafkaProducer<String, MetricData>(producerProps);
+        val metricProducerConfig = config.getConfig(METRIC_PRODUCER);
+        val metricProducerTopic = metricProducerConfig.getString(TOPIC);
+        val metricProducerProps = ConfigUtil.toProducerConfig(metricProducerConfig);
+        val metricProducer = new KafkaProducer<String, MetricData>(metricProducerProps);
 
-        val mapper = new KafkaMultiClusterAnomalyToMetricMapper(consumer, producer, consumerTopic, producerTopic);
+        val mapper = new KafkaMultiClusterAnomalyToMetricMapper(
+                anomalyConsumer, metricProducer, anomalyConsumerTopic,
+                metricProducerTopic
+        );
         mapper.run();
     }
 
@@ -83,50 +88,74 @@ public class KafkaMultiClusterAnomalyToMetricMapper implements Runnable {
             Producer<String, MetricData> metricProducer,
             String anomalyTopic,
             String metricTopic) {
-        
+
         this.anomalyConsumer = anomalyConsumer;
         this.metricProducer = metricProducer;
         this.anomalyTopic = anomalyTopic;
         this.metricTopic = metricTopic;
     }
-    
+
     @Override
     public void run() {
         log.info("Starting KafkaMultiClusterAnomalyToMetricMapper");
         anomalyConsumer.subscribe(Collections.singletonList(anomalyTopic));
-        
+        boolean continueProcessing = true;
+
         // See Kafka: The Definitive Guide, pp. 86 ff.
-        try {
-            while (true) {
-                try {
-                    val anomalyRecords = anomalyConsumer.poll(POLL_PERIOD);
-                    log.trace("Read {} anomalyRecords from topic={}", anomalyRecords.count(), anomalyTopic);
-                    anomalyRecords.forEach(anomalyRecord -> {
-                        val metricDataRecord = toMetricDataRecord(anomalyRecord);
-                        if (metricDataRecord != null) {
-                            metricProducer.send(metricDataRecord);
-                        }
-                    });
-                } catch (WakeupException e) {
-                    throw e;
-                } catch (Exception e) {
-                    log.error("Error processing records", e);
+        while (continueProcessing) {
+            try {
+                pollAnomalyTopic();
+            } catch (WakeupException e) {
+                log.info("Stopping KafkaMultiClusterAnomalyToMetricMapper");
+                anomalyConsumer.close();
+                metricProducer.flush();
+                metricProducer.close();
+                continueProcessing = false;
+            } catch (Exception e) {
+                log.error("Error processing records", e);
+            }
+        }
+    }
+
+    private void pollAnomalyTopic() {
+        val anomalyRecords = anomalyConsumer.poll(POLL_PERIOD);
+        val numConsumed = anomalyRecords.count();
+
+        log.trace("Read {} anomaly records from topic={}", numConsumed, anomalyTopic);
+//        recordsConsumed.increment(numConsumed);
+
+        int numProduced = 0;
+        for (val anomalyRecord : anomalyRecords) {
+            val anomalyMMD = anomalyRecord.value();
+            val anomalyResult = anomalyMMD.getAnomalyResult();
+            val anomalyLevel = anomalyResult.getAnomalyLevel();
+            if (anomalyLevel == AnomalyLevel.WEAK || anomalyLevel == AnomalyLevel.STRONG) {
+                val metricDataRecord = toMetricDataRecord(anomalyRecord);
+                if (metricDataRecord != null) {
+                    metricProducer.send(metricDataRecord);
+                    numProduced++;
                 }
             }
-        } catch (WakeupException e) {
-            // Ignore for shutdown
-            log.info("anomalyConsumer is awake");
-        } finally {
-            anomalyConsumer.close();
-            metricProducer.flush();
-            metricProducer.close();
         }
+
+        log.trace("Wrote {} metricData records to topic={}", numProduced, metricTopic);
+//        recordsProduced.increment(numProduced);
+
+        if (anomalyRecords.isEmpty()) {
+            return;
+        }
+
+        val anomaly0 = anomalyRecords.iterator().next().value();
+        val timestamp = anomaly0.getMetricData().getTimestamp() * 1000L;
+        val timeDelay = System.currentTimeMillis() - timestamp;
+        log.trace("timeDelay={}", timeDelay);
+//        delayTimer.record(Duration.ofMillis(timeDelay));
     }
 
     private ProducerRecord<String, MetricData> toMetricDataRecord(
             ConsumerRecord<String, MappedMetricData> consumerRecord) {
 
-        assert(consumerRecord != null);
+        assert (consumerRecord != null);
 
         val mappedMetricData = consumerRecord.value();
         val metricData = mappedMetricData.getMetricData();
@@ -134,8 +163,8 @@ public class KafkaMultiClusterAnomalyToMetricMapper implements Runnable {
         val tags = metricDef.getTags();
         val kv = tags.getKv();
 
-        // IMPORTANT: This check avoids generating an infinite sequence of MetricDatas.
-        // Without it, this mapper would generate new MetricDatas from its own outputs.
+        // IMPORTANT: This check avoids generating an infinite sequence of MetricDatas. Without it, this mapper would
+        // generate new MetricDatas from its own outputs.
         if (kv.containsKey(AnomalyToMetricMapper.AA_DETECTOR_UUID)) {
             return null;
         }

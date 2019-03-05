@@ -146,6 +146,12 @@ public final class TestObjectMother {
         return mmd;
     }
 
+    public static MappedMetricData mappedMetricData(AnomalyLevel anomalyLevel) {
+        val mmd = mappedMetricData();
+        mmd.setAnomalyResult(anomalyResult(anomalyLevel));
+        return mmd;
+    }
+
     public static MappedMetricData mappedMetricDataWithAnomalyResultAndAADetectorUuid() {
         val tags = metricTagsWithAADetectorUuid();
         val metricDef = new MetricDefinition("some-metric-key", tags, TagCollection.EMPTY);

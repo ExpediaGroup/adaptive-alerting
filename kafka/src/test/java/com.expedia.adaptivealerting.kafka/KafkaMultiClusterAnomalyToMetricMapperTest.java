@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.kafka;
 
+import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.kafka.util.TestObjectMother;
 import com.expedia.metrics.MetricData;
@@ -36,6 +37,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -67,7 +69,7 @@ public class KafkaMultiClusterAnomalyToMetricMapperTest {
     private KafkaMultiClusterAnomalyToMetricMapper a2mMapper;
     
     private ObjectMapper objectMapper;
-    
+
     @Before
     public void setUp() {
         val anomalyConsumer = buildAnomalyConsumer();
@@ -77,7 +79,8 @@ public class KafkaMultiClusterAnomalyToMetricMapperTest {
                 anomalyConsumer,
                 metricProducer,
                 ANOMALY_TOPIC,
-                METRIC_TOPIC);
+                METRIC_TOPIC
+        );
         
         this.objectMapper = new ObjectMapper()
                 .registerModule(new MetricsJavaModule())
@@ -113,15 +116,14 @@ public class KafkaMultiClusterAnomalyToMetricMapperTest {
     }
 
     @Test
-    public void testRunSkipsAnomaliesWithAADetectorUuid() throws Exception {
-        val invalidAnomaly = TestObjectMother.mappedMetricDataWithAnomalyResultAndAADetectorUuid();
-        runSkipsInvalidAnomalies(invalidAnomaly);
-    }
-
-    @Test
-    public void testRunSkipsAnomaliesHavingTagWithNullValue() throws Exception {
-        val invalidAnomaly = TestObjectMother.mappedMetricDataWithAnomalyResultAndNullTagValue();
-        runSkipsInvalidAnomalies(invalidAnomaly);
+    public void testRunSkipsUnmappedAnomalies() throws Exception {
+        val unmapped = new ArrayList<MappedMetricData>();
+        unmapped.add(TestObjectMother.mappedMetricData(AnomalyLevel.NORMAL));
+        unmapped.add(TestObjectMother.mappedMetricData(AnomalyLevel.MODEL_WARMUP));
+        unmapped.add(TestObjectMother.mappedMetricData(AnomalyLevel.UNKNOWN));
+        unmapped.add(TestObjectMother.mappedMetricDataWithAnomalyResultAndAADetectorUuid());
+        unmapped.add(TestObjectMother.mappedMetricDataWithAnomalyResultAndNullTagValue());
+        testRunSkipsUnmappedAnomalies(unmapped);
     }
 
     private KafkaProducer<String, MappedMetricData> buildAnomalyProducer() {
@@ -152,7 +154,8 @@ public class KafkaMultiClusterAnomalyToMetricMapperTest {
         return new KafkaConsumer<>(config);
     }
 
-    private void runSkipsInvalidAnomalies(MappedMetricData invalidAnomaly) throws Exception {
+    private void testRunSkipsUnmappedAnomalies(List<MappedMetricData> unmapped) throws Exception {
+
         // Number of anomalies that should actually pass through the mapper.
         final int numOk = 5;
 
@@ -162,13 +165,15 @@ public class KafkaMultiClusterAnomalyToMetricMapperTest {
         // Not sure why this is a map. I expected to just push a list of anomalies, and not
         // have to worry about using unique keys.
         val anomalies = new HashMap<String, MappedMetricData>();
-        anomalies.put("a", invalidAnomaly);
-        anomalies.put("b", invalidAnomaly);
-        for (int i = 0; i < numOk; i++) {
-            anomalies.put(String.valueOf(i), okAnomaly);
+        for (int i = 0; i < unmapped.size(); i++) {
+            anomalies.put("head" + i, unmapped.get(i));
         }
-        anomalies.put("c", invalidAnomaly);
-        anomalies.put("d", invalidAnomaly);
+        for (int i = 0; i < numOk; i++) {
+            anomalies.put("mid" + i, okAnomaly);
+        }
+        for (int i = 0; i < unmapped.size(); i++) {
+            anomalies.put("tail" + i, unmapped.get(i));
+        }
 
         // Push onto input topic
         val anomalyProducer = buildAnomalyProducer();
