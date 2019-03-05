@@ -216,16 +216,19 @@
                 <version>${typesafe.config.version}</version>
             </dependency>
             <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-core</artifactId>
+                <version>${micrometer.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>io.springfox</groupId>
                 <artifactId>springfox-swagger-ui</artifactId>
                 <version>${swagger.version}</version>
-                <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>io.springfox</groupId>
                 <artifactId>springfox-swagger2</artifactId>
                 <version>${swagger.version}</version>
-                <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>net.sf.jopt-simple</groupId>
@@ -517,13 +520,13 @@
 
         <!-- Runtime -->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-        </dependency>
-        <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-jmx</artifactId>
             <version>${micrometer.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
         </dependency>
 
         <!-- Test -->
