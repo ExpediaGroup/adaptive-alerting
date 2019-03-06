@@ -77,7 +77,7 @@ public class DetectorManager {
         
         val detector = detectorFor(mappedMetricData);
         if (detector == null) {
-            log.warn("No detector: mappedMetricData={}", mappedMetricData);
+            log.warn("No detector for mappedMetricData={}", mappedMetricData);
             return null;
         }
         val metricData = mappedMetricData.getMetricData();
