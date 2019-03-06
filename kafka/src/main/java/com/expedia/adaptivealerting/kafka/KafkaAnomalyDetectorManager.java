@@ -81,7 +81,7 @@ public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
         AnomalyResult anomalyResult = null;
         try {
             anomalyResult = manager.classify(mmd);
-            log.info("anomalyResult={}", anomalyResult);
+            log.info("mmd={}", mmd);
         } catch (Exception e) {
             log.error("Classification error: mmd={}, error={}", mmd, ErrorUtil.fullExceptionDetails(e));
         }

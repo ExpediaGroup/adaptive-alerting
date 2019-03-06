@@ -81,9 +81,7 @@ public class DetectorManager {
             return null;
         }
         val metricData = mappedMetricData.getMetricData();
-        val anomalyResult = detector.classify(metricData);
-        log.info("metricData={}, anomalyResult={}", metricData, anomalyResult);
-        return anomalyResult;
+        return detector.classify(metricData);
     }
     
     private AnomalyDetector detectorFor(MappedMetricData mappedMetricData) {
