@@ -165,6 +165,8 @@ public final class KafkaDetectorManagerTest {
         when(manager.classify(metric_modelWarmup))
                 .thenReturn(TestObjectMother.anomalyResult(AnomalyLevel.MODEL_WARMUP));
         when(manager.classify(metric_unknownAnomaly))
+                .thenReturn(TestObjectMother.anomalyResult(AnomalyLevel.UNKNOWN));
+        when(manager.classify(metric_invalid))
                 .thenThrow(new RuntimeException("Classification error"));
     }
     
