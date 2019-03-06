@@ -51,7 +51,7 @@ public final class KafkaDetectorManagerTest {
     private static final String INVALID_INPUT_VALUE = "invalid-input-value";
     
     @Mock
-    private DetectorManager detectorManager;
+    private DetectorManager manager;
     
     @Mock
     private StreamsAppConfig saConfig;
@@ -73,6 +73,7 @@ public final class KafkaDetectorManagerTest {
     private MappedMetricData metric_strongAnomaly;
     private MappedMetricData metric_modelWarmup;
     private MappedMetricData metric_unknownAnomaly;
+    private MappedMetricData metric_invalid;
     
     @Before
     public void setUp() {
@@ -90,28 +91,33 @@ public final class KafkaDetectorManagerTest {
     }
     
     @Test
-    public void publishesNormalAnomalies() {
+    public void testPublishesNormalAnomalies() {
         publishesAnomaly(metric_normalAnomaly, AnomalyLevel.NORMAL);
     }
     
     @Test
-    public void publishesWeakAnomalies() {
+    public void testPublishesWeakAnomalies() {
         publishesAnomaly(metric_weakAnomaly, AnomalyLevel.WEAK);
     }
     
     @Test
-    public void publishesStrongAnomalies() {
+    public void testPublishesStrongAnomalies() {
         publishesAnomaly(metric_strongAnomaly, AnomalyLevel.STRONG);
     }
     
     @Test
-    public void publishesWarmupAnomalies() {
+    public void testPublishesWarmupAnomalies() {
         publishesAnomaly(metric_modelWarmup, AnomalyLevel.MODEL_WARMUP);
     }
     
     @Test
-    public void publishesUnknownAnomalies() {
+    public void testPublishesUnknownAnomalies() {
         publishesAnomaly(metric_unknownAnomaly, AnomalyLevel.UNKNOWN);
+    }
+
+    @Test
+    public void testDoesNotPublishInvalidAnomaly() {
+        doesNotPublishAnomaly(metric_invalid);
     }
     
     /**
@@ -144,27 +150,30 @@ public final class KafkaDetectorManagerTest {
         this.metric_strongAnomaly = TestObjectMother.mappedMetricData();
         this.metric_modelWarmup = TestObjectMother.mappedMetricData();
         this.metric_unknownAnomaly = TestObjectMother.mappedMetricData();
+        this.metric_invalid = TestObjectMother.mappedMetricData();
     }
     
     private void initDependencies() {
-        when(detectorManager.hasDetectorType(anyString())).thenReturn(true);
+        when(manager.hasDetectorType(anyString())).thenReturn(true);
         
-        when(detectorManager.classify(metric_normalAnomaly))
+        when(manager.classify(metric_normalAnomaly))
                 .thenReturn(TestObjectMother.anomalyResult(AnomalyLevel.NORMAL));
-        when(detectorManager.classify(metric_weakAnomaly))
+        when(manager.classify(metric_weakAnomaly))
                 .thenReturn(TestObjectMother.anomalyResult(AnomalyLevel.WEAK));
-        when(detectorManager.classify(metric_strongAnomaly))
+        when(manager.classify(metric_strongAnomaly))
                 .thenReturn(TestObjectMother.anomalyResult(AnomalyLevel.STRONG));
-        when(detectorManager.classify(metric_modelWarmup))
+        when(manager.classify(metric_modelWarmup))
                 .thenReturn(TestObjectMother.anomalyResult(AnomalyLevel.MODEL_WARMUP));
-        when(detectorManager.classify(metric_unknownAnomaly))
+        when(manager.classify(metric_unknownAnomaly))
                 .thenReturn(TestObjectMother.anomalyResult(AnomalyLevel.UNKNOWN));
+        when(manager.classify(metric_invalid))
+                .thenThrow(new RuntimeException("Classification error"));
     }
     
     private void initTestMachinery() {
         
         // Topology test drivers
-        val topology = new KafkaAnomalyDetectorManager(saConfig, detectorManager).buildTopology();
+        val topology = new KafkaAnomalyDetectorManager(saConfig, manager).buildTopology();
         this.logAndFailDriver = TestObjectMother.topologyTestDriver(topology, MappedMetricDataJsonSerde.class, false);
         this.logAndContinueDriver = TestObjectMother.topologyTestDriver(topology, MappedMetricDataJsonSerde.class, true);
         
