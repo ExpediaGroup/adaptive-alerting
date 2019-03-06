@@ -78,13 +78,20 @@ public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
     
     private MappedMetricData toAnomaly(MappedMetricData mmd) {
         assert mmd != null;
+
         AnomalyResult anomalyResult = null;
         try {
             anomalyResult = manager.classify(mmd);
-            log.info("mmd={}", mmd);
         } catch (Exception e) {
             log.error("Classification error: mmd={}, error={}", mmd, ErrorUtil.fullExceptionDetails(e));
         }
-        return anomalyResult == null ? null : new MappedMetricData(mmd, anomalyResult);
+
+        if (anomalyResult == null) {
+            return null;
+        }
+
+        val newMmd = new MappedMetricData(mmd, anomalyResult);
+        log.info("mmd={}", newMmd);
+        return newMmd;
     }
 }
