@@ -26,6 +26,7 @@ import org.junit.Test;
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.anomdetect.AnomalyToMetricMapper.AA_DETECTOR_UUID;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class AnomalyToMetricMapperTest {
@@ -50,13 +51,13 @@ public class AnomalyToMetricMapperTest {
         assertTrue(detectorUuid.equals(actualKvTags.get(AA_DETECTOR_UUID)));
     }
     
-    @Test(expected = IllegalArgumentException.class)
-    public void toMetricDataRejectsNullAnomalyResult() {
-        mapperUnderTest.toMetricData(null);
+    @Test
+    public void toMetricDataMapsNullToNull() {
+        assertNull(mapperUnderTest.toMetricData(null));
     }
     
-    @Test(expected = IllegalArgumentException.class)
-    public void toMetricDataRejectsAADetectorUuidTag() {
+    @Test
+    public void toMetricDataMapsAnomalyHavingAADetectorUuidTagToNull() {
         val kvTags = MetricUtil.defaultKvTags();
         kvTags.put(AA_DETECTOR_UUID, UUID.randomUUID().toString());
         
@@ -64,7 +65,7 @@ public class AnomalyToMetricMapperTest {
         val metricData = MetricUtil.metricData(metricDef);
         val anomResult = anomalyResult(metricData);
         
-        mapperUnderTest.toMetricData(anomResult);
+        assertNull(mapperUnderTest.toMetricData(anomResult));
     }
 
     private void initTestObjects() {

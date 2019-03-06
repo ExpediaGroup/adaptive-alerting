@@ -21,6 +21,7 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.kafka.util.ConfigUtil;
 import com.expedia.metrics.MetricData;
+import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.metrictank.MetricTankIdFactory;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -153,42 +154,36 @@ public class KafkaMultiClusterAnomalyToMetricMapper implements Runnable {
     }
 
     private ProducerRecord<String, MetricData> toMetricDataRecord(
-            ConsumerRecord<String, MappedMetricData> consumerRecord) {
+            ConsumerRecord<String, MappedMetricData> anomalyRecord) {
 
-        assert (consumerRecord != null);
+        assert (anomalyRecord != null);
 
-        val mappedMetricData = consumerRecord.value();
-        val metricData = mappedMetricData.getMetricData();
-        val metricDef = metricData.getMetricDefinition();
-        val tags = metricDef.getTags();
-        val kv = tags.getKv();
-
-        // IMPORTANT: This check avoids generating an infinite sequence of MetricDatas. Without it, this mapper would
-        // generate new MetricDatas from its own outputs.
-        if (kv.containsKey(AnomalyToMetricMapper.AA_DETECTOR_UUID)) {
-            return null;
-        }
-
-        val anomalyResult = mappedMetricData.getAnomalyResult();
-        val newMetricData = mapper.toMetricData(anomalyResult);
+        val mappedMetricData = anomalyRecord.value();
+        val newMetricData = mapper.toMetricData(mappedMetricData.getAnomalyResult());
 
         if (newMetricData == null) {
             return null;
         }
 
         val newMetricDef = newMetricData.getMetricDefinition();
+        val newMetricId = getMetricId(newMetricDef);
 
-        // Calling metricTankIdFactory.getId() fails when the metric definition contains tags having values that are
-        // null or empty, or contain semicolons. We do see this in production. Hence this check. Would be better though
-        // if we can limit or eliminate such metric definitions since we'd like to avoid unnecessary exceptions.
-        String newMetricId;
-        try {
-            newMetricId = metricTankIdFactory.getId(newMetricDef);
-        } catch (IllegalArgumentException e) {
-            log.warn("IllegalArgumentException: message={}, newMetricDef={}", e.getMessage(), newMetricDef);
+        if (newMetricId == null) {
             return null;
         }
 
         return new ProducerRecord<>(metricTopic, newMetricId, newMetricData);
+    }
+
+    private String getMetricId(MetricDefinition metricDef) {
+        // Calling metricTankIdFactory.getId() fails when the metric definition contains tags having values that are
+        // null or empty, or contain semicolons. We do see this in production. Hence this check. Would be better though
+        // if we can limit or eliminate such metric definitions since we'd like to avoid unnecessary exceptions.
+        try {
+            return metricTankIdFactory.getId(metricDef);
+        } catch (IllegalArgumentException e) {
+            log.warn("IllegalArgumentException: message={}, newMetricDef={}", e.getMessage(), metricDef);
+            return null;
+        }
     }
 }
