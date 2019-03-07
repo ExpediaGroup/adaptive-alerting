@@ -15,21 +15,16 @@
  */
 package com.expedia.adaptivealerting.core.util;
 
-import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.TagCollection;
 import lombok.val;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * Metric utilities.
@@ -74,17 +69,6 @@ public final class MetricUtil {
         return new MetricDefinition(new TagCollection(kvTags, vTags));
     }
 
-    /**
-     * Convenience method to create a new {@link MetricData} from the given definition, value and epoch second.
-     *
-     * @param metricDef Metric definition.
-     * @param value     Value.
-     * @return Metric data.
-     */
-    public static MetricData metricData(MetricDefinition metricDef, double value, long epochSecond) {
-        return new MetricData(metricDef, value, epochSecond);
-    }
-
     public static MetricData metricData(MetricDefinition metricDef) {
         if (metricDef == null) {
             metricDef = metricDefinition();
@@ -104,19 +88,14 @@ public final class MetricUtil {
         return new MetricData(metricDef, value, Instant.now().getEpochSecond());
     }
 
-    public static MetricFrame merge(List<MetricFrame> frames) {
-        notNull(frames, "frames can't be null");
-
-        int totalSize = 0;
-        for (final MetricFrame frame : frames) {
-            totalSize += frame.getNumRows();
-        }
-
-        final List<MetricData> resultList = new ArrayList<>(totalSize);
-        for (final MetricFrame frame : frames) {
-            resultList.addAll(frame.getMetricData());
-        }
-
-        return new MetricFrame(resultList);
+    /**
+     * Convenience method to create a new {@link MetricData} from the given definition, value and epoch second.
+     *
+     * @param metricDef Metric definition.
+     * @param value     Value.
+     * @return Metric data.
+     */
+    public static MetricData metricData(MetricDefinition metricDef, double value, long epochSecond) {
+        return new MetricData(metricDef, value, epochSecond);
     }
 }
