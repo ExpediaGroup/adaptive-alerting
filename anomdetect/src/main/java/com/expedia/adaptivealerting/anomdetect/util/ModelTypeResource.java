@@ -22,6 +22,8 @@ import org.springframework.hateoas.ResourceSupport;
 
 /**
  * Model type resource.
+ *
+ * @deprecated We should just use the key directly.
  */
 @Data
 @NoArgsConstructor
