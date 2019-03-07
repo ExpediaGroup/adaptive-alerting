@@ -24,12 +24,14 @@ import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartSink;
 import com.expedia.adaptivealerting.tools.pipeline.source.MetricFrameMetricSource;
 import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
+import lombok.val;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jfree.chart.JFreeChart;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersTrainingMethod.SIMPLE;
 import static com.expedia.adaptivealerting.anomdetect.holtwinters.SeasonalityType.ADDITIVE;
@@ -134,7 +136,11 @@ public class CsvTrafficHoltWintersVariants {
 
     private static AnomalyChartSink buildChart(MetricFrameMetricSource source, SeasonalityType seasonalityType, HoltWintersParams params,
                                                double alpha, double beta, double gammaLow, String... titleSuffix) {
-        final AnomalyDetectorFilter adf = new AnomalyDetectorFilter(new HoltWintersAnomalyDetector(params));
+
+        val detector = new HoltWintersAnomalyDetector();
+        detector.init(UUID.randomUUID(), params);
+
+        final AnomalyDetectorFilter adf = new AnomalyDetectorFilter(detector);
         final EvaluatorFilter eval = new EvaluatorFilter(new RmseEvaluator());
         final AnomalyChartSink chartSink = PipelineFactory.createChartSink(String.format("HoltWinters %s: alpha=%s, beta=%s, gamma=%s %s", seasonalityType,
                 alpha, beta, gammaLow, Arrays.asList(titleSuffix)));

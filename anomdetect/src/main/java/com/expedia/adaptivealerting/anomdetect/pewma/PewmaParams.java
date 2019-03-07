@@ -15,12 +15,13 @@
  */
 package com.expedia.adaptivealerting.anomdetect.pewma;
 
+import com.expedia.adaptivealerting.anomdetect.DetectorParams;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public final class PewmaParams {
+public final class PewmaParams implements DetectorParams {
     
     /**
      * Smoothing param.
@@ -51,4 +52,9 @@ public final class PewmaParams {
      * How many iterations to train for.
      */
     private final int warmUpPeriod = 30;
+
+    @Override
+    public void validate() {
+        // Not currently implemented
+    }
 }

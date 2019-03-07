@@ -16,14 +16,11 @@
 package com.expedia.adaptivealerting.anomdetect.ewma;
 
 import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.metrics.MetricData;
 import lombok.Getter;
-import lombok.NonNull;
-
-import java.util.UUID;
+import lombok.val;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 import static java.lang.Math.sqrt;
@@ -50,10 +47,6 @@ import static java.lang.Math.sqrt;
  */
 public final class EwmaAnomalyDetector extends AbstractAnomalyDetector<EwmaParams> {
 
-    @Getter
-    @NonNull
-    private EwmaParams params;
-
     /**
      * Mean estimate.
      */
@@ -67,46 +60,24 @@ public final class EwmaAnomalyDetector extends AbstractAnomalyDetector<EwmaParam
     private double variance = 0.0;
     
     public EwmaAnomalyDetector() {
-        this(UUID.randomUUID(), new EwmaParams());
-    }
-    
-    public EwmaAnomalyDetector(UUID uuid) {
-        this(uuid, new EwmaParams());
-    }
-    
-    public EwmaAnomalyDetector(EwmaParams params) {
-        this(UUID.randomUUID(), params);
-    }
-    
-    public EwmaAnomalyDetector(UUID uuid, EwmaParams params) {
-        notNull(uuid, "uuid can't be null");
-        notNull(params, "params can't be null");
-        
-        params.validate();
-
-        setUuid(uuid);
-        loadParams(params);
+        super(EwmaParams.class);
     }
 
     @Override
-    protected void loadParams(EwmaParams params) {
-        this.params = params;
+    protected void initState(EwmaParams params) {
         this.mean = params.getInitMeanEstimate();
     }
 
     @Override
-    protected Class<EwmaParams> getParamsClass() {
-        return EwmaParams.class;
-    }
-    
-    @Override
     public AnomalyResult classify(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
+
+        val params = getParams();
         
-        final double observed = metricData.getValue();
-        final double stdDev = sqrt(this.variance);
-        final double weakDelta = params.getWeakSigmas() * stdDev;
-        final double strongDelta = params.getStrongSigmas() * stdDev;
+        val observed = metricData.getValue();
+        val stdDev = sqrt(this.variance);
+        val weakDelta = params.getWeakSigmas() * stdDev;
+        val strongDelta = params.getStrongSigmas() * stdDev;
         
         final AnomalyThresholds thresholds = new AnomalyThresholds(
                 this.mean + strongDelta,
@@ -116,20 +87,21 @@ public final class EwmaAnomalyDetector extends AbstractAnomalyDetector<EwmaParam
         
         updateEstimates(observed);
         
-        final AnomalyLevel level = thresholds.classify(observed);
+        val level = thresholds.classify(observed);
         
-        final AnomalyResult result = new AnomalyResult(getUuid(), metricData, level);
+        val result = new AnomalyResult(getUuid(), metricData, level);
         result.setPredicted(this.mean);
         result.setThresholds(thresholds);
         return result;
     }
     
     private void updateEstimates(double value) {
-        
+        val params = getParams();
+
         // https://en.wikipedia.org/wiki/Moving_average#Exponentially_weighted_moving_variance_and_standard_deviation
         // http://people.ds.cam.ac.uk/fanf2/hermes/doc/antiforgery/stats.pdf
-        final double diff = value - this.mean;
-        final double incr = params.getAlpha() * diff;
+        val diff = value - this.mean;
+        val incr = params.getAlpha() * diff;
         this.mean += incr;
         
         // Welford's algorithm for computing the variance online

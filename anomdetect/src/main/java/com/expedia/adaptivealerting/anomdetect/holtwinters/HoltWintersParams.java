@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.holtwinters;
 
+import com.expedia.adaptivealerting.anomdetect.DetectorParams;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +34,8 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @Data
 @Accessors(chain = true)
 @Slf4j
-public final class HoltWintersParams {
+public final class HoltWintersParams implements DetectorParams {
+
     /**
      * SeasonalityType parameter used to determine which Seasonality method (Multiplicative or Additive) to use.
      */
@@ -128,6 +130,7 @@ public final class HoltWintersParams {
         return (initTrainingMethod == SIMPLE) ? (frequency * 2) : 0;
     }
 
+    @Override
     public void validate() {
         notNull(seasonalityType, "Required: seasonalityType one of " + Arrays.toString(SeasonalityType.values()));
         notNull(initTrainingMethod, "Required: initTrainingMethod one of " + Arrays.toString(HoltWintersTrainingMethod.values()));

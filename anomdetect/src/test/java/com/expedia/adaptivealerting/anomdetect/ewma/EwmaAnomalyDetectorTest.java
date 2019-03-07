@@ -28,6 +28,7 @@ import org.junit.Test;
 import java.io.InputStreamReader;
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -50,17 +51,18 @@ public class EwmaAnomalyDetectorTest {
         this.epochSecond = Instant.now().getEpochSecond();
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testConstructor_alphaOutOfRange() {
-        new EwmaAnomalyDetector(new EwmaParams().setAlpha(2.0));
-    }
-
     @Test
-    public void noArgConstructor() {
+    public void testInit() {
         val detector = new EwmaAnomalyDetector();
+        detector.init(UUID.randomUUID(), new EwmaParams());
         assertNotNull(detector.getUuid());
         assertNotNull(detector.getParams());
         assertEquals(EwmaParams.class, detector.getParamsClass());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInit_alphaOutOfRange() {
+        new EwmaAnomalyDetector().init(UUID.randomUUID(), new EwmaParams().setAlpha(2.0));
     }
 
     @Test
@@ -72,7 +74,8 @@ public class EwmaAnomalyDetectorTest {
         val params = new EwmaParams()
                 .setAlpha(0.05)
                 .setInitMeanEstimate(observed0);
-        val detector = new EwmaAnomalyDetector(params);
+        val detector = new EwmaAnomalyDetector();
+        detector.init(UUID.randomUUID(), params);
 
         assertEquals(observed0, detector.getMean());
         assertEquals(0.0, detector.getVariance());

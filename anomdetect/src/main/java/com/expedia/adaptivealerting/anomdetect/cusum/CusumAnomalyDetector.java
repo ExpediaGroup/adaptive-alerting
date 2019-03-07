@@ -20,9 +20,7 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
-import lombok.NonNull;
-
-import java.util.UUID;
+import lombok.val;
 
 import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.*;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -39,10 +37,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @Data
 public final class CusumAnomalyDetector extends AbstractAnomalyDetector<CusumParams> {
     private static final double STD_DEV_DIVISOR = 1.128;
-    
-    @NonNull
-    private CusumParams params;
-    
+
     /**
      * Total number of data points seen so far.
      */
@@ -69,44 +64,27 @@ public final class CusumAnomalyDetector extends AbstractAnomalyDetector<CusumPar
     private double prevValue = 0.0;
     
     public CusumAnomalyDetector() {
-        this(UUID.randomUUID(), new CusumParams());
-    }
-    
-    public CusumAnomalyDetector(CusumParams params) {
-        this(UUID.randomUUID(), params);
-    }
-    
-    public CusumAnomalyDetector(UUID uuid, CusumParams params) {
-        notNull(uuid, "uuid can't be null");
-        notNull(params, "params can't be null");
-        
-        setUuid(uuid);
-        loadParams(params);
+        super(CusumParams.class);
     }
 
     @Override
-    protected Class<CusumParams> getParamsClass() {
-        return CusumParams.class;
-    }
-
-    @Override
-    protected void loadParams(CusumParams params) {
-        this.params = params;
+    protected void initState(CusumParams params) {
         this.prevValue = params.getInitMeanEstimate();
     }
-    
+
     @Override
     public AnomalyResult classify(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
-        
-        final double observed = metricData.getValue();
+
+        val params = getParams();
+        val observed = metricData.getValue();
         
         this.movingRange += Math.abs(this.prevValue - observed);
         
-        final double stdDev = avgMovingRange() / STD_DEV_DIVISOR;
-        final double slack = params.getSlackParam() * stdDev;
-        final double weakDelta = params.getWeakSigmas() * stdDev;
-        final double strongDelta = params.getStrongSigmas() * stdDev;
+        val stdDev = avgMovingRange() / STD_DEV_DIVISOR;
+        val slack = params.getSlackParam() * stdDev;
+        val weakDelta = params.getWeakSigmas() * stdDev;
+        val strongDelta = params.getStrongSigmas() * stdDev;
         
         this.sumHigh = Math.max(0, this.sumHigh + observed - (params.getTargetValue() + slack));
         this.sumLow = Math.min(0, this.sumLow + observed - (params.getTargetValue() - slack));
