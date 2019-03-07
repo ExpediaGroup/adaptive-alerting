@@ -51,7 +51,7 @@ public class ObjectMother {
         AnomalyRequest request = new AnomalyRequest();
         request.setDetectorParams(detectorParams);
         request.setDetectorType("constant-detector");
-        request.setHash("1.3dec7f4218c57c1839147f8ca190ed55");
+        request.setMetricTags("what=bookings");
         return request;
     }
 

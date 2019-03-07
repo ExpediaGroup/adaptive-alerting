@@ -20,13 +20,15 @@ import com.expedia.adaptivealerting.modelservice.spi.MetricSourceResult;
 import com.expedia.adaptivealerting.modelservice.util.BeanUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.*;
 
 /**
  * Graphite metric source
@@ -39,16 +41,20 @@ public class GraphiteMetricSource implements MetricSource {
     private RestTemplate restTemplate = new RestTemplate();
 
     @Override
-    public List<MetricSourceResult> getMetricData(String metricName) {
+    public List<MetricSourceResult> getMetricData(String metricTags) {
         GraphiteProperties props = BeanUtil.getBean(GraphiteProperties.class);
-        Map<String, Object> params = Collections.singletonMap("target", metricName);
+        Map<String, Object> params = Collections.singletonMap("tags", metricTags);
+        GraphiteResult graphiteResult[] = restTemplate.getForObject(props.getUrlTemplate(), GraphiteResult[].class, params);
 
-        GraphiteResult graphiteResult = restTemplate.getForObject(props.getUrlTemplate(), GraphiteResult[].class, params)[0];
-        String[][] dataPoints = graphiteResult.getDatapoints();
+        String[][] dataPoints = graphiteResult[0].getDatapoints();
         List<MetricSourceResult> results = new ArrayList<>();
         for (String[] dataPoint : dataPoints) {
-            Double dataPointValue = Double.parseDouble(dataPoint[0]);
+            Double dataPointValue = 0.0;
             long epochSeconds = Long.parseLong(dataPoint[1]);
+            if (dataPoint[0] != null) {
+                dataPointValue = Double.parseDouble(dataPoint[0]);
+
+            }
             MetricSourceResult result = new MetricSourceResult(dataPointValue, epochSeconds);
             results.add(result);
         }

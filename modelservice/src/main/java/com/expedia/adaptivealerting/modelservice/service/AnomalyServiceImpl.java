@@ -60,10 +60,9 @@ public class AnomalyServiceImpl implements AnomalyService {
 
     private List<AnomalyResult> findAnomaliesInTrainingData(AnomalyRequest request) {
         List<AnomalyResult> anomalyResults = new ArrayList<>();
-        Metric metric = metricRepository.findByHash(request.getHash());
         ((List<MetricSource>) metricSources)
                 .forEach(metricSource -> {
-                    List<MetricSourceResult> results = metricSource.getMetricData(metric.getKey());
+                    List<MetricSourceResult> results = metricSource.getMetricData(request.getMetricTags());
                     AnomalyDetector detector = getDetector(request.getDetectorType(), request.getDetectorParams());
                     for (MetricSourceResult result : results) {
                         MetricData metricData = toMetricData(result);

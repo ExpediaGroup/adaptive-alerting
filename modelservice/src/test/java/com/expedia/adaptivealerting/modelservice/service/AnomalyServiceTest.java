@@ -16,8 +16,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import java.util.*;
 
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
 
 @Slf4j
 @RunWith(MockitoJUnitRunner.class)
@@ -39,7 +37,6 @@ public class AnomalyServiceTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         initTestObjects();
-        initDependencies();
     }
 
     //TODO Add anomaly service tests here. [KS]
@@ -54,10 +51,6 @@ public class AnomalyServiceTest {
     private void initTestObjects() {
         ObjectMother mom = ObjectMother.instance();
         this.metric = mom.getMetric();
-    }
-
-    private void initDependencies() {
-        when(metricRepository.findByHash(anyString())).thenReturn(metric);
     }
 
 }

@@ -21,7 +21,7 @@ import java.util.Map;
 
 @Data
 public class AnomalyRequest {
-    private String hash;
+    private String metricTags;
     private String detectorType;
     private Map<String, Object> detectorParams;
 }
