@@ -60,7 +60,7 @@ public final class TempHaystackAwareDetectorSource implements DetectorSource {
     
     @Override
     public List<DetectorMeta> findDetectorMetas(MetricDefinition metricDef) {
-        notNull(metricDef, "metricDefinition can't be null");
+        notNull(metricDef, "metricDef can't be null");
         
         val detectorMetas = primaryDetectorSource.findDetectorMetas(metricDef);
         
