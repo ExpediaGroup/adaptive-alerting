@@ -70,7 +70,9 @@ public class DefaultDetectorSource implements DetectorSource {
     @Override
     public AnomalyDetector findDetector(DetectorMeta detectorMeta, MetricDefinition metricDef) {
         notNull(detectorMeta, "detectorMeta can't be null");
-        // metricDef _can_ be null. This implementation doesn't use it, but other implementations do.
+
+        // metricDef _can_ be null, and normally is.
+        // This implementation doesn't use it, but other implementations do.
         
         val detectorUuid = detectorMeta.getUuid();
 
