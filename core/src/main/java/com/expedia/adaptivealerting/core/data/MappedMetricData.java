@@ -43,7 +43,7 @@ public final class MappedMetricData {
     private MetricData metricData;
     
     @NonNull
-    private UUID detectorUuid;
+    private UUID detectorUUID;
     
     @NonNull
     private String detectorType;
@@ -55,7 +55,7 @@ public final class MappedMetricData {
         notNull(anomalyResult, "anomalyResult can't be null");
         
         this.metricData = orig.getMetricData();
-        this.detectorUuid = orig.getDetectorUuid();
+        this.detectorUUID = orig.getDetectorUUID();
         this.detectorType = orig.getDetectorType();
         this.anomalyResult = anomalyResult;
     }

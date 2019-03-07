@@ -87,15 +87,15 @@ public class DetectorManager {
     private AnomalyDetector detectorFor(MappedMetricData mappedMetricData) {
         notNull(mappedMetricData, "mappedMetricData can't be null");
         
-        val detectorUuid = mappedMetricData.getDetectorUuid();
+        val detectorUUID = mappedMetricData.getDetectorUUID();
         val detectorType = mappedMetricData.getDetectorType();
         val metricDef = mappedMetricData.getMetricData().getMetricDefinition();
         
-        AnomalyDetector detector = cachedDetectors.get(detectorUuid);
+        AnomalyDetector detector = cachedDetectors.get(detectorUUID);
         if (detector == null) {
-            val detectorMeta = new DetectorMeta(detectorUuid, detectorType);
+            val detectorMeta = new DetectorMeta(detectorUUID, detectorType);
             detector = detectorSource.findDetector(detectorMeta, metricDef);
-            cachedDetectors.put(detectorUuid, detector);
+            cachedDetectors.put(detectorUUID, detector);
         }
         return detector;
     }
