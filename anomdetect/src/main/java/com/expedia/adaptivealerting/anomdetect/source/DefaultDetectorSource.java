@@ -18,10 +18,12 @@ package com.expedia.adaptivealerting.anomdetect.source;
 import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.DetectorLookup;
+import com.expedia.adaptivealerting.anomdetect.DetectorParams;
 import com.expedia.adaptivealerting.anomdetect.util.DetectorMeta;
 import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
 import com.expedia.metrics.MetricDefinition;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -68,11 +70,10 @@ public class DefaultDetectorSource implements DetectorSource {
     @Override
     public AnomalyDetector findDetector(DetectorMeta detectorMeta, MetricDefinition metricDef) {
         notNull(detectorMeta, "detectorMeta can't be null");
-        // metricDef _can_ be null.
+        // metricDef _can_ be null. This implementation doesn't use it, but other implementations do.
         
         val detectorUuid = detectorMeta.getUuid();
-        val detectorType = detectorMeta.getType();
-        
+
         // TODO "Latest model" doesn't really make sense for the kind of detectors we load into the DetectorManager.
         // These are basic detectors backed by single statistical models, as opposed to being ML models that we have to
         // refresh/retrain periodically. So we probably want to simplify this by just collapsing the model concept into
@@ -84,10 +85,14 @@ public class DefaultDetectorSource implements DetectorSource {
             // TODO Is this how we want to handle this? [WLW]
             return null;
         }
-    
+
+        val detectorType = detectorMeta.getType();
         val detectorClass = detectorLookup.getDetector(detectorType);
         val detector = (AbstractAnomalyDetector) ReflectionUtil.newInstance(detectorClass);
-        detector.init(model);
+        val paramsClass = detector.getParamsClass();
+        val params = (DetectorParams) new ObjectMapper().convertValue(model.getParams(), paramsClass);
+
+        detector.init(detectorUuid, params);
         log.info("Found detector: {}", detector);
         return detector;
     }

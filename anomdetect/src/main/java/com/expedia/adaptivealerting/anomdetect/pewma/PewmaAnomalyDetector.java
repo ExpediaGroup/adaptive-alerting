@@ -16,14 +16,11 @@
 package com.expedia.adaptivealerting.anomdetect.pewma;
 
 import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
-import lombok.NonNull;
-
-import java.util.UUID;
+import lombok.val;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
@@ -45,10 +42,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  */
 @Data
 public final class PewmaAnomalyDetector extends AbstractAnomalyDetector<PewmaParams> {
-    
-    @NonNull
-    private PewmaParams params;
-    
+
     /**
      * Adjusted alpha, to match the way alpha is used in the paper that describes the algorithm.
      */
@@ -80,29 +74,11 @@ public final class PewmaAnomalyDetector extends AbstractAnomalyDetector<PewmaPar
     private double stdDev;
     
     public PewmaAnomalyDetector() {
-        this(UUID.randomUUID(), new PewmaParams());
-    }
-    
-    public PewmaAnomalyDetector(PewmaParams params) {
-        this(UUID.randomUUID(), params);
-    }
-    
-    public PewmaAnomalyDetector(UUID uuid, PewmaParams params) {
-        notNull(uuid, "uuid can't be null");
-        notNull(params, "params can't be null");
-
-        setUuid(uuid);
-        loadParams(params);
+        super(PewmaParams.class);
     }
 
     @Override
-    protected Class<PewmaParams> getParamsClass() {
-        return PewmaParams.class;
-    }
-
-    @Override
-    protected void loadParams(PewmaParams params) {
-        this.params = params;
+    protected void initState(PewmaParams params) {
         this.adjAlpha = 1.0 - params.getAlpha();
         this.s1 = params.getInitMeanEstimate();
         this.s2 = params.getInitMeanEstimate() * params.getInitMeanEstimate();
@@ -112,12 +88,14 @@ public final class PewmaAnomalyDetector extends AbstractAnomalyDetector<PewmaPar
     @Override
     public AnomalyResult classify(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
+
+        val params = getParams();
+
+        val observed = metricData.getValue();
+        val weakDelta = params.getWeakSigmas() * stdDev;
+        val strongDelta = params.getStrongSigmas() * stdDev;
         
-        final double observed = metricData.getValue();
-        final double weakDelta = params.getWeakSigmas() * stdDev;
-        final double strongDelta = params.getStrongSigmas() * stdDev;
-        
-        final AnomalyThresholds thresholds = new AnomalyThresholds(
+        val thresholds = new AnomalyThresholds(
                 mean + strongDelta,
                 mean + weakDelta,
                 mean - strongDelta,
@@ -125,9 +103,9 @@ public final class PewmaAnomalyDetector extends AbstractAnomalyDetector<PewmaPar
         
         updateEstimates(observed);
         
-        final AnomalyLevel level = thresholds.classifyExclusiveBounds(observed);
+        val level = thresholds.classifyExclusiveBounds(observed);
         
-        final AnomalyResult result = new AnomalyResult(getUuid(), metricData, level);
+        val result = new AnomalyResult(getUuid(), metricData, level);
         result.setPredicted(mean);
         result.setThresholds(thresholds);
         return result;
@@ -153,6 +131,7 @@ public final class PewmaAnomalyDetector extends AbstractAnomalyDetector<PewmaPar
     }
     
     private double calculateAlpha(double pt) {
+        val params = getParams();
         if (this.trainingCount < params.getWarmUpPeriod()) {
             this.trainingCount++;
             return 1.0 - 1.0 / this.trainingCount;

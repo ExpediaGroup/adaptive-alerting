@@ -13,25 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.util;
+package com.expedia.adaptivealerting.anomdetect;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+public interface DetectorParams {
 
-import java.sql.Timestamp;
-import java.util.Map;
-import java.util.UUID;
-
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class ModelResource {
-    private Long id;
-    private UUID uuid;
-    private ModelTypeResource detectorType;
-    private Map<String, Object> params;
-    private Timestamp dateCreated;
+    void validate();
 }

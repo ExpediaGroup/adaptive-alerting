@@ -16,15 +16,10 @@
 package com.expedia.adaptivealerting.anomdetect.constant;
 
 import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
-import lombok.NonNull;
-
-import java.util.UUID;
+import lombok.val;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
@@ -34,41 +29,17 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @Data
 public final class ConstantThresholdAnomalyDetector extends AbstractAnomalyDetector<ConstantThresholdParams> {
 
-    @NonNull
-    private ConstantThresholdParams params;
-
     public ConstantThresholdAnomalyDetector() {
-        this(UUID.randomUUID(), new ConstantThresholdParams());
-    }
-
-    public ConstantThresholdAnomalyDetector(ConstantThresholdParams params) {
-        this(UUID.randomUUID(), params);
-    }
-
-    public ConstantThresholdAnomalyDetector(UUID uuid, ConstantThresholdParams params) {
-        notNull(uuid, "uuid can't be null");
-        notNull(params, "params can't be null");
-
-        setUuid(uuid);
-        loadParams(params);
-    }
-
-    @Override
-    protected Class<ConstantThresholdParams> getParamsClass() {
-        return ConstantThresholdParams.class;
-    }
-
-    @Override
-    protected void loadParams(ConstantThresholdParams params) {
-        this.params = params;
+        super(ConstantThresholdParams.class);
     }
 
     @Override
     public AnomalyResult classify(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
-        final AnomalyThresholds thresholds = params.getThresholds();
-        final AnomalyType type = params.getType();
-        final AnomalyLevel level = thresholds.classify(type, metricData.getValue());
+        val params = getParams();
+        val thresholds = params.getThresholds();
+        val type = params.getType();
+        val level = thresholds.classify(type, metricData.getValue());
         return new AnomalyResult(getUuid(), metricData, level);
     }
 }

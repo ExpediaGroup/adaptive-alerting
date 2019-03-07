@@ -21,9 +21,7 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
-import lombok.NonNull;
-
-import java.util.UUID;
+import lombok.val;
 
 import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.*;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -43,17 +41,10 @@ public final class IndividualsControlChartAnomalyDetector extends AbstractAnomal
     private static final double R_CONTROL_CHART_CONSTANT_D4 = 3.267;
     private static final double R_CONTROL_CHART_CONSTANT_D2 = 1.128;
 
-
     /**
      * Number of points after which limits will be recomputed
      */
     private static final int RECOMPUTE_LIMITS_PERIOD = 100;
-
-    @NonNull
-    private UUID uuid;
-
-    @NonNull
-    private IndividualsControlChartParams params;
 
     /**
      * Aggregate Moving range. Used to calculate avg. moving range.
@@ -101,52 +92,30 @@ public final class IndividualsControlChartAnomalyDetector extends AbstractAnomal
     private double mean;
 
     public IndividualsControlChartAnomalyDetector() {
-        this(UUID.randomUUID(), new IndividualsControlChartParams());
+        super(IndividualsControlChartParams.class);
     }
 
-    public IndividualsControlChartAnomalyDetector(IndividualsControlChartParams params) {
-        this(UUID.randomUUID(),params);
-    }
-
-    /**
-     * Creates a new detector. Initial target is given by params.initValue and initial variance is 0.
-     *
-     * @param uuid   Detector UUID.
-     * @param params Model params.
-     */
-    public IndividualsControlChartAnomalyDetector(UUID uuid, IndividualsControlChartParams params) {
-        notNull(uuid, "uuid can't be null");
-        notNull(params, "params can't be null");
-
-        this.uuid = uuid;
-        this.params = params;
+    @Override
+    protected void initState(IndividualsControlChartParams params) {
         this.prevValue = params.getInitValue();
         this.target = params.getInitValue();
-    }
-
-    @Override
-    protected void loadParams(IndividualsControlChartParams params) {
-        this.params = params;
         this.mean = params.getInitMeanEstimate();
-    }
-
-    @Override
-    protected Class<IndividualsControlChartParams> getParamsClass() {
-        return IndividualsControlChartParams.class;
     }
 
     @Override
     public AnomalyResult classify(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
 
-        final double observed = metricData.getValue();
-        final double stdDev = sqrt(this.variance);
-        //final double weakDelta = params.getWeakSigmas() * stdDev;
-        final double strongDelta = params.getStrongSigmas() * stdDev;
+        val params = getParams();
 
-        double currentRange = Math.abs(prevValue - observed);
+        val observed = metricData.getValue();
+        val stdDev = sqrt(this.variance);
+//        val weakDelta = params.getWeakSigmas() * stdDev;
+        val strongDelta = params.getStrongSigmas() * stdDev;
 
-        final AnomalyThresholds thresholds = new AnomalyThresholds(
+        val currentRange = Math.abs(prevValue - observed);
+
+        val thresholds = new AnomalyThresholds(
                 this.mean + strongDelta,
                 this.mean + strongDelta,
                 this.mean - strongDelta,

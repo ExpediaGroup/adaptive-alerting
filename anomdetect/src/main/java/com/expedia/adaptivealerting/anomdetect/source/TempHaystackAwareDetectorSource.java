@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.source;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.ewma.EwmaParams;
 import com.expedia.adaptivealerting.anomdetect.util.DetectorMeta;
 import com.expedia.adaptivealerting.anomdetect.ewma.EwmaAnomalyDetector;
 import com.expedia.metrics.MetricDefinition;
@@ -105,7 +106,8 @@ public final class TempHaystackAwareDetectorSource implements DetectorSource {
     private AnomalyDetector createHaystackDetector(UUID detectorUuid) {
         AnomalyDetector detector = haystackDetectorMap.get(detectorUuid);
         if (detector == null) {
-            detector = new EwmaAnomalyDetector(detectorUuid);
+            detector = new EwmaAnomalyDetector();
+            ((EwmaAnomalyDetector) detector).init(detectorUuid, new EwmaParams());
             haystackDetectorMap.put(detectorUuid, detector);
         }
         return detector;

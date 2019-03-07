@@ -15,8 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 
 import java.util.UUID;
@@ -24,31 +22,41 @@ import java.util.UUID;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
- * Abstract base class for anomaly detector implementations.
+ * Abstract base class for anomaly detector implementations. {@link #init(UUID, DetectorParams)} method supports
+ * reflection-based instantiation.
  */
-public abstract class AbstractAnomalyDetector<T> implements AnomalyDetector {
-    
+public abstract class AbstractAnomalyDetector<T extends DetectorParams> implements AnomalyDetector {
+
+    @Getter
+    private final Class<T> paramsClass;
+
     @Getter
     private UUID uuid;
-    
-    /**
-     * Initializes this detector with the given model.
-     *
-     * @param modelResource Model resource.
-     */
-    public void init(ModelResource modelResource) {
-        notNull(modelResource, "modelResource can't be null");
-        this.uuid = modelResource.getUuid();
-        
-        T params = new ObjectMapper().convertValue(modelResource.getParams(), getParamsClass());
-        loadParams(params);
+
+    @Getter
+    private T params;
+
+    public AbstractAnomalyDetector(Class<T> paramsClass) {
+        notNull(paramsClass, "paramsClass can't be null");
+        this.paramsClass = paramsClass;
     }
-    
-    protected void setUuid(UUID uuid) {
+
+    public void init(UUID uuid, T params) {
+        notNull(uuid, "uuid can't be null");
+        notNull(params, "params can't be null");
+
+        params.validate();
         this.uuid = uuid;
+        this.params = params;
+        initState(params);
     }
-    
-    protected abstract Class<T> getParamsClass();
-    
-    protected abstract void loadParams(T params);
+
+    /**
+     * Subclasses can implement this to initialize implementation-specific state.
+     *
+     * @param params detector params
+     */
+    protected void initState(T params) {
+        // Override as desired
+    }
 }

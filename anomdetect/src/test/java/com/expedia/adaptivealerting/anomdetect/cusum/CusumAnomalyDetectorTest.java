@@ -22,6 +22,7 @@ import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.opencsv.bean.CsvToBeanBuilder;
 import junit.framework.TestCase;
+import lombok.val;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -30,7 +31,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.time.Instant;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.UUID;
 
 import static junit.framework.TestCase.assertEquals;
@@ -60,10 +60,10 @@ public class CusumAnomalyDetectorTest {
     
     @Test
     public void testEvaluate() {
-        final ListIterator<CusumTestRow> testRows = data.listIterator();
-        final CusumTestRow testRow0 = testRows.next();
+        val testRows = data.listIterator();
+        val testRow0 = testRows.next();
         
-        final CusumParams params = new CusumParams()
+        val params = new CusumParams()
                 .setType(AnomalyType.RIGHT_TAILED)
                 .setTargetValue(0.16)
                 .setWeakSigmas(WEAK_SIGMAS)
@@ -71,8 +71,10 @@ public class CusumAnomalyDetectorTest {
                 .setSlackParam(0.5)
                 .setInitMeanEstimate(testRow0.getObserved())
                 .setWarmUpPeriod(WARMUP_PERIOD);
-        final CusumAnomalyDetector detector = new CusumAnomalyDetector(detectorUUID, params);
-        
+
+        val detector = new CusumAnomalyDetector();
+        detector.init(detectorUUID, params);
+
         int numDataPoints = 1;
     
         while (testRows.hasNext()) {
