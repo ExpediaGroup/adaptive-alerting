@@ -35,10 +35,6 @@ public interface ModelProjection {
     String getUuid();
 
     Map<String, Object> getParams();
-
-    Double getWeakSigmas();
-
-    Double getStrongSigmas();
-
+    
     Timestamp getDateCreated();
 }

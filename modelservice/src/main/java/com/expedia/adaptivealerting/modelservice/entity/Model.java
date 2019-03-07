@@ -47,18 +47,6 @@ public class Model {
     @Convert(converter = JpaConverterJson.class)
     private Map<String, Object> params;
 
-    /**
-     * DB-driven weak sigma override for models that have this parameter. Allows us to make sensitivity adjustments in
-     * response to user feedback when ground truth classifications aren't available.
-     */
-    private Double weakSigmas;
-
-    /**
-     * DB-driven strong sigma override for models that have this parameter. Allows us to make sensitivity adjustments in
-     * response to user feedback when ground truth classifications aren't available.
-     */
-    private Double strongSigmas;
-
     @Column(name = "date_created")
     private Timestamp dateCreated;
 }
