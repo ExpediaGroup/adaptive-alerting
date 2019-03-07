@@ -60,7 +60,9 @@ public final class HoltWintersAnomalyDetector extends AbstractAnomalyDetector<Ho
         notNull(uuid, "uuid can't be null");
         notNull(params, "params can't be null");
 
-        params.validate();
+        // We used to have a params.validate() call here, but that broke the noargs constructor above since
+        // HoltWintersParams starts life with an invalid frequency=0. We may want to remove all the constructors other
+        // than the noargs constructors. [WLW]
 
         setUuid(uuid);
         loadParams(params);
@@ -73,6 +75,7 @@ public final class HoltWintersAnomalyDetector extends AbstractAnomalyDetector<Ho
 
     @Override
     protected void loadParams(HoltWintersParams params) {
+        params.validate();
         this.params = params;
     }
 
