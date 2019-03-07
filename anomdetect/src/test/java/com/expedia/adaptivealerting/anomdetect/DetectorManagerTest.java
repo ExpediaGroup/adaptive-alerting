@@ -28,11 +28,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.UUID;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 /**
@@ -41,13 +42,21 @@ import static org.mockito.Mockito.when;
 public final class DetectorManagerTest {
     private static final String DETECTOR_TYPE = "ewma-detector";
     
-    private DetectorManager manager;
+    private DetectorManager managerUnderTest;
     
     @Mock
     private DetectorSource detectorSource;
-    
-    private MappedMetricData mappedMetricData;
-    
+
+    // "Good" just means the detector source can find a detector for the MMD.
+    private MetricDefinition goodDefinition;
+    private MetricData goodMetricData;
+    private MappedMetricData goodMappedMetricData;
+
+    // "Bad" just means that the detector source can't find a detector for the MMD.
+    private MetricDefinition badDefinition;
+    private MetricData badMetricData;
+    private MappedMetricData badMappedMetricData;
+
     @Mock
     private AnomalyDetector detector;
     
@@ -59,26 +68,63 @@ public final class DetectorManagerTest {
         MockitoAnnotations.initMocks(this);
         initTestObjects();
         initDependencies();
-        this.manager = new DetectorManager(detectorSource);
+        this.managerUnderTest = new DetectorManager(detectorSource);
+    }
+
+    @Test
+    public void testGetDetectorSource() {
+        // Purely for code coverage :D
+        managerUnderTest.getDetectorSource();
+    }
+
+    @Test
+    public void testGetDetectorTypes() {
+        val detectorTypes = managerUnderTest.getDetectorTypes();
+        assertTrue(detectorTypes.contains(DETECTOR_TYPE));
+    }
+    
+    @Test
+    public void testHasDetectorType() {
+        assertTrue(managerUnderTest.hasDetectorType(DETECTOR_TYPE));
+    }
+    
+    @Test
+    public void testDoesNotHaveDetectorType() {
+        assertFalse(managerUnderTest.hasDetectorType("some-nonexistent-type"));
     }
     
     @Test
     public void testClassify() {
-        val result = manager.classify(mappedMetricData);
+        val result = managerUnderTest.classify(goodMappedMetricData);
         assertNotNull(result);
         assertSame(anomalyResult, result);
     }
-    
+
+    @Test
+    public void testClassifyMetricThatCantBeFound() {
+        val result = managerUnderTest.classify(badMappedMetricData);
+        assertNull(result);
+    }
+
     private void initTestObjects() {
-        val metricDef = new MetricDefinition("my-metric");
-        val metricData = new MetricData(metricDef, 100.0, Instant.now().getEpochSecond());
-        this.mappedMetricData = new MappedMetricData(metricData, UUID.randomUUID(), DETECTOR_TYPE);
-        
-        when(detector.classify(metricData)).thenReturn(anomalyResult);
+        this.goodDefinition = new MetricDefinition("good-definition");
+        this.goodMetricData = new MetricData(goodDefinition, 100.0, Instant.now().getEpochSecond());
+        this.goodMappedMetricData = new MappedMetricData(goodMetricData, UUID.randomUUID(), DETECTOR_TYPE);
+
+        this.badDefinition = new MetricDefinition("bad-definition");
+        this.badMetricData = new MetricData(badDefinition, 100.0, Instant.now().getEpochSecond());
+        this.badMappedMetricData = new MappedMetricData(badMetricData, UUID.randomUUID(), DETECTOR_TYPE);
     }
     
     private void initDependencies() {
-        when(detectorSource.findDetector(any(DetectorMeta.class), any(MetricDefinition.class)))
+        when(detector.classify(goodMetricData)).thenReturn(anomalyResult);
+
+        when(detectorSource.findDetectorTypes())
+                .thenReturn(Collections.singleton(DETECTOR_TYPE));
+        
+        when(detectorSource.findDetector(any(DetectorMeta.class), eq(goodDefinition)))
                 .thenReturn(detector);
+        when(detectorSource.findDetector(any(DetectorMeta.class), eq(badDefinition)))
+                .thenReturn(null);
     }
 }

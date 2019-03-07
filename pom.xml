@@ -51,6 +51,10 @@
         <module>modelservice</module>
         <module>samples</module>
         <module>tools</module>
+
+        <!-- For multi-module JaCoCo -->
+        <!-- See https://github.com/jacoco/jacoco/wiki/MavenMultiModule -->
+        <module>reporting</module>
     </modules>
     <scm>
         <connection>scm:git:git://github.com/ExpediaDotCom/adaptive-alerting.git</connection>
@@ -75,8 +79,8 @@
         <!-- Dependencies -->
         <aa.version>1.0.0-SNAPSHOT</aa.version>
         <alert-manager.version>1.0.0-SNAPSHOT</alert-manager.version>
-        <amazonaws.version>1.11.402</amazonaws.version>
         <apache.commons.version>3.7</apache.commons.version>
+        <apache.commons.math.version>3.6.1</apache.commons.math.version>
         <apache.httpcomponents.version>4.5.6</apache.httpcomponents.version>
         <codahale.metrics.version>3.0.2</codahale.metrics.version>
         <jackson.version>2.9.8</jackson.version>
@@ -116,10 +120,10 @@
         <wiremock.version>2.18.0</wiremock.version>
 
         <!-- Maven plugins -->
-        <coveralls-maven-plugin-version>4.3.0</coveralls-maven-plugin-version>
         <jacoco-maven-plugin-version>0.8.3</jacoco-maven-plugin-version>
         <jacoco-percentage>0.99</jacoco-percentage>
         <jacoco-branch-percentage>0.99</jacoco-branch-percentage>
+
         <maven.compiler.plugin.version>3.8.0</maven.compiler.plugin.version>
         <maven.exec.plugin.version>1.6.0</maven.exec.plugin.version>
         <maven.failsafe.plugin.version>2.22.1</maven.failsafe.plugin.version>
@@ -136,23 +140,6 @@
         <dependencies>
 
             <!-- Compile -->
-
-            <!-- TODO Get rid of AWS dependencies once we move RCF out [WLW] -->
-            <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk-core</artifactId>
-                <version>${amazonaws.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk-s3</artifactId>
-                <version>${amazonaws.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk-sagemakerruntime</artifactId>
-                <version>${amazonaws.version}</version>
-            </dependency>
             <dependency>
                 <groupId>com.codahale.metrics</groupId>
                 <artifactId>metrics-core</artifactId>
@@ -229,16 +216,19 @@
                 <version>${typesafe.config.version}</version>
             </dependency>
             <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-core</artifactId>
+                <version>${micrometer.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>io.springfox</groupId>
                 <artifactId>springfox-swagger-ui</artifactId>
                 <version>${swagger.version}</version>
-                <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>io.springfox</groupId>
                 <artifactId>springfox-swagger2</artifactId>
                 <version>${swagger.version}</version>
-                <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>net.sf.jopt-simple</groupId>
@@ -249,6 +239,11 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${apache.commons.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-math3</artifactId>
+                <version>${apache.commons.math.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
@@ -525,13 +520,13 @@
 
         <!-- Runtime -->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-        </dependency>
-        <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-jmx</artifactId>
             <version>${micrometer.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
         </dependency>
 
         <!-- Test -->
@@ -548,6 +543,55 @@
     <build>
         <pluginManagement>
             <plugins>
+
+                <!-- https://github.com/codecov/example-java -->
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacoco-maven-plugin-version}</version>
+                    <executions>
+                        <execution>
+                            <id>jacoco-initialize</id>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>jacoco-report</id>
+                            <phase>test</phase>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>jacoco-check</id>
+                            <phase>test</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                            <configuration>
+                                <rules>
+                                    <rule>
+                                        <element>BUNDLE</element>
+                                        <limits>
+                                            <limit>
+                                                <counter>INSTRUCTION</counter>
+                                                <value>COVEREDRATIO</value>
+                                                <minimum>${jacoco-percentage}</minimum>
+                                            </limit>
+                                            <limit>
+                                                <counter>BRANCH</counter>
+                                                <value>COVEREDRATIO</value>
+                                                <minimum>${jacoco-branch-percentage}</minimum>
+                                            </limit>
+                                        </limits>
+                                    </rule>
+                                </rules>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
                 <!-- mvn -N io.takari:maven:wrapper -Dmaven=3.5.4 -->
                 <plugin>
                     <groupId>io.takari</groupId>
@@ -686,60 +730,6 @@
                     <serverId>ossrh</serverId>
                     <nexusUrl>https://oss.sonatype.org/</nexusUrl>
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${jacoco-maven-plugin-version}</version>
-                <executions>
-                    <execution>
-                        <id>jacoco-initialize</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>jacoco-report</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>jacoco-check</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <rule>
-                                    <element>BUNDLE</element>
-                                    <limits>
-                                        <limit>
-                                            <counter>INSTRUCTION</counter>
-                                            <value>COVEREDRATIO</value>
-                                            <minimum>${jacoco-percentage}</minimum>
-                                        </limit>
-                                        <limit>
-                                            <counter>BRANCH</counter>
-                                            <value>COVEREDRATIO</value>
-                                            <minimum>${jacoco-branch-percentage}</minimum>
-                                        </limit>
-                                    </limits>
-                                </rule>
-                            </rules>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.eluder.coveralls</groupId>
-                <artifactId>coveralls-maven-plugin</artifactId>
-                <version>${coveralls-maven-plugin-version}</version>
-                <configuration>
-                    <repoToken>ey58OJMj1cGwAsmdQAb5bZuTpQ9oZ95bY</repoToken>
                 </configuration>
             </plugin>
         </plugins>

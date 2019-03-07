@@ -26,9 +26,7 @@
         <query objectName="java.lang:type=Memory" attribute="NonHeapMemoryUsage" key="committed"
                resultAlias="jvm.nonHeapMemoryUsage.committed"/>
         <query objectName="java.lang:type=Threading" attribute="ThreadCount" resultAlias="jvm.thread"/>
-        <!--<query objectName="java.lang:type=GarbageCollector,name=ParNew" resultAlias="gc.young.#attribute#"/>-->
-        <!--<query objectName="java.lang:type=GarbageCollector,name=ConcurrentMarkSweep" resultAlias="gc.old.#attribute#"/>-->
-        <!--<query objectName="java.lang:type=ClassLoading" attribute="LoadedClassCount" resultAlias="jvm.loadedClasses"/>-->
+        <query objectName="java.lang:type=OperatingSystem" attribute="SystemCpuLoad" resultAlias="jvm.cpu.usage"/>
       
         <!-- TOMCAT -->
         <query objectName="Tomcat:type=GlobalRequestProcessor,name=*" attribute="requestCount"
@@ -42,12 +40,26 @@
         <query objectName="Tomcat:type=GlobalRequestProcessor,name=*" attribute="bytesReceived"
                resultAlias="tomcat.bytesReceived"/>
       
-       <!-- HTTP -->
-       <!-- FIXME. Just trying out with this URI. Will make a more generic URI later on. [KS] -->
-       <query objectName="spring:name=httpServerRequests.exception.None.method.GET.status.200.uri./api/{repository}" attribute="Count"
+        <!-- HTTP Status -->
+        <!-- FIXME. Just trying out with this URI. Will make a more generic URI later on. [KS] -->
+        <!-- GET Requests -->
+        <query objectName="spring:name=httpServerRequests.exception.None.method.GET.status.200.uri./api/{repository}" attribute="Count"
                resultAlias="http.get.200Count"/>
-       <query objectName="spring:name=&quot;httpServerRequests.exception.None.method.GET.status.404.uri./\*\*&quot;" attribute="Count"
-               resultAlias="http.get.404Count"/>   
+        <query objectName="spring:name=httpServerRequests.exception.None.method.GET.status.200.uri./api/{repository}/search/{search}" attribute="Count"
+               resultAlias="http.get.200Count"/>
+        <query objectName="spring:name=&quot;httpServerRequests.exception.None.method.GET.status.404.uri./\*\*&quot;" attribute="Count"
+               resultAlias="http.get.404Count"/>
+        <query objectName="spring:name=httpServerRequests.exception.ResourceNotFoundException.method.GET.status.404.uri./api/{repository}/search/{search}" attribute="Count"
+               resultAlias="http.get.404Count"/>
+        <query objectName="spring:name=httpServerRequests.exception.None.method.GET.status.500.uri./api/{repository}" attribute="Count"
+               resultAlias="http.get.500Count"/>
+        <!-- POST Requests -->
+        <query objectName="spring:name=httpServerRequests.exception.None.method.POST.status.201.uri./api/{repository}" attribute="Count"
+               resultAlias="http.post.201Count"/>
+        <query objectName="spring:name=httpServerRequests.exception.HttpMessageNotReadableException.method.POST.status.400.uri./api/{repository}" attribute="Count"
+               resultAlias="http.post.400Count"/>
+        <query objectName="spring:name=&quot;httpServerRequests.exception.None.method.POST.status.500.uri./\*\*&quot;" attribute="Count"
+               resultAlias="http.post.500Count"/>
     </queries>
     <outputWriter class="org.jmxtrans.agent.GraphitePlainTextTcpOutputWriter">
         <host>${AA_GRAPHITE_HOST:metrics}</host>

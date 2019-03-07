@@ -15,12 +15,13 @@
  */
 package com.expedia.adaptivealerting.anomdetect.individuals;
 
+import com.expedia.adaptivealerting.anomdetect.DetectorParams;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public final class IndividualsControlChartParams {
+public final class IndividualsControlChartParams implements DetectorParams {
     
     /**
      * Initial mean estimate.
@@ -41,4 +42,9 @@ public final class IndividualsControlChartParams {
      * Initial mean estimate.
      */
     private double initMeanEstimate = 0.0;
+
+    @Override
+    public void validate() {
+        // Not currently implemented
+    }
 }

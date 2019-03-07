@@ -23,8 +23,7 @@ import com.expedia.metrics.MetricData;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-
-import java.util.UUID;
+import lombok.val;
 
 import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.MODEL_WARMUP;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -40,8 +39,6 @@ import static java.lang.String.format;
 public final class HoltWintersAnomalyDetector extends AbstractAnomalyDetector<HoltWintersParams> {
 
     @NonNull
-    private HoltWintersParams params;
-    @NonNull
     private HoltWintersOnlineComponents components;
     @NonNull
     private HoltWintersSimpleTrainingModel holtWintersSimpleTrainingModel;
@@ -49,36 +46,16 @@ public final class HoltWintersAnomalyDetector extends AbstractAnomalyDetector<Ho
     private HoltWintersOnlineAlgorithm holtWintersOnlineAlgorithm;
 
     public HoltWintersAnomalyDetector() {
-        this(UUID.randomUUID(), new HoltWintersParams());
+        super(HoltWintersParams.class);
     }
 
-    public HoltWintersAnomalyDetector(HoltWintersParams params) {
-        this(UUID.randomUUID(), params);
-    }
-
-    public HoltWintersAnomalyDetector(UUID uuid, HoltWintersParams params) {
-        notNull(uuid, "uuid can't be null");
-        notNull(params, "params can't be null");
-
-        params.validate();
-
-        setUuid(uuid);
-        loadParams(params);
+    @Override
+    protected void initState(HoltWintersParams params) {
         components = new HoltWintersOnlineComponents(params);
         holtWintersOnlineAlgorithm = new HoltWintersOnlineAlgorithm();
         holtWintersSimpleTrainingModel = new HoltWintersSimpleTrainingModel(params);
         double initForecast = holtWintersOnlineAlgorithm.getForecast(params.getSeasonalityType(), components.getLevel(), components.getBase(), components.getSeasonal(components.getCurrentSeasonalIndex()));
         components.setForecast(initForecast);
-    }
-
-    @Override
-    protected void loadParams(HoltWintersParams params) {
-        this.params = params;
-    }
-
-    @Override
-    protected Class<HoltWintersParams> getParamsClass() {
-        return HoltWintersParams.class;
     }
 
     @Override
@@ -94,6 +71,7 @@ public final class HoltWintersAnomalyDetector extends AbstractAnomalyDetector<Ho
     }
 
     private void trainOrObserve(double observed) {
+        val params = getParams();
         if (!isInitialTrainingComplete()) {
             holtWintersSimpleTrainingModel.observeAndTrain(observed, params, components);
         } else {
@@ -102,6 +80,7 @@ public final class HoltWintersAnomalyDetector extends AbstractAnomalyDetector<Ho
     }
 
     public boolean isInitialTrainingComplete() {
+        val params = getParams();
         switch (params.getInitTrainingMethod()) {
             case NONE: return true;
             case SIMPLE: return holtWintersSimpleTrainingModel.isTrainingComplete(params);
@@ -129,6 +108,7 @@ public final class HoltWintersAnomalyDetector extends AbstractAnomalyDetector<Ho
      */
     private AnomalyThresholds buildAnomalyThresholds(double prevForecast) {
         // TODO HW: Look at options for configuring how bands are defined
+        val params = getParams();
         double stddev = components.getSeasonalStandardDeviation(components.getCurrentSeasonalIndex());
         final double weakDelta = params.getWeakSigmas() * stddev;
         final double strongDelta = params.getStrongSigmas() * stddev;
@@ -141,6 +121,7 @@ public final class HoltWintersAnomalyDetector extends AbstractAnomalyDetector<Ho
     }
 
     private boolean stillWarmingUp() {
+        val params = getParams();
         return components.getN() <= params.getWarmUpPeriod();
     }
 }

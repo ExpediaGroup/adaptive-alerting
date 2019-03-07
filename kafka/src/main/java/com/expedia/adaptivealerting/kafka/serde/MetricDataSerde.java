@@ -41,5 +41,4 @@ public class MetricDataSerde implements Serde<MetricData> {
     public Deserializer<MetricData> deserializer() {
         return new MetricDataDeserializer();
     }
-    
 }

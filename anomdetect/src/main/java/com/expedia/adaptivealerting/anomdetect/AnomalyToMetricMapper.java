@@ -24,8 +24,6 @@ import lombok.val;
 import java.util.Collections;
 import java.util.HashMap;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
-
 /**
  * <p>
  * Transforms an anomaly into a metric. We do this to feed anomalies back into the metric ingest for visualization.
@@ -35,35 +33,57 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * might generalize this.
  * </p>
  */
-public class AnomalyToMetricTransformer {
-    
+public class AnomalyToMetricMapper {
+
     /**
      * Key/value tag key for metrics representing an anomaly. The value must be the detector UUID.
      */
     public static String AA_DETECTOR_UUID = "aa_detector_uuid";
-    
-    public MetricData transform(AnomalyResult anomalyResult) {
-        notNull(anomalyResult, "anomalyResult can't be null");
-        
+
+    /**
+     * <p>
+     * Transforms the given anomaly result. This method copies the original metric key and tags, and adds a new
+     * {@code aa_detector_uuid} tag whose value is the UUID of the detector that performed the classification. It does
+     * not copy metadata tags.
+     * </p>
+     * <p>
+     * Returns a null if the anomaly result's metric definition contains the {@code aa_detector_uuid} tag.
+     * </p>
+     *
+     * @param anomalyResult anomaly result to transform into a metric
+     * @return the anomaly result as metric data
+     */
+    public MetricData toMetricData(AnomalyResult anomalyResult) {
+
+        // Just transform null to null. [WLW]
+//        notNull(anomalyResult, "anomalyResult can't be null");
+        if (anomalyResult == null) {
+            return null;
+        }
+
         val metricData = anomalyResult.getMetricData();
         val metricDef = metricData.getMetricDefinition();
         val tags = metricDef.getTags();
         val kvTags = tags.getKv();
-        val value = metricData.getValue();
-        val timestamp = metricData.getTimestamp();
-        
+
+        // Reverting back to returning null instead of generating an exception. We get to define the transform we want
+        // here, and I don't see an advantage to generating an exception when the proper transform at the Kafka level
+        // is to transform it into a null too. It reduces the burden on the client. [WLW]
+//        isFalse(kvTags.containsKey(AA_DETECTOR_UUID), "Tag " + AA_DETECTOR_UUID + " not allowed");
         if (kvTags.containsKey(AA_DETECTOR_UUID)) {
-            throw new IllegalArgumentException("Metric can't contain '" + AA_DETECTOR_UUID + "' key/value tag");
+            return null;
         }
-        
+
         val newKVTags = new HashMap<>(kvTags);
         newKVTags.put(AA_DETECTOR_UUID, anomalyResult.getDetectorUUID().toString());
-        
+
         val newKey = metricDef.getKey();
         val newTags = new TagCollection(newKVTags, Collections.EMPTY_SET);
         val newMeta = new TagCollection(Collections.EMPTY_MAP);
         val newMetricDef = new MetricDefinition(newKey, newTags, newMeta);
-        
+        val value = metricData.getValue();
+        val timestamp = metricData.getTimestamp();
+
         return new MetricData(newMetricDef, value, timestamp);
     }
 }

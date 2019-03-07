@@ -35,7 +35,7 @@ import java.util.Map;
  *
  * The config is just expecting a deserializer class that's already typed. [WLW]
  *
- * @param <T>
+ * @param <T> POJO type
  * @deprecated Superseded by {@link AbstractJsonDeserializer}.
  */
 public final class JsonPojoDeserializer<T> implements Deserializer<T> {
@@ -80,6 +80,8 @@ public final class JsonPojoDeserializer<T> implements Deserializer<T> {
         try {
             return objectMapper.readValue(bytes, tClass);
         } catch (IOException e) {
+            // FIXME This differs from AbstractJsonDeserializer, which returns null.
+            // See https://stackoverflow.com/questions/51136942/how-to-handle-serializationexception-after-deserialization
             throw new SerializationException(e);
         }
     }

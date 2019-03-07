@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.util;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,19 +27,11 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ModelResource {
-
     private Long id;
-
     private UUID uuid;
-
     private ModelTypeResource detectorType;
-
     private Map<String, Object> params;
-
-    private Double weakSigmas;
-
-    private Double strongSigmas;
-
     private Timestamp dateCreated;
 }

@@ -24,15 +24,14 @@ import com.expedia.metrics.MetricDefinition;
 import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBeanBuilder;
 import junit.framework.TestCase;
+import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.time.Instant;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.UUID;
 
 import static java.lang.Math.sqrt;
@@ -60,39 +59,41 @@ public class PewmaAnomalyDetectorTest {
     
     @Test
     public void pewmaCloseToEwmaWithZeroBeta() throws IOException {
-        final double beta = 0.0;
+        val beta = 0.0;
         
-        final ListIterator<String[]> testRows = readData_sampleInput().listIterator();
-        final Double observed0 = Double.parseDouble(testRows.next()[0]);
+        val testRows = readData_sampleInput().listIterator();
+        val observed0 = Double.parseDouble(testRows.next()[0]);
         
-        final PewmaParams pewmaParams = new PewmaParams()
+        val pewmaParams = new PewmaParams()
                 .setAlpha(DEFAULT_ALPHA)
                 .setBeta(beta)
                 .setWeakSigmas(WEAK_SIGMAS)
                 .setStrongSigmas(STRONG_SIGMAS)
                 .setInitMeanEstimate(observed0);
-        final PewmaAnomalyDetector pewmaDetector = new PewmaAnomalyDetector(detectorUUID, pewmaParams);
+        val pewmaDetector = new PewmaAnomalyDetector();
+        pewmaDetector.init(detectorUUID, pewmaParams);
     
-        final EwmaParams ewmaParams = new EwmaParams()
+        val ewmaParams = new EwmaParams()
                 .setAlpha(DEFAULT_ALPHA)
                 .setWeakSigmas(WEAK_SIGMAS)
                 .setStrongSigmas(STRONG_SIGMAS)
                 .setInitMeanEstimate(observed0);
-        final EwmaAnomalyDetector ewmaDetector = new EwmaAnomalyDetector(UUID.randomUUID(), ewmaParams);
+        val ewmaDetector = new EwmaAnomalyDetector();
+        ewmaDetector.init(UUID.randomUUID(), ewmaParams);
         
         int rowCount = 1;
         while (testRows.hasNext()) {
-            final Float observed = Float.parseFloat(testRows.next()[0]);
+            val observed = Float.parseFloat(testRows.next()[0]);
             
-            double ewmaStdDev = sqrt(ewmaDetector.getVariance());
+            val ewmaStdDev = sqrt(ewmaDetector.getVariance());
             
-            double threshold = 1.0 / rowCount; // results converge with more iterations
+            val threshold = 1.0 / rowCount; // results converge with more iterations
             assertApproxEqual(ewmaDetector.getMean(), pewmaDetector.getMean(), threshold);
             assertApproxEqual(ewmaStdDev, pewmaDetector.getStdDev(), threshold);
             
-            final MetricData metricData = new MetricData(metricDefinition, observed, epochSecond);
-            final AnomalyLevel pewmaLevel = pewmaDetector.classify(metricData).getAnomalyLevel();
-            final AnomalyLevel ewmaLevel = ewmaDetector.classify(metricData).getAnomalyLevel();
+            val metricData = new MetricData(metricDefinition, observed, epochSecond);
+            val pewmaLevel = pewmaDetector.classify(metricData).getAnomalyLevel();
+            val ewmaLevel = ewmaDetector.classify(metricData).getAnomalyLevel();
             
             if (rowCount > pewmaParams.getWarmUpPeriod()) {
                 assertEquals(pewmaLevel, ewmaLevel);
@@ -103,24 +104,23 @@ public class PewmaAnomalyDetectorTest {
     
     @Test
     public void evaluate() {
-        final ListIterator<PewmaTestRow> testRows = readData_calInflow().listIterator();
-        final double observed0 = testRows.next().getObserved();
+        val testRows = readData_calInflow().listIterator();
+        val observed0 = testRows.next().getObserved();
     
-        final PewmaParams params = new PewmaParams()
+        val params = new PewmaParams()
                 .setAlpha(DEFAULT_ALPHA)
                 .setBeta(0.5)
                 .setWeakSigmas(WEAK_SIGMAS)
                 .setStrongSigmas(STRONG_SIGMAS)
                 .setInitMeanEstimate(observed0);
-        final PewmaAnomalyDetector detector = new PewmaAnomalyDetector(detectorUUID, params);
+        val detector = new PewmaAnomalyDetector();
+        detector.init(detectorUUID, params);
         
         while (testRows.hasNext()) {
-            final PewmaTestRow testRow = testRows.next();
-            
-            final double observed = testRow.getObserved();
-            
-            final MetricData metricData = new MetricData(metricDefinition, observed, epochSecond);
-            final AnomalyLevel level = detector.classify(metricData).getAnomalyLevel();
+            val testRow = testRows.next();
+            val observed = testRow.getObserved();
+            val metricData = new MetricData(metricDefinition, observed, epochSecond);
+            val level = detector.classify(metricData).getAnomalyLevel();
             
             assertApproxEqual(testRow.getMean(), detector.getMean(), TOLERANCE);
             assertApproxEqual(testRow.getStd(), detector.getStdDev(), TOLERANCE);
@@ -129,13 +129,13 @@ public class PewmaAnomalyDetectorTest {
     }
     
     private static List<String[]> readData_sampleInput() throws IOException {
-        final InputStream is = ClassLoader.getSystemResourceAsStream(SAMPLE_INPUT_PATH);
-        CSVReader reader = new CSVReader(new InputStreamReader(is));
+        val is = ClassLoader.getSystemResourceAsStream(SAMPLE_INPUT_PATH);
+        val reader = new CSVReader(new InputStreamReader(is));
         return reader.readAll();
     }
     
     private static List<PewmaTestRow> readData_calInflow() {
-        final InputStream is = ClassLoader.getSystemResourceAsStream(CAL_INFLOW_PATH);
+        val is = ClassLoader.getSystemResourceAsStream(CAL_INFLOW_PATH);
         return new CsvToBeanBuilder<PewmaTestRow>(new InputStreamReader(is))
                 .withType(PewmaTestRow.class)
                 .build()

@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.kafka;
 
-import com.expedia.adaptivealerting.anomdetect.AnomalyToMetricTransformer;
+import com.expedia.adaptivealerting.anomdetect.AnomalyToMetricMapper;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.kafka.serde.MetricDataSerde;
 import com.expedia.metrics.metrictank.MetricTankIdFactory;
@@ -29,7 +29,7 @@ import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Produced;
 
 /**
- * Kafka Streams adapter for {@link AnomalyToMetricTransformer}.
+ * Kafka Streams adapter for {@link AnomalyToMetricMapper}.
  *
  * Note: Currently, the input and output topics must reside on the same Kafka cluster, as noted in
  * https://kafka.apache.org/11/documentation/streams/developer-guide/config-streams.html. Future versions of Kafka
@@ -39,7 +39,7 @@ import org.apache.kafka.streams.kstream.Produced;
 public final class KafkaAnomalyToMetricMapper extends AbstractStreamsApp {
     private static final String APP_ID = "a2m-mapper";
     
-    private final AnomalyToMetricTransformer transformer = new AnomalyToMetricTransformer();
+    private final AnomalyToMetricMapper mapper = new AnomalyToMetricMapper();
     private final MetricTankIdFactory metricTankIdFactory = new MetricTankIdFactory();
     
     public static void main(String[] args) {
@@ -49,7 +49,7 @@ public final class KafkaAnomalyToMetricMapper extends AbstractStreamsApp {
     }
     
     /**
-     * Creates a new Kafka Streams adapter for the {@link AnomalyToMetricTransformer}.
+     * Creates a new Kafka Streams adapter for the {@link AnomalyToMetricMapper}.
      *
      * @param config Streams app configuration.
      */
@@ -70,7 +70,7 @@ public final class KafkaAnomalyToMetricMapper extends AbstractStreamsApp {
         stream
                 .map((key, mappedMetricData) -> {
                     val anomalyResult = mappedMetricData.getAnomalyResult();
-                    val metricData = transformer.transform(anomalyResult);
+                    val metricData = mapper.toMetricData(anomalyResult);
                     val metricDef = metricData.getMetricDefinition();
                     val metricId = metricTankIdFactory.getId(metricDef);
                     return KeyValue.pair(metricId, metricData);

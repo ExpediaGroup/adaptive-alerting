@@ -22,12 +22,13 @@ import com.expedia.adaptivealerting.core.data.io.MetricFrameLoader;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
-import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartSink;
 import com.expedia.adaptivealerting.tools.pipeline.source.MetricFrameMetricSource;
 import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
 import com.expedia.metrics.MetricDefinition;
+import lombok.val;
 
 import java.io.InputStream;
+import java.util.UUID;
 
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.createChartFrame;
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showChartFrame;
@@ -41,49 +42,53 @@ public class CsvTrafficPewmaVariants {
         final MetricFrame frame = MetricFrameLoader.loadCsv(new MetricDefinition("csv"), is, true);
         final MetricFrameMetricSource source = new MetricFrameMetricSource(frame, "data", 200L);
         
-        final PewmaParams params1 = new PewmaParams()
+        val params1 = new PewmaParams()
                 .setAlpha(0.15)
                 .setBeta(1.0)
                 .setWeakSigmas(2.0)
                 .setStrongSigmas(3.0)
                 .setInitMeanEstimate(0.0);
-        final AnomalyDetectorFilter ad1 = new AnomalyDetectorFilter(new PewmaAnomalyDetector(params1));
+        val detector1 = new PewmaAnomalyDetector();
+        detector1.init(UUID.randomUUID(), params1);
+        val detectorFilter1 = new AnomalyDetectorFilter(detector1);
     
-        final PewmaParams params2 = new PewmaParams()
+        val params2 = new PewmaParams()
                 .setAlpha(0.25)
                 .setBeta(1.0)
                 .setWeakSigmas(2.0)
                 .setStrongSigmas(3.0)
                 .setInitMeanEstimate(0.0);
-        final AnomalyDetectorFilter ad2 = new AnomalyDetectorFilter(new PewmaAnomalyDetector(params2));
+        val detector2 = new PewmaAnomalyDetector();
+        val detectorFilter2 = new AnomalyDetectorFilter(detector2);
     
-        final PewmaParams params3 = new PewmaParams()
+        val params3 = new PewmaParams()
                 .setAlpha(0.35)
                 .setBeta(1.0)
                 .setWeakSigmas(2.0)
                 .setStrongSigmas(3.0)
                 .setInitMeanEstimate(0.0);
-        final AnomalyDetectorFilter ad3 = new AnomalyDetectorFilter(new PewmaAnomalyDetector(params3));
-    
-        final EvaluatorFilter eval1 = new EvaluatorFilter(new RmseEvaluator());
-        final EvaluatorFilter eval2 = new EvaluatorFilter(new RmseEvaluator());
-        final EvaluatorFilter eval3 = new EvaluatorFilter(new RmseEvaluator());
+        val detector3 = new PewmaAnomalyDetector();
+        val detectorFilter3 = new AnomalyDetectorFilter(detector3);
+
+        val eval1 = new EvaluatorFilter(new RmseEvaluator());
+        val eval2 = new EvaluatorFilter(new RmseEvaluator());
+        val eval3 = new EvaluatorFilter(new RmseEvaluator());
         
-        final AnomalyChartSink chart1 = PipelineFactory.createChartSink("PEWMA: alpha=0.15");
-        final AnomalyChartSink chart2 = PipelineFactory.createChartSink("PEWMA: alpha=0.25");
-        final AnomalyChartSink chart3 = PipelineFactory.createChartSink("PEWMA: alpha=0.35");
+        val chart1 = PipelineFactory.createChartSink("PEWMA: alpha=0.15");
+        val chart2 = PipelineFactory.createChartSink("PEWMA: alpha=0.25");
+        val chart3 = PipelineFactory.createChartSink("PEWMA: alpha=0.35");
     
-        source.addSubscriber(ad1);
-        source.addSubscriber(ad2);
-        source.addSubscriber(ad3);
+        source.addSubscriber(detectorFilter1);
+        source.addSubscriber(detectorFilter2);
+        source.addSubscriber(detectorFilter3);
     
-        ad1.addSubscriber(eval1);
-        ad2.addSubscriber(eval2);
-        ad3.addSubscriber(eval3);
+        detectorFilter1.addSubscriber(eval1);
+        detectorFilter2.addSubscriber(eval2);
+        detectorFilter3.addSubscriber(eval3);
         
-        ad1.addSubscriber(chart1);
-        ad2.addSubscriber(chart2);
-        ad3.addSubscriber(chart3);
+        detectorFilter1.addSubscriber(chart1);
+        detectorFilter2.addSubscriber(chart2);
+        detectorFilter3.addSubscriber(chart3);
         
         eval1.addSubscriber(chart1);
         eval2.addSubscriber(chart2);

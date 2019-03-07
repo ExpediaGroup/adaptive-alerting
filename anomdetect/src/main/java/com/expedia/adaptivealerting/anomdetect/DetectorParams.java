@@ -13,16 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.rcf;
+package com.expedia.adaptivealerting.anomdetect;
 
-public class Score {
-    private Double score;
-    
-    public Double getScore() {
-        return score;
-    }
-    
-    public void setScore(Double score) {
-        this.score = score;
-    }
+public interface DetectorParams {
+
+    void validate();
 }

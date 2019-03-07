@@ -55,6 +55,17 @@ public class DetectorManager {
     }
     
     /**
+     * Indicates whether this manager manages detectors of the given type.
+     *
+     * @param detectorType Detector type.
+     * @return Boolean indicating whether this manager manages detectors of the given type.
+     */
+    public boolean hasDetectorType(String detectorType) {
+        notNull(detectorType, "detectorType can't be null");
+        return getDetectorTypes().contains(detectorType);
+    }
+    
+    /**
      * Classifies the mapped metric data, performing detector lookup behind the scenes. Returns {@code null} if there's
      * no detector defined for the given mapped metric data.
      *
@@ -66,13 +77,11 @@ public class DetectorManager {
         
         val detector = detectorFor(mappedMetricData);
         if (detector == null) {
-            log.warn("No detector: mappedMetricData={}", mappedMetricData);
+            log.warn("No detector for mappedMetricData={}", mappedMetricData);
             return null;
         }
         val metricData = mappedMetricData.getMetricData();
-        val anomalyResult = detector.classify(metricData);
-        log.info("metricData={}, anomalyResult={}", metricData, anomalyResult);
-        return anomalyResult;
+        return detector.classify(metricData);
     }
     
     private AnomalyDetector detectorFor(MappedMetricData mappedMetricData) {

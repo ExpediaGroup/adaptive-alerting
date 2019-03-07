@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.ewma;
 
+import com.expedia.adaptivealerting.anomdetect.DetectorParams;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -22,7 +23,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 
 @Data
 @Accessors(chain = true)
-public final class EwmaParams {
+public final class EwmaParams implements DetectorParams {
     
     /**
      * Smoothing param. Somewhat misnamed because higher values lead to less smoothing, but it's called the
@@ -44,7 +45,8 @@ public final class EwmaParams {
      * Initial mean estimate.
      */
     private double initMeanEstimate = 0.0;
-    
+
+    @Override
     public void validate() {
         isTrue(0.0 <= alpha && alpha <= 1.0, "Required: alpha in the range [0, 1]");
         isTrue(weakSigmas > 0.0, "Required: weakSigmas > 0.0");

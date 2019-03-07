@@ -18,8 +18,8 @@ package com.expedia.adaptivealerting.kafka;
 import com.expedia.adaptivealerting.anomdetect.DetectorManager;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
 import com.expedia.adaptivealerting.core.util.ErrorUtil;
+import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.kafka.streams.StreamsBuilder;
@@ -29,7 +29,14 @@ import org.apache.kafka.streams.kstream.KStream;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
+ * <p>
  * Kafka streams wrapper around {@link DetectorManager}.
+ * </p>
+ * <p>
+ * We publish all classifications to the output topic. Though AnomalyLevel.NORMAL classifications generate high event
+ * volume, downstream consumers user those to reliably detect recovery from an anomalous situation. Anyway this wrapper
+ * isn't responsible for domain logic; its responsibility is to adapt the {@link DetectorManager} to Kafka.
+ * </p>
  */
 @Slf4j
 public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
@@ -54,40 +61,38 @@ public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
     @Override
     protected Topology buildTopology() {
         val config = getConfig();
-        val inboundTopic = config.getInboundTopic();
-        val outboundTopic = config.getOutboundTopic();
-        val detectorTypes = manager.getDetectorTypes();
-    
-        log.info("Initializing: inboundTopic={}, outboundTopic={}", inboundTopic, outboundTopic);
+        val inputTopic = config.getInboundTopic();
+        val outputTopic = config.getOutboundTopic();
+        log.info("Initializing: inputTopic={}, outputTopic={}", inputTopic, outputTopic);
         
         val builder = new StreamsBuilder();
-        final KStream<String, MappedMetricData> stream = builder.stream(inboundTopic);
+        final KStream<String, MappedMetricData> stream = builder.stream(inputTopic);
         stream
-                .filter((key, mappedMetricData) -> mappedMetricData != null
-                        && detectorTypes.contains(mappedMetricData.getDetectorType()))
-                .mapValues(mappedMetricData -> {
-                    log.trace("Processing mappedMetricData: {}", mappedMetricData);
-                    
-                    // TODO Not sure why we would get null here--mappedMetricData are mapped to models. But in fact we
-                    // are seeing this occur so let's handle it and investigate the cause. [WLW]
-                    AnomalyResult anomalyResult = null;
-                    try {
-                        anomalyResult = manager.classify(mappedMetricData);
-                    } catch (Exception e) {
-                        log.error(
-                                "Encountered error while classifying {}. {}",
-                                mappedMetricData,
-                                ErrorUtil.fullExceptionDetails(e)
-                        );
-                    }
-                    
-                    log.info("anomalyResult={}", anomalyResult);
-                    
-                    return anomalyResult == null ? null : new MappedMetricData(mappedMetricData, anomalyResult);
-                })
-                .filter((key, mappedMetricData) -> mappedMetricData != null)
-                .to(outboundTopic);
+                .filter((key, mmd) -> mmd != null)
+                .filter((key, mmd) -> manager.hasDetectorType(mmd.getDetectorType()))
+                .mapValues(this::toAnomalyMmd)
+                .filter((key, mmd) -> mmd != null)
+                .to(outputTopic);
         return builder.build();
     }
+    
+    private MappedMetricData toAnomalyMmd(MappedMetricData mmd) {
+        assert mmd != null;
 
+        AnomalyResult anomalyResult = null;
+        try {
+            anomalyResult = manager.classify(mmd);
+        } catch (Exception e) {
+            log.error("Classification error: mappedMetricData={}, error={}", mmd, ErrorUtil.fullExceptionDetails(e));
+        }
+
+        if (anomalyResult == null) {
+            log.info("anomalyResult=null");
+            return null;
+        }
+
+        val newMmd = new MappedMetricData(mmd, anomalyResult);
+        log.info("mappedMetricData={}", newMmd);
+        return newMmd;
+    }
 }

@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.kafka;
 
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.core.util.jackson.ObjectMapperUtil;
+import com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde;
 import com.expedia.adaptivealerting.kafka.serde.MetricDataDeserializer;
 import com.expedia.adaptivealerting.kafka.util.TestObjectMother;
 import com.expedia.metrics.MetricData;
@@ -101,7 +102,7 @@ public class KafkaAnomalyToMetricMapperTest {
         
         // Topology test drivers
         val topology = new KafkaAnomalyToMetricMapper(saConfig).buildTopology();
-        this.logAndFailDriver = TestObjectMother.topologyTestDriver(topology, MappedMetricData.class, false);
+        this.logAndFailDriver = TestObjectMother.topologyTestDriver(topology, MappedMetricDataJsonSerde.class, false);
         
         // MappedMetricData producer
         this.mappedMetricDataFactory = TestObjectMother.mappedMetricDataFactory();

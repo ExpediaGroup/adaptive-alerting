@@ -21,6 +21,7 @@ import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.opencsv.bean.CsvToBeanBuilder;
 import junit.framework.TestCase;
+import lombok.val;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -29,7 +30,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.time.Instant;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.UUID;
 
 import static junit.framework.TestCase.assertEquals;
@@ -60,14 +60,15 @@ public class IndividualsChartAnomalyDetectorTest {
     
     @Test
     public void testEvaluate() {
-        final ListIterator<IndividualsChartTestRow> testRows = data.listIterator();
-        final IndividualsChartTestRow testRow0 = testRows.next();
-        final double observed0 = testRow0.getObserved();
+        val testRows = data.listIterator();
+        val testRow0 = testRows.next();
+        val observed0 = testRow0.getObserved();
         
-        final IndividualsControlChartParams params = new IndividualsControlChartParams()
+        val params = new IndividualsControlChartParams()
                 .setInitValue(observed0)
                 .setWarmUpPeriod(WARMUP_PERIOD);
-        final IndividualsControlChartAnomalyDetector detector = new IndividualsControlChartAnomalyDetector(detectorUUID, params);
+        val detector = new IndividualsControlChartAnomalyDetector();
+        detector.init(detectorUUID, params);
         
         int noOfDataPoints = 1;
         

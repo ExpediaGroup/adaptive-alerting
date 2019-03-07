@@ -87,7 +87,7 @@ public final class MetricUtil {
     public static MetricData metricData(MetricDefinition metricDef, double value) {
         return new MetricData(metricDef, value, Instant.now().getEpochSecond());
     }
-
+  
     /**
      * Convenience method to create a new {@link MetricData} from the given definition, value and epoch second.
      *

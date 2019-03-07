@@ -21,6 +21,7 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
+import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -99,9 +100,13 @@ public class ConstantThresholdAnomalyDetectorTest {
     }
 
     private ConstantThresholdAnomalyDetector detector(UUID uuid, AnomalyThresholds thresholds, AnomalyType type) {
-        ConstantThresholdParams params = new ConstantThresholdParams()
-                .setThresholds(thresholds).setType(type);
-        return new ConstantThresholdAnomalyDetector(uuid, params);
+        val params = new ConstantThresholdParams()
+                .setThresholds(thresholds)
+                .setType(type);
+
+        val detector = new ConstantThresholdAnomalyDetector();
+        detector.init(uuid, params);
+        return detector;
     }
 
     private AnomalyLevel classify(AnomalyDetector detector, long epochSecond, float value) {
