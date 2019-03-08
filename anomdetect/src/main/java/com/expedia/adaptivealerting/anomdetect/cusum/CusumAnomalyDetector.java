@@ -110,6 +110,11 @@ public final class CusumAnomalyDetector extends AbstractAnomalyDetector<CusumPar
             lowerWeak = -weakDelta;
             lowerStrong = -strongDelta;
 
+            // Below we use strict inequalities for anomaly checks instead of nonstrict.
+            // The reason is that if a metric runs at a constant value, then the stdev is
+            // 0, and another incoming metric data with the same constant value should
+            // come out as NORMAL, not STRONG. [WLW]
+
             switch (params.getType()) {
                 case LEFT_TAILED:
                     lowerWeak = -weakDelta;
