@@ -15,17 +15,39 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.source;
 
+import com.expedia.adaptivealerting.core.util.ThreadUtil;
+import com.expedia.adaptivealerting.tools.pipeline.util.MetricDataSubscriber;
 import com.expedia.metrics.MetricData;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
 
+@Slf4j
 public final class RandomWalkMetricSourceTest {
-    
+
+    @Test
+    public void testNoArgConstructor() {
+        val metricSource = new RandomWalkMetricSource();
+        assertNotNull(metricSource.next());
+    }
+
+    @Test
+    public void testArgConstructor() {
+        val metricSource = new RandomWalkMetricSource("random-walk", 100L, 0);
+        assertNotNull(metricSource.next());
+    }
+
     @Test
     public void testStartAndStop() {
-        final MetricSource metricSource = new RandomWalkMetricSource("random-walk", 100L, 0);
-        final MetricData result = metricSource.next();
-        assertNotNull(result);
+        MetricDataSubscriber subscriber = (MetricData metricData) -> log.info("metricData={}", metricData);
+
+        val metricSource = new RandomWalkMetricSource();
+        metricSource.addSubscriber(subscriber);
+        metricSource.start();
+        ThreadUtil.sleep(1000L);
+        metricSource.stop();
+        metricSource.removeSubscriber(subscriber);
     }
 }
