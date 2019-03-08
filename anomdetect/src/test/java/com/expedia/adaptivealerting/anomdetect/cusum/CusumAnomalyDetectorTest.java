@@ -27,7 +27,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.time.Instant;
 import java.util.List;
@@ -41,7 +40,7 @@ public class CusumAnomalyDetectorTest {
     private static final double TOLERANCE = 0.01;
     private static final int WARMUP_PERIOD = 25;
     
-    private UUID detectorUUID;
+    private UUID detectorUuid;
     private MetricDefinition metricDefinition;
     private long epochSecond;
     private static List<CusumTestRow> data;
@@ -53,13 +52,33 @@ public class CusumAnomalyDetectorTest {
     
     @Before
     public void setUp() {
-        this.detectorUUID = UUID.randomUUID();
+        this.detectorUuid = UUID.randomUUID();
         this.metricDefinition = new MetricDefinition("some-key");
         this.epochSecond = Instant.now().getEpochSecond();
     }
-    
+
     @Test
-    public void testEvaluate() {
+    public void testClassify_leftTailed() {
+        val params = new CusumParams()
+                .setType(AnomalyType.LEFT_TAILED)
+                .setTargetValue(1000.0)
+                .setWeakSigmas(WEAK_SIGMAS)
+                .setStrongSigmas(STRONG_SIGMAS)
+                .setSlackParam(0.5)
+                .setInitMeanEstimate(1000.0)
+                .setWarmUpPeriod(WARMUP_PERIOD);
+
+        val testRows = new CusumTestRow[] {
+                new CusumTestRow(1020.0, AnomalyLevel.NORMAL.name()),
+                new CusumTestRow(994.0, AnomalyLevel.WEAK.name()),
+                new CusumTestRow(990.0, AnomalyLevel.STRONG.name()),
+        };
+
+        testClassify(params, testRows);
+    }
+
+    @Test
+    public void testClassify_rightTailed() {
         val testRows = data.listIterator();
         val testRow0 = testRows.next();
         
@@ -73,29 +92,76 @@ public class CusumAnomalyDetectorTest {
                 .setWarmUpPeriod(WARMUP_PERIOD);
 
         val detector = new CusumAnomalyDetector();
-        detector.init(detectorUUID, params);
+        detector.init(detectorUuid, params);
 
         int numDataPoints = 1;
     
         while (testRows.hasNext()) {
-            final CusumTestRow testRow = testRows.next();
-            final double observed = testRow.getObserved();
-            final MetricData metricData = new MetricData(metricDefinition, observed, epochSecond);
-            final AnomalyLevel level = detector.classify(metricData).getAnomalyLevel();
-            
-            if (numDataPoints < WARMUP_PERIOD) {
-                assertEquals(AnomalyLevel.MODEL_WARMUP, level);
-            } else {
+            val testRow = testRows.next();
+            val observed = testRow.getObserved();
+            val metricData = new MetricData(metricDefinition, observed, epochSecond);
+            val level = detector.classify(metricData).getAnomalyLevel();
+
+            assertEquals(AnomalyLevel.valueOf(testRow.getLevel()), level);
+
+            // TODO Why not apply these assertions to all rows? [WLW]
+            if (numDataPoints >= WARMUP_PERIOD) {
                 assertApproxEqual(testRow.getSh(), detector.getSumHigh());
                 assertApproxEqual(testRow.getSl(), detector.getSumLow());
-                assertEquals(AnomalyLevel.valueOf(testRow.getLevel()), level);
             }
+
             numDataPoints++;
         }
     }
-    
+
+    @Test
+    public void testClassify_twoTailed() {
+        val params = new CusumParams()
+                .setType(AnomalyType.TWO_TAILED)
+                .setTargetValue(1000.0)
+                .setWeakSigmas(WEAK_SIGMAS)
+                .setStrongSigmas(STRONG_SIGMAS)
+                .setSlackParam(0.5)
+                .setInitMeanEstimate(1000.0)
+                .setWarmUpPeriod(5);
+
+        val testRows = new CusumTestRow[] {
+                new CusumTestRow(1000.0, AnomalyLevel.NORMAL.name()),
+                new CusumTestRow(1020.0, AnomalyLevel.STRONG.name()),
+                new CusumTestRow(994.0, AnomalyLevel.NORMAL.name()),
+                new CusumTestRow(960.0, AnomalyLevel.WEAK.name()),
+        };
+
+        testClassify(params, testRows);
+    }
+
+    private void testClassify(CusumParams params, CusumTestRow[] testRows) {
+        val detector = new CusumAnomalyDetector();
+        detector.init(detectorUuid, params);
+
+        // FIXME Hack to handle an off-by-one bug in the CusumAnomalyDetector. [WLW]
+        val adjWarmupPeriod = params.getWarmUpPeriod() - 1;
+
+        for (int i = 0; i < adjWarmupPeriod; i++) {
+            val metricData = new MetricData(metricDefinition, 1000.0, 1000 * i);
+            val anomalyResult = detector.classify(metricData);
+            val anomalyLevel = anomalyResult.getAnomalyLevel();
+            assertEquals(AnomalyLevel.MODEL_WARMUP, anomalyLevel);
+        }
+
+        for (int i = 0; i < testRows.length; i++) {
+            val testRow = testRows[i];
+            val value = testRow.getObserved();
+            val timestamp = (adjWarmupPeriod + i) * 1000L;
+            val metricData = new MetricData(metricDefinition, value, timestamp);
+            val anomalyResult = detector.classify(metricData);
+            val anomalyLevel = anomalyResult.getAnomalyLevel();
+            assertEquals(AnomalyLevel.valueOf(testRow.getLevel()), anomalyLevel);
+        }
+    }
+
     private static void readDataFromCsv() {
-        final InputStream is = ClassLoader.getSystemResourceAsStream("tests/cusum-sample-input.csv");
+        val is = ClassLoader.getSystemResourceAsStream("tests/cusum-sample-input.csv");
         data = new CsvToBeanBuilder<CusumTestRow>(new InputStreamReader(is))
                 .withType(CusumTestRow.class)
                 .build()
