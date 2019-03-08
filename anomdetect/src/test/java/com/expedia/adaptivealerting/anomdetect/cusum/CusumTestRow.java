@@ -17,13 +17,19 @@ package com.expedia.adaptivealerting.anomdetect.cusum;
 
 import com.opencsv.bean.CsvBindByName;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@RequiredArgsConstructor
 public class CusumTestRow {
 
     @CsvBindByName
     private int sample;
 
+    @NonNull
     @CsvBindByName
     private double observed;
 
@@ -36,6 +42,7 @@ public class CusumTestRow {
     @CsvBindByName(column = "stdev")
     private double stdDev;
 
+    @NonNull
     @CsvBindByName
     private String level;
 }

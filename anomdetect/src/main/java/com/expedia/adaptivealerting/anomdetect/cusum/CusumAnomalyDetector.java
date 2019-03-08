@@ -99,25 +99,36 @@ public final class CusumAnomalyDetector extends AbstractAnomalyDetector<CusumPar
         Double lowerStrong;
         Double lowerWeak;
         AnomalyLevel level;
-        
-        if (totalDataPoints > params.getWarmUpPeriod()) {
+
+        if (totalDataPoints <= params.getWarmUpPeriod()) {
+            level = MODEL_WARMUP;
+        } else {
             level = NORMAL;
+
+            upperWeak = weakDelta;
+            upperStrong = strongDelta;
+            lowerWeak = -weakDelta;
+            lowerStrong = -strongDelta;
+
+            // Below we use strict inequalities for anomaly checks instead of nonstrict.
+            // The reason is that if a metric runs at a constant value, then the stdev is
+            // 0, and another incoming metric data with the same constant value should
+            // come out as NORMAL, not STRONG. [WLW]
+
             switch (params.getType()) {
                 case LEFT_TAILED:
                     lowerWeak = -weakDelta;
                     lowerStrong = -strongDelta;
-                    if (this.sumLow <= lowerStrong) {
+                    if (this.sumLow < lowerStrong) {
                         level = STRONG;
                         // TODO Check whether this is really what we are supposed to do here. [WLW]
                         resetSums();
-                    } else if (this.sumLow <= lowerWeak) {
+                    } else if (this.sumLow < lowerWeak) {
                         level = WEAK;
                     }
                     break;
                 case RIGHT_TAILED:
-                    upperWeak = weakDelta;
-                    upperStrong = strongDelta;
-                    if (this.sumHigh >= upperStrong) {
+                    if (this.sumHigh > upperStrong) {
                         level = STRONG;
                         // TODO Check whether this is really what we are supposed to do here. [WLW]
                         resetSums();
@@ -126,19 +137,17 @@ public final class CusumAnomalyDetector extends AbstractAnomalyDetector<CusumPar
                     }
                     break;
                 case TWO_TAILED:
-                    if (this.sumHigh >= strongDelta || this.sumLow <= strongDelta) {
+                    if (this.sumHigh > upperStrong || this.sumLow < lowerStrong) {
                         level = STRONG;
                         // TODO Check whether this is really what we are supposed to do here. [WLW]
                         resetSums();
-                    } else if (this.sumHigh > weakDelta || this.sumLow <= weakDelta) {
+                    } else if (this.sumHigh > upperWeak || this.sumLow < lowerWeak) {
                         level = WEAK;
                     }
                     break;
                 default:
                     throw new IllegalStateException("Illegal type: " + params.getType());
             }
-        } else {
-            level = MODEL_WARMUP;
         }
         
         return new AnomalyResult(getUuid(), metricData, level);
