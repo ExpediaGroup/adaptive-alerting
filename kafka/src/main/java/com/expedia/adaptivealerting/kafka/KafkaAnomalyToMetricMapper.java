@@ -69,8 +69,7 @@ public final class KafkaAnomalyToMetricMapper extends AbstractStreamsApp {
         final KStream<String, MappedMetricData> stream = builder.stream(inboundTopic);
         stream
                 .map((key, mappedMetricData) -> {
-                    val anomalyResult = mappedMetricData.getAnomalyResult();
-                    val metricData = mapper.toMetricData(anomalyResult);
+                    val metricData = mapper.toMetricData(mappedMetricData);
                     val metricDef = metricData.getMetricDefinition();
                     val metricId = metricTankIdFactory.getId(metricDef);
                     return KeyValue.pair(metricId, metricData);

@@ -90,14 +90,14 @@ public final class HoltWintersAnomalyDetector extends AbstractAnomalyDetector<Ho
 
     private AnomalyResult buildAnomalyResult(MetricData metricData, double prevForecast) {
         return stillWarmingUp()
-                ? new AnomalyResult(getUuid(), metricData, MODEL_WARMUP)
+                ? new AnomalyResult(MODEL_WARMUP)
                 : classifyAnomaly(metricData, prevForecast);
     }
 
     private AnomalyResult classifyAnomaly(MetricData metricData, double prevForecast) {
         AnomalyThresholds thresholds = buildAnomalyThresholds(prevForecast);
         AnomalyLevel level = thresholds.classify(metricData.getValue());
-        AnomalyResult result = new AnomalyResult(getUuid(), metricData, level);
+        AnomalyResult result = new AnomalyResult(level);
         result.setPredicted(prevForecast);
         result.setThresholds(thresholds);
         return result;

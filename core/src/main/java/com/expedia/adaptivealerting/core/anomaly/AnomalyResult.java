@@ -15,14 +15,11 @@
  */
 package com.expedia.adaptivealerting.core.anomaly;
 
-import com.expedia.metrics.MetricData;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-
-import java.util.UUID;
 
 // TODO Currently including the prediction and thresholds because the tools module requires these to render the model
 // bands, and because the predictor performance code depends on having predictions. Eventually I think we want to remove
@@ -36,13 +33,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AnomalyResult {
-    
-    @NonNull
-    private UUID detectorUUID;
-    
-    @NonNull
-    private MetricData metricData;
-    
+
     @NonNull
     private AnomalyLevel anomalyLevel;
     

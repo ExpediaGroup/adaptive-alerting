@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.TagCollection;
@@ -50,18 +50,15 @@ public class AnomalyToMetricMapper {
      * Returns a null if the anomaly result's metric definition contains the {@code aa_detector_uuid} tag.
      * </p>
      *
-     * @param anomalyResult anomaly result to transform into a metric
+     * @param anomaly anomaly result to transform into a metric
      * @return the anomaly result as metric data
      */
-    public MetricData toMetricData(AnomalyResult anomalyResult) {
-
-        // Just transform null to null. [WLW]
-//        notNull(anomalyResult, "anomalyResult can't be null");
-        if (anomalyResult == null) {
+    public MetricData toMetricData(MappedMetricData anomaly) {
+        if (anomaly == null) {
             return null;
         }
 
-        val metricData = anomalyResult.getMetricData();
+        val metricData = anomaly.getMetricData();
         val metricDef = metricData.getMetricDefinition();
         val tags = metricDef.getTags();
         val kvTags = tags.getKv();
@@ -75,7 +72,7 @@ public class AnomalyToMetricMapper {
         }
 
         val newKVTags = new HashMap<>(kvTags);
-        newKVTags.put(AA_DETECTOR_UUID, anomalyResult.getDetectorUUID().toString());
+        newKVTags.put(AA_DETECTOR_UUID, anomaly.getDetectorUuid().toString());
 
         val newKey = metricDef.getKey();
         val newTags = new TagCollection(newKVTags, Collections.EMPTY_SET);

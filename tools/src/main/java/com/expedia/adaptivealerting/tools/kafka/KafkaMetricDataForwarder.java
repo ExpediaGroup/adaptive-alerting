@@ -77,8 +77,8 @@ public final class KafkaMetricDataForwarder {
         
         notNull(metricSource, "metricSource can't be null");
         notNull(kafkaProducer, "kafkaProducer can't be null");
-        
-        metricSource.addSubscriber(metricData -> kafkaProducer.send(new ProducerRecord<>(topicName, null, metricData)));
+
+        metricSource.addSubscriber(metricData -> kafkaProducer.send(new ProducerRecord(topicName, null, metricData)));
         metricSource.start();
     }
 }

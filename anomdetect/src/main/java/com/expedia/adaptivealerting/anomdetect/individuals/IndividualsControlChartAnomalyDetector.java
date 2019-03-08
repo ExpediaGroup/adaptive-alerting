@@ -153,7 +153,7 @@ public final class IndividualsControlChartAnomalyDetector extends AbstractAnomal
         }
         this.prevValue = observed;
 
-        final AnomalyResult result = new AnomalyResult(getUuid(), metricData, level);
+        final AnomalyResult result = new AnomalyResult(level);
         result.setPredicted(this.mean);
         result.setThresholds(thresholds);
         return result;

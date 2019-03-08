@@ -150,7 +150,7 @@ public final class CusumAnomalyDetector extends AbstractAnomalyDetector<CusumPar
             }
         }
         
-        return new AnomalyResult(getUuid(), metricData, level);
+        return new AnomalyResult(level);
     }
     
     private void resetSums() {

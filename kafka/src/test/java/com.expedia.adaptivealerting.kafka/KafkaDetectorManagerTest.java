@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.kafka;
 
 import com.expedia.adaptivealerting.anomdetect.DetectorManager;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonDeserializer;
 import com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde;
@@ -156,18 +157,12 @@ public final class KafkaDetectorManagerTest {
     private void initDependencies() {
         when(manager.hasDetectorType(anyString())).thenReturn(true);
         
-        when(manager.classify(metric_normalAnomaly))
-                .thenReturn(TestObjectMother.anomalyResult(AnomalyLevel.NORMAL));
-        when(manager.classify(metric_weakAnomaly))
-                .thenReturn(TestObjectMother.anomalyResult(AnomalyLevel.WEAK));
-        when(manager.classify(metric_strongAnomaly))
-                .thenReturn(TestObjectMother.anomalyResult(AnomalyLevel.STRONG));
-        when(manager.classify(metric_modelWarmup))
-                .thenReturn(TestObjectMother.anomalyResult(AnomalyLevel.MODEL_WARMUP));
-        when(manager.classify(metric_unknownAnomaly))
-                .thenReturn(TestObjectMother.anomalyResult(AnomalyLevel.UNKNOWN));
-        when(manager.classify(metric_invalid))
-                .thenThrow(new RuntimeException("Classification error"));
+        when(manager.classify(metric_normalAnomaly)).thenReturn(new AnomalyResult(AnomalyLevel.NORMAL));
+        when(manager.classify(metric_weakAnomaly)).thenReturn(new AnomalyResult(AnomalyLevel.WEAK));
+        when(manager.classify(metric_strongAnomaly)).thenReturn(new AnomalyResult(AnomalyLevel.STRONG));
+        when(manager.classify(metric_modelWarmup)).thenReturn(new AnomalyResult(AnomalyLevel.MODEL_WARMUP));
+        when(manager.classify(metric_unknownAnomaly)).thenReturn(new AnomalyResult(AnomalyLevel.UNKNOWN));
+        when(manager.classify(metric_invalid)).thenThrow(new RuntimeException("Classification error"));
     }
     
     private void initTestMachinery() {

@@ -40,6 +40,6 @@ public final class ConstantThresholdAnomalyDetector extends AbstractAnomalyDetec
         val thresholds = params.getThresholds();
         val type = params.getType();
         val level = thresholds.classify(type, metricData.getValue());
-        return new AnomalyResult(getUuid(), metricData, level);
+        return new AnomalyResult(level);
     }
 }
