@@ -133,11 +133,9 @@ public class ModelServiceConnectorTest {
         this.detectorResourceList = new ArrayList<>();
         detectorResourceList.add(new DetectorResource(
                 "3217d4be-9c33-490f-828e-c976b393b000",
-                CONSTANT_DETECTOR,
                 new ModelTypeResource(CONSTANT_DETECTOR)));
         detectorResourceList.add(new DetectorResource(
                 "90c37a3c-f6bb-4c00-b41b-191909cccfb7",
-                EWMA_DETECTOR,
                 new ModelTypeResource(EWMA_DETECTOR)));
         val detectorResources = new DetectorResources(detectorResourceList);
         val detectorResourcesBytes = objectMapper.writeValueAsBytes(detectorResources);

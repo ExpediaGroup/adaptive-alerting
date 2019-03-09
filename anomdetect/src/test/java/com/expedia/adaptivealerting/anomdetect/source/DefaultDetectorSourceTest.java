@@ -119,10 +119,7 @@ public final class DefaultDetectorSourceTest {
         this.detectorMetaMissingDetector = new DetectorMeta(DETECTOR_UUID_MISSING_DETECTOR, DETECTOR_TYPE);
         this.detectorMetaException = new DetectorMeta(DETECTOR_UUID_EXCEPTION, DETECTOR_TYPE);
 
-        val detectorResource = new DetectorResource(
-                DETECTOR_UUID.toString(),
-                DETECTOR_TYPE,
-                new ModelTypeResource(DETECTOR_TYPE));
+        val detectorResource = new DetectorResource(DETECTOR_UUID.toString(), new ModelTypeResource(DETECTOR_TYPE));
         this.detectorResources = new Resources<>(Collections.singletonList(detectorResource));
 
         val params = new HashMap<String, Object>();
