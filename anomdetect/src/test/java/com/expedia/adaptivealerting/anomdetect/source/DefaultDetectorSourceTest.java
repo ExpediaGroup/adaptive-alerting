@@ -17,7 +17,11 @@ package com.expedia.adaptivealerting.anomdetect.source;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.ewma.EwmaAnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.util.*;
+import com.expedia.adaptivealerting.anomdetect.util.DetectorMeta;
+import com.expedia.adaptivealerting.anomdetect.util.DetectorResource;
+import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
+import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
+import com.expedia.adaptivealerting.anomdetect.util.ModelTypeResource;
 import com.expedia.metrics.MetricDefinition;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -27,6 +31,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.hateoas.Resources;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.UUID;
@@ -53,7 +58,7 @@ public final class DefaultDetectorSourceTest {
     private AnomalyDetector detector;
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         this.sourceUnderTest = new DefaultDetectorSource(connector);
         initTestObjects();
@@ -99,7 +104,10 @@ public final class DefaultDetectorSourceTest {
         this.detectorMeta = new DetectorMeta(DETECTOR_UUID, DETECTOR_TYPE);
         this.detectorMetaMissingDetector = new DetectorMeta(DETECTOR_UUID_MISSING_DETECTOR, DETECTOR_TYPE);
 
-        val detectorResource = new DetectorResource(DETECTOR_UUID.toString(), new ModelTypeResource(DETECTOR_TYPE));
+        val detectorResource = new DetectorResource(
+                DETECTOR_UUID.toString(),
+                DETECTOR_TYPE,
+                new ModelTypeResource(DETECTOR_TYPE));
         this.detectorResources = new Resources<>(Collections.singletonList(detectorResource));
 
         val params = new HashMap<String, Object>();
@@ -115,7 +123,7 @@ public final class DefaultDetectorSourceTest {
         this.detector = new EwmaAnomalyDetector();
     }
     
-    private void initDependencies() {
+    private void initDependencies() throws IOException {
         when(connector.findDetectors(metricDef)).thenReturn(detectorResources);
         when(connector.findLatestModel(DETECTOR_UUID)).thenReturn(modelResource);
         when(connector.findLatestModel(DETECTOR_UUID_MISSING_DETECTOR)).thenReturn(null);

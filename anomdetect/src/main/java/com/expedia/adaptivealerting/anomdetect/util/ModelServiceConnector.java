@@ -21,18 +21,21 @@ import com.expedia.metrics.metrictank.MetricTankIdFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.client.fluent.Content;
+import lombok.val;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.hal.Jackson2HalModule;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+
+// FIXME Currently this class uses the URI template in an inconsistent way. In some methods it fills in a detector UUID
+// whereas in others it fills in a metric ID. The only reason it currently works is that no existing client uses both
+// types of method. However if some client used both then the connector would break. We probably want to construct the
+// URI from a scheme/host/port. (Ideal would be hypermedia, but might be overkill for this.) [WLW]
 
 /**
  * <p>
@@ -67,40 +70,25 @@ public class ModelServiceConnector {
         this.uriTemplate = uriTemplate;
     }
     
-    public Resources<DetectorResource> findDetectors(MetricDefinition metricDefinition) {
+    public Resources<DetectorResource> findDetectors(MetricDefinition metricDefinition) throws IOException {
         notNull(metricDefinition, "metricDefinition can't be null");
-        
-        final String id = metricTankIdFactory.getId(metricDefinition);
-        final String uri = String.format(uriTemplate, id);
-        
-        log.info("Finding detectors: metricDefinition={}, id={}, uri={}", metricDefinition, id, uri);
-        try {
-            final Content content = httpClient.get(uri);
-            return objectMapper.readValue(content.asBytes(), DetectorResources.class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        val metricId = metricTankIdFactory.getId(metricDefinition);
+        val findDetectorsUri = String.format(uriTemplate, metricId);
+        val content = httpClient.get(findDetectorsUri);
+        return objectMapper.readValue(content.asBytes(), DetectorResources.class);
     }
 
-    public Resources<ModelResource> findModels(UUID detectorUuid) {
+    public ModelResource findLatestModel(UUID detectorUuid) throws IOException {
         notNull(detectorUuid, "detectorUuid can't be null");
-
-        final String uri = String.format(uriTemplate, detectorUuid);
-
-        log.info("Finding models: , uuid={}, uri={}", detectorUuid, uri);
-        try {
-            final Content content = httpClient.get(uri);
-            return objectMapper.readValue(content.asBytes(), ModelResources.class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        val resources = findModels(detectorUuid);
+        val content = resources.getContent();
+        val list = new ArrayList<>(content);
+        return list.isEmpty() ? null : list.get(0);
     }
-
-    public ModelResource findLatestModel(UUID detectorUuid) {
-        final Resources<ModelResource> modelResources = findModels(detectorUuid);
-        final Collection<ModelResource> modelResourceCollection = modelResources.getContent();
-        List<ModelResource> modelResourceList = new ArrayList<>(modelResourceCollection);
-
-        return modelResourceList.isEmpty() ? null : modelResourceList.get(0);
+    
+    private Resources<ModelResource> findModels(UUID detectorUuid) throws IOException {
+        val findModelsUri = String.format(uriTemplate, detectorUuid);
+        val content = httpClient.get(findModelsUri);
+        return objectMapper.readValue(content.asBytes(), ModelResources.class);
     }
 }

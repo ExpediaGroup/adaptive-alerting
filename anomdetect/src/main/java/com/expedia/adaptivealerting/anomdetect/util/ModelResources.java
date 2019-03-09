@@ -13,13 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.expedia.adaptivealerting.anomdetect.util;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.hateoas.Resources;
 
 /**
  * Model resources.
  */
 public class ModelResources extends Resources<ModelResource> {
+    
+    @JsonCreator
+    public ModelResources(@JsonProperty("content") Iterable<ModelResource> resources) {
+        super(resources);
+    }
 }

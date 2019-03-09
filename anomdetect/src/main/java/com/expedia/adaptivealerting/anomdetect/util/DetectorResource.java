@@ -28,5 +28,9 @@ import org.springframework.hateoas.ResourceSupport;
 @AllArgsConstructor
 public class DetectorResource extends ResourceSupport {
     private String uuid;
+    
+    // This will replace the type field as soon as clients upgrade.
+    private String typeKey;
+    
     private ModelTypeResource type;
 }
