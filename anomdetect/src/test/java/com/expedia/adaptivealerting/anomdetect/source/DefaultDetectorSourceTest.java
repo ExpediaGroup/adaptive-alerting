@@ -43,6 +43,7 @@ import static org.mockito.Mockito.when;
 public final class DefaultDetectorSourceTest {
     private static final UUID DETECTOR_UUID = UUID.fromString("90c37a3c-f6bb-4c00-b41b-191909cccfb7");
     private static final UUID DETECTOR_UUID_MISSING_DETECTOR = UUID.fromString("90c37a3c-f6bb-4c00-b41b-191909cccfb8");
+    private static final UUID DETECTOR_UUID_EXCEPTION = UUID.fromString("90c37a3c-f6bb-4c00-b41b-191909cccfb9");
     private static final String DETECTOR_TYPE = "ewma-detector";
     
     private DefaultDetectorSource sourceUnderTest;
@@ -51,8 +52,10 @@ public final class DefaultDetectorSourceTest {
     private ModelServiceConnector connector;
 
     private MetricDefinition metricDef;
+    private MetricDefinition metricDefException;
     private DetectorMeta detectorMeta;
     private DetectorMeta detectorMetaMissingDetector;
+    private DetectorMeta detectorMetaException;
     private Resources<DetectorResource> detectorResources;
     private ModelResource modelResource;
     private AnomalyDetector detector;
@@ -79,7 +82,12 @@ public final class DefaultDetectorSourceTest {
         assertEquals(DETECTOR_UUID, result.getUuid());
         assertEquals(DETECTOR_TYPE, result.getType());
     }
-
+    
+    @Test(expected = RuntimeException.class)
+    public void testFindDetectorMetas_exception() {
+        sourceUnderTest.findDetectorMetas(metricDefException);
+    }
+    
     @Test
     public void testFindDetector() {
         val result = sourceUnderTest.findDetector(detectorMeta, metricDef);
@@ -97,12 +105,19 @@ public final class DefaultDetectorSourceTest {
         val result = sourceUnderTest.findDetector(detectorMetaMissingDetector, metricDef);
         assertNull(result);
     }
+    
+    @Test(expected = RuntimeException.class)
+    public void testFindDetector_exception() {
+        sourceUnderTest.findDetector(detectorMetaException, metricDef);
+    }
 
     private void initTestObjects() {
         this.metricDef = new MetricDefinition("my-metric");
+        this.metricDefException = new MetricDefinition("metric-that-causes-exception");
 
         this.detectorMeta = new DetectorMeta(DETECTOR_UUID, DETECTOR_TYPE);
         this.detectorMetaMissingDetector = new DetectorMeta(DETECTOR_UUID_MISSING_DETECTOR, DETECTOR_TYPE);
+        this.detectorMetaException = new DetectorMeta(DETECTOR_UUID_EXCEPTION, DETECTOR_TYPE);
 
         val detectorResource = new DetectorResource(
                 DETECTOR_UUID.toString(),
@@ -125,7 +140,12 @@ public final class DefaultDetectorSourceTest {
     
     private void initDependencies() throws IOException {
         when(connector.findDetectors(metricDef)).thenReturn(detectorResources);
+        when(connector.findDetectors(metricDefException))
+                .thenThrow(new IOException("Error reading detectors"));
+        
         when(connector.findLatestModel(DETECTOR_UUID)).thenReturn(modelResource);
         when(connector.findLatestModel(DETECTOR_UUID_MISSING_DETECTOR)).thenReturn(null);
+        when(connector.findLatestModel(DETECTOR_UUID_EXCEPTION))
+                .thenThrow(new IOException("Error reading detector"));
     }
 }
