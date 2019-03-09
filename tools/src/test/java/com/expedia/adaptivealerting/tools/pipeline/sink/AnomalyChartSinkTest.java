@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.tools.pipeline.sink;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.tools.visualization.ChartSeries;
 import com.expedia.metrics.MetricData;
@@ -44,7 +45,8 @@ public final class AnomalyChartSinkTest {
     private TextTitle textTitle;
     
     private ChartSeries chartSeries;
-    private MappedMetricData anomaly;
+    private MappedMetricData strongAnomalyNoThresholds;
+    private MappedMetricData weakAnomalyWithThresholds;
     
     @Before
     public void setUp() {
@@ -55,20 +57,34 @@ public final class AnomalyChartSinkTest {
     }
     
     @Test
-    public void testNext() {
-        sinkUnderTest.next(anomaly);
+    public void testNext_strongAnomalyNoThresholds() {
+        sinkUnderTest.next(strongAnomalyNoThresholds);
+    }
+    
+    @Test
+    public void testNext_weakAnomalyWithThresholds() {
+        sinkUnderTest.next(weakAnomalyWithThresholds);
     }
     
     private void initTestObjects() {
         this.chartSeries = new ChartSeries();
     
         val metricDef = new MetricDefinition("my-metric");
-        val metricData = new MetricData(metricDef, 1.0, Instant.now().getEpochSecond());
-        val anomalyResult = new AnomalyResult();
-        anomalyResult.setAnomalyLevel(AnomalyLevel.STRONG);
+        val metricData = new MetricData(metricDef, 15.0, Instant.now().getEpochSecond());
         
-        this.anomaly = new MappedMetricData(metricData, UUID.randomUUID(), "ewma-detector");
-        anomaly.setAnomalyResult(anomalyResult);
+        val anomalyResult_strong_noThresholds = new AnomalyResult();
+        anomalyResult_strong_noThresholds.setAnomalyLevel(AnomalyLevel.STRONG);
+        
+        val anomalyResult_weak_thresholds = new AnomalyResult();
+        anomalyResult_weak_thresholds.setAnomalyLevel(AnomalyLevel.WEAK);
+        val thresholds = new AnomalyThresholds(100.0, 90.0, 20.0, 10.0);
+        anomalyResult_weak_thresholds.setThresholds(thresholds);
+        
+        this.strongAnomalyNoThresholds = new MappedMetricData(metricData, UUID.randomUUID(), "ewma-detector");
+        this.strongAnomalyNoThresholds.setAnomalyResult(anomalyResult_strong_noThresholds);
+        
+        this.weakAnomalyWithThresholds = new MappedMetricData(metricData, UUID.randomUUID(), "ewma-detector");
+        this.weakAnomalyWithThresholds.setAnomalyResult(anomalyResult_weak_thresholds);
     }
     
     private void initDependencies() {

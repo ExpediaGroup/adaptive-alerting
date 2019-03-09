@@ -116,8 +116,8 @@ public final class HoltWintersAnomalyDetector extends AbstractAnomalyDetector<Ho
         return new AnomalyThresholds(
                 prevForecast + strongDelta,
                 prevForecast + weakDelta,
-                prevForecast - strongDelta,
-                prevForecast - weakDelta);
+                prevForecast - weakDelta, prevForecast - strongDelta
+        );
     }
 
     private boolean stillWarmingUp() {

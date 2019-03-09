@@ -98,8 +98,8 @@ public final class PewmaAnomalyDetector extends AbstractAnomalyDetector<PewmaPar
         val thresholds = new AnomalyThresholds(
                 mean + strongDelta,
                 mean + weakDelta,
-                mean - strongDelta,
-                mean - weakDelta);
+                mean - weakDelta, mean - strongDelta
+        );
         
         updateEstimates(observed);
         

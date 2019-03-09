@@ -37,6 +37,7 @@ public final class AnomalyChartSink implements AnomalyResultSubscriber, ModelEva
     
     @Getter
     private final JFreeChart chart;
+    
     private final ChartSeries chartSeries;
     private final String baseTitle;
     private final DecimalFormat format = new DecimalFormat(".###");

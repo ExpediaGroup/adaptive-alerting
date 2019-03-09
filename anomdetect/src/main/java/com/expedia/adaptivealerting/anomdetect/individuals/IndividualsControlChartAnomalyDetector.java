@@ -118,8 +118,8 @@ public final class IndividualsControlChartAnomalyDetector extends AbstractAnomal
         val thresholds = new AnomalyThresholds(
                 this.mean + strongDelta,
                 this.mean + strongDelta,
-                this.mean - strongDelta,
-                this.mean - strongDelta);
+                this.mean - strongDelta, this.mean - strongDelta
+        );
 
         AnomalyLevel level;
 
