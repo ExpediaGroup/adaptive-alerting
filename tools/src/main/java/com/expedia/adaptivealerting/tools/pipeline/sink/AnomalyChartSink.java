@@ -15,8 +15,6 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.sink;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.core.evaluator.ModelEvaluation;
 import com.expedia.adaptivealerting.tools.pipeline.util.AnomalyResultSubscriber;
@@ -60,8 +58,8 @@ public final class AnomalyChartSink implements AnomalyResultSubscriber, ModelEva
         val epochSecond = metricData.getTimestamp();
         val observed = metricData.getValue();
         val anomalyResult = anomaly.getAnomalyResult();
-        final AnomalyLevel level = anomalyResult.getAnomalyLevel();
-        final AnomalyThresholds thresholds = anomalyResult.getThresholds();
+        val level = anomalyResult.getAnomalyLevel();
+        val thresholds = anomalyResult.getThresholds();
     
         final Second second = toSecond(epochSecond);
         chartSeries.getObserved().add(second, observed);
