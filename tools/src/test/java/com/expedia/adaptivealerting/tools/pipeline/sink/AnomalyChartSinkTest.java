@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.sink;
 
+import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.tools.visualization.ChartSeries;
@@ -33,7 +34,7 @@ import java.util.UUID;
 
 import static org.mockito.Mockito.when;
 
-public class AnomalyChartSinkTest {
+public final class AnomalyChartSinkTest {
     private AnomalyChartSink sinkUnderTest;
     
     @Mock
@@ -64,6 +65,7 @@ public class AnomalyChartSinkTest {
         val metricDef = new MetricDefinition("my-metric");
         val metricData = new MetricData(metricDef, 1.0, Instant.now().getEpochSecond());
         val anomalyResult = new AnomalyResult();
+        anomalyResult.setAnomalyLevel(AnomalyLevel.STRONG);
         
         this.anomaly = new MappedMetricData(metricData, UUID.randomUUID(), "ewma-detector");
         anomaly.setAnomalyResult(anomalyResult);
