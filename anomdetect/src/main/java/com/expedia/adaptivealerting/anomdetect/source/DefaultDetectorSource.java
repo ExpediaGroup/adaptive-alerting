@@ -19,7 +19,6 @@ import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.DetectorLookup;
 import com.expedia.adaptivealerting.anomdetect.DetectorParams;
-import com.expedia.adaptivealerting.anomdetect.util.DetectorMeta;
 import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
 import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
@@ -57,16 +56,15 @@ public class DefaultDetectorSource implements DetectorSource {
     }
     
     @Override
-    public List<DetectorMeta> findDetectorMetas(MetricDefinition metricDef) {
+    public List<UUID> findDetectorUuids(MetricDefinition metricDef) {
         notNull(metricDef, "metricDefinition can't be null");
         try {
             return connector
                     .findDetectors(metricDef)
                     .getContent()
                     .stream()
-                    .map(resource -> new DetectorMeta(
-                            UUID.fromString(resource.getUuid()),
-                            resource.getType().getKey()))
+                    .map(resource ->
+                            UUID.fromString(resource.getUuid()))
                     .collect(Collectors.toList());
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -74,13 +72,12 @@ public class DefaultDetectorSource implements DetectorSource {
     }
     
     @Override
-    public AnomalyDetector findDetector(DetectorMeta detectorMeta, MetricDefinition metricDef) {
-        notNull(detectorMeta, "detectorMeta can't be null");
+    public AnomalyDetector findDetector(UUID detectorUuid, MetricDefinition metricDef) {
+        notNull(detectorUuid, "detectorUuid can't be null");
 
         // metricDef _can_ be null, and normally is.
         // This implementation doesn't use it, but other implementations do.
         
-        val detectorUuid = detectorMeta.getUuid();
 
         // TODO "Latest model" doesn't really make sense for the kind of detectors we load into the DetectorManager.
         // These are basic detectors backed by single statistical models, as opposed to being ML models that we have to
@@ -99,7 +96,7 @@ public class DefaultDetectorSource implements DetectorSource {
             return null;
         }
 
-        val detectorType = detectorMeta.getType();
+        val detectorType = model.getDetectorType().getKey();
         val detectorClass = detectorLookup.getDetector(detectorType);
         val detector = (AbstractAnomalyDetector) ReflectionUtil.newInstance(detectorClass);
         val paramsClass = detector.getParamsClass();

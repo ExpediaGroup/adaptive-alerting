@@ -38,7 +38,7 @@ public class TestHelper {
         MetricDefinition def = new MetricDefinition("latency", tags, TagCollection.EMPTY);
         MetricData data = new MetricData(def, 2.0f, Instant.now().getEpochSecond());
         UUID detectorUUID = UUID.randomUUID();
-        MappedMetricData mappedData = new MappedMetricData(data, detectorUUID, "ewma-detector");
+        MappedMetricData mappedData = new MappedMetricData(data, detectorUUID);
         mappedData.setAnomalyResult(new AnomalyResult(AnomalyLevel.NORMAL));
         return mappedData;
     }

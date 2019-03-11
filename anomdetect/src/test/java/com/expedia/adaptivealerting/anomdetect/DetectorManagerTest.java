@@ -16,7 +16,6 @@
 package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
-import com.expedia.adaptivealerting.anomdetect.util.DetectorMeta;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.metrics.MetricData;
@@ -109,11 +108,11 @@ public final class DetectorManagerTest {
     private void initTestObjects() {
         this.goodDefinition = new MetricDefinition("good-definition");
         this.goodMetricData = new MetricData(goodDefinition, 100.0, Instant.now().getEpochSecond());
-        this.goodMappedMetricData = new MappedMetricData(goodMetricData, UUID.randomUUID(), DETECTOR_TYPE);
+        this.goodMappedMetricData = new MappedMetricData(goodMetricData, UUID.randomUUID());
 
         this.badDefinition = new MetricDefinition("bad-definition");
         this.badMetricData = new MetricData(badDefinition, 100.0, Instant.now().getEpochSecond());
-        this.badMappedMetricData = new MappedMetricData(badMetricData, UUID.randomUUID(), DETECTOR_TYPE);
+        this.badMappedMetricData = new MappedMetricData(badMetricData, UUID.randomUUID());
     }
     
     private void initDependencies() {
@@ -122,9 +121,9 @@ public final class DetectorManagerTest {
         when(detectorSource.findDetectorTypes())
                 .thenReturn(Collections.singleton(DETECTOR_TYPE));
         
-        when(detectorSource.findDetector(any(DetectorMeta.class), eq(goodDefinition)))
+        when(detectorSource.findDetector(any(UUID.class), eq(goodDefinition)))
                 .thenReturn(detector);
-        when(detectorSource.findDetector(any(DetectorMeta.class), eq(badDefinition)))
+        when(detectorSource.findDetector(any(UUID.class), eq(badDefinition)))
                 .thenReturn(null);
     }
 }

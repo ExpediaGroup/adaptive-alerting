@@ -49,9 +49,9 @@ public class DetectorMapper {
     public Set<MappedMetricData> map(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
         return detectorSource
-                .findDetectorMetas(metricData.getMetricDefinition())
+                .findDetectorUuids(metricData.getMetricDefinition())
                 .stream()
-                .map(meta -> new MappedMetricData(metricData, meta.getUuid(), meta.getType()))
+                .map(detectorUuid -> new MappedMetricData(metricData, detectorUuid))
                 .collect(Collectors.toSet());
     }
 }

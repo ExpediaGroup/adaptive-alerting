@@ -133,7 +133,7 @@ public final class TestObjectMother {
     }
     
     public static MappedMetricData mappedMetricData(MetricData metricData) {
-        return new MappedMetricData(metricData, UUID.randomUUID(), "constant-detector");
+        return new MappedMetricData(metricData, UUID.randomUUID());
     }
     
     public static MappedMetricData mappedMetricDataWithAnomalyResult() {
