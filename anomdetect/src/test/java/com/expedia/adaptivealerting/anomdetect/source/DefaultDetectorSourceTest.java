@@ -19,6 +19,7 @@ import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.ewma.EwmaAnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.util.DetectorMeta;
 import com.expedia.adaptivealerting.anomdetect.util.DetectorResource;
+import com.expedia.adaptivealerting.anomdetect.util.DetectorResources;
 import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
 import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.expedia.adaptivealerting.anomdetect.util.ModelTypeResource;
@@ -29,7 +30,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.hateoas.Resources;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -56,7 +56,7 @@ public final class DefaultDetectorSourceTest {
     private DetectorMeta detectorMeta;
     private DetectorMeta detectorMetaMissingDetector;
     private DetectorMeta detectorMetaException;
-    private Resources<DetectorResource> detectorResources;
+    private DetectorResources detectorResources;
     private ModelResource modelResource;
     private AnomalyDetector detector;
 
@@ -120,7 +120,7 @@ public final class DefaultDetectorSourceTest {
         this.detectorMetaException = new DetectorMeta(DETECTOR_UUID_EXCEPTION, DETECTOR_TYPE);
 
         val detectorResource = new DetectorResource(DETECTOR_UUID.toString(), new ModelTypeResource(DETECTOR_TYPE));
-        this.detectorResources = new Resources<>(Collections.singletonList(detectorResource));
+        this.detectorResources = new DetectorResources(Collections.singletonList(detectorResource));
 
         val params = new HashMap<String, Object>();
         params.put("alpha", 0.2);

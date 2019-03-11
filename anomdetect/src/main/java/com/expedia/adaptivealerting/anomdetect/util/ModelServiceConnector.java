@@ -22,12 +22,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.springframework.hateoas.Resources;
-import org.springframework.hateoas.hal.Jackson2HalModule;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -51,11 +47,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @Slf4j
 public class ModelServiceConnector {
     private final MetricTankIdFactory metricTankIdFactory = new MetricTankIdFactory();
-    
-    // https://hdpe.me/post/spring-data-rest-hal-client/
-    private final ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json()
-            .modules(new Jackson2HalModule())
-            .build();
+    private final ObjectMapper objectMapper = new ObjectMapper();
     
     @Getter
     private HttpClientWrapper httpClient;
@@ -70,9 +62,11 @@ public class ModelServiceConnector {
         this.uriTemplate = uriTemplate;
     }
     
-    public Resources<DetectorResource> findDetectors(MetricDefinition metricDefinition) throws IOException {
+    public DetectorResources findDetectors(MetricDefinition metricDefinition) throws IOException {
         notNull(metricDefinition, "metricDefinition can't be null");
         val metricId = metricTankIdFactory.getId(metricDefinition);
+        // http://modelservice/api/detectors/search/findByMetricHash?hash=%s
+        // http://modelservice/api/detectors/search/findByMetricHash?hash=1.bbbad54f9232ba765e20368fe9c1a9c4
         val findDetectorsUri = String.format(uriTemplate, metricId);
         val content = httpClient.get(findDetectorsUri);
         return objectMapper.readValue(content.asBytes(), DetectorResources.class);
@@ -80,13 +74,14 @@ public class ModelServiceConnector {
 
     public ModelResource findLatestModel(UUID detectorUuid) throws IOException {
         notNull(detectorUuid, "detectorUuid can't be null");
-        val resources = findModels(detectorUuid);
-        val content = resources.getContent();
-        val list = new ArrayList<>(content);
-        return list.isEmpty() ? null : list.get(0);
+        val modelResources = findModelsByDetectorUuid(detectorUuid);
+        val modelResourceList = modelResources.getEmbedded().getModels();
+        return modelResourceList.isEmpty() ? null : modelResourceList.get(0);
     }
     
-    private Resources<ModelResource> findModels(UUID detectorUuid) throws IOException {
+    private ModelResources findModelsByDetectorUuid(UUID detectorUuid) throws IOException {
+        // http://modelservice/api/models/search/findLatestByDetectorUuid?uuid=%s
+        // http://modelservice/api/models/search/findLatestByDetectorUuid?uuid=85f395a2-e276-7cfd-34bc-cb850ae3bc2e
         val findModelsUri = String.format(uriTemplate, detectorUuid);
         val content = httpClient.get(findModelsUri);
         return objectMapper.readValue(content.asBytes(), ModelResources.class);

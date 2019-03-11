@@ -62,7 +62,8 @@ public class DefaultDetectorSource implements DetectorSource {
         try {
             return connector
                     .findDetectors(metricDef)
-                    .getContent()
+                    .getEmbedded()
+                    .getDetectors()
                     .stream()
                     .map(resource -> new DetectorMeta(
                             UUID.fromString(resource.getUuid()),
