@@ -15,11 +15,13 @@
  */
 package com.expedia.adaptivealerting.tools.visualization;
 
+import lombok.Data;
 import org.jfree.data.time.TimeSeries;
 
 /**
  * Time series container.
  */
+@Data
 public class ChartSeries {
     private final TimeSeries observed = new TimeSeries("observed");
     private final TimeSeries predicted = new TimeSeries("predicted");
@@ -29,36 +31,4 @@ public class ChartSeries {
     private final TimeSeries strongThresholdLower = new TimeSeries("strongThresholdLower");
     private final TimeSeries strongOutlier = new TimeSeries("strongOutlier");
     private final TimeSeries weakOutlier = new TimeSeries("weakOutlier");
-    
-    public TimeSeries getObserved() {
-        return observed;
-    }
-    
-    public TimeSeries getPredicted() {
-        return predicted;
-    }
-    
-    public TimeSeries getWeakThresholdUpper() {
-        return weakThresholdUpper;
-    }
-    
-    public TimeSeries getWeakThresoldLower() {
-        return weakThresoldLower;
-    }
-    
-    public TimeSeries getStrongThresholdUpper() {
-        return strongThresholdUpper;
-    }
-    
-    public TimeSeries getStrongThresholdLower() {
-        return strongThresholdLower;
-    }
-    
-    public TimeSeries getStrongOutlier() {
-        return strongOutlier;
-    }
-    
-    public TimeSeries getWeakOutlier() {
-        return weakOutlier;
-    }
 }

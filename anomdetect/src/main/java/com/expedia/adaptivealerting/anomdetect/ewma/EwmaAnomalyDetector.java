@@ -82,14 +82,15 @@ public final class EwmaAnomalyDetector extends AbstractAnomalyDetector<EwmaParam
         final AnomalyThresholds thresholds = new AnomalyThresholds(
                 this.mean + strongDelta,
                 this.mean + weakDelta,
-                this.mean - strongDelta,
-                this.mean - weakDelta);
+                this.mean - weakDelta,
+                this.mean - strongDelta
+        );
         
         updateEstimates(observed);
         
         val level = thresholds.classify(observed);
         
-        val result = new AnomalyResult(getUuid(), metricData, level);
+        val result = new AnomalyResult(level);
         result.setPredicted(this.mean);
         result.setThresholds(thresholds);
         return result;

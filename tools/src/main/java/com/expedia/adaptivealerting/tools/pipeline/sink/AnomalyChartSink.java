@@ -15,15 +15,13 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.sink;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
+import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.core.evaluator.ModelEvaluation;
 import com.expedia.adaptivealerting.tools.pipeline.util.AnomalyResultSubscriber;
 import com.expedia.adaptivealerting.tools.pipeline.util.ModelEvaluationSubscriber;
 import com.expedia.adaptivealerting.tools.visualization.ChartSeries;
-import com.expedia.metrics.MetricData;
 import lombok.Getter;
+import lombok.val;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeries;
@@ -39,6 +37,7 @@ public final class AnomalyChartSink implements AnomalyResultSubscriber, ModelEva
     
     @Getter
     private final JFreeChart chart;
+    
     private final ChartSeries chartSeries;
     private final String baseTitle;
     private final DecimalFormat format = new DecimalFormat(".###");
@@ -53,19 +52,20 @@ public final class AnomalyChartSink implements AnomalyResultSubscriber, ModelEva
     }
     
     @Override
-    public void next(AnomalyResult result) {
-        notNull(result, "result can't be null");
+    public void next(MappedMetricData anomaly) {
+        notNull(anomaly, "anomaly can't be null");
         
-        final MetricData metricData = result.getMetricData();
-        final long epochSecond = metricData.getTimestamp();
-        final double observed = metricData.getValue();
-        final AnomalyLevel level = result.getAnomalyLevel();
-        final AnomalyThresholds thresholds = result.getThresholds();
+        val metricData = anomaly.getMetricData();
+        val epochSecond = metricData.getTimestamp();
+        val observed = metricData.getValue();
+        val anomalyResult = anomaly.getAnomalyResult();
+        val level = anomalyResult.getAnomalyLevel();
+        val thresholds = anomalyResult.getThresholds();
     
         final Second second = toSecond(epochSecond);
         chartSeries.getObserved().add(second, observed);
         
-        addValue(chartSeries.getPredicted(), second, result.getPredicted());
+        addValue(chartSeries.getPredicted(), second, anomalyResult.getPredicted());
         
         // FIXME Hacky check
         if (thresholds != null) {

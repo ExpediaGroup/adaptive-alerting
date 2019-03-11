@@ -31,7 +31,7 @@ public class AnomalyThresholdsTest {
     
     @Test
     public void testLowerThresholds() {
-        final AnomalyThresholds thresholds = new AnomalyThresholds(null, null, 25.0, 50.0);
+        final AnomalyThresholds thresholds = new AnomalyThresholds(null, null, 50.0, 25.0);
         assertEquals(AnomalyLevel.STRONG, thresholds.classify(0.0));
         assertEquals(AnomalyLevel.WEAK, thresholds.classify(35.0));
         assertEquals(AnomalyLevel.NORMAL, thresholds.classify(100.0));

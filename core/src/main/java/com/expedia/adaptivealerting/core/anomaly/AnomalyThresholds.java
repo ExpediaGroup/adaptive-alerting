@@ -38,8 +38,8 @@ public class AnomalyThresholds {
     public AnomalyThresholds(
             @JsonProperty("upperStrong") Double upperStrong,
             @JsonProperty("upperWeak") Double upperWeak,
-            @JsonProperty("lowerStrong") Double lowerStrong,
-            @JsonProperty("lowerWeak") Double lowerWeak) {
+            @JsonProperty("lowerWeak") Double lowerWeak,
+            @JsonProperty("lowerStrong") Double lowerStrong) {
 
         isFalse(upperStrong == null && upperWeak == null && lowerWeak == null && lowerStrong == null,
                 "At least one of the thresholds must be not null");

@@ -15,17 +15,22 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.source;
 
-import com.expedia.metrics.MetricData;
+import lombok.val;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
 
 public final class WhiteNoiseMetricSourceTest {
-    
+
     @Test
-    public void testStartAndStop() {
-        final MetricSource metricSource = new WhiteNoiseMetricSource("white-noise", 100L, 0.0, 1.0);
-        final MetricData result = metricSource.next();
-        assertNotNull(result);
+    public void testNoArgConstructor() {
+        val metricSource = new WhiteNoiseMetricSource();
+        assertNotNull(metricSource.next());
+    }
+
+    @Test
+    public void testArgConstructor() {
+        val metricSource = new WhiteNoiseMetricSource("white-noise", 100L, 0.0, 1.0);
+        assertNotNull(metricSource.next());
     }
 }

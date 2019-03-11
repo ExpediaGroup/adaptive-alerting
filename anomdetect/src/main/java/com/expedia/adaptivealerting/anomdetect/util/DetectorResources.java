@@ -15,10 +15,17 @@
  */
 package com.expedia.adaptivealerting.anomdetect.util;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.hateoas.Resources;
 
 /**
  * Detector resources.
  */
 public class DetectorResources extends Resources<DetectorResource> {
+    
+    @JsonCreator
+    public DetectorResources(@JsonProperty("content") Iterable<DetectorResource> resources) {
+        super(resources);
+    }
 }

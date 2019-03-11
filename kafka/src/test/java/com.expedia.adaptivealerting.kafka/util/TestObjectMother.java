@@ -142,13 +142,13 @@ public final class TestObjectMother {
 
     public static MappedMetricData mappedMetricDataWithAnomalyResult(MetricData metricData) {
         val mmd = mappedMetricData(metricData);
-        mmd.setAnomalyResult(anomalyResult(metricData));
+        mmd.setAnomalyResult(new AnomalyResult(AnomalyLevel.STRONG));
         return mmd;
     }
 
     public static MappedMetricData mappedMetricData(AnomalyLevel anomalyLevel) {
         val mmd = mappedMetricData();
-        mmd.setAnomalyResult(anomalyResult(anomalyLevel));
+        mmd.setAnomalyResult(new AnomalyResult(anomalyLevel));
         return mmd;
     }
 
@@ -166,22 +166,6 @@ public final class TestObjectMother {
         return mappedMetricDataWithAnomalyResult(metricData);
     }
 
-    public static AnomalyResult anomalyResult(MetricData metricData) {
-        return anomalyResult(metricData, AnomalyLevel.STRONG);
-    }
-    
-    public static AnomalyResult anomalyResult(AnomalyLevel anomalyLevel) {
-        return anomalyResult(metricData(), anomalyLevel);
-    }
-    
-    public static AnomalyResult anomalyResult(MetricData metricData, AnomalyLevel anomalyLevel) {
-        val anomalyResult = new AnomalyResult();
-        anomalyResult.setDetectorUUID(UUID.randomUUID());
-        anomalyResult.setMetricData(metricData);
-        anomalyResult.setAnomalyLevel(anomalyLevel);
-        return anomalyResult;
-    }
-    
     public static Alert alert() {
         val alert = new Alert();
         alert.setName("some-metric-key");

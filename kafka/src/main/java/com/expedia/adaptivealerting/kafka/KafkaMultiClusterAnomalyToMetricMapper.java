@@ -159,7 +159,7 @@ public class KafkaMultiClusterAnomalyToMetricMapper implements Runnable {
         assert (anomalyRecord != null);
 
         val mappedMetricData = anomalyRecord.value();
-        val newMetricData = mapper.toMetricData(mappedMetricData.getAnomalyResult());
+        val newMetricData = mapper.toMetricData(mappedMetricData);
 
         if (newMetricData == null) {
             return null;

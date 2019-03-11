@@ -39,7 +39,7 @@ public class TestHelper {
         MetricData data = new MetricData(def, 2.0f, Instant.now().getEpochSecond());
         UUID detectorUUID = UUID.randomUUID();
         MappedMetricData mappedData = new MappedMetricData(data, detectorUUID, "ewma-detector");
-        mappedData.setAnomalyResult(new AnomalyResult(detectorUUID, data, AnomalyLevel.NORMAL));
+        mappedData.setAnomalyResult(new AnomalyResult(AnomalyLevel.NORMAL));
         return mappedData;
     }
 

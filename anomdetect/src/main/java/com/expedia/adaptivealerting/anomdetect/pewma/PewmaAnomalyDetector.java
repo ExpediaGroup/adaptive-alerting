@@ -98,14 +98,14 @@ public final class PewmaAnomalyDetector extends AbstractAnomalyDetector<PewmaPar
         val thresholds = new AnomalyThresholds(
                 mean + strongDelta,
                 mean + weakDelta,
-                mean - strongDelta,
-                mean - weakDelta);
+                mean - weakDelta, mean - strongDelta
+        );
         
         updateEstimates(observed);
         
         val level = thresholds.classifyExclusiveBounds(observed);
         
-        val result = new AnomalyResult(getUuid(), metricData, level);
+        val result = new AnomalyResult(level);
         result.setPredicted(mean);
         result.setThresholds(thresholds);
         return result;

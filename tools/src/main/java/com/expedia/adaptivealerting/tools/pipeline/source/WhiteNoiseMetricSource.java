@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.tools.pipeline.source;
 
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
+import lombok.val;
 
 import java.time.Instant;
 import java.util.Random;
@@ -56,7 +57,7 @@ public final class WhiteNoiseMetricSource extends AbstractMetricSource {
     
     @Override
     public MetricData next() {
-        final double value = mean + stdDev * random.nextGaussian();
+        val value = mean + stdDev * random.nextGaussian();
         return new MetricData(metricDefinition, value, Instant.now().getEpochSecond());
     }
 }

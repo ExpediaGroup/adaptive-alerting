@@ -15,10 +15,10 @@
  */
 package com.expedia.adaptivealerting.tools.visualization;
 
+import lombok.val;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYDifferenceRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.time.Second;
@@ -26,10 +26,8 @@ import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.ui.ApplicationFrame;
 import org.jfree.ui.RefineryUtilities;
 
-import javax.swing.JPanel;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridLayout;
+import javax.swing.*;
+import java.awt.*;
 import java.time.Instant;
 import java.util.Date;
 
@@ -49,21 +47,21 @@ public class ChartUtil {
         notNull(title, "title can't be null");
         notNull(chartSeries, "chartSeries can't be null");
         
-        final TimeSeriesCollection strongOutlier = new TimeSeriesCollection(chartSeries.getStrongOutlier());
-        final TimeSeriesCollection weakOutlier = new TimeSeriesCollection(chartSeries.getWeakOutlier());
+        val strongOutlier = new TimeSeriesCollection(chartSeries.getStrongOutlier());
+        val weakOutlier = new TimeSeriesCollection(chartSeries.getWeakOutlier());
         
-        final TimeSeriesCollection observed = new TimeSeriesCollection(chartSeries.getObserved());
-        final TimeSeriesCollection midpoint = new TimeSeriesCollection(chartSeries.getPredicted());
+        val observed = new TimeSeriesCollection(chartSeries.getObserved());
+        val midpoint = new TimeSeriesCollection(chartSeries.getPredicted());
     
-        final TimeSeriesCollection weakThreshold = new TimeSeriesCollection();
+        val weakThreshold = new TimeSeriesCollection();
         weakThreshold.addSeries(chartSeries.getWeakThresholdUpper());
         weakThreshold.addSeries(chartSeries.getWeakThresoldLower());
     
-        final TimeSeriesCollection strongThreshold = new TimeSeriesCollection();
+        val strongThreshold = new TimeSeriesCollection();
         strongThreshold.addSeries(chartSeries.getStrongThresholdUpper());
         strongThreshold.addSeries(chartSeries.getStrongThresholdLower());
         
-        final JFreeChart chart = ChartFactory.createTimeSeriesChart(
+        val chart = ChartFactory.createTimeSeriesChart(
                 title,
                 "Time",
                 "Value",
@@ -72,7 +70,7 @@ public class ChartUtil {
                 false,
                 false);
         
-        final XYPlot plot = chart.getXYPlot();
+        val plot = chart.getXYPlot();
         
         plot.setDataset(1, weakOutlier);
         plot.setDataset(2, observed);
@@ -80,24 +78,24 @@ public class ChartUtil {
         plot.setDataset(4, weakThreshold);
         plot.setDataset(5, strongThreshold);
         
-        final XYLineAndShapeRenderer strongOutlierRenderer = new XYLineAndShapeRenderer(false, true);
+        val strongOutlierRenderer = new XYLineAndShapeRenderer(false, true);
         strongOutlierRenderer.setSeriesPaint(0, STRONG_OUTLIER_COLOR);
         
-        final XYLineAndShapeRenderer weakOutlierRenderer = new XYLineAndShapeRenderer(false, true);
+        val weakOutlierRenderer = new XYLineAndShapeRenderer(false, true);
         weakOutlierRenderer.setSeriesPaint(0, WEAK_OUTLIER_COLOR);
         
-        final XYLineAndShapeRenderer observedRenderer = new XYLineAndShapeRenderer(true, false);
+        val observedRenderer = new XYLineAndShapeRenderer(true, false);
         observedRenderer.setSeriesPaint(0, OBSERVED_COLOR);
         
-        final XYLineAndShapeRenderer midpointRenderer = new XYLineAndShapeRenderer(true, false);
+        val midpointRenderer = new XYLineAndShapeRenderer(true, false);
         midpointRenderer.setSeriesPaint(0, MIDPOINT_COLOR);
         
-        final XYDifferenceRenderer weakThresholdRenderer = new XYDifferenceRenderer();
+        val weakThresholdRenderer = new XYDifferenceRenderer();
         weakThresholdRenderer.setPositivePaint(THRESHOLD_COLOR);
         weakThresholdRenderer.setSeriesPaint(0, THRESHOLD_COLOR);
         weakThresholdRenderer.setSeriesPaint(1, THRESHOLD_COLOR);
     
-        final XYDifferenceRenderer strongThresholdRenderer = new XYDifferenceRenderer();
+        val strongThresholdRenderer = new XYDifferenceRenderer();
         strongThresholdRenderer.setPositivePaint(THRESHOLD_COLOR);
         strongThresholdRenderer.setSeriesPaint(0, THRESHOLD_COLOR);
         strongThresholdRenderer.setSeriesPaint(1, THRESHOLD_COLOR);
@@ -117,9 +115,9 @@ public class ChartUtil {
     }
     
     public static ApplicationFrame createChartFrame(String title, JFreeChart... charts) {
-        ApplicationFrame chartFrame = new ApplicationFrame(title);
+        val chartFrame = new ApplicationFrame(title);
     
-        final JPanel panel = new JPanel();
+        val panel = new JPanel();
         panel.setLayout(new GridLayout(0, 1));
         
         for (JFreeChart chart : charts) {
