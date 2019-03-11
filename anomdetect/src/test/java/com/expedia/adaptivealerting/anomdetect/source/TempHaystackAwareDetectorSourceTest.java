@@ -18,7 +18,6 @@ package com.expedia.adaptivealerting.anomdetect.source;
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.constant.ConstantThresholdAnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.ewma.EwmaAnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.util.DetectorMeta;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.TagCollection;
 import lombok.extern.slf4j.Slf4j;
@@ -48,10 +47,10 @@ public final class TempHaystackAwareDetectorSourceTest {
     private MetricDefinition haystackMetricDef;
     private MetricDefinition nonHaystackMetricDef;
 
-    private DetectorMeta persistentHaystackDetectorMeta;
-    private DetectorMeta dynamicHaystackDetectorMeta;
-    private DetectorMeta nonHaystackDetectorMeta;
-    private DetectorMeta detectorMetaMissingDetector;
+    private UUID persistentHaystackDetectorUuid;
+    private UUID dynamicHaystackDetectorUuid;
+    private UUID nonHaystackDetectorUuid;
+    private UUID missingDetectorUuid;
 
     private AnomalyDetector haystackDetector;
     private AnomalyDetector nonHaystackDetector;
@@ -72,8 +71,8 @@ public final class TempHaystackAwareDetectorSourceTest {
 
     @Test
     public void testFindDetectorUUIDs_sameMetricHasSameUUID() {
-        val results1 = sourceUnderTest.findDetectorMetas(haystackMetricDef);
-        val results2 = sourceUnderTest.findDetectorMetas(haystackMetricDef);
+        val results1 = sourceUnderTest.findDetectorUuids(haystackMetricDef);
+        val results2 = sourceUnderTest.findDetectorUuids(haystackMetricDef);
     
         assertEquals(1, results1.size());
         assertEquals(1, results2.size());
@@ -90,8 +89,8 @@ public final class TempHaystackAwareDetectorSourceTest {
     
     @Test
     public void testFindDetectorUUIDs_differentMetricsHaveDifferentUUIDs() {
-        val haystackResults = sourceUnderTest.findDetectorMetas(haystackMetricDef);
-        val nonHaystackResults = sourceUnderTest.findDetectorMetas(nonHaystackMetricDef);
+        val haystackResults = sourceUnderTest.findDetectorUuids(haystackMetricDef);
+        val nonHaystackResults = sourceUnderTest.findDetectorUuids(nonHaystackMetricDef);
         
         assertEquals(1, haystackResults.size());
         assertEquals(1, nonHaystackResults.size());
@@ -108,19 +107,19 @@ public final class TempHaystackAwareDetectorSourceTest {
     
     @Test
     public void testFindDetector_persistentHaystackDetector() {
-        val result = sourceUnderTest.findDetector(persistentHaystackDetectorMeta, haystackMetricDef);
+        val result = sourceUnderTest.findDetector(persistentHaystackDetectorUuid, haystackMetricDef);
         assertSame(haystackDetector, result);
     }
 
     @Test
     public void testFindDetector_dynamicHaystackDetector() {
-        val result = sourceUnderTest.findDetector(dynamicHaystackDetectorMeta, haystackMetricDef);
+        val result = sourceUnderTest.findDetector(dynamicHaystackDetectorUuid, haystackMetricDef);
         assertNotNull(result);
     }
 
     @Test
     public void testFindDetector_nonHaystackDetector() {
-        val result = sourceUnderTest.findDetector(nonHaystackDetectorMeta, nonHaystackMetricDef);
+        val result = sourceUnderTest.findDetector(nonHaystackDetectorUuid, nonHaystackMetricDef);
         assertSame(nonHaystackDetector, result);
     }
 
@@ -131,17 +130,17 @@ public final class TempHaystackAwareDetectorSourceTest {
 
     @Test
     public void testFindDetector_nullMetricDef() {
-        // Normally we don't need a MetricDefinition to find a detector at all--the detectorMeta
-        // is enough since it contains the detector UUID. But with the TempHaystackAwareDetectorSource
+        // Normally we don't need a MetricDefinition to find a detector at all--the detector UUID
+        // is enough. But with the TempHaystackAwareDetectorSource
         // we want to be able to check the MetricDefinition to see whether it's a Haystack metric,
         // because in that case we currently create a detector dynamically. [WLW]
-        val result = sourceUnderTest.findDetector(nonHaystackDetectorMeta, null);
+        val result = sourceUnderTest.findDetector(nonHaystackDetectorUuid, null);
         assertNull(result);
     }
 
     @Test
     public void testFindDetector_missingDetector() {
-        val result = sourceUnderTest.findDetector(detectorMetaMissingDetector, nonHaystackMetricDef);
+        val result = sourceUnderTest.findDetector(missingDetectorUuid, nonHaystackMetricDef);
         assertNull(result);
     }
     
@@ -155,10 +154,10 @@ public final class TempHaystackAwareDetectorSourceTest {
         
         this.nonHaystackMetricDef = new MetricDefinition("non-haystack-metric");
 
-        this.persistentHaystackDetectorMeta = new DetectorMeta(UUID.randomUUID(), "ewma-haystackDetector");
-        this.dynamicHaystackDetectorMeta = new DetectorMeta(UUID.randomUUID(), "ewma-haystackDetector");
-        this.nonHaystackDetectorMeta = new DetectorMeta(UUID.randomUUID(), "constant-haystackDetector");
-        this.detectorMetaMissingDetector = new DetectorMeta(UUID.randomUUID(), "ewma-missingDetector");
+        this.persistentHaystackDetectorUuid = UUID.randomUUID();
+        this.dynamicHaystackDetectorUuid = UUID.randomUUID();
+        this.nonHaystackDetectorUuid = UUID.randomUUID();
+        this.missingDetectorUuid = UUID.randomUUID();
 
         this.haystackDetector = new EwmaAnomalyDetector();
         this.nonHaystackDetector = new ConstantThresholdAnomalyDetector();
@@ -168,18 +167,18 @@ public final class TempHaystackAwareDetectorSourceTest {
         when(primaryDetectorSource.findDetectorTypes())
                 .thenReturn(detectorTypes);
 
-        when(primaryDetectorSource.findDetectorMetas(haystackMetricDef))
+        when(primaryDetectorSource.findDetectorUuids(haystackMetricDef))
                 .thenReturn(Collections.EMPTY_LIST);
-        when(primaryDetectorSource.findDetectorMetas(nonHaystackMetricDef))
-                .thenReturn(Collections.singletonList(nonHaystackDetectorMeta));
+        when(primaryDetectorSource.findDetectorUuids(nonHaystackMetricDef))
+                .thenReturn(Collections.singletonList(nonHaystackDetectorUuid));
 
-        when(primaryDetectorSource.findDetector(persistentHaystackDetectorMeta, haystackMetricDef))
+        when(primaryDetectorSource.findDetector(persistentHaystackDetectorUuid, haystackMetricDef))
                 .thenReturn(haystackDetector);
-        when(primaryDetectorSource.findDetector(dynamicHaystackDetectorMeta, haystackMetricDef))
+        when(primaryDetectorSource.findDetector(dynamicHaystackDetectorUuid, haystackMetricDef))
                 .thenReturn(null);
-        when(primaryDetectorSource.findDetector(nonHaystackDetectorMeta, nonHaystackMetricDef))
+        when(primaryDetectorSource.findDetector(nonHaystackDetectorUuid, nonHaystackMetricDef))
                 .thenReturn(nonHaystackDetector);
-        when(primaryDetectorSource.findDetector(detectorMetaMissingDetector, nonHaystackMetricDef))
+        when(primaryDetectorSource.findDetector(missingDetectorUuid, nonHaystackMetricDef))
                 .thenReturn(null);
     }
 }

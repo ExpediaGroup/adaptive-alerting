@@ -44,7 +44,7 @@ public final class AnomalyDetectorFilter implements MetricDataSubscriber {
     @Override
     public void next(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
-        val anomaly = new MappedMetricData(metricData, anomalyDetector.getUuid(), "dummy-type");
+        val anomaly = new MappedMetricData(metricData, anomalyDetector.getUuid());
         val anomalyResult = anomalyDetector.classify(metricData);
         anomaly.setAnomalyResult(anomalyResult);
         publish(anomaly);

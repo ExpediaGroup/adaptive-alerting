@@ -16,9 +16,8 @@
 package com.expedia.adaptivealerting.anomdetect.source;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.ewma.EwmaParams;
-import com.expedia.adaptivealerting.anomdetect.util.DetectorMeta;
 import com.expedia.adaptivealerting.anomdetect.ewma.EwmaAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.ewma.EwmaParams;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.metrictank.MetricTankIdFactory;
 import lombok.val;
@@ -40,7 +39,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @deprecated Don't want Haystack-specific code, but doing this just to get things started.
  */
 public final class TempHaystackAwareDetectorSource implements DetectorSource {
-    private static final String EWMA = "ewma-detector";
     private static final String PRODUCT = "product";
     private static final String HAYSTACK = "haystack";
     
@@ -59,32 +57,32 @@ public final class TempHaystackAwareDetectorSource implements DetectorSource {
     }
     
     @Override
-    public List<DetectorMeta> findDetectorMetas(MetricDefinition metricDef) {
+    public List<UUID> findDetectorUuids(MetricDefinition metricDef) {
         notNull(metricDef, "metricDef can't be null");
         
-        val detectorMetas = primaryDetectorSource.findDetectorMetas(metricDef);
+        val detectorUuids = primaryDetectorSource.findDetectorUuids(metricDef);
         
-        if (detectorMetas.size() > 0) {
-            return detectorMetas;
+        if (detectorUuids.size() > 0) {
+            return detectorUuids;
         }
         
         return isHaystackMetric(metricDef) ?
-                findHaystackDetectorMetas(metricDef) :
+                findHaystackDetectorUuids(metricDef) :
                 Collections.EMPTY_LIST;
     }
     
     @Override
-    public AnomalyDetector findDetector(DetectorMeta detectorMeta, MetricDefinition metricDef) {
-        notNull(detectorMeta, "detectorMeta can't be null");
+    public AnomalyDetector findDetector(UUID detectorUuid, MetricDefinition metricDef) {
+        notNull(detectorUuid, "detectorUuid can't be null");
         
-        val detector = primaryDetectorSource.findDetector(detectorMeta, metricDef);
+        val detector = primaryDetectorSource.findDetector(detectorUuid, metricDef);
         
         if (detector != null) {
             return detector;
         }
         
         return isHaystackMetric(metricDef) ?
-                createHaystackDetector(detectorMeta.getUuid()) :
+                createHaystackDetector(detectorUuid) :
                 null;
     }
     
@@ -96,11 +94,10 @@ public final class TempHaystackAwareDetectorSource implements DetectorSource {
         return HAYSTACK.equals(metricDef.getTags().getKv().get(PRODUCT));
     }
     
-    private List<DetectorMeta> findHaystackDetectorMetas(MetricDefinition metricDef) {
+    private List<UUID> findHaystackDetectorUuids(MetricDefinition metricDef) {
         val metricId = idFactory.getId(metricDef);
         val detectorUuid = UUID.nameUUIDFromBytes(metricId.getBytes());
-        val detectorMeta = new DetectorMeta(detectorUuid, EWMA);
-        return Collections.singletonList(detectorMeta);
+        return Collections.singletonList(detectorUuid);
     }
     
     private AnomalyDetector createHaystackDetector(UUID detectorUuid) {

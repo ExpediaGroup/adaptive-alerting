@@ -16,7 +16,6 @@
 package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
-import com.expedia.adaptivealerting.anomdetect.util.DetectorMeta;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
@@ -50,9 +49,9 @@ public final class DetectorMapperTest {
     
     private MetricData mappedData;
     private MetricData unmappedData;
-    private DetectorMeta detectorMeta;
-    private List<DetectorMeta> detectorMetas;
-    private List<DetectorMeta> emptyDetectorMetas;
+    private UUID detectorUuid;
+    private List<UUID> detectorUuids;
+    private List<UUID> emptyDetectorUuids;
     
     @Before
     public void setUp() {
@@ -88,15 +87,13 @@ public final class DetectorMapperTest {
         this.mappedData = new MetricData(mappedDefinition, 9, System.currentTimeMillis());
         this.unmappedData = new MetricData(unmappedDefinition, 9, System.currentTimeMillis());
         
-        this.detectorMeta = new DetectorMeta(
-                UUID.fromString("7629c28a-5958-4ca7-9aaa-49b95d3481ff"),
-                "ewma-detector");
-        this.detectorMetas = Collections.singletonList(detectorMeta);
-        this.emptyDetectorMetas = Collections.EMPTY_LIST;
+        this.detectorUuid = UUID.fromString("7629c28a-5958-4ca7-9aaa-49b95d3481ff");
+        this.detectorUuids = Collections.singletonList(detectorUuid);
+        this.emptyDetectorUuids = Collections.EMPTY_LIST;
     }
     
     private void initDependencies() {
-        when(detectorSource.findDetectorMetas(mappedDefinition)).thenReturn(detectorMetas);
-        when(detectorSource.findDetectorMetas(unmappedDefinition)).thenReturn(emptyDetectorMetas);
+        when(detectorSource.findDetectorUuids(mappedDefinition)).thenReturn(detectorUuids);
+        when(detectorSource.findDetectorUuids(unmappedDefinition)).thenReturn(emptyDetectorUuids);
     }
 }

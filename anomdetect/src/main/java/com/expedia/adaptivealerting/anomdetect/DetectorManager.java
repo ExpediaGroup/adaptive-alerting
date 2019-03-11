@@ -16,7 +16,6 @@
 package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
-import com.expedia.adaptivealerting.anomdetect.util.DetectorMeta;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import lombok.Getter;
@@ -88,13 +87,11 @@ public class DetectorManager {
         notNull(mappedMetricData, "mappedMetricData can't be null");
         
         val detectorUuid = mappedMetricData.getDetectorUuid();
-        val detectorType = mappedMetricData.getDetectorType();
         val metricDef = mappedMetricData.getMetricData().getMetricDefinition();
         
         AnomalyDetector detector = cachedDetectors.get(detectorUuid);
         if (detector == null) {
-            val detectorMeta = new DetectorMeta(detectorUuid, detectorType);
-            detector = detectorSource.findDetector(detectorMeta, metricDef);
+            detector = detectorSource.findDetector(detectorUuid, metricDef);
             cachedDetectors.put(detectorUuid, detector);
         }
         return detector;

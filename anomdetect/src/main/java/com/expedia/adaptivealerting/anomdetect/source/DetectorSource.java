@@ -18,11 +18,11 @@ package com.expedia.adaptivealerting.anomdetect.source;
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.DetectorManager;
 import com.expedia.adaptivealerting.anomdetect.DetectorMapper;
-import com.expedia.adaptivealerting.anomdetect.util.DetectorMeta;
 import com.expedia.metrics.MetricDefinition;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Detector source interfaces, supporting two major functions:
@@ -42,16 +42,16 @@ public interface DetectorSource {
      * Finds the list of detector UUIDs for a given metric.
      *
      * @param metricDef The metric.
-     * @return The mapped detector metas.
+     * @return The detector UUIDs.
      */
-    List<DetectorMeta> findDetectorMetas(MetricDefinition metricDef);
+    List<UUID> findDetectorUuids(MetricDefinition metricDef);
     
     /**
      * Finds the detector for a given detector and, optionally, metric.
      *
-     * @param detectorMeta Detector metadata.
+     * @param detectorUuid Detector uuid.
      * @param metricDef    Optional metric definition, for implementations that create detectors dynamically.
      * @return The associated detector.
      */
-    AnomalyDetector findDetector(DetectorMeta detectorMeta, MetricDefinition metricDef);
+    AnomalyDetector findDetector(UUID detectorUuid, MetricDefinition metricDef);
 }

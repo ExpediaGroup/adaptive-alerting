@@ -69,7 +69,6 @@ public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
         final KStream<String, MappedMetricData> stream = builder.stream(inputTopic);
         stream
                 .filter((key, mmd) -> mmd != null)
-                .filter((key, mmd) -> manager.hasDetectorType(mmd.getDetectorType()))
                 .mapValues(this::toAnomalyMmd)
                 .filter((key, mmd) -> mmd != null)
                 .to(outputTopic);

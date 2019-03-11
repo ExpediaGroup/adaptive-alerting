@@ -80,10 +80,10 @@ public final class AnomalyChartSinkTest {
         val thresholds = new AnomalyThresholds(100.0, 90.0, 20.0, 10.0);
         anomalyResult_weak_thresholds.setThresholds(thresholds);
         
-        this.strongAnomalyNoThresholds = new MappedMetricData(metricData, UUID.randomUUID(), "ewma-detector");
+        this.strongAnomalyNoThresholds = new MappedMetricData(metricData, UUID.randomUUID());
         this.strongAnomalyNoThresholds.setAnomalyResult(anomalyResult_strong_noThresholds);
         
-        this.weakAnomalyWithThresholds = new MappedMetricData(metricData, UUID.randomUUID(), "ewma-detector");
+        this.weakAnomalyWithThresholds = new MappedMetricData(metricData, UUID.randomUUID());
         this.weakAnomalyWithThresholds.setAnomalyResult(anomalyResult_weak_thresholds);
     }
     

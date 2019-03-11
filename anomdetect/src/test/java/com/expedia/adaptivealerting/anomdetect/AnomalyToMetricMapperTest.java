@@ -32,7 +32,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class AnomalyToMetricMapperTest {
-    private static final String DETECTOR_TYPE = "cusum-detector";
 
     private AnomalyToMetricMapper mapperUnderTest;
     private MappedMetricData anomalyWithStringMetricKey;
@@ -76,7 +75,7 @@ public class AnomalyToMetricMapperTest {
     private void initTestObjects() {
         val metricDef = new MetricDefinition("someKey");
         val metricData = MetricUtil.metricData(metricDef);
-        val mmd = new MappedMetricData(metricData, UUID.randomUUID(), DETECTOR_TYPE);
+        val mmd = new MappedMetricData(metricData, UUID.randomUUID());
         mmd.setAnomalyResult(new AnomalyResult(AnomalyLevel.STRONG));
         this.anomalyWithStringMetricKey = mmd;
     }
@@ -87,7 +86,7 @@ public class AnomalyToMetricMapperTest {
         
         val metricDef = MetricUtil.metricDefinition(kvTags, null);
         val metricData = MetricUtil.metricData(metricDef);
-        val mmd = new MappedMetricData(metricData, UUID.randomUUID(), DETECTOR_TYPE);
+        val mmd = new MappedMetricData(metricData, UUID.randomUUID());
         mmd.setAnomalyResult(new AnomalyResult());
         
         assertNull(mapperUnderTest.toMetricData(mmd));

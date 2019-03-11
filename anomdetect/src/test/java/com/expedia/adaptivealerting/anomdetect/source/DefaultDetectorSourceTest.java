@@ -15,9 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.source;
 
-import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.ewma.EwmaAnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.util.DetectorMeta;
 import com.expedia.adaptivealerting.anomdetect.util.DetectorResource;
 import com.expedia.adaptivealerting.anomdetect.util.DetectorResources;
 import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
@@ -53,12 +50,8 @@ public final class DefaultDetectorSourceTest {
 
     private MetricDefinition metricDef;
     private MetricDefinition metricDefException;
-    private DetectorMeta detectorMeta;
-    private DetectorMeta detectorMetaMissingDetector;
-    private DetectorMeta detectorMetaException;
     private DetectorResources detectorResources;
     private ModelResource modelResource;
-    private AnomalyDetector detector;
 
     @Before
     public void setUp() throws Exception {
@@ -74,25 +67,24 @@ public final class DefaultDetectorSourceTest {
     }
 
     @Test
-    public void testFindDetectorMetas() {
-        val results = sourceUnderTest.findDetectorMetas(metricDef);
+    public void testFindDetectorUuids() {
+        val results = sourceUnderTest.findDetectorUuids(metricDef);
         assertEquals(1, results.size());
         
         val result = results.get(0);
-        assertEquals(DETECTOR_UUID, result.getUuid());
-        assertEquals(DETECTOR_TYPE, result.getType());
+        assertEquals(DETECTOR_UUID, result);
     }
     
     @Test(expected = RuntimeException.class)
     public void testFindDetectorMetas_exception() {
-        sourceUnderTest.findDetectorMetas(metricDefException);
+        sourceUnderTest.findDetectorUuids(metricDefException);
     }
     
     @Test
     public void testFindDetector() {
-        val result = sourceUnderTest.findDetector(detectorMeta, metricDef);
+        val result = sourceUnderTest.findDetector(DETECTOR_UUID, metricDef);
         assertNotNull(result);
-        assertEquals(detectorMeta.getUuid(), result.getUuid());
+        assertEquals(DETECTOR_UUID, result.getUuid());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -102,22 +94,18 @@ public final class DefaultDetectorSourceTest {
 
     @Test
     public void testFindDetector_missingDetector() {
-        val result = sourceUnderTest.findDetector(detectorMetaMissingDetector, metricDef);
+        val result = sourceUnderTest.findDetector(DETECTOR_UUID_MISSING_DETECTOR, metricDef);
         assertNull(result);
     }
     
     @Test(expected = RuntimeException.class)
     public void testFindDetector_exception() {
-        sourceUnderTest.findDetector(detectorMetaException, metricDef);
+        sourceUnderTest.findDetector(DETECTOR_UUID_EXCEPTION, metricDef);
     }
 
     private void initTestObjects() {
         this.metricDef = new MetricDefinition("my-metric");
         this.metricDefException = new MetricDefinition("metric-that-causes-exception");
-
-        this.detectorMeta = new DetectorMeta(DETECTOR_UUID, DETECTOR_TYPE);
-        this.detectorMetaMissingDetector = new DetectorMeta(DETECTOR_UUID_MISSING_DETECTOR, DETECTOR_TYPE);
-        this.detectorMetaException = new DetectorMeta(DETECTOR_UUID_EXCEPTION, DETECTOR_TYPE);
 
         val detectorResource = new DetectorResource(DETECTOR_UUID.toString(), new ModelTypeResource(DETECTOR_TYPE));
         this.detectorResources = new DetectorResources(Collections.singletonList(detectorResource));
@@ -131,8 +119,6 @@ public final class DefaultDetectorSourceTest {
         modelResource.setUuid(DETECTOR_UUID);
         modelResource.setParams(params);
         modelResource.setDetectorType(new ModelTypeResource(DETECTOR_TYPE));
-
-        this.detector = new EwmaAnomalyDetector();
     }
     
     private void initDependencies() throws IOException {
