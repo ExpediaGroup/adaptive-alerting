@@ -25,7 +25,7 @@ import org.springframework.hateoas.Resources;
 public class ModelResources extends Resources<ModelResource> {
     
     @JsonCreator
-    public ModelResources(@JsonProperty("content") Iterable<ModelResource> resources) {
+    public ModelResources(@JsonProperty("models") Iterable<ModelResource> resources) {
         super(resources);
     }
 }
