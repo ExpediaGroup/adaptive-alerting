@@ -15,17 +15,31 @@
  */
 package com.expedia.adaptivealerting.anomdetect.util;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.springframework.hateoas.Resources;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 /**
  * Model resources.
  */
-public class ModelResources extends Resources<ModelResource> {
+@Data
+@NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class ModelResources {
     
-    @JsonCreator
-    public ModelResources(@JsonProperty("models") Iterable<ModelResource> resources) {
-        super(resources);
+    @JsonProperty("_embedded")
+    private Embedded embedded = new Embedded();
+    
+    public ModelResources(List<ModelResource> list) {
+        embedded.setModels(list);
+    }
+    
+    @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class Embedded {
+        private List<ModelResource> models;
     }
 }

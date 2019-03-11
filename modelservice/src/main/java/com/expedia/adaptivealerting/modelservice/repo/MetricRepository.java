@@ -59,6 +59,7 @@ public interface MetricRepository extends PagingAndSortingRepository<Metric, Lon
      * Finds a list of metrics by its matching key.
      *
      * @param key Matching key.
+     * @param pageable paging params
      * @return List of metrics by its matching key
      */
     @Query(nativeQuery = true, value = "SELECT * FROM metric m WHERE m.ukey LIKE :key order by m.ukey", countQuery = "SELECT count(*) FROM metric m WHERE m.ukey LIKE :key")
@@ -81,6 +82,4 @@ public interface MetricRepository extends PagingAndSortingRepository<Metric, Lon
      */
     @Query("select mmm.metric from MetricDetectorMapping mmm where mmm.detector.uuid = :uuid")
     List<Metric> findByDetectorUuid(@Param("uuid") String uuid);
-
-
 }

@@ -53,14 +53,6 @@ public class ModelServiceConnectorTest {
     
     private ModelServiceConnector connectorUnderTest;
     private MetricTankIdFactory metricTankIdFactory = new MetricTankIdFactory();
-    
-    // This is just a basic ObjectMapper rather than a Jackson2ObjectMapper, since we are
-    // just writing JSON here. (If we try to use the Jackson2ObjectMapper that we use in the
-    // ModelServiceConnector we get an error:
-    //
-    // com.fasterxml.jackson.databind.JsonMappingException:
-    //     Class org.springframework.hateoas.hal.Jackson2HalModule$HalResourcesSerializer
-    //     has no default (no arg) constructor
     private ObjectMapper objectMapper = new ObjectMapper();
     
     @Mock
@@ -72,7 +64,7 @@ public class ModelServiceConnectorTest {
     private MetricDefinition metricDefinition;
     private Content detectorResourcesContent;
     private Content modelResourcesContent;
-    private Content modelResourcesContent_empty;
+    private Content emptyModelResourcesContent;
     
     @Before
     public void setUp() throws Exception {
@@ -101,7 +93,7 @@ public class ModelServiceConnectorTest {
     @Test
     public void testFindDetectors() throws Exception {
         val result = connectorUnderTest.findDetectors(metricDefinition);
-        assertEquals(detectorResourceList.size(), result.getContent().size());
+        assertEquals(detectorResourceList.size(), result.getEmbedded().getDetectors().size());
     }
     
     @Test(expected = IllegalArgumentException.class)
@@ -139,31 +131,21 @@ public class ModelServiceConnectorTest {
         detectorResourceList.add(new DetectorResource(
                 "90c37a3c-f6bb-4c00-b41b-191909cccfb7",
                 new ModelTypeResource(EWMA_DETECTOR)));
-        val detectorResourcesBytes = writeValueAsBytesHack("detectors", detectorResourceList);
+        val detectorResources = new DetectorResources(detectorResourceList);
+        val detectorResourcesBytes = objectMapper.writeValueAsBytes(detectorResources);
         this.detectorResourcesContent = new Content(detectorResourcesBytes, ContentType.APPLICATION_JSON);
-        log.info("detectorResourcesContent={}", detectorResourcesContent);
         
         // Find models
         this.modelResourceList = new ArrayList<>();
         modelResourceList.add(new ModelResource());
-        val modelResourcesBytes = writeValueAsBytesHack("models", modelResourceList);
+        val modelResources = new ModelResources(modelResourceList);
+        val modelResourcesBytes = objectMapper.writeValueAsBytes(modelResources);
         this.modelResourcesContent = new Content(modelResourcesBytes, ContentType.APPLICATION_JSON);
-        log.info("modelResourcesContent={}", modelResourcesContent);
         
         // Find models - empty list
-        val modelResources_empty = new ModelResources(Collections.EMPTY_LIST);
-        val modelResourcesBytes_empty = writeValueAsBytesHack("models", Collections.EMPTY_LIST);
-        this.modelResourcesContent_empty = new Content(modelResourcesBytes_empty, ContentType.APPLICATION_JSON);
-    }
-    
-    // This is a hack to deal with the fact I can't build an ObjectMapper with the required serializer here. (I want to
-    // use Jackson2HalModule, and I can do that, but then we get an error during serializer initialization since the
-    // module's serializer doesn't have a default constructor.) So I am just putting the list key at the top-level here
-    // instead of using _embedded.<list_key>, which is what the Model Service actually generates. [WLW]
-    private byte[] writeValueAsBytesHack(String key, List<?> resourceList) throws IOException {
-        val detectorResourceMap = new HashMap<String, Object>();
-        detectorResourceMap.put(key, resourceList);
-        return objectMapper.writeValueAsBytes(detectorResourceMap);
+        val emptyModelResources = new ModelResources(Collections.EMPTY_LIST);
+        val emptyModelResourcesBytes = objectMapper.writeValueAsBytes(emptyModelResources);
+        this.emptyModelResourcesContent = new Content(emptyModelResourcesBytes, ContentType.APPLICATION_JSON);
     }
     
     private void initDependencies() throws IOException {
@@ -174,6 +156,6 @@ public class ModelServiceConnectorTest {
         
         when(httpClient.get(findDetectorsUri)).thenReturn(detectorResourcesContent);
         when(httpClient.get(findModelsUri)).thenReturn(modelResourcesContent);
-        when(httpClient.get(findModelsUri_empty)).thenReturn(modelResourcesContent_empty);
+        when(httpClient.get(findModelsUri_empty)).thenReturn(emptyModelResourcesContent);
     }
 }

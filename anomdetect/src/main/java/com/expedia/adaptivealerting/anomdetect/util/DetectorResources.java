@@ -15,17 +15,31 @@
  */
 package com.expedia.adaptivealerting.anomdetect.util;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.springframework.hateoas.Resources;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 /**
  * Detector resources.
  */
-public class DetectorResources extends Resources<DetectorResource> {
+@Data
+@NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class DetectorResources {
     
-    @JsonCreator
-    public DetectorResources(@JsonProperty("detectors") Iterable<DetectorResource> resources) {
-        super(resources);
+    @JsonProperty("_embedded")
+    private Embedded embedded = new Embedded();
+    
+    public DetectorResources(List<DetectorResource> list) {
+        embedded.setDetectors(list);
+    }
+    
+    @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class Embedded {
+        private List<DetectorResource> detectors;
     }
 }
