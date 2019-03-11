@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
+import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.core.util.MetricUtil;
@@ -25,6 +26,7 @@ import org.junit.Test;
 
 import java.util.UUID;
 
+import static com.expedia.adaptivealerting.anomdetect.AnomalyToMetricMapper.AA_ANOMALY_LEVEL;
 import static com.expedia.adaptivealerting.anomdetect.AnomalyToMetricMapper.AA_DETECTOR_UUID;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -42,40 +44,52 @@ public class AnomalyToMetricMapperTest {
     }
     
     @Test
-    public void toMetricDataWithStringMetricKey() {
+    public void testToMetricData_stringMetricKey() {
         val actualMetric = mapperUnderTest.toMetricData(anomalyWithStringMetricKey);
         val actualMetricDef = actualMetric.getMetricDefinition();
         val actualTags = actualMetricDef.getTags();
         val actualKvTags = actualTags.getKv();
         val detectorUuid = anomalyWithStringMetricKey.getDetectorUuid().toString();
+        val anomalyLevel = anomalyWithStringMetricKey.getAnomalyResult().getAnomalyLevel().toString();
         
         assertTrue(detectorUuid.equals(actualKvTags.get(AA_DETECTOR_UUID)));
+        assertTrue(anomalyLevel.equals(actualKvTags.get(AA_ANOMALY_LEVEL)));
     }
     
     @Test
-    public void toMetricDataMapsNullToNull() {
+    public void testToMetricDataMapsNullToNull() {
         assertNull(mapperUnderTest.toMetricData(null));
     }
     
     @Test
-    public void toMetricDataMapsAnomalyHavingAADetectorUuidTagToNull() {
+    public void testToMetricData_aaDetectorUuidToNull() {
         val detectorUuid = UUID.randomUUID();
-
-        val kvTags = MetricUtil.defaultKvTags();
-        kvTags.put(AA_DETECTOR_UUID, detectorUuid.toString());
-        
-        val metricDef = MetricUtil.metricDefinition(kvTags, null);
-        val metricData = MetricUtil.metricData(metricDef);
-        val mmd = new MappedMetricData(metricData, detectorUuid, DETECTOR_TYPE);
-        mmd.setAnomalyResult(new AnomalyResult());
-
-        assertNull(mapperUnderTest.toMetricData(mmd));
+        testToMetricData_reservedTagToNull(AA_DETECTOR_UUID, detectorUuid.toString());
+    }
+    
+    @Test
+    public void testToMetricData_aaAnomalyLevelToNull() {
+        val anomalyLevel = AnomalyLevel.STRONG;
+        testToMetricData_reservedTagToNull(AA_ANOMALY_LEVEL, anomalyLevel.toString());
     }
 
     private void initTestObjects() {
         val metricDef = new MetricDefinition("someKey");
         val metricData = MetricUtil.metricData(metricDef);
         val mmd = new MappedMetricData(metricData, UUID.randomUUID(), DETECTOR_TYPE);
+        mmd.setAnomalyResult(new AnomalyResult(AnomalyLevel.STRONG));
         this.anomalyWithStringMetricKey = mmd;
+    }
+    
+    private void testToMetricData_reservedTagToNull(String tagKey, String tagValue) {
+        val kvTags = MetricUtil.defaultKvTags();
+        kvTags.put(tagKey, tagValue);
+        
+        val metricDef = MetricUtil.metricDefinition(kvTags, null);
+        val metricData = MetricUtil.metricData(metricDef);
+        val mmd = new MappedMetricData(metricData, UUID.randomUUID(), DETECTOR_TYPE);
+        mmd.setAnomalyResult(new AnomalyResult());
+        
+        assertNull(mapperUnderTest.toMetricData(mmd));
     }
 }

@@ -36,10 +36,15 @@ import java.util.HashMap;
 public class AnomalyToMetricMapper {
 
     /**
-     * Key/value tag key for metrics representing an anomaly. The value must be the detector UUID.
+     * Key/value tag key for anomalous metrics. The value must be the detector UUID.
      */
     public static String AA_DETECTOR_UUID = "aa_detector_uuid";
-
+    
+    /**
+     * Key/value tag key for anomalous metrics. The value must be the anomaly level.
+     */
+    public static String AA_ANOMALY_LEVEL = "aa_anomaly_level";
+    
     /**
      * <p>
      * Transforms the given anomaly result. This method copies the original metric key and tags, and adds a new
@@ -57,7 +62,7 @@ public class AnomalyToMetricMapper {
         if (anomaly == null) {
             return null;
         }
-
+        
         val metricData = anomaly.getMetricData();
         val metricDef = metricData.getMetricDefinition();
         val tags = metricDef.getTags();
@@ -66,13 +71,20 @@ public class AnomalyToMetricMapper {
         // Reverting back to returning null instead of generating an exception. We get to define the transform we want
         // here, and I don't see an advantage to generating an exception when the proper transform at the Kafka level
         // is to transform it into a null too. It reduces the burden on the client. [WLW]
-//        isFalse(kvTags.containsKey(AA_DETECTOR_UUID), "Tag " + AA_DETECTOR_UUID + " not allowed");
-        if (kvTags.containsKey(AA_DETECTOR_UUID)) {
+        if (kvTags.containsKey(AA_DETECTOR_UUID) || kvTags.containsKey(AA_ANOMALY_LEVEL)) {
             return null;
         }
+        
+        val detectorUuid = anomaly.getDetectorUuid();
+        val anomalyResult = anomaly.getAnomalyResult();
+        val anomalyLevel = anomalyResult.getAnomalyLevel();
+        
+        assert (detectorUuid != null);
+        assert (anomalyLevel != null);
 
         val newKVTags = new HashMap<>(kvTags);
-        newKVTags.put(AA_DETECTOR_UUID, anomaly.getDetectorUuid().toString());
+        newKVTags.put(AA_DETECTOR_UUID, detectorUuid.toString());
+        newKVTags.put(AA_ANOMALY_LEVEL, anomalyLevel.toString());
 
         val newKey = metricDef.getKey();
         val newTags = new TagCollection(newKVTags, Collections.EMPTY_SET);
