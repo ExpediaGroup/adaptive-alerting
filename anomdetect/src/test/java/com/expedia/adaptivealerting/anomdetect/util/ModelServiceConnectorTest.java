@@ -143,10 +143,7 @@ public class ModelServiceConnectorTest {
         this.modelResourcesContent = new Content(modelResourcesBytes, ContentType.APPLICATION_JSON);
         
         // Find models - empty list
-        val emptyModelResourcesEmbedded = new ModelResources.Embedded();
-        emptyModelResourcesEmbedded.setModels(Collections.EMPTY_LIST);
-        val emptyModelResources = new ModelResources();
-        emptyModelResources.setEmbedded(emptyModelResourcesEmbedded);
+        val emptyModelResources = new ModelResources(Collections.EMPTY_LIST);
         val emptyModelResourcesBytes = objectMapper.writeValueAsBytes(emptyModelResources);
         this.emptyModelResourcesContent = new Content(emptyModelResourcesBytes, ContentType.APPLICATION_JSON);
     }
