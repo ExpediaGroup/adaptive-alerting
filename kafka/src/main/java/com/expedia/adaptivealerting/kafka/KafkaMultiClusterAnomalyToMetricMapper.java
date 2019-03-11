@@ -79,8 +79,7 @@ public class KafkaMultiClusterAnomalyToMetricMapper implements Runnable {
 
         val mapper = new KafkaMultiClusterAnomalyToMetricMapper(
                 anomalyConsumer, metricProducer, anomalyConsumerTopic,
-                metricProducerTopic
-        );
+                metricProducerTopic);
         mapper.run();
     }
 
