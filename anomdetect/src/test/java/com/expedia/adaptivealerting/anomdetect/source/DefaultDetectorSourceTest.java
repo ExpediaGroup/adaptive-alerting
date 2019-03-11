@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.source;
 
 import com.expedia.adaptivealerting.anomdetect.util.DetectorResource;
+import com.expedia.adaptivealerting.anomdetect.util.DetectorResources;
 import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
 import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.expedia.adaptivealerting.anomdetect.util.ModelTypeResource;
@@ -26,7 +27,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.hateoas.Resources;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -50,7 +50,7 @@ public final class DefaultDetectorSourceTest {
 
     private MetricDefinition metricDef;
     private MetricDefinition metricDefException;
-    private Resources<DetectorResource> detectorResources;
+    private DetectorResources detectorResources;
     private ModelResource modelResource;
 
     @Before
@@ -108,7 +108,7 @@ public final class DefaultDetectorSourceTest {
         this.metricDefException = new MetricDefinition("metric-that-causes-exception");
 
         val detectorResource = new DetectorResource(DETECTOR_UUID.toString(), new ModelTypeResource(DETECTOR_TYPE));
-        this.detectorResources = new Resources<>(Collections.singletonList(detectorResource));
+        this.detectorResources = new DetectorResources(Collections.singletonList(detectorResource));
 
         val params = new HashMap<String, Object>();
         params.put("alpha", 0.2);
