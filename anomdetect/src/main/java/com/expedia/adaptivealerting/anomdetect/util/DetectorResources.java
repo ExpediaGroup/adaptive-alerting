@@ -25,7 +25,7 @@ import org.springframework.hateoas.Resources;
 public class DetectorResources extends Resources<DetectorResource> {
     
     @JsonCreator
-    public DetectorResources(@JsonProperty("content") Iterable<DetectorResource> resources) {
+    public DetectorResources(@JsonProperty("detectors") Iterable<DetectorResource> resources) {
         super(resources);
     }
 }

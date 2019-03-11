@@ -28,6 +28,5 @@ import org.springframework.hateoas.ResourceSupport;
 @AllArgsConstructor
 public class DetectorResource extends ResourceSupport {
     private String uuid;
-    
     private ModelTypeResource type;
 }
