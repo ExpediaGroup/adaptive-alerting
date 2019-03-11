@@ -82,7 +82,8 @@ public final class EwmaAnomalyDetector extends AbstractAnomalyDetector<EwmaParam
         final AnomalyThresholds thresholds = new AnomalyThresholds(
                 this.mean + strongDelta,
                 this.mean + weakDelta,
-                this.mean - weakDelta, this.mean - strongDelta
+                this.mean - weakDelta,
+                this.mean - strongDelta
         );
         
         updateEstimates(observed);

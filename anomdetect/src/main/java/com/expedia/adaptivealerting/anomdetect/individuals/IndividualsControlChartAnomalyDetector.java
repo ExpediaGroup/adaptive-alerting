@@ -114,11 +114,13 @@ public final class IndividualsControlChartAnomalyDetector extends AbstractAnomal
         val strongDelta = params.getStrongSigmas() * stdDev;
 
         val currentRange = Math.abs(prevValue - observed);
-
+        
+        // Looks like currently this detector supports only a single anomaly level (strong).
         val thresholds = new AnomalyThresholds(
                 this.mean + strongDelta,
                 this.mean + strongDelta,
-                this.mean - strongDelta, this.mean - strongDelta
+                this.mean - strongDelta,
+                this.mean - strongDelta
         );
 
         AnomalyLevel level;
