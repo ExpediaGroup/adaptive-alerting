@@ -44,8 +44,15 @@ public interface MetricRepository extends PagingAndSortingRepository<Metric, Lon
      * @return Metric identified by the unique hash.
      */
     Metric findByHash(@Param("hash") String hash);
-
-
+    
+    /**
+     * Indicates whether a metric with the given hash exists.
+     *
+     * @param hash metric hash
+     * @return boolean indicating whether a corresponding metric exists
+     */
+    boolean existsByHash(@Param("hash") String hash);
+    
     /**
      * Finds a list of metrics by its user.
      *
