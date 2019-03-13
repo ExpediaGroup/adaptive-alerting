@@ -31,10 +31,6 @@ import static com.expedia.adaptivealerting.kafka.util.TestHelper.newMappedMetric
 import static org.mockito.Mockito.mock;
 import static org.springframework.boot.test.util.EnvironmentTestUtils.addEnvironment;
 
-// FIXME Temporarily ignoring because we're seeing an interaction between this test and the
-// KafkaMultiClusterAnomalyToMetricMapperTest. I think it's because we're setting system
-// properties. [WLW]
-@Ignore
 public class NotifierTest {
 
     @ClassRule
