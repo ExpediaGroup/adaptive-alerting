@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.tools.kafka;
 
 import com.expedia.adaptivealerting.core.data.MetricFrame;
-import com.expedia.adaptivealerting.core.data.io.MetricFrameLoader;
+import com.expedia.adaptivealerting.core.data.MetricFrameLoader;
 import com.expedia.adaptivealerting.tools.pipeline.source.MetricFrameMetricSource;
 import com.expedia.adaptivealerting.tools.pipeline.source.MetricSource;
 import com.expedia.metrics.MetricData;

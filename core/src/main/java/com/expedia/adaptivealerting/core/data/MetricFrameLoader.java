@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.data.io;
+package com.expedia.adaptivealerting.core.data;
 
-import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.jackson.MetricsJavaModule;
 import com.expedia.metrics.metrictank.MetricTankIdFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -37,39 +36,39 @@ import java.util.List;
 public final class MetricFrameLoader {
     final static ObjectMapper objectMapper = new ObjectMapper().registerModule(new MetricsJavaModule());
 
-    public static MetricFrame loadCsv(File metricDefinitionFile, File metricDataFile, boolean hasHeader)
+    public static MetricFrame loadCsv(File metricDefFile, File metricDataFile, boolean hasHeader)
             throws IOException {
 
-        final MetricDefinition metricDefinition = objectMapper.readValue(metricDefinitionFile, MetricDefinition.class);
-        log.info("metricDefinition={}", metricDefinition);
-        log.info("metricId={}", new MetricTankIdFactory().getId(metricDefinition));
-        return loadCsv(metricDefinition, new FileInputStream(metricDataFile), hasHeader);
+        val metricDef = objectMapper.readValue(metricDefFile, MetricDefinition.class);
+        log.info("metricDef={}", metricDef);
+        log.info("metricId={}", new MetricTankIdFactory().getId(metricDef));
+        return loadCsv(metricDef, new FileInputStream(metricDataFile), hasHeader);
     }
 
     /**
      * Loads a {@link MetricFrame} from a CSV input stream.
      *
-     * @param metricDefinition The underlying metric.
-     * @param in               CSV input stream.
-     * @param hasHeader        Indicates whether the data has a header row.
+     * @param metricDef The underlying metric.
+     * @param in        CSV input stream.
+     * @param hasHeader Indicates whether the data has a header row.
      * @return A data frame containing the CSV data.
      * @throws IOException if there's a problem reading the CSV input stream.
      */
-    public static MetricFrame loadCsv(MetricDefinition metricDefinition, InputStream in, boolean hasHeader)
+    public static MetricFrame loadCsv(MetricDefinition metricDef, InputStream in, boolean hasHeader)
             throws IOException {
 
         List<String[]> rows;
-        try (final BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
-            final int skipLines = hasHeader ? 1 : 0;
-            final CSVReader reader = new CSVReaderBuilder(br).withSkipLines(skipLines).build();
+        try (val br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
+            val skipLines = hasHeader ? 1 : 0;
+            val reader = new CSVReaderBuilder(br).withSkipLines(skipLines).build();
             rows = reader.readAll();
         }
 
-        final int numRows = rows.size();
-        final MetricData[] metricData = new MetricData[numRows];
+        val numRows = rows.size();
+        val metricData = new MetricData[numRows];
 
         for (int i = 0; i < numRows; i++) {
-            metricData[i] = toMetricData(metricDefinition, rows.get(i));
+            metricData[i] = toMetricData(metricDef, rows.get(i));
         }
 
         return new MetricFrame(metricData);
