@@ -17,25 +17,19 @@ package com.expedia.adaptivealerting.kafka.serde;
 
 import com.expedia.adaptivealerting.kafka.util.TestObjectMother;
 import com.expedia.metrics.MetricData;
-import com.expedia.metrics.jackson.MetricsJavaModule;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-// TODO Use abstract base class for serde tests [WLW]
 public final class MetricDataMessagePackSerdeTest {
     private MetricDataMessagePackSerde serdeUnderTest;
-    private ObjectMapper objectMapper;
     private MetricData metricData;
 
     @Before
     public void setUp() {
         this.serdeUnderTest = new MetricDataMessagePackSerde();
-        this.objectMapper = new ObjectMapper().registerModule(new MetricsJavaModule());
         this.metricData = TestObjectMother.metricData();
     }
 
@@ -46,17 +40,16 @@ public final class MetricDataMessagePackSerdeTest {
     }
 
     @Test
-    public void testSerialize() throws Exception {
-        val expected = objectMapper.writeValueAsBytes(metricData);
-        val actual = serdeUnderTest.serializer().serialize("some-topic", metricData);
-        assertArrayEquals(expected, actual);
-    }
+    public void testSerializeAndDeserialize() {
+        val serResult = serdeUnderTest.serializer().serialize("some-topic", metricData);
+        val deserResult = serdeUnderTest.deserializer().deserialize("some-topic", serResult);
 
-    @Test
-    public void testDeserialize() throws Exception {
-        val expected = TestObjectMother.metricData();
-        val expectedBytes = objectMapper.writeValueAsBytes(expected);
-        val actual = serdeUnderTest.deserializer().deserialize("some-topic", expectedBytes);
-        assertEquals(expected, actual);
+        val expected = metricData.getMetricDefinition();
+        val actual = deserResult.getMetricDefinition();
+
+        // Comparing key and tags instead of comparing MetricDefinition directly because the deserializer uses a
+        // MetricTank-specific MetricDefinition implementation. [WLW]
+        assertEquals(expected.getKey(), actual.getKey());
+        assertEquals(expected.getTags(), actual.getTags());
     }
 }
