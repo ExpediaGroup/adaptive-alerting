@@ -13,18 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.serde;
+package com.expedia.adaptivealerting.kafka.serde.messagepack;
 
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.metrictank.MessagePackSerializer;
-import org.apache.kafka.common.serialization.Serializer;
+import org.apache.kafka.common.serialization.Deserializer;
 
 import java.io.IOException;
 import java.util.Map;
 
-// TODO Rename this to MetricDataMessagePackSerializer [WLW]
-
-public class MetricDataSerializer implements Serializer<MetricData> {
+public class MetricDataMessagePackDeserializer implements Deserializer<MetricData> {
     private final static MessagePackSerializer mps = new MessagePackSerializer();
 
     @Override
@@ -32,11 +30,10 @@ public class MetricDataSerializer implements Serializer<MetricData> {
     }
 
     @Override
-    public byte[] serialize(String topic, MetricData metricData) {
+    public MetricData deserialize(String topic, byte[] metricDataBytes) {
         try {
-            return mps.serialize(metricData);
+            return mps.deserialize(metricDataBytes);
         } catch (IOException e) {
-            // FIXME This should be SerializationException. [WLW]
             throw new RuntimeException(e);
         }
     }

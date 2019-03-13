@@ -13,34 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.serde;
+package com.expedia.adaptivealerting.kafka.serde.json;
 
-import com.expedia.metrics.MetricData;
-import com.expedia.metrics.metrictank.MessagePackSerializer;
+import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import org.apache.kafka.common.serialization.Deserializer;
+import org.apache.kafka.common.serialization.Serde;
+import org.apache.kafka.common.serialization.Serializer;
 
-import java.io.IOException;
 import java.util.Map;
 
-// TODO Rename this to MetricDataMessagePackDeserializer [WLW]
-
-public class MetricDataDeserializer implements Deserializer<MetricData> {
-    private final static MessagePackSerializer mps = new MessagePackSerializer();
+public final class MappedMetricDataJsonSerde implements Serde<MappedMetricData> {
 
     @Override
-    public void configure(Map<String, ?> configs, boolean isKey) {
-    }
-
-    @Override
-    public MetricData deserialize(String topic, byte[] metricDataBytes) {
-        try {
-            return mps.deserialize(metricDataBytes);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public void configure(Map<String, ?> map, boolean b) {
     }
 
     @Override
     public void close() {
+    }
+
+    @Override
+    public Serializer<MappedMetricData> serializer() {
+        return new MappedMetricDataJsonSerializer();
+    }
+
+    @Override
+    public Deserializer<MappedMetricData> deserializer() {
+        return new MappedMetricDataJsonDeserializer();
     }
 }

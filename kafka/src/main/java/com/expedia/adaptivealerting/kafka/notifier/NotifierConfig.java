@@ -40,7 +40,7 @@ public class NotifierConfig {
     @Value("${kafka.consumer.key.deserializer:org.apache.kafka.common.serialization.StringDeserializer}")
     private String keyDeSerializer;
 
-    @Value("${kafka.consumer.value.deserializer:com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonDeserializer}")
+    @Value("${kafka.consumer.value.deserializer:com.expedia.adaptivealerting.kafka.serde.json.MappedMetricDataJsonDeserializer}")
     private String valueDeSerializer;
 
     @Value("${kafka.consumer.auto.offset.reset:earliest}")

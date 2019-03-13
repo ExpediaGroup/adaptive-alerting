@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.serde;
+package com.expedia.adaptivealerting.kafka.serde.json;
 
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.metrics.MetricData;
 import com.expedia.metrics.jackson.MetricsJavaModule;
 
 /**
- * Kafka deserializer to read {@link MappedMetricData}s from JSON.
+ * Kafka deserializer to read {@link MetricData}s from JSON.
  */
-public class MappedMetricDataJsonDeserializer extends AbstractJsonDeserializer<MappedMetricData> {
+public class MetricDataJsonDeserializer extends AbstractJsonDeserializer<MetricData> {
 
-    public MappedMetricDataJsonDeserializer() {
-        super(MappedMetricData.class);
+    public MetricDataJsonDeserializer() {
+        super(MetricData.class);
         getObjectMapper().registerModule(new MetricsJavaModule());
     }
 }

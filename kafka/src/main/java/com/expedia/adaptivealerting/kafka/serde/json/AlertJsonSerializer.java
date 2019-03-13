@@ -13,26 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.serde;
+package com.expedia.adaptivealerting.kafka.serde.json;
 
-import org.junit.Before;
-import org.junit.Test;
+import com.expedia.alertmanager.model.Alert;
 
-import static org.junit.Assert.assertNotNull;
-
-public class MappedMetricDataJsonSerdeTest {
-    private MappedMetricDataJsonSerde serdeUnderTest;
-
-    @Before
-    public void setUp() {
-        this.serdeUnderTest = new MappedMetricDataJsonSerde();
-    }
-
-    @Test
-    public void justForCoverage() {
-        serdeUnderTest.configure(null, false);
-        serdeUnderTest.close();
-        assertNotNull(serdeUnderTest.serializer());
-        assertNotNull(serdeUnderTest.deserializer());
-    }
+/**
+ * Kafka serializer to write {@link Alert}s to JSON.
+ */
+// TODO Move this to alert-manager. [WLW]
+public class AlertJsonSerializer extends AbstractJsonSerializer<Alert> {
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.serde;
+package com.expedia.adaptivealerting.kafka.serde.messagepack;
 
 import com.expedia.metrics.MetricData;
 import org.apache.kafka.common.serialization.Deserializer;
@@ -22,7 +22,7 @@ import org.apache.kafka.common.serialization.Serializer;
 
 import java.util.Map;
 
-public class MetricDataSerde implements Serde<MetricData> {
+public class MetricDataMessagePackSerde implements Serde<MetricData> {
 
     @Override
     public void configure(Map<String, ?> configs, boolean isKey) {
@@ -34,11 +34,11 @@ public class MetricDataSerde implements Serde<MetricData> {
 
     @Override
     public Serializer<MetricData> serializer() {
-        return new MetricDataSerializer();
+        return new MetricDataMessagePackSerializer();
     }
 
     @Override
     public Deserializer<MetricData> deserializer() {
-        return new MetricDataDeserializer();
+        return new MetricDataMessagePackDeserializer();
     }
 }

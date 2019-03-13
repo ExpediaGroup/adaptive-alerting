@@ -13,18 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.serde;
+package com.expedia.adaptivealerting.kafka.serde.json;
 
-import com.expedia.metrics.MetricData;
-import com.expedia.metrics.jackson.MetricsJavaModule;
+import org.junit.Before;
+import org.junit.Test;
 
-/**
- * Kafka deserializer to read {@link MetricData}s from JSON.
- */
-public class MetricDataJsonDeserializer extends AbstractJsonDeserializer<MetricData> {
+import static org.junit.Assert.assertNotNull;
 
-    public MetricDataJsonDeserializer() {
-        super(MetricData.class);
-        getObjectMapper().registerModule(new MetricsJavaModule());
+public class MappedMetricDataJsonSerdeTest {
+    private MappedMetricDataJsonSerde serdeUnderTest;
+
+    @Before
+    public void setUp() {
+        this.serdeUnderTest = new MappedMetricDataJsonSerde();
+    }
+
+    @Test
+    public void justForCoverage() {
+        serdeUnderTest.configure(null, false);
+        serdeUnderTest.close();
+        assertNotNull(serdeUnderTest.serializer());
+        assertNotNull(serdeUnderTest.deserializer());
     }
 }

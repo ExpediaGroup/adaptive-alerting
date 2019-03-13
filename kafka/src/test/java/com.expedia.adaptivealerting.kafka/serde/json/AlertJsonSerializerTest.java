@@ -13,37 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.serde;
+package com.expedia.adaptivealerting.kafka.serde.json;
 
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.kafka.util.TestObjectMother;
-import com.expedia.metrics.jackson.MetricsJavaModule;
+import com.expedia.alertmanager.model.Alert;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
-/**
- * {@link MappedMetricDataJsonSerializer} unit test.
- */
-public final class MappedMetricDataJsonSerializerTest {
-    private MappedMetricDataJsonSerializer serializerUnderTest;
+public class AlertJsonSerializerTest {
+    private AlertJsonSerializer serializerUnderTest;
     private ObjectMapper objectMapper;
-    private MappedMetricData mappedMetricData;
+    private Alert alert;
 
     @Before
     public void setUp() {
-        this.serializerUnderTest = new MappedMetricDataJsonSerializer();
-        this.objectMapper = new ObjectMapper().registerModule(new MetricsJavaModule());
-        this.mappedMetricData = TestObjectMother.mappedMetricData();
+        this.serializerUnderTest = new AlertJsonSerializer();
+        this.objectMapper = new ObjectMapper();
+        this.alert = TestObjectMother.alert();
     }
 
     @Test
     public void testSerialize() throws Exception {
-        val expected = objectMapper.writeValueAsBytes(mappedMetricData);
-        val actual = serializerUnderTest.serialize("some-topic", mappedMetricData);
+        val expected = objectMapper.writeValueAsBytes(alert);
+        val actual = serializerUnderTest.serialize("some-topic", alert);
         assertArrayEquals(expected, actual);
     }
 }

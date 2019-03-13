@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.serde;
+package com.expedia.adaptivealerting.kafka.serde.json;
 
 import com.expedia.adaptivealerting.kafka.util.TestObjectMother;
 import com.expedia.metrics.jackson.MetricsJavaModule;
@@ -25,23 +25,23 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 /**
- * {@link MappedMetricDataJsonDeserializer} unit test.
+ * {@link MetricDataJsonDeserializer} unit test.
  */
-public final class MappedMetricDataJsonDeserializerTest {
-    private MappedMetricDataJsonDeserializer deserializerUnderTest;
+public final class MetricDataJsonDeserializerTest {
+    private MetricDataJsonDeserializer deserializer;
     private ObjectMapper objectMapper;
 
     @Before
-    public void setUp() {
-        this.deserializerUnderTest = new MappedMetricDataJsonDeserializer();
+    public void setUp() throws Exception {
+        this.deserializer = new MetricDataJsonDeserializer();
         this.objectMapper = new ObjectMapper().registerModule(new MetricsJavaModule());
     }
 
     @Test
     public void testDeserialize() throws Exception {
-        val expected = TestObjectMother.mappedMetricData();
+        val expected = TestObjectMother.metricData();
         val expectedBytes = objectMapper.writeValueAsBytes(expected);
-        val actual = deserializerUnderTest.deserialize("some-topic", expectedBytes);
+        val actual = deserializer.deserialize("some-topic", expectedBytes);
         assertEquals(expected, actual);
     }
 }
