@@ -51,4 +51,16 @@ public interface DetectorRepository extends PagingAndSortingRepository<Detector,
      */
     @Query("select mmm.detector from MetricDetectorMapping mmm where mmm.metric.hash = :hash")
     List<Detector> findByMetricHash(@Param("hash") String hash);
+
+    /**
+     * Finds a list of detectors attached to a given metric hash
+     *
+     * @param interval time in minutes.
+     * @return list of detectors updated withing interval.
+     */
+    @Query(nativeQuery = true, value = "SELECT * from detector WHERE detector.last_update_timestamp > DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL :interval MINUTE)")
+    List<Detector> getLastUpdatedDetectors(@Param("interval") int interval);
+
+
+
 }
