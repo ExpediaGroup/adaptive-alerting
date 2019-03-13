@@ -19,8 +19,8 @@ import com.expedia.adaptivealerting.anomdetect.AnomalyToMetricMapper;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.adaptivealerting.kafka.serde.json.MappedMetricDataJsonSerializer;
-import com.expedia.adaptivealerting.kafka.serde.json.MetricDataJsonSerializer;
+import com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde;
+import com.expedia.adaptivealerting.kafka.serde.MetricDataJsonSerde;
 import com.expedia.alertmanager.model.Alert;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
@@ -212,10 +212,10 @@ public final class TestObjectMother {
     }
 
     public static ConsumerRecordFactory<String, MetricData> metricDataFactory() {
-        return new ConsumerRecordFactory<>(new StringSerializer(), new MetricDataJsonSerializer());
+        return new ConsumerRecordFactory<>(new StringSerializer(), new MetricDataJsonSerde.Ser());
     }
 
     public static ConsumerRecordFactory<String, MappedMetricData> mappedMetricDataFactory() {
-        return new ConsumerRecordFactory<>(new StringSerializer(), new MappedMetricDataJsonSerializer());
+        return new ConsumerRecordFactory<>(new StringSerializer(), new MappedMetricDataJsonSerde.Ser());
     }
 }

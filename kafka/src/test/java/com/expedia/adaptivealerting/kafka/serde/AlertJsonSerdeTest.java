@@ -13,31 +13,48 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.serde.json;
+package com.expedia.adaptivealerting.kafka.serde;
 
 import com.expedia.adaptivealerting.kafka.util.TestObjectMother;
+import com.expedia.alertmanager.model.Alert;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class AlertJsonDeserializerTest {
-    private AlertJsonDeserializer deserializerUnderTest;
+public class AlertJsonSerdeTest {
+    private AlertJsonSerde serdeUnderTest;
     private ObjectMapper objectMapper;
+    private Alert alert;
 
     @Before
     public void setUp() {
-        this.deserializerUnderTest = new AlertJsonDeserializer();
+        this.serdeUnderTest = new AlertJsonSerde();
         this.objectMapper = new ObjectMapper();
+        this.alert = TestObjectMother.alert();
+    }
+
+    @Test
+    public void justForCoverage() {
+        serdeUnderTest.configure(null, false);
+        serdeUnderTest.close();
+    }
+
+    @Test
+    public void testSerialize() throws Exception {
+        val expected = objectMapper.writeValueAsBytes(alert);
+        val actual = serdeUnderTest.serializer().serialize("some-topic", alert);
+        assertArrayEquals(expected, actual);
     }
 
     @Test
     public void testDeserialize() throws Exception {
         val expected = TestObjectMother.alert();
         val expectedBytes = objectMapper.writeValueAsBytes(expected);
-        val actual = deserializerUnderTest.deserialize("some-topic", expectedBytes);
+        val actual = serdeUnderTest.deserializer().deserialize("some-topic", expectedBytes);
         assertEquals(expected, actual);
     }
 }

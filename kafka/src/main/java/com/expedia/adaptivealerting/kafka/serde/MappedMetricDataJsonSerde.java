@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.serde.json;
+package com.expedia.adaptivealerting.kafka.serde;
 
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.metrics.jackson.MetricsJavaModule;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serializer;
@@ -34,11 +35,26 @@ public final class MappedMetricDataJsonSerde implements Serde<MappedMetricData> 
 
     @Override
     public Serializer<MappedMetricData> serializer() {
-        return new MappedMetricDataJsonSerializer();
+        return new Ser();
     }
 
     @Override
     public Deserializer<MappedMetricData> deserializer() {
-        return new MappedMetricDataJsonDeserializer();
+        return new Deser();
+    }
+
+    public static class Ser extends AbstractJsonSerializer<MappedMetricData> {
+
+        public Ser() {
+            getObjectMapper().registerModule(new MetricsJavaModule());
+        }
+    }
+
+    public static class Deser extends AbstractJsonDeserializer<MappedMetricData> {
+
+        public Deser() {
+            super(MappedMetricData.class);
+            getObjectMapper().registerModule(new MetricsJavaModule());
+        }
     }
 }

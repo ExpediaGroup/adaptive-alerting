@@ -4,7 +4,7 @@ kafka:
     bootstrap.servers: "${kafka_endpoint}"
     group.id: "notifier"
     key.deserializer: "org.apache.kafka.common.serialization.StringDeserializer"
-    value.deserializer: "com.expedia.adaptivealerting.kafka.serde.json.MappedMetricDataJsonDeserializer"
+    value.deserializer: "com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde$Deser"
     auto.offset.reset: "earliest"
     session.timeout.ms: 30000
     heartbeat.interval.ms: 10000

@@ -17,7 +17,7 @@ package com.expedia.adaptivealerting.kafka;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.adaptivealerting.kafka.serde.json.AlertJsonSerde;
+import com.expedia.adaptivealerting.kafka.serde.AlertJsonSerde;
 import com.expedia.alertmanager.model.Alert;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;

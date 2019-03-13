@@ -19,8 +19,7 @@ import com.expedia.adaptivealerting.anomdetect.DetectorManager;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.adaptivealerting.kafka.serde.json.MappedMetricDataJsonDeserializer;
-import com.expedia.adaptivealerting.kafka.serde.json.MappedMetricDataJsonSerde;
+import com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde;
 import com.expedia.adaptivealerting.kafka.util.TestObjectMother;
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
@@ -178,7 +177,7 @@ public final class KafkaDetectorManagerTest {
 
         // MappedMetricData consumers
         this.stringDeser = new StringDeserializer();
-        this.anomalyDeser = new MappedMetricDataJsonDeserializer();
+        this.anomalyDeser = new MappedMetricDataJsonSerde.Deser();
     }
 
     private void publishesAnomaly(MappedMetricData metric, AnomalyLevel anomalyLevel) {

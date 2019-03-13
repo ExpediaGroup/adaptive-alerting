@@ -13,16 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.serde.json;
+package com.expedia.adaptivealerting.kafka.serde;
 
-import com.expedia.metrics.MetricData;
+import com.expedia.alertmanager.model.Alert;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serializer;
 
 import java.util.Map;
 
-public final class MetricDataJsonSerde implements Serde<MetricData> {
+// TODO Move this to alert-manager. [WLW]
+public final class AlertJsonSerde implements Serde<Alert> {
 
     @Override
     public void configure(Map<String, ?> map, boolean b) {
@@ -33,12 +34,22 @@ public final class MetricDataJsonSerde implements Serde<MetricData> {
     }
 
     @Override
-    public Serializer<MetricData> serializer() {
-        return new MetricDataJsonSerializer();
+    public Serializer<Alert> serializer() {
+        return new Ser();
     }
 
     @Override
-    public Deserializer<MetricData> deserializer() {
-        return new MetricDataJsonDeserializer();
+    public Deserializer<Alert> deserializer() {
+        return new Deser();
+    }
+
+    public static class Ser extends AbstractJsonSerializer<Alert> {
+    }
+
+    public static class Deser extends AbstractJsonDeserializer<Alert> {
+
+        public Deser() {
+            super(Alert.class);
+        }
     }
 }

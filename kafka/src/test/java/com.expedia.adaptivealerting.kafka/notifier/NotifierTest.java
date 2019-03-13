@@ -21,7 +21,10 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.assertj.core.api.Assertions;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Test;
 import org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -51,8 +54,7 @@ public class NotifierTest {
                 "webhook.url=http://localhost:" + webhook.getPort() + "/hook"
         );
 
-        context.register(
-                PropertyPlaceholderAutoConfiguration.class, NotifierConfig.class, Notifier.class);
+        context.register(PropertyPlaceholderAutoConfiguration.class, NotifierConfig.class, Notifier.class);
         context.refresh();
         notifier = context.getBean(Notifier.class);
         notifierConfig = context.getBean(NotifierConfig.class);

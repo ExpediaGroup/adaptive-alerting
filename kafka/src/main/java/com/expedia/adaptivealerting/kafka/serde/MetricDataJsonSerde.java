@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.serde.json;
+package com.expedia.adaptivealerting.kafka.serde;
 
-import com.expedia.alertmanager.model.Alert;
+import com.expedia.metrics.MetricData;
+import com.expedia.metrics.jackson.MetricsJavaModule;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serializer;
 
 import java.util.Map;
 
-// TODO Move this to alert-manager. [WLW]
-public final class AlertJsonSerde implements Serde<Alert> {
+public final class MetricDataJsonSerde implements Serde<MetricData> {
 
     @Override
     public void configure(Map<String, ?> map, boolean b) {
@@ -34,12 +34,27 @@ public final class AlertJsonSerde implements Serde<Alert> {
     }
 
     @Override
-    public Serializer<Alert> serializer() {
-        return new AlertJsonSerializer();
+    public Serializer<MetricData> serializer() {
+        return new Ser();
     }
 
     @Override
-    public Deserializer<Alert> deserializer() {
-        return new AlertJsonDeserializer();
+    public Deserializer<MetricData> deserializer() {
+        return new Deser();
+    }
+
+    public static class Ser extends AbstractJsonSerializer<MetricData> {
+
+        public Ser() {
+            getObjectMapper().registerModule(new MetricsJavaModule());
+        }
+    }
+
+    public static class Deser extends AbstractJsonDeserializer<MetricData> {
+
+        public Deser() {
+            super(MetricData.class);
+            getObjectMapper().registerModule(new MetricsJavaModule());
+        }
     }
 }
