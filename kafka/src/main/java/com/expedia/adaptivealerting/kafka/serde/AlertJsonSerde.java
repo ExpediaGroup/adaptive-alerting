@@ -15,44 +15,31 @@
  */
 package com.expedia.adaptivealerting.kafka.serde;
 
+import com.expedia.alertmanager.model.Alert;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serializer;
 
 import java.util.Map;
 
-/**
- * @param <T> POJO type
- * @deprecated See {@link JsonPojoDeserializer} for more information.
- */
-public class JsonPojoSerde<T> implements Serde<T> {
-    final private JsonPojoSerializer<T> serializer;
-    final private JsonPojoDeserializer<T> deserializer;
-
-    public JsonPojoSerde() {
-        this.serializer = new JsonPojoSerializer<>();
-        this.deserializer = new JsonPojoDeserializer<>();
-    }
+// TODO Move this to alert-manager. [WLW]
+public final class AlertJsonSerde implements Serde<Alert> {
 
     @Override
-    public void configure(Map<String, ?> configs, boolean isKey) {
-        serializer.configure(configs, isKey);
-        deserializer.configure(configs, isKey);
+    public void configure(Map<String, ?> map, boolean b) {
     }
 
     @Override
     public void close() {
-        serializer.close();
-        deserializer.close();
     }
 
     @Override
-    public Serializer<T> serializer() {
-        return serializer;
+    public Serializer<Alert> serializer() {
+        return new AlertJsonSerializer();
     }
 
     @Override
-    public Deserializer<T> deserializer() {
-        return deserializer;
+    public Deserializer<Alert> deserializer() {
+        return new AlertJsonDeserializer();
     }
 }

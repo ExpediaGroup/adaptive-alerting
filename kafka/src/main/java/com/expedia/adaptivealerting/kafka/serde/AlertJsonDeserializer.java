@@ -13,20 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.notifier;
+package com.expedia.adaptivealerting.kafka.serde;
 
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.MetricRegistry;
+import com.expedia.alertmanager.model.Alert;
 
-public class MetricsMonitor {
-    private final static MetricRegistry metricRegistry;
+/**
+ * Kafka deserializer to read {@link Alert}s from JSON.
+ */
+// TODO Move this to alert-manager. [WLW]
+public class AlertJsonDeserializer extends AbstractJsonDeserializer<Alert> {
 
-    static {
-        metricRegistry = new MetricRegistry();
-        notification_success = metricRegistry.meter("notifier.success");
-        notification_failure = metricRegistry.meter("notifier.failure");
+    public AlertJsonDeserializer() {
+        super(Alert.class);
     }
-
-    public final static Meter notification_success;
-    public final static Meter notification_failure;
 }

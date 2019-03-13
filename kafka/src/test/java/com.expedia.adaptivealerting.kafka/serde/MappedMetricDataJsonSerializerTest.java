@@ -29,21 +29,21 @@ import static org.junit.Assert.assertArrayEquals;
  * {@link MappedMetricDataJsonSerializer} unit test.
  */
 public final class MappedMetricDataJsonSerializerTest {
-    private MappedMetricDataJsonSerializer serializer;
+    private MappedMetricDataJsonSerializer serializerUnderTest;
     private ObjectMapper objectMapper;
     private MappedMetricData mappedMetricData;
 
     @Before
     public void setUp() {
-        this.serializer = new MappedMetricDataJsonSerializer();
+        this.serializerUnderTest = new MappedMetricDataJsonSerializer();
         this.objectMapper = new ObjectMapper().registerModule(new MetricsJavaModule());
         this.mappedMetricData = TestObjectMother.mappedMetricData();
     }
 
     @Test
-    public void testSerializer() throws Exception {
+    public void testSerialize() throws Exception {
         val expected = objectMapper.writeValueAsBytes(mappedMetricData);
-        val actual = serializer.serialize("some-topic", mappedMetricData);
+        val actual = serializerUnderTest.serialize("some-topic", mappedMetricData);
         assertArrayEquals(expected, actual);
     }
 }

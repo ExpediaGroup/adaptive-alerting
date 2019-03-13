@@ -16,32 +16,30 @@
 package com.expedia.adaptivealerting.kafka.serde;
 
 import com.expedia.adaptivealerting.kafka.util.TestObjectMother;
-import com.expedia.metrics.jackson.MetricsJavaModule;
+import com.expedia.alertmanager.model.Alert;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
-/**
- * {@link MappedMetricDataJsonDeserializer} unit test.
- */
-public final class MappedMetricDataJsonDeserializerTest {
-    private MappedMetricDataJsonDeserializer deserializerUnderTest;
+public class AlertJsonSerializerTest {
+    private AlertJsonSerializer serializerUnderTest;
     private ObjectMapper objectMapper;
+    private Alert alert;
 
     @Before
     public void setUp() {
-        this.deserializerUnderTest = new MappedMetricDataJsonDeserializer();
-        this.objectMapper = new ObjectMapper().registerModule(new MetricsJavaModule());
+        this.serializerUnderTest = new AlertJsonSerializer();
+        this.objectMapper = new ObjectMapper();
+        this.alert = TestObjectMother.alert();
     }
 
     @Test
-    public void testDeserialize() throws Exception {
-        val expected = TestObjectMother.mappedMetricData();
-        val expectedBytes = objectMapper.writeValueAsBytes(expected);
-        val actual = deserializerUnderTest.deserialize("some-topic", expectedBytes);
-        assertEquals(expected, actual);
+    public void testSerialize() throws Exception {
+        val expected = objectMapper.writeValueAsBytes(alert);
+        val actual = serializerUnderTest.serialize("some-topic", alert);
+        assertArrayEquals(expected, actual);
     }
 }
