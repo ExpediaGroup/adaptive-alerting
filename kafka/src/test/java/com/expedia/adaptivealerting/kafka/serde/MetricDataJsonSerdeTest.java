@@ -26,7 +26,8 @@ import org.junit.Test;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-public class MetricDataJsonSerdeTest {
+// TODO Use abstract base class for serde tests [WLW]
+public final class MetricDataJsonSerdeTest {
     private MetricDataJsonSerde serdeUnderTest;
     private ObjectMapper objectMapper;
     private MetricData metricData;

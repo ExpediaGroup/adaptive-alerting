@@ -25,7 +25,8 @@ import org.junit.Test;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class AlertJsonSerdeTest {
+// TODO Use abstract base class for serde tests [WLW]
+public final class AlertJsonSerdeTest {
     private AlertJsonSerde serdeUnderTest;
     private ObjectMapper objectMapper;
     private Alert alert;
