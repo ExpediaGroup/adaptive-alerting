@@ -25,12 +25,7 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
@@ -41,16 +36,16 @@ import java.util.List;
 @Slf4j
 public final class MetricFrameLoader {
     final static ObjectMapper objectMapper = new ObjectMapper().registerModule(new MetricsJavaModule());
-    
+
     public static MetricFrame loadCsv(File metricDefinitionFile, File metricDataFile, boolean hasHeader)
             throws IOException {
-        
+
         final MetricDefinition metricDefinition = objectMapper.readValue(metricDefinitionFile, MetricDefinition.class);
         log.info("metricDefinition={}", metricDefinition);
         log.info("metricId={}", new MetricTankIdFactory().getId(metricDefinition));
         return loadCsv(metricDefinition, new FileInputStream(metricDataFile), hasHeader);
     }
-    
+
     /**
      * Loads a {@link MetricFrame} from a CSV input stream.
      *
@@ -62,24 +57,24 @@ public final class MetricFrameLoader {
      */
     public static MetricFrame loadCsv(MetricDefinition metricDefinition, InputStream in, boolean hasHeader)
             throws IOException {
-        
+
         List<String[]> rows;
         try (final BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
             final int skipLines = hasHeader ? 1 : 0;
             final CSVReader reader = new CSVReaderBuilder(br).withSkipLines(skipLines).build();
             rows = reader.readAll();
         }
-        
+
         final int numRows = rows.size();
         final MetricData[] metricData = new MetricData[numRows];
-        
+
         for (int i = 0; i < numRows; i++) {
             metricData[i] = toMetricData(metricDefinition, rows.get(i));
         }
-        
+
         return new MetricFrame(metricData);
     }
-    
+
     private static MetricData toMetricData(MetricDefinition metricDefinition, String[] row) {
         // Some of the CSVs use Instants, some use epoch seconds
         long epochSeconds;

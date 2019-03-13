@@ -42,25 +42,25 @@ public class ChartUtil {
     private static final Color OBSERVED_COLOR = Color.BLUE;
     private static final Color MIDPOINT_COLOR = Color.DARK_GRAY;
     private static final Color THRESHOLD_COLOR = new Color(204, 204, 204, 80);
-    
+
     public static JFreeChart createChart(String title, ChartSeries chartSeries) {
         notNull(title, "title can't be null");
         notNull(chartSeries, "chartSeries can't be null");
-        
+
         val strongOutlier = new TimeSeriesCollection(chartSeries.getStrongOutlier());
         val weakOutlier = new TimeSeriesCollection(chartSeries.getWeakOutlier());
-        
+
         val observed = new TimeSeriesCollection(chartSeries.getObserved());
         val midpoint = new TimeSeriesCollection(chartSeries.getPredicted());
-    
+
         val weakThreshold = new TimeSeriesCollection();
         weakThreshold.addSeries(chartSeries.getWeakThresholdUpper());
         weakThreshold.addSeries(chartSeries.getWeakThresoldLower());
-    
+
         val strongThreshold = new TimeSeriesCollection();
         strongThreshold.addSeries(chartSeries.getStrongThresholdUpper());
         strongThreshold.addSeries(chartSeries.getStrongThresholdLower());
-        
+
         val chart = ChartFactory.createTimeSeriesChart(
                 title,
                 "Time",
@@ -69,57 +69,57 @@ public class ChartUtil {
                 false,
                 false,
                 false);
-        
+
         val plot = chart.getXYPlot();
-        
+
         plot.setDataset(1, weakOutlier);
         plot.setDataset(2, observed);
         plot.setDataset(3, midpoint);
         plot.setDataset(4, weakThreshold);
         plot.setDataset(5, strongThreshold);
-        
+
         val strongOutlierRenderer = new XYLineAndShapeRenderer(false, true);
         strongOutlierRenderer.setSeriesPaint(0, STRONG_OUTLIER_COLOR);
-        
+
         val weakOutlierRenderer = new XYLineAndShapeRenderer(false, true);
         weakOutlierRenderer.setSeriesPaint(0, WEAK_OUTLIER_COLOR);
-        
+
         val observedRenderer = new XYLineAndShapeRenderer(true, false);
         observedRenderer.setSeriesPaint(0, OBSERVED_COLOR);
-        
+
         val midpointRenderer = new XYLineAndShapeRenderer(true, false);
         midpointRenderer.setSeriesPaint(0, MIDPOINT_COLOR);
-        
+
         val weakThresholdRenderer = new XYDifferenceRenderer();
         weakThresholdRenderer.setPositivePaint(THRESHOLD_COLOR);
         weakThresholdRenderer.setSeriesPaint(0, THRESHOLD_COLOR);
         weakThresholdRenderer.setSeriesPaint(1, THRESHOLD_COLOR);
-    
+
         val strongThresholdRenderer = new XYDifferenceRenderer();
         strongThresholdRenderer.setPositivePaint(THRESHOLD_COLOR);
         strongThresholdRenderer.setSeriesPaint(0, THRESHOLD_COLOR);
         strongThresholdRenderer.setSeriesPaint(1, THRESHOLD_COLOR);
-        
+
         plot.setRenderer(0, strongOutlierRenderer);
         plot.setRenderer(1, weakOutlierRenderer);
         plot.setRenderer(2, observedRenderer);
         plot.setRenderer(3, midpointRenderer);
         plot.setRenderer(4, weakThresholdRenderer);
         plot.setRenderer(5, strongThresholdRenderer);
-    
+
         plot.setDomainGridlinePaint(Color.GRAY);
         plot.setRangeGridlinePaint(Color.GRAY);
         plot.setBackgroundPaint(Color.WHITE);
-        
+
         return chart;
     }
-    
+
     public static ApplicationFrame createChartFrame(String title, JFreeChart... charts) {
         val chartFrame = new ApplicationFrame(title);
-    
+
         val panel = new JPanel();
         panel.setLayout(new GridLayout(0, 1));
-        
+
         for (JFreeChart chart : charts) {
             final ChartPanel chartPanel = new ChartPanel(chart);
             chartPanel.setPreferredSize(new Dimension(800, 300));
@@ -127,16 +127,16 @@ public class ChartUtil {
             panel.add(chartPanel);
         }
         chartFrame.setContentPane(panel);
-        
+
         return chartFrame;
     }
-    
+
     public static void showChartFrame(ApplicationFrame chartFrame) {
         chartFrame.pack();
         RefineryUtilities.positionFrameRandomly(chartFrame);
         chartFrame.setVisible(true);
     }
-    
+
     public static Second toSecond(long epochSecond) {
         return new Second(Date.from(Instant.ofEpochSecond(epochSecond)));
     }

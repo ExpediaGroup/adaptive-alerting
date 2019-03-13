@@ -20,19 +20,19 @@ import lombok.Data;
 
 @Data
 public class EwmaTestRow {
-    
+
     @CsvBindByName
     private String date;
-    
+
     @CsvBindByName
     private double observed;
-    
+
     @CsvBindByName
     private double mean;
-    
+
     @CsvBindByName(column = "known.mean")
     private double knownMean;
-    
+
     @CsvBindByName
     private double var;
 }

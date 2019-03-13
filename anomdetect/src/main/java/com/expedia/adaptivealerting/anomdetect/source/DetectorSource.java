@@ -35,9 +35,9 @@ import java.util.UUID;
  * </ul>
  */
 public interface DetectorSource {
-    
+
     Set<String> findDetectorTypes();
-    
+
     /**
      * Finds the list of detector UUIDs for a given metric.
      *
@@ -45,7 +45,7 @@ public interface DetectorSource {
      * @return The detector UUIDs.
      */
     List<UUID> findDetectorUuids(MetricDefinition metricDef);
-    
+
     /**
      * Finds the detector for a given detector and, optionally, metric.
      *

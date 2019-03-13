@@ -29,22 +29,22 @@ import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showCha
  * Sample pipeline based on white noise with EWMA and PEWMA filters.
  */
 public class WhiteNoiseEwmaVsPewma {
-    
+
     public static void main(String[] args) {
         final WhiteNoiseMetricSource source = new WhiteNoiseMetricSource("white-noise", 1000L, 0.0, 1.0);
-    
+
         final AnomalyDetectorFilter ewmaFilter = new AnomalyDetectorFilter(new EwmaAnomalyDetector());
         final AnomalyDetectorFilter pewmaFilter = new AnomalyDetectorFilter(new PewmaAnomalyDetector());
-    
+
         final AnomalyChartSink ewmaChart = PipelineFactory.createChartSink("EWMA");
         final AnomalyChartSink pewmaChart = PipelineFactory.createChartSink("PEWMA");
-    
+
         source.addSubscriber(ewmaFilter);
         source.addSubscriber(pewmaFilter);
-    
+
         ewmaFilter.addSubscriber(ewmaChart);
         pewmaFilter.addSubscriber(pewmaChart);
-    
+
         showChartFrame(createChartFrame("White Noise", ewmaChart.getChart(), pewmaChart.getChart()));
         source.start();
     }

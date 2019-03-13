@@ -29,25 +29,25 @@ import java.util.Map;
  * configuration properties after it's already been typed. To me it looks like serializers and
  * deserializers should be concrete as they ProducerConfig and ConsumerConfig set them by
  * classname. For example
- *
- *    config.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
- *        "com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonDeserializer");
- *
+ * <p>
+ * config.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+ * "com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonDeserializer");
+ * <p>
  * The config is just expecting a deserializer class that's already typed. [WLW]
  *
  * @param <T> POJO type
  * @deprecated Superseded by {@link AbstractJsonDeserializer}.
  */
 public final class JsonPojoDeserializer<T> implements Deserializer<T> {
-    
+
     /**
      * JSON POJO class configuration key.
      */
     public static final String CK_JSON_POJO_CLASS = "JsonPojoClass";
-    
+
     private ObjectMapper objectMapper;
     private Class<T> tClass;
-    
+
     /**
      * Default constructor needed by Kafka
      */
@@ -56,7 +56,7 @@ public final class JsonPojoDeserializer<T> implements Deserializer<T> {
                 .registerModule(new MetricsJavaModule())
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
-    
+
     @SuppressWarnings("unchecked")
     @Override
     public void configure(Map<String, ?> props, boolean isKey) {
@@ -71,7 +71,7 @@ public final class JsonPojoDeserializer<T> implements Deserializer<T> {
             }
         }
     }
-    
+
     @Override
     public T deserialize(String topic, byte[] bytes) {
         if (bytes == null) {
@@ -85,7 +85,7 @@ public final class JsonPojoDeserializer<T> implements Deserializer<T> {
             throw new SerializationException(e);
         }
     }
-    
+
     @Override
     public void close() {
     }

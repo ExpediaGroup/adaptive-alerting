@@ -32,23 +32,23 @@ import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.createC
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showChartFrame;
 
 public final class CsvTrafficEwma {
-    
+
     public static void main(String[] args) throws Exception {
-        
+
         // TODO Use the FileDataConnector rather than the MetricFrameLoader. [WLW]
         final InputStream is = ClassLoader.getSystemResourceAsStream("samples/cal-inflow.csv");
         final MetricFrame frame = MetricFrameLoader.loadCsv(new MetricDefinition("csv"), is, true);
         final MetricFrameMetricSource source = new MetricFrameMetricSource(frame, "data", 200L);
-        
+
         final AnomalyDetectorFilter detectorFilter = new AnomalyDetectorFilter(new EwmaAnomalyDetector());
         final EvaluatorFilter evaluator = new EvaluatorFilter(new RmseEvaluator());
         final AnomalyChartSink chartWrapper = PipelineFactory.createChartSink("EWMA");
-        
+
         source.addSubscriber(detectorFilter);
         detectorFilter.addSubscriber(evaluator);
         detectorFilter.addSubscriber(chartWrapper);
         evaluator.addSubscriber(chartWrapper);
-        
+
         showChartFrame(createChartFrame("Cal Inflow", chartWrapper.getChart()));
         source.start();
     }

@@ -41,13 +41,13 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @Slf4j
 public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
     private static final String CK_AD_MAPPER = "ad-mapper";
-    
+
     private final DetectorMapper mapper;
-    
+
     // TODO Make these configurable. [WLW]
     private Serde<String> outputKeySerde = new Serdes.StringSerde();
     private Serde<MappedMetricData> outputValueSerde = new MappedMetricDataJsonSerde();
-    
+
     public static void main(String[] args) {
         val config = new TypesafeConfigLoader(CK_AD_MAPPER).loadMergedConfig();
         val saConfig = new StreamsAppConfig(config);
@@ -55,7 +55,7 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
         val mapper = new DetectorMapper(detectorSource);
         new KafkaAnomalyDetectorMapper(saConfig, mapper).start();
     }
-    
+
     /**
      * Creates a new Kafka Streams adapter for the {@link DetectorMapper}.
      *
@@ -67,14 +67,14 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
         notNull(mapper, "mapper can't be null");
         this.mapper = mapper;
     }
-    
+
     @Override
     protected Topology buildTopology() {
         val config = getConfig();
         val inputTopic = config.getInboundTopic();
         val outputTopic = config.getOutboundTopic();
         log.info("Initializing: inputTopic={}, outputTopic={}", inputTopic, outputTopic);
-        
+
         val builder = new StreamsBuilder();
         final KStream<String, MetricData> stream = builder.stream(inputTopic);
         stream
@@ -83,14 +83,14 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
                 .to(outputTopic, Produced.with(outputKeySerde, outputValueSerde));
         return builder.build();
     }
-    
+
     private Iterable<? extends KeyValue<String, MappedMetricData>> metricsByDetector(
             String key,
             MetricData metricData) {
-        
+
         assert metricData != null;
         log.trace("Mapping key={}, metricData={}", key, metricData);
-        
+
         val mmdSet = mapper.map(metricData);
         return mmdSet.stream()
                 .map(mmd -> {

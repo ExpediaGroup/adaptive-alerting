@@ -22,7 +22,7 @@ import com.expedia.metrics.jackson.MetricsJavaModule;
  * Kafka deserializer to read {@link MetricData}s from JSON.
  */
 public class MetricDataJsonDeserializer extends AbstractJsonDeserializer<MetricData> {
-    
+
     public MetricDataJsonDeserializer() {
         super(MetricData.class);
         getObjectMapper().registerModule(new MetricsJavaModule());

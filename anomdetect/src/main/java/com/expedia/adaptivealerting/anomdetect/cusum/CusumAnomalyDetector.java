@@ -42,27 +42,27 @@ public final class CusumAnomalyDetector extends AbstractAnomalyDetector<CusumPar
      * Total number of data points seen so far.
      */
     private int totalDataPoints = 1;
-    
+
     /**
      * Cumulative sum on the high side. SH
      */
     private double sumHigh = 0.0;
-    
+
     /**
      * Cumulative sum on the low side. SL
      */
     private double sumLow = 0.0;
-    
+
     /**
      * Moving range. Used to estimate the standard deviation.
      */
     private double movingRange = 0.0;
-    
+
     /**
      * Previous value.
      */
     private double prevValue = 0.0;
-    
+
     public CusumAnomalyDetector() {
         super(CusumParams.class);
     }
@@ -78,22 +78,22 @@ public final class CusumAnomalyDetector extends AbstractAnomalyDetector<CusumPar
 
         val params = getParams();
         val observed = metricData.getValue();
-        
+
         this.movingRange += Math.abs(this.prevValue - observed);
-        
+
         val stdDev = avgMovingRange() / STD_DEV_DIVISOR;
         val slack = params.getSlackParam() * stdDev;
         val weakDelta = params.getWeakSigmas() * stdDev;
         val strongDelta = params.getStrongSigmas() * stdDev;
-        
+
         this.sumHigh = Math.max(0, this.sumHigh + observed - (params.getTargetValue() + slack));
         this.sumLow = Math.min(0, this.sumLow + observed - (params.getTargetValue() - slack));
-        
+
         this.prevValue = observed;
-        
+
         // FIXME This eventually overflows. Realistically it won't happen, but would be nice to fix it anyway. [WLW]
         this.totalDataPoints++;
-        
+
         Double upperStrong;
         Double upperWeak;
         Double lowerStrong;
@@ -149,15 +149,15 @@ public final class CusumAnomalyDetector extends AbstractAnomalyDetector<CusumPar
                     throw new IllegalStateException("Illegal type: " + params.getType());
             }
         }
-        
+
         return new AnomalyResult(level);
     }
-    
+
     private void resetSums() {
         this.sumHigh = 0.0;
         this.sumLow = 0.0;
     }
-    
+
     private double avgMovingRange() {
         if (totalDataPoints > 1) {
             return movingRange / (totalDataPoints - 1);

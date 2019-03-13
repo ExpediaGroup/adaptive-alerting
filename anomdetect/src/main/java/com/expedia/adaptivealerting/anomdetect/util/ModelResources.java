@@ -29,14 +29,14 @@ import java.util.List;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ModelResources {
-    
+
     @JsonProperty("_embedded")
     private Embedded embedded = new Embedded();
-    
+
     public ModelResources(List<ModelResource> list) {
         embedded.setModels(list);
     }
-    
+
     @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Embedded {

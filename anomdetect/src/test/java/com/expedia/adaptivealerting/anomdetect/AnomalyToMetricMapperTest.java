@@ -35,13 +35,13 @@ public class AnomalyToMetricMapperTest {
 
     private AnomalyToMetricMapper mapperUnderTest;
     private MappedMetricData anomalyWithStringMetricKey;
-    
+
     @Before
     public void setUp() {
         this.mapperUnderTest = new AnomalyToMetricMapper();
         initTestObjects();
     }
-    
+
     @Test
     public void testToMetricData_stringMetricKey() {
         val actualMetric = mapperUnderTest.toMetricData(anomalyWithStringMetricKey);
@@ -50,22 +50,22 @@ public class AnomalyToMetricMapperTest {
         val actualKvTags = actualTags.getKv();
         val detectorUuid = anomalyWithStringMetricKey.getDetectorUuid().toString();
         val anomalyLevel = anomalyWithStringMetricKey.getAnomalyResult().getAnomalyLevel().toString();
-        
+
         assertTrue(detectorUuid.equals(actualKvTags.get(AA_DETECTOR_UUID)));
         assertTrue(anomalyLevel.equals(actualKvTags.get(AA_ANOMALY_LEVEL)));
     }
-    
+
     @Test
     public void testToMetricDataMapsNullToNull() {
         assertNull(mapperUnderTest.toMetricData(null));
     }
-    
+
     @Test
     public void testToMetricData_aaDetectorUuidToNull() {
         val detectorUuid = UUID.randomUUID();
         testToMetricData_reservedTagToNull(AA_DETECTOR_UUID, detectorUuid.toString());
     }
-    
+
     @Test
     public void testToMetricData_aaAnomalyLevelToNull() {
         val anomalyLevel = AnomalyLevel.STRONG;
@@ -79,16 +79,16 @@ public class AnomalyToMetricMapperTest {
         mmd.setAnomalyResult(new AnomalyResult(AnomalyLevel.STRONG));
         this.anomalyWithStringMetricKey = mmd;
     }
-    
+
     private void testToMetricData_reservedTagToNull(String tagKey, String tagValue) {
         val kvTags = MetricUtil.defaultKvTags();
         kvTags.put(tagKey, tagValue);
-        
+
         val metricDef = MetricUtil.metricDefinition(kvTags, null);
         val metricData = MetricUtil.metricData(metricDef);
         val mmd = new MappedMetricData(metricData, UUID.randomUUID());
         mmd.setAnomalyResult(new AnomalyResult());
-        
+
         assertNull(mapperUnderTest.toMetricData(mmd));
     }
 }

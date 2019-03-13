@@ -48,20 +48,20 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 public class ModelServiceConnector {
     private final MetricTankIdFactory metricTankIdFactory = new MetricTankIdFactory();
     private final ObjectMapper objectMapper = new ObjectMapper();
-    
+
     @Getter
     private HttpClientWrapper httpClient;
-    
+
     @Getter
     private String uriTemplate;
-    
+
     public ModelServiceConnector(HttpClientWrapper httpClient, String uriTemplate) {
         notNull(httpClient, "httpClient can't be null");
         notNull(uriTemplate, "uriTemplate can't be null");
         this.httpClient = httpClient;
         this.uriTemplate = uriTemplate;
     }
-    
+
     public DetectorResources findDetectors(MetricDefinition metricDefinition) throws IOException {
         notNull(metricDefinition, "metricDefinition can't be null");
         val metricId = metricTankIdFactory.getId(metricDefinition);
@@ -78,7 +78,7 @@ public class ModelServiceConnector {
         val modelResourceList = modelResources.getEmbedded().getModels();
         return modelResourceList.isEmpty() ? null : modelResourceList.get(0);
     }
-    
+
     private ModelResources findModelsByDetectorUuid(UUID detectorUuid) throws IOException {
         // http://modelservice/api/models/search/findLatestByDetectorUuid?uuid=%s
         // http://modelservice/api/models/search/findLatestByDetectorUuid?uuid=85f395a2-e276-7cfd-34bc-cb850ae3bc2e

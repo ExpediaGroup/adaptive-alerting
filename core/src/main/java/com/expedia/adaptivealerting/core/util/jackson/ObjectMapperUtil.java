@@ -25,10 +25,10 @@ import java.io.InputStream;
  * Object mapper utilities.
  */
 public final class ObjectMapperUtil {
-    
+
     private ObjectMapperUtil() {
     }
-    
+
     public static <T> T readValue(ObjectMapper objectMapper, InputStream inputStream, Class<T> clazz) {
         try {
             return objectMapper.readValue(inputStream, clazz);
@@ -36,7 +36,7 @@ public final class ObjectMapperUtil {
             throw new RuntimeException(e);
         }
     }
-    
+
     public static String writeValueAsString(ObjectMapper objectMapper, Object value) {
         try {
             return objectMapper

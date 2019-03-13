@@ -35,7 +35,7 @@ public class NotifierConfig {
 
     @Bean
     public ObjectMapper objectMapper() {
-      return new ObjectMapper().registerModule(new MetricsJavaModule());
+        return new ObjectMapper().registerModule(new MetricsJavaModule());
     }
 
     @Value("${kafka.topic:alerts}")
@@ -58,7 +58,7 @@ public class NotifierConfig {
     private String heartBeatInterval;
     @Value("${kafka.consumer.request.timeout.ms:40000}")
     private String reqTimeout;
-    
+
     /**
      * Kafka Configs.
      *

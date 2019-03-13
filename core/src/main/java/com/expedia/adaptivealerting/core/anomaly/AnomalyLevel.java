@@ -34,7 +34,7 @@ public enum AnomalyLevel {
      * Strong outlier.
      */
     STRONG,
-    
+
     /**
      * No classification because the model is warming up.
      */

@@ -19,16 +19,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersAustouristsTestHelper.ADD_BASE;
-import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersAustouristsTestHelper.ADD_LEVEL;
-import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersAustouristsTestHelper.ADD_SEASONAL;
-import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersAustouristsTestHelper.AUSTOURISTS_FIRST_TWO_SEASONS;
-import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersAustouristsTestHelper.AUSTOURISTS_FREQUENCY;
-import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersAustouristsTestHelper.MULT_BASE;
-import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersAustouristsTestHelper.MULT_LEVEL;
-import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersAustouristsTestHelper.MULT_SEASONAL;
-import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersAustouristsTestHelper.TOLERANCE;
-import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersAustouristsTestHelper.buildAustouristsParams;
+import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersAustouristsTestHelper.*;
 import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersTrainingMethod.NONE;
 import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersTrainingMethod.SIMPLE;
 import static com.expedia.adaptivealerting.anomdetect.holtwinters.SeasonalityType.ADDITIVE;

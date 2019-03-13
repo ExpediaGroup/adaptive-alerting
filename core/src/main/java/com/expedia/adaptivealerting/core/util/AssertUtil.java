@@ -19,35 +19,35 @@ package com.expedia.adaptivealerting.core.util;
  * Assertion utilities.
  */
 public class AssertUtil {
-    
+
     /**
      * Prevent instantiation.
      */
     private AssertUtil() {
     }
-    
+
     public static void isTrue(boolean b, String message) {
         if (!b) {
             throw new IllegalArgumentException(message);
         }
     }
-    
+
     public static void isFalse(boolean b, String message) {
         isTrue(!b, message);
     }
-    
+
     public static void notNull(Object o, String message) {
         isTrue(o != null, message);
     }
-    
+
     public static void isEqual(int v1, int v2, String message) {
         isTrue(v1 == v2, message);
     }
-    
+
     public static void isEqual(Object o1, Object o2, String message) {
         isTrue(o1.equals(o2), message);
     }
-    
+
     public static void isBetween(double value, double lowerBd, double upperBd, String message) {
         isTrue(lowerBd <= value && value <= upperBd, message);
     }

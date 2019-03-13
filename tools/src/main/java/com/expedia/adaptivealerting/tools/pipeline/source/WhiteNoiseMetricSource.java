@@ -32,7 +32,7 @@ public final class WhiteNoiseMetricSource extends AbstractMetricSource {
     private final double mean;
     private final double stdDev;
     private final Random random = new Random();
-    
+
     /**
      * Creates a new, normally-distributed white noise generator. The series name is "white noise" and the period is one
      * second.
@@ -40,7 +40,7 @@ public final class WhiteNoiseMetricSource extends AbstractMetricSource {
     public WhiteNoiseMetricSource() {
         this("white-noise", 1000L, 0.0, 1.0);
     }
-    
+
     /**
      * Creates a new white noise data generator.
      *
@@ -54,7 +54,7 @@ public final class WhiteNoiseMetricSource extends AbstractMetricSource {
         this.mean = mean;
         this.stdDev = sqrt(variance);
     }
-    
+
     @Override
     public MetricData next() {
         val value = mean + stdDev * random.nextGaussian();

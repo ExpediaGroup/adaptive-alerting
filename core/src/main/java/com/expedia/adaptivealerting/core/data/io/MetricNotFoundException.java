@@ -21,12 +21,12 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 public class MetricNotFoundException extends RuntimeException {
     private MetricDefinition metric;
-    
+
     public MetricNotFoundException(MetricDefinition metric) {
         notNull(metric, "metric can't be null");
         this.metric = metric;
     }
-    
+
     public MetricDefinition getMetric() {
         return metric;
     }

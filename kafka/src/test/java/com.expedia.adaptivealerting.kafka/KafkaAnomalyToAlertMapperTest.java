@@ -93,7 +93,7 @@ public class KafkaAnomalyToAlertMapperTest {
         when(streamsAppConfig.getOutboundTopic()).thenReturn(OUTBOUND_TOPIC);
     }
 
-    private void initTestObjects(){
+    private void initTestObjects() {
         this.alert = TestObjectMother.alert();
         this.metricData = TestObjectMother.metricData();
         this.anomalyResult = new AnomalyResult(AnomalyLevel.STRONG);

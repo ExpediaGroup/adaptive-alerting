@@ -34,39 +34,39 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.toSecond;
 
 public final class AnomalyChartSink implements AnomalyResultSubscriber, ModelEvaluationSubscriber {
-    
+
     @Getter
     private final JFreeChart chart;
-    
+
     private final ChartSeries chartSeries;
     private final String baseTitle;
     private final DecimalFormat format = new DecimalFormat(".###");
-    
+
     public AnomalyChartSink(JFreeChart chart, ChartSeries chartSeries) {
         notNull(chart, "chart can't be null");
         notNull(chartSeries, "chartSeries can't be null");
-        
+
         this.chart = chart;
         this.chartSeries = chartSeries;
         this.baseTitle = chart.getTitle().getText();
     }
-    
+
     @Override
     public void next(MappedMetricData anomaly) {
         notNull(anomaly, "anomaly can't be null");
-        
+
         val metricData = anomaly.getMetricData();
         val epochSecond = metricData.getTimestamp();
         val observed = metricData.getValue();
         val anomalyResult = anomaly.getAnomalyResult();
         val level = anomalyResult.getAnomalyLevel();
         val thresholds = anomalyResult.getThresholds();
-    
+
         final Second second = toSecond(epochSecond);
         chartSeries.getObserved().add(second, observed);
-        
+
         addValue(chartSeries.getPredicted(), second, anomalyResult.getPredicted());
-        
+
         // FIXME Hacky check
         if (thresholds != null) {
             addValue(chartSeries.getWeakThresholdUpper(), second, thresholds.getUpperWeak());
@@ -74,18 +74,18 @@ public final class AnomalyChartSink implements AnomalyResultSubscriber, ModelEva
             addValue(chartSeries.getStrongThresholdUpper(), second, thresholds.getUpperStrong());
             addValue(chartSeries.getStrongThresholdLower(), second, thresholds.getLowerStrong());
         }
-        
+
         if (level == STRONG) {
             chartSeries.getStrongOutlier().add(second, observed);
         } else if (level == WEAK) {
             chartSeries.getWeakOutlier().add(second, observed);
         }
     }
-    
+
     @Override
     public void next(ModelEvaluation evaluation) {
         notNull(evaluation, "evaluation can't be null");
-        
+
         final String title = new StringBuilder(baseTitle)
                 .append(" (")
                 .append(evaluation.getEvaluatorMethod())
@@ -95,7 +95,7 @@ public final class AnomalyChartSink implements AnomalyResultSubscriber, ModelEva
                 .toString();
         chart.setTitle(title);
     }
-    
+
     private void addValue(TimeSeries timeSeries, Second second, Double value) {
         if (value != null) {
             timeSeries.add(second, value);

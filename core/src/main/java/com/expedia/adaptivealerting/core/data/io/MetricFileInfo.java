@@ -18,16 +18,16 @@ package com.expedia.adaptivealerting.core.data.io;
 public final class MetricFileInfo {
     private MetricFileLocation location;
     private MetricFileFormat format;
-    
+
     public MetricFileInfo(MetricFileLocation location, MetricFileFormat format) {
         this.location = location;
         this.format = format;
     }
-    
+
     public MetricFileLocation getLocation() {
         return location;
     }
-    
+
     public MetricFileFormat getFormat() {
         return format;
     }

@@ -33,9 +33,9 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 public abstract class AbstractMetricSource implements MetricSource {
     private final long periodMs;
     private final List<MetricDataSubscriber> subscribers = new LinkedList<>();
-    
+
     private final Timer timer = new Timer();
-    
+
     /**
      * Creates a new metric source with the given period.
      *
@@ -46,14 +46,14 @@ public abstract class AbstractMetricSource implements MetricSource {
     public AbstractMetricSource(String metricKey, long periodMs) {
         notNull(metricKey, "metricKey can't be null");
         isTrue(periodMs > 0, "periodMs must be > 0");
-        
+
         this.periodMs = periodMs;
     }
-    
+
     @Override
     public void start() {
         timer.scheduleAtFixedRate(new TimerTask() {
-            
+
             @Override
             public void run() {
                 val next = next();
@@ -63,25 +63,25 @@ public abstract class AbstractMetricSource implements MetricSource {
             }
         }, 0L, periodMs);
     }
-    
+
     @Override
     public void stop() {
         timer.cancel();
         timer.purge();
     }
-    
+
     @Override
     public void addSubscriber(MetricDataSubscriber subscriber) {
         notNull(subscriber, "subscriber can't be null");
         subscribers.add(subscriber);
     }
-    
+
     @Override
     public void removeSubscriber(MetricDataSubscriber subscriber) {
         notNull(subscriber, "subscriber can't be null");
         subscribers.remove(subscriber);
     }
-    
+
     private void publish(MetricData metricData) {
         subscribers.stream().forEach(subscriber -> subscriber.next(metricData));
     }

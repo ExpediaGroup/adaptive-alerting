@@ -25,7 +25,7 @@ import java.util.ListIterator;
  */
 public final class MetricFrameMetricSource extends AbstractMetricSource {
     private ListIterator<MetricData> metricDataListIterator;
-    
+
     /**
      * Publishes data from the given metric frame to any subscribers.
      *
@@ -37,7 +37,7 @@ public final class MetricFrameMetricSource extends AbstractMetricSource {
         super(metricName, periodMs);
         this.metricDataListIterator = metricFrame.listIterator();
     }
-    
+
     @Override
     public MetricData next() {
         if (metricDataListIterator.hasNext()) {

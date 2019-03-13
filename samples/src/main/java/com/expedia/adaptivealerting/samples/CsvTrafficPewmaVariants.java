@@ -34,14 +34,14 @@ import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.createC
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showChartFrame;
 
 public class CsvTrafficPewmaVariants {
-    
+
     public static void main(String[] args) throws Exception {
-    
+
         // TODO Use the FileDataConnector rather than the MetricFrameLoader. [WLW]
         final InputStream is = ClassLoader.getSystemResourceAsStream("samples/cal-inflow.csv");
         final MetricFrame frame = MetricFrameLoader.loadCsv(new MetricDefinition("csv"), is, true);
         final MetricFrameMetricSource source = new MetricFrameMetricSource(frame, "data", 200L);
-        
+
         val params1 = new PewmaParams()
                 .setAlpha(0.15)
                 .setBeta(1.0)
@@ -51,7 +51,7 @@ public class CsvTrafficPewmaVariants {
         val detector1 = new PewmaAnomalyDetector();
         detector1.init(UUID.randomUUID(), params1);
         val detectorFilter1 = new AnomalyDetectorFilter(detector1);
-    
+
         val params2 = new PewmaParams()
                 .setAlpha(0.25)
                 .setBeta(1.0)
@@ -60,7 +60,7 @@ public class CsvTrafficPewmaVariants {
                 .setInitMeanEstimate(0.0);
         val detector2 = new PewmaAnomalyDetector();
         val detectorFilter2 = new AnomalyDetectorFilter(detector2);
-    
+
         val params3 = new PewmaParams()
                 .setAlpha(0.35)
                 .setBeta(1.0)
@@ -73,27 +73,27 @@ public class CsvTrafficPewmaVariants {
         val eval1 = new EvaluatorFilter(new RmseEvaluator());
         val eval2 = new EvaluatorFilter(new RmseEvaluator());
         val eval3 = new EvaluatorFilter(new RmseEvaluator());
-        
+
         val chart1 = PipelineFactory.createChartSink("PEWMA: alpha=0.15");
         val chart2 = PipelineFactory.createChartSink("PEWMA: alpha=0.25");
         val chart3 = PipelineFactory.createChartSink("PEWMA: alpha=0.35");
-    
+
         source.addSubscriber(detectorFilter1);
         source.addSubscriber(detectorFilter2);
         source.addSubscriber(detectorFilter3);
-    
+
         detectorFilter1.addSubscriber(eval1);
         detectorFilter2.addSubscriber(eval2);
         detectorFilter3.addSubscriber(eval3);
-        
+
         detectorFilter1.addSubscriber(chart1);
         detectorFilter2.addSubscriber(chart2);
         detectorFilter3.addSubscriber(chart3);
-        
+
         eval1.addSubscriber(chart1);
         eval2.addSubscriber(chart2);
         eval3.addSubscriber(chart3);
-        
+
         showChartFrame(createChartFrame("Cal Inflow", chart1.getChart(), chart2.getChart(), chart3.getChart()));
         source.start();
     }

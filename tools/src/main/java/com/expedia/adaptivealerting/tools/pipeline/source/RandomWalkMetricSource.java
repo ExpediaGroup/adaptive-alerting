@@ -30,19 +30,19 @@ public final class RandomWalkMetricSource extends AbstractMetricSource {
     private long currentEpochSecond = Instant.now().getEpochSecond();
     private int currentValue = 0;
     private final Random random = new Random();
-    
+
     /**
      * Creates a new random walk metric source with name "random-walk", period=1000L and startValue=0.
      */
     public RandomWalkMetricSource() {
         this("random-walk", 1000L, 0);
     }
-    
+
     public RandomWalkMetricSource(String name, long period, int startValue) {
         super(name, period);
         this.currentValue = startValue;
     }
-    
+
     @Override
     public MetricData next() {
         val result = new MetricData(metricDefinition, currentValue, currentEpochSecond);

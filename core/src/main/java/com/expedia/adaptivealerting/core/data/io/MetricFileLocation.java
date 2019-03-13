@@ -26,42 +26,42 @@ public final class MetricFileLocation {
     private String datePattern;
     private String fileExtension;
     private DateTimeFormatter dateTimeFormatter;
-    
+
     public MetricFileLocation(String metricDir, String datePattern, String fileExtension) {
         this.metricDir = metricDir;
         this.datePattern = datePattern;
         this.fileExtension = fileExtension;
-        
+
         this.dateTimeFormatter = DateTimeFormatter
                 .ofPattern(datePattern)
                 .withZone(ZoneOffset.UTC);
     }
-    
+
     public String getMetricDir() {
         return metricDir;
     }
-    
+
     public String getDatePattern() {
         return datePattern;
     }
-    
+
     public String getFileExtension() {
         return fileExtension;
     }
-    
+
     public String toMetricFilePath(Instant date) {
         notNull(date, "date can't be null");
-        
+
         StringBuilder builder = new StringBuilder(metricDir)
                 .append("/")
                 .append(dateTimeFormatter.format(date));
-        
+
         if (fileExtension != null) {
             builder
                     .append(".")
                     .append(fileExtension);
         }
-        
+
         return builder.toString();
     }
 }

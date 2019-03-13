@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
 
 public final class MetricFrameLoaderTest {
     private static final double TOLERANCE = 0.001;
-    
+
     @Test
     public void testLoadCsv() throws Exception {
         final MetricDefinition metric = new MetricDefinition(new TagCollection(new HashMap<String, String>() {{

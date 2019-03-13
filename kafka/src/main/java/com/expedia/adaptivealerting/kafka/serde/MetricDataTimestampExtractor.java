@@ -20,16 +20,16 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.streams.processor.TimestampExtractor;
 
 public final class MetricDataTimestampExtractor implements TimestampExtractor {
-    
+
     @Override
     public long extract(ConsumerRecord<Object, Object> record, long previousTimestamp) {
         final MetricData metricData = (MetricData) record.value();
         if (metricData == null) {
-            
+
             // We don't want to log this because sometimes it fills up the logs.
             // TODO Figure out what to do instead. Maybe a counter.
 //            log.warn("Skipping null MetricData");
-            
+
             // -1 skips the record.
             return -1L;
         }

@@ -37,13 +37,13 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @RequiredArgsConstructor
 @Slf4j
 public class DetectorManager {
-    
+
     @Getter
     @NonNull
     private DetectorSource detectorSource;
-    
+
     private final Map<UUID, AnomalyDetector> cachedDetectors = new HashMap<>();
-    
+
     /**
      * Returns the managed detector types.
      *
@@ -52,7 +52,7 @@ public class DetectorManager {
     public Set<String> getDetectorTypes() {
         return detectorSource.findDetectorTypes();
     }
-    
+
     /**
      * Indicates whether this manager manages detectors of the given type.
      *
@@ -63,7 +63,7 @@ public class DetectorManager {
         notNull(detectorType, "detectorType can't be null");
         return getDetectorTypes().contains(detectorType);
     }
-    
+
     /**
      * Classifies the mapped metric data, performing detector lookup behind the scenes. Returns {@code null} if there's
      * no detector defined for the given mapped metric data.
@@ -73,7 +73,7 @@ public class DetectorManager {
      */
     public AnomalyResult classify(MappedMetricData mappedMetricData) {
         notNull(mappedMetricData, "mappedMetricData can't be null");
-        
+
         val detector = detectorFor(mappedMetricData);
         if (detector == null) {
             log.warn("No detector for mappedMetricData={}", mappedMetricData);
@@ -82,13 +82,13 @@ public class DetectorManager {
         val metricData = mappedMetricData.getMetricData();
         return detector.classify(metricData);
     }
-    
+
     private AnomalyDetector detectorFor(MappedMetricData mappedMetricData) {
         notNull(mappedMetricData, "mappedMetricData can't be null");
-        
+
         val detectorUuid = mappedMetricData.getDetectorUuid();
         val metricDef = mappedMetricData.getMetricData().getMetricDefinition();
-        
+
         AnomalyDetector detector = cachedDetectors.get(detectorUuid);
         if (detector == null) {
             detector = detectorSource.findDetector(detectorUuid, metricDef);

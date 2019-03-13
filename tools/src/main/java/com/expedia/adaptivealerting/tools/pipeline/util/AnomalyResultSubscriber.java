@@ -21,6 +21,6 @@ import com.expedia.adaptivealerting.core.data.MappedMetricData;
  * Interface for processors that subscribe to an anomaly result channel.
  */
 public interface AnomalyResultSubscriber {
-    
+
     void next(MappedMetricData anomaly);
 }

@@ -28,6 +28,7 @@ public enum HoltWintersTrainingMethod {
      * observation.
      * Implements Hyndman's "simple" method for selecting initial state values.
      * Ensure that warmUpPeriod gte (frequency * 2) to ensure no anomalies are emitted during training period.
+     *
      * @see <a href="https://github.com/robjhyndman/forecast/blob/master/R/HoltWintersNew.R#L61-L67">HoltWintersNew.R</a>
      */
     SIMPLE("simple");

@@ -39,12 +39,12 @@ public class AnomalyToMetricMapper {
      * Key/value tag key for anomalous metrics. The value must be the detector UUID.
      */
     public static String AA_DETECTOR_UUID = "aa_detector_uuid";
-    
+
     /**
      * Key/value tag key for anomalous metrics. The value must be the anomaly level.
      */
     public static String AA_ANOMALY_LEVEL = "aa_anomaly_level";
-    
+
     /**
      * <p>
      * Transforms the given anomaly result. This method copies the original metric key and tags, and adds a new
@@ -62,7 +62,7 @@ public class AnomalyToMetricMapper {
         if (anomaly == null) {
             return null;
         }
-        
+
         val metricData = anomaly.getMetricData();
         val metricDef = metricData.getMetricDefinition();
         val tags = metricDef.getTags();
@@ -74,11 +74,11 @@ public class AnomalyToMetricMapper {
         if (kvTags.containsKey(AA_DETECTOR_UUID) || kvTags.containsKey(AA_ANOMALY_LEVEL)) {
             return null;
         }
-        
+
         val detectorUuid = anomaly.getDetectorUuid();
         val anomalyResult = anomaly.getAnomalyResult();
         val anomalyLevel = anomalyResult.getAnomalyLevel();
-        
+
         assert (detectorUuid != null);
         assert (anomalyLevel != null);
 

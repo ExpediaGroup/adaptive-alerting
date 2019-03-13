@@ -15,11 +15,7 @@
  */
 package com.expedia.adaptivealerting.core.util;
 
-import java.time.DayOfWeek;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -29,13 +25,13 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  */
 public final class DateUtil {
     private static final int MILLIS_PER_MINUTE = 60 * 1000;
-    
+
     /**
      * Prevent instantiation.
      */
     private DateUtil() {
     }
-    
+
     /**
      * Returns the largest day either before or equal to the given date.
      *
@@ -46,7 +42,7 @@ public final class DateUtil {
         notNull(date, "date can't be null");
         return date.truncatedTo(ChronoUnit.DAYS);
     }
-    
+
     /**
      * Returns the largest week either before or equal to the given date, based on UTC time.
      *
@@ -58,7 +54,7 @@ public final class DateUtil {
         final DayOfWeek dow = ZonedDateTime.ofInstant(date, ZoneOffset.UTC).getDayOfWeek();
         return truncatedToDay(date).minus(Duration.ofDays(dow.getValue() % 7));
     }
-    
+
     public static int tickOffsetFromWeekStart(Instant date, int intervalInMinutes) {
         notNull(date, "instant can't be null");
         final Instant baseInstant = truncatedToWeek(date);

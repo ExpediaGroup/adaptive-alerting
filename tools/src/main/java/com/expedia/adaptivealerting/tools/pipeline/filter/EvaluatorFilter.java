@@ -33,12 +33,12 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 public final class EvaluatorFilter implements AnomalyResultSubscriber {
     private final Evaluator evaluator;
     private final List<ModelEvaluationSubscriber> subscribers = new LinkedList<>();
-    
+
     public EvaluatorFilter(Evaluator evaluator) {
         notNull(evaluator, "evaluator can't be null");
         this.evaluator = evaluator;
     }
-    
+
     @Override
     public void next(MappedMetricData anomaly) {
         notNull(anomaly, "anomaly can't be null");
@@ -46,17 +46,17 @@ public final class EvaluatorFilter implements AnomalyResultSubscriber {
         evaluator.update(anomaly.getMetricData().getValue(), getPredicted(anomaly));
         publish(evaluator.evaluate());
     }
-    
+
     public void addSubscriber(ModelEvaluationSubscriber subscriber) {
         notNull(subscriber, "subscriber can't be null");
         subscribers.add(subscriber);
     }
-    
+
     public void removeSubscriber(ModelEvaluationSubscriber subscriber) {
         notNull(subscriber, "subscriber can't be null");
         subscribers.remove(subscriber);
     }
-    
+
     private Double getPredicted(MappedMetricData anomaly) {
         // getPredicted() can return null during warm up; convert null to 0
         val anomalyResult = anomaly.getAnomalyResult();

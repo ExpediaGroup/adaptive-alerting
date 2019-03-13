@@ -22,15 +22,15 @@ import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertFalse;
 
 public class MathUtilTest {
-    
+
     @Test
     public void testIsApproximatelyEqual() {
         assertTrue(isApproximatelyEqual(2.0, 2.0, 0.0));
         assertTrue(isApproximatelyEqual(2.0, 2.0, 0.1));
-        
+
         // This is surprising, but it's because floating point is only approximate.
         assertFalse(isApproximatelyEqual(2.0, 2.1, 0.1));
-        
+
         assertTrue(isApproximatelyEqual(2.0, 2.1, 0.11));
     }
 }

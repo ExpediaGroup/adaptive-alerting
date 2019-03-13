@@ -22,12 +22,7 @@ import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.metrictank.MetricTankIdFactory;
 import lombok.val;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
@@ -41,65 +36,65 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 public final class TempHaystackAwareDetectorSource implements DetectorSource {
     private static final String PRODUCT = "product";
     private static final String HAYSTACK = "haystack";
-    
+
     private final DetectorSource primaryDetectorSource;
     private final MetricTankIdFactory idFactory = new MetricTankIdFactory();
     private final Map<UUID, AnomalyDetector> haystackDetectorMap = new HashMap<>();
-    
+
     public TempHaystackAwareDetectorSource(DetectorSource primaryDetectorSource) {
         notNull(primaryDetectorSource, "primaryDetectorSource can't be null");
         this.primaryDetectorSource = primaryDetectorSource;
     }
-    
+
     @Override
     public Set<String> findDetectorTypes() {
         return primaryDetectorSource.findDetectorTypes();
     }
-    
+
     @Override
     public List<UUID> findDetectorUuids(MetricDefinition metricDef) {
         notNull(metricDef, "metricDef can't be null");
-        
+
         val detectorUuids = primaryDetectorSource.findDetectorUuids(metricDef);
-        
+
         if (detectorUuids.size() > 0) {
             return detectorUuids;
         }
-        
+
         return isHaystackMetric(metricDef) ?
                 findHaystackDetectorUuids(metricDef) :
                 Collections.EMPTY_LIST;
     }
-    
+
     @Override
     public AnomalyDetector findDetector(UUID detectorUuid, MetricDefinition metricDef) {
         notNull(detectorUuid, "detectorUuid can't be null");
-        
+
         val detector = primaryDetectorSource.findDetector(detectorUuid, metricDef);
-        
+
         if (detector != null) {
             return detector;
         }
-        
+
         return isHaystackMetric(metricDef) ?
                 createHaystackDetector(detectorUuid) :
                 null;
     }
-    
+
     private boolean isHaystackMetric(MetricDefinition metricDef) {
         if (metricDef == null) {
             return false;
         }
-        
+
         return HAYSTACK.equals(metricDef.getTags().getKv().get(PRODUCT));
     }
-    
+
     private List<UUID> findHaystackDetectorUuids(MetricDefinition metricDef) {
         val metricId = idFactory.getId(metricDef);
         val detectorUuid = UUID.nameUUIDFromBytes(metricId.getBytes());
         return Collections.singletonList(detectorUuid);
     }
-    
+
     private AnomalyDetector createHaystackDetector(UUID detectorUuid) {
         AnomalyDetector detector = haystackDetectorMap.get(detectorUuid);
         if (detector == null) {

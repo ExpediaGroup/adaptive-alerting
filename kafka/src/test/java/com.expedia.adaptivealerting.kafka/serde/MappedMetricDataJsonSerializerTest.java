@@ -32,14 +32,14 @@ public final class MappedMetricDataJsonSerializerTest {
     private MappedMetricDataJsonSerializer serializer;
     private ObjectMapper objectMapper;
     private MappedMetricData mappedMetricData;
-    
+
     @Before
     public void setUp() {
         this.serializer = new MappedMetricDataJsonSerializer();
         this.objectMapper = new ObjectMapper().registerModule(new MetricsJavaModule());
         this.mappedMetricData = TestObjectMother.mappedMetricData();
     }
-    
+
     @Test
     public void testSerializer() throws Exception {
         val expected = objectMapper.writeValueAsBytes(mappedMetricData);

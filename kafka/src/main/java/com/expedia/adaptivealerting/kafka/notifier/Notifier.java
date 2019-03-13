@@ -24,11 +24,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -81,7 +77,7 @@ public class Notifier implements ApplicationListener<ApplicationReadyEvent> {
 
     private void loopUntilShutdown() {
         try (KafkaConsumer<String, MappedMetricData> kafkaConsumer =
-                 new KafkaConsumer<>(notifierConfig.getKafkaConsumerConfig())) {
+                     new KafkaConsumer<>(notifierConfig.getKafkaConsumerConfig())) {
             kafkaConsumer.subscribe(Arrays.asList(notifierConfig.getKafkaTopic()));
 
             while (running.get()) {
@@ -99,11 +95,10 @@ public class Notifier implements ApplicationListener<ApplicationReadyEvent> {
                 HttpEntity<String> entity = new HttpEntity<>(json, headers);
                 try {
                     ResponseEntity responseEntity =
-                        restTemplate.exchange(webhookUrl, HttpMethod.POST, entity, ResponseEntity.class);
+                            restTemplate.exchange(webhookUrl, HttpMethod.POST, entity, ResponseEntity.class);
                     if (responseEntity.getStatusCode().is2xxSuccessful()) {
                         MetricsMonitor.notification_success.mark();
-                    }
-                    else {
+                    } else {
                         MetricsMonitor.notification_failure.mark();
                     }
                 } catch (HttpClientErrorException ex) {

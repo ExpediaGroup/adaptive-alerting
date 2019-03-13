@@ -31,16 +31,16 @@ import java.util.Map;
  */
 @Slf4j
 public class AbstractJsonSerializer<T> implements Serializer<T> {
-    
+
     @Getter
     private ObjectMapper objectMapper = new ObjectMapper()
             .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-    
+
     @Override
     public void configure(Map<String, ?> map, boolean b) {
         // Nothing to configure
     }
-    
+
     @Override
     public byte[] serialize(String topic, T data) {
         if (data == null) {
@@ -52,7 +52,7 @@ public class AbstractJsonSerializer<T> implements Serializer<T> {
             throw new SerializationException("Error serializing data to JSON", e);
         }
     }
-    
+
     @Override
     public void close() {
         // Nothing to close

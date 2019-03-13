@@ -30,13 +30,13 @@ import static org.junit.Assert.assertEquals;
 public final class MappedMetricDataJsonDeserializerTest {
     private MappedMetricDataJsonDeserializer deserializer;
     private ObjectMapper objectMapper;
-    
+
     @Before
     public void setUp() {
         this.deserializer = new MappedMetricDataJsonDeserializer();
         this.objectMapper = new ObjectMapper().registerModule(new MetricsJavaModule());
     }
-    
+
     @Test
     public void testDeserialize() throws Exception {
         val expected = TestObjectMother.mappedMetricData();

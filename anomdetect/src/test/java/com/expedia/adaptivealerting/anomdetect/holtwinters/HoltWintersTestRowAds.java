@@ -23,13 +23,13 @@ import lombok.Data;
 
 @Data
 public class HoltWintersTestRowAds {
-    
+
     @CsvBindByName
     private String date;
-    
+
     @CsvBindByName
     private int observed;
-    
+
     @CsvBindByName
     private double expectedMean;
 

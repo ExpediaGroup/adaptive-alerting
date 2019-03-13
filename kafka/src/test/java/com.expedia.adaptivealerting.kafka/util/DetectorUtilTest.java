@@ -25,7 +25,7 @@ import static org.junit.Assert.assertNotNull;
  * {@link DetectorUtil} unit test.
  */
 public final class DetectorUtilTest {
-    
+
     @Test
     public void testBuildDetectorSource() {
         val config = ConfigFactory.load("manager.conf");

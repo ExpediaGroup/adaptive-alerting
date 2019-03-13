@@ -29,52 +29,52 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  */
 @Slf4j
 public class TypesafeConfigLoader {
-    
+
     /**
      * Base configuration path.
      */
     private static final String BASE_APP_CONFIG_PATH = "config/base.conf";
-    
+
     /**
      * Fallback configuration key.
      */
     private static final String CK_KSTREAM_APP_DEFAULT_CONFIG = "kstream.app.default";
-    
+
     /**
      * Overrides configuration path environment variable.
      */
     private static final String EV_OVERRIDES_CONFIG_PATH = "AA_OVERRIDES_CONFIG_PATH";
-    
+
     private String appKey;
-    
+
     public TypesafeConfigLoader(String appKey) {
         notNull(appKey, "appKey can't be null");
         this.appKey = appKey;
     }
-    
+
     public Config loadBaseConfig() {
         log.info("Loading base configuration: appKey={}", appKey);
         val baseAppConfigs = ConfigFactory.load(BASE_APP_CONFIG_PATH);
         val defaultAppConfig = baseAppConfigs.getConfig(CK_KSTREAM_APP_DEFAULT_CONFIG);
         return baseAppConfigs.getConfig(appKey).withFallback(defaultAppConfig);
     }
-    
+
     public Config loadOverridesConfig() {
         String overridesPath = System.getenv(EV_OVERRIDES_CONFIG_PATH);
         if (overridesPath == null) {
             overridesPath = "/config/" + appKey + ".conf";
         }
-        
+
         val overridesFile = new File(overridesPath);
         if (!overridesFile.exists()) {
             log.info("No overrides configuration found: appKey={}, overridesFile={}", appKey, overridesFile);
             return null;
         }
-        
+
         log.info("Loading overrides configuration: appKey={}, overridesFile={}", appKey, overridesFile);
         return ConfigFactory.parseFile(overridesFile).getConfig(appKey);
     }
-    
+
     public Config loadMergedConfig() {
         val baseConfigLoader = new TypesafeConfigLoader(appKey);
         val baseConfig = baseConfigLoader.loadBaseConfig();

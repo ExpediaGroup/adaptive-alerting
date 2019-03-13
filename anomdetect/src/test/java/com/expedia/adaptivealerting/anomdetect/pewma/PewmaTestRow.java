@@ -20,16 +20,16 @@ import lombok.Data;
 
 @Data
 public class PewmaTestRow {
-    
+
     @CsvBindByName
     private double observed;
-    
+
     @CsvBindByName
     private double mean;
 
     @CsvBindByName
     private String level;
-    
+
     @CsvBindByName
     private double std;
 }

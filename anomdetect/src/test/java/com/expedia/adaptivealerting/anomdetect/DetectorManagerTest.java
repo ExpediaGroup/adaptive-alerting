@@ -40,9 +40,9 @@ import static org.mockito.Mockito.when;
  */
 public final class DetectorManagerTest {
     private static final String DETECTOR_TYPE = "ewma-detector";
-    
+
     private DetectorManager managerUnderTest;
-    
+
     @Mock
     private DetectorSource detectorSource;
 
@@ -58,10 +58,10 @@ public final class DetectorManagerTest {
 
     @Mock
     private AnomalyDetector detector;
-    
+
     @Mock
     private AnomalyResult anomalyResult;
-    
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -81,17 +81,17 @@ public final class DetectorManagerTest {
         val detectorTypes = managerUnderTest.getDetectorTypes();
         assertTrue(detectorTypes.contains(DETECTOR_TYPE));
     }
-    
+
     @Test
     public void testHasDetectorType() {
         assertTrue(managerUnderTest.hasDetectorType(DETECTOR_TYPE));
     }
-    
+
     @Test
     public void testDoesNotHaveDetectorType() {
         assertFalse(managerUnderTest.hasDetectorType("some-nonexistent-type"));
     }
-    
+
     @Test
     public void testClassify() {
         val result = managerUnderTest.classify(goodMappedMetricData);
@@ -114,13 +114,13 @@ public final class DetectorManagerTest {
         this.badMetricData = new MetricData(badDefinition, 100.0, Instant.now().getEpochSecond());
         this.badMappedMetricData = new MappedMetricData(badMetricData, UUID.randomUUID());
     }
-    
+
     private void initDependencies() {
         when(detector.classify(goodMetricData)).thenReturn(anomalyResult);
 
         when(detectorSource.findDetectorTypes())
                 .thenReturn(Collections.singleton(DETECTOR_TYPE));
-        
+
         when(detectorSource.findDetector(any(UUID.class), eq(goodDefinition)))
                 .thenReturn(detector);
         when(detectorSource.findDetector(any(UUID.class), eq(badDefinition)))

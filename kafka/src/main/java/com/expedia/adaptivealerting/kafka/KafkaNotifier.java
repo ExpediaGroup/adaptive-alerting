@@ -20,7 +20,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class KafkaNotifier {
-    
+
     public static void main(String[] args) {
         SpringApplication.run(KafkaNotifier.class, args);
     }

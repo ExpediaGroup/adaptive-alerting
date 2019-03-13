@@ -25,7 +25,6 @@ public class RmseEvaluator implements Evaluator {
 
     /**
      * Creates a new RmseEvaluator. Initial n and residual sum of squares values are set to 0.
-     * 
      */
     public RmseEvaluator() {
         reset();
