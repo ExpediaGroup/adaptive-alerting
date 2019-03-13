@@ -34,7 +34,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  */
 public class DetectorLookup {
     private final Map<String, Class<? extends AnomalyDetector>> detectorMap = new HashMap<>();
-    
+
     public DetectorLookup() {
         detectorMap.put("constant-detector", ConstantThresholdAnomalyDetector.class);
         detectorMap.put("cusum-detector", CusumAnomalyDetector.class);
@@ -43,19 +43,19 @@ public class DetectorLookup {
         detectorMap.put("individuals-detector", IndividualsControlChartAnomalyDetector.class);
         detectorMap.put("pewma-detector", PewmaAnomalyDetector.class);
     }
-    
+
     public Set<String> getDetectorTypes() {
         return detectorMap.keySet();
     }
-    
+
     public Class<? extends AnomalyDetector> getDetector(String key) {
         notNull(key, "key can't be null");
         val detectorClass = detectorMap.get(key);
-        
+
         if (detectorClass == null) {
             throw new RuntimeException("No such detector: " + key);
         }
-        
+
         return detectorClass;
     }
 }

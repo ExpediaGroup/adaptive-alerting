@@ -29,11 +29,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
@@ -47,17 +43,17 @@ public class ModelServiceConnectorTest {
     private static final String EWMA_DETECTOR = "ewma-detector";
     private static final UUID DETECTOR_UUID = UUID.randomUUID();
     private static final UUID DETECTOR_UUID_EMPTY = UUID.randomUUID();
-    
+
     // FIXME The ModelServiceConnector uses this inconsistently. See the notes in that class for more information. [WLW]
     private static final String URI_TEMPLATE = "http://example.com/%s";
-    
+
     private ModelServiceConnector connectorUnderTest;
     private MetricTankIdFactory metricTankIdFactory = new MetricTankIdFactory();
     private ObjectMapper objectMapper = new ObjectMapper();
-    
+
     @Mock
     private HttpClientWrapper httpClient;
-    
+
     // Test objects
     private List<DetectorResource> detectorResourceList;
     private List<ModelResource> modelResourceList;
@@ -65,7 +61,7 @@ public class ModelServiceConnectorTest {
     private Content detectorResourcesContent;
     private Content modelResourcesContent;
     private Content emptyModelResourcesContent;
-    
+
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -73,29 +69,29 @@ public class ModelServiceConnectorTest {
         initDependencies();
         this.connectorUnderTest = new ModelServiceConnector(httpClient, URI_TEMPLATE);
     }
-    
+
     @Test
     public void testConstructorInjection() {
         assertSame(httpClient, connectorUnderTest.getHttpClient());
         assertSame(URI_TEMPLATE, connectorUnderTest.getUriTemplate());
     }
-    
+
     @Test(expected = IllegalArgumentException.class)
     public void testConstructor_httpClientNotNull() {
         new ModelServiceConnector(null, URI_TEMPLATE);
     }
-    
+
     @Test(expected = IllegalArgumentException.class)
     public void testConstructor_uriTemplateNotNull() {
         new ModelServiceConnector(httpClient, null);
     }
-    
+
     @Test
     public void testFindDetectors() throws Exception {
         val result = connectorUnderTest.findDetectors(metricDefinition);
         assertEquals(detectorResourceList.size(), result.getEmbedded().getDetectors().size());
     }
-    
+
     @Test(expected = IllegalArgumentException.class)
     public void testFindDetectors_metricDefinitionNotNull() throws Exception {
         connectorUnderTest.findDetectors(null);
@@ -106,7 +102,7 @@ public class ModelServiceConnectorTest {
         val result = connectorUnderTest.findLatestModel(DETECTOR_UUID);
         assertNotNull(result);
     }
-    
+
     @Test
     public void testFindLatestModels_empty() throws Exception {
         val result = connectorUnderTest.findLatestModel(DETECTOR_UUID_EMPTY);
@@ -120,9 +116,9 @@ public class ModelServiceConnectorTest {
         tags.put("unit", "");
         tags.put("what", "bookings");
         tags.put("interval", "5");
-        
+
         this.metricDefinition = new MetricDefinition("some-key", new TagCollection(tags), TagCollection.EMPTY);
-        
+
         // Find detectors
         this.detectorResourceList = new ArrayList<>();
         detectorResourceList.add(new DetectorResource(
@@ -134,26 +130,26 @@ public class ModelServiceConnectorTest {
         val detectorResources = new DetectorResources(detectorResourceList);
         val detectorResourcesBytes = objectMapper.writeValueAsBytes(detectorResources);
         this.detectorResourcesContent = new Content(detectorResourcesBytes, ContentType.APPLICATION_JSON);
-        
+
         // Find models
         this.modelResourceList = new ArrayList<>();
         modelResourceList.add(new ModelResource());
         val modelResources = new ModelResources(modelResourceList);
         val modelResourcesBytes = objectMapper.writeValueAsBytes(modelResources);
         this.modelResourcesContent = new Content(modelResourcesBytes, ContentType.APPLICATION_JSON);
-        
+
         // Find models - empty list
         val emptyModelResources = new ModelResources(Collections.EMPTY_LIST);
         val emptyModelResourcesBytes = objectMapper.writeValueAsBytes(emptyModelResources);
         this.emptyModelResourcesContent = new Content(emptyModelResourcesBytes, ContentType.APPLICATION_JSON);
     }
-    
+
     private void initDependencies() throws IOException {
         val metricId = metricTankIdFactory.getId(metricDefinition);
         val findDetectorsUri = String.format(URI_TEMPLATE, metricId);
         val findModelsUri = String.format(URI_TEMPLATE, DETECTOR_UUID);
         val findModelsUri_empty = String.format(URI_TEMPLATE, DETECTOR_UUID_EMPTY);
-        
+
         when(httpClient.get(findDetectorsUri)).thenReturn(detectorResourcesContent);
         when(httpClient.get(findModelsUri)).thenReturn(modelResourcesContent);
         when(httpClient.get(findModelsUri_empty)).thenReturn(emptyModelResourcesContent);

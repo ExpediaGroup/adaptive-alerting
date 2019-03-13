@@ -17,9 +17,7 @@ package com.expedia.adaptivealerting.anomdetect.holtwinters;
 
 import org.junit.Test;
 
-import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersAustouristsTestHelper.ADDITIVE_IDENTITY_SEASONALS;
-import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersAustouristsTestHelper.MULTIPLICATIVE_IDENTITY_SEASONALS;
-import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersAustouristsTestHelper.buildAustouristsParams;
+import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersAustouristsTestHelper.*;
 import static com.expedia.adaptivealerting.anomdetect.holtwinters.SeasonalityType.ADDITIVE;
 import static com.expedia.adaptivealerting.anomdetect.holtwinters.SeasonalityType.MULTIPLICATIVE;
 import static org.junit.Assert.assertArrayEquals;

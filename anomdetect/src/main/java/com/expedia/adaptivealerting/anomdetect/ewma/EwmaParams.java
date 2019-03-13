@@ -24,23 +24,23 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 @Data
 @Accessors(chain = true)
 public final class EwmaParams implements DetectorParams {
-    
+
     /**
      * Smoothing param. Somewhat misnamed because higher values lead to less smoothing, but it's called the
      * smoothing parameter in the literature.
      */
     private double alpha = 0.15;
-    
+
     /**
      * Weak threshold sigmas.
      */
     private double weakSigmas = 3.0;
-    
+
     /**
      * Strong threshold sigmas.
      */
     private double strongSigmas = 4.0;
-    
+
     /**
      * Initial mean estimate.
      */

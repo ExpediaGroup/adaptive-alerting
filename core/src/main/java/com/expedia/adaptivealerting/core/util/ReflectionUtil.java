@@ -21,13 +21,13 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * Reflection utilities.
  */
 public final class ReflectionUtil {
-    
+
     /**
      * Prevent instantiation.
      */
     private ReflectionUtil() {
     }
-    
+
     public static Class classForName(String className) {
         try {
             return Class.forName(className);
@@ -35,12 +35,12 @@ public final class ReflectionUtil {
             throw new RuntimeException(e);
         }
     }
-    
+
     public static Object newInstance(String className) {
         notNull(className, "className can't be null");
         return newInstance(classForName(className));
     }
-    
+
     public static <T> T newInstance(Class<T> clazz) {
         try {
             return clazz.newInstance();

@@ -36,10 +36,10 @@ public class AnomalyResult {
 
     @NonNull
     private AnomalyLevel anomalyLevel;
-    
+
     @Deprecated
     private Double predicted;
-    
+
     @Deprecated
     private AnomalyThresholds thresholds;
 }

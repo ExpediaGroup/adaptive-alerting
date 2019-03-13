@@ -21,24 +21,24 @@ package com.expedia.adaptivealerting.core.data.io;
 public class MetricFileFormat {
     private boolean hasHeader;
     private boolean hasTimestamps;
-    
+
     // Optional field to help when the files have no timestamps.
     private Integer intervalInMinutes;
-    
+
     public MetricFileFormat(boolean hasHeader, boolean hasTimestamps, Integer intervalInMinutes) {
         this.hasHeader = hasHeader;
         this.hasTimestamps = hasTimestamps;
         this.intervalInMinutes = intervalInMinutes;
     }
-    
+
     public boolean getHasHeader() {
         return hasHeader;
     }
-    
+
     public boolean getHasTimestamps() {
         return hasTimestamps;
     }
-    
+
     public Integer getIntervalInMinutes() {
         return intervalInMinutes;
     }

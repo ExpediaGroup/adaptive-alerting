@@ -26,11 +26,11 @@ import java.util.Map;
 
 public class MetricDataSerializer implements Serializer<MetricData> {
     private final static MessagePackSerializer mps = new MessagePackSerializer();
-    
+
     @Override
     public void configure(Map<String, ?> configs, boolean isKey) {
     }
-    
+
     @Override
     public byte[] serialize(String topic, MetricData metricData) {
         try {
@@ -40,7 +40,7 @@ public class MetricDataSerializer implements Serializer<MetricData> {
             throw new RuntimeException(e);
         }
     }
-    
+
     @Override
     public void close() {
     }

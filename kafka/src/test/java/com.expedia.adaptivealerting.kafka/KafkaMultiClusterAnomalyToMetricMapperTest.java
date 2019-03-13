@@ -64,24 +64,24 @@ public class KafkaMultiClusterAnomalyToMetricMapperTest {
 
     @ClassRule
     public static KafkaJunitRule kafka = new KafkaJunitRule(EphemeralKafkaBroker.create()).waitForStartup();
-    
+
     // Class under test
     private KafkaMultiClusterAnomalyToMetricMapper a2mMapper;
-    
+
     private ObjectMapper objectMapper;
 
     @Before
     public void setUp() {
         val anomalyConsumer = buildAnomalyConsumer();
         val metricProducer = buildMetricProducer();
-        
+
         this.a2mMapper = new KafkaMultiClusterAnomalyToMetricMapper(
                 anomalyConsumer,
                 metricProducer,
                 ANOMALY_TOPIC,
                 METRIC_TOPIC
         );
-        
+
         this.objectMapper = new ObjectMapper()
                 .registerModule(new MetricsJavaModule())
                 .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
@@ -90,18 +90,18 @@ public class KafkaMultiClusterAnomalyToMetricMapperTest {
 
     @Test
     public void testRun() throws Exception {
-        
+
         // TODO This mapped metric data represents an anomaly. It's a little confusing because there's a class called
         // AnomalyResult, which seems more like an anomaly. Want to revisit whether we need to put the whole MMD on the
         // anomalies topic, or whether putting an AnomalyResult is sufficient. [WLW]
         val anomaly = TestObjectMother.mappedMetricDataWithAnomalyResult();
         val anomalyJson = objectMapper.writeValueAsString(anomaly);
-        
+
         for (int i = 0; i < NUM_MESSAGES; i++) {
             log.info("Writing anomaly: {}", anomalyJson);
             kafka.helper().produceStrings(ANOMALY_TOPIC, anomalyJson);
         }
-        
+
         val mapperThread = new Thread(a2mMapper);
         mapperThread.start();
         mapperThread.join(THREAD_JOIN_MILLIS);
@@ -139,7 +139,7 @@ public class KafkaMultiClusterAnomalyToMetricMapperTest {
         config.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ANOMALY_DESER);
         return new KafkaConsumer<>(config);
     }
-    
+
     private KafkaProducer<String, MetricData> buildMetricProducer() {
         val config = kafka.helper().producerConfig();
         config.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, STRING_SER);

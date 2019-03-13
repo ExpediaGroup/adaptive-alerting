@@ -15,11 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.source;
 
-import com.expedia.adaptivealerting.anomdetect.util.DetectorResource;
-import com.expedia.adaptivealerting.anomdetect.util.DetectorResources;
-import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
-import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
-import com.expedia.adaptivealerting.anomdetect.util.ModelTypeResource;
+import com.expedia.adaptivealerting.anomdetect.util.*;
 import com.expedia.metrics.MetricDefinition;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -42,9 +38,9 @@ public final class DefaultDetectorSourceTest {
     private static final UUID DETECTOR_UUID_MISSING_DETECTOR = UUID.fromString("90c37a3c-f6bb-4c00-b41b-191909cccfb8");
     private static final UUID DETECTOR_UUID_EXCEPTION = UUID.fromString("90c37a3c-f6bb-4c00-b41b-191909cccfb9");
     private static final String DETECTOR_TYPE = "ewma-detector";
-    
+
     private DefaultDetectorSource sourceUnderTest;
-    
+
     @Mock
     private ModelServiceConnector connector;
 
@@ -70,16 +66,16 @@ public final class DefaultDetectorSourceTest {
     public void testFindDetectorUuids() {
         val results = sourceUnderTest.findDetectorUuids(metricDef);
         assertEquals(1, results.size());
-        
+
         val result = results.get(0);
         assertEquals(DETECTOR_UUID, result);
     }
-    
+
     @Test(expected = RuntimeException.class)
     public void testFindDetectorMetas_exception() {
         sourceUnderTest.findDetectorUuids(metricDefException);
     }
-    
+
     @Test
     public void testFindDetector() {
         val result = sourceUnderTest.findDetector(DETECTOR_UUID, metricDef);
@@ -97,7 +93,7 @@ public final class DefaultDetectorSourceTest {
         val result = sourceUnderTest.findDetector(DETECTOR_UUID_MISSING_DETECTOR, metricDef);
         assertNull(result);
     }
-    
+
     @Test(expected = RuntimeException.class)
     public void testFindDetector_exception() {
         sourceUnderTest.findDetector(DETECTOR_UUID_EXCEPTION, metricDef);
@@ -120,12 +116,12 @@ public final class DefaultDetectorSourceTest {
         modelResource.setParams(params);
         modelResource.setDetectorType(new ModelTypeResource(DETECTOR_TYPE));
     }
-    
+
     private void initDependencies() throws IOException {
         when(connector.findDetectors(metricDef)).thenReturn(detectorResources);
         when(connector.findDetectors(metricDefException))
                 .thenThrow(new IOException("Error reading detectors"));
-        
+
         when(connector.findLatestModel(DETECTOR_UUID)).thenReturn(modelResource);
         when(connector.findLatestModel(DETECTOR_UUID_MISSING_DETECTOR)).thenReturn(null);
         when(connector.findLatestModel(DETECTOR_UUID_EXCEPTION))

@@ -24,14 +24,14 @@ import java.util.UUID;
  * Anomaly detector interface.
  */
 public interface AnomalyDetector {
-    
+
     /**
      * Returns the anomaly detector UUID.
      *
      * @return Anomaly detector UUID.
      */
     UUID getUuid();
-    
+
     /**
      * Classifies a given metric data point.
      *

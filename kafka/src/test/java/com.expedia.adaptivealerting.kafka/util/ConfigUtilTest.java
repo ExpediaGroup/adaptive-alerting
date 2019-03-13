@@ -31,7 +31,7 @@ public final class ConfigUtilTest {
     private static final String VALUE_DESER = "com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonDeserializer";
     private static final String KEY_SER = "org.apache.kafka.common.serialization.StringSerializer";
     private static final String VALUE_SER = "com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerializer";
-    
+
     @Test
     public void testToConsumerConfig() {
         val config = ConfigFactory.load("consumer.conf");
@@ -41,7 +41,7 @@ public final class ConfigUtilTest {
         assertEquals(KEY_DESER, props.getProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG));
         assertEquals(VALUE_DESER, props.getProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG));
     }
-    
+
     @Test
     public void testToProducerConfig() {
         val config = ConfigFactory.load("producer.conf");

@@ -74,8 +74,8 @@ public class CsvTrafficHoltWintersVariants {
 //        charts.add(buildChartWithInitialTrainings(source, M, ALPHA,     BETA, GAMMA,      "No Estimates").getChart());
 //        charts.add(buildChartWithoutInitEstimates(source, M, ALPHA,     BETA, GAMMA,      "No Estimates").getChart());
 
-        charts.add(buildChartWithoutInitEstimates(source, M, ALPHA_LOW, BETA, GAMMA,      "No Estimates", "Low Alpha").getChart());
-        charts.add(buildChartWithInitialTrainings(source, M, ALPHA_LOW, BETA, GAMMA,      "Low Alpha").getChart());
+        charts.add(buildChartWithoutInitEstimates(source, M, ALPHA_LOW, BETA, GAMMA, "No Estimates", "Low Alpha").getChart());
+        charts.add(buildChartWithInitialTrainings(source, M, ALPHA_LOW, BETA, GAMMA, "Low Alpha").getChart());
 
 //        charts.add(buildChartWithoutInitEstimates(source, M, ALPHA_LOW, BETA, GAMMA_HIGH, "No Estimates", "High Gamma").getChart());
 //        charts.add(buildChartWithoutInitEstimates(source, M, ALPHA_LOW, BETA, GAMMA_HIGH, "No Estimates", "Low Alpha", "High Gamma").getChart());

@@ -47,20 +47,20 @@ public class KafkaAnomalyToMetricMapperTest {
     private static final String KAFKA_KEY = "some-kafka-key";
     private static final String INBOUND_TOPIC = "anomalies";
     private static final String OUTBOUND_TOPIC = "mdm";
-    
+
     @Mock
     private StreamsAppConfig saConfig;
-    
+
     // Test objects
     private MetricData metricData;
     private MappedMetricData mappedMetricData;
-    
+
     // Test machinery
     private TopologyTestDriver logAndFailDriver;
     private ConsumerRecordFactory<String, MappedMetricData> mappedMetricDataFactory;
     private StringDeserializer stringDeserializer;
     private Deserializer<MetricData> metricDataDeserializer;
-    
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -68,47 +68,47 @@ public class KafkaAnomalyToMetricMapperTest {
         initTestObjects();
         initTestMachinery();
     }
-    
+
     @After
     public void tearDown() {
         logAndFailDriver.close();
     }
-    
+
     @Test
     public void testTransform() {
-        
+
         // FIXME Serializing the MMD works, but the driver fails to deserialize the MMD.
         logAndFailDriver.pipeInput(mappedMetricDataFactory.create(INBOUND_TOPIC, KAFKA_KEY, mappedMetricData));
-        
+
         val outputRecord = logAndFailDriver.readOutput(OUTBOUND_TOPIC, stringDeserializer, metricDataDeserializer);
         log.trace("outputRecord={}", outputRecord);
-        
+
         // TODO
     }
-    
+
     private void initConfig() {
         when(saConfig.getInboundTopic()).thenReturn(INBOUND_TOPIC);
         when(saConfig.getOutboundTopic()).thenReturn(OUTBOUND_TOPIC);
     }
-    
+
     private void initTestObjects() {
         this.metricData = TestObjectMother.metricData();
-        
+
         this.mappedMetricData = TestObjectMother.mappedMetricData(metricData);
         mappedMetricData.setAnomalyResult(new AnomalyResult(AnomalyLevel.STRONG));
-    
+
         log.trace("mappedMetricData={}", ObjectMapperUtil.writeValueAsString(new ObjectMapper(), mappedMetricData));
     }
-    
+
     private void initTestMachinery() {
-        
+
         // Topology test drivers
         val topology = new KafkaAnomalyToMetricMapper(saConfig).buildTopology();
         this.logAndFailDriver = TestObjectMother.topologyTestDriver(topology, MappedMetricDataJsonSerde.class, false);
-        
+
         // MappedMetricData producer
         this.mappedMetricDataFactory = TestObjectMother.mappedMetricDataFactory();
-        
+
         // MetricData consumer
         // We consume from the outbound topic so we can validate the results.
         this.stringDeserializer = new StringDeserializer();

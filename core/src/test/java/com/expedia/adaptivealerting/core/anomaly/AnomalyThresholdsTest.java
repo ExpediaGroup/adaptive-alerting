@@ -20,7 +20,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 public class AnomalyThresholdsTest {
-    
+
     @Test
     public void testUpperThresholds() {
         final AnomalyThresholds thresholds = new AnomalyThresholds(100.0, 50.0, null, null);
@@ -28,7 +28,7 @@ public class AnomalyThresholdsTest {
         assertEquals(AnomalyLevel.WEAK, thresholds.classify(75.0));
         assertEquals(AnomalyLevel.NORMAL, thresholds.classify(25.0));
     }
-    
+
     @Test
     public void testLowerThresholds() {
         final AnomalyThresholds thresholds = new AnomalyThresholds(null, null, 50.0, 25.0);

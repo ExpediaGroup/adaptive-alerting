@@ -22,32 +22,32 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public final class PewmaParams implements DetectorParams {
-    
+
     /**
      * Smoothing param.
      */
     private double alpha = 0.15;
-    
+
     /**
      * Anomaly weighting param.
      */
     private double beta = 1.0;
-    
+
     /**
      * Weak anomaly threshold, in sigmas.
      */
     private double weakSigmas = 3.0;
-    
+
     /**
      * Strong anomaly threshold, in sigmas.
      */
     private double strongSigmas = 4.0;
-    
+
     /**
      * Initial mean estimate.
      */
     private double initMeanEstimate = 0.0;
-    
+
     /**
      * How many iterations to train for.
      */

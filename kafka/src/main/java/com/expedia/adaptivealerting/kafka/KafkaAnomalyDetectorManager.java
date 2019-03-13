@@ -41,9 +41,9 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @Slf4j
 public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
     private static final String CK_AD_MANAGER = "ad-manager";
-    
+
     private final DetectorManager manager;
-    
+
     public static void main(String[] args) {
         val config = new TypesafeConfigLoader(CK_AD_MANAGER).loadMergedConfig();
         val saConfig = new StreamsAppConfig(config);
@@ -51,20 +51,20 @@ public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
         val manager = new DetectorManager(detectorSource);
         new KafkaAnomalyDetectorManager(saConfig, manager).start();
     }
-    
+
     public KafkaAnomalyDetectorManager(StreamsAppConfig config, DetectorManager manager) {
         super(config);
         notNull(manager, "manager can't be null");
         this.manager = manager;
     }
-    
+
     @Override
     protected Topology buildTopology() {
         val config = getConfig();
         val inputTopic = config.getInboundTopic();
         val outputTopic = config.getOutboundTopic();
         log.info("Initializing: inputTopic={}, outputTopic={}", inputTopic, outputTopic);
-        
+
         val builder = new StreamsBuilder();
         final KStream<String, MappedMetricData> stream = builder.stream(inputTopic);
         stream
@@ -74,7 +74,7 @@ public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
                 .to(outputTopic);
         return builder.build();
     }
-    
+
     private MappedMetricData toAnomalyMmd(MappedMetricData mmd) {
         assert mmd != null;
 

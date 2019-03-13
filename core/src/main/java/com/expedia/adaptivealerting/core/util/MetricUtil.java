@@ -30,28 +30,28 @@ import java.util.Set;
  * Metric utilities.
  */
 public final class MetricUtil {
-    
+
     /**
      * Prevent instantiation.
      */
     private MetricUtil() {
     }
-    
+
     public static Map<String, String> defaultKvTags() {
         val kvTags = new HashMap<String, String>();
         kvTags.put(MetricDefinition.UNIT, "");
         kvTags.put(MetricDefinition.MTYPE, "gauge");
         return kvTags;
     }
-    
+
     public static Set<String> defaultVTags() {
         return new HashSet<>();
     }
-    
+
     public static MetricDefinition metricDefinition() {
         return new MetricDefinition(null, null);
     }
-    
+
     /**
      * Convenience method to create a new metric definition from the given tags. Provides defaults for null values.
      *
@@ -68,14 +68,14 @@ public final class MetricUtil {
         }
         return new MetricDefinition(new TagCollection(kvTags, vTags));
     }
-    
+
     public static MetricData metricData(MetricDefinition metricDef) {
         if (metricDef == null) {
             metricDef = metricDefinition();
         }
         return metricData(metricDef, 0.0);
     }
-    
+
     /**
      * Convenience method to create a new {@link MetricData} from the given definition and value. Sets the timestamp to
      * the current epoch second.

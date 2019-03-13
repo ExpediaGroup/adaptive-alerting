@@ -29,7 +29,7 @@ public class ConstantThresholdParams implements DetectorParams {
      * Detector type: left-, right- or two-tailed.
      */
     private AnomalyType type;
-    
+
     private AnomalyThresholds thresholds;
 
     @Override

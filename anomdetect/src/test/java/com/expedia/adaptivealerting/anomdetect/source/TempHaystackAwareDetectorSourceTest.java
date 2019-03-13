@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
 @Slf4j
 public final class TempHaystackAwareDetectorSourceTest {
     private TempHaystackAwareDetectorSource sourceUnderTest;
-    
+
     @Mock
     private DetectorSource primaryDetectorSource;
 
@@ -73,38 +73,38 @@ public final class TempHaystackAwareDetectorSourceTest {
     public void testFindDetectorUUIDs_sameMetricHasSameUUID() {
         val results1 = sourceUnderTest.findDetectorUuids(haystackMetricDef);
         val results2 = sourceUnderTest.findDetectorUuids(haystackMetricDef);
-    
+
         assertEquals(1, results1.size());
         assertEquals(1, results2.size());
-    
+
         val uuid1 = results1.get(0);
         val uuid2 = results2.get(0);
-        
+
         log.info("Same metric has same UUID:");
         log.info("  uuid1={}", uuid1);
         log.info("  uuid2={}", uuid2);
-    
+
         assertEquals(uuid2, uuid1);
     }
-    
+
     @Test
     public void testFindDetectorUUIDs_differentMetricsHaveDifferentUUIDs() {
         val haystackResults = sourceUnderTest.findDetectorUuids(haystackMetricDef);
         val nonHaystackResults = sourceUnderTest.findDetectorUuids(nonHaystackMetricDef);
-        
+
         assertEquals(1, haystackResults.size());
         assertEquals(1, nonHaystackResults.size());
-    
+
         val uuid1 = haystackResults.get(0);
         val uuid2 = nonHaystackResults.get(0);
-        
+
         log.info("Different metrics have different UUIDs:");
         log.info("  uuid1={}", uuid1);
         log.info("  uuid2={}", uuid2);
-        
+
         assertNotEquals(uuid2, uuid1);
     }
-    
+
     @Test
     public void testFindDetector_persistentHaystackDetector() {
         val result = sourceUnderTest.findDetector(persistentHaystackDetectorUuid, haystackMetricDef);
@@ -143,7 +143,7 @@ public final class TempHaystackAwareDetectorSourceTest {
         val result = sourceUnderTest.findDetector(missingDetectorUuid, nonHaystackMetricDef);
         assertNull(result);
     }
-    
+
     private void initTestObjects() {
         this.detectorTypes = new HashSet<>();
 
@@ -151,7 +151,7 @@ public final class TempHaystackAwareDetectorSourceTest {
                 "haystack-metric",
                 new TagCollection(Collections.singletonMap("product", "haystack")),
                 TagCollection.EMPTY);
-        
+
         this.nonHaystackMetricDef = new MetricDefinition("non-haystack-metric");
 
         this.persistentHaystackDetectorUuid = UUID.randomUUID();
@@ -162,7 +162,7 @@ public final class TempHaystackAwareDetectorSourceTest {
         this.haystackDetector = new EwmaAnomalyDetector();
         this.nonHaystackDetector = new ConstantThresholdAnomalyDetector();
     }
-    
+
     private void initDependencies() {
         when(primaryDetectorSource.findDetectorTypes())
                 .thenReturn(detectorTypes);

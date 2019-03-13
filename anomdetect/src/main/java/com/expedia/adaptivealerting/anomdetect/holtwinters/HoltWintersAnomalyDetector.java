@@ -82,9 +82,12 @@ public final class HoltWintersAnomalyDetector extends AbstractAnomalyDetector<Ho
     public boolean isInitialTrainingComplete() {
         val params = getParams();
         switch (params.getInitTrainingMethod()) {
-            case NONE: return true;
-            case SIMPLE: return holtWintersSimpleTrainingModel.isTrainingComplete(params);
-            default: throw new IllegalStateException(format("Unexpected training method '%s'", params.getInitTrainingMethod()));
+            case NONE:
+                return true;
+            case SIMPLE:
+                return holtWintersSimpleTrainingModel.isTrainingComplete(params);
+            default:
+                throw new IllegalStateException(format("Unexpected training method '%s'", params.getInitTrainingMethod()));
         }
     }
 

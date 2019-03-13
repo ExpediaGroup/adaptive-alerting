@@ -35,11 +35,11 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @RequiredArgsConstructor
 @Slf4j
 public class DetectorMapper {
-    
+
     @Getter
     @NonNull
     private DetectorSource detectorSource;
-    
+
     /**
      * Maps an {@link MetricData} to its corresponding set of {@link MappedMetricData}s.
      *

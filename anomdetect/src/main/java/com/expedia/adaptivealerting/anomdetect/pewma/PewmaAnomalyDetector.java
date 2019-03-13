@@ -47,32 +47,32 @@ public final class PewmaAnomalyDetector extends AbstractAnomalyDetector<PewmaPar
      * Adjusted alpha, to match the way alpha is used in the paper that describes the algorithm.
      */
     private double adjAlpha;
-    
+
     /**
      * Number of data points seen so far.
      */
     private int trainingCount = 1;
-    
+
     /**
      * Internal state for PEWMA algorithm.
      */
     private double s1;
-    
+
     /**
      * Internal state for PEWMA algorithm.
      */
     private double s2;
-    
+
     /**
      * Local mean estimate.
      */
     private double mean;
-    
+
     /**
      * Local standard deviation estimate.
      */
     private double stdDev;
-    
+
     public PewmaAnomalyDetector() {
         super(PewmaParams.class);
     }
@@ -84,7 +84,7 @@ public final class PewmaAnomalyDetector extends AbstractAnomalyDetector<PewmaPar
         this.s2 = params.getInitMeanEstimate() * params.getInitMeanEstimate();
         updateMeanAndStdDev();
     }
-    
+
     @Override
     public AnomalyResult classify(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
@@ -94,23 +94,23 @@ public final class PewmaAnomalyDetector extends AbstractAnomalyDetector<PewmaPar
         val observed = metricData.getValue();
         val weakDelta = params.getWeakSigmas() * stdDev;
         val strongDelta = params.getStrongSigmas() * stdDev;
-        
+
         val thresholds = new AnomalyThresholds(
                 mean + strongDelta,
                 mean + weakDelta,
                 mean - weakDelta, mean - strongDelta
         );
-        
+
         updateEstimates(observed);
-        
+
         val level = thresholds.classifyExclusiveBounds(observed);
-        
+
         val result = new AnomalyResult(level);
         result.setPredicted(mean);
         result.setThresholds(thresholds);
         return result;
     }
-    
+
     private void updateEstimates(double value) {
         double zt = 0;
         if (this.stdDev != 0.0) {
@@ -118,18 +118,18 @@ public final class PewmaAnomalyDetector extends AbstractAnomalyDetector<PewmaPar
         }
         double pt = (1.0 / Math.sqrt(2.0 * Math.PI)) * Math.exp(-0.5 * zt * zt);
         double alpha = calculateAlpha(pt);
-        
+
         this.s1 = alpha * this.s1 + (1.0 - alpha) * value;
         this.s2 = alpha * this.s2 + (1.0 - alpha) * value * value;
-        
+
         updateMeanAndStdDev();
     }
-    
+
     private void updateMeanAndStdDev() {
         this.mean = this.s1;
         this.stdDev = Math.sqrt(this.s2 - this.s1 * this.s1);
     }
-    
+
     private double calculateAlpha(double pt) {
         val params = getParams();
         if (this.trainingCount < params.getWarmUpPeriod()) {

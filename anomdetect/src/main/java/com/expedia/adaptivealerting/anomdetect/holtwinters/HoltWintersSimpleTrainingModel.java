@@ -18,9 +18,7 @@ package com.expedia.adaptivealerting.anomdetect.holtwinters;
 import java.util.Arrays;
 
 import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersTrainingMethod.SIMPLE;
-import static com.expedia.adaptivealerting.core.util.AssertUtil.isFalse;
-import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.core.util.AssertUtil.*;
 import static java.util.stream.DoubleStream.concat;
 
 /**
@@ -44,11 +42,11 @@ public class HoltWintersSimpleTrainingModel {
      * SIMPLE training method requires 2 complete cycles of observations to finish training the initial level, base and seasonal components (l, b, s).
      * l and s can be calculated after the first cycle, b can only be determined after the 2nd cycle. This object stores those 2 cycles as the
      * firstCycle and secondCycle array fields.
-     *
+     * <p>
      * E.g. if frequency=4, then on the 8th observation, the model will complete its training of l, b, s.
      * Furthermore, on the 8th observation this method will then fit the model to the 8 initial observations, by running through those 8 stored data
      * points (in firstCycle and secondCycle) one at a time, to retrospectively apply the smoothing parameters (alpha, beta, gamma) to l, b, s.
-     *
+     * <p>
      * After the 8th observation, the components.getForecast() returns the correct forecast for the 9th observation which is the first non-training
      * observation that can be used to detect anomalies.
      */

@@ -36,49 +36,49 @@ import static junit.framework.TestCase.assertEquals;
 
 public class IndividualsChartAnomalyDetectorTest {
     private static final int WARMUP_PERIOD = 25;
-    
+
     // TODO This tolerance is very loose. Can we tighten it up? [WLW]
     private static final double TOLERANCE = 0.1;
-    
+
     private UUID detectorUUID;
     private MetricDefinition metricDefinition;
     private long epochSecond;
     private static List<IndividualsChartTestRow> data;
-    
-    
+
+
     @BeforeClass
     public static void setUpClass() {
         readDataFromCsv();
     }
-    
+
     @Before
     public void setUp() {
         this.detectorUUID = UUID.randomUUID();
         this.metricDefinition = new MetricDefinition("some-key");
         this.epochSecond = Instant.now().getEpochSecond();
     }
-    
+
     @Test
     public void testEvaluate() {
         val testRows = data.listIterator();
         val testRow0 = testRows.next();
         val observed0 = testRow0.getObserved();
-        
+
         val params = new IndividualsControlChartParams()
                 .setInitValue(observed0)
                 .setWarmUpPeriod(WARMUP_PERIOD);
         val detector = new IndividualsControlChartAnomalyDetector();
         detector.init(detectorUUID, params);
-        
+
         int noOfDataPoints = 1;
-        
+
         while (testRows.hasNext()) {
             final IndividualsChartTestRow testRow = testRows.next();
             final double observed = testRow.getObserved();
-            
+
             final MetricData metricData = new MetricData(metricDefinition, observed, epochSecond);
             final AnomalyLevel level = detector.classify(metricData).getAnomalyLevel();
-            
+
             if (noOfDataPoints < WARMUP_PERIOD) {
                 assertEquals(AnomalyLevel.MODEL_WARMUP, level);
             } else {
@@ -90,11 +90,11 @@ public class IndividualsChartAnomalyDetectorTest {
             noOfDataPoints += 1;
         }
     }
-    
+
     private static void assertApproxEqual(double d1, double d2) {
         TestCase.assertTrue(MathUtil.isApproximatelyEqual(d1, d2, TOLERANCE));
     }
-    
+
     private static void readDataFromCsv() {
         final InputStream is = ClassLoader.getSystemResourceAsStream("tests/individual-chart-sample-input.csv");
         data = new CsvToBeanBuilder<IndividualsChartTestRow>(new InputStreamReader(is))

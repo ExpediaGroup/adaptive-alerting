@@ -50,16 +50,16 @@ public final class KafkaDetectorManagerTest {
     private static final String INPUT_TOPIC = "mapped-metrics";
     private static final String OUTPUT_TOPIC = "anomalies";
     private static final String INVALID_INPUT_VALUE = "invalid-input-value";
-    
+
     @Mock
     private DetectorManager manager;
-    
+
     @Mock
     private StreamsAppConfig saConfig;
-    
+
     @Mock
     private Config tsConfig;
-    
+
     // Test machinery
     private TopologyTestDriver logAndFailDriver;
     private TopologyTestDriver logAndContinueDriver;
@@ -67,7 +67,7 @@ public final class KafkaDetectorManagerTest {
     private ConsumerRecordFactory<String, MappedMetricData> metricFactory;
     private StringDeserializer stringDeser;
     private Deserializer<MappedMetricData> anomalyDeser;
-    
+
     // Test objects
     private MappedMetricData metric_normalAnomaly;
     private MappedMetricData metric_weakAnomaly;
@@ -75,7 +75,7 @@ public final class KafkaDetectorManagerTest {
     private MappedMetricData metric_modelWarmup;
     private MappedMetricData metric_unknownAnomaly;
     private MappedMetricData metric_invalid;
-    
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -84,33 +84,33 @@ public final class KafkaDetectorManagerTest {
         initDependencies();
         initTestMachinery();
     }
-    
+
     @After
     public void tearDown() {
         logAndFailDriver.close();
         logAndContinueDriver.close();
     }
-    
+
     @Test
     public void testPublishesNormalAnomalies() {
         publishesAnomaly(metric_normalAnomaly, AnomalyLevel.NORMAL);
     }
-    
+
     @Test
     public void testPublishesWeakAnomalies() {
         publishesAnomaly(metric_weakAnomaly, AnomalyLevel.WEAK);
     }
-    
+
     @Test
     public void testPublishesStrongAnomalies() {
         publishesAnomaly(metric_strongAnomaly, AnomalyLevel.STRONG);
     }
-    
+
     @Test
     public void testPublishesWarmupAnomalies() {
         publishesAnomaly(metric_modelWarmup, AnomalyLevel.MODEL_WARMUP);
     }
-    
+
     @Test
     public void testPublishesUnknownAnomalies() {
         publishesAnomaly(metric_unknownAnomaly, AnomalyLevel.UNKNOWN);
@@ -120,7 +120,7 @@ public final class KafkaDetectorManagerTest {
     public void testDoesNotPublishInvalidAnomaly() {
         doesNotPublishAnomaly(metric_invalid);
     }
-    
+
     /**
      * Addresses bug https://github.com/ExpediaDotCom/adaptive-alerting/issues/245
      * See also https://stackoverflow.com/questions/51136942/how-to-handle-serializationexception-after-deserialization
@@ -129,7 +129,7 @@ public final class KafkaDetectorManagerTest {
     public void nullOnDeserExceptionWithLogAndFailDriver() {
         nullOnDeserException(logAndFailDriver);
     }
-    
+
     /**
      * Addresses bug https://github.com/ExpediaDotCom/adaptive-alerting/issues/245
      * See also https://stackoverflow.com/questions/51136942/how-to-handle-serializationexception-after-deserialization
@@ -138,13 +138,13 @@ public final class KafkaDetectorManagerTest {
     public void nullOnDeserExceptionWithLogAndContinueDriver() {
         nullOnDeserException(logAndContinueDriver);
     }
-    
+
     private void initConfig() {
         when(saConfig.getTypesafeConfig()).thenReturn(tsConfig);
         when(saConfig.getInboundTopic()).thenReturn(INPUT_TOPIC);
         when(saConfig.getOutboundTopic()).thenReturn(OUTPUT_TOPIC);
     }
-    
+
     private void initTestObjects() {
         this.metric_normalAnomaly = TestObjectMother.mappedMetricData();
         this.metric_weakAnomaly = TestObjectMother.mappedMetricData();
@@ -153,10 +153,10 @@ public final class KafkaDetectorManagerTest {
         this.metric_unknownAnomaly = TestObjectMother.mappedMetricData();
         this.metric_invalid = TestObjectMother.mappedMetricData();
     }
-    
+
     private void initDependencies() {
         when(manager.hasDetectorType(anyString())).thenReturn(true);
-        
+
         when(manager.classify(metric_normalAnomaly)).thenReturn(new AnomalyResult(AnomalyLevel.NORMAL));
         when(manager.classify(metric_weakAnomaly)).thenReturn(new AnomalyResult(AnomalyLevel.WEAK));
         when(manager.classify(metric_strongAnomaly)).thenReturn(new AnomalyResult(AnomalyLevel.STRONG));
@@ -164,41 +164,41 @@ public final class KafkaDetectorManagerTest {
         when(manager.classify(metric_unknownAnomaly)).thenReturn(new AnomalyResult(AnomalyLevel.UNKNOWN));
         when(manager.classify(metric_invalid)).thenThrow(new RuntimeException("Classification error"));
     }
-    
+
     private void initTestMachinery() {
-        
+
         // Topology test drivers
         val topology = new KafkaAnomalyDetectorManager(saConfig, manager).buildTopology();
         this.logAndFailDriver = TestObjectMother.topologyTestDriver(topology, MappedMetricDataJsonSerde.class, false);
         this.logAndContinueDriver = TestObjectMother.topologyTestDriver(topology, MappedMetricDataJsonSerde.class, true);
-        
+
         // MetricData sources
         this.stringFactory = TestObjectMother.stringFactory();
         this.metricFactory = TestObjectMother.mappedMetricDataFactory();
-        
+
         // MappedMetricData consumers
         this.stringDeser = new StringDeserializer();
         this.anomalyDeser = new MappedMetricDataJsonDeserializer();
     }
-    
+
     private void publishesAnomaly(MappedMetricData metric, AnomalyLevel anomalyLevel) {
         val anomalyRecord = getAnomalyRecord(metric);
         val anomaly = anomalyRecord.value();
         assertNotNull(anomaly);
         assertEquals(anomalyLevel, anomaly.getAnomalyResult().getAnomalyLevel());
     }
-    
+
     @SuppressWarnings("unused")
     private void doesNotPublishAnomaly(MappedMetricData metric) {
         assertNull(getAnomalyRecord(metric));
     }
-    
+
     private ProducerRecord<String, MappedMetricData> getAnomalyRecord(MappedMetricData metric) {
         val metricRecord = metricFactory.create(INPUT_TOPIC, KAFKA_KEY, metric);
         logAndFailDriver.pipeInput(metricRecord);
         return logAndFailDriver.readOutput(OUTPUT_TOPIC, stringDeser, anomalyDeser);
     }
-    
+
     private void nullOnDeserException(TopologyTestDriver driver) {
         driver.pipeInput(stringFactory.create(INPUT_TOPIC, KAFKA_KEY, INVALID_INPUT_VALUE));
         val record = driver.readOutput(OUTPUT_TOPIC, stringDeser, anomalyDeser);

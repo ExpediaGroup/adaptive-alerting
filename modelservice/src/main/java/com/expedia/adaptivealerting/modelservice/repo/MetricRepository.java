@@ -44,7 +44,7 @@ public interface MetricRepository extends PagingAndSortingRepository<Metric, Lon
      * @return Metric identified by the unique hash.
      */
     Metric findByHash(@Param("hash") String hash);
-    
+
     /**
      * Indicates whether a metric with the given hash exists.
      *
@@ -52,7 +52,7 @@ public interface MetricRepository extends PagingAndSortingRepository<Metric, Lon
      * @return boolean indicating whether a corresponding metric exists
      */
     boolean existsByHash(@Param("hash") String hash);
-    
+
     /**
      * Finds a list of metrics by its user.
      *
@@ -65,7 +65,7 @@ public interface MetricRepository extends PagingAndSortingRepository<Metric, Lon
     /**
      * Finds a list of metrics by its matching key.
      *
-     * @param key Matching key.
+     * @param key      Matching key.
      * @param pageable paging params
      * @return List of metrics by its matching key
      */

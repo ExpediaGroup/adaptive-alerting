@@ -21,9 +21,7 @@ import java.util.Arrays;
 import java.util.stream.Stream;
 
 import static com.expedia.adaptivealerting.anomdetect.holtwinters.SeasonalityType.MULTIPLICATIVE;
-import static com.expedia.adaptivealerting.core.util.AssertUtil.isBetween;
-import static com.expedia.adaptivealerting.core.util.AssertUtil.isEqual;
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.core.util.AssertUtil.*;
 import static java.lang.String.format;
 import static java.util.Comparator.comparing;
 
@@ -46,8 +44,8 @@ public class HoltWintersSeasonalEstimatesValidator {
      * Validate the given estimates.
      *
      * @param initSeasonalEstimates Array containing the provided estimates for initial seasonal component values.  Must be same length as frequency
-     * @param frequency The amount of observations per cycle.
-     * @param seasonalityType Are the estimates MULTIPLICATIVE or ADDITIVE?
+     * @param frequency             The amount of observations per cycle.
+     * @param seasonalityType       Are the estimates MULTIPLICATIVE or ADDITIVE?
      */
     public void validate(double[] initSeasonalEstimates, int frequency, SeasonalityType seasonalityType) {
         checkNotNull(initSeasonalEstimates);

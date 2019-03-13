@@ -24,7 +24,7 @@ import java.io.IOException;
  * Simple wrapper around Apache's fluent HTTP client, intended to support mockability.
  */
 public class HttpClientWrapper {
-    
+
     /**
      * Makes an HTTP GET call to the given URI and returns the result.
      *

@@ -23,13 +23,13 @@ import java.util.Properties;
  * Configuration utilities.
  */
 public final class ConfigUtil {
-    
+
     /**
      * Prevent instantiation.
      */
     private ConfigUtil() {
     }
-    
+
     /**
      * Maps a configuration instance to a properties instance.
      *

@@ -23,20 +23,20 @@ import org.apache.kafka.common.serialization.Serializer;
 import java.util.Map;
 
 public final class MappedMetricDataJsonSerde implements Serde<MappedMetricData> {
-    
+
     @Override
     public void configure(Map<String, ?> map, boolean b) {
     }
-    
+
     @Override
     public void close() {
     }
-    
+
     @Override
     public Serializer<MappedMetricData> serializer() {
         return new MappedMetricDataJsonSerializer();
     }
-    
+
     @Override
     public Deserializer<MappedMetricData> deserializer() {
         return new MappedMetricDataJsonDeserializer();

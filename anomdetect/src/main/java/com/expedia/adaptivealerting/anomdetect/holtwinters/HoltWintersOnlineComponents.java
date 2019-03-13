@@ -45,6 +45,7 @@ public class HoltWintersOnlineComponents {
 
     /**
      * Constructs HoltWintersOnlineComponents object
+     *
      * @param params User-supplied parameters for the model.  Assumed to be valid.
      */
     public HoltWintersOnlineComponents(HoltWintersParams params) {
@@ -66,8 +67,8 @@ public class HoltWintersOnlineComponents {
     /**
      * Return n=frequency seasonal components in reverse order, starting with the current season.
      * E.g. if frequency=4 and we've most recently observed the 2nd season (s2), the seasonal components will be returned in the following order:
-     *      seasonal[1], seasonal[0], seasonal[3], seasonal[2]
-     *
+     * seasonal[1], seasonal[0], seasonal[3], seasonal[2]
+     * <p>
      * Makes for easy comparison with R-generated datasets.
      *
      * @return seasonal components in reverse order

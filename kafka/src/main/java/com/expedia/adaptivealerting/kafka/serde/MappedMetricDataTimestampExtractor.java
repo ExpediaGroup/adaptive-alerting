@@ -25,16 +25,16 @@ import org.apache.kafka.streams.processor.TimestampExtractor;
  * {@link org.apache.kafka.streams.processor.LogAndSkipOnInvalidTimestamp}.
  */
 public final class MappedMetricDataTimestampExtractor implements TimestampExtractor {
-    
+
     @Override
     public long extract(ConsumerRecord<Object, Object> record, long previousTimestamp) {
         final MappedMetricData mappedMetricData = (MappedMetricData) record.value();
         if (mappedMetricData == null || mappedMetricData.getMetricData() == null) {
-            
+
             // We don't want to log this because sometimes it fills up the logs.
             // TODO Figure out what to do instead. Maybe a counter.
 //            log.warn("Skipping null MappedMetricData");
-            
+
             // -1 skips the record.
             return -1L;
         }

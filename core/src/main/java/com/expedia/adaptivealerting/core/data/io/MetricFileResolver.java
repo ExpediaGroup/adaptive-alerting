@@ -22,7 +22,7 @@ import java.util.Map;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 public final class MetricFileResolver {
-    
+
     /**
      * Resolves the given metric to a path, returning {@literal null} if there's no mapped path.
      *
@@ -32,8 +32,8 @@ public final class MetricFileResolver {
     public MetricFileInfo resolve(MetricDefinition metricDefinition) {
         notNull(metricDefinition, "metric can't be null");
 
-        Map<String,String> metricTags = metricDefinition.getTags().getKv();
-        
+        Map<String, String> metricTags = metricDefinition.getTags().getKv();
+
         // FIXME This is obviously a temporary, hardcoded implementation.
         // We'll replace it with the real thing as we onboard more metrics. [WLW]
         if ("count".equals(metricTags.get("mtype")) &&
@@ -42,15 +42,15 @@ public final class MetricFileResolver {
                 "hotels".equals(metricTags.get("lob")) &&
                 "expedia-com".equals(metricTags.get("pos")) &&
                 "5m".equals(metricTags.get("interval"))) {
-            
+
             return resolveExpBookingsMetric(metricDefinition);
         }
-        
+
         throw new MetricNotFoundException(metricDefinition);
     }
-    
+
     private MetricFileInfo resolveExpBookingsMetric(MetricDefinition metricDefinition) {
-        Map<String,String> metricTags = metricDefinition.getTags().getKv();
+        Map<String, String> metricTags = metricDefinition.getTags().getKv();
 
         // TODO We need the POS in here too.
         final String path = metricTags.get("what") + "/" + metricTags.get("lob");

@@ -22,12 +22,12 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public final class IndividualsControlChartParams implements DetectorParams {
-    
+
     /**
      * Initial mean estimate.
      */
     private double initValue = 0.0;
-    
+
     /**
      * Minimum number of data points required before the anomaly detector is ready for use.
      */

@@ -23,10 +23,10 @@ import org.jfree.chart.JFreeChart;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 public final class PipelineFactory {
-    
+
     public static AnomalyChartSink createChartSink(String title) {
         notNull(title, "title can't be null");
-        
+
         final ChartSeries chartSeries = new ChartSeries();
         final JFreeChart chart = ChartUtil.createChart(title, chartSeries);
         return new AnomalyChartSink(chart, chartSeries);

@@ -33,31 +33,31 @@ import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showCha
  * This is a sample pipeline to calculate RMSE
  */
 public class WhiteNoiseRmse {
-    
+
     public static void main(String[] args) {
         final WhiteNoiseMetricSource source = new WhiteNoiseMetricSource("white-noise", 1000L, 0.0, 1.0);
-        
+
         final AnomalyDetectorFilter ewmaFilter = new AnomalyDetectorFilter(new EwmaAnomalyDetector());
         final AnomalyDetectorFilter pewmaFilter = new AnomalyDetectorFilter(new PewmaAnomalyDetector());
 //        final AnomalyDetectorFilter cusumFilter = new AnomalyDetectorFilter(new CusumAnomalyDetector());
 //        final AnomalyDetectorFilter shewhartIndividualsFilter =
 //                new AnomalyDetectorFilter(new IndividualsControlChartAnomalyDetector());
-        
+
         final EvaluatorFilter ewmaEval = new EvaluatorFilter(new RmseEvaluator());
         final EvaluatorFilter pewmaEval = new EvaluatorFilter(new RmseEvaluator());
 //        final EvaluatorFilter cusumEval = new EvaluatorFilter(new RmseEvaluator());
 //        final EvaluatorFilter individualChartEval = new EvaluatorFilter(new RmseEvaluator());
-        
+
         final AnomalyChartSink ewmaChart = PipelineFactory.createChartSink("EWMA");
         final AnomalyChartSink pewmaChart = PipelineFactory.createChartSink("PEWMA");
 //        final AnomalyChartSink cusumChart = PipelineFactory.createChartSink("CUSUM");
 //        final AnomalyChartSink individualsChart = PipelineFactory.createChartSink("Shewhart Individuals");
-        
+
         source.addSubscriber(ewmaFilter);
         ewmaFilter.addSubscriber(ewmaEval);
         ewmaFilter.addSubscriber(ewmaChart);
         ewmaEval.addSubscriber(ewmaChart);
-        
+
         source.addSubscriber(pewmaFilter);
         pewmaFilter.addSubscriber(pewmaEval);
         pewmaFilter.addSubscriber(pewmaChart);
@@ -72,7 +72,7 @@ public class WhiteNoiseRmse {
 //        shewhartIndividualsFilter.addSubscriber(individualChartEval);
 //        shewhartIndividualsFilter.addSubscriber(individualsChart);
 //        individualChartEval.addSubscriber(individualsChart);
-        
+
         showChartFrame(createChartFrame(
                 "White Noise RMSE",
                 ewmaChart.getChart(),

@@ -39,17 +39,17 @@ public class CusumAnomalyDetectorTest {
     private static final double STRONG_SIGMAS = 4.0;
     private static final double TOLERANCE = 0.01;
     private static final int WARMUP_PERIOD = 25;
-    
+
     private UUID detectorUuid;
     private MetricDefinition metricDefinition;
     private long epochSecond;
     private static List<CusumTestRow> data;
-    
+
     @BeforeClass
     public static void setUpClass() {
         readDataFromCsv();
     }
-    
+
     @Before
     public void setUp() {
         this.detectorUuid = UUID.randomUUID();
@@ -68,7 +68,7 @@ public class CusumAnomalyDetectorTest {
                 .setInitMeanEstimate(1000.0)
                 .setWarmUpPeriod(WARMUP_PERIOD);
 
-        val testRows = new CusumTestRow[] {
+        val testRows = new CusumTestRow[]{
                 new CusumTestRow(1020.0, AnomalyLevel.NORMAL.name()),
                 new CusumTestRow(994.0, AnomalyLevel.WEAK.name()),
                 new CusumTestRow(990.0, AnomalyLevel.STRONG.name()),
@@ -81,7 +81,7 @@ public class CusumAnomalyDetectorTest {
     public void testClassify_rightTailed() {
         val testRows = data.listIterator();
         val testRow0 = testRows.next();
-        
+
         val params = new CusumParams()
                 .setType(AnomalyType.RIGHT_TAILED)
                 .setTargetValue(0.16)
@@ -95,7 +95,7 @@ public class CusumAnomalyDetectorTest {
         detector.init(detectorUuid, params);
 
         int numDataPoints = 1;
-    
+
         while (testRows.hasNext()) {
             val testRow = testRows.next();
             val observed = testRow.getObserved();
@@ -125,7 +125,7 @@ public class CusumAnomalyDetectorTest {
                 .setInitMeanEstimate(1000.0)
                 .setWarmUpPeriod(5);
 
-        val testRows = new CusumTestRow[] {
+        val testRows = new CusumTestRow[]{
                 new CusumTestRow(1000.0, AnomalyLevel.NORMAL.name()),
                 new CusumTestRow(1020.0, AnomalyLevel.STRONG.name()),
                 new CusumTestRow(994.0, AnomalyLevel.NORMAL.name()),
@@ -167,7 +167,7 @@ public class CusumAnomalyDetectorTest {
                 .build()
                 .parse();
     }
-    
+
     private static void assertApproxEqual(double d1, double d2) {
         TestCase.assertTrue(MathUtil.isApproximatelyEqual(d1, d2, TOLERANCE));
     }

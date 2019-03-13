@@ -37,33 +37,33 @@ import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showCha
  * with RMSE evaluators.
  */
 public final class CsvTrafficEwmaVsPewma {
-    
+
     public static void main(String[] args) throws Exception {
-        
+
         // TODO Use the FileDataConnector rather than the MetricFrameLoader. [WLW]
         final InputStream is = ClassLoader.getSystemResourceAsStream("samples/cal-inflow.csv");
         final MetricFrame frame = MetricFrameLoader.loadCsv(new MetricDefinition("csv"), is, true);
         final MetricFrameMetricSource source = new MetricFrameMetricSource(frame, "data", 200L);
-        
+
         final AnomalyDetectorFilter ewmaAD = new AnomalyDetectorFilter(new EwmaAnomalyDetector());
         final AnomalyDetectorFilter pewmaAD = new AnomalyDetectorFilter(new PewmaAnomalyDetector());
-    
+
         final EvaluatorFilter ewmaEval = new EvaluatorFilter(new RmseEvaluator());
         final EvaluatorFilter pewmaEval = new EvaluatorFilter(new RmseEvaluator());
-        
+
         final AnomalyChartSink ewmaChart = PipelineFactory.createChartSink("EWMA");
         final AnomalyChartSink pewmaChart = PipelineFactory.createChartSink("PEWMA");
-        
+
         source.addSubscriber(ewmaAD);
         ewmaAD.addSubscriber(ewmaEval);
         ewmaAD.addSubscriber(ewmaChart);
         ewmaEval.addSubscriber(ewmaChart);
-        
+
         source.addSubscriber(pewmaAD);
         pewmaAD.addSubscriber(pewmaEval);
         pewmaAD.addSubscriber(pewmaChart);
         pewmaEval.addSubscriber(pewmaChart);
-        
+
         showChartFrame(createChartFrame("Cal Inflow", ewmaChart.getChart(), pewmaChart.getChart()));
         source.start();
     }

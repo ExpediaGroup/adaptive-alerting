@@ -18,14 +18,10 @@
     <queries>
 
         <!-- JVM -->
-        <query objectName="java.lang:type=Memory" attribute="HeapMemoryUsage" key="used"
-            resultAlias="jvm.heapMemoryUsage.used"/>
-        <query objectName="java.lang:type=Memory" attribute="HeapMemoryUsage" key="committed"
-            resultAlias="jvm.heapMemoryUsage.committed"/>
-        <query objectName="java.lang:type=Memory" attribute="NonHeapMemoryUsage" key="used"
-            resultAlias="jvm.nonHeapMemoryUsage.used"/>
-        <query objectName="java.lang:type=Memory" attribute="NonHeapMemoryUsage" key="committed"
-            resultAlias="jvm.nonHeapMemoryUsage.committed"/>
+        <query objectName="java.lang:type=Memory" attribute="HeapMemoryUsage" key="used" resultAlias="jvm.heapMemoryUsage.used"/>
+        <query objectName="java.lang:type=Memory" attribute="HeapMemoryUsage" key="committed" resultAlias="jvm.heapMemoryUsage.committed"/>
+        <query objectName="java.lang:type=Memory" attribute="NonHeapMemoryUsage" key="used" resultAlias="jvm.nonHeapMemoryUsage.used"/>
+        <query objectName="java.lang:type=Memory" attribute="NonHeapMemoryUsage" key="committed" resultAlias="jvm.nonHeapMemoryUsage.committed"/>
         <query objectName="java.lang:type=Threading" attribute="ThreadCount" resultAlias="jvm.thread"/>
         <query objectName="java.lang:type=OperatingSystem" attribute="SystemCpuLoad" resultAlias="jvm.cpu.usage"/>
       
@@ -62,47 +58,28 @@
             resultAlias="kstreams.%type%.%task-id%.%processor-node-id%.#attribute#"/>
         -->
 
-
         <!-- service mbeans -->
-        <query objectName="metrics:name=metricpoint.deser.failure" attributes="OneMinuteRate,MeanRate"
-            resultAlias="metricpoint.deser.failure.#attribute#"/>
-        <query objectName="metrics:name=metricpoint.ser.failure" attributes="OneMinuteRate,MeanRate"
-            resultAlias="metricpoint.ser.failure.#attribute#"/>
-        <query objectName="metrics:name=metricpoint.ser.success" attributes="OneMinuteRate,MeanRate"
-            resultAlias="metricpoint.ser.success.#attribute#"/>
-        <query objectName="metrics:name=metricpoints.disordered" attributes="OneMinuteRate,MeanRate"
-            resultAlias="metricpoint.disordered.#attribute#"/>
-        <query objectName="metrics:name=metricpoints.compute.failure" attributes="OneMinuteRate,MeanRate"
-            resultAlias="metricpoint.compute.failure.#attribute#"/>
-        <query objectName="metrics:name=metricprocessor.invalid" attributes="OneMinuteRate,MeanRate"
-            resultAlias="metricprocessor.invalid.#attribute#"/>
-        <query objectName="metrics:name=metricpoint.kafka-external.success" attributes="OneMinuteRate,MeanRate"
-            resultAlias="metricpoint.kafka-external.success.#attribute#"/>
-        <query objectName="metrics:name=metricpoint.kafka-external.failure" attributes="OneMinuteRate,MeanRate"
-            resultAlias="metricpoint.kafka-external.failure.#attribute#"/>
+        <query objectName="metrics:name=metricpoint.deser.failure" attributes="OneMinuteRate,MeanRate" resultAlias="metricpoint.deser.failure.#attribute#"/>
+        <query objectName="metrics:name=metricpoint.ser.failure" attributes="OneMinuteRate,MeanRate" resultAlias="metricpoint.ser.failure.#attribute#"/>
+        <query objectName="metrics:name=metricpoint.ser.success" attributes="OneMinuteRate,MeanRate" resultAlias="metricpoint.ser.success.#attribute#"/>
+        <query objectName="metrics:name=metricpoints.disordered" attributes="OneMinuteRate,MeanRate" resultAlias="metricpoint.disordered.#attribute#"/>
+        <query objectName="metrics:name=metricpoints.compute.failure" attributes="OneMinuteRate,MeanRate" resultAlias="metricpoint.compute.failure.#attribute#"/>
+        <query objectName="metrics:name=metricprocessor.invalid" attributes="OneMinuteRate,MeanRate" resultAlias="metricprocessor.invalid.#attribute#"/>
+        <query objectName="metrics:name=metricpoint.kafka-external.success" attributes="OneMinuteRate,MeanRate" resultAlias="metricpoint.kafka-external.success.#attribute#"/>
+        <query objectName="metrics:name=metricpoint.kafka-external.failure" attributes="OneMinuteRate,MeanRate" resultAlias="metricpoint.kafka-external.failure.#attribute#"/>
 
-        <query objectName="metrics:name=trendmetric.deser.failure" attributes="OneMinuteRate,MeanRate"
-            resultAlias="trend-metric.deser.failure.#attribute#"/>
-        <query objectName="metrics:name=trendmetric.ser.success" attributes="OneMinuteRate,MeanRate"
-            resultAlias="trend-metric.ser.success.#attribute#"/>
-        <query objectName="metrics:name=trendmetric.deser.success" attributes="OneMinuteRate,MeanRate"
-            resultAlias="trend-metric.deser.success.#attribute#"/>
-        <query objectName="metrics:name=trendmetric.compute.time"
-            attributes="50thPercentile,99thPercentile,OneMinuteRate"
-            resultAlias="trend-metric.compute.time.#attribute#"/>
+        <query objectName="metrics:name=trendmetric.deser.failure" attributes="OneMinuteRate,MeanRate" resultAlias="trend-metric.deser.failure.#attribute#"/>
+        <query objectName="metrics:name=trendmetric.ser.success" attributes="OneMinuteRate,MeanRate" resultAlias="trend-metric.ser.success.#attribute#"/>
+        <query objectName="metrics:name=trendmetric.deser.success" attributes="OneMinuteRate,MeanRate" resultAlias="trend-metric.deser.success.#attribute#"/>
+        <query objectName="metrics:name=trendmetric.compute.time" attributes="50thPercentile,99thPercentile,OneMinuteRate" resultAlias="trend-metric.compute.time.#attribute#"/>
 
-        <query objectName="metrics:name=histogram.metric.compute.time"
-            attributes="50thPercentile,99thPercentile,OneMinuteRate"
-            resultAlias="histogram-metric.compute.time.#attribute#"/>
+        <query objectName="metrics:name=histogram.metric.compute.time" attributes="50thPercentile,99thPercentile,OneMinuteRate" resultAlias="histogram-metric.compute.time.#attribute#"/>
 
-        <query objectName="metrics:name=count.metric.compute.time"
-            attributes="50thPercentile,99thPercentile,OneMinuteRate"
-            resultAlias="count-metric.compute.time.#attribute#"/>
+        <query objectName="metrics:name=count.metric.compute.time" attributes="50thPercentile,99thPercentile,OneMinuteRate" resultAlias="count-metric.compute.time.#attribute#"/>
 
-        <query objectName="metrics:name=metricprocessor.trendcount.*"
-            resultAlias="%name%.#attribute#"/>
-
+        <query objectName="metrics:name=metricprocessor.trendcount.*" resultAlias="%name%.#attribute#"/>
     </queries>
+
     <outputWriter class="org.jmxtrans.agent.GraphitePlainTextTcpOutputWriter">
         <host>${AA_GRAPHITE_HOST:metrics}</host>
         <port>${AA_GRAPHITE_PORT:2003}</port>

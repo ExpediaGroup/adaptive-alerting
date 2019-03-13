@@ -58,7 +58,7 @@ public final class EwmaAnomalyDetector extends AbstractAnomalyDetector<EwmaParam
      */
     @Getter
     private double variance = 0.0;
-    
+
     public EwmaAnomalyDetector() {
         super(EwmaParams.class);
     }
@@ -73,29 +73,29 @@ public final class EwmaAnomalyDetector extends AbstractAnomalyDetector<EwmaParam
         notNull(metricData, "metricData can't be null");
 
         val params = getParams();
-        
+
         val observed = metricData.getValue();
         val stdDev = sqrt(this.variance);
         val weakDelta = params.getWeakSigmas() * stdDev;
         val strongDelta = params.getStrongSigmas() * stdDev;
-        
+
         final AnomalyThresholds thresholds = new AnomalyThresholds(
                 this.mean + strongDelta,
                 this.mean + weakDelta,
                 this.mean - weakDelta,
                 this.mean - strongDelta
         );
-        
+
         updateEstimates(observed);
-        
+
         val level = thresholds.classify(observed);
-        
+
         val result = new AnomalyResult(level);
         result.setPredicted(this.mean);
         result.setThresholds(thresholds);
         return result;
     }
-    
+
     private void updateEstimates(double value) {
         val params = getParams();
 
@@ -104,7 +104,7 @@ public final class EwmaAnomalyDetector extends AbstractAnomalyDetector<EwmaParam
         val diff = value - this.mean;
         val incr = params.getAlpha() * diff;
         this.mean += incr;
-        
+
         // Welford's algorithm for computing the variance online
         // https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Online_algorithm
         // https://www.johndcook.com/blog/2008/09/26/comparing-three-methods-of-computing-standard-deviation/

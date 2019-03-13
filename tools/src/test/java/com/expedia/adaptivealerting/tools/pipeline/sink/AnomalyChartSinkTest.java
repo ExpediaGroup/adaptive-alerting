@@ -37,17 +37,17 @@ import static org.mockito.Mockito.when;
 
 public final class AnomalyChartSinkTest {
     private AnomalyChartSink sinkUnderTest;
-    
+
     @Mock
     private JFreeChart chart;
-    
+
     @Mock
     private TextTitle textTitle;
-    
+
     private ChartSeries chartSeries;
     private MappedMetricData strongAnomalyNoThresholds;
     private MappedMetricData weakAnomalyWithThresholds;
-    
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -55,38 +55,38 @@ public final class AnomalyChartSinkTest {
         initDependencies();
         this.sinkUnderTest = new AnomalyChartSink(chart, chartSeries);
     }
-    
+
     @Test
     public void testNext_strongAnomalyNoThresholds() {
         sinkUnderTest.next(strongAnomalyNoThresholds);
     }
-    
+
     @Test
     public void testNext_weakAnomalyWithThresholds() {
         sinkUnderTest.next(weakAnomalyWithThresholds);
     }
-    
+
     private void initTestObjects() {
         this.chartSeries = new ChartSeries();
-    
+
         val metricDef = new MetricDefinition("my-metric");
         val metricData = new MetricData(metricDef, 15.0, Instant.now().getEpochSecond());
-        
+
         val anomalyResult_strong_noThresholds = new AnomalyResult();
         anomalyResult_strong_noThresholds.setAnomalyLevel(AnomalyLevel.STRONG);
-        
+
         val anomalyResult_weak_thresholds = new AnomalyResult();
         anomalyResult_weak_thresholds.setAnomalyLevel(AnomalyLevel.WEAK);
         val thresholds = new AnomalyThresholds(100.0, 90.0, 20.0, 10.0);
         anomalyResult_weak_thresholds.setThresholds(thresholds);
-        
+
         this.strongAnomalyNoThresholds = new MappedMetricData(metricData, UUID.randomUUID());
         this.strongAnomalyNoThresholds.setAnomalyResult(anomalyResult_strong_noThresholds);
-        
+
         this.weakAnomalyWithThresholds = new MappedMetricData(metricData, UUID.randomUUID());
         this.weakAnomalyWithThresholds.setAnomalyResult(anomalyResult_weak_thresholds);
     }
-    
+
     private void initDependencies() {
         when(textTitle.getText()).thenReturn("My Chart");
         when(chart.getTitle()).thenReturn(textTitle);

@@ -22,33 +22,33 @@ import com.expedia.metrics.MetricData;
  * Metric source interface.
  */
 public interface MetricSource {
-    
+
     /**
      * Adds a metric point subscriber to this source.
      *
      * @param subscriber Metric point subscriber.
      */
     void addSubscriber(MetricDataSubscriber subscriber);
-    
+
     /**
      * Removes a metric point subscriber from this source.
      *
      * @param subscriber Metric point subscriber.
      */
     void removeSubscriber(MetricDataSubscriber subscriber);
-    
+
     /**
      * Starts the metric source.
      */
     void start();
-    
+
     /**
      * Returns the next message in the stream.
      *
      * @return Next metric data.
      */
     MetricData next();
-    
+
     /**
      * Stops the metric source.
      */

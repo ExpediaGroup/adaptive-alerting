@@ -29,14 +29,14 @@ import java.util.List;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DetectorResources {
-    
+
     @JsonProperty("_embedded")
     private Embedded embedded = new Embedded();
-    
+
     public DetectorResources(List<DetectorResource> list) {
         embedded.setDetectors(list);
     }
-    
+
     @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Embedded {

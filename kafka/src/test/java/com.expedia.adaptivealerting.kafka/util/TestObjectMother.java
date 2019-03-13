@@ -51,13 +51,13 @@ import java.util.UUID;
  * </p>
  */
 public final class TestObjectMother {
-    
+
     /**
      * Prevent instantiation.
      */
     private TestObjectMother() {
     }
-    
+
     /**
      * Returns a set of metric tags, valid for Metrictank.
      *
@@ -65,15 +65,15 @@ public final class TestObjectMother {
      */
     public static TagCollection metricTags() {
         val tags = new HashMap<String, String>();
-        
+
         // Metrics 2.0
         tags.put("mtype", "gauge");
         tags.put("unit", "");
-        
+
         // Metrictank
         tags.put("org_id", "1");
         tags.put("interval", "1");
-        
+
         return new TagCollection(tags);
     }
 
@@ -101,11 +101,11 @@ public final class TestObjectMother {
         val meta = new HashMap<String, String>();
         return new TagCollection(meta);
     }
-    
+
     public static MetricData metricData() {
         return metricData(100.0);
     }
-    
+
     public static MetricData metricData(double value) {
         val metricDef = new MetricDefinition("some-metric-key", metricTags(), metricMeta());
         return metricData(metricDef, value);
@@ -115,15 +115,15 @@ public final class TestObjectMother {
         val now = Instant.now().getEpochSecond();
         return new MetricData(metricDef, value, now);
     }
-    
+
     /**
      * Returns a mapped metric data with the following characteristics:
      *
      * <ul>
-     *     <li>metricData.value = 100.0</li>
-     *     <li>detectorUuid = random</li>
-     *     <li>detectorType = "constant-detector"</li>
-     *     <li>anomalyResult = null</li>
+     * <li>metricData.value = 100.0</li>
+     * <li>detectorUuid = random</li>
+     * <li>detectorType = "constant-detector"</li>
+     * <li>anomalyResult = null</li>
      * </ul>
      *
      * @return Mapped metric data
@@ -131,11 +131,11 @@ public final class TestObjectMother {
     public static MappedMetricData mappedMetricData() {
         return mappedMetricData(metricData());
     }
-    
+
     public static MappedMetricData mappedMetricData(MetricData metricData) {
         return new MappedMetricData(metricData, UUID.randomUUID());
     }
-    
+
     public static MappedMetricData mappedMetricDataWithAnomalyResult() {
         return mappedMetricDataWithAnomalyResult(metricData());
     }
@@ -169,7 +169,7 @@ public final class TestObjectMother {
     public static Alert alert() {
         val alert = new Alert();
         alert.setName("some-metric-key");
-    
+
         val labels = new HashMap<String, String>();
         // Note: metric key can override a tag if it has the same name.
         labels.put("metric_key", "some-metric-key");
@@ -179,44 +179,44 @@ public final class TestObjectMother {
         labels.put("interval", "1");
         labels.put("anomalyLevel", "STRONG");
         alert.setLabels(labels);
-        
+
         val annotations = new HashMap<String, String>();
         annotations.put("value", "100.0");
         annotations.put("timestamp", String.valueOf(System.currentTimeMillis() / 1000));
         alert.setAnnotations(annotations);
-        
+
         return alert;
     }
-    
+
     public static TopologyTestDriver topologyTestDriver(
             Topology topology,
             Class<?> valueSerdeClass,
             boolean continueOnDeserException) {
-        
+
         val props = new Properties();
         props.put(StreamsConfig.APPLICATION_ID_CONFIG, "test");
         props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "dummy:1234");
         props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName());
         props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, valueSerdeClass.getName());
-        
+
         if (continueOnDeserException) {
             props.put(
                     StreamsConfig.DEFAULT_DESERIALIZATION_EXCEPTION_HANDLER_CLASS_CONFIG,
                     LogAndContinueExceptionHandler.class.getName());
         }
-        
+
         return new TopologyTestDriver(topology, props);
     }
-    
+
     public static ConsumerRecordFactory<String, String> stringFactory() {
         val stringSerializer = new StringSerializer();
         return new ConsumerRecordFactory<>(stringSerializer, stringSerializer);
     }
-    
+
     public static ConsumerRecordFactory<String, MetricData> metricDataFactory() {
         return new ConsumerRecordFactory<>(new StringSerializer(), new MetricDataJsonSerializer());
     }
-    
+
     public static ConsumerRecordFactory<String, MappedMetricData> mappedMetricDataFactory() {
         return new ConsumerRecordFactory<>(new StringSerializer(), new MappedMetricDataJsonSerializer());
     }

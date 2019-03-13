@@ -46,15 +46,15 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @Slf4j
 public class DefaultDetectorSource implements DetectorSource {
     private final DetectorLookup detectorLookup = new DetectorLookup();
-    
+
     @NonNull
     private final ModelServiceConnector connector;
-    
+
     @Override
     public Set<String> findDetectorTypes() {
         return detectorLookup.getDetectorTypes();
     }
-    
+
     @Override
     public List<UUID> findDetectorUuids(MetricDefinition metricDef) {
         notNull(metricDef, "metricDefinition can't be null");
@@ -71,14 +71,14 @@ public class DefaultDetectorSource implements DetectorSource {
             throw new RuntimeException(e);
         }
     }
-    
+
     @Override
     public AnomalyDetector findDetector(UUID detectorUuid, MetricDefinition metricDef) {
         notNull(detectorUuid, "detectorUuid can't be null");
 
         // metricDef _can_ be null, and normally is.
         // This implementation doesn't use it, but other implementations do.
-        
+
 
         // TODO "Latest model" doesn't really make sense for the kind of detectors we load into the DetectorManager.
         // These are basic detectors backed by single statistical models, as opposed to being ML models that we have to
@@ -90,7 +90,7 @@ public class DefaultDetectorSource implements DetectorSource {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    
+
         if (model == null) {
             log.error("No detector for detectorUuid={}", detectorUuid);
             // TODO Is this how we want to handle this? [WLW]
