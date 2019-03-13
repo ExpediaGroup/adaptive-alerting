@@ -79,7 +79,6 @@ public class DefaultDetectorSource implements DetectorSource {
         // metricDef _can_ be null, and normally is.
         // This implementation doesn't use it, but other implementations do.
 
-
         // TODO "Latest model" doesn't really make sense for the kind of detectors we load into the DetectorManager.
         // These are basic detectors backed by single statistical models, as opposed to being ML models that we have to
         // refresh/retrain periodically. So we probably want to simplify this by just collapsing the model concept into

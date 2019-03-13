@@ -18,7 +18,7 @@ package com.expedia.adaptivealerting.kafka;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.adaptivealerting.core.util.jackson.ObjectMapperUtil;
+import com.expedia.adaptivealerting.core.util.ObjectMapperUtil;
 import com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde;
 import com.expedia.adaptivealerting.kafka.serde.MetricDataDeserializer;
 import com.expedia.adaptivealerting.kafka.util.TestObjectMother;
