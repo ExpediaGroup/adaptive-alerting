@@ -13,13 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.util.jackson;
+package com.expedia.adaptivealerting.core.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * Object mapper utilities.
@@ -27,14 +24,6 @@ import java.io.InputStream;
 public final class ObjectMapperUtil {
 
     private ObjectMapperUtil() {
-    }
-
-    public static <T> T readValue(ObjectMapper objectMapper, InputStream inputStream, Class<T> clazz) {
-        try {
-            return objectMapper.readValue(inputStream, clazz);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public static String writeValueAsString(ObjectMapper objectMapper, Object value) {
