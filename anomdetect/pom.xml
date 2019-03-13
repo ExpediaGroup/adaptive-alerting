@@ -33,11 +33,6 @@
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Anomaly detection for streaming time series.</description>
 
-    <properties>
-        <jacoco-percentage>0.8</jacoco-percentage>
-        <jacoco-branch-percentage>0.7</jacoco-branch-percentage>
-    </properties>
-
     <dependencies>
 
         <!-- Compile -->
