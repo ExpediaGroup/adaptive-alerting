@@ -121,8 +121,8 @@
 
         <!-- Maven plugins -->
         <jacoco-maven-plugin-version>0.8.3</jacoco-maven-plugin-version>
-        <jacoco-percentage>0.99</jacoco-percentage>
-        <jacoco-branch-percentage>0.99</jacoco-branch-percentage>
+        <jacoco-percentage>0.8</jacoco-percentage>
+        <jacoco-branch-percentage>0.8</jacoco-branch-percentage>
 
         <maven.compiler.plugin.version>3.8.0</maven.compiler.plugin.version>
         <maven.exec.plugin.version>1.6.0</maven.exec.plugin.version>
