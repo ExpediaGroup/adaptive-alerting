@@ -26,6 +26,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+
 /**
  * Metric utilities.
  */
@@ -48,10 +50,6 @@ public final class MetricUtil {
         return new HashSet<>();
     }
 
-    public static MetricDefinition metricDefinition() {
-        return new MetricDefinition(null, null);
-    }
-
     /**
      * Convenience method to create a new metric definition from the given tags. Provides defaults for null values.
      *
@@ -70,9 +68,7 @@ public final class MetricUtil {
     }
 
     public static MetricData metricData(MetricDefinition metricDef) {
-        if (metricDef == null) {
-            metricDef = metricDefinition();
-        }
+        notNull(metricDef, "metricDef can't be null");
         return metricData(metricDef, 0.0);
     }
 

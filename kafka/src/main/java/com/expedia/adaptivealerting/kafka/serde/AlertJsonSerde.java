@@ -26,7 +26,7 @@ import java.util.Map;
 public final class AlertJsonSerde implements Serde<Alert> {
 
     @Override
-    public void configure(Map<String, ?> map, boolean b) {
+    public void configure(Map<String, ?> configs, boolean isKey) {
     }
 
     @Override
