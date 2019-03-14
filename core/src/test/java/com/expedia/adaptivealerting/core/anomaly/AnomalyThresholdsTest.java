@@ -15,15 +15,37 @@
  */
 package com.expedia.adaptivealerting.core.anomaly;
 
+import lombok.val;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class AnomalyThresholdsTest {
+    private static final double TOLERANCE = 0.001;
+
+    @Test
+    public void forCoverage() {
+        val thresholds = new AnomalyThresholds(100.0, 90.0, 20.0, 10.0);
+
+        assertEquals(100.0, thresholds.getUpperStrong(), TOLERANCE);
+        assertEquals(90.0, thresholds.getUpperWeak(), TOLERANCE);
+        assertEquals(20.0, thresholds.getLowerWeak(), TOLERANCE);
+        assertEquals(10.0, thresholds.getLowerStrong(), TOLERANCE);
+
+        thresholds.setUpperStrong(200.0);
+        thresholds.setUpperWeak(180.0);
+        thresholds.setLowerWeak(40.0);
+        thresholds.setLowerStrong(20.0);
+
+        assertEquals(200.0, thresholds.getUpperStrong(), TOLERANCE);
+        assertEquals(180.0, thresholds.getUpperWeak(), TOLERANCE);
+        assertEquals(40.0, thresholds.getLowerWeak(), TOLERANCE);
+        assertEquals(20.0, thresholds.getLowerStrong(), TOLERANCE);
+    }
 
     @Test
     public void testUpperThresholds() {
-        final AnomalyThresholds thresholds = new AnomalyThresholds(100.0, 50.0, null, null);
+        val thresholds = new AnomalyThresholds(100.0, 50.0, null, null);
         assertEquals(AnomalyLevel.STRONG, thresholds.classify(150.0));
         assertEquals(AnomalyLevel.WEAK, thresholds.classify(75.0));
         assertEquals(AnomalyLevel.NORMAL, thresholds.classify(25.0));
@@ -31,7 +53,7 @@ public class AnomalyThresholdsTest {
 
     @Test
     public void testLowerThresholds() {
-        final AnomalyThresholds thresholds = new AnomalyThresholds(null, null, 50.0, 25.0);
+        val thresholds = new AnomalyThresholds(null, null, 50.0, 25.0);
         assertEquals(AnomalyLevel.STRONG, thresholds.classify(0.0));
         assertEquals(AnomalyLevel.WEAK, thresholds.classify(35.0));
         assertEquals(AnomalyLevel.NORMAL, thresholds.classify(100.0));

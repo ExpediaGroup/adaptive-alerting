@@ -18,12 +18,11 @@ package com.expedia.adaptivealerting.anomdetect.pewma;
 import com.expedia.adaptivealerting.anomdetect.ewma.EwmaAnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.ewma.EwmaParams;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
-import com.expedia.adaptivealerting.core.util.MathUtil;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBeanBuilder;
-import junit.framework.TestCase;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +36,8 @@ import java.util.UUID;
 import static java.lang.Math.sqrt;
 import static junit.framework.TestCase.assertEquals;
 
-public class PewmaAnomalyDetectorTest {
+@Slf4j
+public final class PewmaAnomalyDetectorTest {
     private static final double WEAK_SIGMAS = 2.0;
     private static final double STRONG_SIGMAS = 3.0;
     private static final double DEFAULT_ALPHA = 0.05;
@@ -46,13 +46,13 @@ public class PewmaAnomalyDetectorTest {
     private static final String SAMPLE_INPUT_PATH = "tests/pewma-sample-input.csv";
     private static final String CAL_INFLOW_PATH = "tests/cal-inflow-tests-pewma.csv";
 
-    private UUID detectorUUID;
+    private UUID detectorUuid;
     private MetricDefinition metricDefinition;
     private long epochSecond;
 
     @Before
     public void setUp() {
-        this.detectorUUID = UUID.randomUUID();
+        this.detectorUuid = UUID.randomUUID();
         this.metricDefinition = new MetricDefinition("some-key");
         this.epochSecond = Instant.now().getEpochSecond();
     }
@@ -71,7 +71,7 @@ public class PewmaAnomalyDetectorTest {
                 .setStrongSigmas(STRONG_SIGMAS)
                 .setInitMeanEstimate(observed0);
         val pewmaDetector = new PewmaAnomalyDetector();
-        pewmaDetector.init(detectorUUID, pewmaParams);
+        pewmaDetector.init(detectorUuid, pewmaParams);
 
         val ewmaParams = new EwmaParams()
                 .setAlpha(DEFAULT_ALPHA)
@@ -88,8 +88,8 @@ public class PewmaAnomalyDetectorTest {
             val ewmaStdDev = sqrt(ewmaDetector.getVariance());
 
             val threshold = 1.0 / rowCount; // results converge with more iterations
-            assertApproxEqual(ewmaDetector.getMean(), pewmaDetector.getMean(), threshold);
-            assertApproxEqual(ewmaStdDev, pewmaDetector.getStdDev(), threshold);
+            assertEquals(ewmaDetector.getMean(), pewmaDetector.getMean(), threshold);
+            assertEquals(ewmaStdDev, pewmaDetector.getStdDev(), threshold);
 
             val metricData = new MetricData(metricDefinition, observed, epochSecond);
             val pewmaLevel = pewmaDetector.classify(metricData).getAnomalyLevel();
@@ -114,7 +114,7 @@ public class PewmaAnomalyDetectorTest {
                 .setStrongSigmas(STRONG_SIGMAS)
                 .setInitMeanEstimate(observed0);
         val detector = new PewmaAnomalyDetector();
-        detector.init(detectorUUID, params);
+        detector.init(detectorUuid, params);
 
         while (testRows.hasNext()) {
             val testRow = testRows.next();
@@ -122,8 +122,8 @@ public class PewmaAnomalyDetectorTest {
             val metricData = new MetricData(metricDefinition, observed, epochSecond);
             val level = detector.classify(metricData).getAnomalyLevel();
 
-            assertApproxEqual(testRow.getMean(), detector.getMean(), TOLERANCE);
-            assertApproxEqual(testRow.getStd(), detector.getStdDev(), TOLERANCE);
+            assertEquals(testRow.getMean(), detector.getMean(), TOLERANCE);
+            assertEquals(testRow.getStd(), detector.getStdDev(), TOLERANCE);
             assertEquals(AnomalyLevel.valueOf(testRow.getLevel()), level);
         }
     }
@@ -141,8 +141,5 @@ public class PewmaAnomalyDetectorTest {
                 .build()
                 .parse();
     }
-
-    private static void assertApproxEqual(double d1, double d2, double tolerance) {
-        TestCase.assertTrue(d1 + " !~ " + d2, MathUtil.isApproximatelyEqual(d1, d2, tolerance));
-    }
 }
+
