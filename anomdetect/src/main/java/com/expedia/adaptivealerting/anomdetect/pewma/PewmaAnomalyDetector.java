@@ -103,7 +103,7 @@ public final class PewmaAnomalyDetector extends AbstractAnomalyDetector<PewmaPar
 
         updateEstimates(observed);
 
-        val level = thresholds.classifyExclusiveBounds(observed);
+        val level = thresholds.classify(observed);
 
         val result = new AnomalyResult(level);
         result.setPredicted(mean);

@@ -38,8 +38,7 @@ public final class ConstantThresholdAnomalyDetector extends AbstractAnomalyDetec
         notNull(metricData, "metricData can't be null");
         val params = getParams();
         val thresholds = params.getThresholds();
-        val type = params.getType();
-        val level = thresholds.classify(type, metricData.getValue());
+        val level = thresholds.classify(metricData.getValue());
         return new AnomalyResult(level);
     }
 }

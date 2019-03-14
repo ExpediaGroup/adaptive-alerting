@@ -15,24 +15,16 @@
  */
 package com.expedia.adaptivealerting.core.anomaly;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.val;
+import org.junit.Test;
 
-/**
- * Anomaly result.
- */
-@Data
-@NoArgsConstructor
-@RequiredArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class AnomalyResult {
+import static org.junit.Assert.assertEquals;
 
-    @NonNull
-    private AnomalyLevel anomalyLevel;
+public final class StringToAnomalyLevelConverterTest {
 
-    private Double predicted;
-    private AnomalyThresholds thresholds;
+    @Test
+    public void testConvert() {
+        val converter = new StringToAnomalyLevelConverter();
+        assertEquals(AnomalyLevel.STRONG, converter.convert("STRONG"));
+    }
 }
