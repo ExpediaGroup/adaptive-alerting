@@ -40,6 +40,6 @@ public class Model {
     @Convert(converter = JpaConverterJson.class)
     private Map<String, Object> params;
 
-    @Column(name = "date_created")
+    @Column(name = "date_created", insertable = false)
     private Timestamp dateCreated;
 }

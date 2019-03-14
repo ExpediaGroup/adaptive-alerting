@@ -48,10 +48,10 @@ public class Detector {
     @Column(name = "created_by")
     private String createdBy;
 
-    @Column(name = "last_update_timestamp")
+    @Column(name = "last_update_timestamp", insertable = false)
     private Timestamp lastUpdateTimestamp;
 
-    @Column(name = "enabled")
+    @Column(name = "enabled", insertable = false)
     private Boolean enabled;
 
 }
