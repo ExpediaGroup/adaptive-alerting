@@ -15,26 +15,19 @@
  */
 package com.expedia.adaptivealerting.core.util;
 
-import lombok.extern.slf4j.Slf4j;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.val;
+import org.junit.Test;
 
-/**
- * Reflection utilities.
- */
-@Slf4j
-public final class ReflectionUtil {
+import static org.junit.Assert.assertEquals;
 
-    /**
-     * Prevent instantiation.
-     */
-    private ReflectionUtil() {
-    }
+public final class ObjectMapperTest {
 
-    public static <T> T newInstance(Class<T> clazz) {
-        try {
-            return clazz.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            log.error("Error instantiating " + clazz.getName(), e);
-            throw new RuntimeException(e);
-        }
+    @Test
+    public void testWriteValueAsString() {
+        val objectMapper = new ObjectMapper();
+        val fruits = new String[]{"apple", "banana", "cherry", "tomato"};
+        val result = ObjectMapperUtil.writeValueAsString(objectMapper, fruits);
+        assertEquals("[ \"apple\", \"banana\", \"cherry\", \"tomato\" ]", result);
     }
 }

@@ -15,26 +15,17 @@
  */
 package com.expedia.adaptivealerting.core.util;
 
-import lombok.extern.slf4j.Slf4j;
+import org.junit.Test;
 
-/**
- * Reflection utilities.
- */
-@Slf4j
-public final class ReflectionUtil {
+import static org.junit.Assert.assertTrue;
 
-    /**
-     * Prevent instantiation.
-     */
-    private ReflectionUtil() {
-    }
+public class ThreadUtilTest {
 
-    public static <T> T newInstance(Class<T> clazz) {
-        try {
-            return clazz.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            log.error("Error instantiating " + clazz.getName(), e);
-            throw new RuntimeException(e);
-        }
+    @Test
+    public void testSleep() {
+        long start = System.currentTimeMillis();
+        ThreadUtil.sleep(500);
+        long duration = System.currentTimeMillis() - start;
+        assertTrue(duration >= 450);
     }
 }
