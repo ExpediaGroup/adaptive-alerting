@@ -16,26 +16,20 @@
 package com.expedia.adaptivealerting.kafka.processor;
 
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.metrics.MetricData;
+import lombok.val;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.streams.processor.TimestampExtractor;
 
 /**
- * Timestamp extractor for {@link MetricData}, similar to
- * {@link org.apache.kafka.streams.processor.LogAndSkipOnInvalidTimestamp}.
+ * Extracts a timestamp from a {@link MappedMetricData} consumer record.
  */
 public final class MappedMetricDataTimestampExtractor implements TimestampExtractor {
 
     @Override
     public long extract(ConsumerRecord<Object, Object> record, long previousTimestamp) {
-        final MappedMetricData mappedMetricData = (MappedMetricData) record.value();
+        val mappedMetricData = (MappedMetricData) record.value();
         if (mappedMetricData == null || mappedMetricData.getMetricData() == null) {
-
-            // We don't want to log this because sometimes it fills up the logs.
-            // TODO Figure out what to do instead. Maybe a counter.
-//            log.warn("Skipping null MappedMetricData");
-
-            // -1 skips the record.
+            // -1 skips the record. Don't log as it can fill up the logs.
             return -1L;
         }
         return mappedMetricData.getMetricData().getTimestamp() * 1000L;

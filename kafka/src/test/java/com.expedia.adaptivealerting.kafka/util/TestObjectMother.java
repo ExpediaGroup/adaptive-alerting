@@ -100,10 +100,21 @@ public final class TestObjectMother {
         return new TagCollection(meta);
     }
 
+    /**
+     * Returns a metric data with value 100.0 and timestamp = now.
+     *
+     * @return metric data
+     */
     public static MetricData metricData() {
         return metricData(100.0);
     }
 
+    /**
+     * Returns a metric data with the given value and timestamp = now.
+     *
+     * @param value a value for the metric data
+     * @return metric data
+     */
     public static MetricData metricData(double value) {
         val metricDef = new MetricDefinition("some-metric-key", metricTags(), metricMeta());
         return metricData(metricDef, value);
