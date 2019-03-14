@@ -23,10 +23,8 @@ public class MetricsMonitor {
 
     static {
         metricRegistry = new MetricRegistry();
-        notification_success =
-                metricRegistry.meter("notifier.success");
-        notification_failure =
-                metricRegistry.meter("notifier.failure");
+        notification_success = metricRegistry.meter("notifier.success");
+        notification_failure = metricRegistry.meter("notifier.failure");
     }
 
     public final static Meter notification_success;

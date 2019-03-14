@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.serde;
+package com.expedia.adaptivealerting.kafka.processor;
 
 import com.expedia.metrics.MetricData;
 import org.apache.kafka.clients.consumer.ConsumerRecord;

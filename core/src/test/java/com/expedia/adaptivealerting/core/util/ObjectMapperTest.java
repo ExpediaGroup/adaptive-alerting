@@ -13,17 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.serde;
+package com.expedia.adaptivealerting.core.util;
 
-import com.expedia.metrics.MetricData;
-import com.expedia.metrics.jackson.MetricsJavaModule;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.val;
+import org.junit.Test;
 
-/**
- * Kafka serializer to write {@link MetricData}s to JSON.
- */
-public class MetricDataJsonSerializer extends AbstractJsonSerializer<MetricData> {
+import static org.junit.Assert.assertEquals;
 
-    public MetricDataJsonSerializer() {
-        getObjectMapper().registerModule(new MetricsJavaModule());
+public final class ObjectMapperTest {
+
+    @Test
+    public void testWriteValueAsString() {
+        val objectMapper = new ObjectMapper();
+        val fruits = new String[]{"apple", "banana", "cherry", "tomato"};
+        val result = ObjectMapperUtil.writeValueAsString(objectMapper, fruits);
+        assertEquals("[ \"apple\", \"banana\", \"cherry\", \"tomato\" ]", result);
     }
 }

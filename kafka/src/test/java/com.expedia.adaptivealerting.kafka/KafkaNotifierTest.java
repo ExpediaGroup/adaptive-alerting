@@ -23,7 +23,6 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.assertj.core.api.Assertions;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,10 +52,6 @@ import static com.expedia.adaptivealerting.kafka.util.TestHelper.newMappedMetric
         KafkaNotifierTest.ServiceDependencies.class
 })
 
-// FIXME Temporarily ignoring because we're seeing an interaction between this test and the
-// KafkaMultiClusterAnomalyToMetricMapperTest. I think it's because we're setting system
-// properties. [WLW]
-@Ignore
 public class KafkaNotifierTest {
 
     @ClassRule

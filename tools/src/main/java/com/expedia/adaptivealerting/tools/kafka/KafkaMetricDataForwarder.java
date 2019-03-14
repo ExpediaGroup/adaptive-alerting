@@ -63,8 +63,7 @@ public final class KafkaMetricDataForwarder {
         props.put("linger.ms", 1);
         props.put("buffer.memory", 33554432);
         props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        props.put("value.serializer", "com.expedia.adaptivealerting.kafka.serde.JsonPojoSerializer");
-//        props.put("value.serializer", "com.expedia.adaptivealerting.kafka.serde.MetricDataSerde$DataSerializer");
+        props.put("value.serializer", "com.expedia.adaptivealerting.kafka.serde.MetricDataJsonSerde$Ser");
         Producer<String, MetricData> producer = new KafkaProducer<>(props);
 
         new KafkaMetricDataForwarder(metricSource, producer, topicName);

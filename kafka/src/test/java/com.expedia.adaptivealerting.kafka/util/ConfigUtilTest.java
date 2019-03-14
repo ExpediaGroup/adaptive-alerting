@@ -28,9 +28,9 @@ public final class ConfigUtilTest {
     private static final String GROUP_ID = "my-group";
     private static final String CLIENT_ID = "my-client";
     private static final String KEY_DESER = "org.apache.kafka.common.serialization.StringDeserializer";
-    private static final String VALUE_DESER = "com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonDeserializer";
+    private static final String VALUE_DESER = "com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde$Deser";
     private static final String KEY_SER = "org.apache.kafka.common.serialization.StringSerializer";
-    private static final String VALUE_SER = "com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerializer";
+    private static final String VALUE_SER = "com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde$Ser";
 
     @Test
     public void testToConsumerConfig() {

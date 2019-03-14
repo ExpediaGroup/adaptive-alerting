@@ -15,9 +15,12 @@
  */
 package com.expedia.adaptivealerting.core.util;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Reflection utilities.
  */
+@Slf4j
 public final class ReflectionUtil {
 
     /**
@@ -30,6 +33,7 @@ public final class ReflectionUtil {
         try {
             return clazz.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
+            log.error("Error instantiating " + clazz.getName(), e);
             throw new RuntimeException(e);
         }
     }

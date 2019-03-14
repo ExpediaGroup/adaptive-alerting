@@ -50,14 +50,14 @@ public class KafkaMultiClusterAnomalyToMetricMapperTest {
     // Anomaly consumer
     private static final String ANOMALY_TOPIC = "anomalies";
     private static final String STRING_DESER = "org.apache.kafka.common.serialization.StringDeserializer";
-    private static final String ANOMALY_SER = "com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerializer";
-    private static final String ANOMALY_DESER = "com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonDeserializer";
+    private static final String ANOMALY_SER = "com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde$Ser";
+    private static final String ANOMALY_DESER = "com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde$Deser";
 
     // Metric producer
     private static final String METRIC_TOPIC = "metrics";
     private static final String STRING_SER = "org.apache.kafka.common.serialization.StringSerializer";
-    private static final String METRIC_SER = "com.expedia.adaptivealerting.kafka.serde.MetricDataJsonSerializer";
-    private static final String METRIC_DESER = "com.expedia.adaptivealerting.kafka.serde.MetricDataJsonDeserializer";
+    private static final String METRIC_SER = "com.expedia.adaptivealerting.kafka.serde.MetricDataJsonSerde$Ser";
+    private static final String METRIC_DESER = "com.expedia.adaptivealerting.kafka.serde.MetricDataJsonSerde$Deser";
 
     private static final int NUM_MESSAGES = 20;
     private static final long THREAD_JOIN_MILLIS = 5000L;

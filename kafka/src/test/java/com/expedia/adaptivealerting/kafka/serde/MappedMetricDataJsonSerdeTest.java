@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.kafka.serde;
 
+import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.kafka.util.TestObjectMother;
-import com.expedia.metrics.MetricData;
 import com.expedia.metrics.jackson.MetricsJavaModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.val;
@@ -24,26 +24,39 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
-/**
- * {@link MetricDataJsonSerializer} unit test.
- */
-public final class MetricDataJsonSerializerTest {
-    private MetricDataJsonSerializer serializer;
+// TODO Use abstract base class for serde tests [WLW]
+public final class MappedMetricDataJsonSerdeTest {
+    private MappedMetricDataJsonSerde serdeUnderTest;
     private ObjectMapper objectMapper;
-    private MetricData metricData;
+    private MappedMetricData mappedMetricData;
 
     @Before
     public void setUp() {
-        this.serializer = new MetricDataJsonSerializer();
+        this.serdeUnderTest = new MappedMetricDataJsonSerde();
         this.objectMapper = new ObjectMapper().registerModule(new MetricsJavaModule());
-        this.metricData = TestObjectMother.metricData();
+        this.mappedMetricData = TestObjectMother.mappedMetricData();
+    }
+
+    @Test
+    public void justForCoverage() {
+        serdeUnderTest.configure(null, false);
+        serdeUnderTest.close();
     }
 
     @Test
     public void testSerialize() throws Exception {
-        val expected = objectMapper.writeValueAsBytes(metricData);
-        val actual = serializer.serialize("some-topic", metricData);
+        val expected = objectMapper.writeValueAsBytes(mappedMetricData);
+        val actual = serdeUnderTest.serializer().serialize("some-topic", mappedMetricData);
         assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void testDeserialize() throws Exception {
+        val expected = TestObjectMother.mappedMetricData();
+        val expectedBytes = objectMapper.writeValueAsBytes(expected);
+        val actual = serdeUnderTest.deserializer().deserialize("some-topic", expectedBytes);
+        assertEquals(expected, actual);
     }
 }

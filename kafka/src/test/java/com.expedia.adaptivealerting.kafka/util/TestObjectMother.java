@@ -19,9 +19,8 @@ import com.expedia.adaptivealerting.anomdetect.AnomalyToMetricMapper;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.adaptivealerting.kafka.serde.JsonPojoDeserializer;
-import com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerializer;
-import com.expedia.adaptivealerting.kafka.serde.MetricDataJsonSerializer;
+import com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde;
+import com.expedia.adaptivealerting.kafka.serde.MetricDataJsonSerde;
 import com.expedia.alertmanager.model.Alert;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
@@ -36,7 +35,6 @@ import org.apache.kafka.streams.errors.LogAndContinueExceptionHandler;
 import org.apache.kafka.streams.test.ConsumerRecordFactory;
 
 import java.time.Instant;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.UUID;
@@ -214,18 +212,10 @@ public final class TestObjectMother {
     }
 
     public static ConsumerRecordFactory<String, MetricData> metricDataFactory() {
-        return new ConsumerRecordFactory<>(new StringSerializer(), new MetricDataJsonSerializer());
+        return new ConsumerRecordFactory<>(new StringSerializer(), new MetricDataJsonSerde.Ser());
     }
 
     public static ConsumerRecordFactory<String, MappedMetricData> mappedMetricDataFactory() {
-        return new ConsumerRecordFactory<>(new StringSerializer(), new MappedMetricDataJsonSerializer());
-    }
-
-    public static JsonPojoDeserializer<Alert> alertDeserializer() {
-        val deserializer = new JsonPojoDeserializer<Alert>();
-        deserializer.configure(
-                Collections.singletonMap(JsonPojoDeserializer.CK_JSON_POJO_CLASS, Alert.class),
-                false);
-        return deserializer;
+        return new ConsumerRecordFactory<>(new StringSerializer(), new MappedMetricDataJsonSerde.Ser());
     }
 }

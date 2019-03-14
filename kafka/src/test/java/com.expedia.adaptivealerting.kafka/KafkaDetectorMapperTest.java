@@ -17,7 +17,7 @@ package com.expedia.adaptivealerting.kafka;
 
 import com.expedia.adaptivealerting.anomdetect.DetectorMapper;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonDeserializer;
+import com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde;
 import com.expedia.adaptivealerting.kafka.serde.MetricDataJsonSerde;
 import com.expedia.adaptivealerting.kafka.util.TestObjectMother;
 import com.expedia.metrics.MetricData;
@@ -149,7 +149,7 @@ public final class KafkaDetectorMapperTest {
         // MappedMetricData consumer
         // We consume the key and value from the outbound topic so we can validate the results.
         this.stringDeser = new StringDeserializer();
-        this.mmdDeser = new MappedMetricDataJsonDeserializer();
+        this.mmdDeser = new MappedMetricDataJsonSerde.Deser();
     }
 
     private void nullOnDeserException(TopologyTestDriver driver) {

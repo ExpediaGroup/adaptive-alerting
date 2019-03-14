@@ -16,32 +16,46 @@
 package com.expedia.adaptivealerting.kafka.serde;
 
 import com.expedia.adaptivealerting.kafka.util.TestObjectMother;
-import com.expedia.metrics.jackson.MetricsJavaModule;
+import com.expedia.alertmanager.model.Alert;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * {@link MappedMetricDataJsonDeserializer} unit test.
- */
-public final class MappedMetricDataJsonDeserializerTest {
-    private MappedMetricDataJsonDeserializer deserializer;
+// TODO Use abstract base class for serde tests [WLW]
+public final class AlertJsonSerdeTest {
+    private AlertJsonSerde serdeUnderTest;
     private ObjectMapper objectMapper;
+    private Alert alert;
 
     @Before
     public void setUp() {
-        this.deserializer = new MappedMetricDataJsonDeserializer();
-        this.objectMapper = new ObjectMapper().registerModule(new MetricsJavaModule());
+        this.serdeUnderTest = new AlertJsonSerde();
+        this.objectMapper = new ObjectMapper();
+        this.alert = TestObjectMother.alert();
+    }
+
+    @Test
+    public void justForCoverage() {
+        serdeUnderTest.configure(null, false);
+        serdeUnderTest.close();
+    }
+
+    @Test
+    public void testSerialize() throws Exception {
+        val expected = objectMapper.writeValueAsBytes(alert);
+        val actual = serdeUnderTest.serializer().serialize("some-topic", alert);
+        assertArrayEquals(expected, actual);
     }
 
     @Test
     public void testDeserialize() throws Exception {
-        val expected = TestObjectMother.mappedMetricData();
+        val expected = TestObjectMother.alert();
         val expectedBytes = objectMapper.writeValueAsBytes(expected);
-        val actual = deserializer.deserialize("some-topic", expectedBytes);
+        val actual = serdeUnderTest.deserializer().deserialize("some-topic", expectedBytes);
         assertEquals(expected, actual);
     }
 }

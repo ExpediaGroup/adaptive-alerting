@@ -92,7 +92,8 @@ class ConstantThresholdBasedE2ETestSpec extends IntegrationTestSpec {
       Then("'constant threshold outlier detector' should read records from its topic and " +
         "write those anomalous records to output topic")
       val consumerPropAnomalyTopic = configToProps(anomalyTopicConsumerConfig.getConfig(STREAM))
-      consumerPropAnomalyTopic.put("JsonPOJOClass", classOf[AnomalyResult])
+      // No longer using this config. [WLW]
+//      consumerPropAnomalyTopic.put("JsonPOJOClass", classOf[AnomalyResult])
       val outputRecords: List[KeyValue[String, AnomalyResult]] =
         IntegrationTestUtils.waitUntilMinKeyValueRecordsReceived[String, AnomalyResult](
           consumerPropAnomalyTopic,

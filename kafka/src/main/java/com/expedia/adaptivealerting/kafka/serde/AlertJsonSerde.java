@@ -15,32 +15,41 @@
  */
 package com.expedia.adaptivealerting.kafka.serde;
 
-import com.expedia.metrics.MetricData;
-import com.expedia.metrics.metrictank.MessagePackSerializer;
+import com.expedia.alertmanager.model.Alert;
 import org.apache.kafka.common.serialization.Deserializer;
+import org.apache.kafka.common.serialization.Serde;
+import org.apache.kafka.common.serialization.Serializer;
 
-import java.io.IOException;
 import java.util.Map;
 
-// TODO Rename this to MetricDataMessagePackDeserializer [WLW]
-
-public class MetricDataDeserializer implements Deserializer<MetricData> {
-    private final static MessagePackSerializer mps = new MessagePackSerializer();
+// TODO Move this to alert-manager. [WLW]
+public final class AlertJsonSerde implements Serde<Alert> {
 
     @Override
     public void configure(Map<String, ?> configs, boolean isKey) {
     }
 
     @Override
-    public MetricData deserialize(String topic, byte[] metricDataBytes) {
-        try {
-            return mps.deserialize(metricDataBytes);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public void close() {
     }
 
     @Override
-    public void close() {
+    public Serializer<Alert> serializer() {
+        return new Ser();
+    }
+
+    @Override
+    public Deserializer<Alert> deserializer() {
+        return new Deser();
+    }
+
+    public static class Ser extends AbstractJsonSerializer<Alert> {
+    }
+
+    public static class Deser extends AbstractJsonDeserializer<Alert> {
+
+        public Deser() {
+            super(Alert.class);
+        }
     }
 }
