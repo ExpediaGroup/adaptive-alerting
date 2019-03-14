@@ -78,7 +78,9 @@ public class KafkaMultiClusterAnomalyToMetricMapper implements Runnable {
         val metricProducer = new KafkaProducer<String, MetricData>(metricProducerProps);
 
         val mapper = new KafkaMultiClusterAnomalyToMetricMapper(
-                anomalyConsumer, metricProducer, anomalyConsumerTopic,
+                anomalyConsumer,
+                metricProducer,
+                anomalyConsumerTopic,
                 metricProducerTopic);
         mapper.run();
     }
@@ -157,21 +159,22 @@ public class KafkaMultiClusterAnomalyToMetricMapper implements Runnable {
 
         assert (anomalyRecord != null);
 
-        val mappedMetricData = anomalyRecord.value();
-        val newMetricData = mapper.toMetricData(mappedMetricData);
+        val mmd = anomalyRecord.value();
+        val metricData = mmd.getMetricData();
+        val timestampMillis = metricData.getTimestamp() * 1000L;
 
+        val newMetricData = mapper.toMetricData(mmd);
         if (newMetricData == null) {
             return null;
         }
 
         val newMetricDef = newMetricData.getMetricDefinition();
         val newMetricId = getMetricId(newMetricDef);
-
         if (newMetricId == null) {
             return null;
         }
 
-        return new ProducerRecord<>(metricTopic, newMetricId, newMetricData);
+        return new ProducerRecord<>(metricTopic, null, timestampMillis, newMetricId, newMetricData);
     }
 
     private String getMetricId(MetricDefinition metricDef) {
