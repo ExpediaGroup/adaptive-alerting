@@ -19,6 +19,7 @@ import com.expedia.adaptivealerting.modelservice.util.JpaConverterJson;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.util.Map;
 
 /**
@@ -46,5 +47,11 @@ public class Detector {
 
     @Column(name = "created_by")
     private String createdBy;
+
+    @Column(name = "last_update_timestamp")
+    private Timestamp lastUpdateTimestamp;
+
+    @Column(name = "enabled")
+    private Boolean enabled;
 
 }

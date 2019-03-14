@@ -17,10 +17,12 @@ package com.expedia.adaptivealerting.modelservice.repo;
 
 import com.expedia.adaptivealerting.modelservice.entity.Detector;
 import com.expedia.adaptivealerting.modelservice.entity.projection.InlineType;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -51,4 +53,26 @@ public interface DetectorRepository extends PagingAndSortingRepository<Detector,
      */
     @Query("select mmm.detector from MetricDetectorMapping mmm where mmm.metric.hash = :hash")
     List<Detector> findByMetricHash(@Param("hash") String hash);
+
+    /**
+     * Finds a list of detectors attached to a given metric hash
+     *
+     * @param interval time in minutes.
+     * @return list of detectors updated withing interval.
+     */
+    @Query(nativeQuery = true, value = "SELECT * from detector WHERE detector.last_update_timestamp > DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL :interval MINUTE)")
+    List<Detector> getLastUpdatedDetectors(@Param("interval") int interval);
+
+    /**
+     * Toggle a detector enabled status
+     *
+     * @param enabled boolean
+     * @param uuid    detectorUUID
+     * @return number of updated rows
+     */
+    @Modifying
+    @Transactional
+    @Query("update Detector d set d.enabled = :enabled where d.uuid = :uuid")
+    int toggleDetector(@Param("enabled") Boolean enabled, @Param("uuid") String uuid);
+
 }
