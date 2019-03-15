@@ -112,13 +112,10 @@ public class ConstantThresholdAnomalyDetectorTest {
     }
 
     private void verifyResult(AnomalyLevel level, AnomalyDetector detector, long epochSecond, double value) {
-        val result = detector.classify(metricData(epochSecond, value));
+        val metricData = new MetricData(metricDefinition, value, epochSecond);
+        val result = detector.classify(metricData);
         assertNull(result.getPredicted());
         assertNotNull(result.getThresholds());
         assertEquals(level, result.getAnomalyLevel());
-    }
-
-    private MetricData metricData(long epochSecond, double value) {
-        return new MetricData(metricDefinition, value, epochSecond);
     }
 }
