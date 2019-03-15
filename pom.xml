@@ -107,7 +107,7 @@
         <slf4j.version>1.7.25</slf4j.version>
         <spring.boot.version>2.0.5.RELEASE</spring.boot.version>
         <spring.security.jwt.version>1.0.9.RELEASE</spring.security.jwt.version>
-        <spring.security.oauth2.version>2.3.4.RELEASE</spring.security.oauth2.version>
+        <spring.security.oauth2.version>2.3.5.RELEASE</spring.security.oauth2.version>
 
         <!-- Version 0.25.0.RELEASE breaks Model Service. [WLW] -->
         <!-- Caused by: org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'org.springframework.hateoas.hal.HalConfiguration' available -->
