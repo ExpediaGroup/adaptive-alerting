@@ -29,6 +29,8 @@ target/
 # IDE-specific
 *.iml
 .idea/
+*.ipr
+*.iws
 
 .DS_Store
 .project
