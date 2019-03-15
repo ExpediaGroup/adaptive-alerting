@@ -174,6 +174,7 @@ public class KafkaMultiClusterAnomalyToMetricMapper implements Runnable {
             return null;
         }
 
+        log.info("produced={}", newMetricData);
         return new ProducerRecord<>(metricTopic, null, timestampMillis, newMetricId, newMetricData);
     }
 
