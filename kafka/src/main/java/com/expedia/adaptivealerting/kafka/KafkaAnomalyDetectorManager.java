@@ -91,7 +91,7 @@ public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
         }
 
         val newMmd = new MappedMetricData(mmd, anomalyResult);
-        log.info("mappedMetricData={}", newMmd);
+        log.info("produced={}", newMmd);
         return newMmd;
     }
 }

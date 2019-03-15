@@ -89,11 +89,11 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
             MetricData metricData) {
 
         assert metricData != null;
-        log.trace("Mapping key={}, metricData={}", key, metricData);
 
         val mmdSet = mapper.map(metricData);
         return mmdSet.stream()
                 .map(mmd -> {
+                    log.info("produced={}", mmd);
                     val newKey = mmd.getDetectorUuid().toString();
                     return KeyValue.pair(newKey, mmd);
                 })
