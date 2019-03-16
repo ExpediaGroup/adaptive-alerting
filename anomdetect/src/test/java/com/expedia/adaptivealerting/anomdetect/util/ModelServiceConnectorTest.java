@@ -42,7 +42,7 @@ public class ModelServiceConnectorTest {
     private static final String CONSTANT_DETECTOR = "constant-detector";
     private static final String EWMA_DETECTOR = "ewma-detector";
     private static final UUID DETECTOR_UUID = UUID.randomUUID();
-    private static final UUID DETECTOR_UUID_EMPTY = UUID.randomUUID();
+    private static final UUID DETECTOR_UUID_NO_MODELS = UUID.randomUUID();
 
     // FIXME The ModelServiceConnector uses this inconsistently. See the notes in that class for more information. [WLW]
     private static final String URI_TEMPLATE = "http://example.com/%s";
@@ -87,26 +87,25 @@ public class ModelServiceConnectorTest {
     }
 
     @Test
-    public void testFindDetectors() throws Exception {
+    public void testFindDetectors() {
         val result = connectorUnderTest.findDetectors(metricDefinition);
         assertEquals(detectorResourceList.size(), result.getEmbedded().getDetectors().size());
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testFindDetectors_metricDefinitionNotNull() throws Exception {
+    public void testFindDetectors_metricDefinitionNotNull() {
         connectorUnderTest.findDetectors(null);
     }
 
     @Test
-    public void testFindLatestModels() throws Exception {
+    public void testFindLatestModels() {
         val result = connectorUnderTest.findLatestModel(DETECTOR_UUID);
         assertNotNull(result);
     }
 
-    @Test
-    public void testFindLatestModels_empty() throws Exception {
-        val result = connectorUnderTest.findLatestModel(DETECTOR_UUID_EMPTY);
-        assertNull(result);
+    @Test(expected = DetectorNotFoundException.class)
+    public void testFindLatestModels_empty() {
+        connectorUnderTest.findLatestModel(DETECTOR_UUID_NO_MODELS);
     }
 
     private void initTestObjects() throws Exception {
@@ -148,7 +147,7 @@ public class ModelServiceConnectorTest {
         val metricId = metricTankIdFactory.getId(metricDefinition);
         val findDetectorsUri = String.format(URI_TEMPLATE, metricId);
         val findModelsUri = String.format(URI_TEMPLATE, DETECTOR_UUID);
-        val findModelsUri_empty = String.format(URI_TEMPLATE, DETECTOR_UUID_EMPTY);
+        val findModelsUri_empty = String.format(URI_TEMPLATE, DETECTOR_UUID_NO_MODELS);
 
         when(httpClient.get(findDetectorsUri)).thenReturn(detectorResourcesContent);
         when(httpClient.get(findModelsUri)).thenReturn(modelResourcesContent);

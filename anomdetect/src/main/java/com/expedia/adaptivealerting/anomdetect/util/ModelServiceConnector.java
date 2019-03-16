@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.http.client.fluent.Content;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -62,28 +63,89 @@ public class ModelServiceConnector {
         this.uriTemplate = uriTemplate;
     }
 
-    public DetectorResources findDetectors(MetricDefinition metricDefinition) throws IOException {
+    /**
+     * Calls the Model Service to finds the detectors for the given metric definition.
+     *
+     * @param metricDefinition metric definition
+     * @return detectors for the given metric definition
+     * @throws DetectorRetrievalException       if there's a problem calling the Model Service
+     * @throws DetectorDeserializationException if there's a problem deserializing the Model Service response into a
+     *                                          detector list (e.g., invalid detector models)
+     * @throws DetectorException                if there's any other problem finding the detector list
+     */
+    public DetectorResources findDetectors(MetricDefinition metricDefinition) {
         notNull(metricDefinition, "metricDefinition can't be null");
+
         val metricId = metricTankIdFactory.getId(metricDefinition);
+
         // http://modelservice/api/detectors/search/findByMetricHash?hash=%s
         // http://modelservice/api/detectors/search/findByMetricHash?hash=1.bbbad54f9232ba765e20368fe9c1a9c4
-        val findDetectorsUri = String.format(uriTemplate, metricId);
-        val content = httpClient.get(findDetectorsUri);
-        return objectMapper.readValue(content.asBytes(), DetectorResources.class);
+        val uri = String.format(uriTemplate, metricId);
+
+        Content content;
+        try {
+            content = httpClient.get(uri);
+        } catch (IOException e) {
+            val message = "IOException while getting detectors" +
+                    ": metricDefinition=" + metricDefinition +
+                    ", metricId=" + metricId +
+                    ", httpMethod=GET" +
+                    ", uri=" + uri;
+            throw new DetectorRetrievalException(message, e);
+        }
+
+        try {
+            return objectMapper.readValue(content.asBytes(), DetectorResources.class);
+        } catch (IOException e) {
+            val message = "IOException while deserializing detectors" +
+                    ": metricDefinition=" + metricDefinition;
+            throw new DetectorDeserializationException(message, e);
+        }
     }
 
-    public ModelResource findLatestModel(UUID detectorUuid) throws IOException {
+    /**
+     * Finds the latest model for the given detector.
+     *
+     * @param detectorUuid detector UUID
+     * @return latest model for the given detector
+     * @throws DetectorRetrievalException       if there's a problem calling the Model Service
+     * @throws DetectorDeserializationException if there's a problem deserializing the Model Service response into a
+     *                                          model (e.g., invalid model)
+     * @throws DetectorNotFoundException        if the detector doesn't have any models
+     * @throws DetectorException                if there's any other problem finding the detector
+     */
+    public ModelResource findLatestModel(UUID detectorUuid) {
         notNull(detectorUuid, "detectorUuid can't be null");
-        val modelResources = findModelsByDetectorUuid(detectorUuid);
-        val modelResourceList = modelResources.getEmbedded().getModels();
-        return modelResourceList.isEmpty() ? null : modelResourceList.get(0);
-    }
 
-    private ModelResources findModelsByDetectorUuid(UUID detectorUuid) throws IOException {
         // http://modelservice/api/models/search/findLatestByDetectorUuid?uuid=%s
         // http://modelservice/api/models/search/findLatestByDetectorUuid?uuid=85f395a2-e276-7cfd-34bc-cb850ae3bc2e
-        val findModelsUri = String.format(uriTemplate, detectorUuid);
-        val content = httpClient.get(findModelsUri);
-        return objectMapper.readValue(content.asBytes(), ModelResources.class);
+        val uri = String.format(uriTemplate, detectorUuid);
+
+        // This returns a list, but it contains either a single detector or none.
+        // We should have made the backing method return a Model instead of a List<Model>. [WLW]
+        Content content;
+        try {
+            content = httpClient.get(uri);
+        } catch (IOException e) {
+            val message = "IOException while getting models for detector " + detectorUuid +
+                    ": httpMethod=GET" +
+                    ", uri=" + uri;
+            throw new DetectorRetrievalException(message, e);
+        }
+
+        ModelResources modelResources;
+        try {
+            modelResources = objectMapper.readValue(content.asBytes(), ModelResources.class);
+        } catch (IOException e) {
+            val message = "IOException while deserializing models for detector " + detectorUuid;
+            throw new DetectorDeserializationException(message, e);
+        }
+
+        val modelResourceList = modelResources.getEmbedded().getModels();
+        if (modelResourceList.isEmpty()) {
+            throw new DetectorNotFoundException("No models for detectorUuid=" + detectorUuid);
+        }
+
+        return modelResourceList.get(0);
     }
 }

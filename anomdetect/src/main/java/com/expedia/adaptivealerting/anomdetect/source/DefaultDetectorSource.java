@@ -19,7 +19,6 @@ import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.DetectorLookup;
 import com.expedia.adaptivealerting.anomdetect.DetectorParams;
-import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
 import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
 import com.expedia.metrics.MetricDefinition;
@@ -29,7 +28,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -58,18 +56,14 @@ public class DefaultDetectorSource implements DetectorSource {
     @Override
     public List<UUID> findDetectorUuids(MetricDefinition metricDef) {
         notNull(metricDef, "metricDefinition can't be null");
-        try {
-            return connector
-                    .findDetectors(metricDef)
-                    .getEmbedded()
-                    .getDetectors()
-                    .stream()
-                    .map(resource ->
-                            UUID.fromString(resource.getUuid()))
-                    .collect(Collectors.toList());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return connector
+                .findDetectors(metricDef)
+                .getEmbedded()
+                .getDetectors()
+                .stream()
+                .map(resource ->
+                        UUID.fromString(resource.getUuid()))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -83,18 +77,7 @@ public class DefaultDetectorSource implements DetectorSource {
         // These are basic detectors backed by single statistical models, as opposed to being ML models that we have to
         // refresh/retrain periodically. So we probably want to simplify this by just collapsing the model concept into
         // the detector. [WLW]
-        ModelResource model;
-        try {
-            model = connector.findLatestModel(detectorUuid);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        if (model == null) {
-            log.error("No detector for detectorUuid={}", detectorUuid);
-            // TODO Is this how we want to handle this? [WLW]
-            return null;
-        }
+        val model = connector.findLatestModel(detectorUuid);
 
         val detectorType = model.getDetectorType().getKey();
         val detectorClass = detectorLookup.getDetector(detectorType);

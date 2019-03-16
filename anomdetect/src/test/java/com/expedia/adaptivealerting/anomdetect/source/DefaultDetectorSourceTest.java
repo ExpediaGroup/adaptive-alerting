@@ -15,7 +15,13 @@
  */
 package com.expedia.adaptivealerting.anomdetect.source;
 
-import com.expedia.adaptivealerting.anomdetect.util.*;
+import com.expedia.adaptivealerting.anomdetect.util.DetectorNotFoundException;
+import com.expedia.adaptivealerting.anomdetect.util.DetectorResource;
+import com.expedia.adaptivealerting.anomdetect.util.DetectorResources;
+import com.expedia.adaptivealerting.anomdetect.util.DetectorRetrievalException;
+import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
+import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
+import com.expedia.adaptivealerting.anomdetect.util.ModelTypeResource;
 import com.expedia.metrics.MetricDefinition;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -24,12 +30,12 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
 @Slf4j
@@ -50,7 +56,7 @@ public final class DefaultDetectorSourceTest {
     private ModelResource modelResource;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
         this.sourceUnderTest = new DefaultDetectorSource(connector);
         initTestObjects();
@@ -88,10 +94,9 @@ public final class DefaultDetectorSourceTest {
         sourceUnderTest.findDetector(null, metricDef);
     }
 
-    @Test
+    @Test(expected = DetectorNotFoundException.class)
     public void testFindDetector_missingDetector() {
-        val result = sourceUnderTest.findDetector(DETECTOR_UUID_MISSING_DETECTOR, metricDef);
-        assertNull(result);
+        sourceUnderTest.findDetector(DETECTOR_UUID_MISSING_DETECTOR, metricDef);
     }
 
     @Test(expected = RuntimeException.class)
@@ -117,14 +122,15 @@ public final class DefaultDetectorSourceTest {
         modelResource.setDetectorType(new ModelTypeResource(DETECTOR_TYPE));
     }
 
-    private void initDependencies() throws IOException {
+    private void initDependencies() {
         when(connector.findDetectors(metricDef)).thenReturn(detectorResources);
         when(connector.findDetectors(metricDefException))
-                .thenThrow(new IOException("Error reading detectors"));
+                .thenThrow(new DetectorRetrievalException("Error finding detectors"));
 
         when(connector.findLatestModel(DETECTOR_UUID)).thenReturn(modelResource);
-        when(connector.findLatestModel(DETECTOR_UUID_MISSING_DETECTOR)).thenReturn(null);
+        when(connector.findLatestModel(DETECTOR_UUID_MISSING_DETECTOR))
+                .thenThrow(new DetectorNotFoundException("No models found"));
         when(connector.findLatestModel(DETECTOR_UUID_EXCEPTION))
-                .thenThrow(new IOException("Error reading detector"));
+                .thenThrow(new DetectorRetrievalException("Error finding latest model"));
     }
 }
