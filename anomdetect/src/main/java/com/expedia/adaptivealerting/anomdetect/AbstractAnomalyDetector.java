@@ -36,7 +36,7 @@ public abstract class AbstractAnomalyDetector<T extends DetectorParams> implemen
     @Getter
     private T params;
 
-    public AbstractAnomalyDetector(Class<T> paramsClass) {
+    protected AbstractAnomalyDetector(Class<T> paramsClass) {
         notNull(paramsClass, "paramsClass can't be null");
         this.paramsClass = paramsClass;
     }

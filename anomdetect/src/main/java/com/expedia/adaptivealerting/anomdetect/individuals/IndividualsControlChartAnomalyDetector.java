@@ -21,9 +21,13 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.val;
 
-import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.*;
+import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.MODEL_WARMUP;
+import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.NORMAL;
+import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.STRONG;
+import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.WEAK;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 import static java.lang.Math.abs;
 import static java.lang.Math.sqrt;
@@ -37,6 +41,7 @@ import static java.lang.Math.sqrt;
  * @see <a href="https://www.spcforexcel.com/knowledge/variable-control-charts/individuals-control-charts">https://www.spcforexcel.com/knowledge/variable-control-charts/individuals-control-charts</a>
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public final class IndividualsControlChartAnomalyDetector extends AbstractAnomalyDetector<IndividualsControlChartParams> {
     private static final double R_CONTROL_CHART_CONSTANT_D4 = 3.267;
     private static final double R_CONTROL_CHART_CONSTANT_D2 = 1.128;

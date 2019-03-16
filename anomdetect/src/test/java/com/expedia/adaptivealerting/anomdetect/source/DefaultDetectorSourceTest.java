@@ -30,6 +30,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.UUID;
@@ -125,12 +126,12 @@ public final class DefaultDetectorSourceTest {
     private void initDependencies() {
         when(connector.findDetectors(metricDef)).thenReturn(detectorResources);
         when(connector.findDetectors(metricDefException))
-                .thenThrow(new DetectorRetrievalException("Error finding detectors"));
+                .thenThrow(new DetectorRetrievalException("Error finding detectors", new IOException()));
 
         when(connector.findLatestModel(DETECTOR_UUID)).thenReturn(modelResource);
         when(connector.findLatestModel(DETECTOR_UUID_MISSING_DETECTOR))
                 .thenThrow(new DetectorNotFoundException("No models found"));
         when(connector.findLatestModel(DETECTOR_UUID_EXCEPTION))
-                .thenThrow(new DetectorRetrievalException("Error finding latest model"));
+                .thenThrow(new DetectorRetrievalException("Error finding latest model", new IOException()));
     }
 }

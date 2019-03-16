@@ -28,8 +28,8 @@ import java.util.UUID;
 
 import static com.expedia.adaptivealerting.anomdetect.AnomalyToMetricMapper.AA_ANOMALY_LEVEL;
 import static com.expedia.adaptivealerting.anomdetect.AnomalyToMetricMapper.AA_DETECTOR_UUID;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class AnomalyToMetricMapperTest {
 
@@ -51,8 +51,8 @@ public class AnomalyToMetricMapperTest {
         val detectorUuid = anomalyWithStringMetricKey.getDetectorUuid().toString();
         val anomalyLevel = anomalyWithStringMetricKey.getAnomalyResult().getAnomalyLevel().toString();
 
-        assertTrue(detectorUuid.equals(actualKvTags.get(AA_DETECTOR_UUID)));
-        assertTrue(anomalyLevel.equals(actualKvTags.get(AA_ANOMALY_LEVEL)));
+        assertEquals(detectorUuid, actualKvTags.get(AA_DETECTOR_UUID));
+        assertEquals(anomalyLevel, actualKvTags.get(AA_ANOMALY_LEVEL));
     }
 
     @Test

@@ -20,10 +20,6 @@ package com.expedia.adaptivealerting.anomdetect.util;
  */
 public class DetectorRetrievalException extends DetectorException {
 
-    public DetectorRetrievalException(String message) {
-        super(message);
-    }
-
     public DetectorRetrievalException(String message, Throwable cause) {
         super(message, cause);
     }

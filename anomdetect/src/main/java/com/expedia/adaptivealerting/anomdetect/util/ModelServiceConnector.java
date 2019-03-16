@@ -19,7 +19,6 @@ import com.expedia.adaptivealerting.anomdetect.DetectorMapper;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.metrictank.MetricTankIdFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.http.client.fluent.Content;
@@ -48,19 +47,18 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @Slf4j
 public class ModelServiceConnector {
     private final MetricTankIdFactory metricTankIdFactory = new MetricTankIdFactory();
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final HttpClientWrapper httpClient;
+    private final String uriTemplate;
+    private final ObjectMapper objectMapper;
 
-    @Getter
-    private HttpClientWrapper httpClient;
-
-    @Getter
-    private String uriTemplate;
-
-    public ModelServiceConnector(HttpClientWrapper httpClient, String uriTemplate) {
+    public ModelServiceConnector(HttpClientWrapper httpClient, String uriTemplate, ObjectMapper objectMapper) {
         notNull(httpClient, "httpClient can't be null");
         notNull(uriTemplate, "uriTemplate can't be null");
+        notNull(objectMapper, "objectMapper can't be null");
+
         this.httpClient = httpClient;
         this.uriTemplate = uriTemplate;
+        this.objectMapper = objectMapper;
     }
 
     /**
