@@ -15,5 +15,5 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.filter;
 
-public class EvaluatorFilterTest {
+public final class EvaluatorFilterTest {
 }

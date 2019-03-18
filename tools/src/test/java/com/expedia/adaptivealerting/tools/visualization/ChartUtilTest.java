@@ -21,7 +21,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class ChartUtilTest {
+public final class ChartUtilTest {
 
     @Test(expected = IllegalAccessException.class)
     public void testPrivateConstructor() throws Exception {
