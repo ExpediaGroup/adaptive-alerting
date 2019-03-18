@@ -30,4 +30,5 @@ import lombok.NoArgsConstructor;
 public class DetectorResource {
     private String uuid;
     private ModelTypeResource type;
+    private Boolean enabled;
 }

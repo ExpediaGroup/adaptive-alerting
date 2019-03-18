@@ -29,12 +29,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
+import static com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector.API_PATH_DETECTOR_BY_METRIC_HASH;
+import static com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector.API_PATH_MODEL_BY_DETECTOR_UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
@@ -52,7 +50,7 @@ public class ModelServiceConnectorTest {
     private static final UUID DETECTOR_UUID_NO_MODELS = UUID.randomUUID();
 
     // FIXME The ModelServiceConnector uses this inconsistently. See the notes in that class for more information. [WLW]
-    private static final String URI_TEMPLATE = "http://example.com/%s";
+    private static final String URI_TEMPLATE = "http://example.com";
 
     private ModelServiceConnector connectorUnderTest;
     private MetricTankIdFactory metricTankIdFactory = new MetricTankIdFactory();
@@ -181,10 +179,10 @@ public class ModelServiceConnectorTest {
         this.detectorResourceList = new ArrayList<>();
         detectorResourceList.add(new DetectorResource(
                 "3217d4be-9c33-490f-828e-c976b393b000",
-                new ModelTypeResource(CONSTANT_DETECTOR)));
+                new ModelTypeResource(CONSTANT_DETECTOR), true));
         detectorResourceList.add(new DetectorResource(
                 "90c37a3c-f6bb-4c00-b41b-191909cccfb7",
-                new ModelTypeResource(EWMA_DETECTOR)));
+                new ModelTypeResource(EWMA_DETECTOR), true));
         this.detectorResources = new DetectorResources(detectorResourceList);
         val detectorResourcesBytes = new ObjectMapper().writeValueAsBytes(detectorResources);
         this.detectorResourcesContent = new Content(detectorResourcesBytes, ContentType.APPLICATION_JSON);
@@ -216,9 +214,9 @@ public class ModelServiceConnectorTest {
         val metricId_cantRetrieve = metricTankIdFactory.getId(metricDef_cantRetrieve);
         val metricId_cantDeserialize = metricTankIdFactory.getId(metricDef_cantDeserialize);
 
-        val uri = String.format(URI_TEMPLATE, metricId);
-        val uri_cantRetrieve = String.format(URI_TEMPLATE, metricId_cantRetrieve);
-        val uri_cantDeserialize = String.format(URI_TEMPLATE, metricId_cantDeserialize);
+        val uri = String.format(URI_TEMPLATE + API_PATH_DETECTOR_BY_METRIC_HASH, metricId);
+        val uri_cantRetrieve = String.format(URI_TEMPLATE + API_PATH_DETECTOR_BY_METRIC_HASH, metricId_cantRetrieve);
+        val uri_cantDeserialize = String.format(URI_TEMPLATE + API_PATH_DETECTOR_BY_METRIC_HASH, metricId_cantDeserialize);
 
         when(httpClient.get(uri)).thenReturn(detectorResourcesContent);
         when(httpClient.get(uri_cantRetrieve)).thenThrow(new IOException());
@@ -233,10 +231,10 @@ public class ModelServiceConnectorTest {
     }
 
     private void initDependencies_findLatestModel_httpClient() throws IOException {
-        val uri = String.format(URI_TEMPLATE, DETECTOR_UUID);
-        val uri_cantRetrieve = String.format(URI_TEMPLATE, DETECTOR_UUID_CANT_RETRIEVE);
-        val uri_cantDeserialize = String.format(URI_TEMPLATE, DETECTOR_UUID_CANT_DESERIALIZE);
-        val uri_noModels = String.format(URI_TEMPLATE, DETECTOR_UUID_NO_MODELS);
+        val uri = String.format(URI_TEMPLATE + API_PATH_MODEL_BY_DETECTOR_UUID, DETECTOR_UUID);
+        val uri_cantRetrieve = String.format(URI_TEMPLATE + API_PATH_MODEL_BY_DETECTOR_UUID, DETECTOR_UUID_CANT_RETRIEVE);
+        val uri_cantDeserialize = String.format(URI_TEMPLATE + API_PATH_MODEL_BY_DETECTOR_UUID, DETECTOR_UUID_CANT_DESERIALIZE);
+        val uri_noModels = String.format(URI_TEMPLATE + API_PATH_MODEL_BY_DETECTOR_UUID, DETECTOR_UUID_NO_MODELS);
 
         when(httpClient.get(uri)).thenReturn(modelResourcesContent);
         when(httpClient.get(uri_cantRetrieve)).thenThrow(new IOException());

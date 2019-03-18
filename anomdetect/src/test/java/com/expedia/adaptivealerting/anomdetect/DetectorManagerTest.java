@@ -20,6 +20,7 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
+import com.typesafe.config.Config;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
@@ -62,12 +63,14 @@ public final class DetectorManagerTest {
     @Mock
     private AnomalyResult anomalyResult;
 
+    @Mock Config config;
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         initTestObjects();
         initDependencies();
-        this.managerUnderTest = new DetectorManager(detectorSource);
+        this.managerUnderTest = new DetectorManager(detectorSource, config);
     }
 
     @Test
@@ -125,5 +128,7 @@ public final class DetectorManagerTest {
                 .thenReturn(detector);
         when(detectorSource.findDetector(any(UUID.class), eq(badDefinition)))
                 .thenReturn(null);
+
+        when(config.getInt("detector-refresh-period")).thenReturn(1);
     }
 }

@@ -109,7 +109,7 @@ public final class DefaultDetectorSourceTest {
         this.metricDef = new MetricDefinition("my-metric");
         this.metricDefException = new MetricDefinition("metric-that-causes-exception");
 
-        val detectorResource = new DetectorResource(DETECTOR_UUID.toString(), new ModelTypeResource(DETECTOR_TYPE));
+        val detectorResource = new DetectorResource(DETECTOR_UUID.toString(), new ModelTypeResource(DETECTOR_TYPE),true);
         this.detectorResources = new DetectorResources(Collections.singletonList(detectorResource));
 
         val params = new HashMap<String, Object>();

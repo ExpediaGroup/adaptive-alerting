@@ -48,16 +48,19 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 public class ModelServiceConnector {
     private final MetricTankIdFactory metricTankIdFactory = new MetricTankIdFactory();
     private final HttpClientWrapper httpClient;
-    private final String uriTemplate;
+    private final String baseUri;
     private final ObjectMapper objectMapper;
+    public static final String API_PATH_DETECTOR_BY_METRIC_HASH = "/api/detectors/search/findByMetricHash?hash=%s";
+    public static final String API_PATH_MODEL_BY_DETECTOR_UUID = "/api/models/search/findLatestByDetectorUuid?uuid=%s";
+    public static final String API_PATH_DETECTOR_UPDATES = "/api/detectors/search/getLastUpdatedDetectors?interval=%d";
 
-    public ModelServiceConnector(HttpClientWrapper httpClient, String uriTemplate, ObjectMapper objectMapper) {
+    public ModelServiceConnector(HttpClientWrapper httpClient, String baseUri, ObjectMapper objectMapper) {
         notNull(httpClient, "httpClient can't be null");
-        notNull(uriTemplate, "uriTemplate can't be null");
+        notNull(baseUri, "baseUri can't be null");
         notNull(objectMapper, "objectMapper can't be null");
 
         this.httpClient = httpClient;
-        this.uriTemplate = uriTemplate;
+        this.baseUri = baseUri;
         this.objectMapper = objectMapper;
     }
 
@@ -78,7 +81,7 @@ public class ModelServiceConnector {
 
         // http://modelservice/api/detectors/search/findByMetricHash?hash=%s
         // http://modelservice/api/detectors/search/findByMetricHash?hash=1.bbbad54f9232ba765e20368fe9c1a9c4
-        val uri = String.format(uriTemplate, metricId);
+        val uri = String.format(baseUri + API_PATH_DETECTOR_BY_METRIC_HASH, metricId);
 
         Content content;
         try {
@@ -117,7 +120,7 @@ public class ModelServiceConnector {
 
         // http://modelservice/api/models/search/findLatestByDetectorUuid?uuid=%s
         // http://modelservice/api/models/search/findLatestByDetectorUuid?uuid=85f395a2-e276-7cfd-34bc-cb850ae3bc2e
-        val uri = String.format(uriTemplate, detectorUuid);
+        val uri = String.format(baseUri + API_PATH_MODEL_BY_DETECTOR_UUID, detectorUuid);
 
         // This returns a list, but it contains either a single detector or none.
         // We should have made the backing method return a Model instead of a List<Model>. [WLW]
@@ -145,5 +148,32 @@ public class ModelServiceConnector {
         }
 
         return modelResourceList.get(0);
+    }
+
+    public DetectorResources findUpdatedDetectors(int timePeriod) {
+        notNull(timePeriod, "timePeriod can't be null");
+
+        val uri = String.format(baseUri + API_PATH_DETECTOR_UPDATES, timePeriod);
+
+
+        Content content;
+        try {
+            content = httpClient.get(uri);
+        } catch (IOException e) {
+            val message = "IOException while getting last updated detectors" +
+                    ": timePeriod=" + timePeriod +
+                    ", httpMethod=GET" +
+                    ", uri=" + uri;
+            throw new DetectorRetrievalException(message, e);
+        }
+
+        try {
+            return objectMapper.readValue(content.asBytes(), DetectorResources.class);
+        } catch (IOException e) {
+            val message = "IOException while deserializing detectors" +
+                    ": timePeriod=" + timePeriod;
+            throw new DetectorDeserializationException(message, e);
+        }
+
     }
 }

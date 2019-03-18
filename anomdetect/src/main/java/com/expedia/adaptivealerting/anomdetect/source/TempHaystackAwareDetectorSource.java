@@ -81,6 +81,11 @@ public final class TempHaystackAwareDetectorSource implements DetectorSource {
                 null;
     }
 
+    @Override
+    public List<UUID> findUpdatedDetectors(int timePeriod) {
+        return new ArrayList<UUID>();
+    }
+
     private boolean isHaystackMetric(MetricDefinition metricDef) {
         if (metricDef == null) {
             return false;

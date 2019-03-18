@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.anomdetect;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.typesafe.config.Config;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
@@ -37,12 +41,32 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @RequiredArgsConstructor
 @Slf4j
 public class DetectorManager {
+    private static final String CK_DETECTOR_REFRESH_PERIOD = "detector-refresh-period";
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     @Getter
     @NonNull
     private DetectorSource detectorSource;
 
+    private int detectorRefreshTimePeriod;
+
     private final Map<UUID, AnomalyDetector> cachedDetectors = new HashMap<>();
+
+    public DetectorManager(DetectorSource detectorSource, Config config) {
+        this.detectorSource = detectorSource;
+        this.detectorRefreshTimePeriod = config.getInt(CK_DETECTOR_REFRESH_PERIOD);
+        this.initScheduler();
+    }
+
+    private void initScheduler() {
+        scheduler.scheduleWithFixedDelay(() -> {
+            try {
+                this.detectorMapRefresh();
+            } catch (Exception e) {
+                log.error("Error refreshing detectors", e);
+            }
+        }, 10, detectorRefreshTimePeriod, TimeUnit.MINUTES);
+    }
 
     /**
      * Returns the managed detector types.
@@ -95,5 +119,14 @@ public class DetectorManager {
             cachedDetectors.put(detectorUuid, detector);
         }
         return detector;
+    }
+
+    /**
+     * Remove detectors from cache that have been modified in last `timePeriod` minutes.
+     * The deleted detectors will be cleaned up and the detectors modified will be reloaded
+     * when corresponding mapped-metric comes in.
+     */
+    private void detectorMapRefresh() {
+        detectorSource.findUpdatedDetectors(detectorRefreshTimePeriod).forEach(cachedDetectors::remove);
     }
 }

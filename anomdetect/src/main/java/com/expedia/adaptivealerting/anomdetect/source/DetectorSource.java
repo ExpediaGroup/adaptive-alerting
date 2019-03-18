@@ -58,4 +58,14 @@ public interface DetectorSource {
      * @throws DetectorException         if there's some other problem while trying to finding the detector
      */
     AnomalyDetector findDetector(UUID detectorUuid, MetricDefinition metricDef);
+
+
+    /**
+     * Finds the list of detector UUIDs updated in last `timePeriod` minutes
+     *
+     * @param timePeriod time period in minutes.
+     * @return The detector UUIDs.
+     * @throws DetectorException if there's a problem finding the detectors
+     */
+    public List<UUID> findUpdatedDetectors(int timePeriod);
 }
