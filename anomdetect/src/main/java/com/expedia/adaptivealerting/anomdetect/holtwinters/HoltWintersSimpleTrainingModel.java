@@ -18,7 +18,9 @@ package com.expedia.adaptivealerting.anomdetect.holtwinters;
 import java.util.Arrays;
 
 import static com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersTrainingMethod.SIMPLE;
-import static com.expedia.adaptivealerting.core.util.AssertUtil.*;
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isFalse;
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 import static java.util.stream.DoubleStream.concat;
 
 /**
@@ -49,6 +51,10 @@ public class HoltWintersSimpleTrainingModel {
      * <p>
      * After the 8th observation, the components.getForecast() returns the correct forecast for the 9th observation which is the first non-training
      * observation that can be used to detect anomalies.
+     *
+     * @param y          data series
+     * @param params     model parameters
+     * @param components model components
      */
     public void observeAndTrain(double y, HoltWintersParams params, HoltWintersOnlineComponents components) {
         checkNulls(params, components);

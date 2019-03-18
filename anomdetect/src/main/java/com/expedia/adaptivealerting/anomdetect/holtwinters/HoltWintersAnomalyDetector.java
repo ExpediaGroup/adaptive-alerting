@@ -34,8 +34,8 @@ import static java.lang.String.format;
  *
  * @see <a href="https://otexts.org/fpp2/holt-winters.html">Holt-Winters' Seasonal Method</a>
  */
-@EqualsAndHashCode(callSuper = true)
 @Data
+@EqualsAndHashCode(callSuper = true)
 public final class HoltWintersAnomalyDetector extends AbstractAnomalyDetector<HoltWintersParams> {
 
     @NonNull

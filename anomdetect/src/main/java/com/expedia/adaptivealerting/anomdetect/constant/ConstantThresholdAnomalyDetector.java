@@ -18,6 +18,8 @@ package com.expedia.adaptivealerting.anomdetect.constant;
 import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.metrics.MetricData;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.val;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -25,6 +27,8 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 /**
  * Anomaly detector with constant thresholds for weak and strong anomalies. Supports both one- and two-tailed tests.
  */
+@Data
+@EqualsAndHashCode(callSuper = true)
 public final class ConstantThresholdAnomalyDetector extends AbstractAnomalyDetector<ConstantThresholdParams> {
 
     public ConstantThresholdAnomalyDetector() {

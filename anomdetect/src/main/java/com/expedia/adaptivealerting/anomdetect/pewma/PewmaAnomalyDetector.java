@@ -20,6 +20,7 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.val;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -41,6 +42,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * </p>
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public final class PewmaAnomalyDetector extends AbstractAnomalyDetector<PewmaParams> {
 
     /**

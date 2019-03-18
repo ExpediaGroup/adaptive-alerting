@@ -18,6 +18,8 @@ package com.expedia.adaptivealerting.anomdetect.source;
 import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.DetectorManager;
 import com.expedia.adaptivealerting.anomdetect.DetectorMapper;
+import com.expedia.adaptivealerting.anomdetect.util.DetectorException;
+import com.expedia.adaptivealerting.anomdetect.util.DetectorNotFoundException;
 import com.expedia.metrics.MetricDefinition;
 
 import java.util.List;
@@ -28,10 +30,8 @@ import java.util.UUID;
  * Detector source interfaces, supporting two major functions:
  *
  * <ul>
- * <li>mapping a metric definition to a list of detector metas (required by
- * {@link DetectorMapper}), and</li>
- * <li>mapping a detector UUID to the associated detector (required by
- * {@link DetectorManager}).</li>
+ * <li>mapping a metric definition to a list of detector metas (required by {@link DetectorMapper}), and</li>
+ * <li>mapping a detector UUID to the associated detector (required by {@link DetectorManager}).</li>
  * </ul>
  */
 public interface DetectorSource {
@@ -43,15 +43,19 @@ public interface DetectorSource {
      *
      * @param metricDef The metric.
      * @return The detector UUIDs.
+     * @throws DetectorException if there's a problem finding the detectors
      */
     List<UUID> findDetectorUuids(MetricDefinition metricDef);
 
     /**
-     * Finds the detector for a given detector and, optionally, metric.
+     * Finds the detector for a given detector and, optionally, metric. We expect the detector to exist and to be
+     * well-defined, so we throw a {@link DetectorException} if that's not the case.
      *
      * @param detectorUuid Detector uuid.
      * @param metricDef    Optional metric definition, for implementations that create detectors dynamically.
      * @return The associated detector.
+     * @throws DetectorNotFoundException if the detector does not exist
+     * @throws DetectorException         if there's some other problem while trying to finding the detector
      */
     AnomalyDetector findDetector(UUID detectorUuid, MetricDefinition metricDef);
 }
