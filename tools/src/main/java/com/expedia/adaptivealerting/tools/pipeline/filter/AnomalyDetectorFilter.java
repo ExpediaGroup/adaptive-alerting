@@ -36,9 +36,9 @@ public final class AnomalyDetectorFilter implements MetricDataSubscriber {
     private final AnomalyDetector anomalyDetector;
     private final List<AnomalyResultSubscriber> subscribers = new LinkedList<>();
 
-    public AnomalyDetectorFilter(AnomalyDetector anomalyDetector) {
-        notNull(anomalyDetector, "anomalyDetector can't be null");
-        this.anomalyDetector = anomalyDetector;
+    public AnomalyDetectorFilter(AnomalyDetector detector) {
+        notNull(detector, "detector can't be null");
+        this.anomalyDetector = detector;
     }
 
     @Override

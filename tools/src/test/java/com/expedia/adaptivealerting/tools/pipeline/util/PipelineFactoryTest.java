@@ -15,5 +15,21 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.util;
 
-public class PipelineFactoryTest {
+import lombok.val;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+
+public final class PipelineFactoryTest {
+
+    @Test
+    public void testCreateChartSink() {
+        val sink = PipelineFactory.createChartSink("My Chart");
+        assertNotNull(sink);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateChartSink_nullTitle() {
+        PipelineFactory.createChartSink(null);
+    }
 }

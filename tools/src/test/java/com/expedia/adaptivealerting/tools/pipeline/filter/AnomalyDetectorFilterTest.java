@@ -15,5 +15,50 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.filter;
 
-public class AnomalyDetectorFilterTest {
+import com.expedia.adaptivealerting.anomdetect.ewma.EwmaAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.ewma.EwmaParams;
+import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.adaptivealerting.tools.pipeline.util.AnomalyResultSubscriber;
+import com.expedia.metrics.MetricData;
+import com.expedia.metrics.MetricDefinition;
+import lombok.val;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.time.Instant;
+import java.util.UUID;
+
+import static org.junit.Assert.assertTrue;
+
+public final class AnomalyDetectorFilterTest {
+    private AnomalyDetectorFilter filterUnderTest;
+    private MetricData metricData;
+
+    @Before
+    public void setUp() {
+        val detector = new EwmaAnomalyDetector();
+        detector.init(UUID.randomUUID(), new EwmaParams());
+        this.filterUnderTest = new AnomalyDetectorFilter(detector);
+
+        val metricDef =  new MetricDefinition("my-metric-def");
+        this.metricData = new MetricData(metricDef, 10.0, Instant.now().getEpochSecond());
+    }
+
+    @Test
+    public void testNext() {
+        boolean[] gotNext = new boolean[1];
+
+        val subscriber = new AnomalyResultSubscriber() {
+            @Override
+            public void next(MappedMetricData anomaly) {
+                gotNext[0] = true;
+            }
+        };
+
+        filterUnderTest.addSubscriber(subscriber);
+        filterUnderTest.next(metricData);
+        filterUnderTest.removeSubscriber(subscriber);
+
+        assertTrue(gotNext[0]);
+    }
 }
