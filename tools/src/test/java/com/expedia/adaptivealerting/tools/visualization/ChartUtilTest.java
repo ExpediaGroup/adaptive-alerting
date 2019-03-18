@@ -54,4 +54,12 @@ public final class ChartUtilTest {
         val frame = ChartUtil.createChartFrame("My Frame", chart);
         assertEquals("My Frame", frame.getTitle());
     }
+
+    @Test
+    public void testCreateChartPanel() {
+        val chartSeries = new ChartSeries();
+        val chart = ChartUtil.createChart("My Chart", chartSeries);
+        val panel = ChartUtil.createChartPanel(chart);
+        assertEquals(1, panel.getComponents().length);
+    }
 }
