@@ -15,31 +15,18 @@
  */
 package com.expedia.adaptivealerting.core.evaluator;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 /**
  * Model Evaluation
  */
+@AllArgsConstructor
 public class ModelEvaluation {
 
+    @Getter
     private String evaluatorMethod;
+
+    @Getter
     private double evaluatorScore;
-
-    public ModelEvaluation(String method, double score) {
-        this.evaluatorMethod = method;
-        this.evaluatorScore = score;
-    }
-
-    /**
-     * @return the evaluatorScore
-     */
-    public String getEvaluatorMethod() {
-        return evaluatorMethod;
-    }
-
-    /**
-     * @return the evaluatorScore
-     */
-    public double getEvaluatorScore() {
-        return evaluatorScore;
-    }
-
 }
