@@ -27,11 +27,12 @@ import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeries;
 
 import java.text.DecimalFormat;
+import java.time.Instant;
+import java.util.Date;
 
 import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.STRONG;
 import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.WEAK;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
-import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.toSecond;
 
 public final class AnomalyChartSink implements AnomalyResultSubscriber, ModelEvaluationSubscriber {
 
@@ -62,7 +63,7 @@ public final class AnomalyChartSink implements AnomalyResultSubscriber, ModelEva
         val level = anomalyResult.getAnomalyLevel();
         val thresholds = anomalyResult.getThresholds();
 
-        final Second second = toSecond(epochSecond);
+        val second = toSecond(epochSecond);
         chartSeries.getObserved().add(second, observed);
 
         addValue(chartSeries.getPredicted(), second, anomalyResult.getPredicted());
@@ -94,6 +95,10 @@ public final class AnomalyChartSink implements AnomalyResultSubscriber, ModelEva
                 .append(")")
                 .toString();
         chart.setTitle(title);
+    }
+
+    private Second toSecond(long epochSecond) {
+        return new Second(Date.from(Instant.ofEpochSecond(epochSecond)));
     }
 
     private void addValue(TimeSeries timeSeries, Second second, Double value) {
