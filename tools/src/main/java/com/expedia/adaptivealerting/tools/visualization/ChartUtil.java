@@ -43,6 +43,10 @@ public final class ChartUtil {
     private static final Color MIDPOINT_COLOR = Color.DARK_GRAY;
     private static final Color THRESHOLD_COLOR = new Color(204, 204, 204, 80);
 
+    /** Prevent instantiation */
+    private ChartUtil() {
+    }
+
     public static JFreeChart createChart(String title, ChartSeries chartSeries) {
         notNull(title, "title can't be null");
         notNull(chartSeries, "chartSeries can't be null");

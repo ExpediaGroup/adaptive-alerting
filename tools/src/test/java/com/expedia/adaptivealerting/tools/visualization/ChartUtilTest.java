@@ -28,4 +28,22 @@ public class ChartUtilTest {
         val chart = ChartUtil.createChart("My Chart", chartSeries);
         assertEquals("My Chart", chart.getTitle().getText());
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateChart_nullTitle() {
+        ChartUtil.createChart(null, new ChartSeries());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateChart_nullSeries() {
+        ChartUtil.createChart("My Chart", null);
+    }
+
+    @Test
+    public void testCreateChartFrame() {
+        val chartSeries = new ChartSeries();
+        val chart = ChartUtil.createChart("My Chart", chartSeries);
+        val frame = ChartUtil.createChartFrame("My Frame", chart);
+        assertEquals("My Frame", frame.getTitle());
+    }
 }
