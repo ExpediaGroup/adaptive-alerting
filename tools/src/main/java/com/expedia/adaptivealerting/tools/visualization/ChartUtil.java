@@ -36,7 +36,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 /**
  * Chart utilities.
  */
-public class ChartUtil {
+public final class ChartUtil {
     private static final Color STRONG_OUTLIER_COLOR = Color.RED;
     private static final Color WEAK_OUTLIER_COLOR = new Color(255, 194, 0);
     private static final Color OBSERVED_COLOR = Color.BLUE;
