@@ -42,10 +42,10 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 /**
- * {@link KafkaMultiClusterAnomalyToMetricMapper} unit test.
+ * {@link KafkaAnomalyToMetricMapper} unit test.
  */
 @Slf4j
-public class KafkaMultiClusterAnomalyToMetricMapperTest {
+public class KafkaAnomalyToMetricMapperTest {
 
     // Anomaly consumer
     private static final String ANOMALY_TOPIC = "anomalies";
@@ -66,7 +66,7 @@ public class KafkaMultiClusterAnomalyToMetricMapperTest {
     public static KafkaJunitRule kafka = new KafkaJunitRule(EphemeralKafkaBroker.create()).waitForStartup();
 
     // Class under test
-    private KafkaMultiClusterAnomalyToMetricMapper a2mMapper;
+    private KafkaAnomalyToMetricMapper a2mMapper;
 
     private ObjectMapper objectMapper;
 
@@ -75,7 +75,7 @@ public class KafkaMultiClusterAnomalyToMetricMapperTest {
         val anomalyConsumer = buildAnomalyConsumer();
         val metricProducer = buildMetricProducer();
 
-        this.a2mMapper = new KafkaMultiClusterAnomalyToMetricMapper(
+        this.a2mMapper = new KafkaAnomalyToMetricMapper(
                 anomalyConsumer,
                 metricProducer,
                 ANOMALY_TOPIC,

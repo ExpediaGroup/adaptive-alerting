@@ -23,6 +23,7 @@ import com.expedia.adaptivealerting.kafka.util.ConfigUtil;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.metrictank.MetricTankIdFactory;
+import com.typesafe.config.Config;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -41,8 +42,8 @@ import java.util.Collections;
  * {@link AnomalyResult}.
  */
 @Slf4j
-public class KafkaMultiClusterAnomalyToMetricMapper implements Runnable {
-    private static final String APP_ID = "mc-a2m-mapper";
+public class KafkaAnomalyToMetricMapper implements Runnable {
+    private static final String APP_ID = "a2m-mapper";
     private static final String ANOMALY_CONSUMER = "anomaly-consumer";
     private static final String METRIC_PRODUCER = "metric-producer";
     private static final String TOPIC = "topic";
@@ -66,7 +67,12 @@ public class KafkaMultiClusterAnomalyToMetricMapper implements Runnable {
 
         // TODO Refactor the loader such that it's not tied to Kafka Streams. [WLW]
         val config = new TypesafeConfigLoader(APP_ID).loadMergedConfig();
+        val mapper = buildMapper(config);
+        mapper.run();
+    }
 
+    // Extracted for unit testing
+    static KafkaAnomalyToMetricMapper buildMapper(Config config) {
         val anomalyConsumerConfig = config.getConfig(ANOMALY_CONSUMER);
         val anomalyConsumerTopic = anomalyConsumerConfig.getString(TOPIC);
         val anomalyConsumerProps = ConfigUtil.toConsumerConfig(anomalyConsumerConfig);
@@ -77,15 +83,14 @@ public class KafkaMultiClusterAnomalyToMetricMapper implements Runnable {
         val metricProducerProps = ConfigUtil.toProducerConfig(metricProducerConfig);
         val metricProducer = new KafkaProducer<String, MetricData>(metricProducerProps);
 
-        val mapper = new KafkaMultiClusterAnomalyToMetricMapper(
+        return new KafkaAnomalyToMetricMapper(
                 anomalyConsumer,
                 metricProducer,
                 anomalyConsumerTopic,
                 metricProducerTopic);
-        mapper.run();
     }
 
-    public KafkaMultiClusterAnomalyToMetricMapper(
+    public KafkaAnomalyToMetricMapper(
             Consumer<String, MappedMetricData> anomalyConsumer,
             Producer<String, MetricData> metricProducer,
             String anomalyTopic,
@@ -99,7 +104,7 @@ public class KafkaMultiClusterAnomalyToMetricMapper implements Runnable {
 
     @Override
     public void run() {
-        log.info("Starting KafkaMultiClusterAnomalyToMetricMapper");
+        log.info("Starting KafkaAnomalyToMetricMapper");
         anomalyConsumer.subscribe(Collections.singletonList(anomalyTopic));
         boolean continueProcessing = true;
 
@@ -108,7 +113,7 @@ public class KafkaMultiClusterAnomalyToMetricMapper implements Runnable {
             try {
                 pollAnomalyTopic();
             } catch (WakeupException e) {
-                log.info("Stopping KafkaMultiClusterAnomalyToMetricMapper");
+                log.info("Stopping KafkaAnomalyToMetricMapper");
                 anomalyConsumer.close();
                 metricProducer.flush();
                 metricProducer.close();

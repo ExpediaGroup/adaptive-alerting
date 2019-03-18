@@ -1,10 +1,10 @@
 locals {
-  app_name = "mc-a2m-mapper"
-  config_file_path = "${path.module}/templates/mc-a2m-mapper_conf.tpl"
+  app_name = "a2m-mapper"
+  config_file_path = "${path.module}/templates/a2m-mapper_conf.tpl"
   deployment_yaml_file_path = "${path.module}/templates/deployment_yaml.tpl"
   count = "${var.enabled?1:0}"
   checksum = "${sha1("${data.template_file.config_data.rendered}")}"
-  configmap_name = "mc-a2m-mapper-${local.checksum}"
+  configmap_name = "a2m-mapper-${local.checksum}"
 }
 
 data "template_file" "config_data" {
@@ -51,13 +51,13 @@ data "template_file" "deployment_yaml" {
   }
 }
 
-resource "kubernetes_config_map" "mc-a2m-mapper-config" {
+resource "kubernetes_config_map" "a2m-mapper-config" {
   metadata {
     name = "${local.configmap_name}"
     namespace = "${var.namespace}"
   }
   data {
-    "mc-a2m-mapper.conf" = "${data.template_file.config_data.rendered}"
+    "a2m-mapper.conf" = "${data.template_file.config_data.rendered}"
   }
   count = "${local.count}"
 }

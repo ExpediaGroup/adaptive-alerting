@@ -35,7 +35,7 @@ spec:
             memory: ${memory_request}Mi
         env:
         - name: "AA_OVERRIDES_CONFIG_PATH"
-          value: "/config/mc-a2m-mapper.conf"
+          value: "/config/a2m-mapper.conf"
         - name: "AA_GRAPHITE_HOST"
           value: "${graphite_host}"
         - name: "AA_GRAPHITE_PORT"
