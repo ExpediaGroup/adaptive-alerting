@@ -39,7 +39,7 @@ public final class AlertJsonSerdeTest {
     }
 
     @Test
-    public void justForCoverage() {
+    public void coverageOnly() {
         serdeUnderTest.configure(null, false);
         serdeUnderTest.close();
     }

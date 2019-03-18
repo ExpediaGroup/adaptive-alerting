@@ -60,15 +60,15 @@ public class KafkaAnomalyToMetricMapper implements Runnable {
     @Getter
     private final Producer<String, MetricData> metricProducer;
 
+    @Getter
     private String anomalyTopic;
+
+    @Getter
     private String metricTopic;
 
     public static void main(String[] args) {
-
         // TODO Refactor the loader such that it's not tied to Kafka Streams. [WLW]
-        val config = new TypesafeConfigLoader(APP_ID).loadMergedConfig();
-        val mapper = buildMapper(config);
-        mapper.run();
+        buildMapper(new TypesafeConfigLoader(APP_ID).loadMergedConfig()).run();
     }
 
     // Extracted for unit testing
