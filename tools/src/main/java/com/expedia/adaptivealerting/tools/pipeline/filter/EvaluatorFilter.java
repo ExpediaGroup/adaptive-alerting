@@ -60,7 +60,7 @@ public final class EvaluatorFilter implements AnomalyResultSubscriber {
     private Double getPredicted(MappedMetricData anomaly) {
         // getPredicted() can return null during warm up; convert null to 0
         val anomalyResult = anomaly.getAnomalyResult();
-        return (anomalyResult.getPredicted() == null ? 0 : anomalyResult.getPredicted());
+        return (anomalyResult.getPredicted() == null ? 0.0 : anomalyResult.getPredicted());
     }
 
     private void publish(ModelEvaluation modelEvaluation) {
