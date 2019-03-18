@@ -36,12 +36,16 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 /**
  * Chart utilities.
  */
-public class ChartUtil {
+public final class ChartUtil {
     private static final Color STRONG_OUTLIER_COLOR = Color.RED;
     private static final Color WEAK_OUTLIER_COLOR = new Color(255, 194, 0);
     private static final Color OBSERVED_COLOR = Color.BLUE;
     private static final Color MIDPOINT_COLOR = Color.DARK_GRAY;
     private static final Color THRESHOLD_COLOR = new Color(204, 204, 204, 80);
+
+    /** Prevent instantiation */
+    private ChartUtil() {
+    }
 
     public static JFreeChart createChart(String title, ChartSeries chartSeries) {
         notNull(title, "title can't be null");
