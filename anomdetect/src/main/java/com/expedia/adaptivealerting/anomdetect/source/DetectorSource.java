@@ -48,10 +48,9 @@ public interface DetectorSource {
     List<UUID> findDetectorUuids(MetricDefinition metricDef);
 
     /**
-     * Finds the detector for a given detector and, optionally, metric. We expect the detector to exist and to be
-     * well-defined, so we throw a {@link DetectorException} if that's not the case.
+     * Finds the detector for a given detector and, optionally, metric.
      *
-     * @param detectorUuid Detector uuid.
+     * @param detectorUuid Detector UUID.
      * @param metricDef    Optional metric definition, for implementations that create detectors dynamically.
      * @return The associated detector.
      * @throws DetectorNotFoundException if the detector does not exist
