@@ -16,11 +16,17 @@
 package com.expedia.adaptivealerting.tools.visualization;
 
 import lombok.val;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class ChartUtilTest {
+
+    @Test(expected = IllegalAccessException.class)
+    public void testPrivateConstructor() throws Exception {
+        ChartUtil.class.newInstance();
+    }
 
     @Test
     public void testCreateChart() {
@@ -39,7 +45,9 @@ public class ChartUtilTest {
         ChartUtil.createChart("My Chart", null);
     }
 
+    // N.B. Travis CI fails when running this since Travis CI is headless.
     @Test
+    @Ignore
     public void testCreateChartFrame() {
         val chartSeries = new ChartSeries();
         val chart = ChartUtil.createChart("My Chart", chartSeries);
