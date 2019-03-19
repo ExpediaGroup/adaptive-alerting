@@ -101,21 +101,21 @@ module "modelservice" {
   db_endpoint = "${var.modelservice["db_endpoint"]}"
 }
 
-module "mc-a2m-mapper" {
-  source = "mc-a2m-mapper"
+module "a2m-mapper" {
+  source = "a2m-mapper"
 
   # Docker
-  image = "${var.mc-a2m-mapper["image"]}"
-  image_pull_policy = "${var.mc-a2m-mapper["image_pull_policy"]}"
+  image = "${var.a2m-mapper["image"]}"
+  image_pull_policy = "${var.a2m-mapper["image_pull_policy"]}"
 
   # Kubernetes
   namespace = "${var.app_namespace}"
-  enabled = "${var.mc-a2m-mapper["enabled"]}"
-  replicas = "${var.mc-a2m-mapper["instances"]}"
-  cpu_limit = "${var.mc-a2m-mapper["cpu_limit"]}"
-  cpu_request = "${var.mc-a2m-mapper["cpu_request"]}"
-  memory_limit = "${var.mc-a2m-mapper["memory_limit"]}"
-  memory_request = "${var.mc-a2m-mapper["memory_request"]}"
+  enabled = "${var.a2m-mapper["enabled"]}"
+  replicas = "${var.a2m-mapper["instances"]}"
+  cpu_limit = "${var.a2m-mapper["cpu_limit"]}"
+  cpu_request = "${var.a2m-mapper["cpu_request"]}"
+  memory_limit = "${var.a2m-mapper["memory_limit"]}"
+  memory_request = "${var.a2m-mapper["memory_request"]}"
   node_selector_label = "${var.node_selector_label}"
   kubectl_executable_name = "${var.kubectl_executable_name}"
   kubectl_context_name = "${var.kubectl_context_name}"
@@ -124,20 +124,20 @@ module "mc-a2m-mapper" {
   graphite_enabled = "${var.graphite_enabled}"
   graphite_hostname = "${var.graphite_hostname}"
   graphite_port = "${var.graphite_port}"
-  jvm_memory_limit = "${var.mc-a2m-mapper["jvm_memory_limit"]}"
-  env_vars = "${var.mc-a2m-mapper["environment_overrides"]}"
+  jvm_memory_limit = "${var.a2m-mapper["jvm_memory_limit"]}"
+  env_vars = "${var.a2m-mapper["environment_overrides"]}"
 
   # App
-  anomaly_consumer_bootstrap_servers = "${var.mc-a2m-mapper["anomaly_consumer_bootstrap_servers"]}"
-  anomaly_consumer_group_id = "${var.mc-a2m-mapper["anomaly_consumer_group_id"]}"
-  anomaly_consumer_topic = "${var.mc-a2m-mapper["anomaly_consumer_topic"]}"
-  anomaly_consumer_key_deserializer = "${var.mc-a2m-mapper["anomaly_consumer_key_deserializer"]}"
-  anomaly_consumer_value_deserializer = "${var.mc-a2m-mapper["anomaly_consumer_value_deserializer"]}"
-  metric_producer_bootstrap_servers = "${var.mc-a2m-mapper["metric_producer_bootstrap_servers"]}"
-  metric_producer_client_id = "${var.mc-a2m-mapper["metric_producer_client_id"]}"
-  metric_producer_topic = "${var.mc-a2m-mapper["metric_producer_topic"]}"
-  metric_producer_key_serializer = "${var.mc-a2m-mapper["metric_producer_key_serializer"]}"
-  metric_producer_value_serializer = "${var.mc-a2m-mapper["metric_producer_value_serializer"]}"
+  anomaly_consumer_bootstrap_servers = "${var.a2m-mapper["anomaly_consumer_bootstrap_servers"]}"
+  anomaly_consumer_group_id = "${var.a2m-mapper["anomaly_consumer_group_id"]}"
+  anomaly_consumer_topic = "${var.a2m-mapper["anomaly_consumer_topic"]}"
+  anomaly_consumer_key_deserializer = "${var.a2m-mapper["anomaly_consumer_key_deserializer"]}"
+  anomaly_consumer_value_deserializer = "${var.a2m-mapper["anomaly_consumer_value_deserializer"]}"
+  metric_producer_bootstrap_servers = "${var.a2m-mapper["metric_producer_bootstrap_servers"]}"
+  metric_producer_client_id = "${var.a2m-mapper["metric_producer_client_id"]}"
+  metric_producer_topic = "${var.a2m-mapper["metric_producer_topic"]}"
+  metric_producer_key_serializer = "${var.a2m-mapper["metric_producer_key_serializer"]}"
+  metric_producer_value_serializer = "${var.a2m-mapper["metric_producer_value_serializer"]}"
 }
 
 module "notifier" {

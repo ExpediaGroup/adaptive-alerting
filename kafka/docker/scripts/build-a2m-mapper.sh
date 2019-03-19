@@ -14,9 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-APP_NAME="adaptive-alerting-mc-a2m-mapper"
-DOTTED_APP_NAME="mc.a2m.mapper"
-MAIN_CLASS="com.expedia.adaptivealerting.kafka.KafkaMultiClusterAnomalyToMetricMapper"
+APP_NAME="adaptive-alerting-a2m-mapper"
+DOTTED_APP_NAME="a2m.mapper"
+MAIN_CLASS="com.expedia.adaptivealerting.kafka.KafkaAnomalyToMetricMapper"
 
 cd `cd -P -- "$(dirname -- "$0")" && pwd -P`
 

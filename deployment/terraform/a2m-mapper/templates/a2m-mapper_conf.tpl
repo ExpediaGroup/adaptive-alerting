@@ -1,4 +1,4 @@
-mc-a2m-mapper {
+a2m-mapper {
   anomaly-consumer {
     bootstrap.servers = "${anomaly_consumer_bootstrap_servers}"
     group.id = "${anomaly_consumer_group_id}"

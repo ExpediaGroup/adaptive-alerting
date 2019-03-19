@@ -24,6 +24,10 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 public final class PipelineFactory {
 
+    // Prevent instantiation
+    private PipelineFactory() {
+    }
+
     public static AnomalyChartSink createChartSink(String title) {
         notNull(title, "title can't be null");
 
