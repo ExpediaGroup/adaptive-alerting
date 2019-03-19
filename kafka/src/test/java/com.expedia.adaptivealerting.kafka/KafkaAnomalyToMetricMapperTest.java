@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.charithe.kafka.EphemeralKafkaBroker;
 import com.github.charithe.kafka.KafkaJunitRule;
+import com.typesafe.config.ConfigFactory;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -40,12 +41,13 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
- * {@link KafkaMultiClusterAnomalyToMetricMapper} unit test.
+ * {@link KafkaAnomalyToMetricMapper} unit test.
  */
 @Slf4j
-public class KafkaMultiClusterAnomalyToMetricMapperTest {
+public final class KafkaAnomalyToMetricMapperTest {
 
     // Anomaly consumer
     private static final String ANOMALY_TOPIC = "anomalies";
@@ -65,9 +67,7 @@ public class KafkaMultiClusterAnomalyToMetricMapperTest {
     @ClassRule
     public static KafkaJunitRule kafka = new KafkaJunitRule(EphemeralKafkaBroker.create()).waitForStartup();
 
-    // Class under test
-    private KafkaMultiClusterAnomalyToMetricMapper a2mMapper;
-
+    private KafkaAnomalyToMetricMapper a2mMapperUnderTest;
     private ObjectMapper objectMapper;
 
     @Before
@@ -75,7 +75,7 @@ public class KafkaMultiClusterAnomalyToMetricMapperTest {
         val anomalyConsumer = buildAnomalyConsumer();
         val metricProducer = buildMetricProducer();
 
-        this.a2mMapper = new KafkaMultiClusterAnomalyToMetricMapper(
+        this.a2mMapperUnderTest = new KafkaAnomalyToMetricMapper(
                 anomalyConsumer,
                 metricProducer,
                 ANOMALY_TOPIC,
@@ -86,6 +86,21 @@ public class KafkaMultiClusterAnomalyToMetricMapperTest {
                 .registerModule(new MetricsJavaModule())
                 .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
+
+    @Test
+    public void coverageOnly() {
+        assertNotNull(a2mMapperUnderTest.getAnomalyConsumer());
+        assertNotNull(a2mMapperUnderTest.getMetricProducer());
+    }
+
+    @Test
+    public void testBuildMapper() {
+        val config = ConfigFactory.load("a2m-mapper.conf");
+        val mapper = KafkaAnomalyToMetricMapper.buildMapper(config);
+        assertNotNull(mapper);
+        assertEquals(ANOMALY_TOPIC, mapper.getAnomalyTopic());
+        assertEquals(METRIC_TOPIC, mapper.getMetricTopic());
     }
 
     @Test
@@ -102,10 +117,10 @@ public class KafkaMultiClusterAnomalyToMetricMapperTest {
             kafka.helper().produceStrings(ANOMALY_TOPIC, anomalyJson);
         }
 
-        val mapperThread = new Thread(a2mMapper);
+        val mapperThread = new Thread(a2mMapperUnderTest);
         mapperThread.start();
         mapperThread.join(THREAD_JOIN_MILLIS);
-        a2mMapper.getAnomalyConsumer().wakeup();
+        a2mMapperUnderTest.getAnomalyConsumer().wakeup();
 
         val metrics = kafka.helper().consumeStrings(METRIC_TOPIC, NUM_MESSAGES).get();
         assertEquals(NUM_MESSAGES, metrics.size());
@@ -180,10 +195,10 @@ public class KafkaMultiClusterAnomalyToMetricMapperTest {
         kafka.helper().produce(ANOMALY_TOPIC, anomalyProducer, anomalies);
 
         // Run the processor
-        val mapperThread = new Thread(a2mMapper);
+        val mapperThread = new Thread(a2mMapperUnderTest);
         mapperThread.start();
         mapperThread.join(THREAD_JOIN_MILLIS);
-        a2mMapper.getAnomalyConsumer().wakeup();
+        a2mMapperUnderTest.getAnomalyConsumer().wakeup();
 
         // Read from the output topic.
         // Run on a separate thread so we can join if it blocks forever.

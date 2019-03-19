@@ -34,9 +34,17 @@ public final class MetricDataMessagePackSerdeTest {
     }
 
     @Test
-    public void justForCoverage() {
+    public void coverageOnly() {
         serdeUnderTest.configure(null, false);
         serdeUnderTest.close();
+
+        val serializer = new MetricDataMessagePackSerde.Ser();
+        serializer.configure(null, false);
+        serializer.close();
+
+        val deserializer = new MetricDataMessagePackSerde.Deser();
+        deserializer.configure(null, false);
+        deserializer.close();
     }
 
     @Test

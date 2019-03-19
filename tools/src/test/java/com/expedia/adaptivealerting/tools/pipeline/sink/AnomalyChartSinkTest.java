@@ -19,6 +19,7 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.adaptivealerting.core.evaluator.ModelEvaluation;
 import com.expedia.adaptivealerting.tools.visualization.ChartSeries;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
@@ -33,6 +34,7 @@ import org.mockito.MockitoAnnotations;
 import java.time.Instant;
 import java.util.UUID;
 
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
 public final class AnomalyChartSinkTest {
@@ -47,6 +49,7 @@ public final class AnomalyChartSinkTest {
     private ChartSeries chartSeries;
     private MappedMetricData strongAnomalyNoThresholds;
     private MappedMetricData weakAnomalyWithThresholds;
+    private ModelEvaluation modelEvaluation;
 
     @Before
     public void setUp() {
@@ -57,6 +60,11 @@ public final class AnomalyChartSinkTest {
     }
 
     @Test
+    public void coverageOnly() {
+        assertNotNull(sinkUnderTest.getChart());
+    }
+
+    @Test
     public void testNext_strongAnomalyNoThresholds() {
         sinkUnderTest.next(strongAnomalyNoThresholds);
     }
@@ -64,6 +72,21 @@ public final class AnomalyChartSinkTest {
     @Test
     public void testNext_weakAnomalyWithThresholds() {
         sinkUnderTest.next(weakAnomalyWithThresholds);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testNext_nullAnomaly() {
+        sinkUnderTest.next((MappedMetricData) null);
+    }
+
+    @Test
+    public void testNext_modelEvaluation() {
+        sinkUnderTest.next(modelEvaluation);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testNext_nullModelEvaluation() {
+        sinkUnderTest.next((ModelEvaluation) null);
     }
 
     private void initTestObjects() {
@@ -85,6 +108,8 @@ public final class AnomalyChartSinkTest {
 
         this.weakAnomalyWithThresholds = new MappedMetricData(metricData, UUID.randomUUID());
         this.weakAnomalyWithThresholds.setAnomalyResult(anomalyResult_weak_thresholds);
+
+        this.modelEvaluation = new ModelEvaluation("some-method", 0.0);
     }
 
     private void initDependencies() {
