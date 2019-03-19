@@ -152,10 +152,7 @@ public class ModelServiceConnector {
 
     public DetectorResources findUpdatedDetectors(int timePeriod) {
         notNull(timePeriod, "timePeriod can't be null");
-
         val uri = String.format(baseUri + API_PATH_DETECTOR_UPDATES, timePeriod);
-
-
         Content content;
         try {
             content = httpClient.get(uri);

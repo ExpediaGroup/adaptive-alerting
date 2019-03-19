@@ -43,6 +43,7 @@ import static org.mockito.Mockito.when;
 public final class DetectorManagerTest {
     private static final String DETECTOR_TYPE = "ewma-detector";
     private final int detector_refresh_period = 1;
+    private final int bad_detector_refresh_period = 0;
 
     private DetectorManager managerUnderTest;
 
@@ -68,6 +69,7 @@ public final class DetectorManagerTest {
     private AnomalyResult anomalyResult;
 
     @Mock Config config;
+    @Mock Config badConfig;
 
     @Before
     public void setUp() {
@@ -76,6 +78,12 @@ public final class DetectorManagerTest {
         initDependencies();
         this.managerUnderTest = new DetectorManager(detectorSource, config);
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testBadConfig() {
+        new DetectorManager(detectorSource, badConfig);
+    }
+
 
     @Test
     public void testGetDetectorSource() {
@@ -147,5 +155,6 @@ public final class DetectorManagerTest {
         when(detectorSource.findUpdatedDetectors(detector_refresh_period)).thenReturn(updatedDetectors);
 
         when(config.getInt("detector-refresh-period")).thenReturn(detector_refresh_period);
+        when(badConfig.getInt("detector-refresh-period")).thenReturn(bad_detector_refresh_period);
     }
 }
