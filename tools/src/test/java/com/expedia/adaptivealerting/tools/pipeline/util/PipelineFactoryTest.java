@@ -22,6 +22,11 @@ import static org.junit.Assert.assertNotNull;
 
 public final class PipelineFactoryTest {
 
+    @Test(expected = IllegalAccessException.class)
+    public void testPrivateConstructor() throws Exception {
+        PipelineFactory.class.newInstance();
+    }
+
     @Test
     public void testCreateChartSink() {
         val sink = PipelineFactory.createChartSink("My Chart");
