@@ -144,6 +144,12 @@ public final class TempHaystackAwareDetectorSourceTest {
         assertNull(result);
     }
 
+    @Test
+    public void testFindUpdatedDetectorUuids() {
+        val results = sourceUnderTest.findUpdatedDetectors(1);
+        assertEquals(0, results.size());
+    }
+
     private void initTestObjects() {
         this.detectorTypes = new HashSet<>();
 

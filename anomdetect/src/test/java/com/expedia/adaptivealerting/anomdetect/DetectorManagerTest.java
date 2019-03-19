@@ -29,6 +29,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.time.Instant;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
@@ -41,11 +42,14 @@ import static org.mockito.Mockito.when;
  */
 public final class DetectorManagerTest {
     private static final String DETECTOR_TYPE = "ewma-detector";
+    private final int detector_refresh_period = 1;
 
     private DetectorManager managerUnderTest;
 
     @Mock
     private DetectorSource detectorSource;
+
+    private List<UUID> updatedDetectors;
 
     // "Good" just means the detector source can find a detector for the MMD.
     private MetricDefinition goodDefinition;
@@ -96,6 +100,13 @@ public final class DetectorManagerTest {
     }
 
     @Test
+    public void testDetectorRefresh() {
+        val result = managerUnderTest.detectorMapRefresh();
+        assertNotNull(result);
+        assertEquals(updatedDetectors, result);
+    }
+
+    @Test
     public void testClassify() {
         val result = managerUnderTest.classify(goodMappedMetricData);
         assertNotNull(result);
@@ -116,6 +127,10 @@ public final class DetectorManagerTest {
         this.badDefinition = new MetricDefinition("bad-definition");
         this.badMetricData = new MetricData(badDefinition, 100.0, Instant.now().getEpochSecond());
         this.badMappedMetricData = new MappedMetricData(badMetricData, UUID.randomUUID());
+
+        UUID detectorUuid = UUID.fromString("7629c28a-5958-4ca7-9aaa-49b95d3481ff");
+        this.updatedDetectors = Collections.singletonList(detectorUuid);
+
     }
 
     private void initDependencies() {
@@ -129,6 +144,8 @@ public final class DetectorManagerTest {
         when(detectorSource.findDetector(any(UUID.class), eq(badDefinition)))
                 .thenReturn(null);
 
-        when(config.getInt("detector-refresh-period")).thenReturn(1);
+        when(detectorSource.findUpdatedDetectors(detector_refresh_period)).thenReturn(updatedDetectors);
+
+        when(config.getInt("detector-refresh-period")).thenReturn(detector_refresh_period);
     }
 }

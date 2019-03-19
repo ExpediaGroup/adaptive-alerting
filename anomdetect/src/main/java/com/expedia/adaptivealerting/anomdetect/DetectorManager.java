@@ -25,10 +25,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -65,7 +62,7 @@ public class DetectorManager {
             } catch (Exception e) {
                 log.error("Error refreshing detectors", e);
             }
-        }, 10, detectorRefreshTimePeriod, TimeUnit.MINUTES);
+        }, 1, detectorRefreshTimePeriod, TimeUnit.MINUTES);
     }
 
     /**
@@ -126,7 +123,15 @@ public class DetectorManager {
      * The deleted detectors will be cleaned up and the detectors modified will be reloaded
      * when corresponding mapped-metric comes in.
      */
-    private void detectorMapRefresh() {
-        detectorSource.findUpdatedDetectors(detectorRefreshTimePeriod).forEach(cachedDetectors::remove);
+    List<UUID> detectorMapRefresh() {
+
+        List<UUID> updatedDetectors = new ArrayList<>();
+        detectorSource.findUpdatedDetectors(detectorRefreshTimePeriod).forEach(key -> {
+            updatedDetectors.add(key);
+            cachedDetectors.remove(key);
+        });
+
+        log.info("Removed detectors on refresh : {}"+updatedDetectors);
+        return updatedDetectors;
     }
 }
