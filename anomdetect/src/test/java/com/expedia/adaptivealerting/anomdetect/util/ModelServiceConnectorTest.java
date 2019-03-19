@@ -31,8 +31,7 @@ import org.mockito.MockitoAnnotations;
 import java.io.IOException;
 import java.util.*;
 
-import static com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector.API_PATH_DETECTOR_BY_METRIC_HASH;
-import static com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector.API_PATH_MODEL_BY_DETECTOR_UUID;
+import static com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
@@ -65,6 +64,11 @@ public class ModelServiceConnectorTest {
     private MetricDefinition metricDef;
     private MetricDefinition metricDef_cantRetrieve;
     private MetricDefinition metricDef_cantDeserialize;
+
+    private int invalidTimePeriod = 0;
+    private int timePeriod_cantRetrieve = 2;
+    private int timePeriod_cantDeserialize = 3;
+
     private List<DetectorResource> detectorResourceList;
     private Content detectorResourcesContent;
     @Mock
@@ -111,8 +115,18 @@ public class ModelServiceConnectorTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testFindDetectors_metricDefinitionNotNull() {
-        connectorUnderTest.findDetectors(null);
+    public void testFindUpdatedDetectors_timePeriodInvalid() {
+        connectorUnderTest.findUpdatedDetectors(invalidTimePeriod);
+    }
+
+    @Test(expected = DetectorRetrievalException.class)
+    public void testFindUpdatedDetector_cantRetrieve() {
+        connectorUnderTest.findUpdatedDetectors(timePeriod_cantRetrieve);
+    }
+
+    @Test(expected = DetectorDeserializationException.class)
+    public void testFindUpdatedDetector_cantDeserialize() {
+        connectorUnderTest.findUpdatedDetectors(timePeriod_cantDeserialize);
     }
 
     @Test(expected = DetectorRetrievalException.class)
@@ -156,6 +170,7 @@ public class ModelServiceConnectorTest {
         initDependencies_findDetectors_objectMapper();
         initDependencies_findLatestModel_httpClient();
         initDependencies_findLatestModel_objectMapper();
+        initDependencies_findUpdatedDetectors_httpClient();
     }
 
     private void initTestObjects_findDetectors() throws IOException {
@@ -219,6 +234,14 @@ public class ModelServiceConnectorTest {
         val uri_cantDeserialize = String.format(URI_TEMPLATE + API_PATH_DETECTOR_BY_METRIC_HASH, metricId_cantDeserialize);
 
         when(httpClient.get(uri)).thenReturn(detectorResourcesContent);
+        when(httpClient.get(uri_cantRetrieve)).thenThrow(new IOException());
+        when(httpClient.get(uri_cantDeserialize)).thenReturn(detectorResourcesContent_cantDeserialize);
+    }
+
+    private void initDependencies_findUpdatedDetectors_httpClient() throws IOException {
+        val uri_cantRetrieve = String.format(URI_TEMPLATE + API_PATH_DETECTOR_UPDATES, timePeriod_cantRetrieve);
+        val uri_cantDeserialize = String.format(URI_TEMPLATE + API_PATH_DETECTOR_UPDATES, timePeriod_cantDeserialize);
+
         when(httpClient.get(uri_cantRetrieve)).thenThrow(new IOException());
         when(httpClient.get(uri_cantDeserialize)).thenReturn(detectorResourcesContent_cantDeserialize);
     }

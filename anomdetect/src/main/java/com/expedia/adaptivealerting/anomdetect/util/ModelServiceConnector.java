@@ -26,6 +26,7 @@ import org.apache.http.client.fluent.Content;
 import java.io.IOException;
 import java.util.UUID;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 // FIXME Currently this class uses the URI template in an inconsistent way. In some methods it fills in a detector UUID
@@ -151,7 +152,8 @@ public class ModelServiceConnector {
     }
 
     public DetectorResources findUpdatedDetectors(int timePeriod) {
-        notNull(timePeriod, "timePeriod can't be null");
+        isTrue(timePeriod > 0, "timePeriod can't be negative");
+
         val uri = String.format(baseUri + API_PATH_DETECTOR_UPDATES, timePeriod);
         Content content;
         try {
