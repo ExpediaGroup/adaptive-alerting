@@ -27,7 +27,7 @@ variable "modelservice" {
   type = "map"
 }
 
-variable "mc-a2m-mapper" {
+variable "a2m-mapper" {
   type = "map"
 }
 

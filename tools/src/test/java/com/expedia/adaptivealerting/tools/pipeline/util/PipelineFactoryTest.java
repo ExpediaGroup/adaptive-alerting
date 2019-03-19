@@ -15,24 +15,26 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.util;
 
-import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartSink;
-import com.expedia.adaptivealerting.tools.visualization.ChartSeries;
-import com.expedia.adaptivealerting.tools.visualization.ChartUtil;
 import lombok.val;
+import org.junit.Test;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static org.junit.Assert.assertNotNull;
 
-public final class PipelineFactory {
+public final class PipelineFactoryTest {
 
-    // Prevent instantiation
-    private PipelineFactory() {
+    @Test(expected = IllegalAccessException.class)
+    public void testPrivateConstructor() throws Exception {
+        PipelineFactory.class.newInstance();
     }
 
-    public static AnomalyChartSink createChartSink(String title) {
-        notNull(title, "title can't be null");
+    @Test
+    public void testCreateChartSink() {
+        val sink = PipelineFactory.createChartSink("My Chart");
+        assertNotNull(sink);
+    }
 
-        val chartSeries = new ChartSeries();
-        val chart = ChartUtil.createChart(title, chartSeries);
-        return new AnomalyChartSink(chart, chartSeries);
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateChartSink_nullTitle() {
+        PipelineFactory.createChartSink(null);
     }
 }
