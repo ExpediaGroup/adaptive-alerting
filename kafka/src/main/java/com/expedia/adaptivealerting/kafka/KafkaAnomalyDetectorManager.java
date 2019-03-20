@@ -48,7 +48,7 @@ public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
         val config = new TypesafeConfigLoader(CK_AD_MANAGER).loadMergedConfig();
         val saConfig = new StreamsAppConfig(config);
         val detectorSource = DetectorUtil.buildDetectorSource(config);
-        val manager = new DetectorManager(detectorSource);
+        val manager = new DetectorManager(detectorSource,config);
         new KafkaAnomalyDetectorManager(saConfig, manager).start();
     }
 

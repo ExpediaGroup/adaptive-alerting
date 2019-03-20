@@ -8,5 +8,6 @@ ad-mapper {
   health.status.path = "/app/isHealthy"
   inbound-topic = "aa-metrics"
   outbound-topic = "mapped-metrics"
-  model-service-uri-template = "${modelservice_uri_template}"
+  detector-refresh-period = "${detector_refresh_period}"
+  model-service-base-uri = "${modelservice_base_uri}"
 }

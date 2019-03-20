@@ -27,10 +27,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
@@ -144,6 +141,12 @@ public final class TempHaystackAwareDetectorSourceTest {
         assertNull(result);
     }
 
+    @Test
+    public void testFindUpdatedDetectorUuids() {
+        val results = sourceUnderTest.findUpdatedDetectors(1);
+        assertEquals(1, results.size());
+    }
+
     private void initTestObjects() {
         this.detectorTypes = new HashSet<>();
 
@@ -180,5 +183,7 @@ public final class TempHaystackAwareDetectorSourceTest {
                 .thenReturn(nonHaystackDetector);
         when(primaryDetectorSource.findDetector(missingDetectorUuid, nonHaystackMetricDef))
                 .thenReturn(null);
+        when(primaryDetectorSource.findUpdatedDetectors(1))
+                .thenReturn(Collections.singletonList(UUID.randomUUID()));
     }
 }

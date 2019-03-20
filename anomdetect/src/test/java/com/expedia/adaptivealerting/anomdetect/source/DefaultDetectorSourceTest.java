@@ -54,6 +54,7 @@ public final class DefaultDetectorSourceTest {
     private MetricDefinition metricDef;
     private MetricDefinition metricDefException;
     private DetectorResources detectorResources;
+    private DetectorResources updatedDetectorResources;
     private ModelResource modelResource;
 
     @Before
@@ -72,6 +73,15 @@ public final class DefaultDetectorSourceTest {
     @Test
     public void testFindDetectorUuids() {
         val results = sourceUnderTest.findDetectorUuids(metricDef);
+        assertEquals(1, results.size());
+
+        val result = results.get(0);
+        assertEquals(DETECTOR_UUID, result);
+    }
+
+    @Test
+    public void testFindUpdatedDetectorUuids() {
+        val results = sourceUnderTest.findUpdatedDetectors(1);
         assertEquals(1, results.size());
 
         val result = results.get(0);
@@ -109,8 +119,12 @@ public final class DefaultDetectorSourceTest {
         this.metricDef = new MetricDefinition("my-metric");
         this.metricDefException = new MetricDefinition("metric-that-causes-exception");
 
-        val detectorResource = new DetectorResource(DETECTOR_UUID.toString(), new ModelTypeResource(DETECTOR_TYPE));
+        val detectorResource = new DetectorResource(DETECTOR_UUID.toString(), new ModelTypeResource(DETECTOR_TYPE),true);
         this.detectorResources = new DetectorResources(Collections.singletonList(detectorResource));
+
+
+        val updatedDetectorsResource = new DetectorResource(DETECTOR_UUID.toString(), new ModelTypeResource(DETECTOR_TYPE),true);
+        this.updatedDetectorResources = new DetectorResources(Collections.singletonList(updatedDetectorsResource));
 
         val params = new HashMap<String, Object>();
         params.put("alpha", 0.2);
@@ -133,5 +147,6 @@ public final class DefaultDetectorSourceTest {
                 .thenThrow(new DetectorNotFoundException("No models found"));
         when(connector.findLatestModel(DETECTOR_UUID_EXCEPTION))
                 .thenThrow(new DetectorRetrievalException("Error finding latest model", new IOException()));
+        when(connector.findUpdatedDetectors(1)).thenReturn(updatedDetectorResources);
     }
 }

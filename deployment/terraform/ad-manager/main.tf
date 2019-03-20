@@ -11,7 +11,8 @@ data "template_file" "config_data" {
   template = "${file("${local.config_file_path}")}"
   vars {
     kafka_endpoint = "${var.kafka_endpoint}"
-    modelservice_uri_template = "${var.modelservice_uri_template}"
+    modelservice_uri_template = "${var.modelservice_base_uri}"
+    detector_refresh_period = "${var.detector_refresh_period}"
   }
 }
 
