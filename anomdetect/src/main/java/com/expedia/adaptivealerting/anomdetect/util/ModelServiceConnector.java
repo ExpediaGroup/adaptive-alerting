@@ -152,7 +152,7 @@ public class ModelServiceConnector {
     }
 
     public DetectorResources findUpdatedDetectors(int timePeriod) {
-        isTrue(timePeriod > 0, "timePeriod can't be negative");
+        isTrue(timePeriod > 0, "timePeriod must be strictly positive");
 
         val uri = String.format(baseUri + API_PATH_DETECTOR_UPDATES, timePeriod);
         Content content;

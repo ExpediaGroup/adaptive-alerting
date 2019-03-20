@@ -58,6 +58,7 @@ public class DetectorManager {
     private void initScheduler() {
         scheduler.scheduleWithFixedDelay(() -> {
             try {
+                log.trace("Refreshing detectors");
                 this.detectorMapRefresh();
             } catch (Exception e) {
                 log.error("Error refreshing detectors", e);
@@ -131,7 +132,7 @@ public class DetectorManager {
             cachedDetectors.remove(key);
         });
 
-        log.info("Removed detectors on refresh : {}"+updatedDetectors);
+        log.info("Removed detectors on refresh : {}",updatedDetectors);
         return updatedDetectors;
     }
 }
