@@ -17,7 +17,6 @@ package com.expedia.adaptivealerting.kafka.util;
 
 import com.expedia.adaptivealerting.anomdetect.source.DefaultDetectorSource;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
-import com.expedia.adaptivealerting.anomdetect.source.TempHaystackAwareDetectorSource;
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,6 +34,9 @@ public final class DetectorUtil {
     public static DetectorSource buildDetectorSource(Config config) {
         val uriTemplate = config.getString(CK_MODEL_SERVICE_URI_TEMPLATE);
         val connector = new ModelServiceConnector(new HttpClientWrapper(), uriTemplate, new ObjectMapper());
-        return new TempHaystackAwareDetectorSource(new DefaultDetectorSource(connector));
+
+        // TODO Disabling this as it is generating a huge number of classification errors in the DetectorManager.
+//        return new TempHaystackAwareDetectorSource(new DefaultDetectorSource(connector));
+        return new DefaultDetectorSource(connector);
     }
 }
