@@ -60,8 +60,8 @@ public class KafkaAnomalyToAlertMapper extends AbstractStreamsApp {
     @Override
     protected Topology buildTopology() {
         val config = getConfig();
-        val inboundTopic = config.getInboundTopic();
-        val outboundTopic = config.getOutboundTopic();
+        val inboundTopic = config.getInputTopic();
+        val outboundTopic = config.getOutputTopic();
 
         log.info("Initializing: inboundTopic={}, outboundTopic={}", inboundTopic, outboundTopic);
 

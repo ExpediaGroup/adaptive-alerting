@@ -119,8 +119,8 @@ public final class KafkaDetectorMapperTest {
 
     private void initConfig() {
         when(saConfig.getTypesafeConfig()).thenReturn(tsConfig);
-        when(saConfig.getInboundTopic()).thenReturn(INPUT_TOPIC);
-        when(saConfig.getOutboundTopic()).thenReturn(OUTPUT_TOPIC);
+        when(saConfig.getInputTopic()).thenReturn(INPUT_TOPIC);
+        when(saConfig.getOutputTopic()).thenReturn(OUTPUT_TOPIC);
     }
 
     private void initTestObjects() {

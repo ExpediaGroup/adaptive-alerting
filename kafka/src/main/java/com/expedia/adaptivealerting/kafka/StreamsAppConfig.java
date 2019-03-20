@@ -37,12 +37,12 @@ public class StreamsAppConfig {
     /**
      * Inbound topic configuration key.
      */
-    private static final String CK_INBOUND_TOPIC = "inbound-topic";
+    private static final String CK_INPUT_TOPIC = "inbound-topic";
 
     /**
      * Outbound topic configuration key.
      */
-    private static final String CK_OUTBOUND_TOPIC = "outbound-topic";
+    private static final String CK_OUTPUT_TOPIC = "outbound-topic";
 
     /**
      * Health status path configuration key.
@@ -56,10 +56,10 @@ public class StreamsAppConfig {
     private final StreamsConfig streamsConfig;
 
     @Getter
-    private final String inboundTopic;
+    private final String inputTopic;
 
     @Getter
-    private final String outboundTopic;
+    private final String outputTopic;
 
     @Getter
     private final String healthStatusPath;
@@ -68,8 +68,8 @@ public class StreamsAppConfig {
         notNull(typesafeConfig, "typesafeConfig can't be null");
         this.typesafeConfig = typesafeConfig;
         this.streamsConfig = toStreamsConfig(typesafeConfig.getConfig(CK_STREAMS));
-        this.inboundTopic = typesafeConfig.getString(CK_INBOUND_TOPIC);
-        this.outboundTopic = typesafeConfig.getString(CK_OUTBOUND_TOPIC);
+        this.inputTopic = typesafeConfig.getString(CK_INPUT_TOPIC);
+        this.outputTopic = typesafeConfig.getString(CK_OUTPUT_TOPIC);
         this.healthStatusPath = typesafeConfig.getString(CK_HEALTH_STATUS_PATH);
     }
 

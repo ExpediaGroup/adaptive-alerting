@@ -90,8 +90,8 @@ public class KafkaAnomalyToAlertMapperTest {
     }
 
     private void initConfig() {
-        when(streamsAppConfig.getInboundTopic()).thenReturn(INBOUND_TOPIC);
-        when(streamsAppConfig.getOutboundTopic()).thenReturn(OUTBOUND_TOPIC);
+        when(streamsAppConfig.getInputTopic()).thenReturn(INBOUND_TOPIC);
+        when(streamsAppConfig.getOutputTopic()).thenReturn(OUTBOUND_TOPIC);
     }
 
     private void initTestObjects() {
