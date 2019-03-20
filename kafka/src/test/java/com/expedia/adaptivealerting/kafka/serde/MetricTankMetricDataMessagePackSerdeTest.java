@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.kafka.serde;
 import com.expedia.adaptivealerting.kafka.util.TestObjectMother;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
+import com.expedia.metrics.metrictank.MetricTankMetricDefinition;
 import lombok.val;
 import org.apache.kafka.common.errors.SerializationException;
 import org.junit.Before;
@@ -28,13 +29,13 @@ import java.time.Instant;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-public final class MetricDataMessagePackSerdeTest {
-    private MetricDataMessagePackSerde serdeUnderTest;
+public final class MetricTankMetricDataMessagePackSerdeTest {
+    private MetricTankMetricDataMessagePackSerde serdeUnderTest;
     private MetricData metricData;
 
     @Before
     public void setUp() {
-        this.serdeUnderTest = new MetricDataMessagePackSerde();
+        this.serdeUnderTest = new MetricTankMetricDataMessagePackSerde();
         this.metricData = TestObjectMother.metricData();
     }
 
@@ -43,11 +44,11 @@ public final class MetricDataMessagePackSerdeTest {
         serdeUnderTest.configure(null, false);
         serdeUnderTest.close();
 
-        val serializer = new MetricDataMessagePackSerde.Ser();
+        val serializer = new MetricTankMetricDataMessagePackSerde.Ser();
         serializer.configure(null, false);
         serializer.close();
 
-        val deserializer = new MetricDataMessagePackSerde.Deser();
+        val deserializer = new MetricTankMetricDataMessagePackSerde.Deser();
         deserializer.configure(null, false);
         deserializer.close();
     }
@@ -58,19 +59,20 @@ public final class MetricDataMessagePackSerdeTest {
         val deserResult = serdeUnderTest.deserializer().deserialize("some-topic", serResult);
 
         val expected = metricData.getMetricDefinition();
-        val actual = deserResult.getMetricDefinition();
+        val actual = (MetricTankMetricDefinition) deserResult.getMetricDefinition();
 
         // Comparing key and tags instead of comparing MetricDefinition directly because the deserializer uses a
         // MetricTank-specific MetricDefinition implementation. [WLW]
         assertEquals(expected.getKey(), actual.getKey());
         assertEquals(expected.getTags(), actual.getTags());
+        assertEquals(MetricTankMetricDataMessagePackSerde.DEFAULT_ORG_ID, actual.getOrgId());
+        assertEquals(MetricTankMetricDataMessagePackSerde.DEFAULT_MTYPE, actual.getMtype());
+        assertEquals(MetricTankMetricDataMessagePackSerde.DEFAULT_UNIT, actual.getUnit());
+        assertEquals(MetricTankMetricDataMessagePackSerde.DEFAULT_INTERVAL, actual.getInterval());
     }
 
     @Test(expected = SerializationException.class)
     public void testSerialize_invalidMetricData() {
-        // The only reason we require a null key to throw a SerializationException here is that
-        // MetricTank expects a non-null key, and this serde is a MetricTank serde. But in general
-        // AA doesn't require a non-null key.
         val invalidMetricDef = new MetricDefinition((String) null);
         val invalidMetricData = new MetricData(invalidMetricDef, 0.0, Instant.now().getEpochSecond());
         serdeUnderTest.serializer().serialize("some-topic", invalidMetricData);

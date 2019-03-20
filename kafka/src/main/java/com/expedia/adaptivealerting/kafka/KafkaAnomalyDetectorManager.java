@@ -61,8 +61,8 @@ public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
     @Override
     protected Topology buildTopology() {
         val config = getConfig();
-        val inputTopic = config.getInboundTopic();
-        val outputTopic = config.getOutboundTopic();
+        val inputTopic = config.getInputTopic();
+        val outputTopic = config.getOutputTopic();
         log.info("Initializing: inputTopic={}, outputTopic={}", inputTopic, outputTopic);
 
         val builder = new StreamsBuilder();
