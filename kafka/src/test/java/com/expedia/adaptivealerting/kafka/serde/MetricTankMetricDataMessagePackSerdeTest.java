@@ -17,12 +17,17 @@ package com.expedia.adaptivealerting.kafka.serde;
 
 import com.expedia.adaptivealerting.kafka.util.TestObjectMother;
 import com.expedia.metrics.MetricData;
+import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.metrictank.MetricTankMetricDefinition;
 import lombok.val;
+import org.apache.kafka.common.errors.SerializationException;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.time.Instant;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public final class MetricTankMetricDataMessagePackSerdeTest {
     private MetricTankMetricDataMessagePackSerde serdeUnderTest;
@@ -64,5 +69,18 @@ public final class MetricTankMetricDataMessagePackSerdeTest {
         assertEquals(MetricTankMetricDataMessagePackSerde.DEFAULT_MTYPE, actual.getMtype());
         assertEquals(MetricTankMetricDataMessagePackSerde.DEFAULT_UNIT, actual.getUnit());
         assertEquals(MetricTankMetricDataMessagePackSerde.DEFAULT_INTERVAL, actual.getInterval());
+    }
+
+    @Test(expected = SerializationException.class)
+    public void testSerialize_invalidMetricData() {
+        val invalidMetricDef = new MetricDefinition((String) null);
+        val invalidMetricData = new MetricData(invalidMetricDef, 0.0, Instant.now().getEpochSecond());
+        serdeUnderTest.serializer().serialize("some-topic", invalidMetricData);
+    }
+
+    @Test
+    public void testDeserialize_invalidMetricDataBytes() {
+        val actual = serdeUnderTest.deserializer().deserialize("some-topic", "hey".getBytes());
+        assertNull(actual);
     }
 }
