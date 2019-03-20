@@ -82,7 +82,9 @@ public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
         try {
             anomalyResult = manager.classify(mmd);
         } catch (Exception e) {
-            log.error("Classification error: mappedMetricData={}, error={}", mmd, ErrorUtil.fullExceptionDetails(e));
+            log.error("Classification error: mappedMetricData={}, error={}",
+                    mmd,
+                    ErrorUtil.singleLineExceptionTrace(e));
         }
 
         if (anomalyResult == null) {
