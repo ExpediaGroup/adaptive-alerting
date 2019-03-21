@@ -15,9 +15,9 @@
  */
 package com.expedia.adaptivealerting.anomdetect.comp;
 
-import com.expedia.adaptivealerting.anomdetect.core.AnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.algo.EwmaDetector;
-import com.expedia.adaptivealerting.anomdetect.algo.EwmaParams;
+import com.expedia.adaptivealerting.anomdetect.detector.Detector;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaDetector;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaParams;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.metrictank.MetricTankIdFactory;
 import lombok.val;
@@ -39,7 +39,7 @@ public final class TempHaystackAwareDetectorSource implements DetectorSource {
 
     private final DetectorSource primaryDetectorSource;
     private final MetricTankIdFactory idFactory = new MetricTankIdFactory();
-    private final Map<UUID, AnomalyDetector> haystackDetectorMap = new HashMap<>();
+    private final Map<UUID, Detector> haystackDetectorMap = new HashMap<>();
 
     public TempHaystackAwareDetectorSource(DetectorSource primaryDetectorSource) {
         notNull(primaryDetectorSource, "primaryDetectorSource can't be null");
@@ -67,7 +67,7 @@ public final class TempHaystackAwareDetectorSource implements DetectorSource {
     }
 
     @Override
-    public AnomalyDetector findDetector(UUID detectorUuid, MetricDefinition metricDef) {
+    public Detector findDetector(UUID detectorUuid, MetricDefinition metricDef) {
         notNull(detectorUuid, "detectorUuid can't be null");
 
         val detector = primaryDetectorSource.findDetector(detectorUuid, metricDef);
@@ -100,8 +100,8 @@ public final class TempHaystackAwareDetectorSource implements DetectorSource {
         return Collections.singletonList(detectorUuid);
     }
 
-    private AnomalyDetector createHaystackDetector(UUID detectorUuid) {
-        AnomalyDetector detector = haystackDetectorMap.get(detectorUuid);
+    private Detector createHaystackDetector(UUID detectorUuid) {
+        Detector detector = haystackDetectorMap.get(detectorUuid);
         if (detector == null) {
             detector = new EwmaDetector();
             ((EwmaDetector) detector).init(detectorUuid, new EwmaParams());

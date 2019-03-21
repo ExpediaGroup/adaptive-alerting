@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.comp;
 
-import com.expedia.adaptivealerting.anomdetect.algo.CusumDetector;
+import com.expedia.adaptivealerting.anomdetect.detector.CusumDetector;
 import lombok.val;
 import org.junit.Test;
 

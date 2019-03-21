@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.anomdetect.core.AnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.detector.Detector;
 import com.expedia.adaptivealerting.anomdetect.comp.DetectorSource;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
@@ -48,7 +48,7 @@ public class DetectorManager {
 
     private int detectorRefreshTimePeriod;
 
-    private final Map<UUID, AnomalyDetector> cachedDetectors = new HashMap<>();
+    private final Map<UUID, Detector> cachedDetectors = new HashMap<>();
 
     public DetectorManager(DetectorSource detectorSource, Config config) {
         this.detectorSource = detectorSource;
@@ -106,13 +106,13 @@ public class DetectorManager {
         return detector.classify(metricData);
     }
 
-    private AnomalyDetector detectorFor(MappedMetricData mappedMetricData) {
+    private Detector detectorFor(MappedMetricData mappedMetricData) {
         notNull(mappedMetricData, "mappedMetricData can't be null");
 
         val detectorUuid = mappedMetricData.getDetectorUuid();
         val metricDef = mappedMetricData.getMetricData().getMetricDefinition();
 
-        AnomalyDetector detector = cachedDetectors.get(detectorUuid);
+        Detector detector = cachedDetectors.get(detectorUuid);
         if (detector == null) {
             detector = detectorSource.findDetector(detectorUuid, metricDef);
             cachedDetectors.put(detectorUuid, detector);

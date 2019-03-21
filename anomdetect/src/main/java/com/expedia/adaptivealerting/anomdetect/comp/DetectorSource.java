@@ -15,11 +15,11 @@
  */
 package com.expedia.adaptivealerting.anomdetect.comp;
 
-import com.expedia.adaptivealerting.anomdetect.core.AnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.detector.Detector;
 import com.expedia.adaptivealerting.anomdetect.DetectorManager;
 import com.expedia.adaptivealerting.anomdetect.DetectorMapper;
-import com.expedia.adaptivealerting.anomdetect.core.DetectorException;
-import com.expedia.adaptivealerting.anomdetect.core.DetectorNotFoundException;
+import com.expedia.adaptivealerting.anomdetect.DetectorException;
+import com.expedia.adaptivealerting.anomdetect.DetectorNotFoundException;
 import com.expedia.metrics.MetricDefinition;
 
 import java.util.List;
@@ -56,7 +56,7 @@ public interface DetectorSource {
      * @throws DetectorNotFoundException if the detector does not exist
      * @throws DetectorException         if there's some other problem while trying to finding the detector
      */
-    AnomalyDetector findDetector(UUID detectorUuid, MetricDefinition metricDef);
+    Detector findDetector(UUID detectorUuid, MetricDefinition metricDef);
 
 
     /**

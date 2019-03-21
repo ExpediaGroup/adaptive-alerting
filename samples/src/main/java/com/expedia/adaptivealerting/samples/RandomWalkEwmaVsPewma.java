@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.algo.EwmaDetector;
-import com.expedia.adaptivealerting.anomdetect.algo.PewmaDetector;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaDetector;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.PewmaDetector;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
