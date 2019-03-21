@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.pewma.PewmaAnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.pewma.PewmaParams;
+import com.expedia.adaptivealerting.anomdetect.algo.PewmaDetector;
+import com.expedia.adaptivealerting.anomdetect.algo.PewmaParams;
 import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.adaptivealerting.core.data.MetricFrameLoader;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
@@ -48,7 +48,7 @@ public class CsvTrafficPewmaVariants {
                 .setWeakSigmas(2.0)
                 .setStrongSigmas(3.0)
                 .setInitMeanEstimate(0.0);
-        val detector1 = new PewmaAnomalyDetector();
+        val detector1 = new PewmaDetector();
         detector1.init(UUID.randomUUID(), params1);
         val detectorFilter1 = new AnomalyDetectorFilter(detector1);
 
@@ -58,7 +58,7 @@ public class CsvTrafficPewmaVariants {
                 .setWeakSigmas(2.0)
                 .setStrongSigmas(3.0)
                 .setInitMeanEstimate(0.0);
-        val detector2 = new PewmaAnomalyDetector();
+        val detector2 = new PewmaDetector();
         val detectorFilter2 = new AnomalyDetectorFilter(detector2);
 
         val params3 = new PewmaParams()
@@ -67,7 +67,7 @@ public class CsvTrafficPewmaVariants {
                 .setWeakSigmas(2.0)
                 .setStrongSigmas(3.0)
                 .setInitMeanEstimate(0.0);
-        val detector3 = new PewmaAnomalyDetector();
+        val detector3 = new PewmaDetector();
         val detectorFilter3 = new AnomalyDetectorFilter(detector3);
 
         val eval1 = new EvaluatorFilter(new RmseEvaluator());

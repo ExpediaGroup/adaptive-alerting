@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.filter;
 
-import com.expedia.adaptivealerting.anomdetect.ewma.EwmaAnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.ewma.EwmaParams;
+import com.expedia.adaptivealerting.anomdetect.algo.EwmaDetector;
+import com.expedia.adaptivealerting.anomdetect.algo.EwmaParams;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.tools.pipeline.util.AnomalyResultSubscriber;
 import com.expedia.metrics.MetricData;
@@ -36,7 +36,7 @@ public final class AnomalyDetectorFilterTest {
 
     @Before
     public void setUp() {
-        val detector = new EwmaAnomalyDetector();
+        val detector = new EwmaDetector();
         detector.init(UUID.randomUUID(), new EwmaParams());
         this.filterUnderTest = new AnomalyDetectorFilter(detector);
 

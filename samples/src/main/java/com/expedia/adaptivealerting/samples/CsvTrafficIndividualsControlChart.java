@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.individuals.IndividualsControlChartAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.algo.IndividualsControlChartDetector;
 import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.adaptivealerting.core.data.MetricFrameLoader;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
@@ -44,7 +44,7 @@ public final class CsvTrafficIndividualsControlChart {
         final MetricFrame frame = MetricFrameLoader.loadCsv(new MetricDefinition("csv"), is, true);
         final MetricFrameMetricSource source = new MetricFrameMetricSource(frame, "data", 200L);
 
-        final AnomalyDetectorFilter detectorFilter = new AnomalyDetectorFilter(new IndividualsControlChartAnomalyDetector());
+        final AnomalyDetectorFilter detectorFilter = new AnomalyDetectorFilter(new IndividualsControlChartDetector());
         final EvaluatorFilter evaluator = new EvaluatorFilter(new RmseEvaluator());
         final AnomalyChartSink chartWrapper = PipelineFactory.createChartSink("IndividualsControlChart");
 

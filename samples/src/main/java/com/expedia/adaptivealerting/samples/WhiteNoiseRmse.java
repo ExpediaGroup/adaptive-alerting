@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.ewma.EwmaAnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.pewma.PewmaAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.algo.EwmaDetector;
+import com.expedia.adaptivealerting.anomdetect.algo.PewmaDetector;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
@@ -37,11 +37,11 @@ public class WhiteNoiseRmse {
     public static void main(String[] args) {
         final WhiteNoiseMetricSource source = new WhiteNoiseMetricSource("white-noise", 1000L, 0.0, 1.0);
 
-        final AnomalyDetectorFilter ewmaFilter = new AnomalyDetectorFilter(new EwmaAnomalyDetector());
-        final AnomalyDetectorFilter pewmaFilter = new AnomalyDetectorFilter(new PewmaAnomalyDetector());
-//        final AnomalyDetectorFilter cusumFilter = new AnomalyDetectorFilter(new CusumAnomalyDetector());
+        final AnomalyDetectorFilter ewmaFilter = new AnomalyDetectorFilter(new EwmaDetector());
+        final AnomalyDetectorFilter pewmaFilter = new AnomalyDetectorFilter(new PewmaDetector());
+//        final AnomalyDetectorFilter cusumFilter = new AnomalyDetectorFilter(new CusumDetector());
 //        final AnomalyDetectorFilter shewhartIndividualsFilter =
-//                new AnomalyDetectorFilter(new IndividualsControlChartAnomalyDetector());
+//                new AnomalyDetectorFilter(new IndividualsControlChartDetector());
 
         final EvaluatorFilter ewmaEval = new EvaluatorFilter(new RmseEvaluator());
         final EvaluatorFilter pewmaEval = new EvaluatorFilter(new RmseEvaluator());

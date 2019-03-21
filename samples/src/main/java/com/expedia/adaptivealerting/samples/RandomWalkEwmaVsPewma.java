@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.ewma.EwmaAnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.pewma.PewmaAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.algo.EwmaDetector;
+import com.expedia.adaptivealerting.anomdetect.algo.PewmaDetector;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
@@ -35,8 +35,8 @@ public class RandomWalkEwmaVsPewma {
     public static void main(String[] args) {
         final RandomWalkMetricSource source = new RandomWalkMetricSource();
 
-        final AnomalyDetectorFilter ewmaAD = new AnomalyDetectorFilter(new EwmaAnomalyDetector());
-        final AnomalyDetectorFilter pewmaAD = new AnomalyDetectorFilter(new PewmaAnomalyDetector());
+        final AnomalyDetectorFilter ewmaAD = new AnomalyDetectorFilter(new EwmaDetector());
+        final AnomalyDetectorFilter pewmaAD = new AnomalyDetectorFilter(new PewmaDetector());
 
         final EvaluatorFilter ewmaEval = new EvaluatorFilter(new RmseEvaluator());
         final EvaluatorFilter pewmaEval = new EvaluatorFilter(new RmseEvaluator());
