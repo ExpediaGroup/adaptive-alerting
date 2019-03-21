@@ -15,13 +15,13 @@
  */
 package com.expedia.adaptivealerting.anomdetect.source;
 
-import com.expedia.adaptivealerting.anomdetect.util.DetectorNotFoundException;
-import com.expedia.adaptivealerting.anomdetect.util.DetectorResource;
-import com.expedia.adaptivealerting.anomdetect.util.DetectorResources;
-import com.expedia.adaptivealerting.anomdetect.util.DetectorRetrievalException;
-import com.expedia.adaptivealerting.anomdetect.util.ModelResource;
-import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
-import com.expedia.adaptivealerting.anomdetect.util.ModelTypeResource;
+import com.expedia.adaptivealerting.anomdetect.exception.DetectorNotFoundException;
+import com.expedia.adaptivealerting.anomdetect.exception.DetectorRetrievalException;
+import com.expedia.adaptivealerting.anomdetect.source.util.DetectorResource;
+import com.expedia.adaptivealerting.anomdetect.source.util.DetectorResources;
+import com.expedia.adaptivealerting.anomdetect.source.util.ModelResource;
+import com.expedia.adaptivealerting.anomdetect.source.util.ModelServiceConnector;
+import com.expedia.adaptivealerting.anomdetect.source.util.ModelTypeResource;
 import com.expedia.metrics.MetricDefinition;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;

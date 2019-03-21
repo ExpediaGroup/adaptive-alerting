@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.ewma.EwmaAnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.pewma.PewmaAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.lib.EwmaDetector;
+import com.expedia.adaptivealerting.anomdetect.lib.PewmaDetector;
 import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartSink;
 import com.expedia.adaptivealerting.tools.pipeline.source.WhiteNoiseMetricSource;
@@ -33,8 +33,8 @@ public class WhiteNoiseEwmaVsPewma {
     public static void main(String[] args) {
         final WhiteNoiseMetricSource source = new WhiteNoiseMetricSource("white-noise", 1000L, 0.0, 1.0);
 
-        final AnomalyDetectorFilter ewmaFilter = new AnomalyDetectorFilter(new EwmaAnomalyDetector());
-        final AnomalyDetectorFilter pewmaFilter = new AnomalyDetectorFilter(new PewmaAnomalyDetector());
+        final AnomalyDetectorFilter ewmaFilter = new AnomalyDetectorFilter(new EwmaDetector());
+        final AnomalyDetectorFilter pewmaFilter = new AnomalyDetectorFilter(new PewmaDetector());
 
         final AnomalyChartSink ewmaChart = PipelineFactory.createChartSink("EWMA");
         final AnomalyChartSink pewmaChart = PipelineFactory.createChartSink("PEWMA");

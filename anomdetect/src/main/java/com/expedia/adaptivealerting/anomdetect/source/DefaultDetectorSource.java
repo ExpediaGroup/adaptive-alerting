@@ -15,11 +15,11 @@
  */
 package com.expedia.adaptivealerting.anomdetect.source;
 
-import com.expedia.adaptivealerting.anomdetect.AbstractAnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.core.AbstractDetector;
+import com.expedia.adaptivealerting.anomdetect.core.AnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.DetectorLookup;
-import com.expedia.adaptivealerting.anomdetect.DetectorParams;
-import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector;
+import com.expedia.adaptivealerting.anomdetect.core.DetectorParams;
+import com.expedia.adaptivealerting.anomdetect.source.util.ModelServiceConnector;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
 import com.expedia.metrics.MetricDefinition;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -81,7 +81,7 @@ public class DefaultDetectorSource implements DetectorSource {
 
         val detectorType = model.getDetectorType().getKey();
         val detectorClass = detectorLookup.getDetector(detectorType);
-        val detector = (AbstractAnomalyDetector) ReflectionUtil.newInstance(detectorClass);
+        val detector = (AbstractDetector) ReflectionUtil.newInstance(detectorClass);
         val paramsClass = detector.getParamsClass();
         val params = (DetectorParams) new ObjectMapper().convertValue(model.getParams(), paramsClass);
 

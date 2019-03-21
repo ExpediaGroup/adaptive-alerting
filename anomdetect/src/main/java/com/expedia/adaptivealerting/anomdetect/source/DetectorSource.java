@@ -15,11 +15,11 @@
  */
 package com.expedia.adaptivealerting.anomdetect.source;
 
-import com.expedia.adaptivealerting.anomdetect.AnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.core.AnomalyDetector;
 import com.expedia.adaptivealerting.anomdetect.DetectorManager;
 import com.expedia.adaptivealerting.anomdetect.DetectorMapper;
-import com.expedia.adaptivealerting.anomdetect.util.DetectorException;
-import com.expedia.adaptivealerting.anomdetect.util.DetectorNotFoundException;
+import com.expedia.adaptivealerting.anomdetect.exception.DetectorException;
+import com.expedia.adaptivealerting.anomdetect.exception.DetectorNotFoundException;
 import com.expedia.metrics.MetricDefinition;
 
 import java.util.List;

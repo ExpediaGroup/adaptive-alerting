@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.anomdetect.cusum.CusumAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.lib.CusumDetector;
 import lombok.val;
 import org.junit.Test;
 
@@ -34,7 +34,7 @@ public final class DetectorLookupTest {
     @Test
     public void testLookupCusumDetector() {
         val cusumDetectorClass = lookupUnderTest.getDetector("cusum-detector");
-        assertEquals(CusumAnomalyDetector.class, cusumDetectorClass);
+        assertEquals(CusumDetector.class, cusumDetectorClass);
     }
 
     @Test(expected = RuntimeException.class)

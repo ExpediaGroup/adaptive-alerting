@@ -15,12 +15,13 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.anomdetect.constant.ConstantThresholdAnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.cusum.CusumAnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.ewma.EwmaAnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.holtwinters.HoltWintersAnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.individuals.IndividualsControlChartAnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.pewma.PewmaAnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.core.AnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.lib.ConstantThresholdDetector;
+import com.expedia.adaptivealerting.anomdetect.lib.CusumDetector;
+import com.expedia.adaptivealerting.anomdetect.lib.EwmaDetector;
+import com.expedia.adaptivealerting.anomdetect.lib.holtwinters.HoltWintersDetector;
+import com.expedia.adaptivealerting.anomdetect.lib.IndividualsControlChartDetector;
+import com.expedia.adaptivealerting.anomdetect.lib.PewmaDetector;
 import lombok.val;
 
 import java.util.HashMap;
@@ -36,12 +37,12 @@ public class DetectorLookup {
     private final Map<String, Class<? extends AnomalyDetector>> detectorMap = new HashMap<>();
 
     public DetectorLookup() {
-        detectorMap.put("constant-detector", ConstantThresholdAnomalyDetector.class);
-        detectorMap.put("cusum-detector", CusumAnomalyDetector.class);
-        detectorMap.put("ewma-detector", EwmaAnomalyDetector.class);
-        detectorMap.put("holtwinters-detector", HoltWintersAnomalyDetector.class);
-        detectorMap.put("individuals-detector", IndividualsControlChartAnomalyDetector.class);
-        detectorMap.put("pewma-detector", PewmaAnomalyDetector.class);
+        detectorMap.put("constant-detector", ConstantThresholdDetector.class);
+        detectorMap.put("cusum-detector", CusumDetector.class);
+        detectorMap.put("ewma-detector", EwmaDetector.class);
+        detectorMap.put("holtwinters-detector", HoltWintersDetector.class);
+        detectorMap.put("individuals-detector", IndividualsControlChartDetector.class);
+        detectorMap.put("pewma-detector", PewmaDetector.class);
     }
 
     public Set<String> getDetectorTypes() {

@@ -15,12 +15,12 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.cusum.CusumAnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.cusum.CusumParams;
-import com.expedia.adaptivealerting.anomdetect.ewma.EwmaAnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.ewma.EwmaParams;
-import com.expedia.adaptivealerting.anomdetect.pewma.PewmaAnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.pewma.PewmaParams;
+import com.expedia.adaptivealerting.anomdetect.lib.CusumDetector;
+import com.expedia.adaptivealerting.anomdetect.lib.CusumParams;
+import com.expedia.adaptivealerting.anomdetect.lib.EwmaDetector;
+import com.expedia.adaptivealerting.anomdetect.lib.EwmaParams;
+import com.expedia.adaptivealerting.anomdetect.lib.PewmaDetector;
+import com.expedia.adaptivealerting.anomdetect.lib.PewmaParams;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorFilter;
@@ -43,7 +43,7 @@ public final class Sample001 {
                 .setAlpha(0.20)
                 .setWeakSigmas(4.5)
                 .setStrongSigmas(5.5);
-        val ewmaAD = new EwmaAnomalyDetector();
+        val ewmaAD = new EwmaDetector();
         ewmaAD.init(UUID.randomUUID(), ewmaParams);
         val ewmaADF = new AnomalyDetectorFilter(ewmaAD);
 
@@ -51,7 +51,7 @@ public final class Sample001 {
                 .setAlpha(0.20)
                 .setWeakSigmas(5.0)
                 .setStrongSigmas(6.0);
-        val pewmaAD = new PewmaAnomalyDetector();
+        val pewmaAD = new PewmaDetector();
         pewmaAD.init(UUID.randomUUID(), pewmaParams);
         val pewmaADF = new AnomalyDetectorFilter(pewmaAD);
 
@@ -61,7 +61,7 @@ public final class Sample001 {
                 .setWeakSigmas(3.0)
                 .setStrongSigmas(4.0)
                 .setInitMeanEstimate(13_000_000);
-        val cusumAD = new CusumAnomalyDetector();
+        val cusumAD = new CusumDetector();
         cusumAD.init(UUID.randomUUID(), cusumParams);
         val cusumADF = new AnomalyDetectorFilter(cusumAD);
 
