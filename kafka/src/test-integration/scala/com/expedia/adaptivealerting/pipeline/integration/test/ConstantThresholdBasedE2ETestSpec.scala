@@ -17,8 +17,10 @@ package com.expedia.adaptivealerting.pipeline.integration.test
 
 import java.time.Instant
 
+import com.expedia.adaptivealerting.anomdetect.comp.HttpClientWrapper
+import com.expedia.adaptivealerting.anomdetect.comp.connector.{HttpClientWrapper, ModelServiceConnector}
 import com.expedia.adaptivealerting.anomdetect.source.HttpClientWrapper
-import com.expedia.adaptivealerting.anomdetect.source.util.{HttpClientWrapper, ModelServiceConnector}
+import com.expedia.adaptivealerting.anomdetect.source.util.ModelServiceConnector
 import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector
 import com.expedia.adaptivealerting.anomdetect.{DetectorManager, DetectorMapper}
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult
