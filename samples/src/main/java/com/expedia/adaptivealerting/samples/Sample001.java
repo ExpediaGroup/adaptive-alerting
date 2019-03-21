@@ -15,12 +15,12 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.algo.CusumDetector;
-import com.expedia.adaptivealerting.anomdetect.algo.CusumParams;
-import com.expedia.adaptivealerting.anomdetect.algo.EwmaDetector;
-import com.expedia.adaptivealerting.anomdetect.algo.EwmaParams;
-import com.expedia.adaptivealerting.anomdetect.algo.PewmaDetector;
-import com.expedia.adaptivealerting.anomdetect.algo.PewmaParams;
+import com.expedia.adaptivealerting.anomdetect.detector.CusumDetector;
+import com.expedia.adaptivealerting.anomdetect.detector.CusumParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaDetector;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.PewmaDetector;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.PewmaParams;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorFilter;

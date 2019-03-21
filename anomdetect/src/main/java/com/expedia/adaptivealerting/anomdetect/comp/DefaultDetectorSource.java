@@ -16,9 +16,9 @@
 package com.expedia.adaptivealerting.anomdetect.comp;
 
 import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelServiceConnector;
-import com.expedia.adaptivealerting.anomdetect.core.AbstractDetector;
-import com.expedia.adaptivealerting.anomdetect.core.AnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.core.DetectorParams;
+import com.expedia.adaptivealerting.anomdetect.detector.AbstractDetector;
+import com.expedia.adaptivealerting.anomdetect.detector.Detector;
+import com.expedia.adaptivealerting.anomdetect.detector.DetectorParams;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
 import com.expedia.metrics.MetricDefinition;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -66,7 +66,7 @@ public class DefaultDetectorSource implements DetectorSource {
     }
 
     @Override
-    public AnomalyDetector findDetector(UUID detectorUuid, MetricDefinition metricDef) {
+    public Detector findDetector(UUID detectorUuid, MetricDefinition metricDef) {
         notNull(detectorUuid, "detectorUuid can't be null");
 
         // metricDef _can_ be null, and normally is.

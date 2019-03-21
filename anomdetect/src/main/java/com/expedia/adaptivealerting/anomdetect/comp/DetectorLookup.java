@@ -15,13 +15,13 @@
  */
 package com.expedia.adaptivealerting.anomdetect.comp;
 
-import com.expedia.adaptivealerting.anomdetect.core.AnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.algo.ConstantThresholdDetector;
-import com.expedia.adaptivealerting.anomdetect.algo.CusumDetector;
-import com.expedia.adaptivealerting.anomdetect.algo.EwmaDetector;
-import com.expedia.adaptivealerting.anomdetect.algo.holtwinters.HoltWintersDetector;
-import com.expedia.adaptivealerting.anomdetect.algo.IndividualsControlChartDetector;
-import com.expedia.adaptivealerting.anomdetect.algo.PewmaDetector;
+import com.expedia.adaptivealerting.anomdetect.detector.Detector;
+import com.expedia.adaptivealerting.anomdetect.detector.ConstantThresholdDetector;
+import com.expedia.adaptivealerting.anomdetect.detector.CusumDetector;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaDetector;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersDetector;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.IndividualsControlChartDetector;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.PewmaDetector;
 import lombok.val;
 
 import java.util.HashMap;
@@ -34,7 +34,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * Detector lookup table.
  */
 public class DetectorLookup {
-    private final Map<String, Class<? extends AnomalyDetector>> detectorMap = new HashMap<>();
+    private final Map<String, Class<? extends Detector>> detectorMap = new HashMap<>();
 
     public DetectorLookup() {
         detectorMap.put("constant-detector", ConstantThresholdDetector.class);
@@ -49,7 +49,7 @@ public class DetectorLookup {
         return detectorMap.keySet();
     }
 
-    public Class<? extends AnomalyDetector> getDetector(String key) {
+    public Class<? extends Detector> getDetector(String key) {
         notNull(key, "key can't be null");
         val detectorClass = detectorMap.get(key);
 

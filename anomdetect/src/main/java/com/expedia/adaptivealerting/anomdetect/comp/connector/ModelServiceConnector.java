@@ -16,10 +16,10 @@
 package com.expedia.adaptivealerting.anomdetect.comp.connector;
 
 import com.expedia.adaptivealerting.anomdetect.DetectorMapper;
-import com.expedia.adaptivealerting.anomdetect.core.DetectorDeserializationException;
-import com.expedia.adaptivealerting.anomdetect.core.DetectorException;
-import com.expedia.adaptivealerting.anomdetect.core.DetectorNotFoundException;
-import com.expedia.adaptivealerting.anomdetect.core.DetectorRetrievalException;
+import com.expedia.adaptivealerting.anomdetect.DetectorDeserializationException;
+import com.expedia.adaptivealerting.anomdetect.DetectorException;
+import com.expedia.adaptivealerting.anomdetect.DetectorNotFoundException;
+import com.expedia.adaptivealerting.anomdetect.DetectorRetrievalException;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.metrictank.MetricTankIdFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;

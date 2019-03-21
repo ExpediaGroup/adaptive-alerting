@@ -15,9 +15,9 @@
  */
 package com.expedia.adaptivealerting.anomdetect.comp;
 
-import com.expedia.adaptivealerting.anomdetect.core.AnomalyDetector;
-import com.expedia.adaptivealerting.anomdetect.algo.ConstantThresholdDetector;
-import com.expedia.adaptivealerting.anomdetect.algo.EwmaDetector;
+import com.expedia.adaptivealerting.anomdetect.detector.Detector;
+import com.expedia.adaptivealerting.anomdetect.detector.ConstantThresholdDetector;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaDetector;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.TagCollection;
 import lombok.extern.slf4j.Slf4j;
@@ -49,8 +49,8 @@ public final class TempHaystackAwareDetectorSourceTest {
     private UUID nonHaystackDetectorUuid;
     private UUID missingDetectorUuid;
 
-    private AnomalyDetector haystackDetector;
-    private AnomalyDetector nonHaystackDetector;
+    private Detector haystackDetector;
+    private Detector nonHaystackDetector;
 
     @Before
     public void setUp() {

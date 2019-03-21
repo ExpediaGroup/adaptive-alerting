@@ -15,9 +15,9 @@
  */
 package com.expedia.adaptivealerting.anomdetect.comp.connector;
 
-import com.expedia.adaptivealerting.anomdetect.core.DetectorDeserializationException;
-import com.expedia.adaptivealerting.anomdetect.core.DetectorNotFoundException;
-import com.expedia.adaptivealerting.anomdetect.core.DetectorRetrievalException;
+import com.expedia.adaptivealerting.anomdetect.DetectorDeserializationException;
+import com.expedia.adaptivealerting.anomdetect.DetectorNotFoundException;
+import com.expedia.adaptivealerting.anomdetect.DetectorRetrievalException;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.TagCollection;
 import com.expedia.metrics.metrictank.MetricTankIdFactory;

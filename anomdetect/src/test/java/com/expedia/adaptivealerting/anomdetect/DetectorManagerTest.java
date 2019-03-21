@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.anomdetect.core.AnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.detector.Detector;
 import com.expedia.adaptivealerting.anomdetect.comp.DetectorSource;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
@@ -64,7 +64,7 @@ public final class DetectorManagerTest {
     private MappedMetricData badMappedMetricData;
 
     @Mock
-    private AnomalyDetector detector;
+    private Detector detector;
 
     @Mock
     private AnomalyResult anomalyResult;

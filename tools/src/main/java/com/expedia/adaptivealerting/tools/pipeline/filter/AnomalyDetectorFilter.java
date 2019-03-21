@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.filter;
 
-import com.expedia.adaptivealerting.anomdetect.core.AnomalyDetector;
+import com.expedia.adaptivealerting.anomdetect.detector.Detector;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.tools.pipeline.util.AnomalyResultSubscriber;
 import com.expedia.adaptivealerting.tools.pipeline.util.MetricDataSubscriber;
@@ -33,19 +33,19 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  */
 @Slf4j
 public final class AnomalyDetectorFilter implements MetricDataSubscriber {
-    private final AnomalyDetector anomalyDetector;
+    private final Detector detector;
     private final List<AnomalyResultSubscriber> subscribers = new LinkedList<>();
 
-    public AnomalyDetectorFilter(AnomalyDetector detector) {
+    public AnomalyDetectorFilter(Detector detector) {
         notNull(detector, "detector can't be null");
-        this.anomalyDetector = detector;
+        this.detector = detector;
     }
 
     @Override
     public void next(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
-        val anomaly = new MappedMetricData(metricData, anomalyDetector.getUuid());
-        val anomalyResult = anomalyDetector.classify(metricData);
+        val anomaly = new MappedMetricData(metricData, detector.getUuid());
+        val anomalyResult = detector.classify(metricData);
         anomaly.setAnomalyResult(anomalyResult);
         publish(anomaly);
     }
