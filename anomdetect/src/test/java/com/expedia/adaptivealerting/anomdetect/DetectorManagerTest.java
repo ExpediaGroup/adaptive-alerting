@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.anomdetect.detector.Detector;
 import com.expedia.adaptivealerting.anomdetect.comp.DetectorSource;
+import com.expedia.adaptivealerting.anomdetect.detector.Detector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.metrics.MetricData;
@@ -33,9 +33,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 /**
@@ -69,8 +73,11 @@ public final class DetectorManagerTest {
     @Mock
     private AnomalyResult anomalyResult;
 
-    @Mock Config config;
-    @Mock Config badConfig;
+    @Mock
+    private Config config;
+
+    @Mock
+    private Config badConfig;
 
     @Before
     public void setUp() {
@@ -84,7 +91,6 @@ public final class DetectorManagerTest {
     public void testBadConfig() {
         new DetectorManager(detectorSource, badConfig);
     }
-
 
     @Test
     public void testGetDetectorSource() {
@@ -145,14 +151,8 @@ public final class DetectorManagerTest {
     private void initDependencies() {
         when(detector.classify(goodMetricData)).thenReturn(anomalyResult);
 
-        when(detectorSource.findDetectorTypes())
-                .thenReturn(Collections.singleton(DETECTOR_TYPE));
-
-        when(detectorSource.findDetector(any(UUID.class), eq(goodDefinition)))
-                .thenReturn(detector);
-        when(detectorSource.findDetector(any(UUID.class), eq(badDefinition)))
-                .thenReturn(null);
-
+        when(detectorSource.findDetectorTypes()).thenReturn(Collections.singleton(DETECTOR_TYPE));
+        when(detectorSource.findDetector(any(UUID.class))).thenReturn(detector);
         when(detectorSource.findUpdatedDetectors(detector_refresh_period)).thenReturn(updatedDetectors);
 
         when(config.getInt("detector-refresh-period")).thenReturn(detector_refresh_period);

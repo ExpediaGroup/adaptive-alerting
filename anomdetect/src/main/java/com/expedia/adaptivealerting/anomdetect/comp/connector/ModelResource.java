@@ -18,16 +18,13 @@ package com.expedia.adaptivealerting.anomdetect.comp.connector;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
-import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Map;
-import java.util.UUID;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ModelResource {
-    private Long id;
-    private UUID uuid;
     private ModelTypeResource detectorType;
     private Map<String, Object> params;
-    private Timestamp dateCreated;
+    private Date dateCreated;
 }
