@@ -43,22 +43,6 @@ public class AnomalyThresholdsTest {
         assertEquals(20.0, thresholds.getLowerStrong(), TOLERANCE);
     }
 
-    @Test
-    public void testUpperThresholds() {
-        val thresholds = new AnomalyThresholds(100.0, 50.0, null, null);
-        assertEquals(AnomalyLevel.STRONG, thresholds.classify(150.0));
-        assertEquals(AnomalyLevel.WEAK, thresholds.classify(75.0));
-        assertEquals(AnomalyLevel.NORMAL, thresholds.classify(25.0));
-    }
-
-    @Test
-    public void testLowerThresholds() {
-        val thresholds = new AnomalyThresholds(null, null, 50.0, 25.0);
-        assertEquals(AnomalyLevel.STRONG, thresholds.classify(0.0));
-        assertEquals(AnomalyLevel.WEAK, thresholds.classify(35.0));
-        assertEquals(AnomalyLevel.NORMAL, thresholds.classify(100.0));
-    }
-
     @Test(expected = IllegalArgumentException.class)
     public void testConstructor_allThresholdsNull() {
         new AnomalyThresholds(null, null, null, null);

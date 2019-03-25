@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters;
 
+import com.expedia.adaptivealerting.anomdetect.comp.AnomalyClassifier;
 import com.expedia.adaptivealerting.anomdetect.detector.AbstractDetector;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.metrics.MetricData;
@@ -98,9 +98,9 @@ public final class HoltWintersDetector extends AbstractDetector<HoltWintersParam
     }
 
     private AnomalyResult classifyAnomaly(MetricData metricData, double prevForecast) {
-        AnomalyThresholds thresholds = buildAnomalyThresholds(prevForecast);
-        AnomalyLevel level = thresholds.classify(metricData.getValue());
-        AnomalyResult result = new AnomalyResult(level);
+        val thresholds = buildAnomalyThresholds(prevForecast);
+        val level = new AnomalyClassifier(getAnomalyType()).classify(thresholds, metricData.getValue());
+        val result = new AnomalyResult(level);
         result.setPredicted(prevForecast);
         result.setThresholds(thresholds);
         return result;

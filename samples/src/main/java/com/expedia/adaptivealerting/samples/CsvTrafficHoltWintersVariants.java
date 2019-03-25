@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.samples;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersDetector;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersParams;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.SeasonalityType;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
@@ -138,7 +139,7 @@ public class CsvTrafficHoltWintersVariants {
                                                double alpha, double beta, double gammaLow, String... titleSuffix) {
 
         val detector = new HoltWintersDetector();
-        detector.init(UUID.randomUUID(), params);
+        detector.init(UUID.randomUUID(), params, AnomalyType.TWO_TAILED);
 
         final AnomalyDetectorFilter adf = new AnomalyDetectorFilter(detector);
         final EvaluatorFilter eval = new EvaluatorFilter(new RmseEvaluator());

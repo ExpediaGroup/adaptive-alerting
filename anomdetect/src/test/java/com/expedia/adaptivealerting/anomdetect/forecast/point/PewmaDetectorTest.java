@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.forecast.point;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.opencsv.CSVReader;
@@ -69,7 +70,7 @@ public final class PewmaDetectorTest {
                 .setStrongSigmas(STRONG_SIGMAS)
                 .setInitMeanEstimate(observed0);
         val pewmaDetector = new PewmaDetector();
-        pewmaDetector.init(detectorUuid, pewmaParams);
+        pewmaDetector.init(detectorUuid, pewmaParams, AnomalyType.TWO_TAILED);
 
         val ewmaParams = new EwmaParams()
                 .setAlpha(DEFAULT_ALPHA)
@@ -77,7 +78,7 @@ public final class PewmaDetectorTest {
                 .setStrongSigmas(STRONG_SIGMAS)
                 .setInitMeanEstimate(observed0);
         val ewmaDetector = new EwmaDetector();
-        ewmaDetector.init(UUID.randomUUID(), ewmaParams);
+        ewmaDetector.init(UUID.randomUUID(), ewmaParams, AnomalyType.TWO_TAILED);
 
         int rowCount = 1;
         while (testRows.hasNext()) {
@@ -112,7 +113,7 @@ public final class PewmaDetectorTest {
                 .setStrongSigmas(STRONG_SIGMAS)
                 .setInitMeanEstimate(observed0);
         val detector = new PewmaDetector();
-        detector.init(detectorUuid, params);
+        detector.init(detectorUuid, params, AnomalyType.TWO_TAILED);
 
         while (testRows.hasNext()) {
             val testRow = testRows.next();

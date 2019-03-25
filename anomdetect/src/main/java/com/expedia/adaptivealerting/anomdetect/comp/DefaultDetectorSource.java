@@ -16,8 +16,11 @@
 package com.expedia.adaptivealerting.anomdetect.comp;
 
 import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelServiceConnector;
+import com.expedia.adaptivealerting.anomdetect.detector.ConstantThresholdParams;
+import com.expedia.adaptivealerting.anomdetect.detector.CusumParams;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
 import com.expedia.adaptivealerting.anomdetect.detector.DetectorParams;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
 import com.expedia.metrics.MetricDefinition;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -59,8 +62,7 @@ public class DefaultDetectorSource implements DetectorSource {
                 .getEmbedded()
                 .getDetectors()
                 .stream()
-                .map(resource ->
-                        UUID.fromString(resource.getUuid()))
+                .map(resource -> UUID.fromString(resource.getUuid()))
                 .collect(Collectors.toList());
     }
 
@@ -82,11 +84,16 @@ public class DefaultDetectorSource implements DetectorSource {
                 .getEmbedded()
                 .getDetectors()
                 .stream()
-                .map(resource ->
-                        UUID.fromString(resource.getUuid()))
+                .map(resource -> UUID.fromString(resource.getUuid()))
                 .collect(Collectors.toList());
     }
 
+
+    // ================================================================================
+    // Legacy
+    // ================================================================================
+
+    @Deprecated
     private Detector doLegacyFindDetector(UUID uuid) {
 
         // TODO "Latest model" doesn't really make sense for the kind of detectors we load into the DetectorManager.
@@ -100,9 +107,25 @@ public class DefaultDetectorSource implements DetectorSource {
         val detector = ReflectionUtil.newInstance(detectorClass);
         val paramsClass = detector.getParamsClass();
         val params = (DetectorParams) new ObjectMapper().convertValue(model.getParams(), paramsClass);
+        val anomalyType = doLegacyGetAnomalyType(params);
 
-        detector.init(uuid, params);
+        detector.init(uuid, params, anomalyType);
         log.info("Found detector: {}", detector);
         return detector;
+    }
+
+    @Deprecated
+    private AnomalyType doLegacyGetAnomalyType(DetectorParams params) {
+        val paramsClass = params.getClass();
+
+        // TODO For now we simply reproduce current behavior, which is that only certain detectors support tails. Soon
+        //  we'll remove these hardcodes since all detectors will support tails.
+        if (ConstantThresholdParams.class.equals(paramsClass)) {
+            return ((ConstantThresholdParams) params).getType();
+        } else if (CusumParams.class.equals(paramsClass)) {
+            return ((CusumParams) params).getType();
+        } else {
+            return AnomalyType.TWO_TAILED;
+        }
     }
 }

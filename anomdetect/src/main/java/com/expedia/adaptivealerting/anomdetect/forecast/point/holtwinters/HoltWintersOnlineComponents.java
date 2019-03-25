@@ -23,11 +23,12 @@ import java.util.Arrays;
 
 /**
  * Encapsulates the values that represent the components for the {@link HoltWintersOnlineAlgorithm} logic.
- * This represents the model's online data as opposed to {@link HoltWintersParams} which represents the users values for the model's parameters.
+ * This represents the model's online data as opposed to {@link HoltWintersParams} which represents the users values for
+ * the model's parameters.
  *
- * @see <a href="https://otexts.org/fpp2/holt-winters.html">Holt-Winters' Seasonal Method</a>
- * and <a href="https://robjhyndman.com/hyndsight/seasonal-periods/">https://robjhyndman.com/hyndsight/seasonal-periods/</a> for naming conventions
- * (e.g. usage of "frequency" and "cycle").
+ * @see <a href="https://otexts.org/fpp2/holt-winters.html">Holt-Winters' Seasonal Method</a> and
+ * <a href="https://robjhyndman.com/hyndsight/seasonal-periods/">https://robjhyndman.com/hyndsight/seasonal-periods/</a>
+ * for naming conventions (e.g. usage of "frequency" and "cycle").
  */
 @Data
 public class HoltWintersOnlineComponents {

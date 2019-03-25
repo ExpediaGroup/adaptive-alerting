@@ -22,6 +22,8 @@ import lombok.Data;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.isFalse;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 
+// TODO Rename this to IntervalForecast, but preserve "thresholds" JSON name. [WLW]
+
 /**
  * Weak and strong thresholds to support both one- and two-tailed tests.
  */
@@ -59,19 +61,5 @@ public class AnomalyThresholds {
         this.upperWeak = upperWeak;
         this.lowerStrong = lowerStrong;
         this.lowerWeak = lowerWeak;
-    }
-
-    public AnomalyLevel classify(double value) {
-        if (upperStrong != null && value >= upperStrong) {
-            return AnomalyLevel.STRONG;
-        } else if (upperWeak != null && value >= upperWeak) {
-            return AnomalyLevel.WEAK;
-        } else if (lowerStrong != null && value <= lowerStrong) {
-            return AnomalyLevel.STRONG;
-        } else if (lowerWeak != null && value <= lowerWeak) {
-            return AnomalyLevel.WEAK;
-        } else {
-            return AnomalyLevel.NORMAL;
-        }
     }
 }

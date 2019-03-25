@@ -15,20 +15,20 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.adaptivealerting.core.data.MetricFrameLoader;
 import com.expedia.adaptivealerting.tools.pipeline.source.MetricFrameMetricSource;
 import com.expedia.metrics.MetricDefinition;
+import lombok.val;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 public class MetricGenerationHelper {
+
     // TODO: Use this from other Sample classes
     public static MetricFrameMetricSource buildMetricFrameMetricSource(String filename, long periodMs) throws IOException {
-        final InputStream is = ClassLoader.getSystemResourceAsStream(filename);
+        val is = ClassLoader.getSystemResourceAsStream(filename);
         // TODO Use the FileDataConnector rather than the MetricFrameLoader. [WLW]
-        final MetricFrame frame = MetricFrameLoader.loadCsv(new MetricDefinition("csv"), is, true);
+        val frame = MetricFrameLoader.loadCsv(new MetricDefinition("csv"), is, true);
         return new MetricFrameMetricSource(frame, "data", periodMs);
     }
 }

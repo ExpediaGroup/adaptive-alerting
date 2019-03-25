@@ -33,6 +33,13 @@ public class AnomalyResult {
     @NonNull
     private AnomalyLevel anomalyLevel;
 
+    /**
+     * Point forecast.
+     */
     private Double predicted;
+
+    /**
+     * Interval forecast.
+     */
     private AnomalyThresholds thresholds;
 }

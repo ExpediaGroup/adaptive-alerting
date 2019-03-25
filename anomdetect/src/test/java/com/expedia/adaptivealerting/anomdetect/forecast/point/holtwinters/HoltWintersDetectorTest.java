@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import lombok.val;
@@ -29,7 +30,10 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.UUID;
 
-import static com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersAustouristsTestHelper.*;
+import static com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersAustouristsTestHelper.AUSTOURISTS_ADD_DATA;
+import static com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersAustouristsTestHelper.AUSTOURISTS_MULT_DATA;
+import static com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersAustouristsTestHelper.TOLERANCE;
+import static com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersAustouristsTestHelper.buildAustouristsParams;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -57,7 +61,7 @@ public class HoltWintersDetectorTest {
                 .setFrequency(24)
                 .setAlpha(2.0);
         val detector = new HoltWintersDetector();
-        detector.init(detectorUUID, params);
+        detector.init(detectorUUID, params, AnomalyType.TWO_TAILED);
     }
 
     @Test
@@ -91,7 +95,7 @@ public class HoltWintersDetectorTest {
                 buildAustouristsParams(seasonalityType, initLevelEstimate, initBaseEstimate, initSeasonalEstimates);
 
         val subject = new HoltWintersDetector();
-        subject.init(detectorUUID, params);
+        subject.init(detectorUUID, params, AnomalyType.TWO_TAILED);
 
         while (testRows.hasNext()) {
             final HoltWintersAustouristsTestRow testRow = testRows.next();

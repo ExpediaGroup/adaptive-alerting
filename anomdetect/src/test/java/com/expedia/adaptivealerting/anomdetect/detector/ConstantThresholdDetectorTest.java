@@ -106,7 +106,7 @@ public class ConstantThresholdDetectorTest {
                 .setType(type);
 
         val detector = new ConstantThresholdDetector();
-        detector.init(uuid, params);
+        detector.init(uuid, params, type);
         return detector;
     }
 

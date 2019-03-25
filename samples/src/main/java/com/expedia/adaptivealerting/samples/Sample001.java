@@ -44,7 +44,7 @@ public final class Sample001 {
                 .setWeakSigmas(4.5)
                 .setStrongSigmas(5.5);
         val ewmaAD = new EwmaDetector();
-        ewmaAD.init(UUID.randomUUID(), ewmaParams);
+        ewmaAD.init(UUID.randomUUID(), ewmaParams, AnomalyType.TWO_TAILED);
         val ewmaADF = new AnomalyDetectorFilter(ewmaAD);
 
         val pewmaParams = new PewmaParams()
@@ -52,7 +52,7 @@ public final class Sample001 {
                 .setWeakSigmas(5.0)
                 .setStrongSigmas(6.0);
         val pewmaAD = new PewmaDetector();
-        pewmaAD.init(UUID.randomUUID(), pewmaParams);
+        pewmaAD.init(UUID.randomUUID(), pewmaParams, AnomalyType.TWO_TAILED);
         val pewmaADF = new AnomalyDetectorFilter(pewmaAD);
 
         val cusumParams = new CusumParams()
@@ -62,7 +62,7 @@ public final class Sample001 {
                 .setStrongSigmas(4.0)
                 .setInitMeanEstimate(13_000_000);
         val cusumAD = new CusumDetector();
-        cusumAD.init(UUID.randomUUID(), cusumParams);
+        cusumAD.init(UUID.randomUUID(), cusumParams, AnomalyType.TWO_TAILED);
         val cusumADF = new AnomalyDetectorFilter(cusumAD);
 
         val ewmaEval = new EvaluatorFilter(new RmseEvaluator());

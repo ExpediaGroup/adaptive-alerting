@@ -87,7 +87,7 @@ public final class AnomalyChartSink implements AnomalyResultSubscriber, ModelEva
     public void next(ModelEvaluation evaluation) {
         notNull(evaluation, "evaluation can't be null");
 
-        final String title = new StringBuilder(baseTitle)
+        val title = new StringBuilder(baseTitle)
                 .append(" (")
                 .append(evaluation.getEvaluatorMethod())
                 .append("=")

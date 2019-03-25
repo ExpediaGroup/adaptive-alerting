@@ -17,7 +17,7 @@ package com.expedia.adaptivealerting.samples;
 
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PewmaDetector;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PewmaParams;
-import com.expedia.adaptivealerting.core.data.MetricFrame;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.adaptivealerting.core.data.MetricFrameLoader;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorFilter;
@@ -27,7 +27,6 @@ import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
 import com.expedia.metrics.MetricDefinition;
 import lombok.val;
 
-import java.io.InputStream;
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.createChartFrame;
@@ -38,9 +37,9 @@ public class CsvTrafficPewmaVariants {
     public static void main(String[] args) throws Exception {
 
         // TODO Use the FileDataConnector rather than the MetricFrameLoader. [WLW]
-        final InputStream is = ClassLoader.getSystemResourceAsStream("samples/cal-inflow.csv");
-        final MetricFrame frame = MetricFrameLoader.loadCsv(new MetricDefinition("csv"), is, true);
-        final MetricFrameMetricSource source = new MetricFrameMetricSource(frame, "data", 200L);
+        val is = ClassLoader.getSystemResourceAsStream("samples/cal-inflow.csv");
+        val frame = MetricFrameLoader.loadCsv(new MetricDefinition("csv"), is, true);
+        val source = new MetricFrameMetricSource(frame, "data", 200L);
 
         val params1 = new PewmaParams()
                 .setAlpha(0.15)
@@ -49,7 +48,7 @@ public class CsvTrafficPewmaVariants {
                 .setStrongSigmas(3.0)
                 .setInitMeanEstimate(0.0);
         val detector1 = new PewmaDetector();
-        detector1.init(UUID.randomUUID(), params1);
+        detector1.init(UUID.randomUUID(), params1, AnomalyType.TWO_TAILED);
         val detectorFilter1 = new AnomalyDetectorFilter(detector1);
 
         val params2 = new PewmaParams()
