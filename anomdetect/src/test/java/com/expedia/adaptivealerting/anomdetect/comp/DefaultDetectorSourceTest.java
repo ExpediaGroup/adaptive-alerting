@@ -88,6 +88,11 @@ public final class DefaultDetectorSourceTest {
         assertEquals(DETECTOR_UUID_EWMA, result);
     }
 
+    @Test(expected = RuntimeException.class)
+    public void testFindDetectorUuids_exception() {
+        sourceUnderTest.findDetectorUuids(metricDefException);
+    }
+
     @Test
     public void testFindUpdatedDetectorUuids() {
         val results = sourceUnderTest.findUpdatedDetectors(1);
@@ -97,24 +102,27 @@ public final class DefaultDetectorSourceTest {
         assertEquals(DETECTOR_UUID_EWMA, result);
     }
 
-    @Test(expected = RuntimeException.class)
-    public void testFindDetectorMetas_exception() {
-        sourceUnderTest.findDetectorUuids(metricDefException);
-    }
-
-    @Test
-    public void testFindDetector() {
-        val result = sourceUnderTest.findDetector(DETECTOR_UUID_EWMA);
-        assertNotNull(result);
-        assertEquals(DETECTOR_UUID_EWMA, result.getUuid());
-    }
-
     @Test
     public void testFindDetector_constantThreshold() {
         val result = sourceUnderTest.findDetector(DETECTOR_UUID_CONSTANT_THRESHOLD);
         assertNotNull(result);
         assertEquals(DETECTOR_UUID_CONSTANT_THRESHOLD, result.getUuid());
         assertEquals(modelResource_constantThreshold.getParams().get("type"), result.getAnomalyType());
+    }
+
+    @Test
+    public void testFindDetector_cusum() {
+        val result = sourceUnderTest.findDetector(DETECTOR_UUID_CUSUM);
+        assertNotNull(result);
+        assertEquals(DETECTOR_UUID_CUSUM, result.getUuid());
+        assertEquals(modelResource_cusum.getParams().get("type"), result.getAnomalyType());
+    }
+
+    @Test
+    public void testFindDetector_ewma() {
+        val result = sourceUnderTest.findDetector(DETECTOR_UUID_EWMA);
+        assertNotNull(result);
+        assertEquals(DETECTOR_UUID_EWMA, result.getUuid());
     }
 
     @Test(expected = IllegalArgumentException.class)
