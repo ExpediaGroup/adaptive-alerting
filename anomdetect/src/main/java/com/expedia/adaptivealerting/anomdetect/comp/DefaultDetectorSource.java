@@ -116,15 +116,14 @@ public class DefaultDetectorSource implements DetectorSource {
 
     @Deprecated
     private AnomalyType doLegacyGetAnomalyType(DetectorParams params) {
+        val paramsClass = params.getClass();
 
         // TODO For now we simply reproduce current behavior, which is that only certain detectors support tails. Soon
         //  we'll remove these hardcodes since all detectors will support tails.
-        if (ConstantThresholdParams.class.equals(params)) {
-            val constantThresholdParams = (ConstantThresholdParams) params;
-            return constantThresholdParams.getType();
-        } else if (CusumParams.class.equals(params)) {
-            val cusumParams = (CusumParams) params;
-            return cusumParams.getType();
+        if (ConstantThresholdParams.class.equals(paramsClass)) {
+            return ((ConstantThresholdParams) params).getType();
+        } else if (CusumParams.class.equals(paramsClass)) {
+            return ((CusumParams) params).getType();
         } else {
             return AnomalyType.TWO_TAILED;
         }
