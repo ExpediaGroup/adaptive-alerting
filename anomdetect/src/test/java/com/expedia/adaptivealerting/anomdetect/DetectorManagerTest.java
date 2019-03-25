@@ -39,7 +39,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 /**
@@ -47,14 +46,16 @@ import static org.mockito.Mockito.when;
  */
 public final class DetectorManagerTest {
     private static final String DETECTOR_TYPE = "ewma-detector";
-    private final int detector_refresh_period = 1;
-    private final int bad_detector_refresh_period = 0;
+    private final int detectorRefreshPeriod = 1;
+    private final int badDetectorRefreshPeriod = 0;
 
     private DetectorManager managerUnderTest;
 
     @Mock
     private DetectorSource detectorSource;
 
+    private UUID mappedUuid;
+    private UUID unmappedUuid;
     private List<UUID> updatedDetectors;
 
     // "Good" just means the detector source can find a detector for the MMD.
@@ -135,15 +136,18 @@ public final class DetectorManagerTest {
     }
 
     private void initTestObjects() {
+        this.mappedUuid = UUID.randomUUID();
+        this.unmappedUuid = UUID.randomUUID();
+
         this.goodDefinition = new MetricDefinition("good-definition");
         this.goodMetricData = new MetricData(goodDefinition, 100.0, Instant.now().getEpochSecond());
-        this.goodMappedMetricData = new MappedMetricData(goodMetricData, UUID.randomUUID());
+        this.goodMappedMetricData = new MappedMetricData(goodMetricData, mappedUuid);
 
         this.badDefinition = new MetricDefinition("bad-definition");
         this.badMetricData = new MetricData(badDefinition, 100.0, Instant.now().getEpochSecond());
-        this.badMappedMetricData = new MappedMetricData(badMetricData, UUID.randomUUID());
+        this.badMappedMetricData = new MappedMetricData(badMetricData, unmappedUuid);
 
-        UUID detectorUuid = UUID.fromString("7629c28a-5958-4ca7-9aaa-49b95d3481ff");
+        val detectorUuid = UUID.fromString("7629c28a-5958-4ca7-9aaa-49b95d3481ff");
         this.updatedDetectors = Collections.singletonList(detectorUuid);
 
     }
@@ -152,10 +156,11 @@ public final class DetectorManagerTest {
         when(detector.classify(goodMetricData)).thenReturn(anomalyResult);
 
         when(detectorSource.findDetectorTypes()).thenReturn(Collections.singleton(DETECTOR_TYPE));
-        when(detectorSource.findDetector(any(UUID.class))).thenReturn(detector);
-        when(detectorSource.findUpdatedDetectors(detector_refresh_period)).thenReturn(updatedDetectors);
+        when(detectorSource.findDetector(mappedUuid)).thenReturn(detector);
+        when(detectorSource.findDetector(unmappedUuid)).thenReturn(null);
+        when(detectorSource.findUpdatedDetectors(detectorRefreshPeriod)).thenReturn(updatedDetectors);
 
-        when(config.getInt("detector-refresh-period")).thenReturn(detector_refresh_period);
-        when(badConfig.getInt("detector-refresh-period")).thenReturn(bad_detector_refresh_period);
+        when(config.getInt("detector-refresh-period")).thenReturn(detectorRefreshPeriod);
+        when(badConfig.getInt("detector-refresh-period")).thenReturn(badDetectorRefreshPeriod);
     }
 }
