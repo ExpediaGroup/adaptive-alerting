@@ -15,9 +15,9 @@
  */
 package com.expedia.adaptivealerting.anomdetect.comp.connector;
 
-import com.expedia.adaptivealerting.anomdetect.DetectorMapper;
 import com.expedia.adaptivealerting.anomdetect.DetectorDeserializationException;
 import com.expedia.adaptivealerting.anomdetect.DetectorException;
+import com.expedia.adaptivealerting.anomdetect.DetectorMapper;
 import com.expedia.adaptivealerting.anomdetect.DetectorNotFoundException;
 import com.expedia.adaptivealerting.anomdetect.DetectorRetrievalException;
 import com.expedia.metrics.MetricDefinition;
@@ -51,13 +51,14 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  */
 @Slf4j
 public class ModelServiceConnector {
+    public static final String API_PATH_DETECTOR_BY_METRIC_HASH = "/api/detectors/search/findByMetricHash?hash=%s";
+    public static final String API_PATH_MODEL_BY_DETECTOR_UUID = "/api/models/search/findLatestByDetectorUuid?uuid=%s";
+    public static final String API_PATH_DETECTOR_UPDATES = "/api/detectors/search/getLastUpdatedDetectors?interval=%d";
+
     private final MetricTankIdFactory metricTankIdFactory = new MetricTankIdFactory();
     private final HttpClientWrapper httpClient;
     private final String baseUri;
     private final ObjectMapper objectMapper;
-    public static final String API_PATH_DETECTOR_BY_METRIC_HASH = "/api/detectors/search/findByMetricHash?hash=%s";
-    public static final String API_PATH_MODEL_BY_DETECTOR_UUID = "/api/models/search/findLatestByDetectorUuid?uuid=%s";
-    public static final String API_PATH_DETECTOR_UPDATES = "/api/detectors/search/getLastUpdatedDetectors?interval=%d";
 
     public ModelServiceConnector(HttpClientWrapper httpClient, String baseUri, ObjectMapper objectMapper) {
         notNull(httpClient, "httpClient can't be null");

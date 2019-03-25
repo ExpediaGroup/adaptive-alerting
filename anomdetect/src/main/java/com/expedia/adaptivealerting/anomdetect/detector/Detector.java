@@ -23,7 +23,9 @@ import java.util.UUID;
 /**
  * Anomaly detector interface.
  */
-public interface Detector {
+public interface Detector<T extends DetectorParams> {
+
+    void init(UUID uuid, T params);
 
     /**
      * Returns the anomaly detector UUID.
@@ -31,6 +33,8 @@ public interface Detector {
      * @return Anomaly detector UUID.
      */
     UUID getUuid();
+
+    Class<T> getParamsClass();
 
     /**
      * Classifies a given metric data point.

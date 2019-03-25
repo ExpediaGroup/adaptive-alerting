@@ -18,8 +18,15 @@ package com.expedia.adaptivealerting.modelservice.entity;
 import com.expedia.adaptivealerting.modelservice.util.JpaConverterJson;
 import lombok.Data;
 
-import javax.persistence.*;
-import java.sql.Timestamp;
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -41,5 +48,5 @@ public class Model {
     private Map<String, Object> params;
 
     @Column(name = "date_created", insertable = false)
-    private Timestamp dateCreated;
+    private Date dateCreated;
 }

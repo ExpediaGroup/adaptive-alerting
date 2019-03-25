@@ -34,9 +34,6 @@ public final class DetectorUtil {
     public static DetectorSource buildDetectorSource(Config config) {
         val uriTemplate = config.getString(CK_MODEL_SERVICE_URI_TEMPLATE);
         val connector = new ModelServiceConnector(new HttpClientWrapper(), uriTemplate, new ObjectMapper());
-
-        // TODO Disabling this as it is generating a huge number of classification errors in the DetectorManager.
-//        return new TempHaystackAwareDetectorSource(new DefaultDetectorSource(connector));
         return new DefaultDetectorSource(connector);
     }
 }

@@ -28,6 +28,7 @@ import java.util.Map;
 @Data
 @Entity
 public class Detector {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

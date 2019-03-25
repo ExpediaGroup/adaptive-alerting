@@ -95,24 +95,24 @@ public final class DefaultDetectorSourceTest {
 
     @Test
     public void testFindDetector() {
-        val result = sourceUnderTest.findDetector(DETECTOR_UUID, metricDef);
+        val result = sourceUnderTest.findDetector(DETECTOR_UUID);
         assertNotNull(result);
         assertEquals(DETECTOR_UUID, result.getUuid());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testFindDetector_nullMeta() {
-        sourceUnderTest.findDetector(null, metricDef);
+        sourceUnderTest.findDetector(null);
     }
 
     @Test(expected = DetectorNotFoundException.class)
     public void testFindDetector_missingDetector() {
-        sourceUnderTest.findDetector(DETECTOR_UUID_MISSING_DETECTOR, metricDef);
+        sourceUnderTest.findDetector(DETECTOR_UUID_MISSING_DETECTOR);
     }
 
     @Test(expected = RuntimeException.class)
     public void testFindDetector_exception() {
-        sourceUnderTest.findDetector(DETECTOR_UUID_EXCEPTION, metricDef);
+        sourceUnderTest.findDetector(DETECTOR_UUID_EXCEPTION);
     }
 
     private void initTestObjects() {
@@ -132,7 +132,6 @@ public final class DefaultDetectorSourceTest {
         params.put("strongSigmas", 4.0);
 
         this.modelResource = new ModelResource();
-        modelResource.setUuid(DETECTOR_UUID);
         modelResource.setParams(params);
         modelResource.setDetectorType(new ModelTypeResource(DETECTOR_TYPE));
     }

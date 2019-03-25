@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.anomdetect.detector.Detector;
 import com.expedia.adaptivealerting.anomdetect.comp.DetectorSource;
+import com.expedia.adaptivealerting.anomdetect.detector.Detector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.typesafe.config.Config;
@@ -25,8 +25,14 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import lombok.var;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -48,6 +54,8 @@ public class DetectorManager {
 
     private int detectorRefreshTimePeriod;
 
+    // TODO Consider making this an explicit class so we can mock it and verify interactions
+    //  against it. [WLW]
     private final Map<UUID, Detector> cachedDetectors = new HashMap<>();
 
     public DetectorManager(DetectorSource detectorSource, Config config) {
@@ -110,12 +118,12 @@ public class DetectorManager {
         notNull(mappedMetricData, "mappedMetricData can't be null");
 
         val detectorUuid = mappedMetricData.getDetectorUuid();
-        val metricDef = mappedMetricData.getMetricData().getMetricDefinition();
-
-        Detector detector = cachedDetectors.get(detectorUuid);
+        var detector = cachedDetectors.get(detectorUuid);
         if (detector == null) {
-            detector = detectorSource.findDetector(detectorUuid, metricDef);
+            detector = detectorSource.findDetector(detectorUuid);
             cachedDetectors.put(detectorUuid, detector);
+        } else {
+            log.trace("Got cached detector");
         }
         return detector;
     }
@@ -127,7 +135,7 @@ public class DetectorManager {
      */
     List<UUID> detectorMapRefresh() {
 
-        List<UUID> updatedDetectors = new ArrayList<>();
+        var updatedDetectors = new ArrayList<UUID>();
         detectorSource.findUpdatedDetectors(detectorRefreshTimePeriod).forEach(key -> {
             updatedDetectors.add(key);
             cachedDetectors.remove(key);

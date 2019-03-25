@@ -16,7 +16,6 @@
 package com.expedia.adaptivealerting.anomdetect.comp;
 
 import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelServiceConnector;
-import com.expedia.adaptivealerting.anomdetect.detector.AbstractDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
 import com.expedia.adaptivealerting.anomdetect.detector.DetectorParams;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
@@ -66,27 +65,12 @@ public class DefaultDetectorSource implements DetectorSource {
     }
 
     @Override
-    public Detector findDetector(UUID detectorUuid, MetricDefinition metricDef) {
-        notNull(detectorUuid, "detectorUuid can't be null");
+    public Detector findDetector(UUID uuid) {
+        notNull(uuid, "uuid can't be null");
 
-        // metricDef _can_ be null, and normally is.
-        // This implementation doesn't use it, but other implementations do.
-
-        // TODO "Latest model" doesn't really make sense for the kind of detectors we load into the DetectorManager.
-        // These are basic detectors backed by single statistical models, as opposed to being ML models that we have to
-        // refresh/retrain periodically. So we probably want to simplify this by just collapsing the model concept into
-        // the detector. [WLW]
-        val model = connector.findLatestModel(detectorUuid);
-
-        val detectorType = model.getDetectorType().getKey();
-        val detectorClass = detectorLookup.getDetector(detectorType);
-        val detector = (AbstractDetector) ReflectionUtil.newInstance(detectorClass);
-        val paramsClass = detector.getParamsClass();
-        val params = (DetectorParams) new ObjectMapper().convertValue(model.getParams(), paramsClass);
-
-        detector.init(detectorUuid, params);
-        log.info("Found detector: {}", detector);
-        return detector;
+        // TODO Currently we use a legacy process to find the detector. The legacy process couples point forecast algos
+        //  with interval forecast algos. We will decouple these shortly. [WLW]
+        return doLegacyFindDetector(uuid);
     }
 
     @Override
@@ -101,5 +85,24 @@ public class DefaultDetectorSource implements DetectorSource {
                 .map(resource ->
                         UUID.fromString(resource.getUuid()))
                 .collect(Collectors.toList());
+    }
+
+    private Detector doLegacyFindDetector(UUID uuid) {
+
+        // TODO "Latest model" doesn't really make sense for the kind of detectors we load into the DetectorManager.
+        //  These are basic detectors backed by single statistical models, as opposed to being ML models that we have to
+        //  refresh/retrain periodically. So we probably want to simplify this by just collapsing the model concept into
+        //  the detector. [WLW]
+        val model = connector.findLatestModel(uuid);
+
+        val detectorType = model.getDetectorType().getKey();
+        val detectorClass = detectorLookup.getDetector(detectorType);
+        val detector = ReflectionUtil.newInstance(detectorClass);
+        val paramsClass = detector.getParamsClass();
+        val params = (DetectorParams) new ObjectMapper().convertValue(model.getParams(), paramsClass);
+
+        detector.init(uuid, params);
+        log.info("Found detector: {}", detector);
+        return detector;
     }
 }

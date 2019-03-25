@@ -25,7 +25,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * Abstract base class for anomaly detector implementations. {@link #init(UUID, DetectorParams)} method supports
  * reflection-based instantiation.
  */
-public abstract class AbstractDetector<T extends DetectorParams> implements Detector {
+public abstract class AbstractDetector<T extends DetectorParams> implements Detector<T> {
 
     @Getter
     private final Class<T> paramsClass;
@@ -41,6 +41,7 @@ public abstract class AbstractDetector<T extends DetectorParams> implements Dete
         this.paramsClass = paramsClass;
     }
 
+    @Override
     public void init(UUID uuid, T params) {
         notNull(uuid, "uuid can't be null");
         notNull(params, "params can't be null");
