@@ -120,13 +120,14 @@ public final class IndividualsControlChartDetector extends AbstractDetector<Indi
 
         val currentRange = Math.abs(prevValue - observed);
 
+        // TODO Modify this to use AnomalyClassifier.classify() so we can get tail checks. [WLW]
+
         // Looks like currently this detector supports only a single anomaly level (strong).
         val thresholds = new AnomalyThresholds(
                 this.mean + strongDelta,
                 this.mean + strongDelta,
                 this.mean - strongDelta,
-                this.mean - strongDelta
-        );
+                this.mean - strongDelta);
 
         AnomalyLevel level;
 

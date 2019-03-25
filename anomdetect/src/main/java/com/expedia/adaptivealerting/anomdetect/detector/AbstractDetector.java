@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detector;
 
+import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import lombok.Getter;
 
 import java.util.UUID;
@@ -22,8 +23,8 @@ import java.util.UUID;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
- * Abstract base class for anomaly detector implementations. {@link #init(UUID, DetectorParams)} method supports
- * reflection-based instantiation.
+ * Abstract base class for anomaly detector implementations. {@link #init(UUID, DetectorParams, AnomalyType)} method
+ * supports reflection-based instantiation.
  */
 public abstract class AbstractDetector<T extends DetectorParams> implements Detector<T> {
 
@@ -36,19 +37,24 @@ public abstract class AbstractDetector<T extends DetectorParams> implements Dete
     @Getter
     private T params;
 
+    @Getter
+    private AnomalyType anomalyType;
+
     protected AbstractDetector(Class<T> paramsClass) {
         notNull(paramsClass, "paramsClass can't be null");
         this.paramsClass = paramsClass;
     }
 
     @Override
-    public void init(UUID uuid, T params) {
+    public void init(UUID uuid, T params, AnomalyType anomalyType) {
         notNull(uuid, "uuid can't be null");
         notNull(params, "params can't be null");
+        notNull(anomalyType, "anomalyType can't be null");
 
         params.validate();
         this.uuid = uuid;
         this.params = params;
+        this.anomalyType = anomalyType;
         initState(params);
     }
 

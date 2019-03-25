@@ -18,9 +18,9 @@ package com.expedia.adaptivealerting.samples;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaDetector;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PewmaDetector;
 import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorFilter;
-import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartSink;
 import com.expedia.adaptivealerting.tools.pipeline.source.WhiteNoiseMetricSource;
 import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
+import lombok.val;
 
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.createChartFrame;
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showChartFrame;
@@ -31,13 +31,13 @@ import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showCha
 public class WhiteNoiseEwmaVsPewma {
 
     public static void main(String[] args) {
-        final WhiteNoiseMetricSource source = new WhiteNoiseMetricSource("white-noise", 1000L, 0.0, 1.0);
+        val source = new WhiteNoiseMetricSource("white-noise", 1000L, 0.0, 1.0);
 
-        final AnomalyDetectorFilter ewmaFilter = new AnomalyDetectorFilter(new EwmaDetector());
-        final AnomalyDetectorFilter pewmaFilter = new AnomalyDetectorFilter(new PewmaDetector());
+        val ewmaFilter = new AnomalyDetectorFilter(new EwmaDetector());
+        val pewmaFilter = new AnomalyDetectorFilter(new PewmaDetector());
 
-        final AnomalyChartSink ewmaChart = PipelineFactory.createChartSink("EWMA");
-        final AnomalyChartSink pewmaChart = PipelineFactory.createChartSink("PEWMA");
+        val ewmaChart = PipelineFactory.createChartSink("EWMA");
+        val pewmaChart = PipelineFactory.createChartSink("PEWMA");
 
         source.addSubscriber(ewmaFilter);
         source.addSubscriber(pewmaFilter);

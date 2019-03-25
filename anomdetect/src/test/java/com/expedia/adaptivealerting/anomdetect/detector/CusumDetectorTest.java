@@ -59,8 +59,10 @@ public class CusumDetectorTest {
 
     @Test
     public void testClassify_leftTailed() {
+        val anomalyType = AnomalyType.LEFT_TAILED;
+
         val params = new CusumParams()
-                .setType(AnomalyType.LEFT_TAILED)
+                .setType(anomalyType)
                 .setTargetValue(1000.0)
                 .setWeakSigmas(WEAK_SIGMAS)
                 .setStrongSigmas(STRONG_SIGMAS)
@@ -74,7 +76,7 @@ public class CusumDetectorTest {
                 new CusumTestRow(990.0, AnomalyLevel.STRONG.name()),
         };
 
-        testClassify(params, testRows);
+        testClassify(params, anomalyType, testRows);
     }
 
     @Test
@@ -82,8 +84,10 @@ public class CusumDetectorTest {
         val testRows = data.listIterator();
         val testRow0 = testRows.next();
 
+        val anomalyType = AnomalyType.RIGHT_TAILED;
+
         val params = new CusumParams()
-                .setType(AnomalyType.RIGHT_TAILED)
+                .setType(anomalyType)
                 .setTargetValue(0.16)
                 .setWeakSigmas(WEAK_SIGMAS)
                 .setStrongSigmas(STRONG_SIGMAS)
@@ -92,7 +96,7 @@ public class CusumDetectorTest {
                 .setWarmUpPeriod(WARMUP_PERIOD);
 
         val detector = new CusumDetector();
-        detector.init(detectorUuid, params);
+        detector.init(detectorUuid, params, anomalyType);
 
         int numDataPoints = 1;
 
@@ -116,8 +120,10 @@ public class CusumDetectorTest {
 
     @Test
     public void testClassify_twoTailed() {
+        val anomalyType = AnomalyType.TWO_TAILED;
+
         val params = new CusumParams()
-                .setType(AnomalyType.TWO_TAILED)
+                .setType(anomalyType)
                 .setTargetValue(1000.0)
                 .setWeakSigmas(WEAK_SIGMAS)
                 .setStrongSigmas(STRONG_SIGMAS)
@@ -132,12 +138,12 @@ public class CusumDetectorTest {
                 new CusumTestRow(960.0, AnomalyLevel.WEAK.name()),
         };
 
-        testClassify(params, testRows);
+        testClassify(params, anomalyType, testRows);
     }
 
-    private void testClassify(CusumParams params, CusumTestRow[] testRows) {
+    private void testClassify(CusumParams params, AnomalyType anomalyType, CusumTestRow[] testRows) {
         val detector = new CusumDetector();
-        detector.init(detectorUuid, params);
+        detector.init(detectorUuid, params, anomalyType);
 
         // FIXME Hack to handle an off-by-one bug in the CusumDetector. [WLW]
         val adjWarmupPeriod = params.getWarmUpPeriod() - 1;

@@ -29,6 +29,9 @@ public class ConstantThresholdParams implements DetectorParams {
      */
     private AnomalyType type;
 
+    /**
+     * Constant thresholds.
+     */
     private AnomalyThresholds thresholds;
 
     @Override

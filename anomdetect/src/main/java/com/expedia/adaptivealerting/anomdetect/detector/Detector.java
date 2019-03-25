@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.detector;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.metrics.MetricData;
 
 import java.util.UUID;
@@ -25,7 +26,7 @@ import java.util.UUID;
  */
 public interface Detector<T extends DetectorParams> {
 
-    void init(UUID uuid, T params);
+    void init(UUID uuid, T params, AnomalyType anomalyType);
 
     /**
      * Returns the anomaly detector UUID.
@@ -35,6 +36,8 @@ public interface Detector<T extends DetectorParams> {
     UUID getUuid();
 
     Class<T> getParamsClass();
+
+    AnomalyType getAnomalyType();
 
     /**
      * Classifies a given metric data point.

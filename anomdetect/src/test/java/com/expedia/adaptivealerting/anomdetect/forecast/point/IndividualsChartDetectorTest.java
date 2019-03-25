@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.forecast.point;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.adaptivealerting.core.util.MathUtil;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
@@ -68,7 +69,7 @@ public class IndividualsChartDetectorTest {
                 .setInitValue(observed0)
                 .setWarmUpPeriod(WARMUP_PERIOD);
         val detector = new IndividualsControlChartDetector();
-        detector.init(detectorUUID, params);
+        detector.init(detectorUUID, params, AnomalyType.TWO_TAILED);
 
         int noOfDataPoints = 1;
 

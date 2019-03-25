@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.point;
 
+import com.expedia.adaptivealerting.anomdetect.comp.AnomalyClassifier;
 import com.expedia.adaptivealerting.anomdetect.detector.AbstractDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
@@ -91,7 +92,7 @@ public final class EwmaDetector extends AbstractDetector<EwmaParams> {
 
         updateEstimates(observed);
 
-        val level = thresholds.classify(observed);
+        val level = new AnomalyClassifier(getAnomalyType()).classify(thresholds, observed);
 
         val result = new AnomalyResult(level);
         result.setPredicted(this.mean);

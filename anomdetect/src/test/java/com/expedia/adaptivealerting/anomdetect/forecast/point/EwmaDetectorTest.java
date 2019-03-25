@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.point;
 
+import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.adaptivealerting.core.util.MathUtil;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
@@ -54,7 +55,7 @@ public class EwmaDetectorTest {
     @Test
     public void testInit() {
         val detector = new EwmaDetector();
-        detector.init(UUID.randomUUID(), new EwmaParams());
+        detector.init(UUID.randomUUID(), new EwmaParams(), AnomalyType.TWO_TAILED);
         assertNotNull(detector.getUuid());
         assertNotNull(detector.getParams());
         assertEquals(EwmaParams.class, detector.getParamsClass());
@@ -62,7 +63,7 @@ public class EwmaDetectorTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testInit_alphaOutOfRange() {
-        new EwmaDetector().init(UUID.randomUUID(), new EwmaParams().setAlpha(2.0));
+        new EwmaDetector().init(UUID.randomUUID(), new EwmaParams().setAlpha(2.0), AnomalyType.TWO_TAILED);
     }
 
     @Test
@@ -75,7 +76,7 @@ public class EwmaDetectorTest {
                 .setAlpha(0.05)
                 .setInitMeanEstimate(observed0);
         val detector = new EwmaDetector();
-        detector.init(UUID.randomUUID(), params);
+        detector.init(UUID.randomUUID(), params, AnomalyType.TWO_TAILED);
 
         assertEquals(observed0, detector.getMean());
         assertEquals(0.0, detector.getVariance());

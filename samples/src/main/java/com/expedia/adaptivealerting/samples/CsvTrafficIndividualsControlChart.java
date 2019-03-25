@@ -16,17 +16,14 @@
 package com.expedia.adaptivealerting.samples;
 
 import com.expedia.adaptivealerting.anomdetect.forecast.point.IndividualsControlChartDetector;
-import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.adaptivealerting.core.data.MetricFrameLoader;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
-import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartSink;
 import com.expedia.adaptivealerting.tools.pipeline.source.MetricFrameMetricSource;
 import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
 import com.expedia.metrics.MetricDefinition;
-
-import java.io.InputStream;
+import lombok.val;
 
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.createChartFrame;
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showChartFrame;
@@ -40,13 +37,13 @@ public final class CsvTrafficIndividualsControlChart {
              MemoryUtil of clusters, anything where deviation from runningMean could hint possible outliers, here suitable-dataset.csv is just
              a placeholder name to be replaced by applicable data.
         */
-        final InputStream is = ClassLoader.getSystemResourceAsStream("samples/suitable-dataset.csv");
-        final MetricFrame frame = MetricFrameLoader.loadCsv(new MetricDefinition("csv"), is, true);
-        final MetricFrameMetricSource source = new MetricFrameMetricSource(frame, "data", 200L);
+        val is = ClassLoader.getSystemResourceAsStream("samples/suitable-dataset.csv");
+        val frame = MetricFrameLoader.loadCsv(new MetricDefinition("csv"), is, true);
+        val source = new MetricFrameMetricSource(frame, "data", 200L);
 
-        final AnomalyDetectorFilter detectorFilter = new AnomalyDetectorFilter(new IndividualsControlChartDetector());
-        final EvaluatorFilter evaluator = new EvaluatorFilter(new RmseEvaluator());
-        final AnomalyChartSink chartWrapper = PipelineFactory.createChartSink("IndividualsControlChart");
+        val detectorFilter = new AnomalyDetectorFilter(new IndividualsControlChartDetector());
+        val evaluator = new EvaluatorFilter(new RmseEvaluator());
+        val chartWrapper = PipelineFactory.createChartSink("IndividualsControlChart");
 
         source.addSubscriber(detectorFilter);
         detectorFilter.addSubscriber(evaluator);
