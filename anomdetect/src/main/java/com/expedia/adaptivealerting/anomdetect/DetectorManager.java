@@ -120,6 +120,8 @@ public class DetectorManager {
         if (detector == null) {
             detector = detectorSource.findDetector(detectorUuid);
             cachedDetectors.put(detectorUuid, detector);
+        } else {
+            log.trace("Got cached detector");
         }
         return detector;
     }

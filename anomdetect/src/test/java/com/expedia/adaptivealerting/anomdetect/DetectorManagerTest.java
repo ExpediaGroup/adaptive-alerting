@@ -130,6 +130,16 @@ public final class DetectorManagerTest {
     }
 
     @Test
+    public void testClassify_getCached() {
+        managerUnderTest.classify(goodMappedMetricData);
+
+        // This one grabs the cached detector
+        // TODO Come up with some way to actually prove this. E.g. mock the cache and verify().
+        //  For now I just put a log.trace() in there. [WLW]
+        managerUnderTest.classify(goodMappedMetricData);
+    }
+
+    @Test
     public void testClassifyMetricThatCantBeFound() {
         val result = managerUnderTest.classify(badMappedMetricData);
         assertNull(result);
