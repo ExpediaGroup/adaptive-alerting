@@ -54,6 +54,8 @@ public class DetectorManager {
 
     private int detectorRefreshTimePeriod;
 
+    // TODO Consider making this an explicit class so we can mock it and verify interactions
+    //  against it. [WLW]
     private final Map<UUID, Detector> cachedDetectors = new HashMap<>();
 
     public DetectorManager(DetectorSource detectorSource, Config config) {
