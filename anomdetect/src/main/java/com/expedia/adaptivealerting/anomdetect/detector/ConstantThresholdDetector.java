@@ -25,7 +25,7 @@ import lombok.val;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
- * Anomaly detector with constant intervalForecast for weak and strong anomalies. Supports both one- and two-tailed tests.
+ * Anomaly detector with constant threshold for weak and strong anomalies. Supports both one- and two-tailed tests.
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

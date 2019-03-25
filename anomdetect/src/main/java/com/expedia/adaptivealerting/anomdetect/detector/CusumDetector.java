@@ -27,7 +27,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * <p>
- * Anomaly detector based on the cumulative sum. This is an online algorithm, meaning that it updates the intervalForecast
+ * Anomaly detector based on the cumulative sum. This is an online algorithm, meaning that it updates the threshold
  * incrementally as new data comes in.
  * </p>
  * <p>
