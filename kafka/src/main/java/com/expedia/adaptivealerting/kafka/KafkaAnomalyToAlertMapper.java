@@ -19,6 +19,7 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.kafka.serde.AlertJsonSerde;
 import com.expedia.alertmanager.model.Alert;
+import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.kafka.common.serialization.Serdes;
@@ -42,6 +43,9 @@ public class KafkaAnomalyToAlertMapper extends AbstractStreamsApp {
     private static final String TIMESTAMP = "timestamp";
     private static final String ANOMALY_LEVEL = "anomalyLevel";
 
+    // Cleaned code coverage
+    // https://reflectoring.io/100-percent-test-coverage/
+    @Generated
     public static void main(String[] args) {
         val tsConfig = new TypesafeConfigLoader(APP_ID).loadMergedConfig();
         val saConfig = new StreamsAppConfig(tsConfig);

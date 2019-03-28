@@ -16,11 +16,15 @@
 package com.expedia.adaptivealerting.anomdetect.forecast.interval;
 
 import lombok.val;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class IntervalForecastTest {
 
     @Test
+    @Ignore
+    // See https://reflectoring.io/jacoco/ for a better solution
+    // The approach below creates more test code to manage
     public void coverageOnly() {
         val intervalForecast = new IntervalForecast();
         intervalForecast.setUpperStrong(100.0);
