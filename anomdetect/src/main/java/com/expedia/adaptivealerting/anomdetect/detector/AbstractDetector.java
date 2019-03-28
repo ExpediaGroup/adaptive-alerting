@@ -55,7 +55,18 @@ public abstract class AbstractDetector<T extends DetectorParams> implements Dete
         this.uuid = uuid;
         this.params = params;
         this.anomalyType = anomalyType;
+
+        initComponents(params);
         initState(params);
+    }
+
+    /**
+     * Initialize components. Subclasses can implement this as needed.
+     *
+     * @param params detector params
+     */
+    protected void initComponents(T params) {
+        // Override as desired
     }
 
     /**

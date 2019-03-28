@@ -17,6 +17,8 @@ package com.expedia.adaptivealerting.anomdetect.forecast.point;
 
 import com.expedia.adaptivealerting.anomdetect.comp.AnomalyClassifier;
 import com.expedia.adaptivealerting.anomdetect.detector.AbstractDetector;
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecast;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.metrics.MetricData;
@@ -26,7 +28,6 @@ import lombok.Getter;
 import lombok.val;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
-import static java.lang.Math.sqrt;
 
 // TODO Add model warmup param and anomaly level. See e.g. CUSUM, Individuals, PEWMA. [WLW]
 
@@ -52,20 +53,27 @@ import static java.lang.Math.sqrt;
 @EqualsAndHashCode(callSuper = true)
 public final class EwmaDetector extends AbstractDetector<EwmaParams> {
 
+    // TODO Temporarily using an internal interval forecaster. Will externalize this shortly. [WLW]
+    private ExponentialWelfordIntervalForecaster intervalForecaster;
+
     /**
      * Mean estimate.
      */
     @Getter
     private double mean = 0.0;
 
-    /**
-     * Variance estimate.
-     */
-    @Getter
-    private double variance = 0.0;
-
     public EwmaDetector() {
         super(EwmaParams.class);
+    }
+
+    @Override
+    protected void initComponents(EwmaParams params) {
+        val welfordParams = new ExponentialWelfordIntervalForecaster.Params()
+                .setAlpha(params.getAlpha())
+                .setInitVarianceEstimate(0.0)
+                .setWeakSigmas(params.getWeakSigmas())
+                .setStrongSigmas(params.getStrongSigmas());
+        this.intervalForecaster = new ExponentialWelfordIntervalForecaster(welfordParams);
     }
 
     @Override
@@ -73,26 +81,20 @@ public final class EwmaDetector extends AbstractDetector<EwmaParams> {
         this.mean = params.getInitMeanEstimate();
     }
 
+    public double getVariance() {
+        return intervalForecaster.getVariance();
+    }
+
     @Override
     public AnomalyResult classify(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
 
-        val params = getParams();
-
         val observed = metricData.getValue();
-        val stdDev = sqrt(this.variance);
-        val weakDelta = params.getWeakSigmas() * stdDev;
-        val strongDelta = params.getStrongSigmas() * stdDev;
-
-        val thresholds = new AnomalyThresholds(
-                this.mean + strongDelta,
-                this.mean + weakDelta,
-                this.mean - weakDelta,
-                this.mean - strongDelta);
+        val intervalForecast = intervalForecaster.forecast(metricData, mean);
+        val thresholds = toAnomalyThresholds(intervalForecast);
+        val level = new AnomalyClassifier(getAnomalyType()).classify(thresholds, observed);
 
         updateEstimates(observed);
-
-        val level = new AnomalyClassifier(getAnomalyType()).classify(thresholds, observed);
 
         val result = new AnomalyResult(level);
         result.setPredicted(this.mean);
@@ -100,18 +102,20 @@ public final class EwmaDetector extends AbstractDetector<EwmaParams> {
         return result;
     }
 
+    private AnomalyThresholds toAnomalyThresholds(IntervalForecast intervalForecast) {
+        return new AnomalyThresholds(
+                intervalForecast.getUpperStrong(),
+                intervalForecast.getUpperWeak(),
+                intervalForecast.getLowerWeak(),
+                intervalForecast.getLowerStrong());
+    }
+
     private void updateEstimates(double value) {
-        val params = getParams();
 
         // https://en.wikipedia.org/wiki/Moving_average#Exponentially_weighted_moving_variance_and_standard_deviation
         // http://people.ds.cam.ac.uk/fanf2/hermes/doc/antiforgery/stats.pdf
         val diff = value - this.mean;
-        val incr = params.getAlpha() * diff;
+        val incr = getParams().getAlpha() * diff;
         this.mean += incr;
-
-        // Welford's algorithm for computing the variance online
-        // https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Online_algorithm
-        // https://www.johndcook.com/blog/2008/09/26/comparing-three-methods-of-computing-standard-deviation/
-        this.variance = (1.0 - params.getAlpha()) * (this.variance + diff * incr);
     }
 }

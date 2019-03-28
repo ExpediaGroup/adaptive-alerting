@@ -15,9 +15,17 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.interval;
 
-import com.expedia.metrics.MetricData;
+import lombok.val;
+import org.junit.Test;
 
-public interface IntervalForecaster {
+public class IntervalForecastTest {
 
-    IntervalForecast forecast(MetricData metricData, double pointForecast);
+    @Test
+    public void coverageOnly() {
+        val intervalForecast = new IntervalForecast();
+        intervalForecast.setUpperStrong(100.0);
+        intervalForecast.setUpperWeak(90.0);
+        intervalForecast.setLowerWeak(20.0);
+        intervalForecast.setLowerStrong(10.0);
+    }
 }
