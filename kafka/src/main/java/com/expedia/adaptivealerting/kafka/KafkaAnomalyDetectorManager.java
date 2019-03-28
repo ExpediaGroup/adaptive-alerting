@@ -20,6 +20,7 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.core.util.ErrorUtil;
 import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
+import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.kafka.streams.StreamsBuilder;
@@ -44,6 +45,9 @@ public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
 
     private final DetectorManager manager;
 
+    // Cleaned code coverage
+    // https://reflectoring.io/100-percent-test-coverage/
+    @Generated
     public static void main(String[] args) {
         val config = new TypesafeConfigLoader(CK_AD_MANAGER).loadMergedConfig();
         val saConfig = new StreamsAppConfig(config);

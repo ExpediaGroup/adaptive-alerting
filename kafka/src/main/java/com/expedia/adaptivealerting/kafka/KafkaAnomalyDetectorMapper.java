@@ -20,6 +20,7 @@ import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde;
 import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
 import com.expedia.metrics.MetricData;
+import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.kafka.common.serialization.Serde;
@@ -48,6 +49,9 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
     private Serde<String> outputKeySerde = new Serdes.StringSerde();
     private Serde<MappedMetricData> outputValueSerde = new MappedMetricDataJsonSerde();
 
+    // Cleaned code coverage
+    // https://reflectoring.io/100-percent-test-coverage/
+    @Generated
     public static void main(String[] args) {
         val config = new TypesafeConfigLoader(CK_AD_MAPPER).loadMergedConfig();
         val saConfig = new StreamsAppConfig(config);

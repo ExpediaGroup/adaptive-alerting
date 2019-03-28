@@ -15,12 +15,16 @@
  */
 package com.expedia.adaptivealerting.kafka;
 
+import lombok.Generated;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class KafkaNotifier {
 
+    // Cleaned code coverage
+    // https://reflectoring.io/100-percent-test-coverage/
+    @Generated
     public static void main(String[] args) {
         SpringApplication.run(KafkaNotifier.class, args);
     }

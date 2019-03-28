@@ -24,6 +24,7 @@ import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.metrictank.MetricTankIdFactory;
 import com.typesafe.config.Config;
+import lombok.Generated;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -66,6 +67,9 @@ public class KafkaAnomalyToMetricMapper implements Runnable {
     @Getter
     private String metricTopic;
 
+    // Cleaned code coverage
+    // https://reflectoring.io/100-percent-test-coverage/
+    @Generated
     public static void main(String[] args) {
         // TODO Refactor the loader such that it's not tied to Kafka Streams. [WLW]
         buildMapper(new TypesafeConfigLoader(APP_ID).loadMergedConfig()).run();
