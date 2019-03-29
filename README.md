@@ -4,7 +4,7 @@
 
 # Adaptive Alerting (AA)
 
-Streaming anomaly detection with automated model selection and autotuning.
+Streaming anomaly detection with automated model selection and fitting.
 
 [Wiki documentation](https://github.com/ExpediaDotCom/adaptive-alerting/wiki)
 
