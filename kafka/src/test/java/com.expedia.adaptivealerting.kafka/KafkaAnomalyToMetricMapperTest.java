@@ -131,7 +131,7 @@ public final class KafkaAnomalyToMetricMapperTest {
     }
 
     @Test
-    public void testRunSkipsUnmappedAnomalies() throws Exception {
+    public void testRun_unmappedAnomalies() throws Exception {
         val unmapped = new ArrayList<MappedMetricData>();
         unmapped.add(TestObjectMother.mappedMetricData(AnomalyLevel.NORMAL));
         unmapped.add(TestObjectMother.mappedMetricData(AnomalyLevel.MODEL_WARMUP));
