@@ -143,12 +143,8 @@ public class KafkaAnomalyToMetricMapper implements Runnable {
             if (anomalyLevel == AnomalyLevel.WEAK || anomalyLevel == AnomalyLevel.STRONG) {
                 val metricDataRecord = toMetricDataRecord(anomalyRecord);
                 if (metricDataRecord != null) {
-                    try {
-                        metricProducer.send(metricDataRecord);
-                        log.info("Sent: metricDataRecord={}", metricDataRecord);
-                    } catch (RuntimeException e) {
-                        log.error("Failed to send: metricDataRecord={}, exception={}", metricDataRecord, e.toString());
-                    }
+                    metricProducer.send(metricDataRecord);
+                    log.info("Sent: metricDataRecord={}", metricDataRecord);
                     numProduced++;
                 }
             }
