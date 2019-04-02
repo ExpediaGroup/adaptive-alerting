@@ -143,7 +143,12 @@ public class KafkaAnomalyToMetricMapper implements Runnable {
             if (anomalyLevel == AnomalyLevel.WEAK || anomalyLevel == AnomalyLevel.STRONG) {
                 val metricDataRecord = toMetricDataRecord(anomalyRecord);
                 if (metricDataRecord != null) {
-                    metricProducer.send(metricDataRecord);
+                    try {
+                        metricProducer.send(metricDataRecord);
+                        log.info("Sent: metricDataRecord={}", metricDataRecord);
+                    } catch (RuntimeException e) {
+                        log.error("Failed to send: metricDataRecord={}, exception={}", metricDataRecord, e.toString());
+                    }
                     numProduced++;
                 }
             }
@@ -183,7 +188,6 @@ public class KafkaAnomalyToMetricMapper implements Runnable {
             return null;
         }
 
-        log.info("produced={}", newMetricData);
         return new ProducerRecord<>(metricTopic, null, timestampMillis, newMetricId, newMetricData);
     }
 
