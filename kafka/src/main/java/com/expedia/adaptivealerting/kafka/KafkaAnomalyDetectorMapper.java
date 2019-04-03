@@ -15,8 +15,11 @@
  */
 package com.expedia.adaptivealerting.kafka;
 
+import com.codahale.metrics.MetricRegistry;
 import com.expedia.adaptivealerting.anomdetect.DetectorMapper;
+import com.expedia.adaptivealerting.anomdetect.mapper.MapperResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.adaptivealerting.kafka.processor.MetricDataTransformerSupplier;
 import com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde;
 import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
 import com.expedia.metrics.MetricData;
@@ -30,6 +33,9 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Produced;
+import org.apache.kafka.streams.state.KeyValueStore;
+import org.apache.kafka.streams.state.StoreBuilder;
+import org.apache.kafka.streams.state.Stores;
 
 import java.util.stream.Collectors;
 
@@ -42,6 +48,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @Slf4j
 public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
     private static final String CK_AD_MAPPER = "ad-mapper";
+    private static final String stateStoreName = "es-request-buffer";
 
     private final DetectorMapper mapper;
 
@@ -56,7 +63,7 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
         val config = new TypesafeConfigLoader(CK_AD_MAPPER).loadMergedConfig();
         val saConfig = new StreamsAppConfig(config);
         val detectorSource = DetectorUtil.buildDetectorSource(config);
-        val mapper = new DetectorMapper(detectorSource);
+        val mapper = new DetectorMapper(new MetricRegistry(), detectorSource);
         new KafkaAnomalyDetectorMapper(saConfig, mapper).start();
     }
 
@@ -80,27 +87,30 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
         log.info("Initializing: inputTopic={}, outputTopic={}", inputTopic, outputTopic);
 
         val builder = new StreamsBuilder();
+
+        // create store
+        StoreBuilder<KeyValueStore<String, MappedMetricData>> keyValueStoreBuilder =
+                Stores.keyValueStoreBuilder(Stores.inMemoryKeyValueStore(stateStoreName),
+                        Serdes.String(),
+                        new MappedMetricDataJsonSerde())
+                        .withLoggingDisabled();
+        // register store
+        builder.addStateStore(keyValueStoreBuilder);
+
         final KStream<String, MetricData> stream = builder.stream(inputTopic);
         stream
                 .filter((key, md) -> md != null)
+                .transform(new MetricDataTransformerSupplier(mapper, stateStoreName), stateStoreName)
                 .flatMap(this::metricsByDetector)
                 .to(outputTopic, Produced.with(outputKeySerde, outputValueSerde));
         return builder.build();
     }
 
-    private Iterable<? extends KeyValue<String, MappedMetricData>> metricsByDetector(
-            String key,
-            MetricData metricData) {
 
-        assert metricData != null;
-
-        val mmdSet = mapper.map(metricData);
-        return mmdSet.stream()
-                .map(mmd -> {
-                    log.info("produced={}", mmd);
-                    val newKey = mmd.getDetectorUuid().toString();
-                    return KeyValue.pair(newKey, mmd);
-                })
+    private Iterable<? extends KeyValue<String, MappedMetricData>> metricsByDetector(String key, MapperResult mmRes) {
+        assert mmRes != null;
+        return mmRes.getMatchingUuids().stream()
+                .map(uuid -> KeyValue.pair(uuid.toString(), new MappedMetricData(mmRes.getMetricData(), uuid.getId())))
                 .collect(Collectors.toSet());
     }
 }

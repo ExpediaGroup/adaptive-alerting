@@ -20,6 +20,7 @@ import com.expedia.adaptivealerting.anomdetect.DetectorException;
 import com.expedia.adaptivealerting.anomdetect.DetectorMapper;
 import com.expedia.adaptivealerting.anomdetect.DetectorNotFoundException;
 import com.expedia.adaptivealerting.anomdetect.DetectorRetrievalException;
+import com.expedia.adaptivealerting.anomdetect.mapper.es.ESMatchingDetectorsResponse;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.metrictank.MetricTankIdFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,6 +29,9 @@ import lombok.val;
 import org.apache.http.client.fluent.Content;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
@@ -180,4 +184,11 @@ public class ModelServiceConnector {
         }
 
     }
+
+
+    public ESMatchingDetectorsResponse findMatchingDetectorMappings(List<Map<String, String>> tagsList){
+        //TODO
+        return new ESMatchingDetectorsResponse(Collections.emptyList(),0);
+    }
+
 }
