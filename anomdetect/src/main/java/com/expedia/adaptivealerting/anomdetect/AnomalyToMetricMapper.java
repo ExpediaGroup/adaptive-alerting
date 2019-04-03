@@ -85,7 +85,7 @@ public class AnomalyToMetricMapper {
         // TODO This is temporary diagnostic code. Some but not all anomaly series are showing up in Grafana, and I'm
         //  testing whether this is because the high volume anomalies are causing the lower-volume anomalies to be
         //  dropped. (The lower volume anomalies used to show up in Grafana.) [WLW]
-        if (!"1ab7c71a-3574-a798-8422-c7fe67364001".equals(detectorUuid)) {
+        if (!"1ab7c71a-3574-a798-8422-c7fe67364001".equals(detectorUuid.toString())) {
             return null;
         }
 
