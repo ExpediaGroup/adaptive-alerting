@@ -21,10 +21,10 @@ public class ObjectMother {
 
     public GraphiteResult[] getGraphiteData() {
         String[][] datapoints = new String[2][2];
-        datapoints[0][0] = "78.0";
-        datapoints[0][1] = "1548829800";
-        datapoints[1][0] = "81.0";
-        datapoints[1][1] = "1548830400";
+        datapoints[0][0] = String.valueOf(78.0);
+        datapoints[0][1] = String.valueOf(1548829800);
+        datapoints[1][0] = String.valueOf(81.0);
+        datapoints[1][1] = String.valueOf(1548830400);
 
         GraphiteResult[] results = new GraphiteResult[1];
         GraphiteResult result = new GraphiteResult();
