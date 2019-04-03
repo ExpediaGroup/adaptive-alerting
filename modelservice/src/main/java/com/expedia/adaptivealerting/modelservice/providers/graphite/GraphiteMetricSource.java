@@ -40,18 +40,19 @@ public class GraphiteMetricSource implements MetricSource {
 
         GraphiteProperties props = BeanUtil.getBean(GraphiteProperties.class);
         Map<String, Object> params = Collections.singletonMap("tags", metricTags);
-        GraphiteResult graphiteResult[] = restTemplate.getForObject(props.getUrlTemplate(), GraphiteResult[].class, params);
-
-        String[][] dataPoints = graphiteResult[0].getDatapoints();
+        GraphiteResult[] graphiteResult = restTemplate.getForObject(props.getUrlTemplate(), GraphiteResult[].class, params);
         List<MetricSourceResult> results = new ArrayList<>();
-        for (String[] dataPoint : dataPoints) {
-            Double dataPointValue = 0.0;
-            long epochSeconds = Long.parseLong(dataPoint[1]);
-            if (dataPoint[0] != null) {
-                dataPointValue = Double.parseDouble(dataPoint[0]);
+        if (graphiteResult.length != 0) {
+            String[][] dataPoints = graphiteResult[0].getDatapoints();
+            for (String[] dataPoint : dataPoints) {
+                Double dataPointValue = 0.0;
+                long epochSeconds = Long.parseLong(dataPoint[1]);
+                if (dataPoint[0] != null) {
+                    dataPointValue = Double.parseDouble(dataPoint[0]);
+                }
+                MetricSourceResult result = new MetricSourceResult(dataPointValue, epochSeconds);
+                results.add(result);
             }
-            MetricSourceResult result = new MetricSourceResult(dataPointValue, epochSeconds);
-            results.add(result);
         }
         return results;
     }
