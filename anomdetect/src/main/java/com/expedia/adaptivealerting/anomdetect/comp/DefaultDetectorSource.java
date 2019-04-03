@@ -20,6 +20,7 @@ import com.expedia.adaptivealerting.anomdetect.detector.ConstantThresholdParams;
 import com.expedia.adaptivealerting.anomdetect.detector.CusumParams;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
 import com.expedia.adaptivealerting.anomdetect.detector.DetectorParams;
+import com.expedia.adaptivealerting.anomdetect.mapper.es.ESMatchingDetectorsResponse;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
 import com.expedia.metrics.MetricDefinition;
@@ -29,9 +30,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -88,6 +87,11 @@ public class DefaultDetectorSource implements DetectorSource {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public ESMatchingDetectorsResponse findMatchingDetectorMappings(List<Map<String, String>> metricTags){
+        // TODO implement
+        return null;
+    }
 
     // ================================================================================
     // Legacy
