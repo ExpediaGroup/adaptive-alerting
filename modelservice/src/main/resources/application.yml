@@ -33,6 +33,8 @@ management:
       tomcat: false
       system: false
       process: false
+graphite:
+  urlTemplate: "https://graphite/render?from=-24hours&format=json&maxDataPoints=144&target={target}"
 security:
   clientId: "id"
   secret: "secret"
