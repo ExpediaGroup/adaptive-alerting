@@ -30,7 +30,6 @@ import lombok.val;
 @Slf4j
 public final class DetectorUtil {
     private static final String CK_MODEL_SERVICE_URI_TEMPLATE = "model-service-base-uri";
-    public static final String DELIMITER = "=";
 
     public static DetectorSource buildDetectorSource(Config config) {
         val uriTemplate = config.getString(CK_MODEL_SERVICE_URI_TEMPLATE);

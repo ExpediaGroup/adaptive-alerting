@@ -66,7 +66,7 @@ public final class DetectorMapperTest {
         assertSame(detectorSource, mapper.getDetectorSource());
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test(expected = AssertionError.class)
     public void testModelServiceConnectorNotNull() {
         new DetectorMapper(null);
     }
