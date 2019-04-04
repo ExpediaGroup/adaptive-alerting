@@ -15,9 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.codahale.metrics.Counter;
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.MetricRegistry;
+
 import com.expedia.adaptivealerting.anomdetect.comp.DetectorSource;
 import com.expedia.adaptivealerting.anomdetect.mapper.CacheUtil;
 import com.expedia.adaptivealerting.anomdetect.mapper.Detector;
@@ -29,11 +27,16 @@ import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.metrics.MetricData;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Metrics;
+import lombok.Getter;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -47,24 +50,29 @@ public class DetectorMapper {
 
     private Counter cacheHit;
     private Counter cacheMiss;
-    private Meter cacheSize;
-    private Meter indexSize;
+    private AtomicLong cacheSize;
+    private AtomicLong indexSize;
     private Cache<String, String> cache;
     //TODO - need to handle this better instead of using a variable
     private long lastElasticLookUpLatency = -1;
+    @Getter
+    @NonNull
     private DetectorSource detectorSource;
 
 
-    public DetectorMapper(MetricRegistry metricRegistry, DetectorSource detectorSource) {
+    public DetectorMapper(DetectorSource detectorSource) {
+
+        assert detectorSource!=null;
+
         this.cache = CacheBuilder.newBuilder()
                 .expireAfterWrite(120, TimeUnit.MINUTES)
                 .build();
 
         this.detectorSource = detectorSource;
-        this.cacheSize = metricRegistry.meter("cache.size");
-        this.indexSize = metricRegistry.meter("index.size");
-        this.cacheHit = metricRegistry.counter("cache.hit");
-        this.cacheMiss = metricRegistry.counter("cache.miss");
+        this.cacheSize = Metrics.gauge("cache.size", new AtomicLong(0));
+        this.indexSize = Metrics.gauge("index.size", new AtomicLong(0));
+        this.cacheHit = Metrics.counter("cache.hit");
+        this.cacheMiss = Metrics.counter("cache.miss");
     }
 
     public List<Detector> getDetectorsFromCache(MetricData metricData) {
@@ -75,9 +83,9 @@ public class DetectorMapper {
         String cachedDetectorIdsString = cache.getIfPresent(cacheKey);
 
         if (cachedDetectorIdsString == null) {
-            this.cacheMiss.inc();
+            this.cacheMiss.increment();
         } else {
-            this.cacheHit.inc();
+            this.cacheHit.increment();
             detectors = CacheUtil.buildDetectors(cachedDetectorIdsString);
         }
 
@@ -125,7 +133,7 @@ public class DetectorMapper {
             });
 
             Set<Integer> searchIndexes = groupedDetectorsByIndex.keySet();
-            indexSize.mark(searchIndexes.size());
+            indexSize.set(searchIndexes.size());
 
 //For metrics with no matching detectors, set matching detectors to empty in cache to avoid repeated cache miss
             final AtomicInteger i = new AtomicInteger(0);
@@ -143,7 +151,7 @@ public class DetectorMapper {
             isSuccessFull = false;
         }
 
-        this.cacheSize.mark(cache.size());
+        this.cacheSize.set(cache.size());
         return isSuccessFull;
     }
 

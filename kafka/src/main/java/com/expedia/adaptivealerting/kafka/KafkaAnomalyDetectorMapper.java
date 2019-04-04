@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.kafka;
 
-import com.codahale.metrics.MetricRegistry;
 import com.expedia.adaptivealerting.anomdetect.DetectorMapper;
 import com.expedia.adaptivealerting.anomdetect.mapper.MapperResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
@@ -63,7 +62,7 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
         val config = new TypesafeConfigLoader(CK_AD_MAPPER).loadMergedConfig();
         val saConfig = new StreamsAppConfig(config);
         val detectorSource = DetectorUtil.buildDetectorSource(config);
-        val mapper = new DetectorMapper(new MetricRegistry(), detectorSource);
+        val mapper = new DetectorMapper(detectorSource);
         new KafkaAnomalyDetectorMapper(saConfig, mapper).start();
     }
 
