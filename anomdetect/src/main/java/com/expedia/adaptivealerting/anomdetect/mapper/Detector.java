@@ -17,11 +17,13 @@ package com.expedia.adaptivealerting.anomdetect.mapper;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class Detector {
     private UUID id;
 }

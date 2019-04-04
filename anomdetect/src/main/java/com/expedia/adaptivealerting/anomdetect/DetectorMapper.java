@@ -90,7 +90,6 @@ public class DetectorMapper {
         }
 
         return detectors;
-
     }
 
     /**
