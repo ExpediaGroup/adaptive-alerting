@@ -82,13 +82,6 @@ public class AnomalyToMetricMapper {
         assert (detectorUuid != null);
         assert (anomalyLevel != null);
 
-        // TODO This is temporary diagnostic code. Some but not all anomaly series are showing up in Grafana, and I'm
-        //  testing whether this is because the high volume anomalies are causing the lower-volume anomalies to be
-        //  dropped. (The lower volume anomalies used to show up in Grafana.) [WLW]
-        if (!"1ab7c71a-3574-a798-8422-c7fe67364001".equals(detectorUuid.toString())) {
-            return null;
-        }
-
         val newKVTags = new HashMap<>(kvTags);
         newKVTags.put(AA_DETECTOR_UUID, detectorUuid.toString());
         newKVTags.put(AA_ANOMALY_LEVEL, anomalyLevel.toString());

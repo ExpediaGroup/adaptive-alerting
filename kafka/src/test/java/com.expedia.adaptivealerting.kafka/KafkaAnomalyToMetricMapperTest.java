@@ -34,7 +34,6 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -48,7 +47,6 @@ import static org.junit.Assert.assertNotNull;
  * {@link KafkaAnomalyToMetricMapper} unit test.
  */
 @Slf4j
-@Ignore
 public final class KafkaAnomalyToMetricMapperTest {
 
     // Anomaly consumer
