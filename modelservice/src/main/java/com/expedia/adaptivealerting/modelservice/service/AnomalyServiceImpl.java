@@ -18,13 +18,11 @@ package com.expedia.adaptivealerting.modelservice.service;
 import com.expedia.adaptivealerting.anomdetect.detector.*;
 import com.expedia.adaptivealerting.anomdetect.comp.DetectorLookup;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.adaptivealerting.core.util.MetricUtil;
-import com.expedia.adaptivealerting.core.util.ReflectionUtil;
 import com.expedia.adaptivealerting.modelservice.spi.*;
+import com.expedia.adaptivealerting.modelservice.util.DetectorUtil;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -32,8 +30,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * Service to fetch anomalies for a given metric and detector.
@@ -58,7 +54,7 @@ public class AnomalyServiceImpl implements AnomalyService {
         ((List<MetricSource>) metricSources)
                 .forEach(metricSource -> {
                     List<MetricSourceResult> results = metricSource.getMetricData(request.getMetricTags());
-                    Detector detector = getDetector(request.getDetectorType(), request.getDetectorParams());
+                    Detector detector = DetectorUtil.getDetector(request.getDetectorType(), request.getDetectorParams());
                     for (MetricSourceResult result : results) {
                         MetricData metricData = toMetricData(result);
                         AnomalyResult anomalyResult = detector.classify(metricData);
@@ -68,29 +64,8 @@ public class AnomalyServiceImpl implements AnomalyService {
         return anomalyResults;
     }
 
-    private Detector getDetector(String detectorType, Map paramsMap) {
-        Class<? extends Detector> detectorClass = detectorLookup.getDetector(detectorType);
-        AbstractDetector detector = (AbstractDetector) ReflectionUtil.newInstance(detectorClass);
-        Class<? extends DetectorParams> paramsClass = detector.getParamsClass();
-        DetectorParams params = (DetectorParams) new ObjectMapper().convertValue(paramsMap, paramsClass);
-        detector.init(UUID.randomUUID(), params, doLegacyGetAnomalyType(params));
-        return detector;
-    }
-
     private MetricData toMetricData(MetricSourceResult result) {
         MetricDefinition metricDefinition = MetricUtil.metricDefinition(null, null);
         return MetricUtil.metricData(metricDefinition, result.getDataPoint(), result.getEpochSecond());
-    }
-
-    private AnomalyType doLegacyGetAnomalyType(DetectorParams params) {
-        Class<? extends DetectorParams> paramsClass = params.getClass();
-
-        if (ConstantThresholdParams.class.equals(paramsClass)) {
-            return ((ConstantThresholdParams) params).getType();
-        } else if (CusumParams.class.equals(paramsClass)) {
-            return ((CusumParams) params).getType();
-        } else {
-            return AnomalyType.TWO_TAILED;
-        }
     }
 }
