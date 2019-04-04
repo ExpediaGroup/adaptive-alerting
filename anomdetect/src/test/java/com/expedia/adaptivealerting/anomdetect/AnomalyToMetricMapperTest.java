@@ -22,7 +22,6 @@ import com.expedia.adaptivealerting.core.util.MetricUtil;
 import com.expedia.metrics.MetricDefinition;
 import lombok.val;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.UUID;
@@ -42,9 +41,7 @@ public class AnomalyToMetricMapperTest {
         initTestObjects();
     }
 
-    // FIXME Remove @Ignore after completing my diagnostic test. [WLW]
     @Test
-    @Ignore
     public void testToMetricData_stringMetricKey() {
         val actualMetric = mapperUnderTest.toMetricData(anomalyWithStringMetricKey);
         val actualMetricDef = actualMetric.getMetricDefinition();
