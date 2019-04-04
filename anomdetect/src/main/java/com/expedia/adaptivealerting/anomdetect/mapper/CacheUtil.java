@@ -48,7 +48,7 @@ public final class CacheUtil {
     public static String getDetectorIdsString(List<Detector> list) {
         List<String> result = new ArrayList<>();
         list.forEach(detector -> {
-            result.add(detector.getId().toString());
+            result.add(detector.getUuid().toString());
         });
         return String.join("|", result);
     }

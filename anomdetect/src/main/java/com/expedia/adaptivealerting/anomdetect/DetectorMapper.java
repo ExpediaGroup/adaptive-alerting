@@ -21,7 +21,7 @@ import com.expedia.adaptivealerting.anomdetect.mapper.CacheUtil;
 import com.expedia.adaptivealerting.anomdetect.mapper.Detector;
 import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMapping;
 import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMatchResponse;
-import com.expedia.adaptivealerting.anomdetect.mapper.es.ESMatchingDetectorsResponse;
+import com.expedia.adaptivealerting.anomdetect.mapper.es.MatchingDetectorsResponse;
 import com.expedia.adaptivealerting.anomdetect.mapper.es.ExpressionTree;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.metrics.MetricData;
@@ -54,7 +54,7 @@ public class DetectorMapper {
     private AtomicLong indexSize;
     private Cache<String, String> cache;
     //TODO - need to handle this better instead of using a variable
-    private long lastElasticLookUpLatency = -1;
+    private AtomicLong lastElasticLookUpLatency = new AtomicLong(-1);
     @Getter
     @NonNull
     private DetectorSource detectorSource;
@@ -80,13 +80,13 @@ public class DetectorMapper {
         List<Detector> detectors = new ArrayList<>();
 
         String cacheKey = CacheUtil.getKey(metricData.getMetricDefinition().getTags().getKv());
-        String cachedDetectorIdsString = cache.getIfPresent(cacheKey);
+        String bunchOfCachedDetectorIds = cache.getIfPresent(cacheKey);
 
-        if (cachedDetectorIdsString == null) {
+        if (bunchOfCachedDetectorIds == null) {
             this.cacheMiss.increment();
         } else {
             this.cacheHit.increment();
-            detectors = CacheUtil.buildDetectors(cachedDetectorIdsString);
+            detectors = CacheUtil.buildDetectors(bunchOfCachedDetectorIds);
         }
 
         return detectors;
@@ -108,18 +108,17 @@ public class DetectorMapper {
                 .collect(Collectors.toSet());
     }
 
-    public boolean fetchDetectorMapping(List<Map<String, String>> cacheMissedMetricTags) {
+    public boolean isSuccessfulDetetectorMappingLookup(List<Map<String, String>> cacheMissedMetricTags) {
 
-        boolean isSuccessFull;
         log.info("Mapping-Cache: lookup for {} metrics", cacheMissedMetricTags.size());
-        ESMatchingDetectorsResponse matchingDetectorMappings = detectorSource.findMatchingDetectorMappings(cacheMissedMetricTags);
+        MatchingDetectorsResponse matchingDetectorMappings = detectorSource.findMatchingDetectorMappings(cacheMissedMetricTags);
 
         if (matchingDetectorMappings != null) {
 
             DetectorMatchResponse response = process(matchingDetectorMappings);
 
-            lastElasticLookUpLatency = response.getLookupTimeInMillis();
-            Map<Integer, List<Detector>> groupedDetectorsByIndex = response.getGroupedDetectorsByIndex();
+            lastElasticLookUpLatency.set(response.getLookupTimeInMillis());
+            Map<Integer, List<Detector>> groupedDetectorsByIndex = response.getGroupedDetectorsBySearchIndex();
 
             //populate cache and result map
             groupedDetectorsByIndex.forEach((index, detectors) -> {
@@ -144,18 +143,15 @@ public class DetectorMapper {
                 i.incrementAndGet();
             });
 
-            isSuccessFull = true;
         } else {
-            lastElasticLookUpLatency = -2;
-            isSuccessFull = false;
+            lastElasticLookUpLatency.set(-2);
         }
-
         this.cacheSize.set(cache.size());
-        return isSuccessFull;
+        return matchingDetectorMappings != null;
     }
 
     //TODO move this to modelService  DetectorMatchResponse
-    private DetectorMatchResponse process(ESMatchingDetectorsResponse res) {
+    private DetectorMatchResponse process(MatchingDetectorsResponse res) {
         Map<Integer, List<Detector>> groupedDetectorsByIndex = new HashMap<>();
         log.info("Mapping-Cache: found {} matching mappings", res.getDetectorMappings().size());
         res.getDetectorMappings().forEach(detectorMapping -> {
@@ -171,9 +167,9 @@ public class DetectorMapper {
         return new DetectorMatchResponse(groupedDetectorsByIndex, res.getLookupTimeInMillis());
     }
 
-    //TODO - need to improve this
+    //TODO - make batch size configureable
     public int optimalBatchSize() {
-        if (lastElasticLookUpLatency == -1 || lastElasticLookUpLatency > 100) {
+        if (lastElasticLookUpLatency.longValue() == -1 || lastElasticLookUpLatency.longValue() > 100) {
             return 80;
         }
         return 0;
@@ -186,7 +182,7 @@ public class DetectorMapper {
 
         this.cache.asMap().entrySet().forEach(mapping -> {
             disabledDetectorMappings.forEach(disabledDetectorMapping -> {
-                if (mapping.getValue().contains(disabledDetectorMapping.getDetector().getId().toString())) {
+                if (mapping.getValue().contains(disabledDetectorMapping.getDetector().getUuid().toString())) {
                     mappingsWhichNeedsAnUpdate.put(mapping.getKey(), mapping.getValue());
                 }
             });
@@ -211,7 +207,7 @@ public class DetectorMapper {
 
     private List<UUID> getDetectorIds(List<DetectorMapping> disabledDetectorMappings) {
         return disabledDetectorMappings
-                .stream().map(detectorMapping -> detectorMapping.getDetector().getId())
+                .stream().map(detectorMapping -> detectorMapping.getDetector().getUuid())
                 .collect(Collectors.toList());
     }
 
@@ -240,7 +236,7 @@ public class DetectorMapper {
         log.info("invalidating cache entries: {} for input : {}",
                 Arrays.toString(matchingMappings.toArray()),
                 Arrays.toString(newDetectorMappings.stream()
-                        .map(mapping -> mapping.getDetector().getId().toString())
+                        .map(mapping -> mapping.getDetector().getUuid().toString())
                         .collect(Collectors.toList()).toArray()));
         //invalidate matches.
         cache.invalidateAll(matchingMappings);
@@ -249,7 +245,7 @@ public class DetectorMapper {
     private List<Map<String, String>> findTags(List<DetectorMapping> newDetectorMappings) {
         return newDetectorMappings.stream()
                 .map(detectorMapping ->
-                        findTagsFromDetectorMappingExpression(detectorMapping.getConditionExpression()))
+                        findTagsFromDetectorMappingExpression(detectorMapping.getExpression()))
                 .collect(Collectors.toList());
     }
 

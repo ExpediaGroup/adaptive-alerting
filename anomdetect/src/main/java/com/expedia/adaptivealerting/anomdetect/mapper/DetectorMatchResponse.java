@@ -27,6 +27,6 @@ import java.util.Map;
 @Data
 @AllArgsConstructor
 public class DetectorMatchResponse {
-    private Map<Integer, List<Detector>> groupedDetectorsByIndex;
+    private Map<Integer, List<Detector>> groupedDetectorsBySearchIndex;
     private long lookupTimeInMillis;
 }

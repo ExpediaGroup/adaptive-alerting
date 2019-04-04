@@ -23,7 +23,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class ESMatchingDetectorsResponse {
+public class MatchingDetectorsResponse {
     private List<DetectorMapping> detectorMappings;
     private long lookupTimeInMillis;
 }

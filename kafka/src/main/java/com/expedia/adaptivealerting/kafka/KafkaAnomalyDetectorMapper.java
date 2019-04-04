@@ -108,8 +108,8 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
 
     private Iterable<? extends KeyValue<String, MappedMetricData>> metricsByDetector(String key, MapperResult mmRes) {
         assert mmRes != null;
-        return mmRes.getMatchingUuids().stream()
-                .map(uuid -> KeyValue.pair(uuid.toString(), new MappedMetricData(mmRes.getMetricData(), uuid.getId())))
+        return mmRes.getMatchingDetectors().stream()
+                .map(detector -> KeyValue.pair(detector.getUuid().toString(), new MappedMetricData(mmRes.getMetricData(), detector.getUuid())))
                 .collect(Collectors.toSet());
     }
 }
