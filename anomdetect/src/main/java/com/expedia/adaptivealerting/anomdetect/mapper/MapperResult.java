@@ -33,6 +33,6 @@ public class MapperResult {
     private MetricData metricData;
     @NonNull
     @Getter
-    private List<Detector> matchingUuids;
+    private List<Detector> matchingDetectors;
 
 }

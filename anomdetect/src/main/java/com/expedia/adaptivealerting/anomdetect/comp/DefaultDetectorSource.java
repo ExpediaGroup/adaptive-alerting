@@ -20,7 +20,7 @@ import com.expedia.adaptivealerting.anomdetect.detector.ConstantThresholdParams;
 import com.expedia.adaptivealerting.anomdetect.detector.CusumParams;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
 import com.expedia.adaptivealerting.anomdetect.detector.DetectorParams;
-import com.expedia.adaptivealerting.anomdetect.mapper.es.ESMatchingDetectorsResponse;
+import com.expedia.adaptivealerting.anomdetect.mapper.es.MatchingDetectorsResponse;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
 import com.expedia.metrics.MetricDefinition;
@@ -88,7 +88,7 @@ public class DefaultDetectorSource implements DetectorSource {
     }
 
     @Override
-    public ESMatchingDetectorsResponse findMatchingDetectorMappings(List<Map<String, String>> metricTags){
+    public MatchingDetectorsResponse findMatchingDetectorMappings(List<Map<String, String>> metricTags){
         // TODO implement
         return null;
     }

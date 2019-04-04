@@ -25,5 +25,5 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Detector {
-    private UUID id;
+    private UUID uuid;
 }

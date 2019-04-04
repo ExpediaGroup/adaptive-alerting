@@ -30,7 +30,7 @@ import java.util.List;
 public class DetectorMapping {
     private String id;
     private Detector detector;
-    private ExpressionTree conditionExpression;
+    private ExpressionTree expression;
     private User user;
     private long lastModifiedTimeInMillis;
     private long createdTimeInMillis;

@@ -4,7 +4,7 @@ import com.expedia.adaptivealerting.anomdetect.comp.DetectorSource;
 import com.expedia.adaptivealerting.anomdetect.mapper.CacheUtil;
 import com.expedia.adaptivealerting.anomdetect.mapper.Detector;
 import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMapping;
-import com.expedia.adaptivealerting.anomdetect.mapper.es.ESMatchingDetectorsResponse;
+import com.expedia.adaptivealerting.anomdetect.mapper.es.MatchingDetectorsResponse;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.TagCollection;
@@ -70,14 +70,14 @@ public class DetectorMapperWithCacheTest {
                 });
 
 
-        ESMatchingDetectorsResponse detectorMatchResponse = new ESMatchingDetectorsResponse(detectorMappings, System.currentTimeMillis());
+        MatchingDetectorsResponse detectorMatchResponse = new MatchingDetectorsResponse(detectorMappings, System.currentTimeMillis());
         Mockito.when(detectorSource.findMatchingDetectorMappings(listOfMetricTags)).thenReturn(detectorMatchResponse);
     }
 
     @Test
     public void testDoCacheLookupAndSendToOutputTopic() throws IOException {
         this.initDependencies();
-        detectorMapper.fetchDetectorMapping(listOfMetricTags);
+        detectorMapper.isSuccessfulDetetectorMappingLookup(listOfMetricTags);
 
         Map<String, List<Detector>> detectorResults = new HashMap<>();
 

@@ -20,7 +20,7 @@ import com.expedia.adaptivealerting.anomdetect.DetectorException;
 import com.expedia.adaptivealerting.anomdetect.DetectorMapper;
 import com.expedia.adaptivealerting.anomdetect.DetectorNotFoundException;
 import com.expedia.adaptivealerting.anomdetect.DetectorRetrievalException;
-import com.expedia.adaptivealerting.anomdetect.mapper.es.ESMatchingDetectorsResponse;
+import com.expedia.adaptivealerting.anomdetect.mapper.es.MatchingDetectorsResponse;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.metrictank.MetricTankIdFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -186,9 +186,9 @@ public class ModelServiceConnector {
     }
 
 
-    public ESMatchingDetectorsResponse findMatchingDetectorMappings(List<Map<String, String>> tagsList){
+    public MatchingDetectorsResponse findMatchingDetectorMappings(List<Map<String, String>> tagsList){
         //TODO
-        return new ESMatchingDetectorsResponse(Collections.emptyList(),0);
+        return new MatchingDetectorsResponse(Collections.emptyList(),0);
     }
 
 }
