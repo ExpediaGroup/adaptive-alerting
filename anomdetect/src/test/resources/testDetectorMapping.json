@@ -1,0 +1,30 @@
+[
+  {
+    "detector": {
+      "id": "2c49ba26-1a7d-43f4-b70c-c6644a2c1689",
+      "type": "constant-threshold"
+    },
+    "searchIndexes": [
+      0,
+      2
+    ]
+  },
+  {
+    "detector": {
+      "id": "5eaa54e9-7406-4a1d-bd9b-e055eca1a423",
+      "type": "constant-threshold"
+    },
+    "searchIndexes": [
+      4
+    ]
+  },
+  {
+    "detector": {
+      "id": "d86b798c-cfee-4a2c-a17a-aa2ba79ccf51",
+      "type": "constant-threshold"
+    },
+    "searchIndexes": [
+      1
+    ]
+  }
+]
