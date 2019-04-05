@@ -16,6 +16,8 @@
 package com.expedia.adaptivealerting.kafka.util;
 
 import com.expedia.adaptivealerting.anomdetect.comp.DefaultDetectorSource;
+import com.expedia.adaptivealerting.anomdetect.comp.DetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.comp.DetectorLookup;
 import com.expedia.adaptivealerting.anomdetect.comp.DetectorSource;
 import com.expedia.adaptivealerting.anomdetect.comp.connector.HttpClientWrapper;
 import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelServiceConnector;
@@ -34,6 +36,7 @@ public final class DetectorUtil {
     public static DetectorSource buildDetectorSource(Config config) {
         val uriTemplate = config.getString(CK_MODEL_SERVICE_URI_TEMPLATE);
         val connector = new ModelServiceConnector(new HttpClientWrapper(), uriTemplate, new ObjectMapper());
-        return new DefaultDetectorSource(connector);
+        val detectorFactory = new DetectorFactory(new DetectorLookup());
+        return new DefaultDetectorSource(connector, detectorFactory);
     }
 }

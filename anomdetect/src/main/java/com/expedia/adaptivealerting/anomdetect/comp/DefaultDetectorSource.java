@@ -16,14 +16,8 @@
 package com.expedia.adaptivealerting.anomdetect.comp;
 
 import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelServiceConnector;
-import com.expedia.adaptivealerting.anomdetect.detector.ConstantThresholdParams;
-import com.expedia.adaptivealerting.anomdetect.detector.CusumParams;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
-import com.expedia.adaptivealerting.anomdetect.detector.DetectorParams;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
-import com.expedia.adaptivealerting.core.util.ReflectionUtil;
 import com.expedia.metrics.MetricDefinition;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,10 +38,15 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @RequiredArgsConstructor
 @Slf4j
 public class DefaultDetectorSource implements DetectorSource {
+
+    // FIXME This is duplicated here and in the DetectorFactory. [WLW]
     private final DetectorLookup detectorLookup = new DetectorLookup();
 
     @NonNull
     private final ModelServiceConnector connector;
+
+    @NonNull
+    private final DetectorFactory detectorFactory;
 
     @Override
     public Set<String> findDetectorTypes() {
@@ -70,9 +69,13 @@ public class DefaultDetectorSource implements DetectorSource {
     public Detector findDetector(UUID uuid) {
         notNull(uuid, "uuid can't be null");
 
-        // TODO Currently we use a legacy process to find the detector. The legacy process couples point forecast algos
-        //  with interval forecast algos. We will decouple these shortly. [WLW]
-        return doLegacyFindDetector(uuid);
+        // TODO "Latest model" doesn't really make sense for the kind of detectors we load into the DetectorManager.
+        //  These are basic detectors backed by single statistical models, as opposed to being ML models that we have to
+        //  refresh/retrain periodically. So we probably want to simplify this by just collapsing the model concept into
+        //  the detector. [WLW]
+        val modelResource = connector.findLatestModel(uuid);
+
+        return detectorFactory.createLegacyDetector(uuid, modelResource);
     }
 
     @Override
@@ -86,46 +89,5 @@ public class DefaultDetectorSource implements DetectorSource {
                 .stream()
                 .map(resource -> UUID.fromString(resource.getUuid()))
                 .collect(Collectors.toList());
-    }
-
-
-    // ================================================================================
-    // Legacy
-    // ================================================================================
-
-    @Deprecated
-    private Detector doLegacyFindDetector(UUID uuid) {
-
-        // TODO "Latest model" doesn't really make sense for the kind of detectors we load into the DetectorManager.
-        //  These are basic detectors backed by single statistical models, as opposed to being ML models that we have to
-        //  refresh/retrain periodically. So we probably want to simplify this by just collapsing the model concept into
-        //  the detector. [WLW]
-        val model = connector.findLatestModel(uuid);
-
-        val detectorType = model.getDetectorType().getKey();
-        val detectorClass = detectorLookup.getDetector(detectorType);
-        val detector = ReflectionUtil.newInstance(detectorClass);
-        val paramsClass = detector.getParamsClass();
-        val params = (DetectorParams) new ObjectMapper().convertValue(model.getParams(), paramsClass);
-        val anomalyType = doLegacyGetAnomalyType(params);
-
-        detector.init(uuid, params, anomalyType);
-        log.info("Found detector: {}", detector);
-        return detector;
-    }
-
-    @Deprecated
-    private AnomalyType doLegacyGetAnomalyType(DetectorParams params) {
-        val paramsClass = params.getClass();
-
-        // TODO For now we simply reproduce current behavior, which is that only certain detectors support tails. Soon
-        //  we'll remove these hardcodes since all detectors will support tails.
-        if (ConstantThresholdParams.class.equals(paramsClass)) {
-            return ((ConstantThresholdParams) params).getType();
-        } else if (CusumParams.class.equals(paramsClass)) {
-            return ((CusumParams) params).getType();
-        } else {
-            return AnomalyType.TWO_TAILED;
-        }
     }
 }
