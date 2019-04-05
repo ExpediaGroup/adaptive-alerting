@@ -51,7 +51,6 @@ import static com.expedia.adaptivealerting.kafka.util.TestHelper.newMappedMetric
 @ContextConfiguration(initializers = {
         KafkaNotifierTest.ServiceDependencies.class
 })
-
 public class KafkaNotifierTest {
 
     @ClassRule

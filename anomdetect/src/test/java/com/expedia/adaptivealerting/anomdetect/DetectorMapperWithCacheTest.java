@@ -77,7 +77,7 @@ public class DetectorMapperWithCacheTest {
     @Test
     public void testDoCacheLookupAndSendToOutputTopic() throws IOException {
         this.initDependencies();
-        detectorMapper.isSuccessfulDetetectorMappingLookup(listOfMetricTags);
+        detectorMapper.isSuccessfulDetectorMappingLookup(listOfMetricTags);
 
         Map<String, List<Detector>> detectorResults = new HashMap<>();
 

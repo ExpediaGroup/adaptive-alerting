@@ -144,6 +144,7 @@ public class KafkaAnomalyToMetricMapper implements Runnable {
                 val metricDataRecord = toMetricDataRecord(anomalyRecord);
                 if (metricDataRecord != null) {
                     metricProducer.send(metricDataRecord);
+                    log.info("Sent: metricDataRecord={}", metricDataRecord);
                     numProduced++;
                 }
             }
@@ -183,7 +184,6 @@ public class KafkaAnomalyToMetricMapper implements Runnable {
             return null;
         }
 
-        log.info("produced={}", newMetricData);
         return new ProducerRecord<>(metricTopic, null, timestampMillis, newMetricId, newMetricData);
     }
 

@@ -45,19 +45,20 @@ public final class CacheUtil {
         return tags;
     }
 
-    public static String getDetectorIdsString(List<Detector> list) {
+    public static String getDetectorIds(List<Detector> detectors) {
         List<String> result = new ArrayList<>();
-        list.forEach(detector -> {
+        detectors.forEach(detector -> {
             result.add(detector.getUuid().toString());
         });
         return String.join("|", result);
     }
 
-    public static List<Detector> buildDetectors(String detectorIdsString) {
-        if (detectorIdsString == null || "".equals(detectorIdsString)) {
+    public static List<Detector> buildDetectors(String bunchOfDetectorIds) {
+        if (bunchOfDetectorIds == null || "".equals(bunchOfDetectorIds)) {
             return Collections.emptyList();
         }
-        String[] detectorList = detectorIdsString.split("\\|");
-        return Arrays.asList(detectorList).stream().map(dt -> new Detector(UUID.fromString(dt))).collect(Collectors.toList());
+        String[] detectorList = bunchOfDetectorIds.split("\\|");
+        return Arrays.asList(detectorList).stream().map(
+                detector -> new Detector(UUID.fromString(detector))).collect(Collectors.toList());
     }
 }

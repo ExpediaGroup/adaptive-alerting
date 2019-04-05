@@ -47,12 +47,8 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  */
 @Slf4j
 public class DetectorMapper {
-
-    private Counter cacheHit;
-    private Counter cacheMiss;
-    private AtomicLong cacheSize;
     private AtomicLong indexSize;
-    private Cache<String, String> cache;
+    private DetectorMapperCache cache;
     //TODO - need to handle this better instead of using a variable
     private AtomicLong lastElasticLookUpLatency = new AtomicLong(-1);
     @Getter
@@ -61,35 +57,15 @@ public class DetectorMapper {
 
 
     public DetectorMapper(DetectorSource detectorSource) {
-
         assert detectorSource!=null;
-
-        this.cache = CacheBuilder.newBuilder()
-                .expireAfterWrite(120, TimeUnit.MINUTES)
-                .build();
-
         this.detectorSource = detectorSource;
-        this.cacheSize = Metrics.gauge("cache.size", new AtomicLong(0));
         this.indexSize = Metrics.gauge("index.size", new AtomicLong(0));
-        this.cacheHit = Metrics.counter("cache.hit");
-        this.cacheMiss = Metrics.counter("cache.miss");
+        this.cache = new DetectorMapperCache();
     }
 
     public List<Detector> getDetectorsFromCache(MetricData metricData) {
-
-        List<Detector> detectors = new ArrayList<>();
-
         String cacheKey = CacheUtil.getKey(metricData.getMetricDefinition().getTags().getKv());
-        String bunchOfCachedDetectorIds = cache.getIfPresent(cacheKey);
-
-        if (bunchOfCachedDetectorIds == null) {
-            this.cacheMiss.increment();
-        } else {
-            this.cacheHit.increment();
-            detectors = CacheUtil.buildDetectors(bunchOfCachedDetectorIds);
-        }
-
-        return detectors;
+        return cache.get(cacheKey);
     }
 
     /**
@@ -108,7 +84,7 @@ public class DetectorMapper {
                 .collect(Collectors.toSet());
     }
 
-    public boolean isSuccessfulDetetectorMappingLookup(List<Map<String, String>> cacheMissedMetricTags) {
+    public boolean isSuccessfulDetectorMappingLookup(List<Map<String, String>> cacheMissedMetricTags) {
 
         log.info("Mapping-Cache: lookup for {} metrics", cacheMissedMetricTags.size());
         MatchingDetectorsResponse matchingDetectorMappings = detectorSource.findMatchingDetectorMappings(cacheMissedMetricTags);
@@ -124,9 +100,7 @@ public class DetectorMapper {
             groupedDetectorsByIndex.forEach((index, detectors) -> {
                 String cacheKey = CacheUtil.getKey(cacheMissedMetricTags.get(index));
                 if (!detectors.isEmpty()) {
-                    String detectorIdsString = CacheUtil.getDetectorIdsString(detectors);
-                    log.info("Updating cache with {} - {}", cacheKey, detectorIdsString);
-                    cache.put(cacheKey, detectorIdsString);
+                    cache.put(cacheKey, detectors);
                 }
             });
 
@@ -138,7 +112,7 @@ public class DetectorMapper {
             cacheMissedMetricTags.forEach(tags -> {
                 if (!searchIndexes.contains(i.get())) {
                     String cacheKey = CacheUtil.getKey(tags);
-                    cache.put(cacheKey, "");
+                    cache.put(cacheKey, Collections.EMPTY_LIST);
                 }
                 i.incrementAndGet();
             });
@@ -146,7 +120,6 @@ public class DetectorMapper {
         } else {
             lastElasticLookUpLatency.set(-2);
         }
-        this.cacheSize.set(cache.size());
         return matchingDetectorMappings != null;
     }
 
@@ -175,71 +148,19 @@ public class DetectorMapper {
         return 0;
     }
 
-    public void removeFromCache(List<DetectorMapping> disabledDetectorMappings) {
-        Map<String, String> modifiedDetectorMappings = new HashMap<>();
-
-        Map<String, String> mappingsWhichNeedsAnUpdate = new HashMap<>();
-
-        this.cache.asMap().entrySet().forEach(mapping -> {
-            disabledDetectorMappings.forEach(disabledDetectorMapping -> {
-                if (mapping.getValue().contains(disabledDetectorMapping.getDetector().getUuid().toString())) {
-                    mappingsWhichNeedsAnUpdate.put(mapping.getKey(), mapping.getValue());
-                }
-            });
-        });
-
-        mappingsWhichNeedsAnUpdate.entrySet().forEach(i -> {
-            mappingsWhichNeedsAnUpdate.entrySet().forEach(mapping -> {
-                String bunchOfUpdatedDetectorIds =
-                        removeDisabledDetectorIds(getDetectorIds(disabledDetectorMappings), mapping.getValue());
-                modifiedDetectorMappings.put(mapping.getKey(), bunchOfUpdatedDetectorIds);
-            });
-        });
-
-        log.info("removing mappings : {} from cache entries",
-                Arrays.toString(getDetectorIds(disabledDetectorMappings).toArray()));
-        modifiedDetectorMappings.entrySet().forEach(modifiedDetectorMapping -> {
-            log.info("cache key: {}, updated mapping {}", modifiedDetectorMapping.getKey(), modifiedDetectorMapping.getValue());
-        });
-
-        this.cache.putAll(modifiedDetectorMappings);
-    }
-
-    private List<UUID> getDetectorIds(List<DetectorMapping> disabledDetectorMappings) {
-        return disabledDetectorMappings
-                .stream().map(detectorMapping -> detectorMapping.getDetector().getUuid())
+    public void removeMappings(List<DetectorMapping> disabledDetectorMappings) {
+        List<Detector> detectors = disabledDetectorMappings.stream()
+                .map(disabledDetectorMapping -> disabledDetectorMapping.getDetector())
                 .collect(Collectors.toList());
+        this.cache.removeFromCache(detectors);
     }
 
-    private String removeDisabledDetectorIds(List<UUID> detectorUuids, String detectorIdsString) {
-        List<Detector> detectors = CacheUtil.buildDetectors(detectorIdsString);
-        detectorUuids.forEach(uuid -> {
-            detectors.remove(new Detector(uuid));
-        });
-        return CacheUtil.getDetectorIdsString(detectors);
-    }
-
-    public void updateCache(List<DetectorMapping> newDetectorMappings) {
+    public void addMappings(List<DetectorMapping> newDetectorMappings) {
         final List<String> matchingMappings = new ArrayList<>();
-        List<Map<String, String>> listOfTagsFromExpression = findTags(newDetectorMappings);
-
-        //iterate over the list of cache entries and find for matches and invalidate those from cache.
-        //FIXME - This is a brute force approach with time complexity of O(n * m).
-        // But assumption is that this will work as we are doing this in memory
-        // and m (no of new mappings) will be always less.
-        this.cache.asMap().entrySet().forEach(mapping -> {
-            Map<String, String> metricTags = CacheUtil.getTags(mapping.getKey());
-            if (doMetricTagsMatchesWithTagsPresentInExpression(metricTags, listOfTagsFromExpression)) {
-                matchingMappings.add(mapping.getKey());
-            }
-        });
-        log.info("invalidating cache entries: {} for input : {}",
-                Arrays.toString(matchingMappings.toArray()),
-                Arrays.toString(newDetectorMappings.stream()
-                        .map(mapping -> mapping.getDetector().getUuid().toString())
-                        .collect(Collectors.toList()).toArray()));
-        //invalidate matches.
-        cache.invalidateAll(matchingMappings);
+        List<Map<String, String>> listOfGroupOfTagsFromExpression = findTags(newDetectorMappings);
+        //invalidating the matching keys so that cache will be refilled
+        //from mappings store whenever any new metrics comes
+        cache.invalidateKeysMatchingTags(listOfGroupOfTagsFromExpression);
     }
 
     private List<Map<String, String>> findTags(List<DetectorMapping> newDetectorMappings) {
@@ -247,22 +168,6 @@ public class DetectorMapper {
                 .map(detectorMapping ->
                         findTagsFromDetectorMappingExpression(detectorMapping.getExpression()))
                 .collect(Collectors.toList());
-    }
-
-    private boolean doMetricTagsMatchesWithTagsPresentInExpression(Map<String, String> metricTags,
-                                                                   List<Map<String, String>> tagsFromDetectorMappingExpression) {
-        //FIXME - we are doing an exact match here. so this will work as along as we always use AND condition
-        //in expression.
-        //we need to improve this logic to handle OR, NOT conditions as well.
-        for (Map<String, String> tags : tagsFromDetectorMappingExpression) {
-            for (Map.Entry<String, String> entry : tags.entrySet()) {
-                if (metricTags.get(entry.getKey()) == null
-                        || !metricTags.get(entry.getKey()).equals(entry.getValue())) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     private Map<String, String> findTagsFromDetectorMappingExpression(ExpressionTree expression) {
