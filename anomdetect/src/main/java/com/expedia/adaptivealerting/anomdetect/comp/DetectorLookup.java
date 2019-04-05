@@ -15,13 +15,13 @@
  */
 package com.expedia.adaptivealerting.anomdetect.comp;
 
-import com.expedia.adaptivealerting.anomdetect.detector.Detector;
 import com.expedia.adaptivealerting.anomdetect.detector.ConstantThresholdDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.CusumDetector;
+import com.expedia.adaptivealerting.anomdetect.detector.Detector;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaDetector;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersDetector;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.IndividualsControlChartDetector;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PewmaDetector;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersDetector;
 import lombok.val;
 
 import java.util.HashMap;
