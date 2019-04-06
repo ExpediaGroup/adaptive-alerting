@@ -13,9 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.detector;
+package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
-public interface DetectorParams {
+import com.opencsv.bean.CsvBindByName;
+import lombok.Data;
 
-    void validate();
+@Data
+public class PewmaTestRow {
+
+    @CsvBindByName
+    private double observed;
+
+    @CsvBindByName
+    private double mean;
+
+    @CsvBindByName
+    private String level;
+
+    @CsvBindByName
+    private double std;
 }

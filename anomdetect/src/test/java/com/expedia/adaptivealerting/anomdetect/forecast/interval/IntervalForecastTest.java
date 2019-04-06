@@ -16,13 +16,14 @@
 package com.expedia.adaptivealerting.anomdetect.forecast.interval;
 
 import lombok.val;
-import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class IntervalForecastTest {
+    private static final double TOLERANCE = 0.001;
 
     @Test
-    @Ignore
     // See https://reflectoring.io/jacoco/ for a better solution
     // The approach below creates more test code to manage
     public void coverageOnly() {
@@ -31,5 +32,29 @@ public class IntervalForecastTest {
         intervalForecast.setUpperWeak(90.0);
         intervalForecast.setLowerWeak(20.0);
         intervalForecast.setLowerStrong(10.0);
+    }
+
+    @Test
+    public void testConstructor() {
+        val intervalForecast = new IntervalForecast(100.0, 90.0, 20.0, 10.0);
+        assertEquals(100.0, intervalForecast.getUpperStrong(), TOLERANCE);
+        assertEquals(90.0, intervalForecast.getUpperWeak(), TOLERANCE);
+        assertEquals(20.0, intervalForecast.getLowerWeak(), TOLERANCE);
+        assertEquals(10.0, intervalForecast.getLowerStrong(), TOLERANCE);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructor_upperStrongBelowUpperWeak() {
+        new IntervalForecast(90.0, 100.0, 20.0, 10.0);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructor_upperWeakBelowLowerWeak() {
+        new IntervalForecast(100.0, 20.0, 90.0, 10.0);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstrutor_lowerWeakBelowLowerStrong() {
+        new IntervalForecast(100.0, 90.0, 10.0, 20.0);
     }
 }

@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.comp;
+package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
 import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelResource;
 import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelTypeResource;
 import com.expedia.adaptivealerting.anomdetect.detector.ConstantThresholdDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.CusumDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import lombok.val;
@@ -37,12 +36,12 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.doReturn;
 
-public class DetectorFactoryTest {
+public class LegacyDetectorFactoryTest {
     public static final String CONSTANT_THRESHOLD = "constant-detector";
     public static final String CUSUM = "cusum-detector";
     public static final String EWMA = "ewma-detector";
 
-    private DetectorFactory factoryUnderTest;
+    private LegacyDetectorFactory factoryUnderTest;
 
     @Mock
     private DetectorLookup detectorLookup;
@@ -51,7 +50,7 @@ public class DetectorFactoryTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         initDependencies();
-        this.factoryUnderTest = new DetectorFactory(detectorLookup);
+        this.factoryUnderTest = new LegacyDetectorFactory(detectorLookup);
     }
 
     @Test(expected = IllegalArgumentException.class)

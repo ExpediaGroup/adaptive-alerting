@@ -13,35 +13,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.forecast.point;
+package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
-import com.expedia.adaptivealerting.anomdetect.detector.DetectorParams;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public final class IndividualsControlChartParams implements DetectorParams {
+@Deprecated
+public final class PewmaParams implements DetectorParams {
 
     /**
-     * Initial mean estimate.
+     * Smoothing param.
      */
-    private double initValue = 0.0;
+    private double alpha = 0.15;
 
     /**
-     * Minimum number of data points required before the anomaly detector is ready for use.
+     * Anomaly weighting param.
      */
-    private int warmUpPeriod = 30;
+    private double beta = 1.0;
 
     /**
-     * Strong threshold sigmas.
+     * Weak anomaly threshold, in sigmas.
      */
-    private double strongSigmas = 3.0;
+    private double weakSigmas = 3.0;
+
+    /**
+     * Strong anomaly threshold, in sigmas.
+     */
+    private double strongSigmas = 4.0;
 
     /**
      * Initial mean estimate.
      */
     private double initMeanEstimate = 0.0;
+
+    /**
+     * How many iterations to train for.
+     */
+    private final int warmUpPeriod = 30;
 
     @Override
     public void validate() {

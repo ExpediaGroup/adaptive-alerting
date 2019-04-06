@@ -13,33 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.forecast.point;
+package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
-import com.expedia.adaptivealerting.anomdetect.detector.DetectorParams;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
+
 @Data
 @Accessors(chain = true)
-public final class PewmaParams implements DetectorParams {
+@Deprecated
+public final class EwmaParams implements DetectorParams {
 
     /**
-     * Smoothing param.
+     * Smoothing param. Somewhat misnamed because higher values lead to less smoothing, but it's called the
+     * smoothing parameter in the literature.
      */
     private double alpha = 0.15;
 
     /**
-     * Anomaly weighting param.
-     */
-    private double beta = 1.0;
-
-    /**
-     * Weak anomaly threshold, in sigmas.
+     * Weak threshold sigmas.
      */
     private double weakSigmas = 3.0;
 
     /**
-     * Strong anomaly threshold, in sigmas.
+     * Strong threshold sigmas.
      */
     private double strongSigmas = 4.0;
 
@@ -48,13 +46,10 @@ public final class PewmaParams implements DetectorParams {
      */
     private double initMeanEstimate = 0.0;
 
-    /**
-     * How many iterations to train for.
-     */
-    private final int warmUpPeriod = 30;
-
     @Override
     public void validate() {
-        // Not currently implemented
+        isTrue(0.0 <= alpha && alpha <= 1.0, "Required: alpha in the range [0, 1]");
+        isTrue(weakSigmas > 0.0, "Required: weakSigmas > 0.0");
+        isTrue(strongSigmas > weakSigmas, "Required: strongSigmas > weakSigmas");
     }
 }

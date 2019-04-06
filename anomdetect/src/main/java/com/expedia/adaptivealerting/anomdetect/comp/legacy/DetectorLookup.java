@@ -13,15 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.comp;
+package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
 import com.expedia.adaptivealerting.anomdetect.detector.ConstantThresholdDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.CusumDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaDetector;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.IndividualsControlChartDetector;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.PewmaDetector;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersDetector;
 import lombok.val;
 
 import java.util.HashMap;
@@ -33,6 +29,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 /**
  * Detector lookup table.
  */
+@Deprecated
 public class DetectorLookup {
     private final Map<String, Class<? extends Detector>> detectorMap = new HashMap<>();
 

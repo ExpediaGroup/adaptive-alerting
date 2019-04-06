@@ -13,33 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.forecast.point;
+package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
-import com.expedia.adaptivealerting.anomdetect.detector.DetectorParams;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
-
 @Data
 @Accessors(chain = true)
-public final class EwmaParams implements DetectorParams {
+@Deprecated
+public final class IndividualsControlChartParams implements DetectorParams {
 
     /**
-     * Smoothing param. Somewhat misnamed because higher values lead to less smoothing, but it's called the
-     * smoothing parameter in the literature.
+     * Initial mean estimate.
      */
-    private double alpha = 0.15;
+    private double initValue = 0.0;
 
     /**
-     * Weak threshold sigmas.
+     * Minimum number of data points required before the anomaly detector is ready for use.
      */
-    private double weakSigmas = 3.0;
+    private int warmUpPeriod = 30;
 
     /**
      * Strong threshold sigmas.
      */
-    private double strongSigmas = 4.0;
+    private double strongSigmas = 3.0;
 
     /**
      * Initial mean estimate.
@@ -48,8 +45,6 @@ public final class EwmaParams implements DetectorParams {
 
     @Override
     public void validate() {
-        isTrue(0.0 <= alpha && alpha <= 1.0, "Required: alpha in the range [0, 1]");
-        isTrue(weakSigmas > 0.0, "Required: weakSigmas > 0.0");
-        isTrue(strongSigmas > weakSigmas, "Required: strongSigmas > weakSigmas");
+        // Not currently implemented
     }
 }

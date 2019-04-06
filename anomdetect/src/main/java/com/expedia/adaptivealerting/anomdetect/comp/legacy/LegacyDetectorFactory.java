@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.comp;
+package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
 import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelResource;
 import com.expedia.adaptivealerting.anomdetect.detector.ConstantThresholdParams;
 import com.expedia.adaptivealerting.anomdetect.detector.CusumParams;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
-import com.expedia.adaptivealerting.anomdetect.detector.DetectorParams;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,18 +32,18 @@ import java.util.UUID;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
- * Builds detectors based on detector configurations.
+ * Builds detectors based on legacy detector configurations.
  */
 @RequiredArgsConstructor
 @Slf4j
-public class DetectorFactory {
+@Deprecated
+public class LegacyDetectorFactory {
 
     @NonNull
     private DetectorLookup detectorLookup;
 
     // TODO Currently we use a legacy process to find the detector. The legacy process couples point forecast algos
     //  with interval forecast algos. We will decouple these shortly. [WLW]
-    @Deprecated
     public Detector createLegacyDetector(UUID uuid, ModelResource modelResource) {
         notNull(uuid, "uuid can't be null");
         notNull(modelResource, "modelResource can't be null");
@@ -61,7 +60,6 @@ public class DetectorFactory {
         return detector;
     }
 
-    @Deprecated
     private AnomalyType doLegacyGetAnomalyType(DetectorParams params) {
         val paramsClass = params.getClass();
 

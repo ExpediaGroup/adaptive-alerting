@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.forecast.point;
+package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
 import com.expedia.adaptivealerting.anomdetect.comp.AnomalyClassifier;
 import com.expedia.adaptivealerting.anomdetect.detector.AbstractDetector;
@@ -44,6 +44,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@Deprecated
 public final class PewmaDetector extends AbstractDetector<PewmaParams> {
 
     /**
