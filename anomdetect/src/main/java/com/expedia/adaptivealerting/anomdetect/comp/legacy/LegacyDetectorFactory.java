@@ -16,6 +16,8 @@
 package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
 import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelResource;
+import com.expedia.adaptivealerting.anomdetect.detector.ConstantThresholdParams;
+import com.expedia.adaptivealerting.anomdetect.detector.CusumParams;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;

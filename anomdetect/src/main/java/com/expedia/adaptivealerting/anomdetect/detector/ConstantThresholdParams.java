@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.comp.legacy;
+package com.expedia.adaptivealerting.anomdetect.detector;
 
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.DetectorParams;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -22,7 +24,7 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 @Deprecated
-public final class CusumParams implements DetectorParams {
+public class ConstantThresholdParams implements DetectorParams {
 
     /**
      * Detector type: left-, right- or two-tailed.
@@ -30,34 +32,9 @@ public final class CusumParams implements DetectorParams {
     private AnomalyType type;
 
     /**
-     * Target value (i.e., the set point).
+     * Constant thresholds.
      */
-    private double targetValue = 0.0;
-
-    /**
-     * Weak threshold sigmas.
-     */
-    private double weakSigmas = 3.0;
-
-    /**
-     * Strong threshold sigmas.
-     */
-    private double strongSigmas = 4.0;
-
-    /**
-     * Slack param to calculate slack value k where k = slack_param * stdev.
-     */
-    private double slackParam = 0.5;
-
-    /**
-     * Initial mean estimate.
-     */
-    private double initMeanEstimate = 0.0;
-
-    /**
-     * Minimum number of data points required before this anomaly detector is available for use.
-     */
-    private int warmUpPeriod = 25;
+    private AnomalyThresholds thresholds;
 
     @Override
     public void validate() {

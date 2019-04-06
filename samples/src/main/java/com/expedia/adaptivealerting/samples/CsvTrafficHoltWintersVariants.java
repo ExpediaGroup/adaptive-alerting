@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersDetector;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.HoltWintersDetector;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.HoltWintersParams;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.SeasonalityType;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;

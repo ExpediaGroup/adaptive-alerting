@@ -20,7 +20,6 @@ import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelTypeResource;
 import com.expedia.adaptivealerting.anomdetect.detector.ConstantThresholdDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.CusumDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import lombok.val;

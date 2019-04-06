@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.forecast.point;
+package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
 import com.expedia.adaptivealerting.anomdetect.comp.AnomalyClassifier;
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.EwmaParams;
 import com.expedia.adaptivealerting.anomdetect.detector.AbstractDetector;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecast;
@@ -52,6 +51,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@Deprecated
 public final class EwmaDetector extends AbstractDetector<EwmaParams> {
 
     // TODO Temporarily using an internal interval forecaster. Will externalize this shortly. [WLW]

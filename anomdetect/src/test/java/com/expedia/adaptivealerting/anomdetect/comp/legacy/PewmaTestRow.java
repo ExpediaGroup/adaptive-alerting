@@ -13,16 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.forecast.point;
+package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
 import com.opencsv.bean.CsvBindByName;
 import lombok.Data;
 
 @Data
-public class EwmaTestRow {
-
-    @CsvBindByName
-    private String date;
+public class PewmaTestRow {
 
     @CsvBindByName
     private double observed;
@@ -30,9 +27,9 @@ public class EwmaTestRow {
     @CsvBindByName
     private double mean;
 
-    @CsvBindByName(column = "known.mean")
-    private double knownMean;
+    @CsvBindByName
+    private String level;
 
     @CsvBindByName
-    private double var;
+    private double std;
 }

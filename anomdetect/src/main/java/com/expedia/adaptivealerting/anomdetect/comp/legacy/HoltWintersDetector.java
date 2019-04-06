@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters;
+package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
 import com.expedia.adaptivealerting.anomdetect.comp.AnomalyClassifier;
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.HoltWintersParams;
 import com.expedia.adaptivealerting.anomdetect.detector.AbstractDetector;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersClassificationException;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersOnlineAlgorithm;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersOnlineComponents;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersSimpleTrainingModel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.metrics.MetricData;
@@ -37,6 +40,7 @@ import static java.lang.String.format;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@Deprecated
 public final class HoltWintersDetector extends AbstractDetector<HoltWintersParams> {
 
     @NonNull
