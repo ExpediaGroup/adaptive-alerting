@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters;
 
 import com.expedia.adaptivealerting.anomdetect.comp.AnomalyClassifier;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.HoltWintersParams;
 import com.expedia.adaptivealerting.anomdetect.detector.AbstractDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;

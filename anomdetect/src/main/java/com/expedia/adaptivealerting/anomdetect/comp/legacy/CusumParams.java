@@ -13,23 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.forecast.point;
+package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
-import com.expedia.adaptivealerting.anomdetect.detector.DetectorParams;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
-
 @Data
 @Accessors(chain = true)
-public final class EwmaParams implements DetectorParams {
+@Deprecated
+public final class CusumParams implements DetectorParams {
 
     /**
-     * Smoothing param. Somewhat misnamed because higher values lead to less smoothing, but it's called the
-     * smoothing parameter in the literature.
+     * Detector type: left-, right- or two-tailed.
      */
-    private double alpha = 0.15;
+    private AnomalyType type;
+
+    /**
+     * Target value (i.e., the set point).
+     */
+    private double targetValue = 0.0;
 
     /**
      * Weak threshold sigmas.
@@ -42,14 +45,22 @@ public final class EwmaParams implements DetectorParams {
     private double strongSigmas = 4.0;
 
     /**
+     * Slack param to calculate slack value k where k = slack_param * stdev.
+     */
+    private double slackParam = 0.5;
+
+    /**
      * Initial mean estimate.
      */
     private double initMeanEstimate = 0.0;
 
+    /**
+     * Minimum number of data points required before this anomaly detector is available for use.
+     */
+    private int warmUpPeriod = 25;
+
     @Override
     public void validate() {
-        isTrue(0.0 <= alpha && alpha <= 1.0, "Required: alpha in the range [0, 1]");
-        isTrue(weakSigmas > 0.0, "Required: weakSigmas > 0.0");
-        isTrue(strongSigmas > weakSigmas, "Required: strongSigmas > weakSigmas");
+        // Not currently implemented
     }
 }

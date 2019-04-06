@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.interval;
 
-import com.expedia.adaptivealerting.anomdetect.detector.DetectorParams;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.DetectorParams;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
 import lombok.Getter;

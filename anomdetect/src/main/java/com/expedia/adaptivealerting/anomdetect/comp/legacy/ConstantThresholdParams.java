@@ -13,35 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.forecast.point;
+package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
-import com.expedia.adaptivealerting.anomdetect.detector.DetectorParams;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public final class IndividualsControlChartParams implements DetectorParams {
+@Deprecated
+public class ConstantThresholdParams implements DetectorParams {
 
     /**
-     * Initial mean estimate.
+     * Detector type: left-, right- or two-tailed.
      */
-    private double initValue = 0.0;
+    private AnomalyType type;
 
     /**
-     * Minimum number of data points required before the anomaly detector is ready for use.
+     * Constant thresholds.
      */
-    private int warmUpPeriod = 30;
-
-    /**
-     * Strong threshold sigmas.
-     */
-    private double strongSigmas = 3.0;
-
-    /**
-     * Initial mean estimate.
-     */
-    private double initMeanEstimate = 0.0;
+    private AnomalyThresholds thresholds;
 
     @Override
     public void validate() {

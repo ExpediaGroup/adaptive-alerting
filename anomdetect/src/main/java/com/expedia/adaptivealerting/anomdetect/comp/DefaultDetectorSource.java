@@ -16,6 +16,8 @@
 package com.expedia.adaptivealerting.anomdetect.comp;
 
 import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelServiceConnector;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.DetectorLookup;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
 import com.expedia.metrics.MetricDefinition;
 import lombok.NonNull;
@@ -46,7 +48,7 @@ public class DefaultDetectorSource implements DetectorSource {
     private final ModelServiceConnector connector;
 
     @NonNull
-    private final DetectorFactory detectorFactory;
+    private final LegacyDetectorFactory legacyDetectorFactory;
 
     @Override
     public Set<String> findDetectorTypes() {
@@ -75,7 +77,7 @@ public class DefaultDetectorSource implements DetectorSource {
         //  the detector. [WLW]
         val modelResource = connector.findLatestModel(uuid);
 
-        return detectorFactory.createLegacyDetector(uuid, modelResource);
+        return legacyDetectorFactory.createLegacyDetector(uuid, modelResource);
     }
 
     @Override

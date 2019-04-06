@@ -13,26 +13,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.detector;
+package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public class ConstantThresholdParams implements DetectorParams {
+@Deprecated
+public final class PewmaParams implements DetectorParams {
 
     /**
-     * Detector type: left-, right- or two-tailed.
+     * Smoothing param.
      */
-    private AnomalyType type;
+    private double alpha = 0.15;
 
     /**
-     * Constant thresholds.
+     * Anomaly weighting param.
      */
-    private AnomalyThresholds thresholds;
+    private double beta = 1.0;
+
+    /**
+     * Weak anomaly threshold, in sigmas.
+     */
+    private double weakSigmas = 3.0;
+
+    /**
+     * Strong anomaly threshold, in sigmas.
+     */
+    private double strongSigmas = 4.0;
+
+    /**
+     * Initial mean estimate.
+     */
+    private double initMeanEstimate = 0.0;
+
+    /**
+     * How many iterations to train for.
+     */
+    private final int warmUpPeriod = 30;
 
     @Override
     public void validate() {

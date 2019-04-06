@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.comp;
+package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
 import com.expedia.adaptivealerting.anomdetect.detector.ConstantThresholdDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.CusumDetector;
@@ -33,6 +33,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 /**
  * Detector lookup table.
  */
+@Deprecated
 public class DetectorLookup {
     private final Map<String, Class<? extends Detector>> detectorMap = new HashMap<>();
 

@@ -22,9 +22,10 @@ import com.expedia.adaptivealerting.anomdetect.comp.connector.DetectorResources;
 import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelResource;
 import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelServiceConnector;
 import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelTypeResource;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaDetector;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaParams;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.EwmaParams;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.metrics.MetricDefinition;
 import lombok.extern.slf4j.Slf4j;
@@ -58,7 +59,7 @@ public final class DefaultDetectorSourceTest {
     private ModelServiceConnector connector;
 
     @Mock
-    private DetectorFactory detectorFactory;
+    private LegacyDetectorFactory legacyDetectorFactory;
 
     private MetricDefinition metricDef;
     private MetricDefinition metricDefException;
@@ -72,7 +73,7 @@ public final class DefaultDetectorSourceTest {
         MockitoAnnotations.initMocks(this);
         initTestObjects();
         initDependencies();
-        this.sourceUnderTest = new DefaultDetectorSource(connector, detectorFactory);
+        this.sourceUnderTest = new DefaultDetectorSource(connector, legacyDetectorFactory);
     }
 
     @Test
@@ -175,7 +176,7 @@ public final class DefaultDetectorSourceTest {
         when(connector.findLatestModel(DETECTOR_UUID_EXCEPTION))
                 .thenThrow(new DetectorRetrievalException("Error finding latest model", new IOException()));
 
-        when(detectorFactory.createLegacyDetector(any(UUID.class), any(ModelResource.class)))
+        when(legacyDetectorFactory.createLegacyDetector(any(UUID.class), any(ModelResource.class)))
                 .thenReturn(detector);
     }
 }

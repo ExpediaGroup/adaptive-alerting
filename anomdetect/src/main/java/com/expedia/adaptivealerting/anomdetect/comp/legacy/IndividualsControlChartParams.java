@@ -13,51 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.detector;
+package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
-import com.expedia.adaptivealerting.anomdetect.detector.DetectorParams;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public final class CusumParams implements DetectorParams {
+@Deprecated
+public final class IndividualsControlChartParams implements DetectorParams {
 
     /**
-     * Detector type: left-, right- or two-tailed.
+     * Initial mean estimate.
      */
-    private AnomalyType type;
+    private double initValue = 0.0;
 
     /**
-     * Target value (i.e., the set point).
+     * Minimum number of data points required before the anomaly detector is ready for use.
      */
-    private double targetValue = 0.0;
-
-    /**
-     * Weak threshold sigmas.
-     */
-    private double weakSigmas = 3.0;
+    private int warmUpPeriod = 30;
 
     /**
      * Strong threshold sigmas.
      */
-    private double strongSigmas = 4.0;
-
-    /**
-     * Slack param to calculate slack value k where k = slack_param * stdev.
-     */
-    private double slackParam = 0.5;
+    private double strongSigmas = 3.0;
 
     /**
      * Initial mean estimate.
      */
     private double initMeanEstimate = 0.0;
-
-    /**
-     * Minimum number of data points required before this anomaly detector is available for use.
-     */
-    private int warmUpPeriod = 25;
 
     @Override
     public void validate() {
