@@ -77,7 +77,7 @@ public class DefaultDetectorSource implements DetectorSource {
         //  the detector. [WLW]
         val modelResource = connector.findLatestModel(uuid);
 
-        return legacyDetectorFactory.createLegacyDetector(uuid, modelResource);
+        return legacyDetectorFactory.createDetector(uuid, modelResource);
     }
 
     @Override

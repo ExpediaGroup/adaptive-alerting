@@ -15,11 +15,12 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.EwmaDetector;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.DetectorLookup;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.PewmaDetector;
 import com.expedia.adaptivealerting.core.data.MetricFrameLoader;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
-import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorFilter;
+import com.expedia.adaptivealerting.tools.pipeline.filter.DetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.source.MetricFrameMetricSource;
 import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
@@ -42,8 +43,9 @@ public final class CsvTrafficEwmaVsPewma {
         val frame = MetricFrameLoader.loadCsv(new MetricDefinition("csv"), is, true);
         val source = new MetricFrameMetricSource(frame, "data", 200L);
 
-        val ewmaAD = new AnomalyDetectorFilter(new EwmaDetector());
-        val pewmaAD = new AnomalyDetectorFilter(new PewmaDetector());
+        val factory = new LegacyDetectorFactory(new DetectorLookup());
+        val ewmaAD = new DetectorFilter(factory.createEwmaDetector());
+        val pewmaAD = new DetectorFilter(new PewmaDetector());
 
         val ewmaEval = new EvaluatorFilter(new RmseEvaluator());
         val pewmaEval = new EvaluatorFilter(new RmseEvaluator());

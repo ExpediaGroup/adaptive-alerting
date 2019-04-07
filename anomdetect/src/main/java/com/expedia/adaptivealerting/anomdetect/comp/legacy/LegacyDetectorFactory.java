@@ -19,6 +19,9 @@ import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelResource;
 import com.expedia.adaptivealerting.anomdetect.detector.ConstantThresholdParams;
 import com.expedia.adaptivealerting.anomdetect.detector.CusumParams;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
+import com.expedia.adaptivealerting.anomdetect.forecast.ForecastingDetector;
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaster;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,6 +29,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import lombok.var;
 
 import java.util.UUID;
 
@@ -38,26 +42,49 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @Slf4j
 @Deprecated
 public class LegacyDetectorFactory {
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @NonNull
     private DetectorLookup detectorLookup;
 
     // TODO Currently we use a legacy process to find the detector. The legacy process couples point forecast algos
     //  with interval forecast algos. We will decouple these shortly. [WLW]
-    public Detector createLegacyDetector(UUID uuid, ModelResource modelResource) {
+    public Detector createDetector(UUID uuid, ModelResource modelResource) {
         notNull(uuid, "uuid can't be null");
         notNull(modelResource, "modelResource can't be null");
 
         val detectorType = modelResource.getDetectorType().getKey();
-        val detectorClass = detectorLookup.getDetector(detectorType);
-        val detector = ReflectionUtil.newInstance(detectorClass);
-        val paramsClass = detector.getParamsClass();
-        val params = (DetectorParams) new ObjectMapper().convertValue(modelResource.getParams(), paramsClass);
-        val anomalyType = doLegacyGetAnomalyType(params);
+        var detector = (Detector) null;
 
-        detector.init(uuid, params, anomalyType);
+        if (LegacyDetectorTypes.EWMA.equals(detectorType)) {
+            val params = objectMapper.convertValue(modelResource.getParams(), EwmaParams.class);
+            detector = createEwmaDetector(uuid, params);
+        } else {
+            val detectorClass = detectorLookup.getDetector(detectorType);
+            detector = ReflectionUtil.newInstance(detectorClass);
+            val paramsClass = detector.getParamsClass();
+            val params = (DetectorParams) objectMapper.convertValue(modelResource.getParams(), paramsClass);
+            val anomalyType = doLegacyGetAnomalyType(params);
+            detector.init(uuid, params, anomalyType);
+        }
+
         log.info("Created detector: {}", detector);
         return detector;
+    }
+
+    public Detector createEwmaDetector() {
+        return createEwmaDetector(UUID.randomUUID(), new EwmaParams());
+    }
+
+    public Detector createEwmaDetector(UUID uuid, EwmaParams params) {
+        notNull(uuid, "uuid can't be null");
+        notNull(params, "params can't be null");
+
+        val pointForecaster = new EwmaPointForecaster(params.toPointForecasterParams());
+        val intervalForecaster = new ExponentialWelfordIntervalForecaster(params.toIntervalForecasterParams());
+        val anomalyType = AnomalyType.TWO_TAILED;
+
+        return new ForecastingDetector(uuid, pointForecaster, intervalForecaster, anomalyType);
     }
 
     private AnomalyType doLegacyGetAnomalyType(DetectorParams params) {

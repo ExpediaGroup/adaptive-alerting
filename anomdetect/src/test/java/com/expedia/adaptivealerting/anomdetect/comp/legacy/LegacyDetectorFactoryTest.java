@@ -20,6 +20,9 @@ import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelTypeResource;
 import com.expedia.adaptivealerting.anomdetect.detector.ConstantThresholdDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.CusumDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
+import com.expedia.adaptivealerting.anomdetect.forecast.ForecastingDetector;
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaster;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import lombok.val;
@@ -34,13 +37,10 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 
 public class LegacyDetectorFactoryTest {
-    public static final String CONSTANT_THRESHOLD = "constant-detector";
-    public static final String CUSUM = "cusum-detector";
-    public static final String EWMA = "ewma-detector";
-
     private LegacyDetectorFactory factoryUnderTest;
 
     @Mock
@@ -54,61 +54,75 @@ public class LegacyDetectorFactoryTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCreateLegacyDetector_nullUuid() {
+    public void testCreateDetector_nullUuid() {
         val params = new HashMap<String, Object>();
-        val modelResource = buildModelResource(EWMA, params);
-        factoryUnderTest.createLegacyDetector(null, modelResource);
+        val modelResource = buildModelResource(LegacyDetectorTypes.EWMA, params);
+        factoryUnderTest.createDetector(null, modelResource);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCreateLegacyDetector_nullModelResource() {
-        factoryUnderTest.createLegacyDetector(UUID.randomUUID(), null);
+    public void testCreateDetector_nullModelResource() {
+        factoryUnderTest.createDetector(UUID.randomUUID(), null);
     }
 
     @Test
-    public void testCreateLegacyDetector_constantThreshold() {
+    public void testCreateDetector_constantThreshold() {
         val params = new HashMap<String, Object>();
         params.put("type", AnomalyType.TWO_TAILED);
         params.put("thresholds", new AnomalyThresholds(100.0, 90.0, 20.0, 10.0));
-
-        val detector = buildDetector(CONSTANT_THRESHOLD, params);
-
+        val detector = buildDetector(LegacyDetectorTypes.CONSTANT_THRESHOLD, params);
         assertEquals(ConstantThresholdDetector.class, detector.getClass());
     }
 
     @Test
-    public void testCreateLegacyDetector_cusum() {
+    public void testCreateDetector_cusum() {
         val params = new HashMap<String, Object>();
         params.put("type", AnomalyType.LEFT_TAILED);
-
-        val detector = buildDetector(CUSUM, params);
-
+        val detector = buildDetector(LegacyDetectorTypes.CUSUM, params);
         assertEquals(CusumDetector.class, detector.getClass());
     }
 
     @Test
-    public void testCreateLegacyDetector_ewma() {
+    public void testCreateDetector_ewma() {
         val params = new HashMap<String, Object>();
-        val detector = buildDetector(EWMA, params);
-        assertEquals(EwmaDetector.class, detector.getClass());
+        val detector = (ForecastingDetector) buildDetector(LegacyDetectorTypes.EWMA, params);
+        assertTrue(detector.getPointForecaster() instanceof EwmaPointForecaster);
+        assertTrue(detector.getIntervalForecaster() instanceof ExponentialWelfordIntervalForecaster);
+    }
+
+    @Test
+    public void testCreateEwmaDetector_noArg() {
+        val detector = (ForecastingDetector) factoryUnderTest.createEwmaDetector();
+        assertTrue(detector.getPointForecaster() instanceof EwmaPointForecaster);
+        assertTrue(detector.getIntervalForecaster() instanceof ExponentialWelfordIntervalForecaster);
+    }
+
+    @Test
+    public void testCreateDetector_pewma() {
+        val params = new HashMap<String, Object>();
+        val detector = buildDetector(LegacyDetectorTypes.PEWMA, params);
+        assertEquals(PewmaDetector.class, detector.getClass());
     }
 
     private void initDependencies() {
         // https://dzone.com/articles/mocking-method-with-wildcard-generic-return-type
         doReturn(ConstantThresholdDetector.class)
                 .when(detectorLookup)
-                .getDetector(CONSTANT_THRESHOLD);
+                .getDetector(LegacyDetectorTypes.CONSTANT_THRESHOLD);
         doReturn(CusumDetector.class)
                 .when(detectorLookup)
-                .getDetector(CUSUM);
+                .getDetector(LegacyDetectorTypes.CUSUM);
         doReturn(EwmaDetector.class)
                 .when(detectorLookup)
-                .getDetector(EWMA);
+                .getDetector(LegacyDetectorTypes.EWMA);
+        doReturn(PewmaDetector.class)
+                .when(detectorLookup)
+                .getDetector(LegacyDetectorTypes.PEWMA);
     }
 
     private Detector buildDetector(String type, Map<String, Object> params) {
         val modelResource = buildModelResource(type, params);
-        return factoryUnderTest.createLegacyDetector(UUID.randomUUID(), modelResource);
+        return factoryUnderTest.createDetector(UUID.randomUUID(), modelResource);
     }
 
     private ModelResource buildModelResource(String type, Map<String, Object> params) {

@@ -15,15 +15,16 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.detector.CusumDetector;
-import com.expedia.adaptivealerting.anomdetect.detector.CusumParams;
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.EwmaDetector;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.DetectorLookup;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.EwmaParams;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.PewmaDetector;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.PewmaParams;
+import com.expedia.adaptivealerting.anomdetect.detector.CusumDetector;
+import com.expedia.adaptivealerting.anomdetect.detector.CusumParams;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
-import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorFilter;
+import com.expedia.adaptivealerting.tools.pipeline.filter.DetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
 import lombok.val;
@@ -39,13 +40,13 @@ public final class Sample001 {
     public static void main(String[] args) throws Exception {
         val source = buildMetricFrameMetricSource("samples/sample001.csv", 200L);
 
+        val factory = new LegacyDetectorFactory(new DetectorLookup());
         val ewmaParams = new EwmaParams()
                 .setAlpha(0.20)
                 .setWeakSigmas(4.5)
                 .setStrongSigmas(5.5);
-        val ewmaAD = new EwmaDetector();
-        ewmaAD.init(UUID.randomUUID(), ewmaParams, AnomalyType.TWO_TAILED);
-        val ewmaADF = new AnomalyDetectorFilter(ewmaAD);
+        val ewmaAD = factory.createEwmaDetector(UUID.randomUUID(), ewmaParams);
+        val ewmaADF = new DetectorFilter(ewmaAD);
 
         val pewmaParams = new PewmaParams()
                 .setAlpha(0.20)
@@ -53,7 +54,7 @@ public final class Sample001 {
                 .setStrongSigmas(6.0);
         val pewmaAD = new PewmaDetector();
         pewmaAD.init(UUID.randomUUID(), pewmaParams, AnomalyType.TWO_TAILED);
-        val pewmaADF = new AnomalyDetectorFilter(pewmaAD);
+        val pewmaADF = new DetectorFilter(pewmaAD);
 
         val cusumParams = new CusumParams()
                 .setType(AnomalyType.RIGHT_TAILED)
@@ -63,7 +64,7 @@ public final class Sample001 {
                 .setInitMeanEstimate(13_000_000);
         val cusumAD = new CusumDetector();
         cusumAD.init(UUID.randomUUID(), cusumParams, AnomalyType.TWO_TAILED);
-        val cusumADF = new AnomalyDetectorFilter(cusumAD);
+        val cusumADF = new DetectorFilter(cusumAD);
 
         val ewmaEval = new EvaluatorFilter(new RmseEvaluator());
         val pewmaEval = new EvaluatorFilter(new RmseEvaluator());

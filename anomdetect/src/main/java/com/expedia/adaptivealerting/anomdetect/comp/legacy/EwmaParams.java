@@ -15,6 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaster;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -45,6 +47,20 @@ public final class EwmaParams implements DetectorParams {
      * Initial mean estimate.
      */
     private double initMeanEstimate = 0.0;
+
+    public EwmaPointForecaster.Params toPointForecasterParams() {
+        return new EwmaPointForecaster.Params()
+                .setAlpha(alpha)
+                .setInitMeanEstimate(initMeanEstimate);
+    }
+
+    public ExponentialWelfordIntervalForecaster.Params toIntervalForecasterParams() {
+        return new ExponentialWelfordIntervalForecaster.Params()
+                .setAlpha(alpha)
+                .setInitVarianceEstimate(0.0)
+                .setWeakSigmas(weakSigmas)
+                .setStrongSigmas(strongSigmas);
+    }
 
     @Override
     public void validate() {
