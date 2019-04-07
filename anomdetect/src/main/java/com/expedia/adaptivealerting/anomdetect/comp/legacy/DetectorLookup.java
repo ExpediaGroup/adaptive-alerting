@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 import com.expedia.adaptivealerting.anomdetect.detector.ConstantThresholdDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.CusumDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
+import com.expedia.adaptivealerting.anomdetect.forecast.ForecastingDetector;
 import lombok.val;
 
 import java.util.HashMap;
@@ -36,7 +37,7 @@ public class DetectorLookup {
     public DetectorLookup() {
         detectorMap.put("constant-detector", ConstantThresholdDetector.class);
         detectorMap.put("cusum-detector", CusumDetector.class);
-        detectorMap.put("ewma-detector", EwmaDetector.class);
+        detectorMap.put("ewma-detector", ForecastingDetector.class);
         detectorMap.put("holtwinters-detector", HoltWintersDetector.class);
         detectorMap.put("individuals-detector", IndividualsControlChartDetector.class);
         detectorMap.put("pewma-detector", PewmaDetector.class);

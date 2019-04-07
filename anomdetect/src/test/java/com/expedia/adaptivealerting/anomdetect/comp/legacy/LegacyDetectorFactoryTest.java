@@ -112,9 +112,6 @@ public class LegacyDetectorFactoryTest {
         doReturn(CusumDetector.class)
                 .when(detectorLookup)
                 .getDetector(LegacyDetectorTypes.CUSUM);
-        doReturn(EwmaDetector.class)
-                .when(detectorLookup)
-                .getDetector(LegacyDetectorTypes.EWMA);
         doReturn(PewmaDetector.class)
                 .when(detectorLookup)
                 .getDetector(LegacyDetectorTypes.PEWMA);
