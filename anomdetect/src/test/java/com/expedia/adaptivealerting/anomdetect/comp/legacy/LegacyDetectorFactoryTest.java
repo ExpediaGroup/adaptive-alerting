@@ -113,6 +113,13 @@ public class LegacyDetectorFactoryTest {
         assertTrue(detector.getIntervalForecaster() instanceof ExponentialWelfordIntervalForecaster);
     }
 
+    @Test
+    public void testCreateDetector_individuals() {
+        val params = new HashMap<String, Object>();
+        val detector = buildDetector(LegacyDetectorTypes.INDIVIDUALS, params);
+        assertTrue(detector instanceof IndividualsControlChartDetector);
+    }
+
     private void initDependencies() {
         // https://dzone.com/articles/mocking-method-with-wildcard-generic-return-type
         doReturn(ConstantThresholdDetector.class)
@@ -121,6 +128,9 @@ public class LegacyDetectorFactoryTest {
         doReturn(CusumDetector.class)
                 .when(detectorLookup)
                 .getDetector(LegacyDetectorTypes.CUSUM);
+        doReturn(IndividualsControlChartDetector.class)
+                .when(detectorLookup)
+                .getDetector(LegacyDetectorTypes.INDIVIDUALS);
     }
 
     private Detector buildDetector(String type, Map<String, Object> params) {

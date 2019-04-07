@@ -59,6 +59,7 @@ public class LegacyDetectorFactory {
 
         if (LegacyDetectorTypes.EWMA.equals(detectorType)) {
             val params = objectMapper.convertValue(modelResource.getParams(), EwmaParams.class);
+            params.validate();
             detector = createEwmaDetector(uuid, params);
         } else if (LegacyDetectorTypes.PEWMA.equals(detectorType)) {
             val params = objectMapper.convertValue(modelResource.getParams(), PewmaParams.class);

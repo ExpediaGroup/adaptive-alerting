@@ -23,7 +23,7 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 @Deprecated
-public final class PewmaParams implements DetectorParams {
+public final class PewmaParams {
 
     /**
      * Smoothing param.
@@ -69,10 +69,5 @@ public final class PewmaParams implements DetectorParams {
                 .setInitVarianceEstimate(0.0)
                 .setWeakSigmas(weakSigmas)
                 .setStrongSigmas(strongSigmas);
-    }
-
-    @Override
-    public void validate() {
-        // Not currently implemented
     }
 }
