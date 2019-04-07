@@ -68,6 +68,12 @@ public final class EwmaPointForecasterTest {
         }
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testForecast_nullMetricData() {
+        val forecaster = new EwmaPointForecaster();
+        forecaster.forecast(null);
+    }
+
     private static void readData_calInflow() {
         val is = ClassLoader.getSystemResourceAsStream("tests/cal-inflow-tests-ewma.csv");
         data = new CsvToBeanBuilder<EwmaTestRow>(new InputStreamReader(is))

@@ -22,6 +22,7 @@ import com.expedia.adaptivealerting.anomdetect.detector.Detector;
 import com.expedia.adaptivealerting.anomdetect.forecast.ForecastingDetector;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.PewmaPointForecaster;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -59,6 +60,9 @@ public class LegacyDetectorFactory {
         if (LegacyDetectorTypes.EWMA.equals(detectorType)) {
             val params = objectMapper.convertValue(modelResource.getParams(), EwmaParams.class);
             detector = createEwmaDetector(uuid, params);
+        } else if (LegacyDetectorTypes.PEWMA.equals(detectorType)) {
+            val params = objectMapper.convertValue(modelResource.getParams(), PewmaParams.class);
+            detector = createPewmaDetector(uuid, params);
         } else {
             val detectorClass = detectorLookup.getDetector(detectorType);
             detector = ReflectionUtil.newInstance(detectorClass);
@@ -81,6 +85,21 @@ public class LegacyDetectorFactory {
         notNull(params, "params can't be null");
 
         val pointForecaster = new EwmaPointForecaster(params.toPointForecasterParams());
+        val intervalForecaster = new ExponentialWelfordIntervalForecaster(params.toIntervalForecasterParams());
+        val anomalyType = AnomalyType.TWO_TAILED;
+
+        return new ForecastingDetector(uuid, pointForecaster, intervalForecaster, anomalyType);
+    }
+
+    public Detector createPewmaDetector() {
+        return createPewmaDetector(UUID.randomUUID(), new PewmaParams());
+    }
+
+    public Detector createPewmaDetector(UUID uuid, PewmaParams params) {
+        notNull(uuid, "uuid can't be null");
+        notNull(params, "params can't be null");
+
+        val pointForecaster = new PewmaPointForecaster(params.toPointForecasterParams());
         val intervalForecaster = new ExponentialWelfordIntervalForecaster(params.toIntervalForecasterParams());
         val anomalyType = AnomalyType.TWO_TAILED;
 

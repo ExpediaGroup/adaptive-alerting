@@ -17,7 +17,6 @@ package com.expedia.adaptivealerting.samples;
 
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.DetectorLookup;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.PewmaDetector;
 import com.expedia.adaptivealerting.tools.pipeline.filter.DetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.source.WhiteNoiseMetricSource;
 import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
@@ -36,7 +35,7 @@ public class WhiteNoiseEwmaVsPewma {
 
         val factory = new LegacyDetectorFactory(new DetectorLookup());
         val ewmaFilter = new DetectorFilter(factory.createEwmaDetector());
-        val pewmaFilter = new DetectorFilter(new PewmaDetector());
+        val pewmaFilter = new DetectorFilter(factory.createPewmaDetector());
 
         val ewmaChart = PipelineFactory.createChartSink("EWMA");
         val pewmaChart = PipelineFactory.createChartSink("PEWMA");

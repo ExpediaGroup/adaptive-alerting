@@ -18,7 +18,6 @@ package com.expedia.adaptivealerting.samples;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.DetectorLookup;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.EwmaParams;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.PewmaDetector;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.PewmaParams;
 import com.expedia.adaptivealerting.anomdetect.detector.CusumDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.CusumParams;
@@ -52,8 +51,7 @@ public final class Sample001 {
                 .setAlpha(0.20)
                 .setWeakSigmas(5.0)
                 .setStrongSigmas(6.0);
-        val pewmaAD = new PewmaDetector();
-        pewmaAD.init(UUID.randomUUID(), pewmaParams, AnomalyType.TWO_TAILED);
+        val pewmaAD = factory.createPewmaDetector(UUID.randomUUID(), pewmaParams);
         val pewmaADF = new DetectorFilter(pewmaAD);
 
         val cusumParams = new CusumParams()

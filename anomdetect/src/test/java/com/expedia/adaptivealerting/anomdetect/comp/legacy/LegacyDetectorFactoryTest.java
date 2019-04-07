@@ -23,6 +23,7 @@ import com.expedia.adaptivealerting.anomdetect.detector.Detector;
 import com.expedia.adaptivealerting.anomdetect.forecast.ForecastingDetector;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.PewmaPointForecaster;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import lombok.val;
@@ -100,8 +101,16 @@ public class LegacyDetectorFactoryTest {
     @Test
     public void testCreateDetector_pewma() {
         val params = new HashMap<String, Object>();
-        val detector = buildDetector(LegacyDetectorTypes.PEWMA, params);
-        assertEquals(PewmaDetector.class, detector.getClass());
+        val detector = (ForecastingDetector) buildDetector(LegacyDetectorTypes.PEWMA, params);
+        assertTrue(detector.getPointForecaster() instanceof PewmaPointForecaster);
+        assertTrue(detector.getIntervalForecaster() instanceof ExponentialWelfordIntervalForecaster);
+    }
+
+    @Test
+    public void testCreatePewmaDetector_noArg() {
+        val detector = (ForecastingDetector) factoryUnderTest.createPewmaDetector();
+        assertTrue(detector.getPointForecaster() instanceof PewmaPointForecaster);
+        assertTrue(detector.getIntervalForecaster() instanceof ExponentialWelfordIntervalForecaster);
     }
 
     private void initDependencies() {
@@ -112,9 +121,6 @@ public class LegacyDetectorFactoryTest {
         doReturn(CusumDetector.class)
                 .when(detectorLookup)
                 .getDetector(LegacyDetectorTypes.CUSUM);
-        doReturn(PewmaDetector.class)
-                .when(detectorLookup)
-                .getDetector(LegacyDetectorTypes.PEWMA);
     }
 
     private Detector buildDetector(String type, Map<String, Object> params) {

@@ -48,6 +48,7 @@ public class EwmaPointForecaster implements PointForecaster {
 
     @Override
     public double forecast(MetricData metricData) {
+        notNull(metricData, "metricData can't be null");
         val observed = metricData.getValue();
         updateMeanEstimate(observed);
         return mean;

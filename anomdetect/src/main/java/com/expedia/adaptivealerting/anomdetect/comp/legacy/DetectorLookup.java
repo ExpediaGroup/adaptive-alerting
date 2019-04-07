@@ -40,7 +40,7 @@ public class DetectorLookup {
         detectorMap.put("ewma-detector", ForecastingDetector.class);
         detectorMap.put("holtwinters-detector", HoltWintersDetector.class);
         detectorMap.put("individuals-detector", IndividualsControlChartDetector.class);
-        detectorMap.put("pewma-detector", PewmaDetector.class);
+        detectorMap.put("pewma-detector", ForecastingDetector.class);
     }
 
     public Set<String> getDetectorTypes() {
