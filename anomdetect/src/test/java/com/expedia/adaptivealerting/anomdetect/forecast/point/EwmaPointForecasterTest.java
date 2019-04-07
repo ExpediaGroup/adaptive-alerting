@@ -57,6 +57,8 @@ public final class EwmaPointForecasterTest {
                 .setAlpha(0.05)
                 .setInitMeanEstimate(observed0);
         val forecaster = new EwmaPointForecaster(params);
+
+        assertEquals(params, forecaster.getParams());
         assertEquals(observed0, forecaster.getMean(), TOLERANCE);
 
         while (testRows.hasNext()) {

@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.point;
 
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.DetectorParams;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
 import lombok.Generated;
@@ -23,7 +22,6 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.val;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 public class EwmaPointForecaster implements PointForecaster {
@@ -64,7 +62,7 @@ public class EwmaPointForecaster implements PointForecaster {
 
     @Data
     @Accessors(chain = true)
-    public static class Params implements DetectorParams {
+    public static class Params {
 
         /**
          * Smoothing param. Somewhat misnamed because higher values lead to less smoothing, but it's called the
@@ -78,10 +76,5 @@ public class EwmaPointForecaster implements PointForecaster {
          */
         @Generated // https://reflectoring.io/100-percent-test-coverage/
         public double initMeanEstimate = 0.0;
-
-        @Override
-        public void validate() {
-            isTrue(0.0 <= alpha && alpha <= 1.0, "Required: alpha in the range [0, 1]");
-        }
     }
 }

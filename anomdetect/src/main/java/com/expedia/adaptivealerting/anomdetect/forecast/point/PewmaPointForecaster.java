@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.point;
 
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.DetectorParams;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
 import lombok.Generated;
@@ -117,7 +116,7 @@ public class PewmaPointForecaster implements PointForecaster {
 
     @Data
     @Accessors(chain = true)
-    public static class Params implements DetectorParams {
+    public static class Params {
 
         /**
          * Smoothing param.
@@ -138,10 +137,5 @@ public class PewmaPointForecaster implements PointForecaster {
          * How many iterations to train for.
          */
         private int warmUpPeriod = 30;
-
-        @Override
-        public void validate() {
-            // Not currently implemented
-        }
     }
 }

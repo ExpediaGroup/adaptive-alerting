@@ -86,11 +86,13 @@ public final class PewmaPointForecasterTest {
         val testRows = readData_calInflow().listIterator();
         val observed0 = testRows.next().getObserved();
 
-        val params = new PewmaParams()
+        val params = new PewmaPointForecaster.Params()
                 .setAlpha(DEFAULT_ALPHA)
                 .setBeta(0.5)
                 .setInitMeanEstimate(observed0);
-        val forecaster = new PewmaPointForecaster(params.toPointForecasterParams());
+        val forecaster = new PewmaPointForecaster(params);
+
+        assertEquals(params, forecaster.getParams());
 
         while (testRows.hasNext()) {
             val testRow = testRows.next();
@@ -101,6 +103,12 @@ public final class PewmaPointForecasterTest {
             assertEquals(testRow.getMean(), forecaster.getMean(), TOLERANCE);
             assertEquals(testRow.getStd(), forecaster.getStdDev(), TOLERANCE);
         }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testForecast_nullMetricData() {
+        val forecaster = new PewmaPointForecaster();
+        forecaster.forecast(null);
     }
 
     private static List<String[]> readData_sampleInput() throws IOException {
