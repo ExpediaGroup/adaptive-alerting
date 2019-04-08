@@ -20,7 +20,7 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.core.evaluator.ModelEvaluation;
-import com.expedia.adaptivealerting.core.util.TestObjectMother;
+import com.expedia.adaptivealerting.tools.util.TestObjectMother;
 import com.expedia.adaptivealerting.tools.visualization.ChartSeries;
 import com.expedia.metrics.MetricData;
 import lombok.val;

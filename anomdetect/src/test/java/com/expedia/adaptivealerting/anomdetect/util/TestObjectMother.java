@@ -13,19 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.util;
+package com.expedia.adaptivealerting.anomdetect.util;
 
 import com.expedia.metrics.MetricDefinition;
 
 /**
- * <p>
  * Test object mother: http://wiki.c2.com/?ObjectMother
- * </p>
- * <p>
- * Ideally this would be part of the test source directory, but Maven doesn't allow us to declare test-only
- * dependencies. So we're putting this in the main source directory, considering that to be the lesser of two evils as
- * compared to duplicating this class in each module.
- * </p>
  */
 public final class TestObjectMother {
 

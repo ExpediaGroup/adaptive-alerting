@@ -19,7 +19,7 @@ import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecas
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecaster;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
-import com.expedia.adaptivealerting.core.util.TestObjectMother;
+import com.expedia.adaptivealerting.anomdetect.util.TestObjectMother;
 import com.expedia.metrics.MetricData;
 import lombok.val;
 import org.junit.Before;
