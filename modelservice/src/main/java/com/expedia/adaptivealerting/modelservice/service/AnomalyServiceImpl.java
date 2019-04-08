@@ -56,16 +56,12 @@ public class AnomalyServiceImpl implements AnomalyService {
                     List<MetricSourceResult> results = metricSource.getMetricData(request.getMetricTags());
                     Detector detector = DetectorUtil.getDetector(request.getDetectorType(), request.getDetectorParams());
                     for (MetricSourceResult result : results) {
-                        MetricData metricData = toMetricData(result);
+                        MetricDefinition metricDefinition = MetricUtil.metricDefinition(null, null);
+                        MetricData metricData = MetricUtil.metricData(metricDefinition, result.getDataPoint(), result.getEpochSecond());
                         AnomalyResult anomalyResult = detector.classify(metricData);
                         anomalyResults.add(anomalyResult);
                     }
                 });
         return anomalyResults;
-    }
-
-    private MetricData toMetricData(MetricSourceResult result) {
-        MetricDefinition metricDefinition = MetricUtil.metricDefinition(null, null);
-        return MetricUtil.metricData(metricDefinition, result.getDataPoint(), result.getEpochSecond());
     }
 }
