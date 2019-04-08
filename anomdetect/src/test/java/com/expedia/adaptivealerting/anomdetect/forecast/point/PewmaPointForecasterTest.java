@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.anomdetect.forecast.point;
 
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.EwmaParams;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.PewmaParams;
+import com.expedia.adaptivealerting.core.util.TestObjectMother;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.opencsv.CSVReader;
@@ -46,7 +47,7 @@ public final class PewmaPointForecasterTest {
 
     @Before
     public void setUp() {
-        this.metricDef = new MetricDefinition("some-key");
+        this.metricDef = TestObjectMother.metricDefinition();
         this.epochSecond = Instant.now().getEpochSecond();
     }
 
@@ -57,19 +58,23 @@ public final class PewmaPointForecasterTest {
         val testRows = readData_sampleInput().listIterator();
         val observed0 = Double.parseDouble(testRows.next()[0]);
 
+        val ewmaParams = new EwmaParams()
+                .setAlpha(DEFAULT_ALPHA)
+                .setInitMeanEstimate(observed0);
+        val ewmaPointForecaster = new EwmaPointForecaster(ewmaParams.toPointForecasterParams());
+
         val pewmaParams = new PewmaParams()
                 .setAlpha(DEFAULT_ALPHA)
                 .setBeta(beta)
                 .setInitMeanEstimate(observed0);
         val pewmaPointForecaster = new PewmaPointForecaster(pewmaParams.toPointForecasterParams());
 
-        val ewmaParams = new EwmaParams()
-                .setAlpha(DEFAULT_ALPHA)
-                .setInitMeanEstimate(observed0);
-        val ewmaPointForecaster = new EwmaPointForecaster(ewmaParams.toPointForecasterParams());
-
         int rowCount = 1;
         while (testRows.hasNext()) {
+            val observed = Double.parseDouble(testRows.next()[0]);
+            val metricData = new MetricData(metricDef, observed, rowCount);
+            ewmaPointForecaster.forecast(metricData);
+            pewmaPointForecaster.forecast(metricData);
             val threshold = 1.0 / rowCount; // results converge with more iterations
             assertEquals(ewmaPointForecaster.getMean(), pewmaPointForecaster.getMean(), threshold);
             rowCount++;
