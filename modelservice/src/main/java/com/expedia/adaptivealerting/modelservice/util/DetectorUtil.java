@@ -1,6 +1,7 @@
 package com.expedia.adaptivealerting.modelservice.util;
 
-import com.expedia.adaptivealerting.anomdetect.comp.DetectorLookup;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.DetectorLookup;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.DetectorParams;
 import com.expedia.adaptivealerting.anomdetect.detector.*;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.adaptivealerting.core.util.ReflectionUtil;
