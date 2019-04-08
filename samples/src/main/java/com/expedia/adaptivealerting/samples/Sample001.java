@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.DetectorLookup;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.EwmaParams;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.PewmaParams;
@@ -38,21 +37,33 @@ public final class Sample001 {
 
     public static void main(String[] args) throws Exception {
         val source = buildMetricFrameMetricSource("samples/sample001.csv", 200L);
+        val factory = new LegacyDetectorFactory();
 
-        val factory = new LegacyDetectorFactory(new DetectorLookup());
         val ewmaParams = new EwmaParams()
                 .setAlpha(0.20)
                 .setWeakSigmas(4.5)
                 .setStrongSigmas(5.5);
-        val ewmaAD = factory.createEwmaDetector(UUID.randomUUID(), ewmaParams);
-        val ewmaADF = new DetectorFilter(ewmaAD);
+        val ewmaDetector = factory.createEwmaDetector(UUID.randomUUID(), ewmaParams);
+        val ewmaFilter = new DetectorFilter(ewmaDetector);
+        val ewmaEval = new EvaluatorFilter(new RmseEvaluator());
+        val ewmaChart = PipelineFactory.createChartSink("EWMA");
+        source.addSubscriber(ewmaFilter);
+        ewmaFilter.addSubscriber(ewmaEval);
+        ewmaFilter.addSubscriber(ewmaChart);
+        ewmaEval.addSubscriber(ewmaChart);
 
         val pewmaParams = new PewmaParams()
                 .setAlpha(0.20)
                 .setWeakSigmas(5.0)
                 .setStrongSigmas(6.0);
-        val pewmaAD = factory.createPewmaDetector(UUID.randomUUID(), pewmaParams);
-        val pewmaADF = new DetectorFilter(pewmaAD);
+        val pewmaDetector = factory.createPewmaDetector(UUID.randomUUID(), pewmaParams);
+        val pewmaFilter = new DetectorFilter(pewmaDetector);
+        val pewmaEval = new EvaluatorFilter(new RmseEvaluator());
+        val pewmaChart = PipelineFactory.createChartSink("PEWMA");
+        source.addSubscriber(pewmaFilter);
+        pewmaFilter.addSubscriber(pewmaEval);
+        pewmaFilter.addSubscriber(pewmaChart);
+        pewmaEval.addSubscriber(pewmaChart);
 
         val cusumParams = new CusumParams()
                 .setType(AnomalyType.RIGHT_TAILED)
@@ -60,29 +71,11 @@ public final class Sample001 {
                 .setWeakSigmas(3.0)
                 .setStrongSigmas(4.0)
                 .setInitMeanEstimate(13_000_000);
-        val cusumAD = new CusumDetector();
-        cusumAD.init(UUID.randomUUID(), cusumParams, AnomalyType.TWO_TAILED);
-        val cusumADF = new DetectorFilter(cusumAD);
-
-        val ewmaEval = new EvaluatorFilter(new RmseEvaluator());
-        val pewmaEval = new EvaluatorFilter(new RmseEvaluator());
-
-        val ewmaChart = PipelineFactory.createChartSink("EWMA");
-        val pewmaChart = PipelineFactory.createChartSink("PEWMA");
+        val cusumDetector = new CusumDetector(UUID.randomUUID(), cusumParams);
+        val cusumFilter = new DetectorFilter(cusumDetector);
         val cusumChart = PipelineFactory.createChartSink("CUSUM");
-
-        source.addSubscriber(ewmaADF);
-        ewmaADF.addSubscriber(ewmaEval);
-        ewmaADF.addSubscriber(ewmaChart);
-        ewmaEval.addSubscriber(ewmaChart);
-
-        source.addSubscriber(pewmaADF);
-        pewmaADF.addSubscriber(pewmaEval);
-        pewmaADF.addSubscriber(pewmaChart);
-        pewmaEval.addSubscriber(pewmaChart);
-
-        source.addSubscriber(cusumADF);
-        cusumADF.addSubscriber(cusumChart);
+        source.addSubscriber(cusumFilter);
+        cusumFilter.addSubscriber(cusumChart);
 
         showChartFrame(createChartFrame(
                 "Sample001.csv",

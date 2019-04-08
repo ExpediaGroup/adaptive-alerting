@@ -79,11 +79,6 @@ public final class DefaultDetectorSourceTest {
     }
 
     @Test
-    public void testFindDetectorTypes() {
-        assertNotNull(sourceUnderTest.findDetectorTypes());
-    }
-
-    @Test
     public void testFindDetectorUuids() {
         val results = sourceUnderTest.findDetectorUuids(metricDef);
         assertEquals(1, results.size());

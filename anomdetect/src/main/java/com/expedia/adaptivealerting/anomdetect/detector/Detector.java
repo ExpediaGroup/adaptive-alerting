@@ -15,9 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detector;
 
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.DetectorParams;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.metrics.MetricData;
 
 import java.util.UUID;
@@ -25,7 +23,7 @@ import java.util.UUID;
 /**
  * Anomaly detector interface.
  */
-public interface Detector<T extends DetectorParams> {
+public interface Detector {
 
     /**
      * Returns the anomaly detector UUID.
@@ -41,22 +39,4 @@ public interface Detector<T extends DetectorParams> {
      * @return Anomaly result.
      */
     AnomalyResult classify(MetricData metricData);
-
-    // ================================================================================
-    // Deprecated
-    // ================================================================================
-
-    // Deprecated: params and anomaly type not part of the general contract.
-    @Deprecated
-    void init(UUID uuid, T params, AnomalyType anomalyType);
-
-    // Deprecated: params not part of the general contract.
-    // params can go with the detector or its individual components (e.g. forecasters).
-    @Deprecated
-    Class<T> getParamsClass();
-
-    // Deprecated: anomalyType not part of the general contract.
-    // anomalyType is for forecasting detectors.
-    @Deprecated
-    AnomalyType getAnomalyType();
 }

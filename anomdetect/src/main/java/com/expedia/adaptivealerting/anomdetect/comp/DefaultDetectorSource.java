@@ -16,7 +16,6 @@
 package com.expedia.adaptivealerting.anomdetect.comp;
 
 import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelServiceConnector;
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.DetectorLookup;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
 import com.expedia.metrics.MetricDefinition;
@@ -26,7 +25,6 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -41,19 +39,11 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @Slf4j
 public class DefaultDetectorSource implements DetectorSource {
 
-    // FIXME This is duplicated here and in the DetectorFactory. [WLW]
-    private final DetectorLookup detectorLookup = new DetectorLookup();
-
     @NonNull
     private final ModelServiceConnector connector;
 
     @NonNull
     private final LegacyDetectorFactory legacyDetectorFactory;
-
-    @Override
-    public Set<String> findDetectorTypes() {
-        return detectorLookup.getDetectorTypes();
-    }
 
     @Override
     public List<UUID> findDetectorUuids(MetricDefinition metricDef) {

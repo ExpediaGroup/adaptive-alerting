@@ -19,9 +19,10 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.metrics.MetricData;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.val;
+
+import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.MODEL_WARMUP;
 import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.NORMAL;
@@ -39,9 +40,7 @@ import static java.lang.Math.sqrt;
  *
  * @see <a href="https://www.spcforexcel.com/knowledge/variable-control-charts/individuals-control-charts">https://www.spcforexcel.com/knowledge/variable-control-charts/individuals-control-charts</a>
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
-public final class IndividualsControlChartDetector extends AbstractDetector<IndividualsControlChartParams> {
+public final class IndividualsControlChartDetector implements Detector {
     private static final double R_CONTROL_CHART_CONSTANT_D4 = 3.267;
     private static final double R_CONTROL_CHART_CONSTANT_D2 = 1.128;
 
@@ -49,6 +48,12 @@ public final class IndividualsControlChartDetector extends AbstractDetector<Indi
      * Number of points after which limits will be recomputed
      */
     private static final int RECOMPUTE_LIMITS_PERIOD = 100;
+
+    @Getter
+    private UUID uuid;
+
+    @Getter
+    private IndividualsControlChartParams params;
 
     /**
      * Aggregate Moving range. Used to calculate avg. moving range.
@@ -73,16 +78,19 @@ public final class IndividualsControlChartDetector extends AbstractDetector<Indi
     /**
      * Upper limit for R chart
      */
+    @Getter
     private double upperControlLimit_R;
 
     /**
      * Upper limit for X chart
      */
+    @Getter
     private double upperControlLimit_X;
 
     /**
      * Lower limit for X chart
      */
+    @Getter
     private double lowerControlLimit_X;
 
     /**
@@ -95,12 +103,11 @@ public final class IndividualsControlChartDetector extends AbstractDetector<Indi
      */
     private double mean;
 
-    public IndividualsControlChartDetector() {
-        super(IndividualsControlChartParams.class);
-    }
-
-    @Override
-    protected void initState(IndividualsControlChartParams params) {
+    public IndividualsControlChartDetector(UUID uuid, IndividualsControlChartParams params) {
+        notNull(uuid, "uuid can't be null");
+        notNull(params, "params can't be null");
+        this.uuid = uuid;
+        this.params = params;
         this.prevValue = params.getInitValue();
         this.target = params.getInitValue();
         this.mean = params.getInitMeanEstimate();

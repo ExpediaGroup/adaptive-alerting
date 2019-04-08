@@ -18,33 +18,39 @@ package com.expedia.adaptivealerting.anomdetect.detector;
 import com.expedia.adaptivealerting.anomdetect.comp.AnomalyClassifier;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.metrics.MetricData;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.val;
+
+import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * Anomaly detector with constant threshold for weak and strong anomalies. Supports both one- and two-tailed tests.
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
-public final class ConstantThresholdDetector extends AbstractDetector<ConstantThresholdParams> {
+public final class ConstantThresholdDetector implements Detector {
 
-    public ConstantThresholdDetector() {
-        super(ConstantThresholdParams.class);
+    @Getter
+    private final UUID uuid;
+
+    @Getter
+    private final ConstantThresholdParams params;
+
+    private final AnomalyClassifier classifier;
+
+    public ConstantThresholdDetector(UUID uuid, ConstantThresholdParams params) {
+        notNull(uuid, "uuid can't be null");
+        notNull(params, "params can't be null");
+        this.uuid = uuid;
+        this.params = params;
+        this.classifier = new AnomalyClassifier(params.getType());
     }
 
     @Override
     public AnomalyResult classify(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
-
-        val params = getParams();
         val thresholds = params.getThresholds();
-        val level = new AnomalyClassifier(getAnomalyType()).classify(thresholds, metricData.getValue());
-        
-        val result = new AnomalyResult(level);
-        result.setThresholds(thresholds);
-        return result;
+        val level = classifier.classify(thresholds, metricData.getValue());
+        return new AnomalyResult(level).setThresholds(thresholds);
     }
 }

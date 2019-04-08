@@ -70,4 +70,8 @@ public final class PewmaParams {
                 .setWeakSigmas(weakSigmas)
                 .setStrongSigmas(strongSigmas);
     }
+
+    public void validate() {
+        // TODO
+    }
 }

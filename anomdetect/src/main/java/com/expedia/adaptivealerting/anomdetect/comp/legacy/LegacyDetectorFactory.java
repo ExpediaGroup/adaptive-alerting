@@ -16,22 +16,25 @@
 package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
 import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelResource;
+import com.expedia.adaptivealerting.anomdetect.detector.ConstantThresholdDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.ConstantThresholdParams;
+import com.expedia.adaptivealerting.anomdetect.detector.CusumDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.CusumParams;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
+import com.expedia.adaptivealerting.anomdetect.detector.IndividualsControlChartDetector;
+import com.expedia.adaptivealerting.anomdetect.detector.IndividualsControlChartParams;
 import com.expedia.adaptivealerting.anomdetect.forecast.ForecastingDetector;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PewmaPointForecaster;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
-import com.expedia.adaptivealerting.core.util.ReflectionUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import lombok.var;
 
+import java.util.Map;
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -45,9 +48,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 public class LegacyDetectorFactory {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @NonNull
-    private DetectorLookup detectorLookup;
-
     // TODO Currently we use a legacy process to find the detector. The legacy process couples point forecast algos
     //  with interval forecast algos. We will decouple these shortly. [WLW]
     public Detector createDetector(UUID uuid, ModelResource modelResource) {
@@ -55,69 +55,78 @@ public class LegacyDetectorFactory {
         notNull(modelResource, "modelResource can't be null");
 
         val detectorType = modelResource.getDetectorType().getKey();
+        val paramsMap = modelResource.getParams();
         var detector = (Detector) null;
 
-        if (LegacyDetectorTypes.EWMA.equals(detectorType)) {
-            val params = objectMapper.convertValue(modelResource.getParams(), EwmaParams.class);
-            params.validate();
-            detector = createEwmaDetector(uuid, params);
+        if (LegacyDetectorTypes.CONSTANT_THRESHOLD.equals(detectorType)) {
+            detector = createConstantThresholdDetector(uuid, toParams(paramsMap, ConstantThresholdParams.class));
+        } else if (LegacyDetectorTypes.CUSUM.equals(detectorType)) {
+            detector = createCusumDetector(uuid, toParams(paramsMap, CusumParams.class));
+        } else if (LegacyDetectorTypes.EWMA.equals(detectorType)) {
+            detector = createEwmaDetector(uuid, toParams(paramsMap, EwmaParams.class));
+        } else if (LegacyDetectorTypes.HOLT_WINTERS.equals(detectorType)) {
+            detector = createHoltWintersDetector(uuid, toParams(paramsMap, HoltWintersParams.class));
+        } else if (LegacyDetectorTypes.INDIVIDUALS.equals(detectorType)) {
+            detector = createIndividualsDetector(uuid, toParams(paramsMap, IndividualsControlChartParams.class));
         } else if (LegacyDetectorTypes.PEWMA.equals(detectorType)) {
-            val params = objectMapper.convertValue(modelResource.getParams(), PewmaParams.class);
-            detector = createPewmaDetector(uuid, params);
+            detector = createPewmaDetector(uuid, toParams(paramsMap, PewmaParams.class));
         } else {
-            val detectorClass = detectorLookup.getDetector(detectorType);
-            detector = ReflectionUtil.newInstance(detectorClass);
-            val paramsClass = detector.getParamsClass();
-            val params = (DetectorParams) objectMapper.convertValue(modelResource.getParams(), paramsClass);
-            val anomalyType = doLegacyGetAnomalyType(params);
-            detector.init(uuid, params, anomalyType);
+            throw new IllegalArgumentException("Unknown detector type: " + detectorType);
         }
 
         log.info("Created detector: {}", detector);
         return detector;
     }
 
-    public Detector createEwmaDetector() {
-        return createEwmaDetector(UUID.randomUUID(), new EwmaParams());
+    public Detector createConstantThresholdDetector(UUID uuid, ConstantThresholdParams params) {
+        notNull(uuid, "uuid can't be null");
+        notNull(params, "params can't be null");
+        params.validate();
+        return new ConstantThresholdDetector(uuid, params);
+    }
+
+    public Detector createCusumDetector(UUID uuid, CusumParams params) {
+        notNull(uuid, "uuid can't be null");
+        notNull(params, "params can't be null");
+        params.validate();
+        return new CusumDetector(uuid, params);
     }
 
     public Detector createEwmaDetector(UUID uuid, EwmaParams params) {
         notNull(uuid, "uuid can't be null");
         notNull(params, "params can't be null");
-
+        params.validate();
         val pointForecaster = new EwmaPointForecaster(params.toPointForecasterParams());
         val intervalForecaster = new ExponentialWelfordIntervalForecaster(params.toIntervalForecasterParams());
         val anomalyType = AnomalyType.TWO_TAILED;
-
         return new ForecastingDetector(uuid, pointForecaster, intervalForecaster, anomalyType);
     }
 
-    public Detector createPewmaDetector() {
-        return createPewmaDetector(UUID.randomUUID(), new PewmaParams());
+    public Detector createHoltWintersDetector(UUID uuid, HoltWintersParams params) {
+        notNull(uuid, "uuid can't be null");
+        notNull(params, "params can't be null");
+        params.validate();
+        return new HoltWintersDetector(uuid, params);
+    }
+
+    public Detector createIndividualsDetector(UUID uuid, IndividualsControlChartParams params) {
+        notNull(uuid, "uuid can't be null");
+        notNull(params, "params can't be null");
+        params.validate();
+        return new IndividualsControlChartDetector(uuid, params);
     }
 
     public Detector createPewmaDetector(UUID uuid, PewmaParams params) {
         notNull(uuid, "uuid can't be null");
         notNull(params, "params can't be null");
-
+        params.validate();
         val pointForecaster = new PewmaPointForecaster(params.toPointForecasterParams());
         val intervalForecaster = new ExponentialWelfordIntervalForecaster(params.toIntervalForecasterParams());
         val anomalyType = AnomalyType.TWO_TAILED;
-
         return new ForecastingDetector(uuid, pointForecaster, intervalForecaster, anomalyType);
     }
 
-    private AnomalyType doLegacyGetAnomalyType(DetectorParams params) {
-        val paramsClass = params.getClass();
-
-        // TODO For now we simply reproduce current behavior, which is that only certain detectors support tails. Soon
-        //  we'll remove these hardcodes since all detectors will support tails.
-        if (ConstantThresholdParams.class.equals(paramsClass)) {
-            return ((ConstantThresholdParams) params).getType();
-        } else if (CusumParams.class.equals(paramsClass)) {
-            return ((CusumParams) params).getType();
-        } else {
-            return AnomalyType.TWO_TAILED;
-        }
+    private <T> T toParams(Map<String, Object> paramsMap, Class<T> paramsClass) {
+        return objectMapper.convertValue(paramsMap, paramsClass);
     }
 }

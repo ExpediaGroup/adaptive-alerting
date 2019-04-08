@@ -95,8 +95,7 @@ public class CusumDetectorTest {
                 .setInitMeanEstimate(testRow0.getObserved())
                 .setWarmUpPeriod(WARMUP_PERIOD);
 
-        val detector = new CusumDetector();
-        detector.init(detectorUuid, params, anomalyType);
+        val detector = new CusumDetector(detectorUuid, params);
 
         int numDataPoints = 1;
 
@@ -142,8 +141,7 @@ public class CusumDetectorTest {
     }
 
     private void testClassify(CusumParams params, AnomalyType anomalyType, CusumTestRow[] testRows) {
-        val detector = new CusumDetector();
-        detector.init(detectorUuid, params, anomalyType);
+        val detector = new CusumDetector(detectorUuid, params);
 
         // FIXME Hack to handle an off-by-one bug in the CusumDetector. [WLW]
         val adjWarmupPeriod = params.getWarmUpPeriod() - 1;

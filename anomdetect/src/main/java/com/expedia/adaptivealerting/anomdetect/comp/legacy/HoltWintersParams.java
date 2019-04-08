@@ -36,7 +36,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @Accessors(chain = true)
 @Slf4j
 @Deprecated
-public final class HoltWintersParams implements DetectorParams {
+public final class HoltWintersParams {
 
     /**
      * SeasonalityType parameter used to determine which Seasonality method (Multiplicative or Additive) to use.
@@ -132,7 +132,6 @@ public final class HoltWintersParams implements DetectorParams {
         return (initTrainingMethod == HoltWintersTrainingMethod.SIMPLE) ? (frequency * 2) : 0;
     }
 
-    @Override
     public void validate() {
         notNull(seasonalityType, "Required: seasonalityType one of " + Arrays.toString(SeasonalityType.values()));
         notNull(initTrainingMethod, "Required: initTrainingMethod one of " + Arrays.toString(HoltWintersTrainingMethod.values()));

@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.DetectorLookup;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.PewmaParams;
 import com.expedia.adaptivealerting.core.data.MetricFrameLoader;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.tools.pipeline.filter.DetectorFilter;
@@ -25,6 +25,8 @@ import com.expedia.adaptivealerting.tools.pipeline.source.MetricFrameMetricSourc
 import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
 import com.expedia.metrics.MetricDefinition;
 import lombok.val;
+
+import java.util.UUID;
 
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.createChartFrame;
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showChartFrame;
@@ -38,14 +40,16 @@ public final class CsvTrafficPewma {
         val frame = MetricFrameLoader.loadCsv(new MetricDefinition("csv"), is, true);
         val source = new MetricFrameMetricSource(frame, "data", 200L);
 
-        val factory = new LegacyDetectorFactory(new DetectorLookup());
-        val detector = new DetectorFilter(factory.createPewmaDetector());
+        val factory = new LegacyDetectorFactory();
+
+        val detector = factory.createPewmaDetector(UUID.randomUUID(), new PewmaParams());
+        val filter = new DetectorFilter(detector);
         val evaluator = new EvaluatorFilter(new RmseEvaluator());
         val chartWrapper = PipelineFactory.createChartSink("PEWMA");
 
-        source.addSubscriber(detector);
-        detector.addSubscriber(evaluator);
-        detector.addSubscriber(chartWrapper);
+        source.addSubscriber(filter);
+        filter.addSubscriber(evaluator);
+        filter.addSubscriber(chartWrapper);
         evaluator.addSubscriber(chartWrapper);
 
         showChartFrame(createChartFrame("Cal Inflow", chartWrapper.getChart()));

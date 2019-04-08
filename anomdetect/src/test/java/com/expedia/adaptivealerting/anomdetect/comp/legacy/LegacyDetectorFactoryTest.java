@@ -30,7 +30,6 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Date;
@@ -40,19 +39,14 @@ import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.doReturn;
 
 public class LegacyDetectorFactoryTest {
     private LegacyDetectorFactory factoryUnderTest;
 
-    @Mock
-    private DetectorLookup detectorLookup;
-
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        initDependencies();
-        this.factoryUnderTest = new LegacyDetectorFactory(detectorLookup);
+        this.factoryUnderTest = new LegacyDetectorFactory();
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -93,25 +87,11 @@ public class LegacyDetectorFactoryTest {
     }
 
     @Test
-    public void testCreateEwmaDetector_noArg() {
-        val detector = (ForecastingDetector) factoryUnderTest.createEwmaDetector();
-        assertTrue(detector.getPointForecaster() instanceof EwmaPointForecaster);
-        assertTrue(detector.getIntervalForecaster() instanceof ExponentialWelfordIntervalForecaster);
-    }
-
-    @Test
-    public void testCreateDetector_pewma() {
+    public void testCreateDetector_holtWinters() {
         val params = new HashMap<String, Object>();
-        val detector = (ForecastingDetector) buildDetector(LegacyDetectorTypes.PEWMA, params);
-        assertTrue(detector.getPointForecaster() instanceof PewmaPointForecaster);
-        assertTrue(detector.getIntervalForecaster() instanceof ExponentialWelfordIntervalForecaster);
-    }
-
-    @Test
-    public void testCreatePewmaDetector_noArg() {
-        val detector = (ForecastingDetector) factoryUnderTest.createPewmaDetector();
-        assertTrue(detector.getPointForecaster() instanceof PewmaPointForecaster);
-        assertTrue(detector.getIntervalForecaster() instanceof ExponentialWelfordIntervalForecaster);
+        params.put("frequency", 24);
+        val detector = buildDetector(LegacyDetectorTypes.HOLT_WINTERS, params);
+        assertTrue(detector instanceof HoltWintersDetector);
     }
 
     @Test
@@ -121,17 +101,12 @@ public class LegacyDetectorFactoryTest {
         assertTrue(detector instanceof IndividualsControlChartDetector);
     }
 
-    private void initDependencies() {
-        // https://dzone.com/articles/mocking-method-with-wildcard-generic-return-type
-        doReturn(ConstantThresholdDetector.class)
-                .when(detectorLookup)
-                .getDetector(LegacyDetectorTypes.CONSTANT_THRESHOLD);
-        doReturn(CusumDetector.class)
-                .when(detectorLookup)
-                .getDetector(LegacyDetectorTypes.CUSUM);
-        doReturn(IndividualsControlChartDetector.class)
-                .when(detectorLookup)
-                .getDetector(LegacyDetectorTypes.INDIVIDUALS);
+    @Test
+    public void testCreateDetector_pewma() {
+        val params = new HashMap<String, Object>();
+        val detector = (ForecastingDetector) buildDetector(LegacyDetectorTypes.PEWMA, params);
+        assertTrue(detector.getPointForecaster() instanceof PewmaPointForecaster);
+        assertTrue(detector.getIntervalForecaster() instanceof ExponentialWelfordIntervalForecaster);
     }
 
     private Detector buildDetector(String type, Map<String, Object> params) {

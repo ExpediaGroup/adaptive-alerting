@@ -18,7 +18,6 @@ package com.expedia.adaptivealerting.samples;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.HoltWintersDetector;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.HoltWintersParams;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.SeasonalityType;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.tools.pipeline.filter.DetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
@@ -138,17 +137,21 @@ public class CsvTrafficHoltWintersVariants {
     private static AnomalyChartSink buildChart(MetricFrameMetricSource source, SeasonalityType seasonalityType, HoltWintersParams params,
                                                double alpha, double beta, double gammaLow, String... titleSuffix) {
 
-        val detector = new HoltWintersDetector();
-        detector.init(UUID.randomUUID(), params, AnomalyType.TWO_TAILED);
+        val detector = new HoltWintersDetector(UUID.randomUUID(), new HoltWintersParams());
+        val detectorFilter = new DetectorFilter(detector);
+        val evalFilter = new EvaluatorFilter(new RmseEvaluator());
+        val chartSink = PipelineFactory.createChartSink(String.format(
+                "HoltWinters %s: alpha=%s, beta=%s, gamma=%s %s",
+                seasonalityType,
+                alpha,
+                beta,
+                gammaLow,
+                Arrays.asList(titleSuffix)));
 
-        final DetectorFilter adf = new DetectorFilter(detector);
-        final EvaluatorFilter eval = new EvaluatorFilter(new RmseEvaluator());
-        final AnomalyChartSink chartSink = PipelineFactory.createChartSink(String.format("HoltWinters %s: alpha=%s, beta=%s, gamma=%s %s", seasonalityType,
-                alpha, beta, gammaLow, Arrays.asList(titleSuffix)));
-        source.addSubscriber(adf);
-        adf.addSubscriber(eval);
-        adf.addSubscriber(chartSink);
-        eval.addSubscriber(chartSink);
+        source.addSubscriber(detectorFilter);
+        detectorFilter.addSubscriber(evalFilter);
+        detectorFilter.addSubscriber(chartSink);
+        evalFilter.addSubscriber(chartSink);
         return chartSink;
     }
 }
