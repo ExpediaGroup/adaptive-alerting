@@ -54,4 +54,15 @@ public final class MetricUtilTest {
         val metricData = MetricUtil.metricData(metricDef, 3.14159);
         assertEquals(3.14159, metricData.getValue(), 0.001);
     }
+
+    @Test
+    public void testMetricData_value_and_epochSecond() {
+        val kvTags = MetricUtil.defaultKvTags();
+        val vTags = MetricUtil.defaultVTags();
+        val metricDef = MetricUtil.metricDefinition(kvTags, vTags);
+        val metricData = MetricUtil.metricData(metricDef, 3.14159, 1554702637);
+        assertEquals(3.14159, metricData.getValue(), 0.001);
+        assertEquals(1554702637, metricData.getTimestamp(), 0.001);
+
+    }
 }
