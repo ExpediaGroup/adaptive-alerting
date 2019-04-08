@@ -15,10 +15,7 @@
  */
 package com.expedia.adaptivealerting.core.util;
 
-import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
-
-import java.time.Instant;
 
 /**
  * <p>
@@ -34,9 +31,5 @@ public final class TestObjectMother {
 
     public static MetricDefinition metricDefinition() {
         return new MetricDefinition("my-metric");
-    }
-
-    public static MetricData metricData() {
-        return new MetricData(metricDefinition(), 100.0, Instant.now().getEpochSecond());
     }
 }
