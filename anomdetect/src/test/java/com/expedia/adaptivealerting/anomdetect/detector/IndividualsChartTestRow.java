@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.expedia.adaptivealerting.anomdetect.comp.legacy;
+package com.expedia.adaptivealerting.anomdetect.detector;
 
 import com.opencsv.bean.CsvBindByName;
 import lombok.Data;

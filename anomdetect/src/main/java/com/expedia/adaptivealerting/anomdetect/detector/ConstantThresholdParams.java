@@ -23,7 +23,6 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-@Deprecated
 public class ConstantThresholdParams implements DetectorParams {
 
     /**

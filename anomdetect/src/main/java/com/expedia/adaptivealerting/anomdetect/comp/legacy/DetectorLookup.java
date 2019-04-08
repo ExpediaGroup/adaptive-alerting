@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 import com.expedia.adaptivealerting.anomdetect.detector.ConstantThresholdDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.CusumDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
+import com.expedia.adaptivealerting.anomdetect.detector.IndividualsControlChartDetector;
 import com.expedia.adaptivealerting.anomdetect.forecast.ForecastingDetector;
 import lombok.val;
 

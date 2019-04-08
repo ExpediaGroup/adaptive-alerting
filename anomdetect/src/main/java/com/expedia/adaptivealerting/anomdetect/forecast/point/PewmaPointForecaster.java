@@ -114,6 +114,8 @@ public class PewmaPointForecaster implements PointForecaster {
         return (1.0 - params.getBeta() * pt) * this.adjAlpha;
     }
 
+    // TODO Describe why we chose these defaults as appropriate.
+    //  For example if the paper recommends them, we should say that.
     @Data
     @Accessors(chain = true)
     public static class Params {

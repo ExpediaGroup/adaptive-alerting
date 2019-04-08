@@ -19,8 +19,8 @@ import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecas
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecaster;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
+import com.expedia.adaptivealerting.core.util.TestObjectMother;
 import com.expedia.metrics.MetricData;
-import com.expedia.metrics.MetricDefinition;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,7 +57,7 @@ public class ForecastingDetectorTest {
 
     @Test
     public void testClassify() {
-        val metricDef = new MetricDefinition("my-metric");
+        val metricDef = TestObjectMother.metricDefinition();
         val metricData = new MetricData(metricDef, 100.0, Instant.now().getEpochSecond());
         val result = detectorUnderTest.classify(metricData);
         assertNotNull(result);

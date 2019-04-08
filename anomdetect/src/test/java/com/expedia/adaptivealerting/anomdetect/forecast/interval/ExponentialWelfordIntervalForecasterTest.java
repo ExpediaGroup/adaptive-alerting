@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.interval;
 
+import com.expedia.adaptivealerting.core.util.TestObjectMother;
 import com.expedia.metrics.MetricData;
-import com.expedia.metrics.MetricDefinition;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvToBeanBuilder;
 import lombok.Data;
@@ -63,7 +63,7 @@ public class ExponentialWelfordIntervalForecasterTest {
 
     @Test
     public void testForecast() {
-        val metricDef = new MetricDefinition("my-metric");
+        val metricDef = TestObjectMother.metricDefinition();
         val secondBase = Instant.now().getEpochSecond();
         var secondOffset = 0;
 

@@ -35,6 +35,21 @@ import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
+/**
+ * <p>
+ * {@link Detector} implementation based on underlying forecasters. The general approach is to generate a forecast and
+ * compare the observed value to the forecast. If the observed value is too far from the forecast, then the detector
+ * classifies the observation as an anomaly.
+ * </p>
+ * <p>
+ * We actually generate two types of forecast: point and interval forecasts. These are based upon underlying
+ * {@link PointForecaster} and {@link IntervalForecaster} implementations. Additionally we use {@link AnomalyType} to
+ * apply either a one- or two-tailed test when generating the classification.
+ * </p>
+ *
+ * @see PointForecaster
+ * @see IntervalForecaster
+ */
 @RequiredArgsConstructor
 public class ForecastingDetector implements Detector {
 

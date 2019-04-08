@@ -70,13 +70,8 @@ public final class PewmaPointForecasterTest {
 
         int rowCount = 1;
         while (testRows.hasNext()) {
-            val observed = Float.parseFloat(testRows.next()[0]);
-//            val ewmaStdDev = sqrt(ewmaDetector.getVariance());
-
             val threshold = 1.0 / rowCount; // results converge with more iterations
-//            assertEquals(ewmaDetector.getMean(), pewmaDetector.getMean(), threshold);
-//            assertEquals(ewmaStdDev, pewmaDetector.getStdDev(), threshold);
-
+            assertEquals(ewmaPointForecaster.getMean(), pewmaPointForecaster.getMean(), threshold);
             rowCount++;
         }
     }
