@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.forecast.point;
+package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
-import com.expedia.adaptivealerting.anomdetect.detector.DetectorParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaster;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -23,7 +24,8 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 
 @Data
 @Accessors(chain = true)
-public final class EwmaParams implements DetectorParams {
+@Deprecated
+public final class EwmaParams {
 
     /**
      * Smoothing param. Somewhat misnamed because higher values lead to less smoothing, but it's called the
@@ -46,7 +48,20 @@ public final class EwmaParams implements DetectorParams {
      */
     private double initMeanEstimate = 0.0;
 
-    @Override
+    public EwmaPointForecaster.Params toPointForecasterParams() {
+        return new EwmaPointForecaster.Params()
+                .setAlpha(alpha)
+                .setInitMeanEstimate(initMeanEstimate);
+    }
+
+    public ExponentialWelfordIntervalForecaster.Params toIntervalForecasterParams() {
+        return new ExponentialWelfordIntervalForecaster.Params()
+                .setAlpha(alpha)
+                .setInitVarianceEstimate(0.0)
+                .setWeakSigmas(weakSigmas)
+                .setStrongSigmas(strongSigmas);
+    }
+
     public void validate() {
         isTrue(0.0 <= alpha && alpha <= 1.0, "Required: alpha in the range [0, 1]");
         isTrue(weakSigmas > 0.0, "Required: weakSigmas > 0.0");

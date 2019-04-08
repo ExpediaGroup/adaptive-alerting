@@ -15,8 +15,9 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.filter;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaDetector;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.ForecastingDetector;
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaster;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.tools.pipeline.util.AnomalyResultSubscriber;
@@ -32,14 +33,17 @@ import java.util.UUID;
 import static org.junit.Assert.assertTrue;
 
 public final class DetectorFilterTest {
-    private AnomalyDetectorFilter filterUnderTest;
+    private DetectorFilter filterUnderTest;
     private MetricData metricData;
 
     @Before
     public void setUp() {
-        val detector = new EwmaDetector();
-        detector.init(UUID.randomUUID(), new EwmaParams(), AnomalyType.TWO_TAILED);
-        this.filterUnderTest = new AnomalyDetectorFilter(detector);
+        val detector = new ForecastingDetector(
+                UUID.randomUUID(),
+                new EwmaPointForecaster(),
+                new ExponentialWelfordIntervalForecaster(),
+                AnomalyType.TWO_TAILED);
+        this.filterUnderTest = new DetectorFilter(detector);
 
         val metricDef =  new MetricDefinition("my-metric-def");
         this.metricData = new MetricData(metricDef, 10.0, Instant.now().getEpochSecond());

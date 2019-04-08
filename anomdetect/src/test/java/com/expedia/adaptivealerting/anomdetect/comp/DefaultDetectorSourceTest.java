@@ -22,7 +22,11 @@ import com.expedia.adaptivealerting.anomdetect.comp.connector.DetectorResources;
 import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelResource;
 import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelServiceConnector;
 import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelTypeResource;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.detector.Detector;
+import com.expedia.adaptivealerting.anomdetect.forecast.ForecastingDetector;
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaster;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.metrics.MetricDefinition;
 import lombok.extern.slf4j.Slf4j;
@@ -39,16 +43,13 @@ import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @Slf4j
 public final class DefaultDetectorSourceTest {
-    private static final String DETECTOR_TYPE_CONSTANT_THRESHOLD = "constant-detector";
-    private static final String DETECTOR_TYPE_CUSUM = "cusum-detector";
     private static final String DETECTOR_TYPE_EWMA = "ewma-detector";
 
-    private static final UUID DETECTOR_UUID_CONSTANT_THRESHOLD = UUID.randomUUID();
-    private static final UUID DETECTOR_UUID_CUSUM = UUID.randomUUID();
     private static final UUID DETECTOR_UUID_EWMA = UUID.randomUUID();
     private static final UUID DETECTOR_UUID_MISSING_DETECTOR = UUID.randomUUID();
     private static final UUID DETECTOR_UUID_EXCEPTION = UUID.randomUUID();
@@ -58,20 +59,22 @@ public final class DefaultDetectorSourceTest {
     @Mock
     private ModelServiceConnector connector;
 
+    @Mock
+    private LegacyDetectorFactory legacyDetectorFactory;
+
     private MetricDefinition metricDef;
     private MetricDefinition metricDefException;
     private DetectorResources detectorResources;
     private DetectorResources updatedDetectorResources;
-    private ModelResource modelResource_constantThreshold;
-    private ModelResource modelResource_cusum;
     private ModelResource modelResource_ewma;
+    private Detector detector;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        this.sourceUnderTest = new DefaultDetectorSource(connector);
         initTestObjects();
         initDependencies();
+        this.sourceUnderTest = new DefaultDetectorSource(connector, legacyDetectorFactory);
     }
 
     @Test
@@ -100,22 +103,6 @@ public final class DefaultDetectorSourceTest {
 
         val result = results.get(0);
         assertEquals(DETECTOR_UUID_EWMA, result);
-    }
-
-    @Test
-    public void testFindDetector_constantThreshold() {
-        val result = sourceUnderTest.findDetector(DETECTOR_UUID_CONSTANT_THRESHOLD);
-        assertNotNull(result);
-        assertEquals(DETECTOR_UUID_CONSTANT_THRESHOLD, result.getUuid());
-        assertEquals(modelResource_constantThreshold.getParams().get("type"), result.getAnomalyType());
-    }
-
-    @Test
-    public void testFindDetector_cusum() {
-        val result = sourceUnderTest.findDetector(DETECTOR_UUID_CUSUM);
-        assertNotNull(result);
-        assertEquals(DETECTOR_UUID_CUSUM, result.getUuid());
-        assertEquals(modelResource_cusum.getParams().get("type"), result.getAnomalyType());
     }
 
     @Test
@@ -163,35 +150,20 @@ public final class DefaultDetectorSourceTest {
     }
 
     private void initTestObjects_findLatestModel() {
-        val constantThresholdParams = new HashMap<String, Object>();
-        constantThresholdParams.put("type", AnomalyType.RIGHT_TAILED);
-        constantThresholdParams.put("thresholds", new AnomalyThresholds(null, null, 20.0, 10.0));
-
-        val cusumParams = new HashMap<String, Object>();
-        cusumParams.put("type", AnomalyType.LEFT_TAILED);
-        cusumParams.put("targetValue", 100.0);
-        cusumParams.put("weakSigmas", 3.0);
-        cusumParams.put("strongSigmas", 4.0);
-        cusumParams.put("slackParam", 0.5);
-        cusumParams.put("initMeanEstimate", 100.0);
-        cusumParams.put("warmUpPeriod", 30);
-
         val ewmaParams = new HashMap<String, Object>();
         ewmaParams.put("alpha", 0.2);
         ewmaParams.put("weakSigmas", 2.0);
         ewmaParams.put("strongSigmas", 4.0);
 
-        this.modelResource_constantThreshold = new ModelResource();
-        modelResource_constantThreshold.setParams(constantThresholdParams);
-        modelResource_constantThreshold.setDetectorType(new ModelTypeResource(DETECTOR_TYPE_CONSTANT_THRESHOLD));
-
-        this.modelResource_cusum = new ModelResource();
-        modelResource_cusum.setParams(cusumParams);
-        modelResource_cusum.setDetectorType(new ModelTypeResource(DETECTOR_TYPE_CUSUM));
-
         this.modelResource_ewma = new ModelResource();
         modelResource_ewma.setParams(ewmaParams);
         modelResource_ewma.setDetectorType(new ModelTypeResource(DETECTOR_TYPE_EWMA));
+
+        this.detector = new ForecastingDetector(
+                DETECTOR_UUID_EWMA,
+                new EwmaPointForecaster(),
+                new ExponentialWelfordIntervalForecaster(),
+                AnomalyType.TWO_TAILED);
     }
 
     private void initDependencies() {
@@ -199,20 +171,16 @@ public final class DefaultDetectorSourceTest {
                 .thenReturn(detectorResources);
         when(connector.findDetectors(metricDefException))
                 .thenThrow(new DetectorRetrievalException("Error finding detectors", new IOException()));
-
         when(connector.findUpdatedDetectors(1))
                 .thenReturn(updatedDetectorResources);
-
-        when(connector.findLatestModel(DETECTOR_UUID_CONSTANT_THRESHOLD))
-                .thenReturn(modelResource_constantThreshold);
-        when(connector.findLatestModel(DETECTOR_UUID_CUSUM))
-                .thenReturn(modelResource_cusum);
         when(connector.findLatestModel(DETECTOR_UUID_EWMA))
                 .thenReturn(modelResource_ewma);
-
         when(connector.findLatestModel(DETECTOR_UUID_MISSING_DETECTOR))
                 .thenThrow(new DetectorNotFoundException("No models found"));
         when(connector.findLatestModel(DETECTOR_UUID_EXCEPTION))
                 .thenThrow(new DetectorRetrievalException("Error finding latest model", new IOException()));
+
+        when(legacyDetectorFactory.createDetector(any(UUID.class), any(ModelResource.class)))
+                .thenReturn(detector);
     }
 }

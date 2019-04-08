@@ -13,15 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.comp;
+package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
-import com.expedia.adaptivealerting.anomdetect.detector.Detector;
 import com.expedia.adaptivealerting.anomdetect.detector.ConstantThresholdDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.CusumDetector;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaDetector;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersDetector;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.IndividualsControlChartDetector;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.PewmaDetector;
+import com.expedia.adaptivealerting.anomdetect.detector.Detector;
+import com.expedia.adaptivealerting.anomdetect.forecast.ForecastingDetector;
 import lombok.val;
 
 import java.util.HashMap;
@@ -33,16 +30,17 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 /**
  * Detector lookup table.
  */
+@Deprecated
 public class DetectorLookup {
     private final Map<String, Class<? extends Detector>> detectorMap = new HashMap<>();
 
     public DetectorLookup() {
         detectorMap.put("constant-detector", ConstantThresholdDetector.class);
         detectorMap.put("cusum-detector", CusumDetector.class);
-        detectorMap.put("ewma-detector", EwmaDetector.class);
+        detectorMap.put("ewma-detector", ForecastingDetector.class);
         detectorMap.put("holtwinters-detector", HoltWintersDetector.class);
         detectorMap.put("individuals-detector", IndividualsControlChartDetector.class);
-        detectorMap.put("pewma-detector", PewmaDetector.class);
+        detectorMap.put("pewma-detector", ForecastingDetector.class);
     }
 
     public Set<String> getDetectorTypes() {

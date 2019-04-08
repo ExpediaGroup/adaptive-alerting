@@ -32,11 +32,11 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * Stream filter that applies an outlier detector to metrics and generates outlier detector results.
  */
 @Slf4j
-public final class AnomalyDetectorFilter implements MetricDataSubscriber {
+public final class DetectorFilter implements MetricDataSubscriber {
     private final Detector detector;
     private final List<AnomalyResultSubscriber> subscribers = new LinkedList<>();
 
-    public AnomalyDetectorFilter(Detector detector) {
+    public DetectorFilter(Detector detector) {
         notNull(detector, "detector can't be null");
         this.detector = detector;
     }

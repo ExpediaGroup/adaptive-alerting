@@ -13,9 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.detector;
+package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
-public interface DetectorParams {
-
-    void validate();
+public interface LegacyDetectorTypes {
+    String CONSTANT_THRESHOLD = "constant-detector";
+    String CUSUM = "cusum-detector";
+    String EWMA = "ewma-detector";
+    String HOLT_WINTERS = "holtwinters-detector";
+    String INDIVIDUALS = "individuals-detector";
+    String PEWMA = "pewma-detector";
 }

@@ -15,10 +15,10 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaDetector;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.PewmaDetector;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.DetectorLookup;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
-import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorFilter;
+import com.expedia.adaptivealerting.tools.pipeline.filter.DetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.source.RandomWalkMetricSource;
 import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
@@ -35,8 +35,9 @@ public class RandomWalkEwmaVsPewma {
     public static void main(String[] args) {
         val source = new RandomWalkMetricSource();
 
-        val ewmaAD = new AnomalyDetectorFilter(new EwmaDetector());
-        val pewmaAD = new AnomalyDetectorFilter(new PewmaDetector());
+        val factory = new LegacyDetectorFactory(new DetectorLookup());
+        val ewmaAD = new DetectorFilter(factory.createEwmaDetector());
+        val pewmaAD = new DetectorFilter(factory.createPewmaDetector());
 
         val ewmaEval = new EvaluatorFilter(new RmseEvaluator());
         val pewmaEval = new EvaluatorFilter(new RmseEvaluator());
