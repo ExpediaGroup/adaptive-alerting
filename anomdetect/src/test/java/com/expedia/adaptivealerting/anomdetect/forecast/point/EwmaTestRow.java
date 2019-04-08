@@ -13,35 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.anomaly;
+package com.expedia.adaptivealerting.anomdetect.forecast.point;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.opencsv.bean.CsvBindByName;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.Accessors;
 
-/**
- * Anomaly result.
- */
 @Data
-@NoArgsConstructor
-@RequiredArgsConstructor
-@Accessors(chain = true)
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class AnomalyResult {
+public class EwmaTestRow {
 
-    @NonNull
-    private AnomalyLevel anomalyLevel;
+    @CsvBindByName
+    private String date;
 
-    /**
-     * Point forecast.
-     */
-    private Double predicted;
+    @CsvBindByName
+    private double observed;
 
-    /**
-     * Interval forecast.
-     */
-    private AnomalyThresholds thresholds;
+    @CsvBindByName
+    private double mean;
+
+    @CsvBindByName(column = "known.mean")
+    private double knownMean;
+
+    @CsvBindByName
+    private double var;
 }

@@ -24,8 +24,9 @@ import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelServiceConnec
 import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelTypeResource;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.EwmaDetector;
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.EwmaParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.ForecastingDetector;
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaster;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.metrics.MetricDefinition;
 import lombok.extern.slf4j.Slf4j;
@@ -158,8 +159,11 @@ public final class DefaultDetectorSourceTest {
         modelResource_ewma.setParams(ewmaParams);
         modelResource_ewma.setDetectorType(new ModelTypeResource(DETECTOR_TYPE_EWMA));
 
-        this.detector = new EwmaDetector();
-        detector.init(DETECTOR_UUID_EWMA, new EwmaParams(), AnomalyType.TWO_TAILED);
+        this.detector = new ForecastingDetector(
+                DETECTOR_UUID_EWMA,
+                new EwmaPointForecaster(),
+                new ExponentialWelfordIntervalForecaster(),
+                AnomalyType.TWO_TAILED);
     }
 
     private void initDependencies() {
@@ -176,7 +180,7 @@ public final class DefaultDetectorSourceTest {
         when(connector.findLatestModel(DETECTOR_UUID_EXCEPTION))
                 .thenThrow(new DetectorRetrievalException("Error finding latest model", new IOException()));
 
-        when(legacyDetectorFactory.createLegacyDetector(any(UUID.class), any(ModelResource.class)))
+        when(legacyDetectorFactory.createDetector(any(UUID.class), any(ModelResource.class)))
                 .thenReturn(detector);
     }
 }

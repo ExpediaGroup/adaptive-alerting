@@ -20,7 +20,7 @@ import com.expedia.adaptivealerting.anomdetect.comp.legacy.HoltWintersParams;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.SeasonalityType;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
-import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorFilter;
+import com.expedia.adaptivealerting.tools.pipeline.filter.DetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartSink;
 import com.expedia.adaptivealerting.tools.pipeline.source.MetricFrameMetricSource;
@@ -141,7 +141,7 @@ public class CsvTrafficHoltWintersVariants {
         val detector = new HoltWintersDetector();
         detector.init(UUID.randomUUID(), params, AnomalyType.TWO_TAILED);
 
-        final AnomalyDetectorFilter adf = new AnomalyDetectorFilter(detector);
+        final DetectorFilter adf = new DetectorFilter(detector);
         final EvaluatorFilter eval = new EvaluatorFilter(new RmseEvaluator());
         final AnomalyChartSink chartSink = PipelineFactory.createChartSink(String.format("HoltWinters %s: alpha=%s, beta=%s, gamma=%s %s", seasonalityType,
                 alpha, beta, gammaLow, Arrays.asList(titleSuffix)));

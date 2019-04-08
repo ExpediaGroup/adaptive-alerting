@@ -15,21 +15,11 @@
  */
 package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
-import com.opencsv.bean.CsvBindByName;
-import lombok.Data;
-
-@Data
-public class PewmaTestRow {
-
-    @CsvBindByName
-    private double observed;
-
-    @CsvBindByName
-    private double mean;
-
-    @CsvBindByName
-    private String level;
-
-    @CsvBindByName
-    private double std;
+public interface LegacyDetectorTypes {
+    String CONSTANT_THRESHOLD = "constant-detector";
+    String CUSUM = "cusum-detector";
+    String EWMA = "ewma-detector";
+    String HOLT_WINTERS = "holtwinters-detector";
+    String INDIVIDUALS = "individuals-detector";
+    String PEWMA = "pewma-detector";
 }

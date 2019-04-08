@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters;
 
 public class HoltWintersClassificationException extends RuntimeException {
+
     public HoltWintersClassificationException(String message, Exception e) {
         super(message, e);
     }

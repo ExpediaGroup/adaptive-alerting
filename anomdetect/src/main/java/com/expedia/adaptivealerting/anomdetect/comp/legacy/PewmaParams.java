@@ -15,13 +15,15 @@
  */
 package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.PewmaPointForecaster;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
 @Deprecated
-public final class PewmaParams implements DetectorParams {
+public final class PewmaParams {
 
     /**
      * Smoothing param.
@@ -51,10 +53,21 @@ public final class PewmaParams implements DetectorParams {
     /**
      * How many iterations to train for.
      */
-    private final int warmUpPeriod = 30;
+    private int warmUpPeriod = 30;
 
-    @Override
-    public void validate() {
-        // Not currently implemented
+    public PewmaPointForecaster.Params toPointForecasterParams() {
+        return new PewmaPointForecaster.Params()
+                .setAlpha(alpha)
+                .setBeta(beta)
+                .setInitMeanEstimate(initMeanEstimate)
+                .setWarmUpPeriod(warmUpPeriod);
+    }
+
+    public ExponentialWelfordIntervalForecaster.Params toIntervalForecasterParams() {
+        return new ExponentialWelfordIntervalForecaster.Params()
+                .setAlpha(alpha)
+                .setInitVarianceEstimate(0.0)
+                .setWeakSigmas(weakSigmas)
+                .setStrongSigmas(strongSigmas);
     }
 }
