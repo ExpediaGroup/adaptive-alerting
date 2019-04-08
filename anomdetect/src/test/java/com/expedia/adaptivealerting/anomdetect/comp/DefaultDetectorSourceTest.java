@@ -28,6 +28,7 @@ import com.expedia.adaptivealerting.anomdetect.forecast.ForecastingDetector;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaster;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
+import com.expedia.adaptivealerting.anomdetect.util.TestObjectMother;
 import com.expedia.metrics.MetricDefinition;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -133,7 +134,7 @@ public final class DefaultDetectorSourceTest {
     }
 
     private void initTestObjects_findDetectors() {
-        this.metricDef = new MetricDefinition("my-metric");
+        this.metricDef = TestObjectMother.metricDefinition();
         this.metricDefException = new MetricDefinition("metric-that-causes-exception");
 
         val detectorResource = new DetectorResource(

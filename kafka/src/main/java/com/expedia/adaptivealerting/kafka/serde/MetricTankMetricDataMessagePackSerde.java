@@ -40,7 +40,15 @@ import java.util.Map;
 @Slf4j
 public class MetricTankMetricDataMessagePackSerde implements Serde<MetricData> {
     public static final int DEFAULT_ORG_ID = 1;
-    public static final int DEFAULT_INTERVAL = 300;
+
+    /**
+     * Default metric data interval, in seconds. Note that Metrictank will use this to snap timestamps, so this means
+     * that Metrictank will aggregate (specifically, average) multiple metric data coming in at a shorter interval. In
+     * other words, if we have metric data X0=100 and X1=200 coming in 30 seconds later, then Metrictank will interpret
+     * this as a single metric data with value 150.
+     */
+    public static final int DEFAULT_INTERVAL = 60;
+
     public static final String DEFAULT_UNIT = "";
     public static final String DEFAULT_MTYPE = "gauge";
 

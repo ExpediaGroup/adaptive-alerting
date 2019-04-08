@@ -18,8 +18,8 @@ package com.expedia.adaptivealerting.tools.pipeline.source;
 import com.expedia.adaptivealerting.core.data.MetricFrame;
 import com.expedia.adaptivealerting.core.util.ThreadUtil;
 import com.expedia.adaptivealerting.tools.pipeline.util.MetricDataSubscriber;
+import com.expedia.adaptivealerting.tools.util.TestObjectMother;
 import com.expedia.metrics.MetricData;
-import com.expedia.metrics.MetricDefinition;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.Before;
@@ -36,7 +36,7 @@ public final class MetricFrameMetricSourceTest {
 
     @Before
     public void setUp() {
-        val metricDef = new MetricDefinition("my-metric-def");
+        val metricDef = TestObjectMother.metricDefinition();
         val metricData = new MetricData(metricDef, 10.0, Instant.now().getEpochSecond());
         val metricDataPoints = new MetricData[]{metricData};
         this.frame = new MetricFrame(metricDataPoints);

@@ -21,8 +21,8 @@ import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaste
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.tools.pipeline.util.AnomalyResultSubscriber;
+import com.expedia.adaptivealerting.tools.util.TestObjectMother;
 import com.expedia.metrics.MetricData;
-import com.expedia.metrics.MetricDefinition;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public final class DetectorFilterTest {
                 AnomalyType.TWO_TAILED);
         this.filterUnderTest = new DetectorFilter(detector);
 
-        val metricDef =  new MetricDefinition("my-metric-def");
+        val metricDef = TestObjectMother.metricDefinition();
         this.metricData = new MetricData(metricDef, 10.0, Instant.now().getEpochSecond());
     }
 

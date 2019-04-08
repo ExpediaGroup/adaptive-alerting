@@ -22,7 +22,6 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-@Deprecated
 public final class CusumParams implements DetectorParams {
 
     /**
