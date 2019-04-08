@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.modelservice;
 
+import com.codahale.metrics.MetricRegistry;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -49,6 +50,11 @@ public class ModelServiceApp {
         source.registerCorsConfiguration("/**", config);
 
         return new CorsFilter(source);
+    }
+
+    @Bean
+    public MetricRegistry metricRegistry() {
+        return new MetricRegistry();
     }
 
     //Adding a custom data source bean to avoid conflicting dataSource bean error. [KS]

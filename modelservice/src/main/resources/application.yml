@@ -3,9 +3,9 @@ spring:
     web-environment: true
     show-banner: false
   datasource:
-    url: "jdbc:mysql://database:3306/aa_model_service?autoReconnect=true"
+    url: "jdbc:mysql://localhost:3306/aa_model_service?useLegacyDatetimeCode=false&serverTimezone=Australia/Brisbane&autoReconnect=true"
     username: ${USERNAME:root}
-    password: ${PASSWORD:""}
+    password: "LCLeryw5enqo"
     maximum-pool-size: 8
     minimum-idle: 0
     driver-class-name: "com.mysql.cj.jdbc.Driver"
@@ -22,6 +22,40 @@ spring:
 endpoints:
   health:
     sensitive: false
+
+# Swagger Documentation
+swagger:
+  service:
+    version: "1.0.0"
+    title: "Model service detector mapper"
+    description: "A service that provides APIs for model-service-detector-mapper"
+    termsPath: ""
+    contact:
+      name: "EWE Platform"
+      email: "EWE Platform@expedia.com"
+    licencePath: "#"
+    licenceType: ""
+
+# Additional Config
+test:
+  helloMsg: "Hello there"
+
+vault:
+  host: ${spring.cloud.vault.uri}
+
+es:
+  enabled: true
+  index.name: detector_mappings
+  doctype: details
+  urls: localhost:9001
+  connection.timeout: 40000
+  max.connection.idletime: 1000
+  max.total.connection: 2000
+  read.timeout: 1000
+
+model-service:
+  find-latest-changes-url: http://localhost:8008/detector-mapping/last-updated?timeInSecs=65
+
 management:
   context-path: "/admin"
   metrics:
