@@ -15,14 +15,13 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detector;
 
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.DetectorParams;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public final class CusumParams implements DetectorParams {
+public final class CusumParams {
 
     /**
      * Detector type: left-, right- or two-tailed.
@@ -59,7 +58,6 @@ public final class CusumParams implements DetectorParams {
      */
     private int warmUpPeriod = 25;
 
-    @Override
     public void validate() {
         // Not currently implemented
     }

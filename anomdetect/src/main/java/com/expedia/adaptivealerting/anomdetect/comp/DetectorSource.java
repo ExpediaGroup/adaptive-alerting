@@ -23,7 +23,6 @@ import com.expedia.adaptivealerting.anomdetect.detector.Detector;
 import com.expedia.metrics.MetricDefinition;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -35,8 +34,6 @@ import java.util.UUID;
  * </ul>
  */
 public interface DetectorSource {
-
-    Set<String> findDetectorTypes();
 
     /**
      * Finds the list of detector UUIDs for a given metric.

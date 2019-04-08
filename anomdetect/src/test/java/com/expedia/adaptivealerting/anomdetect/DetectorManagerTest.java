@@ -34,11 +34,9 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 /**
@@ -100,22 +98,6 @@ public final class DetectorManagerTest {
     }
 
     @Test
-    public void testGetDetectorTypes() {
-        val detectorTypes = managerUnderTest.getDetectorTypes();
-        assertTrue(detectorTypes.contains(DETECTOR_TYPE));
-    }
-
-    @Test
-    public void testHasDetectorType() {
-        assertTrue(managerUnderTest.hasDetectorType(DETECTOR_TYPE));
-    }
-
-    @Test
-    public void testDoesNotHaveDetectorType() {
-        assertFalse(managerUnderTest.hasDetectorType("some-nonexistent-type"));
-    }
-
-    @Test
     public void testDetectorRefresh() {
         val result = managerUnderTest.detectorMapRefresh();
         assertNotNull(result);
@@ -165,7 +147,6 @@ public final class DetectorManagerTest {
     private void initDependencies() {
         when(detector.classify(goodMetricData)).thenReturn(anomalyResult);
 
-        when(detectorSource.findDetectorTypes()).thenReturn(Collections.singleton(DETECTOR_TYPE));
         when(detectorSource.findDetector(mappedUuid)).thenReturn(detector);
         when(detectorSource.findDetector(unmappedUuid)).thenReturn(null);
         when(detectorSource.findUpdatedDetectors(detectorRefreshPeriod)).thenReturn(updatedDetectors);

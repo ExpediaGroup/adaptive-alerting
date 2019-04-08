@@ -16,7 +16,6 @@
 package com.expedia.adaptivealerting.anomdetect.forecast;
 
 import com.expedia.adaptivealerting.anomdetect.comp.AnomalyClassifier;
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.DetectorParams;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecast;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecaster;
@@ -86,18 +85,6 @@ public class ForecastingDetector implements Detector {
         return new AnomalyResult(level)
                 .setPredicted(pointForecast)
                 .setThresholds(thresholds);
-    }
-
-    @Override
-    @Generated // https://reflectoring.io/100-percent-test-coverage/
-    public void init(UUID uuid, DetectorParams params, AnomalyType anomalyType) {
-        throw new UnsupportedOperationException("Deprecated; not implemented");
-    }
-
-    @Override
-    @Generated // https://reflectoring.io/100-percent-test-coverage/
-    public Class getParamsClass() {
-        throw new UnsupportedOperationException("Deprecated; not implemented");
     }
 
     private AnomalyThresholds toAnomalyThresholds(IntervalForecast intervalForecast) {

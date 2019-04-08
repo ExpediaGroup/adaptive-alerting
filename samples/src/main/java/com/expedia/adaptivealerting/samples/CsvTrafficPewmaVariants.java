@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.DetectorLookup;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.PewmaParams;
 import com.expedia.adaptivealerting.core.data.MetricFrameLoader;
@@ -41,7 +40,7 @@ public class CsvTrafficPewmaVariants {
         val frame = MetricFrameLoader.loadCsv(new MetricDefinition("csv"), is, true);
         val source = new MetricFrameMetricSource(frame, "data", 200L);
 
-        val factory = new LegacyDetectorFactory(new DetectorLookup());
+        val factory = new LegacyDetectorFactory();
 
         val params1 = new PewmaParams()
                 .setAlpha(0.15)

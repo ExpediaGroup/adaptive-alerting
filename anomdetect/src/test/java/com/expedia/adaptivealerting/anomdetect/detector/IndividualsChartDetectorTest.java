@@ -16,7 +16,6 @@
 package com.expedia.adaptivealerting.anomdetect.detector;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.adaptivealerting.core.util.MathUtil;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
@@ -41,7 +40,7 @@ public class IndividualsChartDetectorTest {
     // TODO This tolerance is very loose. Can we tighten it up? [WLW]
     private static final double TOLERANCE = 0.1;
 
-    private UUID detectorUUID;
+    private UUID detectorUuid;
     private MetricDefinition metricDefinition;
     private long epochSecond;
     private static List<IndividualsChartTestRow> data;
@@ -54,7 +53,7 @@ public class IndividualsChartDetectorTest {
 
     @Before
     public void setUp() {
-        this.detectorUUID = UUID.randomUUID();
+        this.detectorUuid = UUID.randomUUID();
         this.metricDefinition = new MetricDefinition("some-key");
         this.epochSecond = Instant.now().getEpochSecond();
     }
@@ -68,8 +67,7 @@ public class IndividualsChartDetectorTest {
         val params = new IndividualsControlChartParams()
                 .setInitValue(observed0)
                 .setWarmUpPeriod(WARMUP_PERIOD);
-        val detector = new IndividualsControlChartDetector();
-        detector.init(detectorUUID, params, AnomalyType.TWO_TAILED);
+        val detector = new IndividualsControlChartDetector(detectorUuid, params);
 
         int noOfDataPoints = 1;
 

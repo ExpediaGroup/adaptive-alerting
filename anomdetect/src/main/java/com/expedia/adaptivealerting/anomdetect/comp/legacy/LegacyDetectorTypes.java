@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
+@Deprecated
 public interface LegacyDetectorTypes {
     String CONSTANT_THRESHOLD = "constant-detector";
     String CUSUM = "cusum-detector";

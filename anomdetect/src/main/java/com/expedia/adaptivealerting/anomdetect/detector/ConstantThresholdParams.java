@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detector;
 
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.DetectorParams;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import lombok.Data;
@@ -23,7 +22,7 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public class ConstantThresholdParams implements DetectorParams {
+public class ConstantThresholdParams {
 
     /**
      * Detector type: left-, right- or two-tailed.
@@ -35,7 +34,6 @@ public class ConstantThresholdParams implements DetectorParams {
      */
     private AnomalyThresholds thresholds;
 
-    @Override
     public void validate() {
         // Not currently implemented
     }
