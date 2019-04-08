@@ -63,6 +63,5 @@ public final class MetricUtilTest {
         val metricData = MetricUtil.metricData(metricDef, 3.14159, 1554702637);
         assertEquals(3.14159, metricData.getValue(), 0.001);
         assertEquals(1554702637, metricData.getTimestamp(), 0.001);
-
     }
 }
