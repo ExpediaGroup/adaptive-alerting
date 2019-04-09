@@ -53,7 +53,7 @@ public class AnomalyServiceTest {
     public void testGetAnomalies() {
         mockSource(graphiteMetricSource);
         List<AnomalyResult> actualResults = anomalyService.getAnomalies(anomalyRequest);
-        verifyNumberOfSourceCalls(graphiteMetricSource, Mockito.atMost(10));
+        verifyNumberOfSourceCalls(graphiteMetricSource, Mockito.atMost(1));
         assertNotNull(actualResults);
         Assert.assertEquals(0, actualResults.size());
     }
