@@ -43,6 +43,10 @@ public class AnomalyServiceImpl implements AnomalyService {
 
     @Override
     public List<AnomalyResult> getAnomalies(AnomalyRequest request) {
+        return findAnomaliesInTrainingData(request);
+    }
+
+    private List<AnomalyResult> findAnomaliesInTrainingData(AnomalyRequest request) {
         List<AnomalyResult> anomalyResults = new ArrayList<>();
         ((List<MetricSource>) metricSources)
                 .forEach(metricSource -> {
@@ -56,6 +60,5 @@ public class AnomalyServiceImpl implements AnomalyService {
                     }
                 });
         return anomalyResults;
-
     }
 }

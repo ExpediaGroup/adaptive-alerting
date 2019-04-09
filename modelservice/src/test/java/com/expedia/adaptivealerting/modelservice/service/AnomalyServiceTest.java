@@ -22,7 +22,7 @@ import static org.junit.Assert.*;
 
 
 @Slf4j
-@RunWith(MockitoJUnitRunner.Silent.class)
+@RunWith(MockitoJUnitRunner.class)
 public class AnomalyServiceTest {
 
     @InjectMocks
