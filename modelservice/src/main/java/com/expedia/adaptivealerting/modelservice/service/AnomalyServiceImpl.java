@@ -16,7 +16,6 @@
 package com.expedia.adaptivealerting.modelservice.service;
 
 import com.expedia.adaptivealerting.anomdetect.detector.*;
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.DetectorLookup;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.util.MetricUtil;
 import com.expedia.adaptivealerting.modelservice.spi.*;
@@ -37,8 +36,6 @@ import java.util.List;
 @Service
 @Slf4j
 public class AnomalyServiceImpl implements AnomalyService {
-
-    private final DetectorLookup detectorLookup = new DetectorLookup();
 
     @Autowired
     @Qualifier("metricSourceServiceListFactoryBean")
