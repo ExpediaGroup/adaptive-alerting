@@ -53,7 +53,7 @@ public class ObjectMother {
     }
 
     public Map<String, Object> getDetectorParams() {
-        String thresholds = "{\"thresholds\": {\"lowerStrong\": \"8\", \"lowerWeak\": \"9\"}}";
+        String thresholds = "{\"thresholds\": {\"lowerStrong\": \"70\", \"lowerWeak\": \"90\"}}";
         Map<String, Object> detectorParams = toObject(thresholds);
         detectorParams.put("type", "LEFT_TAILED");
         return detectorParams;

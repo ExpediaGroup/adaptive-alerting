@@ -1,5 +1,6 @@
 package com.expedia.adaptivealerting.modelservice.service;
 
+import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.modelservice.providers.graphite.GraphiteMetricSource;
 import com.expedia.adaptivealerting.modelservice.spi.MetricSource;
@@ -19,6 +20,7 @@ import java.util.*;
 
 import static org.junit.Assert.*;
 
+
 @Slf4j
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class AnomalyServiceTest {
@@ -33,8 +35,8 @@ public class AnomalyServiceTest {
     @Mock
     private GraphiteMetricSource graphiteMetricSource;
 
-    @Mock
-    private MetricSourceResult metricSourceResult = new MetricSourceResult();
+    @Spy
+    private MetricSourceResult metricSourceResult;
 
     @Spy
     private List<MetricSourceResult> metricSourceResults = new ArrayList<>();
@@ -43,30 +45,32 @@ public class AnomalyServiceTest {
 
     @Before
     public void setUp() {
+        initTestObjects();
+        initDependencies();
         metricSources.add(graphiteMetricSource);
         metricSourceResults.add(metricSourceResult);
         MockitoAnnotations.initMocks(this);
-        initTestObjects();
     }
 
     @Test
     public void testGetAnomalies() {
-        mockSource(graphiteMetricSource);
         List<AnomalyResult> actualResults = anomalyService.getAnomalies(anomalyRequest);
         verifyNumberOfSourceCalls(graphiteMetricSource, Mockito.atMost(1));
         assertNotNull(actualResults);
-        Assert.assertEquals(0, actualResults.size());
+        Assert.assertEquals(1, actualResults.size());
+        Assert.assertEquals(AnomalyLevel.WEAK, actualResults.get(0).getAnomalyLevel());
     }
 
     private void initTestObjects() {
         ObjectMother mom = ObjectMother.instance();
         anomalyRequest = mom.getAnomalyRequest();
+        metricSourceResult = mom.getMetricData();
     }
 
-    private void mockSource(MetricSource source) {
-        System.out.println(metricSourceResults.size());
-        Mockito.when(source.getMetricData(Mockito.anyString())).thenReturn(metricSourceResults);
+    private void initDependencies() {
+        Mockito.when(graphiteMetricSource.getMetricData(Mockito.anyString())).thenReturn(metricSourceResults);
     }
+
 
     private void verifyNumberOfSourceCalls(MetricSource metricSource, VerificationMode verifMode) {
         Mockito.verify(metricSource, verifMode).getMetricData(Mockito.anyString());
