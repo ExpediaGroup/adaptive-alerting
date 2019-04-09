@@ -101,6 +101,8 @@ module "modelservice" {
 
   # App
   db_endpoint = "${var.modelservice["db_endpoint"]}"
+  detector_mapper_es_urls = "${var.modelservice["detector_mapper_es_urls"]}"
+  detector_mapper_es_config_vars_json = "${var.modelservice["detector_mapper_es_config_vars_json"]}"
 }
 
 module "a2m-mapper" {

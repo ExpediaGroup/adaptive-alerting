@@ -11,6 +11,8 @@ data "template_file" "config_data" {
   template = "${file("${local.application_yaml_file_path}")}"
   vars {
     db_endpoint = "${var.db_endpoint}"
+    detector_mapper_es_urls = "${var.detector_mapper_es_urls}"
+    detector_mapper_es_config_vars_json = "${var.detector_mapper_es_config_vars_json}"
   }
 }
 

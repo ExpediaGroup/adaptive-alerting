@@ -32,6 +32,8 @@ variable "env_vars" {}
 
 # App
 variable "db_endpoint" {}
+variable "detector_mapper_es_urls" {}
+variable "detector_mapper_es_config_vars_json" {}
 
 # Unsure what this is, but we don't seem to be using it.
 #variable "termination_grace_period" {

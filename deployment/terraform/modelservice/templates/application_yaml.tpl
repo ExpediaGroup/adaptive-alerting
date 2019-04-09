@@ -36,3 +36,10 @@ management:
       process: false
 security:
   signingKey: $${SIGNING_KEY}
+
+datasource-es:
+  create.index.if.not.found: true
+  index.name: detector_mappings
+  doctype: details
+  urls: ${detector_mapper_es_urls}
+  config: ${detector_mapper_es_config_vars_json}

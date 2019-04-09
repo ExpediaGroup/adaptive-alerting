@@ -43,18 +43,12 @@ test:
 vault:
   host: ${spring.cloud.vault.uri}
 
-es:
-  enabled: true
+datasource-es:
+  create.index.if.not.found: true
   index.name: detector_mappings
   doctype: details
-  urls: localhost:9001
-  connection.timeout: 40000
-  max.connection.idletime: 1000
-  max.total.connection: 2000
-  read.timeout: 1000
-
-model-service:
-  find-latest-changes-url: http://localhost:8008/detector-mapping/last-updated?timeInSecs=65
+  urls: localhost:8005
+  config: {"connection.timeout":40000, "connection.retry.timeout":40000, "max.total.connection":200, "aws-iam-auth-required":false}
 
 management:
   context-path: "/admin"
