@@ -1,9 +1,6 @@
 package com.expedia.adaptivealerting.modelservice.detectormapper.controller;
 
-import com.expedia.adaptivealerting.modelservice.detectormapper.service.CreateDetectorMappingRequest;
-import com.expedia.adaptivealerting.modelservice.detectormapper.service.DetectorMapping;
-import com.expedia.adaptivealerting.modelservice.detectormapper.service.DetectorMappingService;
-import com.expedia.adaptivealerting.modelservice.detectormapper.service.SearchMappingsRequest;
+import com.expedia.adaptivealerting.modelservice.detectormapper.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -62,5 +60,10 @@ public class DetectorMappingController {
     public List<DetectorMapping> findDetectorMapping(@RequestParam int timeInSecs) {
         Assert.notNull(timeInSecs, "timeInSecs can't be null");
         return detectorMappingService.findLastUpdated(timeInSecs);
+    }
+
+    @RequestMapping(value = "/detector-mapping/findMatchingByTags", method = RequestMethod.POST)
+    public MatchingDetectorsResponse searchDetectorMapping(@RequestBody List<Map<String, String>> tagsList) {
+        return detectorMappingService.findMatchingDetectorMappings(tagsList);
     }
 }

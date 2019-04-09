@@ -5,7 +5,7 @@ import java.util.Map;
 
 public interface DetectorMappingService {
 
-    DetectorMatchResponse findMatchingDetectorMappings(List<Map<String, String>> tagsList);
+    MatchingDetectorsResponse findMatchingDetectorMappings(List<Map<String, String>> tagsList);
     String createDetectorMapping(CreateDetectorMappingRequest createDetectorMappingRequest);
     void updateDetectorMapping(UpdateDetectorMappingRequest updateDetectorMappingRequest);
     void deleteDetectorMapping(String id);

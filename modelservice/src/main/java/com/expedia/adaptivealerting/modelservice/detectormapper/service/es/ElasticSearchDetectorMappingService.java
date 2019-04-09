@@ -3,13 +3,7 @@ package com.expedia.adaptivealerting.modelservice.detectormapper.service.es;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.expedia.adaptivealerting.modelservice.detectormapper.service.CreateDetectorMappingRequest;
-import com.expedia.adaptivealerting.modelservice.detectormapper.service.Detector;
-import com.expedia.adaptivealerting.modelservice.detectormapper.service.DetectorMapping;
-import com.expedia.adaptivealerting.modelservice.detectormapper.service.DetectorMappingService;
-import com.expedia.adaptivealerting.modelservice.detectormapper.service.DetectorMatchResponse;
-import com.expedia.adaptivealerting.modelservice.detectormapper.service.SearchMappingsRequest;
-import com.expedia.adaptivealerting.modelservice.detectormapper.service.UpdateDetectorMappingRequest;
+import com.expedia.adaptivealerting.modelservice.detectormapper.service.*;
 import com.expedia.adaptivealerting.modelservice.detectormapper.util.QueryUtil;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
@@ -79,7 +73,7 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
     }
 
     @Override
-    public DetectorMatchResponse findMatchingDetectorMappings(List<Map<String, String>> tagsList) {
+    public MatchingDetectorsResponse findMatchingDetectorMappings(List<Map<String, String>> tagsList) {
         try {
             List<BytesReference> refList = new ArrayList<>();
 
@@ -94,6 +88,7 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
                     refList, XContentType.JSON);
             SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
             ConstantScoreQueryBuilder constantScoreQueryBuilder = new ConstantScoreQueryBuilder(percolateQuery);
+            log.info("Percolator query: {}", constantScoreQueryBuilder.toString());
             searchSourceBuilder.query(constantScoreQueryBuilder);
             searchSourceBuilder.timeout(new TimeValue(elasticSearchConfig.getConnectionTimeout()));
             //FIXME setting default result set size to 500.
@@ -296,7 +291,7 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
             ScoreMode.None);
     }
     
-    private DetectorMatchResponse getDetectorMappings(RestHighLevelClient client,
+    private MatchingDetectorsResponse getDetectorMappings(RestHighLevelClient client,
                                                       SearchSourceBuilder searchSourceBuilder,
                                                       List<Map<String, String>> tagsList) {
         final SearchRequest searchRequest =
@@ -306,14 +301,19 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
         try {
             log.info("ES lookup start for {}", tagsList.toArray());
             SearchResponse searchResponse = client.search(searchRequest);
+            log.info("search Request {}", searchRequest.toString());
             log.info("ES took {} for {}", searchResponse.getTook().getMillis(), tagsList.size());
             delayTimer.update(searchResponse.getTook().getMillis(), TimeUnit.MILLISECONDS);
             SearchHit hits[] = searchResponse.getHits().getHits();
+         //   return Arrays.asList(hits.getHits()).stream()
+            //        .map(hit -> getDetectorMapping(hit.getSourceAsString(), hit.getId(), Optional.empty()))
+            //        .collect(Collectors.toList());
             List<DetectorMapping> detectorMappings = Arrays.asList(hits).stream()
                 .map(hit -> getDetectorMapping(hit.getSourceAsString(), hit.getId(), Optional.of(hit.getFields())))
-                .filter(detectorMapping -> detectorMapping.isEnabled()) //FIXME - move this condition into search query
+               // .filter(detectorMapping -> detectorMapping.isEnabled()) //FIXME - move this condition into search query
                 .collect(Collectors.toList());
-            return new DetectorMatchResponse(detectorMappings, searchResponse.getTook().getMillis());
+            log.info("ES detectormappings hits as received {}", detectorMappings.size());
+            return ConverttoMatchingDetectorsResponse(new DetectorMatchResponse(detectorMappings, searchResponse.getTook().getMillis()));
         } catch (IOException e) {
             log.error("ES search failed", e);
             this.exceptionCount.inc();
@@ -341,5 +341,21 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
         });
 
         return detectorMapping;
+    }
+
+    private MatchingDetectorsResponse ConverttoMatchingDetectorsResponse(DetectorMatchResponse res) {
+        Map<Integer, List<Detector>> groupedDetectorsByIndex = new HashMap<>();
+        log.info("Mapping-Cache: found {} matching mappings", res.getDetectorMappings().size());
+        res.getDetectorMappings().forEach(detectorMapping -> {
+            detectorMapping.getSearchIndexes().forEach(searchIndex -> {
+                groupedDetectorsByIndex.computeIfAbsent(searchIndex, index -> new ArrayList<>());
+                groupedDetectorsByIndex.computeIfPresent(searchIndex, (index, list) -> {
+                    list.add(detectorMapping.getDetector());
+                    return list;
+                });
+            });
+
+        });
+        return new MatchingDetectorsResponse(groupedDetectorsByIndex, res.getLookupTimeInMillis());
     }
 }
