@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.filter;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.ForecastingDetector;
+import com.expedia.adaptivealerting.anomdetect.detector.ForecastingDetector;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaster;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;

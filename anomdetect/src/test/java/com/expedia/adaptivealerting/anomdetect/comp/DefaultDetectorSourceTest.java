@@ -24,7 +24,7 @@ import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelServiceConnec
 import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelTypeResource;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
-import com.expedia.adaptivealerting.anomdetect.forecast.ForecastingDetector;
+import com.expedia.adaptivealerting.anomdetect.detector.ForecastingDetector;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaster;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;

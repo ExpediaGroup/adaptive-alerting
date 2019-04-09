@@ -49,7 +49,7 @@ public class PowerLawIntervalForecaster implements IntervalForecaster {
 
     @Data
     @Accessors(chain = true)
-    public static class Params {
+    public static final class Params {
         private double alpha;
         private double beta;
         private double weakMultiplier;

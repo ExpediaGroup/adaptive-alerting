@@ -82,7 +82,7 @@ public class ExponentialWelfordIntervalForecaster implements IntervalForecaster 
 
     @Data
     @Accessors(chain = true)
-    public static class Params {
+    public static final class Params {
         private double alpha = 0.15;
         private double initVarianceEstimate = 0.0;
         private double weakSigmas = 3.0;

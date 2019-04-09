@@ -17,8 +17,13 @@ package com.expedia.adaptivealerting.anomdetect.detector;
 
 import com.expedia.adaptivealerting.anomdetect.comp.AnomalyClassifier;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.metrics.MetricData;
+import lombok.Data;
+import lombok.Generated;
 import lombok.Getter;
+import lombok.experimental.Accessors;
 import lombok.val;
 
 import java.util.UUID;
@@ -31,16 +36,19 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 public final class ConstantThresholdDetector implements Detector {
 
     @Getter
+    @Generated // https://reflectoring.io/100-percent-test-coverage/
     private final UUID uuid;
 
     @Getter
-    private final ConstantThresholdParams params;
+    @Generated // https://reflectoring.io/100-percent-test-coverage/
+    private final Params params;
 
     private final AnomalyClassifier classifier;
 
-    public ConstantThresholdDetector(UUID uuid, ConstantThresholdParams params) {
+    public ConstantThresholdDetector(UUID uuid, Params params) {
         notNull(uuid, "uuid can't be null");
         notNull(params, "params can't be null");
+        params.validate();
         this.uuid = uuid;
         this.params = params;
         this.classifier = new AnomalyClassifier(params.getType());
@@ -52,5 +60,24 @@ public final class ConstantThresholdDetector implements Detector {
         val thresholds = params.getThresholds();
         val level = classifier.classify(thresholds, metricData.getValue());
         return new AnomalyResult(level).setThresholds(thresholds);
+    }
+
+    @Data
+    @Accessors(chain = true)
+    public static final class Params {
+
+        /**
+         * Detector type: left-, right- or two-tailed.
+         */
+        private AnomalyType type;
+
+        /**
+         * Constant thresholds.
+         */
+        private AnomalyThresholds thresholds;
+
+        public void validate() {
+            // Not currently implemented
+        }
     }
 }
