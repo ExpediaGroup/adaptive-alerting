@@ -43,7 +43,7 @@ public class MultiplicativeIntervalForecaster implements IntervalForecaster {
 
     @Data
     @Accessors(chain = true)
-    public static class Params {
+    public static final class Params {
 
         /**
          * Multiplier against the level, used to generate the weak interval:

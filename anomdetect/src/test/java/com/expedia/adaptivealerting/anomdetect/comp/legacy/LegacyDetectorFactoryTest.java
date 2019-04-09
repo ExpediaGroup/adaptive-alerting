@@ -20,8 +20,8 @@ import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelTypeResource;
 import com.expedia.adaptivealerting.anomdetect.detector.ConstantThresholdDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.CusumDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
-import com.expedia.adaptivealerting.anomdetect.detector.IndividualsControlChartDetector;
-import com.expedia.adaptivealerting.anomdetect.forecast.ForecastingDetector;
+import com.expedia.adaptivealerting.anomdetect.detector.IndividualsDetector;
+import com.expedia.adaptivealerting.anomdetect.detector.ForecastingDetector;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PewmaPointForecaster;
@@ -98,7 +98,7 @@ public class LegacyDetectorFactoryTest {
     public void testCreateDetector_individuals() {
         val params = new HashMap<String, Object>();
         val detector = buildDetector(LegacyDetectorTypes.INDIVIDUALS, params);
-        assertTrue(detector instanceof IndividualsControlChartDetector);
+        assertTrue(detector instanceof IndividualsDetector);
     }
 
     @Test

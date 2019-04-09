@@ -25,7 +25,7 @@ import lombok.ToString;
  */
 @Data
 @ToString
-public class IndividualsChartTestRow {
+public class IndividualsTestRow {
 
     @CsvBindByName
     private int sample;

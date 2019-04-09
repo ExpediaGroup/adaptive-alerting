@@ -44,7 +44,7 @@ public class AdditiveIntervalForecaster implements IntervalForecaster {
 
     @Data
     @Accessors(chain = true)
-    public static class Params {
+    public static final class Params {
         private double weakValue;
         private double strongValue;
 

@@ -17,13 +17,10 @@ package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
 import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelResource;
 import com.expedia.adaptivealerting.anomdetect.detector.ConstantThresholdDetector;
-import com.expedia.adaptivealerting.anomdetect.detector.ConstantThresholdParams;
 import com.expedia.adaptivealerting.anomdetect.detector.CusumDetector;
-import com.expedia.adaptivealerting.anomdetect.detector.CusumParams;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
-import com.expedia.adaptivealerting.anomdetect.detector.IndividualsControlChartDetector;
-import com.expedia.adaptivealerting.anomdetect.detector.IndividualsControlChartParams;
-import com.expedia.adaptivealerting.anomdetect.forecast.ForecastingDetector;
+import com.expedia.adaptivealerting.anomdetect.detector.IndividualsDetector;
+import com.expedia.adaptivealerting.anomdetect.detector.ForecastingDetector;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PewmaPointForecaster;
@@ -59,15 +56,15 @@ public class LegacyDetectorFactory {
         var detector = (Detector) null;
 
         if (LegacyDetectorTypes.CONSTANT_THRESHOLD.equals(detectorType)) {
-            detector = createConstantThresholdDetector(uuid, toParams(paramsMap, ConstantThresholdParams.class));
+            detector = createConstantThresholdDetector(uuid, toParams(paramsMap, ConstantThresholdDetector.Params.class));
         } else if (LegacyDetectorTypes.CUSUM.equals(detectorType)) {
-            detector = createCusumDetector(uuid, toParams(paramsMap, CusumParams.class));
+            detector = createCusumDetector(uuid, toParams(paramsMap, CusumDetector.Params.class));
         } else if (LegacyDetectorTypes.EWMA.equals(detectorType)) {
             detector = createEwmaDetector(uuid, toParams(paramsMap, EwmaParams.class));
         } else if (LegacyDetectorTypes.HOLT_WINTERS.equals(detectorType)) {
             detector = createHoltWintersDetector(uuid, toParams(paramsMap, HoltWintersParams.class));
         } else if (LegacyDetectorTypes.INDIVIDUALS.equals(detectorType)) {
-            detector = createIndividualsDetector(uuid, toParams(paramsMap, IndividualsControlChartParams.class));
+            detector = createIndividualsDetector(uuid, toParams(paramsMap, IndividualsDetector.Params.class));
         } else if (LegacyDetectorTypes.PEWMA.equals(detectorType)) {
             detector = createPewmaDetector(uuid, toParams(paramsMap, PewmaParams.class));
         } else {
@@ -78,14 +75,14 @@ public class LegacyDetectorFactory {
         return detector;
     }
 
-    public Detector createConstantThresholdDetector(UUID uuid, ConstantThresholdParams params) {
+    public Detector createConstantThresholdDetector(UUID uuid, ConstantThresholdDetector.Params params) {
         notNull(uuid, "uuid can't be null");
         notNull(params, "params can't be null");
         params.validate();
         return new ConstantThresholdDetector(uuid, params);
     }
 
-    public Detector createCusumDetector(UUID uuid, CusumParams params) {
+    public Detector createCusumDetector(UUID uuid, CusumDetector.Params params) {
         notNull(uuid, "uuid can't be null");
         notNull(params, "params can't be null");
         params.validate();
@@ -109,11 +106,11 @@ public class LegacyDetectorFactory {
         return new HoltWintersDetector(uuid, params);
     }
 
-    public Detector createIndividualsDetector(UUID uuid, IndividualsControlChartParams params) {
+    public Detector createIndividualsDetector(UUID uuid, IndividualsDetector.Params params) {
         notNull(uuid, "uuid can't be null");
         notNull(params, "params can't be null");
         params.validate();
-        return new IndividualsControlChartDetector(uuid, params);
+        return new IndividualsDetector(uuid, params);
     }
 
     public Detector createPewmaDetector(UUID uuid, PewmaParams params) {

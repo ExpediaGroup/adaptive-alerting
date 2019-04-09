@@ -34,7 +34,7 @@ import java.util.UUID;
 
 import static junit.framework.TestCase.assertEquals;
 
-public class IndividualsChartDetectorTest {
+public class IndividualsDetectorTest {
     private static final int WARMUP_PERIOD = 25;
 
     // TODO This tolerance is very loose. Can we tighten it up? [WLW]
@@ -43,7 +43,7 @@ public class IndividualsChartDetectorTest {
     private UUID detectorUuid;
     private MetricDefinition metricDefinition;
     private long epochSecond;
-    private static List<IndividualsChartTestRow> data;
+    private static List<IndividualsTestRow> data;
 
 
     @BeforeClass
@@ -64,15 +64,15 @@ public class IndividualsChartDetectorTest {
         val testRow0 = testRows.next();
         val observed0 = testRow0.getObserved();
 
-        val params = new IndividualsControlChartParams()
+        val params = new IndividualsDetector.Params()
                 .setInitValue(observed0)
                 .setWarmUpPeriod(WARMUP_PERIOD);
-        val detector = new IndividualsControlChartDetector(detectorUuid, params);
+        val detector = new IndividualsDetector(detectorUuid, params);
 
         int noOfDataPoints = 1;
 
         while (testRows.hasNext()) {
-            final IndividualsChartTestRow testRow = testRows.next();
+            final IndividualsTestRow testRow = testRows.next();
             final double observed = testRow.getObserved();
 
             final MetricData metricData = new MetricData(metricDefinition, observed, epochSecond);
@@ -96,8 +96,8 @@ public class IndividualsChartDetectorTest {
 
     private static void readDataFromCsv() {
         final InputStream is = ClassLoader.getSystemResourceAsStream("tests/individual-chart-sample-input.csv");
-        data = new CsvToBeanBuilder<IndividualsChartTestRow>(new InputStreamReader(is))
-                .withType(IndividualsChartTestRow.class)
+        data = new CsvToBeanBuilder<IndividualsTestRow>(new InputStreamReader(is))
+                .withType(IndividualsTestRow.class)
                 .build()
                 .parse();
     }
