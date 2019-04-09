@@ -41,7 +41,7 @@ public class GraphiteMetricSource implements MetricSource {
 
     @Override
     public List<MetricSourceResult> getMetricData(String metricTags) {
-
+        
         GraphiteProperties props = BeanUtil.getBean(GraphiteProperties.class);
         Map<String, Object> params = Collections.singletonMap("tags", metricTags);
         GraphiteResult[] graphiteResult = restTemplate.getForObject(props.getUrlTemplate(), GraphiteResult[].class, params);

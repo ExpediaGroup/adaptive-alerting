@@ -19,6 +19,7 @@ import com.expedia.adaptivealerting.anomdetect.detector.*;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.util.MetricUtil;
 import com.expedia.adaptivealerting.modelservice.spi.*;
+import com.expedia.adaptivealerting.modelservice.util.BeanUtil;
 import com.expedia.adaptivealerting.modelservice.util.DetectorUtil;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;

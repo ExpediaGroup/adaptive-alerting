@@ -5,6 +5,8 @@ import com.expedia.adaptivealerting.modelservice.providers.graphite.GraphiteResu
 import com.expedia.adaptivealerting.modelservice.providers.graphite.Tags;
 import com.expedia.adaptivealerting.modelservice.service.AnomalyRequest;
 import com.expedia.adaptivealerting.modelservice.spi.MetricSourceResult;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -43,16 +45,18 @@ public class ObjectMother {
     }
 
     public AnomalyRequest getAnomalyRequest() {
-        Map detectorParams = new HashMap<String, Object>();
-        detectorParams.put("upperStrong", 80.0);
-        detectorParams.put("upperWeak", 70.0);
-        detectorParams.put("type", "RIGHT_TAILED");
-
         AnomalyRequest request = new AnomalyRequest();
-        request.setDetectorParams(detectorParams);
+        request.setDetectorParams(getDetectorParams());
         request.setDetectorType("constant-detector");
         request.setMetricTags("what=bookings");
         return request;
+    }
+
+    public Map<String, Object> getDetectorParams() {
+        String thresholds = "{\"thresholds\": {\"lowerStrong\": \"8\", \"lowerWeak\": \"9\"}}";
+        Map<String, Object> detectorParams = toObject(thresholds);
+        detectorParams.put("type", "LEFT_TAILED");
+        return detectorParams;
     }
 
     public Metric getMetric() {
@@ -60,5 +64,10 @@ public class ObjectMother {
         metric.setHash("1.3dec7f4218c57c1839147f8ca190ed55");
         metric.setKey("key");
         return metric;
+    }
+
+    @SneakyThrows
+    private Map<String, Object> toObject(String message) {
+        return new ObjectMapper().readValue(message, HashMap.class);
     }
 }

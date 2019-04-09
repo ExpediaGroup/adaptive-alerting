@@ -2,36 +2,36 @@ package com.expedia.adaptivealerting.modelservice.util;
 
 import com.expedia.adaptivealerting.anomdetect.detector.ConstantThresholdDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
-import com.expedia.adaptivealerting.core.util.MetricUtil;
-import com.expedia.metrics.MetricDefinition;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
+import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import org.json.JSONObject;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.MockitoAnnotations;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
+
 @Slf4j
 public class DetectorUtilTest {
 
+    private Map<String, Object> detectorParams;
+
+    @Before
+    public void setUp() {
+        MockitoAnnotations.initMocks(this);
+        initTestObjects();
+    }
+
     @Test
     public void testGetDetector() {
-
-        String thresholds = "{\"thresholds\": {\"lowerStrong\": \"8\", \"lowerWeak\": \"9\"}}";
-        Map<String, Object> detectorParams = toObject(thresholds);
-        detectorParams.put("type", "LEFT_TAILED");
         Detector detector = DetectorUtil.getDetector("constant-detector", detectorParams);
         assertEquals(ConstantThresholdDetector.class, detector.getClass());
     }
 
-    @SneakyThrows
-    private Map<String, Object> toObject(String message) {
-        return new ObjectMapper().readValue(message, HashMap.class);
+    private void initTestObjects() {
+        ObjectMother mom = ObjectMother.instance();
+        detectorParams = mom.getDetectorParams();
     }
 }
