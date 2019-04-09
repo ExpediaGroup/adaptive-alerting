@@ -1,28 +1,39 @@
 package com.expedia.adaptivealerting.modelservice.util;
 
-import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelResource;
-import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelTypeResource;
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.DetectorLookup;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.DetectorParams;
 import com.expedia.adaptivealerting.anomdetect.detector.*;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
+import com.expedia.adaptivealerting.core.util.ReflectionUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
 public class DetectorUtil {
 
+    private static final DetectorLookup detectorLookup = new DetectorLookup();
+
     public static Detector getDetector(String detectorType, Map paramsMap) {
+        Class<? extends Detector> detectorClass = detectorLookup.getDetector(detectorType);
+        AbstractDetector detector = (AbstractDetector) ReflectionUtil.newInstance(detectorClass);
 
-        ModelTypeResource modelTypeResource = new ModelTypeResource();
-        modelTypeResource.setKey(detectorType);
-        ModelResource resource = new ModelResource();
-        resource.setDetectorType(modelTypeResource);
-        resource.setParams(paramsMap);
-        resource.setDateCreated(new Date());
+        Class<? extends DetectorParams> paramsClass = detector.getParamsClass();
+        DetectorParams params = (DetectorParams) new ObjectMapper().convertValue(paramsMap, paramsClass);
+        AnomalyType anomalyType = getAnomalyType(paramsClass, params);
+        detector.init(UUID.randomUUID(), params, anomalyType);
+        return detector;
+    }
 
-        LegacyDetectorFactory factory = new LegacyDetectorFactory();
-        return factory.createDetector(UUID.randomUUID(), resource);
+    private static AnomalyType getAnomalyType(Class<? extends DetectorParams> paramsClass, DetectorParams params) {
+        if (ConstantThresholdParams.class.equals(paramsClass)) {
+            return ((ConstantThresholdParams) params).getType();
+        } else if (CusumParams.class.equals(paramsClass)) {
+            return ((CusumParams) params).getType();
+        } else {
+            return AnomalyType.TWO_TAILED;
+        }
     }
 }
