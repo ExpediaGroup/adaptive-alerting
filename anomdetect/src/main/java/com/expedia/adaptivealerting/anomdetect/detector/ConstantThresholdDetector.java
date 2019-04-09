@@ -48,6 +48,7 @@ public final class ConstantThresholdDetector implements Detector {
     public ConstantThresholdDetector(UUID uuid, Params params) {
         notNull(uuid, "uuid can't be null");
         notNull(params, "params can't be null");
+        params.validate();
         this.uuid = uuid;
         this.params = params;
         this.classifier = new AnomalyClassifier(params.getType());

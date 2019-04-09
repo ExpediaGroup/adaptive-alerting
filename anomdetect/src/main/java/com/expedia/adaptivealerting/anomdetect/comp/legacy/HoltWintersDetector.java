@@ -59,6 +59,8 @@ public final class HoltWintersDetector implements Detector {
         notNull(uuid, "uuid can't be null");
         notNull(params, "params can't be null");
 
+        params.validate();
+
         this.uuid = uuid;
         this.params = params;
 

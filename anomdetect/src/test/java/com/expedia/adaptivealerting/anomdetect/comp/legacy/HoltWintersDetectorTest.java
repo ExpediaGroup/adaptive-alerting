@@ -42,6 +42,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Tests Holt-Winters functionality by comparing with data generated from Hyndman's R "fpp2" library - see GenerateAustouristsTests.R
  */
+@Deprecated
 public class HoltWintersDetectorTest {
 
     @Rule

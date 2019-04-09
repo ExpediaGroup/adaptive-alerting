@@ -80,6 +80,7 @@ public final class CusumDetector implements Detector {
     public CusumDetector(UUID uuid, Params params) {
         notNull(uuid, "uuid can't be null");
         notNull(params, "params can't be null");
+        params.validate();
         this.uuid = uuid;
         this.params = params;
         this.prevValue = params.getInitMeanEstimate();

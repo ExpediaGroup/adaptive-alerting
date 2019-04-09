@@ -19,8 +19,8 @@ import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelResource;
 import com.expedia.adaptivealerting.anomdetect.detector.ConstantThresholdDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.CusumDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
-import com.expedia.adaptivealerting.anomdetect.detector.IndividualsDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.ForecastingDetector;
+import com.expedia.adaptivealerting.anomdetect.detector.IndividualsDetector;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PewmaPointForecaster;
@@ -29,9 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import lombok.var;
 
-import java.util.Map;
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -43,50 +41,42 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @Slf4j
 @Deprecated
 public class LegacyDetectorFactory {
+    static final String CONSTANT_THRESHOLD = "constant-detector";
+    static final String CUSUM = "cusum-detector";
+    static final String EWMA = "ewma-detector";
+    static final String HOLT_WINTERS = "holtwinters-detector";
+    static final String INDIVIDUALS = "individuals-detector";
+    static final String PEWMA = "pewma-detector";
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     // TODO Currently we use a legacy process to find the detector. The legacy process couples point forecast algos
     //  with interval forecast algos. We will decouple these shortly. [WLW]
-    public Detector createDetector(UUID uuid, ModelResource modelResource) {
+    public Detector createDetector(UUID uuid, ModelResource model) {
         notNull(uuid, "uuid can't be null");
-        notNull(modelResource, "modelResource can't be null");
+        notNull(model, "model can't be null");
 
-        val detectorType = modelResource.getDetectorType().getKey();
-        val paramsMap = modelResource.getParams();
-        var detector = (Detector) null;
+        Detector detector;
+        val detectorType = model.getDetectorType().getKey();
 
-        if (LegacyDetectorTypes.CONSTANT_THRESHOLD.equals(detectorType)) {
-            detector = createConstantThresholdDetector(uuid, toParams(paramsMap, ConstantThresholdDetector.Params.class));
-        } else if (LegacyDetectorTypes.CUSUM.equals(detectorType)) {
-            detector = createCusumDetector(uuid, toParams(paramsMap, CusumDetector.Params.class));
-        } else if (LegacyDetectorTypes.EWMA.equals(detectorType)) {
-            detector = createEwmaDetector(uuid, toParams(paramsMap, EwmaParams.class));
-        } else if (LegacyDetectorTypes.HOLT_WINTERS.equals(detectorType)) {
-            detector = createHoltWintersDetector(uuid, toParams(paramsMap, HoltWintersParams.class));
-        } else if (LegacyDetectorTypes.INDIVIDUALS.equals(detectorType)) {
-            detector = createIndividualsDetector(uuid, toParams(paramsMap, IndividualsDetector.Params.class));
-        } else if (LegacyDetectorTypes.PEWMA.equals(detectorType)) {
-            detector = createPewmaDetector(uuid, toParams(paramsMap, PewmaParams.class));
+        if (CONSTANT_THRESHOLD.equals(detectorType)) {
+            detector = new ConstantThresholdDetector(uuid, toParams(model, ConstantThresholdDetector.Params.class));
+        } else if (CUSUM.equals(detectorType)) {
+            detector = new CusumDetector(uuid, toParams(model, CusumDetector.Params.class));
+        } else if (EWMA.equals(detectorType)) {
+            detector = createEwmaDetector(uuid, toParams(model, EwmaParams.class));
+        } else if (HOLT_WINTERS.equals(detectorType)) {
+            detector = createHoltWintersDetector(uuid, toParams(model, HoltWintersParams.class));
+        } else if (INDIVIDUALS.equals(detectorType)) {
+            detector = new IndividualsDetector(uuid, toParams(model, IndividualsDetector.Params.class));
+        } else if (PEWMA.equals(detectorType)) {
+            detector = createPewmaDetector(uuid, toParams(model, PewmaParams.class));
         } else {
             throw new IllegalArgumentException("Unknown detector type: " + detectorType);
         }
 
         log.info("Created detector: {}", detector);
         return detector;
-    }
-
-    public Detector createConstantThresholdDetector(UUID uuid, ConstantThresholdDetector.Params params) {
-        notNull(uuid, "uuid can't be null");
-        notNull(params, "params can't be null");
-        params.validate();
-        return new ConstantThresholdDetector(uuid, params);
-    }
-
-    public Detector createCusumDetector(UUID uuid, CusumDetector.Params params) {
-        notNull(uuid, "uuid can't be null");
-        notNull(params, "params can't be null");
-        params.validate();
-        return new CusumDetector(uuid, params);
     }
 
     public Detector createEwmaDetector(UUID uuid, EwmaParams params) {
@@ -102,15 +92,7 @@ public class LegacyDetectorFactory {
     public Detector createHoltWintersDetector(UUID uuid, HoltWintersParams params) {
         notNull(uuid, "uuid can't be null");
         notNull(params, "params can't be null");
-        params.validate();
         return new HoltWintersDetector(uuid, params);
-    }
-
-    public Detector createIndividualsDetector(UUID uuid, IndividualsDetector.Params params) {
-        notNull(uuid, "uuid can't be null");
-        notNull(params, "params can't be null");
-        params.validate();
-        return new IndividualsDetector(uuid, params);
     }
 
     public Detector createPewmaDetector(UUID uuid, PewmaParams params) {
@@ -123,7 +105,8 @@ public class LegacyDetectorFactory {
         return new ForecastingDetector(uuid, pointForecaster, intervalForecaster, anomalyType);
     }
 
-    private <T> T toParams(Map<String, Object> paramsMap, Class<T> paramsClass) {
-        return objectMapper.convertValue(paramsMap, paramsClass);
+    private <T> T toParams(ModelResource model, Class<T> paramsClass) {
+        return objectMapper.convertValue(model.getParams(), paramsClass);
     }
+
 }
