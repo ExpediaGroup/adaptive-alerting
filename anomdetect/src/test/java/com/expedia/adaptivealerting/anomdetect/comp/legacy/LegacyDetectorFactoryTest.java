@@ -110,6 +110,12 @@ public class LegacyDetectorFactoryTest {
         assertTrue(detector.getIntervalForecaster() instanceof ExponentialWelfordIntervalForecaster);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateDetector_unknown() {
+        val params = new HashMap<String, Object>();
+        buildDetector("some-unknown-detector-type", params);
+    }
+
     private Detector buildDetector(String type, Map<String, Object> params) {
         val modelResource = buildModelResource(type, params);
         return factoryUnderTest.createDetector(UUID.randomUUID(), modelResource);

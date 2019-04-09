@@ -108,5 +108,4 @@ public class LegacyDetectorFactory {
     private <T> T toParams(ModelResource model, Class<T> paramsClass) {
         return objectMapper.convertValue(model.getParams(), paramsClass);
     }
-
 }
