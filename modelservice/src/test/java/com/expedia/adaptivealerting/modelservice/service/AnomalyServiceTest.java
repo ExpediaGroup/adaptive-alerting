@@ -6,11 +6,13 @@ import com.expedia.adaptivealerting.modelservice.spi.MetricSource;
 import com.expedia.adaptivealerting.modelservice.spi.MetricSourceResult;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.*;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.verification.VerificationMode;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.*;
@@ -31,27 +33,42 @@ public class AnomalyServiceTest {
     @Mock
     private GraphiteMetricSource graphiteMetricSource;
 
+    @Mock
+    private MetricSourceResult metricSourceResult = new MetricSourceResult();
+
     @Spy
-    private List<MetricSourceResult> results = new ArrayList<>();
+    private List<MetricSourceResult> metricSourceResults = new ArrayList<>();
 
     private AnomalyRequest anomalyRequest;
 
     @Before
     public void setUp() {
         metricSources.add(graphiteMetricSource);
-        this.results.add(new MetricSourceResult());
+        metricSourceResults.add(metricSourceResult);
         MockitoAnnotations.initMocks(this);
         initTestObjects();
     }
 
     @Test
     public void testGetAnomalies() {
+        mockSource(graphiteMetricSource);
         List<AnomalyResult> actualResults = anomalyService.getAnomalies(anomalyRequest);
+        verifyNumberOfSourceCalls(graphiteMetricSource, Mockito.atMost(10));
         assertNotNull(actualResults);
+        Assert.assertEquals(0, actualResults.size());
     }
 
     private void initTestObjects() {
         ObjectMother mom = ObjectMother.instance();
         anomalyRequest = mom.getAnomalyRequest();
+    }
+
+    private void mockSource(MetricSource source) {
+        System.out.println(metricSourceResults.size());
+        Mockito.when(source.getMetricData(Mockito.anyString())).thenReturn(metricSourceResults);
+    }
+
+    private void verifyNumberOfSourceCalls(MetricSource metricSource, VerificationMode verifMode) {
+        Mockito.verify(metricSource, verifMode).getMetricData(Mockito.anyString());
     }
 }
