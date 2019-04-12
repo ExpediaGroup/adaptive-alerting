@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.HoltWintersDetector;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.HoltWintersParams;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.SeasonalityType;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.tools.pipeline.filter.DetectorFilter;
@@ -137,7 +137,8 @@ public class CsvTrafficHoltWintersVariants {
     private static AnomalyChartSink buildChart(MetricFrameMetricSource source, SeasonalityType seasonalityType, HoltWintersParams params,
                                                double alpha, double beta, double gammaLow, String... titleSuffix) {
 
-        val detector = new HoltWintersDetector(UUID.randomUUID(), new HoltWintersParams());
+        val factory = new LegacyDetectorFactory();
+        val detector = factory.createHoltWintersDetector(UUID.randomUUID(), new HoltWintersParams());
         val detectorFilter = new DetectorFilter(detector);
         val evalFilter = new EvaluatorFilter(new RmseEvaluator());
         val chartSink = PipelineFactory.createChartSink(String.format(

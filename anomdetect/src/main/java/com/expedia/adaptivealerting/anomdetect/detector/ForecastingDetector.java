@@ -76,13 +76,13 @@ public class ForecastingDetector implements Detector {
         notNull(metricData, "metricData can't be null");
 
         val pointForecast = pointForecaster.forecast(metricData);
-        val intervalForecast = intervalForecaster.forecast(metricData, pointForecast);
+        val intervalForecast = intervalForecaster.forecast(metricData, pointForecast.getValue());
         val thresholds = toAnomalyThresholds(intervalForecast);
         val observed = metricData.getValue();
         val level = new AnomalyClassifier(anomalyType).classify(thresholds, observed);
 
         return new AnomalyResult(level)
-                .setPredicted(pointForecast)
+                .setPredicted(pointForecast.getValue())
                 .setThresholds(thresholds);
     }
 

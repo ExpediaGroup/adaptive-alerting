@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Expedia Group, Inc.
+ * Copyright 2018-2019 Expedia Group, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.HoltWintersForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersSeasonalEstimatesValidator;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersTrainingMethod;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.SeasonalityType;
@@ -37,6 +39,11 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @Slf4j
 @Deprecated
 public final class HoltWintersParams {
+
+    /**
+     * A default alpha value for the exponential Welford interval forecaster.
+     */
+    private static final double DEFAULT_EXP_WELFORD_ALPHA = 0.15;
 
     /**
      * SeasonalityType parameter used to determine which Seasonality method (Multiplicative or Additive) to use.
@@ -130,6 +137,32 @@ public final class HoltWintersParams {
      */
     public int calculateInitTrainingPeriod() {
         return (initTrainingMethod == HoltWintersTrainingMethod.SIMPLE) ? (frequency * 2) : 0;
+    }
+
+    public HoltWintersForecaster.Params toPointForecasterParams() {
+        return new HoltWintersForecaster.Params()
+                .setSeasonalityType(seasonalityType)
+                .setFrequency(frequency)
+                .setAlpha(alpha)
+                .setBeta(beta)
+                .setGamma(gamma)
+                .setWarmUpPeriod(warmUpPeriod)
+                .setInitLevelEstimate(initLevelEstimate)
+                .setInitBaseEstimate(initBaseEstimate)
+                .setInitSeasonalEstimates(initSeasonalEstimates)
+                .setInitTrainingMethod(initTrainingMethod);
+    }
+
+    public ExponentialWelfordIntervalForecaster.Params toIntervalForecasterParams() {
+
+        // Currently we simply use a default alpha here. I'm not marking this as a TODO
+        // since this HoltWintersParams class is deprecated anyway, and we want to start
+        // using explicitly selected and tuned interval forecasters. [WLW]
+        return new ExponentialWelfordIntervalForecaster.Params()
+                .setAlpha(DEFAULT_EXP_WELFORD_ALPHA)
+                .setInitVarianceEstimate(0.0)
+                .setWeakSigmas(weakSigmas)
+                .setStrongSigmas(strongSigmas);
     }
 
     public void validate() {

@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.anomdetect.detector;
 
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecast;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecast;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecaster;
 import com.expedia.adaptivealerting.anomdetect.util.TestObjectMother;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
@@ -70,7 +71,7 @@ public class ForecastingDetectorTest {
 
     private void initDependencies() {
         when(pointForecaster.forecast(any(MetricData.class)))
-                .thenReturn(50.0);
+                .thenReturn(new PointForecast(50.0, false));
         when(intervalForecaster.forecast(any(MetricData.class), anyDouble()))
                 .thenReturn(new IntervalForecast(100.0, 90.0, 20.0, 10.0));
     }
