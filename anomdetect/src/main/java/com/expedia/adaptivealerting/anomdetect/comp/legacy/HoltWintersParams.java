@@ -125,10 +125,6 @@ public final class HoltWintersParams {
 
     private final HoltWintersSeasonalEstimatesValidator seasonalEstimatesValidator = new HoltWintersSeasonalEstimatesValidator();
 
-    public boolean isMultiplicative() {
-        return seasonalityType.equals(SeasonalityType.MULTIPLICATIVE);
-    }
-
     /**
      * Calculates the initial training period (if applicable) based on initTrainingMethod and frequency.
      * Used to determine whether to perform training or forecasting on an observation.
