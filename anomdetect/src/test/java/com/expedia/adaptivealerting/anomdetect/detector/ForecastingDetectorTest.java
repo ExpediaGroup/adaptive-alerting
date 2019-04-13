@@ -31,6 +31,7 @@ import org.mockito.MockitoAnnotations;
 import java.time.Instant;
 import java.util.UUID;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
@@ -45,15 +46,25 @@ public class ForecastingDetectorTest {
     @Mock
     private IntervalForecaster intervalForecaster;
 
+    private UUID detectorUuid;
+    private AnomalyType anomalyType;
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         initDependencies();
-        this.detectorUnderTest = new ForecastingDetector(
-                UUID.randomUUID(),
-                pointForecaster,
-                intervalForecaster,
-                AnomalyType.TWO_TAILED);
+        this.detectorUuid= UUID.randomUUID();
+        this.anomalyType = AnomalyType.TWO_TAILED;
+        this.detectorUnderTest =
+                new ForecastingDetector(detectorUuid, pointForecaster, intervalForecaster, anomalyType);
+    }
+
+    @Test
+    public void testAccessors() {
+        assertEquals(detectorUuid, detectorUnderTest.getUuid());
+        assertEquals(pointForecaster, detectorUnderTest.getPointForecaster());
+        assertEquals(intervalForecaster, detectorUnderTest.getIntervalForecaster());
+        assertEquals(anomalyType, detectorUnderTest.getAnomalyType());
     }
 
     @Test

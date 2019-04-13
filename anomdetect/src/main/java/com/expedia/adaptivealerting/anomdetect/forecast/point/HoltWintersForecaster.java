@@ -24,6 +24,7 @@ import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWi
 import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.SeasonalityType;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
+import lombok.Generated;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -38,9 +39,11 @@ import static java.lang.String.format;
 public class HoltWintersForecaster implements PointForecaster {
 
     @Getter
+    @Generated // https://reflectoring.io/100-percent-test-coverage/
     private Params params;
 
     @Getter
+    @Generated // https://reflectoring.io/100-percent-test-coverage/
     private HoltWintersOnlineComponents components;
 
     private HoltWintersSimpleTrainingModel holtWintersSimpleTrainingModel;
@@ -48,9 +51,7 @@ public class HoltWintersForecaster implements PointForecaster {
 
     public HoltWintersForecaster(Params params) {
         notNull(params, "params can't be null");
-
         params.validate();
-
         this.params = params;
 
         this.components = new HoltWintersOnlineComponents(params);
@@ -85,12 +86,12 @@ public class HoltWintersForecaster implements PointForecaster {
             case SIMPLE:
                 return holtWintersSimpleTrainingModel.isTrainingComplete(params);
             default:
+                // This shouldn't happen
                 throw new IllegalStateException(format("Unexpected training method '%s'", params.getInitTrainingMethod()));
         }
     }
 
     private void trainOrObserve(double observed) {
-        val params = getParams();
         if (!isInitialTrainingComplete()) {
             holtWintersSimpleTrainingModel.observeAndTrain(observed, params, components);
         } else {
@@ -99,7 +100,6 @@ public class HoltWintersForecaster implements PointForecaster {
     }
 
     private boolean stillWarmingUp() {
-        val params = getParams();
         return components.getN() <= params.getWarmUpPeriod();
     }
 

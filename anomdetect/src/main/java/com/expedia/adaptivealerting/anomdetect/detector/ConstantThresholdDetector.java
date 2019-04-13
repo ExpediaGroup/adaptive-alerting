@@ -21,7 +21,6 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
-import lombok.Generated;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.val;
@@ -36,11 +35,9 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 public final class ConstantThresholdDetector implements Detector {
 
     @Getter
-    @Generated // https://reflectoring.io/100-percent-test-coverage/
     private final UUID uuid;
 
     @Getter
-    @Generated // https://reflectoring.io/100-percent-test-coverage/
     private final Params params;
 
     private final AnomalyClassifier classifier;
