@@ -41,11 +41,8 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * https://www.spcforexcel.com/knowledge/variable-control-charts/keeping-process-target-cusum-charts
  * </p>
  */
-public final class CusumDetector implements Detector {
+public final class CusumDetector extends AbstractDetector {
     private static final double STD_DEV_DIVISOR = 1.128;
-
-    @Getter
-    private UUID uuid;
 
     @Getter
     private Params params;
@@ -78,10 +75,9 @@ public final class CusumDetector implements Detector {
     private double prevValue = 0.0;
 
     public CusumDetector(UUID uuid, Params params) {
-        notNull(uuid, "uuid can't be null");
+        super(uuid);
         notNull(params, "params can't be null");
         params.validate();
-        this.uuid = uuid;
         this.params = params;
         this.prevValue = params.getInitMeanEstimate();
     }

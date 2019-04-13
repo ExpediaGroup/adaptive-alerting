@@ -32,10 +32,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 /**
  * Anomaly detector with constant threshold for weak and strong anomalies. Supports both one- and two-tailed tests.
  */
-public final class ConstantThresholdDetector implements Detector {
-
-    @Getter
-    private final UUID uuid;
+public final class ConstantThresholdDetector extends AbstractDetector {
 
     @Getter
     private final Params params;
@@ -43,10 +40,9 @@ public final class ConstantThresholdDetector implements Detector {
     private final AnomalyClassifier classifier;
 
     public ConstantThresholdDetector(UUID uuid, Params params) {
-        notNull(uuid, "uuid can't be null");
+        super(uuid);
         notNull(params, "params can't be null");
         params.validate();
-        this.uuid = uuid;
         this.params = params;
         this.classifier = new AnomalyClassifier(params.getType());
     }
