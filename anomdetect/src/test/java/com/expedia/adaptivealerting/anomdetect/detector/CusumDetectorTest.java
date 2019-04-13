@@ -61,7 +61,7 @@ public class CusumDetectorTest {
     public void testClassify_leftTailed() {
         val anomalyType = AnomalyType.LEFT_TAILED;
 
-        val params = new CusumParams()
+        val params = new CusumDetector.Params()
                 .setType(anomalyType)
                 .setTargetValue(1000.0)
                 .setWeakSigmas(WEAK_SIGMAS)
@@ -86,7 +86,7 @@ public class CusumDetectorTest {
 
         val anomalyType = AnomalyType.RIGHT_TAILED;
 
-        val params = new CusumParams()
+        val params = new CusumDetector.Params()
                 .setType(anomalyType)
                 .setTargetValue(0.16)
                 .setWeakSigmas(WEAK_SIGMAS)
@@ -95,8 +95,7 @@ public class CusumDetectorTest {
                 .setInitMeanEstimate(testRow0.getObserved())
                 .setWarmUpPeriod(WARMUP_PERIOD);
 
-        val detector = new CusumDetector();
-        detector.init(detectorUuid, params, anomalyType);
+        val detector = new CusumDetector(detectorUuid, params);
 
         int numDataPoints = 1;
 
@@ -122,7 +121,7 @@ public class CusumDetectorTest {
     public void testClassify_twoTailed() {
         val anomalyType = AnomalyType.TWO_TAILED;
 
-        val params = new CusumParams()
+        val params = new CusumDetector.Params()
                 .setType(anomalyType)
                 .setTargetValue(1000.0)
                 .setWeakSigmas(WEAK_SIGMAS)
@@ -141,9 +140,8 @@ public class CusumDetectorTest {
         testClassify(params, anomalyType, testRows);
     }
 
-    private void testClassify(CusumParams params, AnomalyType anomalyType, CusumTestRow[] testRows) {
-        val detector = new CusumDetector();
-        detector.init(detectorUuid, params, anomalyType);
+    private void testClassify(CusumDetector.Params params, AnomalyType anomalyType, CusumTestRow[] testRows) {
+        val detector = new CusumDetector(detectorUuid, params);
 
         // FIXME Hack to handle an off-by-one bug in the CusumDetector. [WLW]
         val adjWarmupPeriod = params.getWarmUpPeriod() - 1;

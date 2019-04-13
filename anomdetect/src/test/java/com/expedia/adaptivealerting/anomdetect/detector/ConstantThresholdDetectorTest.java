@@ -101,13 +101,10 @@ public class ConstantThresholdDetectorTest {
     }
 
     private ConstantThresholdDetector detector(UUID uuid, AnomalyThresholds thresholds, AnomalyType type) {
-        val params = new ConstantThresholdParams()
+        val params = new ConstantThresholdDetector.Params()
                 .setThresholds(thresholds)
                 .setType(type);
-
-        val detector = new ConstantThresholdDetector();
-        detector.init(uuid, params, type);
-        return detector;
+        return new ConstantThresholdDetector(uuid, params);
     }
 
     private void verifyResult(AnomalyLevel level, Detector detector, long epochSecond, double value) {

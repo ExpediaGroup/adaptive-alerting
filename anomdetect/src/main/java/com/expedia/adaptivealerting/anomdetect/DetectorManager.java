@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -73,26 +72,6 @@ public class DetectorManager {
                 log.error("Error refreshing detectors", e);
             }
         }, 1, detectorRefreshTimePeriod, TimeUnit.MINUTES);
-    }
-
-    /**
-     * Returns the managed detector types.
-     *
-     * @return Managed detector types.
-     */
-    public Set<String> getDetectorTypes() {
-        return detectorSource.findDetectorTypes();
-    }
-
-    /**
-     * Indicates whether this manager manages detectors of the given type.
-     *
-     * @param detectorType Detector type.
-     * @return Boolean indicating whether this manager manages detectors of the given type.
-     */
-    public boolean hasDetectorType(String detectorType) {
-        notNull(detectorType, "detectorType can't be null");
-        return getDetectorTypes().contains(detectorType);
     }
 
     /**

@@ -17,12 +17,19 @@ package com.expedia.adaptivealerting.anomdetect.detector;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 import lombok.val;
 
-import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.*;
+import java.util.UUID;
+
+import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.MODEL_WARMUP;
+import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.NORMAL;
+import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.STRONG;
+import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.WEAK;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
@@ -34,10 +41,14 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * https://www.spcforexcel.com/knowledge/variable-control-charts/keeping-process-target-cusum-charts
  * </p>
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
-public final class CusumDetector extends AbstractDetector<CusumParams> {
+public final class CusumDetector implements Detector {
     private static final double STD_DEV_DIVISOR = 1.128;
+
+    @Getter
+    private UUID uuid;
+
+    @Getter
+    private Params params;
 
     /**
      * Total number of data points seen so far.
@@ -47,11 +58,13 @@ public final class CusumDetector extends AbstractDetector<CusumParams> {
     /**
      * Cumulative sum on the high side. SH
      */
+    @Getter
     private double sumHigh = 0.0;
 
     /**
      * Cumulative sum on the low side. SL
      */
+    @Getter
     private double sumLow = 0.0;
 
     /**
@@ -64,12 +77,12 @@ public final class CusumDetector extends AbstractDetector<CusumParams> {
      */
     private double prevValue = 0.0;
 
-    public CusumDetector() {
-        super(CusumParams.class);
-    }
-
-    @Override
-    protected void initState(CusumParams params) {
+    public CusumDetector(UUID uuid, Params params) {
+        notNull(uuid, "uuid can't be null");
+        notNull(params, "params can't be null");
+        params.validate();
+        this.uuid = uuid;
+        this.params = params;
         this.prevValue = params.getInitMeanEstimate();
     }
 
@@ -164,5 +177,49 @@ public final class CusumDetector extends AbstractDetector<CusumParams> {
             return movingRange / (totalDataPoints - 1);
         }
         return movingRange;
+    }
+
+    @Data
+    @Accessors(chain = true)
+    public static final class Params {
+
+        /**
+         * Detector type: left-, right- or two-tailed.
+         */
+        private AnomalyType type;
+
+        /**
+         * Target value (i.e., the set point).
+         */
+        private double targetValue = 0.0;
+
+        /**
+         * Weak threshold sigmas.
+         */
+        private double weakSigmas = 3.0;
+
+        /**
+         * Strong threshold sigmas.
+         */
+        private double strongSigmas = 4.0;
+
+        /**
+         * Slack param to calculate slack value k where k = slack_param * stdev.
+         */
+        private double slackParam = 0.5;
+
+        /**
+         * Initial mean estimate.
+         */
+        private double initMeanEstimate = 0.0;
+
+        /**
+         * Minimum number of data points required before this anomaly detector is available for use.
+         */
+        private int warmUpPeriod = 25;
+
+        public void validate() {
+            // Not currently implemented
+        }
     }
 }

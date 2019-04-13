@@ -37,8 +37,6 @@ import java.util.UUID;
  */
 public interface DetectorSource {
 
-    Set<String> findDetectorTypes();
-
     /**
      * Finds the list of detector UUIDs for a given metric.
      *

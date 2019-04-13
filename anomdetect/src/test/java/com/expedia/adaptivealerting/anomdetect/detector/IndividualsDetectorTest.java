@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.forecast.point;
+package com.expedia.adaptivealerting.anomdetect.detector;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.adaptivealerting.core.util.MathUtil;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
@@ -35,16 +34,16 @@ import java.util.UUID;
 
 import static junit.framework.TestCase.assertEquals;
 
-public class IndividualsChartDetectorTest {
+public class IndividualsDetectorTest {
     private static final int WARMUP_PERIOD = 25;
 
     // TODO This tolerance is very loose. Can we tighten it up? [WLW]
     private static final double TOLERANCE = 0.1;
 
-    private UUID detectorUUID;
+    private UUID detectorUuid;
     private MetricDefinition metricDefinition;
     private long epochSecond;
-    private static List<IndividualsChartTestRow> data;
+    private static List<IndividualsTestRow> data;
 
 
     @BeforeClass
@@ -54,7 +53,7 @@ public class IndividualsChartDetectorTest {
 
     @Before
     public void setUp() {
-        this.detectorUUID = UUID.randomUUID();
+        this.detectorUuid = UUID.randomUUID();
         this.metricDefinition = new MetricDefinition("some-key");
         this.epochSecond = Instant.now().getEpochSecond();
     }
@@ -65,16 +64,15 @@ public class IndividualsChartDetectorTest {
         val testRow0 = testRows.next();
         val observed0 = testRow0.getObserved();
 
-        val params = new IndividualsControlChartParams()
+        val params = new IndividualsDetector.Params()
                 .setInitValue(observed0)
                 .setWarmUpPeriod(WARMUP_PERIOD);
-        val detector = new IndividualsControlChartDetector();
-        detector.init(detectorUUID, params, AnomalyType.TWO_TAILED);
+        val detector = new IndividualsDetector(detectorUuid, params);
 
         int noOfDataPoints = 1;
 
         while (testRows.hasNext()) {
-            final IndividualsChartTestRow testRow = testRows.next();
+            final IndividualsTestRow testRow = testRows.next();
             final double observed = testRow.getObserved();
 
             final MetricData metricData = new MetricData(metricDefinition, observed, epochSecond);
@@ -98,8 +96,8 @@ public class IndividualsChartDetectorTest {
 
     private static void readDataFromCsv() {
         final InputStream is = ClassLoader.getSystemResourceAsStream("tests/individual-chart-sample-input.csv");
-        data = new CsvToBeanBuilder<IndividualsChartTestRow>(new InputStreamReader(is))
-                .withType(IndividualsChartTestRow.class)
+        data = new CsvToBeanBuilder<IndividualsTestRow>(new InputStreamReader(is))
+                .withType(IndividualsTestRow.class)
                 .build()
                 .parse();
     }

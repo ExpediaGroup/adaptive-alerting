@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.interval;
 
-import com.expedia.adaptivealerting.anomdetect.detector.DetectorParams;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
 import lombok.Getter;
@@ -44,6 +43,10 @@ public class ExponentialWelfordIntervalForecaster implements IntervalForecaster 
 
     @Getter
     private double variance;
+
+    public ExponentialWelfordIntervalForecaster() {
+        this(new Params());
+    }
 
     public ExponentialWelfordIntervalForecaster(Params params) {
         notNull(params, "params can't be null");
@@ -79,14 +82,13 @@ public class ExponentialWelfordIntervalForecaster implements IntervalForecaster 
 
     @Data
     @Accessors(chain = true)
-    public static class Params implements DetectorParams {
-        private double alpha;
-        private double initVarianceEstimate;
-        private double weakSigmas;
-        private double strongSigmas;
+    public static final class Params {
+        private double alpha = 0.15;
+        private double initVarianceEstimate = 0.0;
+        private double weakSigmas = 3.0;
+        private double strongSigmas = 4.0;
         // TODO Add warmup period
 
-        @Override
         public void validate() {
             // TODO Implement
         }

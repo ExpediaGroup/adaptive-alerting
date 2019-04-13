@@ -13,38 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.expedia.adaptivealerting.anomdetect.util;
 
-package com.expedia.adaptivealerting.anomdetect.forecast.point;
-
-import com.opencsv.bean.CsvBindByName;
-import lombok.Data;
-import lombok.ToString;
+import com.expedia.metrics.MetricDefinition;
 
 /**
- * The type Individual chart test row.
+ * Test object mother: http://wiki.c2.com/?ObjectMother
  */
-@Data
-@ToString
-public class IndividualsChartTestRow {
+public final class TestObjectMother {
 
-    @CsvBindByName
-    private int sample;
-
-    @CsvBindByName
-    private double observed;
-
-    @CsvBindByName
-    private double upperControlLimit_R;
-
-    @CsvBindByName
-    private double upperControlLimit_X;
-
-    @CsvBindByName
-    private double lowerControlLimit_X;
-
-    @CsvBindByName
-    private double target;
-
-    @CsvBindByName
-    private String anomalyLevel;
+    public static MetricDefinition metricDefinition() {
+        return new MetricDefinition("my-metric");
+    }
 }

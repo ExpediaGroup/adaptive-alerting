@@ -15,12 +15,9 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.point;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
-import com.expedia.adaptivealerting.core.util.MathUtil;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.opencsv.bean.CsvToBeanBuilder;
-import junit.framework.TestCase;
 import lombok.val;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -29,15 +26,13 @@ import org.junit.Test;
 import java.io.InputStreamReader;
 import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 
-import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
 
-public class EwmaDetectorTest {
+public final class EwmaPointForecasterTest {
     private static final double TOLERANCE = 0.001;
 
-    private MetricDefinition metricDefinition;
+    private MetricDefinition metricDef;
     private long epochSecond;
     private static List<EwmaTestRow> data;
 
@@ -48,22 +43,8 @@ public class EwmaDetectorTest {
 
     @Before
     public void setUp() {
-        this.metricDefinition = new MetricDefinition("some-key");
+        this.metricDef = new MetricDefinition("some-key");
         this.epochSecond = Instant.now().getEpochSecond();
-    }
-
-    @Test
-    public void testInit() {
-        val detector = new EwmaDetector();
-        detector.init(UUID.randomUUID(), new EwmaParams(), AnomalyType.TWO_TAILED);
-        assertNotNull(detector.getUuid());
-        assertNotNull(detector.getParams());
-        assertEquals(EwmaParams.class, detector.getParamsClass());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testInit_alphaOutOfRange() {
-        new EwmaDetector().init(UUID.randomUUID(), new EwmaParams().setAlpha(2.0), AnomalyType.TWO_TAILED);
     }
 
     @Test
@@ -72,29 +53,27 @@ public class EwmaDetectorTest {
         val testRow0 = testRows.next();
         val observed0 = testRow0.getObserved();
 
-        val params = new EwmaParams()
+        val params = new EwmaPointForecaster.Params()
                 .setAlpha(0.05)
                 .setInitMeanEstimate(observed0);
-        val detector = new EwmaDetector();
-        detector.init(UUID.randomUUID(), params, AnomalyType.TWO_TAILED);
+        val forecaster = new EwmaPointForecaster(params);
 
-        assertEquals(observed0, detector.getMean());
-        assertEquals(0.0, detector.getVariance());
+        assertEquals(params, forecaster.getParams());
+        assertEquals(observed0, forecaster.getMean(), TOLERANCE);
 
         while (testRows.hasNext()) {
             val testRow = testRows.next();
             val observed = testRow.getObserved();
-
-            val metricData = new MetricData(metricDefinition, observed, epochSecond);
-            detector.classify(metricData);
-
-            // TODO: Move this to GenerateCalInflowTestsEwma.R
-            assertApproxEqual(testRow.getKnownMean(), testRow.getMean());
-
-            assertApproxEqual(testRow.getMean(), detector.getMean());
-            assertApproxEqual(testRow.getVar(), detector.getVariance());
-            // TODO: Assert AnomalyResult.getAnomalyLevel matches expected
+            val metricData = new MetricData(metricDef, observed, epochSecond);
+            forecaster.forecast(metricData);
+            assertEquals(testRow.getKnownMean(), forecaster.getMean(), TOLERANCE);
         }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testForecast_nullMetricData() {
+        val forecaster = new EwmaPointForecaster();
+        forecaster.forecast(null);
     }
 
     private static void readData_calInflow() {
@@ -103,10 +82,5 @@ public class EwmaDetectorTest {
                 .withType(EwmaTestRow.class)
                 .build()
                 .parse();
-    }
-
-    private static void assertApproxEqual(double d1, double d2) {
-        // TODO: This could use Assert.assertEquals(double expected, double actual, double delta)
-        TestCase.assertTrue(MathUtil.isApproximatelyEqual(d1, d2, TOLERANCE));
     }
 }

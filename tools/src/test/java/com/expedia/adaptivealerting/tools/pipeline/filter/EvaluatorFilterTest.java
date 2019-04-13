@@ -20,8 +20,8 @@ import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.core.evaluator.ModelEvaluation;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.tools.pipeline.util.ModelEvaluationSubscriber;
+import com.expedia.adaptivealerting.tools.util.TestObjectMother;
 import com.expedia.metrics.MetricData;
-import com.expedia.metrics.MetricDefinition;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +40,7 @@ public final class EvaluatorFilterTest {
         val evaluator = new RmseEvaluator();
         this.filterUnderTest = new EvaluatorFilter(evaluator);
 
-        val metricDef = new MetricDefinition("my-metric-def");
+        val metricDef = TestObjectMother.metricDefinition();
         val metricData = new MetricData(metricDef, 10.0, Instant.now().getEpochSecond());
 
         val anomalyResult = new AnomalyResult();

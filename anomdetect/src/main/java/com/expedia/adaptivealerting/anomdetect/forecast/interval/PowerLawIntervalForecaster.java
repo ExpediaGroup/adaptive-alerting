@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.interval;
 
-import com.expedia.adaptivealerting.anomdetect.detector.DetectorParams;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
 import lombok.Getter;
@@ -50,13 +49,12 @@ public class PowerLawIntervalForecaster implements IntervalForecaster {
 
     @Data
     @Accessors(chain = true)
-    public static class Params implements DetectorParams {
+    public static final class Params {
         private double alpha;
         private double beta;
         private double weakMultiplier;
         private double strongMultiplier;
 
-        @Override
         public void validate() {
             // TODO Implement
         }

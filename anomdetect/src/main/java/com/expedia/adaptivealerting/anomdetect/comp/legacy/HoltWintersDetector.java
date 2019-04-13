@@ -13,17 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters;
+package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
 import com.expedia.adaptivealerting.anomdetect.comp.AnomalyClassifier;
-import com.expedia.adaptivealerting.anomdetect.detector.AbstractDetector;
+import com.expedia.adaptivealerting.anomdetect.detector.Detector;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersClassificationException;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersOnlineAlgorithm;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersOnlineComponents;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersSimpleTrainingModel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.metrics.MetricData;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
+import lombok.Getter;
 import lombok.val;
+
+import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.MODEL_WARMUP;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -34,28 +39,37 @@ import static java.lang.String.format;
  *
  * @see <a href="https://otexts.org/fpp2/holt-winters.html">Holt-Winters' Seasonal Method</a>
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
-public final class HoltWintersDetector extends AbstractDetector<HoltWintersParams> {
+@Deprecated
+public final class HoltWintersDetector implements Detector {
 
-    @NonNull
+    @Getter
+    private UUID uuid;
+
+    @Getter
+    private HoltWintersParams params;
+
+    @Getter
     private HoltWintersOnlineComponents components;
-    @NonNull
+
     private HoltWintersSimpleTrainingModel holtWintersSimpleTrainingModel;
-    @NonNull
     private HoltWintersOnlineAlgorithm holtWintersOnlineAlgorithm;
+    private AnomalyClassifier classifier;
 
-    public HoltWintersDetector() {
-        super(HoltWintersParams.class);
-    }
+    public HoltWintersDetector(UUID uuid, HoltWintersParams params) {
+        notNull(uuid, "uuid can't be null");
+        notNull(params, "params can't be null");
 
-    @Override
-    protected void initState(HoltWintersParams params) {
-        components = new HoltWintersOnlineComponents(params);
-        holtWintersOnlineAlgorithm = new HoltWintersOnlineAlgorithm();
-        holtWintersSimpleTrainingModel = new HoltWintersSimpleTrainingModel(params);
+        params.validate();
+
+        this.uuid = uuid;
+        this.params = params;
+
+        this.components = new HoltWintersOnlineComponents(params);
+        this.holtWintersOnlineAlgorithm = new HoltWintersOnlineAlgorithm();
+        this.holtWintersSimpleTrainingModel = new HoltWintersSimpleTrainingModel(params);
         double initForecast = holtWintersOnlineAlgorithm.getForecast(params.getSeasonalityType(), components.getLevel(), components.getBase(), components.getSeasonal(components.getCurrentSeasonalIndex()));
         components.setForecast(initForecast);
+        this.classifier = new AnomalyClassifier(AnomalyType.TWO_TAILED);
     }
 
     @Override
@@ -99,11 +113,10 @@ public final class HoltWintersDetector extends AbstractDetector<HoltWintersParam
 
     private AnomalyResult classifyAnomaly(MetricData metricData, double prevForecast) {
         val thresholds = buildAnomalyThresholds(prevForecast);
-        val level = new AnomalyClassifier(getAnomalyType()).classify(thresholds, metricData.getValue());
-        val result = new AnomalyResult(level);
-        result.setPredicted(prevForecast);
-        result.setThresholds(thresholds);
-        return result;
+        val level = classifier.classify(thresholds, metricData.getValue());
+        return new AnomalyResult(level)
+                .setPredicted(prevForecast)
+                .setThresholds(thresholds);
     }
 
     /**
@@ -120,8 +133,7 @@ public final class HoltWintersDetector extends AbstractDetector<HoltWintersParam
                 prevForecast + strongDelta,
                 prevForecast + weakDelta,
                 prevForecast - weakDelta,
-                prevForecast - strongDelta
-        );
+                prevForecast - strongDelta);
     }
 
     private boolean stillWarmingUp() {

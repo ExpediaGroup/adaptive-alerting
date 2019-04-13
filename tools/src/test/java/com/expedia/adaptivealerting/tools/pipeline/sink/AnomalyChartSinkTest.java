@@ -20,9 +20,9 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.core.evaluator.ModelEvaluation;
+import com.expedia.adaptivealerting.tools.util.TestObjectMother;
 import com.expedia.adaptivealerting.tools.visualization.ChartSeries;
 import com.expedia.metrics.MetricData;
-import com.expedia.metrics.MetricDefinition;
 import lombok.val;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.title.TextTitle;
@@ -92,7 +92,7 @@ public final class AnomalyChartSinkTest {
     private void initTestObjects() {
         this.chartSeries = new ChartSeries();
 
-        val metricDef = new MetricDefinition("my-metric");
+        val metricDef = TestObjectMother.metricDefinition();
         val metricData = new MetricData(metricDef, 15.0, Instant.now().getEpochSecond());
 
         val anomalyResult_strong_noThresholds = new AnomalyResult();

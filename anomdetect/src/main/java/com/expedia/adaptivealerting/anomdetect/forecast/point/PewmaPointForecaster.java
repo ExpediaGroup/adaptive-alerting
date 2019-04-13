@@ -15,36 +15,20 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.point;
 
-import com.expedia.adaptivealerting.anomdetect.comp.AnomalyClassifier;
-import com.expedia.adaptivealerting.anomdetect.detector.AbstractDetector;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Generated;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 import lombok.val;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
-// TODO Return MODEL_WARMUP anomaly level if the model is still warming up. [WLW]
+public class PewmaPointForecaster implements PointForecaster {
 
-/**
- * <p>
- * Anomaly detector based on the probabilistic exponential weighted moving average. This is an online algorithm, meaning
- * that it updates the thresholds incrementally as new data comes in, but is less influenced by outliers than EWMA.
- * </p>
- * <p>
- * It takes a little while before the internal mean and variance estimates converge to something that makes sense. As a
- * rule of thumb, feed the detector 30 data points or so before using it for actual anomaly detection.
- * </p>
- * <p>
- * See https://www.ll.mit.edu/mission/cybersec/publications/publication-files/full_papers/2012_08_05_Carter_IEEESSP_FP.pdf.
- * Implementation based off code from here https://aws.amazon.com/blogs/iot/anomaly-detection-using-aws-iot-and-aws-lambda/.
- * </p>
- */
-@Data
-@EqualsAndHashCode(callSuper = true)
-public final class PewmaDetector extends AbstractDetector<PewmaParams> {
+    @Getter
+    @Generated // https://reflectoring.io/100-percent-test-coverage/
+    private Params params;
 
     /**
      * Adjusted alpha, to match the way alpha is used in the paper that describes the algorithm.
@@ -69,49 +53,43 @@ public final class PewmaDetector extends AbstractDetector<PewmaParams> {
     /**
      * Local mean estimate.
      */
+    @Getter
     private double mean;
 
     /**
      * Local standard deviation estimate.
      */
+    @Getter
     private double stdDev;
 
-    public PewmaDetector() {
-        super(PewmaParams.class);
+    public PewmaPointForecaster() {
+        this(new Params());
     }
 
-    @Override
-    protected void initState(PewmaParams params) {
+    public PewmaPointForecaster(Params params) {
+        notNull(params, "params can't be null");
+        this.params = params;
+
+        // Init config
         this.adjAlpha = 1.0 - params.getAlpha();
+
+        // Init state
         this.s1 = params.getInitMeanEstimate();
-        this.s2 = params.getInitMeanEstimate() * params.getInitMeanEstimate();
+        this.s2 = s1 * s1;
         updateMeanAndStdDev();
     }
 
     @Override
-    public AnomalyResult classify(MetricData metricData) {
+    public double forecast(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
-
-        val params = getParams();
-
         val observed = metricData.getValue();
-        val weakDelta = params.getWeakSigmas() * stdDev;
-        val strongDelta = params.getStrongSigmas() * stdDev;
-
-        val thresholds = new AnomalyThresholds(
-                mean + strongDelta,
-                mean + weakDelta,
-                mean - weakDelta,
-                mean - strongDelta);
-
         updateEstimates(observed);
+        return mean;
+    }
 
-        val level = new AnomalyClassifier(getAnomalyType()).classify(thresholds, observed);
-
-        val result = new AnomalyResult(level);
-        result.setPredicted(mean);
-        result.setThresholds(thresholds);
-        return result;
+    private void updateMeanAndStdDev() {
+        this.mean = this.s1;
+        this.stdDev = Math.sqrt(this.s2 - this.s1 * this.s1);
     }
 
     private void updateEstimates(double value) {
@@ -128,17 +106,38 @@ public final class PewmaDetector extends AbstractDetector<PewmaParams> {
         updateMeanAndStdDev();
     }
 
-    private void updateMeanAndStdDev() {
-        this.mean = this.s1;
-        this.stdDev = Math.sqrt(this.s2 - this.s1 * this.s1);
-    }
-
     private double calculateAlpha(double pt) {
-        val params = getParams();
         if (this.trainingCount < params.getWarmUpPeriod()) {
             this.trainingCount++;
             return 1.0 - 1.0 / this.trainingCount;
         }
         return (1.0 - params.getBeta() * pt) * this.adjAlpha;
+    }
+
+    // TODO Describe why we chose these defaults as appropriate.
+    //  For example if the paper recommends them, we should say that.
+    @Data
+    @Accessors(chain = true)
+    public static class Params {
+
+        /**
+         * Smoothing param.
+         */
+        private double alpha = 0.15;
+
+        /**
+         * Anomaly weighting param.
+         */
+        private double beta = 1.0;
+
+        /**
+         * Initial mean estimate.
+         */
+        private double initMeanEstimate = 0.0;
+
+        /**
+         * How many iterations to train for.
+         */
+        private int warmUpPeriod = 30;
     }
 }

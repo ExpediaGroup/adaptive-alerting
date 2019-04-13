@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 Expedia Group, Inc.
+ * Copyright 2019 Expedia Group, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters;
+package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
-import com.expedia.adaptivealerting.anomdetect.detector.DetectorParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersSeasonalEstimatesValidator;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersTrainingMethod;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.SeasonalityType;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +35,8 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @Data
 @Accessors(chain = true)
 @Slf4j
-public final class HoltWintersParams implements DetectorParams {
+@Deprecated
+public final class HoltWintersParams {
 
     /**
      * SeasonalityType parameter used to determine which Seasonality method (Multiplicative or Additive) to use.
@@ -129,7 +132,6 @@ public final class HoltWintersParams implements DetectorParams {
         return (initTrainingMethod == HoltWintersTrainingMethod.SIMPLE) ? (frequency * 2) : 0;
     }
 
-    @Override
     public void validate() {
         notNull(seasonalityType, "Required: seasonalityType one of " + Arrays.toString(SeasonalityType.values()));
         notNull(initTrainingMethod, "Required: initTrainingMethod one of " + Arrays.toString(HoltWintersTrainingMethod.values()));

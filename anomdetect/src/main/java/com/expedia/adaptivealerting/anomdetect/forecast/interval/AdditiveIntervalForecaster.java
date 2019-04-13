@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.interval;
 
-import com.expedia.adaptivealerting.anomdetect.detector.DetectorParams;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
 import lombok.Getter;
@@ -45,11 +44,10 @@ public class AdditiveIntervalForecaster implements IntervalForecaster {
 
     @Data
     @Accessors(chain = true)
-    public static class Params implements DetectorParams {
+    public static final class Params {
         private double weakValue;
         private double strongValue;
 
-        @Override
         public void validate() {
             // TODO Implement
         }

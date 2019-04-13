@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters;
+package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
+import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersAustouristsTestRow;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersTrainingMethod;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.SeasonalityType;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import lombok.val;
@@ -40,28 +42,29 @@ import static org.junit.Assert.assertEquals;
 /**
  * Tests Holt-Winters functionality by comparing with data generated from Hyndman's R "fpp2" library - see GenerateAustouristsTests.R
  */
+@Deprecated
 public class HoltWintersDetectorTest {
+
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
 
-    private UUID detectorUUID;
+    private UUID detectorUuid;
     private MetricDefinition metricDefinition;
     private long epochSecond;
 
     @Before
     public void setUp() {
-        this.detectorUUID = UUID.randomUUID();
+        this.detectorUuid = UUID.randomUUID();
         this.metricDefinition = new MetricDefinition("some-key");
         this.epochSecond = Instant.now().getEpochSecond();
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testInit_alphaOutOfRange() {
-        val params = new HoltWintersParams()
+        new HoltWintersParams()
                 .setFrequency(24)
-                .setAlpha(2.0);
-        val detector = new HoltWintersDetector();
-        detector.init(detectorUUID, params, AnomalyType.TWO_TAILED);
+                .setAlpha(2.0)
+                .validate();
     }
 
     @Test
@@ -94,8 +97,7 @@ public class HoltWintersDetectorTest {
                 buildAustouristsParams(seasonalityType).setInitTrainingMethod(HoltWintersTrainingMethod.SIMPLE) :
                 buildAustouristsParams(seasonalityType, initLevelEstimate, initBaseEstimate, initSeasonalEstimates);
 
-        val subject = new HoltWintersDetector();
-        subject.init(detectorUUID, params, AnomalyType.TWO_TAILED);
+        val subject = new HoltWintersDetector(detectorUuid, params);
 
         while (testRows.hasNext()) {
             final HoltWintersAustouristsTestRow testRow = testRows.next();

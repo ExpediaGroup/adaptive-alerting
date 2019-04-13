@@ -15,14 +15,17 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaDetector;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.PewmaDetector;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.EwmaParams;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.PewmaParams;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
-import com.expedia.adaptivealerting.tools.pipeline.filter.AnomalyDetectorFilter;
+import com.expedia.adaptivealerting.tools.pipeline.filter.DetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.source.WhiteNoiseMetricSource;
 import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
 import lombok.val;
+
+import java.util.UUID;
 
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.createChartFrame;
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showChartFrame;
@@ -37,21 +40,15 @@ public class WhiteNoiseRmse {
     public static void main(String[] args) {
         val source = new WhiteNoiseMetricSource("white-noise", 1000L, 0.0, 1.0);
 
-        val ewmaFilter = new AnomalyDetectorFilter(new EwmaDetector());
-        val pewmaFilter = new AnomalyDetectorFilter(new PewmaDetector());
-//        val cusumFilter = new AnomalyDetectorFilter(new CusumDetector());
-//        val shewhartIndividualsFilter =
-//                new AnomalyDetectorFilter(new IndividualsControlChartDetector());
+        val factory = new LegacyDetectorFactory();
+        val ewmaFilter = new DetectorFilter(factory.createEwmaDetector(UUID.randomUUID(), new EwmaParams()));
+        val pewmaFilter = new DetectorFilter(factory.createPewmaDetector(UUID.randomUUID(), new PewmaParams()));
 
         val ewmaEval = new EvaluatorFilter(new RmseEvaluator());
         val pewmaEval = new EvaluatorFilter(new RmseEvaluator());
-//        val cusumEval = new EvaluatorFilter(new RmseEvaluator());
-//        val individualChartEval = new EvaluatorFilter(new RmseEvaluator());
 
         val ewmaChart = PipelineFactory.createChartSink("EWMA");
         val pewmaChart = PipelineFactory.createChartSink("PEWMA");
-//        val cusumChart = PipelineFactory.createChartSink("CUSUM");
-//        val individualsChart = PipelineFactory.createChartSink("Shewhart Individuals");
 
         source.addSubscriber(ewmaFilter);
         ewmaFilter.addSubscriber(ewmaEval);
@@ -63,22 +60,10 @@ public class WhiteNoiseRmse {
         pewmaFilter.addSubscriber(pewmaChart);
         pewmaEval.addSubscriber(pewmaChart);
 
-//        source.addSubscriber(cusumFilter);
-//        cusumFilter.addSubscriber(cusumEval);
-//        cusumFilter.addSubscriber(cusumChart);
-//        cusumEval.addSubscriber(cusumChart);
-//
-//        source.addSubscriber(shewhartIndividualsFilter);
-//        shewhartIndividualsFilter.addSubscriber(individualChartEval);
-//        shewhartIndividualsFilter.addSubscriber(individualsChart);
-//        individualChartEval.addSubscriber(individualsChart);
-
         showChartFrame(createChartFrame(
                 "White Noise RMSE",
                 ewmaChart.getChart(),
                 pewmaChart.getChart()
-//                cusumChart.getChart(),
-//                individualsChart.getChart()
         ));
         source.start();
     }

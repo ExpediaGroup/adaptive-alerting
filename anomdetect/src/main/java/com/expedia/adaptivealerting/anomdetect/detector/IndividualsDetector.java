@@ -13,16 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.forecast.point;
+package com.expedia.adaptivealerting.anomdetect.detector;
 
-import com.expedia.adaptivealerting.anomdetect.detector.AbstractDetector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 import lombok.val;
+
+import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.MODEL_WARMUP;
 import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.NORMAL;
@@ -40,9 +42,7 @@ import static java.lang.Math.sqrt;
  *
  * @see <a href="https://www.spcforexcel.com/knowledge/variable-control-charts/individuals-control-charts">https://www.spcforexcel.com/knowledge/variable-control-charts/individuals-control-charts</a>
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
-public final class IndividualsControlChartDetector extends AbstractDetector<IndividualsControlChartParams> {
+public final class IndividualsDetector implements Detector {
     private static final double R_CONTROL_CHART_CONSTANT_D4 = 3.267;
     private static final double R_CONTROL_CHART_CONSTANT_D2 = 1.128;
 
@@ -50,6 +50,12 @@ public final class IndividualsControlChartDetector extends AbstractDetector<Indi
      * Number of points after which limits will be recomputed
      */
     private static final int RECOMPUTE_LIMITS_PERIOD = 100;
+
+    @Getter
+    private UUID uuid;
+
+    @Getter
+    private Params params;
 
     /**
      * Aggregate Moving range. Used to calculate avg. moving range.
@@ -74,16 +80,19 @@ public final class IndividualsControlChartDetector extends AbstractDetector<Indi
     /**
      * Upper limit for R chart
      */
+    @Getter
     private double upperControlLimit_R;
 
     /**
      * Upper limit for X chart
      */
+    @Getter
     private double upperControlLimit_X;
 
     /**
      * Lower limit for X chart
      */
+    @Getter
     private double lowerControlLimit_X;
 
     /**
@@ -96,12 +105,12 @@ public final class IndividualsControlChartDetector extends AbstractDetector<Indi
      */
     private double mean;
 
-    public IndividualsControlChartDetector() {
-        super(IndividualsControlChartParams.class);
-    }
-
-    @Override
-    protected void initState(IndividualsControlChartParams params) {
+    public IndividualsDetector(UUID uuid, Params params) {
+        notNull(uuid, "uuid can't be null");
+        notNull(params, "params can't be null");
+        params.validate();
+        this.uuid = uuid;
+        this.params = params;
         this.prevValue = params.getInitValue();
         this.target = params.getInitValue();
         this.mean = params.getInitMeanEstimate();
@@ -173,5 +182,34 @@ public final class IndividualsControlChartDetector extends AbstractDetector<Indi
 
     private double getAverageMovingRange() {
         return movingRangeSum / Math.max(1, totalDataPoints - 1);
+    }
+
+    @Data
+    @Accessors(chain = true)
+    public static final class Params {
+
+        /**
+         * Initial mean estimate.
+         */
+        private double initValue = 0.0;
+
+        /**
+         * Minimum number of data points required before the anomaly detector is ready for use.
+         */
+        private int warmUpPeriod = 30;
+
+        /**
+         * Strong threshold sigmas.
+         */
+        private double strongSigmas = 3.0;
+
+        /**
+         * Initial mean estimate.
+         */
+        private double initMeanEstimate = 0.0;
+
+        public void validate() {
+            // Not currently implemented
+        }
     }
 }

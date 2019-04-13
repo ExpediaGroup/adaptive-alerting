@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 Expedia Group, Inc.
+ * Copyright 2019 Expedia Group, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.forecast.point;
+package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
-import com.expedia.adaptivealerting.anomdetect.detector.DetectorParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.PewmaPointForecaster;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public final class PewmaParams implements DetectorParams {
+@Deprecated
+public final class PewmaParams {
 
     /**
      * Smoothing param.
@@ -51,10 +53,25 @@ public final class PewmaParams implements DetectorParams {
     /**
      * How many iterations to train for.
      */
-    private final int warmUpPeriod = 30;
+    private int warmUpPeriod = 30;
 
-    @Override
+    public PewmaPointForecaster.Params toPointForecasterParams() {
+        return new PewmaPointForecaster.Params()
+                .setAlpha(alpha)
+                .setBeta(beta)
+                .setInitMeanEstimate(initMeanEstimate)
+                .setWarmUpPeriod(warmUpPeriod);
+    }
+
+    public ExponentialWelfordIntervalForecaster.Params toIntervalForecasterParams() {
+        return new ExponentialWelfordIntervalForecaster.Params()
+                .setAlpha(alpha)
+                .setInitVarianceEstimate(0.0)
+                .setWeakSigmas(weakSigmas)
+                .setStrongSigmas(strongSigmas);
+    }
+
     public void validate() {
-        // Not currently implemented
+        // TODO
     }
 }

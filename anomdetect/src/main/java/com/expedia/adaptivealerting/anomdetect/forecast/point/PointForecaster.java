@@ -15,5 +15,9 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.point;
 
+import com.expedia.metrics.MetricData;
+
 public interface PointForecaster {
+
+    double forecast(MetricData metricData);
 }

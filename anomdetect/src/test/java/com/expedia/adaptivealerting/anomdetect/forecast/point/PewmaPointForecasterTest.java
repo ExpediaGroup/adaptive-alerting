@@ -15,8 +15,9 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.point;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.EwmaParams;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.PewmaParams;
+import com.expedia.adaptivealerting.anomdetect.util.TestObjectMother;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.opencsv.CSVReader;
@@ -30,104 +31,84 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 
-import static java.lang.Math.sqrt;
-import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 @Slf4j
-public final class PewmaDetectorTest {
-    private static final double WEAK_SIGMAS = 2.0;
-    private static final double STRONG_SIGMAS = 3.0;
+public final class PewmaPointForecasterTest {
     private static final double DEFAULT_ALPHA = 0.05;
     private static final double TOLERANCE = 0.00001;
 
     private static final String SAMPLE_INPUT_PATH = "tests/pewma-sample-input.csv";
     private static final String CAL_INFLOW_PATH = "tests/cal-inflow-tests-pewma.csv";
 
-    private UUID detectorUuid;
-    private MetricDefinition metricDefinition;
+    private MetricDefinition metricDef;
     private long epochSecond;
 
     @Before
     public void setUp() {
-        this.detectorUuid = UUID.randomUUID();
-        this.metricDefinition = new MetricDefinition("some-key");
+        this.metricDef = TestObjectMother.metricDefinition();
         this.epochSecond = Instant.now().getEpochSecond();
     }
 
     @Test
-    public void pewmaCloseToEwmaWithZeroBeta() throws IOException {
+    public void testPewmaCloseToEwmaWithZeroBeta() throws IOException {
         val beta = 0.0;
 
         val testRows = readData_sampleInput().listIterator();
         val observed0 = Double.parseDouble(testRows.next()[0]);
 
+        val ewmaParams = new EwmaParams()
+                .setAlpha(DEFAULT_ALPHA)
+                .setInitMeanEstimate(observed0);
+        val ewmaPointForecaster = new EwmaPointForecaster(ewmaParams.toPointForecasterParams());
+
         val pewmaParams = new PewmaParams()
                 .setAlpha(DEFAULT_ALPHA)
                 .setBeta(beta)
-                .setWeakSigmas(WEAK_SIGMAS)
-                .setStrongSigmas(STRONG_SIGMAS)
                 .setInitMeanEstimate(observed0);
-        val pewmaDetector = new PewmaDetector();
-        pewmaDetector.init(detectorUuid, pewmaParams, AnomalyType.TWO_TAILED);
-
-        val ewmaParams = new EwmaParams()
-                .setAlpha(DEFAULT_ALPHA)
-                .setWeakSigmas(WEAK_SIGMAS)
-                .setStrongSigmas(STRONG_SIGMAS)
-                .setInitMeanEstimate(observed0);
-        val ewmaDetector = new EwmaDetector();
-        ewmaDetector.init(UUID.randomUUID(), ewmaParams, AnomalyType.TWO_TAILED);
+        val pewmaPointForecaster = new PewmaPointForecaster(pewmaParams.toPointForecasterParams());
 
         int rowCount = 1;
         while (testRows.hasNext()) {
-            val observed = Float.parseFloat(testRows.next()[0]);
-
-            val ewmaStdDev = sqrt(ewmaDetector.getVariance());
-
+            val observed = Double.parseDouble(testRows.next()[0]);
+            val metricData = new MetricData(metricDef, observed, rowCount);
+            ewmaPointForecaster.forecast(metricData);
+            pewmaPointForecaster.forecast(metricData);
             val threshold = 1.0 / rowCount; // results converge with more iterations
-            assertEquals(ewmaDetector.getMean(), pewmaDetector.getMean(), threshold);
-            assertEquals(ewmaStdDev, pewmaDetector.getStdDev(), threshold);
-
-            val metricData = new MetricData(metricDefinition, observed, epochSecond);
-            val pewmaLevel = pewmaDetector.classify(metricData).getAnomalyLevel();
-            val ewmaLevel = ewmaDetector.classify(metricData).getAnomalyLevel();
-
-            // FIXME The PEWMA interval forecaster isn't correct as it treats the initial variance estimate as
-            //  estimate 1 instead of estimate 0. To fix this we will want to swap out the current PEWMA interval
-            //  forecaster with the new ExponentialWelfordIntervalForecaster. [WLW]
-//            if (rowCount > pewmaParams.getWarmUpPeriod()) {
-//                assertEquals(pewmaLevel, ewmaLevel);
-//            }
+            assertEquals(ewmaPointForecaster.getMean(), pewmaPointForecaster.getMean(), threshold);
             rowCount++;
         }
     }
 
     @Test
-    public void evaluate() {
+    public void testForecast() {
         val testRows = readData_calInflow().listIterator();
         val observed0 = testRows.next().getObserved();
 
-        val params = new PewmaParams()
+        val params = new PewmaPointForecaster.Params()
                 .setAlpha(DEFAULT_ALPHA)
                 .setBeta(0.5)
-                .setWeakSigmas(WEAK_SIGMAS)
-                .setStrongSigmas(STRONG_SIGMAS)
                 .setInitMeanEstimate(observed0);
-        val detector = new PewmaDetector();
-        detector.init(detectorUuid, params, AnomalyType.TWO_TAILED);
+        val forecaster = new PewmaPointForecaster(params);
+
+        assertEquals(params, forecaster.getParams());
 
         while (testRows.hasNext()) {
             val testRow = testRows.next();
             val observed = testRow.getObserved();
-            val metricData = new MetricData(metricDefinition, observed, epochSecond);
-            val level = detector.classify(metricData).getAnomalyLevel();
+            val metricData = new MetricData(metricDef, observed, epochSecond);
+            forecaster.forecast(metricData);
 
-            assertEquals(testRow.getMean(), detector.getMean(), TOLERANCE);
-            assertEquals(testRow.getStd(), detector.getStdDev(), TOLERANCE);
-            assertEquals(AnomalyLevel.valueOf(testRow.getLevel()), level);
+            assertEquals(testRow.getMean(), forecaster.getMean(), TOLERANCE);
+            assertEquals(testRow.getStd(), forecaster.getStdDev(), TOLERANCE);
         }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testForecast_nullMetricData() {
+        val forecaster = new PewmaPointForecaster();
+        forecaster.forecast(null);
     }
 
     private static List<String[]> readData_sampleInput() throws IOException {
@@ -144,4 +125,3 @@ public final class PewmaDetectorTest {
                 .parse();
     }
 }
-

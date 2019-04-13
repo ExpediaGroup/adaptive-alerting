@@ -19,6 +19,7 @@ import com.expedia.adaptivealerting.anomdetect.comp.DefaultDetectorSource;
 import com.expedia.adaptivealerting.anomdetect.comp.DetectorSource;
 import com.expedia.adaptivealerting.anomdetect.comp.connector.HttpClientWrapper;
 import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelServiceConnector;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,6 @@ public final class DetectorUtil {
     public static DetectorSource buildDetectorSource(Config config) {
         val uriTemplate = config.getString(CK_MODEL_SERVICE_URI_TEMPLATE);
         val connector = new ModelServiceConnector(new HttpClientWrapper(), uriTemplate, new ObjectMapper());
-        return new DefaultDetectorSource(connector);
+        return new DefaultDetectorSource(connector, new LegacyDetectorFactory());
     }
 }

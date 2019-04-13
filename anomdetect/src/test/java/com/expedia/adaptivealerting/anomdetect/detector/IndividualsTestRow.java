@@ -13,9 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.expedia.adaptivealerting.anomdetect.detector;
 
-public interface DetectorParams {
+import com.opencsv.bean.CsvBindByName;
+import lombok.Data;
+import lombok.ToString;
 
-    void validate();
+/**
+ * The type Individual chart test row.
+ */
+@Data
+@ToString
+public class IndividualsTestRow {
+
+    @CsvBindByName
+    private int sample;
+
+    @CsvBindByName
+    private double observed;
+
+    @CsvBindByName
+    private double upperControlLimit_R;
+
+    @CsvBindByName
+    private double upperControlLimit_X;
+
+    @CsvBindByName
+    private double lowerControlLimit_X;
+
+    @CsvBindByName
+    private double target;
+
+    @CsvBindByName
+    private String anomalyLevel;
 }

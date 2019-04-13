@@ -13,29 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.detector;
+package com.expedia.adaptivealerting.tools.util;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
-import lombok.Data;
-import lombok.experimental.Accessors;
+import com.expedia.metrics.MetricDefinition;
 
-@Data
-@Accessors(chain = true)
-public class ConstantThresholdParams implements DetectorParams {
+/**
+ * Test object mother: http://wiki.c2.com/?ObjectMother
+ */
+public final class TestObjectMother {
 
-    /**
-     * Detector type: left-, right- or two-tailed.
-     */
-    private AnomalyType type;
-
-    /**
-     * Constant thresholds.
-     */
-    private AnomalyThresholds thresholds;
-
-    @Override
-    public void validate() {
-        // Not currently implemented
+    public static MetricDefinition metricDefinition() {
+        return new MetricDefinition("my-metric");
     }
 }

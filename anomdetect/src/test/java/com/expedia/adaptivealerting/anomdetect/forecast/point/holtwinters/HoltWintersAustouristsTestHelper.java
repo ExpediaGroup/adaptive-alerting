@@ -15,6 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters;
 
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.HoltWintersParams;
+
 import java.util.List;
 
 import static com.expedia.adaptivealerting.anomdetect.util.CsvToBeanFileReader.readData;

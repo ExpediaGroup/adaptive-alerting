@@ -20,6 +20,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
 
 /**
  * Anomaly result.
@@ -27,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
+@Accessors(chain = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AnomalyResult {
 

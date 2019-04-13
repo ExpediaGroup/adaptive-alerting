@@ -35,8 +35,9 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 
 /**
@@ -154,8 +155,6 @@ public final class KafkaDetectorManagerTest {
     }
 
     private void initDependencies() {
-        when(manager.hasDetectorType(anyString())).thenReturn(true);
-
         when(manager.classify(metric_normalAnomaly)).thenReturn(new AnomalyResult(AnomalyLevel.NORMAL));
         when(manager.classify(metric_weakAnomaly)).thenReturn(new AnomalyResult(AnomalyLevel.WEAK));
         when(manager.classify(metric_strongAnomaly)).thenReturn(new AnomalyResult(AnomalyLevel.STRONG));
