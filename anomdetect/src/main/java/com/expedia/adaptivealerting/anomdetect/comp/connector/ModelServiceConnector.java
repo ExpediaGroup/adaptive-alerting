@@ -15,12 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect.comp.connector;
 
-import com.expedia.adaptivealerting.anomdetect.DetectorDeserializationException;
-import com.expedia.adaptivealerting.anomdetect.DetectorException;
-import com.expedia.adaptivealerting.anomdetect.DetectorMapper;
-import com.expedia.adaptivealerting.anomdetect.DetectorNotFoundException;
-import com.expedia.adaptivealerting.anomdetect.DetectorRetrievalException;
-import com.expedia.adaptivealerting.anomdetect.mapper.es.MatchingDetectorsResponse;
+import com.expedia.adaptivealerting.anomdetect.*;
+import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMatchResponse;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.metrictank.MetricTankIdFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,7 +25,6 @@ import lombok.val;
 import org.apache.http.client.fluent.Content;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -58,6 +53,7 @@ public class ModelServiceConnector {
     public static final String API_PATH_DETECTOR_BY_METRIC_HASH = "/api/detectors/search/findByMetricHash?hash=%s";
     public static final String API_PATH_MODEL_BY_DETECTOR_UUID = "/api/models/search/findLatestByDetectorUuid?uuid=%s";
     public static final String API_PATH_DETECTOR_UPDATES = "/api/detectors/search/getLastUpdatedDetectors?interval=%d";
+    public static final String API_PATH_MATCHING_DETECTOR_BY_TAGS = "/api/detector-mapping/findMatchingByTags";
 
     private final MetricTankIdFactory metricTankIdFactory = new MetricTankIdFactory();
     private final HttpClientWrapper httpClient;
@@ -186,9 +182,27 @@ public class ModelServiceConnector {
     }
 
 
-    public MatchingDetectorsResponse findMatchingDetectorMappings(List<Map<String, String>> tagsList){
-        //TODO
-        return new MatchingDetectorsResponse(Collections.emptyList(),0);
+    public DetectorMatchResponse findMatchingDetectorMappings(List<Map<String, String>> tagsList) {
+        val uri = baseUri + API_PATH_MATCHING_DETECTOR_BY_TAGS;
+        Content content;
+        try {
+            String body = objectMapper.writeValueAsString(tagsList);
+            content = httpClient.post(uri, body);
+        } catch (IOException e) {
+            val message = "IOException while getting last updated detectors" +
+                    ": tags=" + tagsList +
+                    ", httpMethod=GET" +
+                    ", uri=" + uri;
+            throw new DetectorRetrievalException(message, e); // TODO CHANGE
+        }
+        try {
+            return objectMapper.readValue(content.asBytes(), DetectorMatchResponse.class);
+        } catch (IOException e) {
+            val message = "IOException while deserializing detectors" +
+                    ": tags=" + tagsList;
+            throw new DetectorDeserializationException(message, e);
+        }
+
     }
 
 }

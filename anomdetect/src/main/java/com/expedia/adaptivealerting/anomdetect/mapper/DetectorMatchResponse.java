@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.anomdetect.mapper;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Map;
@@ -24,8 +25,10 @@ import java.util.Map;
 /**
  * @author shsethi
  */
+//same as com.expedia.adaptivealerting.modelservice.model.MatchingDetectorsResponse
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class DetectorMatchResponse {
     private Map<Integer, List<Detector>> groupedDetectorsBySearchIndex;
     private long lookupTimeInMillis;

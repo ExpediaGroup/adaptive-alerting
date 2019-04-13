@@ -49,7 +49,7 @@ public class DetectorMapperCache {
 
     public void put(String key, List<Detector> detectors) {
         String bunchOfDetectorIds = CacheUtil.getDetectorIds(detectors);
-        log.info("Updating cache with {} - {}", key, bunchOfDetectorIds);
+        log.trace("Updating cache with {} - {}", key, bunchOfDetectorIds);
         cache.put(key, bunchOfDetectorIds);
         this.cacheSize.set(cache.size());
     }

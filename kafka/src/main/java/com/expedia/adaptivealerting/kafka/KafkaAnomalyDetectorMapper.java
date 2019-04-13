@@ -20,6 +20,7 @@ import com.expedia.adaptivealerting.anomdetect.mapper.MapperResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.kafka.processor.MetricDataTransformerSupplier;
 import com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde;
+import com.expedia.adaptivealerting.kafka.serde.MetricDataJsonSerde;
 import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
 import com.expedia.metrics.MetricData;
 import lombok.Generated;
@@ -88,10 +89,10 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
         val builder = new StreamsBuilder();
 
         // create store
-        StoreBuilder<KeyValueStore<String, MappedMetricData>> keyValueStoreBuilder =
+        StoreBuilder<KeyValueStore<String, MetricData>> keyValueStoreBuilder =
                 Stores.keyValueStoreBuilder(Stores.inMemoryKeyValueStore(stateStoreName),
                         Serdes.String(),
-                        new MappedMetricDataJsonSerde())
+                        new MetricDataJsonSerde())
                         .withLoggingDisabled();
         // register store
         builder.addStateStore(keyValueStoreBuilder);

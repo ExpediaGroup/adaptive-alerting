@@ -1,30 +1,25 @@
-[
-  {
-    "detector": {
-      "uuid": "2c49ba26-1a7d-43f4-b70c-c6644a2c1689",
-      "type": "constant-threshold"
-    },
-    "searchIndexes": [
-      0,
-      2
+{
+  "groupedDetectorsBySearchIndex": {
+    "0": [
+      {
+        "id": "2c49ba26-1a7d-43f4-b70c-c6644a2c1689"
+      }
+    ],
+    "1": [
+      {
+        "id": "d86b798c-cfee-4a2c-a17a-aa2ba79ccf51"
+      }
+    ],
+    "2": [
+      {
+        "id": "2c49ba26-1a7d-43f4-b70c-c6644a2c1689"
+      }
+    ],
+    "4": [
+      {
+        "id": "5eaa54e9-7406-4a1d-bd9b-e055eca1a423"
+      }
     ]
   },
-  {
-    "detector": {
-      "uuid": "5eaa54e9-7406-4a1d-bd9b-e055eca1a423",
-      "type": "constant-threshold"
-    },
-    "searchIndexes": [
-      4
-    ]
-  },
-  {
-    "detector": {
-      "uuid": "d86b798c-cfee-4a2c-a17a-aa2ba79ccf51",
-      "type": "constant-threshold"
-    },
-    "searchIndexes": [
-      1
-    ]
-  }
-]
+  "lookupTimeInMillis": 9
+}

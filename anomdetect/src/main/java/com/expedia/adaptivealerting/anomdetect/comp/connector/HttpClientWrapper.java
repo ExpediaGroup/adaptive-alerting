@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.anomdetect.comp.connector;
 
 import org.apache.http.client.fluent.Content;
 import org.apache.http.client.fluent.Request;
+import org.apache.http.entity.ContentType;
 
 import java.io.IOException;
 
@@ -34,6 +35,22 @@ public class HttpClientWrapper {
      */
     public Content get(String uri) throws IOException {
         return Request.Get(uri)
+                .execute()
+                .returnContent();
+    }
+
+    /**
+     * Makes a Post call to the given URI with given body and returns result
+     *
+     * @param uri  the uri
+     * @param body the body
+     * @return Call result
+     * @throws IOException the io exception
+     */
+    @Generated // https://reflectoring.io/100-percent-test-coverage/
+    public Content post(String uri, String body) throws IOException {
+        return Request.Post(uri)
+                .bodyString(body, ContentType.APPLICATION_JSON)
                 .execute()
                 .returnContent();
     }

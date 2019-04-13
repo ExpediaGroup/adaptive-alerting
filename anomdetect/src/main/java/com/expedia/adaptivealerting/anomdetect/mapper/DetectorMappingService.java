@@ -15,14 +15,12 @@
  */
 package com.expedia.adaptivealerting.anomdetect.mapper;
 
-import com.expedia.adaptivealerting.anomdetect.mapper.es.MatchingDetectorsResponse;
-
 import java.util.List;
 import java.util.Map;
 
 public interface DetectorMappingService {
 
-    MatchingDetectorsResponse findMatchingDetectorMappings(List<Map<String, String>> tagsList);
+    DetectorMatchResponse findMatchingDetectorMappings(List<Map<String, String>> tagsList);
     void deleteDetectorMapping(String id);
     DetectorMapping findDetectorMapping(String id);
     List<DetectorMapping> findLastUpdated(int timeInSeconds);

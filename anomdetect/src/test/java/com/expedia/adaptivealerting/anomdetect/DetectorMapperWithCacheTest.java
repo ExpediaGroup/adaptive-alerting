@@ -3,8 +3,7 @@ package com.expedia.adaptivealerting.anomdetect;
 import com.expedia.adaptivealerting.anomdetect.comp.DetectorSource;
 import com.expedia.adaptivealerting.anomdetect.mapper.CacheUtil;
 import com.expedia.adaptivealerting.anomdetect.mapper.Detector;
-import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMapping;
-import com.expedia.adaptivealerting.anomdetect.mapper.es.MatchingDetectorsResponse;
+import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMatchResponse;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.TagCollection;
@@ -64,13 +63,10 @@ public class DetectorMapperWithCacheTest {
                 });
 
 
-        List<DetectorMapping> detectorMappings = mapper.readValue(
+        DetectorMatchResponse detectorMatchResponse = mapper.readValue(
                 new File(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("testDetectorMapping.json")).getFile()),
-                new TypeReference<List<DetectorMapping>>() {
-                });
+                DetectorMatchResponse.class);
 
-
-        MatchingDetectorsResponse detectorMatchResponse = new MatchingDetectorsResponse(detectorMappings, System.currentTimeMillis());
         Mockito.when(detectorSource.findMatchingDetectorMappings(listOfMetricTags)).thenReturn(detectorMatchResponse);
     }
 

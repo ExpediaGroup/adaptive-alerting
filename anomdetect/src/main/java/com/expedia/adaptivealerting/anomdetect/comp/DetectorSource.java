@@ -20,12 +20,11 @@ import com.expedia.adaptivealerting.anomdetect.DetectorManager;
 import com.expedia.adaptivealerting.anomdetect.DetectorMapper;
 import com.expedia.adaptivealerting.anomdetect.DetectorNotFoundException;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
-import com.expedia.adaptivealerting.anomdetect.mapper.es.MatchingDetectorsResponse;
+import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMatchResponse;
 import com.expedia.metrics.MetricDefinition;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -69,6 +68,6 @@ public interface DetectorSource {
     public List<UUID> findUpdatedDetectors(int timePeriod);
 
 
-    public MatchingDetectorsResponse findMatchingDetectorMappings(List<Map<String, String>> metricTags);
+    public DetectorMatchResponse findMatchingDetectorMappings(List<Map<String, String>> metricTags);
 
 }

@@ -96,7 +96,7 @@ class MetricDataTransformer implements Transformer<String, MetricData, KeyValue<
                 }
 
             } else {
-                log.info("ES lookup skipped , as batch size is not optimum");
+                log.trace("ES lookup skipped , as batch size is not optimum");
             }
 
             // commit the current processing progress

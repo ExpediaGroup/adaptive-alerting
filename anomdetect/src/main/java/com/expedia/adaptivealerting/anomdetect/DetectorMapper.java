@@ -22,7 +22,6 @@ import com.expedia.adaptivealerting.anomdetect.mapper.Detector;
 import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMapping;
 import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMatchResponse;
 import com.expedia.adaptivealerting.anomdetect.mapper.es.ExpressionTree;
-import com.expedia.adaptivealerting.anomdetect.mapper.es.MatchingDetectorsResponse;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.metrics.MetricData;
 import io.micrometer.core.instrument.Metrics;
@@ -83,14 +82,12 @@ public class DetectorMapper {
     public boolean isSuccessfulDetectorMappingLookup(List<Map<String, String>> cacheMissedMetricTags) {
 
         log.info("Mapping-Cache: lookup for {} metrics", cacheMissedMetricTags.size());
-        MatchingDetectorsResponse matchingDetectorMappings = detectorSource.findMatchingDetectorMappings(cacheMissedMetricTags);
+        DetectorMatchResponse matchingDetectorMappings = detectorSource.findMatchingDetectorMappings(cacheMissedMetricTags);
 
         if (matchingDetectorMappings != null) {
 
-            DetectorMatchResponse response = process(matchingDetectorMappings);
-
-            lastElasticLookUpLatency.set(response.getLookupTimeInMillis());
-            Map<Integer, List<Detector>> groupedDetectorsByIndex = response.getGroupedDetectorsBySearchIndex();
+            lastElasticLookUpLatency.set(matchingDetectorMappings.getLookupTimeInMillis());
+            Map<Integer, List<Detector>> groupedDetectorsByIndex = matchingDetectorMappings.getGroupedDetectorsBySearchIndex();
 
             //populate cache and result map
             groupedDetectorsByIndex.forEach((index, detectors) -> {
@@ -117,23 +114,6 @@ public class DetectorMapper {
             lastElasticLookUpLatency.set(-2);
         }
         return matchingDetectorMappings != null;
-    }
-
-    //TODO move this to modelService  DetectorMatchResponse
-    private DetectorMatchResponse process(MatchingDetectorsResponse res) {
-        Map<Integer, List<Detector>> groupedDetectorsByIndex = new HashMap<>();
-        log.info("Mapping-Cache: found {} matching mappings", res.getDetectorMappings().size());
-        res.getDetectorMappings().forEach(detectorMapping -> {
-            detectorMapping.getSearchIndexes().forEach(searchIndex -> {
-                groupedDetectorsByIndex.computeIfAbsent(searchIndex, index -> new ArrayList<>());
-                groupedDetectorsByIndex.computeIfPresent(searchIndex, (index, list) -> {
-                    list.add(detectorMapping.getDetector());
-                    return list;
-                });
-            });
-
-        });
-        return new DetectorMatchResponse(groupedDetectorsByIndex, res.getLookupTimeInMillis());
     }
 
     //TODO - make batch size configureable
