@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters;
+package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.HoltWintersParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersTrainingMethod;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.SeasonalityType;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

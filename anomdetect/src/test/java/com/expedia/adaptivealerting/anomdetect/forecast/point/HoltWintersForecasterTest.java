@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.point;
 
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.HoltWintersParams;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersAustouristsTestRow;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersTrainingMethod;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.SeasonalityType;
@@ -56,10 +55,57 @@ public final class HoltWintersForecasterTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testInit_alphaOutOfRange() {
-        new HoltWintersParams()
+    public void testInit_frequency0() {
+        new HoltWintersForecaster.Params()
+                .setFrequency(0)
+                .validate();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testValidateParams_alphaLT0() {
+        new HoltWintersForecaster.Params()
+                .setFrequency(24)
+                .setAlpha(-0.1)
+                .validate();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInit_alphaGT1() {
+        new HoltWintersForecaster.Params()
                 .setFrequency(24)
                 .setAlpha(2.0)
+                .validate();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testValidateParams_betaLT0() {
+        new HoltWintersForecaster.Params()
+                .setFrequency(24)
+                .setBeta(-0.1)
+                .validate();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInit_betaGT1() {
+        new HoltWintersForecaster.Params()
+                .setFrequency(24)
+                .setBeta(2.0)
+                .validate();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testValidateParams_gammeLT0() {
+        new HoltWintersForecaster.Params()
+                .setFrequency(24)
+                .setGamma(-0.1)
+                .validate();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInit_gammaGT1() {
+        new HoltWintersForecaster.Params()
+                .setFrequency(24)
+                .setGamma(2.0)
                 .validate();
     }
 
