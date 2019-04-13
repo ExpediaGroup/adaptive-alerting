@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertSame;
 
 public class CusumDetectorTest {
     private static final double WEAK_SIGMAS = 3.0;
@@ -142,6 +143,8 @@ public class CusumDetectorTest {
 
     private void testClassify(CusumDetector.Params params, AnomalyType anomalyType, CusumTestRow[] testRows) {
         val detector = new CusumDetector(detectorUuid, params);
+        assertEquals(detectorUuid, detector.getUuid());
+        assertSame(params, detector.getParams());
 
         // FIXME Hack to handle an off-by-one bug in the CusumDetector. [WLW]
         val adjWarmupPeriod = params.getWarmUpPeriod() - 1;

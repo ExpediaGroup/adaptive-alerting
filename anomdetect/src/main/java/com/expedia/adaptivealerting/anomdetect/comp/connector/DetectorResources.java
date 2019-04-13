@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.anomdetect.comp.connector;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.Generated;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
@@ -28,6 +29,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Generated // https://reflectoring.io/100-percent-test-coverage/
 public class DetectorResources {
 
     @JsonProperty("_embedded")

@@ -24,6 +24,7 @@ import java.io.IOException;
 /**
  * Simple wrapper around Apache's fluent HTTP client, intended to support mockability.
  */
+@Generated // https://reflectoring.io/100-percent-test-coverage/
 public class HttpClientWrapper {
 
     /**
@@ -33,7 +34,6 @@ public class HttpClientWrapper {
      * @return Call result
      * @throws IOException if there's a problem making the call
      */
-    @Generated // https://reflectoring.io/100-percent-test-coverage/
     public Content get(String uri) throws IOException {
         return Request.Get(uri)
                 .execute()

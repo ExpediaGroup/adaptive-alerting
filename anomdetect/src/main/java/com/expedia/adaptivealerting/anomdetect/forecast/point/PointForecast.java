@@ -15,9 +15,17 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.point;
 
-import com.expedia.metrics.MetricData;
+import lombok.Data;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
-public interface PointForecaster {
+@Data
+@RequiredArgsConstructor
+public final class PointForecast {
 
-    PointForecast forecast(MetricData metricData);
+    @NonNull
+    private double value;
+
+    @NonNull
+    private boolean warmup;
 }
