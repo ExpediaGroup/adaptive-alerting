@@ -44,7 +44,6 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 public class DetectorMapper {
     private AtomicLong indexSize;
     private DetectorMapperCache cache;
-    //TODO - need to handle this better instead of using a variable
     private AtomicLong lastElasticLookUpLatency = new AtomicLong(-1);
     @Getter
     @NonNull

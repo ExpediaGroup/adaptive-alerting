@@ -28,6 +28,7 @@ import lombok.val;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.streams.TopologyTestDriver;
+import org.apache.kafka.streams.state.KeyValueStore;
 import org.apache.kafka.streams.test.ConsumerRecordFactory;
 import org.apache.kafka.streams.test.OutputVerifier;
 import org.junit.Assert;
@@ -75,22 +76,23 @@ public final class KafkaDetectorMapperTest {
     private ConsumerRecordFactory<String, String> stringFactory;
     private StringDeserializer stringDeser;
     private Deserializer<MappedMetricData> mmdDeser;
-    private UUID uuid;
     private Detector detector;
+    private KeyValueStore<String, MetricData> kvStore;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         initConfig();
         initTestObjects();
-        initDependencies();
         initTestMachinery();
     }
-
 
     @Test
     public void testMetricDataToMappedMetricData() {
         initLogAndFail();
+        when(mapper.getDetectorsFromCache(any(MetricData.class)))
+                .thenReturn(Collections.singletonList(detector));
+
         logAndFailDriver.pipeInput(metricDataFactory.create(INPUT_TOPIC, KAFKA_KEY, metricData));
 
         // The streams app remaps the key to the detector UUID. [WLW]
@@ -100,7 +102,6 @@ public final class KafkaDetectorMapperTest {
         OutputVerifier.compareKeyValue(outputRecord, outputKafkaKey, mappedMetricData);
         logAndFailDriver.close();
     }
-
     /**
      * Addresses bug https://github.com/ExpediaDotCom/adaptive-alerting/issues/253
      * See also https://stackoverflow.com/questions/51136942/how-to-handle-serializationexception-after-deserialization
@@ -123,6 +124,52 @@ public final class KafkaDetectorMapperTest {
         logAndContinueDriver.close();
     }
 
+
+    @Test
+    public void shouldPutInStoreForFirstInput() {
+        initLogAndContinue();
+
+        logAndContinueDriver.pipeInput(metricDataFactory.create(INPUT_TOPIC, "key-1", TestObjectMother.metricData()));
+        kvStore = logAndContinueDriver.getKeyValueStore(stateStoreName);
+        Assert.assertEquals(kvStore.approximateNumEntries(), 1);
+
+        val outputRecord = logAndContinueDriver.readOutput(OUTPUT_TOPIC, stringDeser, mmdDeser);
+        Assert.assertNull(outputRecord);
+        logAndContinueDriver.close();
+    }
+
+    @Test
+    public void shouldPutInStoreDifferentEntriesForSameKey() {
+        initLogAndContinue();
+
+        logAndContinueDriver.pipeInput(metricDataFactory.create(INPUT_TOPIC, "key-1", TestObjectMother.metricData()));
+        logAndContinueDriver.pipeInput(metricDataFactory.create(INPUT_TOPIC, "key-1", TestObjectMother.metricData()));
+        kvStore = logAndContinueDriver.getKeyValueStore(stateStoreName);
+        Assert.assertEquals(kvStore.approximateNumEntries(), 2);
+
+        logAndContinueDriver.close();
+    }
+
+    @Test
+    public void shouldOutputResultWhenReceivedMoreEntriesThanOptimumBatchSize() {
+        initLogAndContinue();
+
+        when(mapper.getDetectorsFromCache(any(MetricData.class)))
+                .thenReturn(Collections.singletonList(detector));
+        when(mapper.optimalBatchSize()).thenReturn(2);
+
+        logAndContinueDriver.pipeInput(metricDataFactory.create(INPUT_TOPIC, "key-1", TestObjectMother.metricData()));
+        logAndContinueDriver.pipeInput(metricDataFactory.create(INPUT_TOPIC, "key-1", TestObjectMother.metricData()));
+        kvStore = logAndContinueDriver.getKeyValueStore(stateStoreName);
+        val outputRecord = logAndContinueDriver.readOutput(OUTPUT_TOPIC, stringDeser, mmdDeser);
+
+        OutputVerifier.compareKeyValue( outputRecord, detector.getUuid().toString(), mappedMetricData);
+        Assert.assertEquals(kvStore.approximateNumEntries(), 0);
+
+        logAndContinueDriver.close();
+    }
+
+
     private void initConfig() {
         when(saConfig.getTypesafeConfig()).thenReturn(tsConfig);
         when(saConfig.getInputTopic()).thenReturn(INPUT_TOPIC);
@@ -131,23 +178,18 @@ public final class KafkaDetectorMapperTest {
 
     private void initTestObjects() {
         this.metricData = TestObjectMother.metricData();
-        this.uuid = UUID.randomUUID();
-        this.detector= new Detector(this.uuid);
+        UUID uuid = UUID.randomUUID();
+        this.detector = new Detector(uuid);
         this.mappedMetricData = TestObjectMother.mappedMetricData(metricData, uuid);
     }
 
-    private void initDependencies() {
-        when(mapper.getDetectorsFromCache(any(MetricData.class)))
-                .thenReturn(Collections.singletonList(detector));
-    }
-
-    private void initLogAndFail(){
+    private void initLogAndFail() {
         // Topology test drivers
         val topology = new KafkaAnomalyDetectorMapper(saConfig, mapper).buildTopology();
         this.logAndFailDriver = TestObjectMother.topologyTestDriver(topology, MetricDataJsonSerde.class, false);
     }
 
-    private void initLogAndContinue(){
+    private void initLogAndContinue() {
         // Topology test drivers
         val topology = new KafkaAnomalyDetectorMapper(saConfig, mapper).buildTopology();
         this.logAndContinueDriver = TestObjectMother.topologyTestDriver(topology, MetricDataJsonSerde.class, true);

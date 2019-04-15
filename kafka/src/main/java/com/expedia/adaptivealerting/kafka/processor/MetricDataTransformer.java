@@ -68,11 +68,10 @@ class MetricDataTransformer implements Transformer<String, MetricData, KeyValue<
     @SuppressWarnings("unchecked")
     public void init(ProcessorContext context) {
         this.context = context;
-        //TODO remove hardcode
         this.kvStore = (KeyValueStore<String, MetricData>) context.getStateStore(stateStoreName);
 
         //TODO decide PUNCTUATION time
-        this.context.schedule(2000, PunctuationType.WALL_CLOCK_TIME, (timestamp) -> {
+        this.context.schedule(200, PunctuationType.WALL_CLOCK_TIME, (timestamp) -> {
 
             if (kvStore.approximateNumEntries() >= detectorMapper.optimalBatchSize()) {
                 KeyValueIterator<String, MetricData> iter = this.kvStore.all();
@@ -96,7 +95,7 @@ class MetricDataTransformer implements Transformer<String, MetricData, KeyValue<
                 }
 
             } else {
-                log.trace("ES lookup skipped , as batch size is not optimum");
+                log.trace("ES lookup skipped, as batch size is not optimum");
             }
 
             // commit the current processing progress
