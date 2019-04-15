@@ -21,17 +21,19 @@ import com.expedia.adaptivealerting.modelservice.service.AnomalyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
+@RequestMapping(path = "/api")
 public class AnomalyController {
 
     @Autowired
     private AnomalyService anomalyService;
 
-    @PostMapping(path = "/api/anomalies", consumes = "application/json", produces = "application/json")
+    @PostMapping(path = "/anomalies", consumes = "application/json", produces = "application/json")
     public List<AnomalyResult> getAnomalies(@RequestBody AnomalyRequest request) {
         return anomalyService.getAnomalies(request);
     }

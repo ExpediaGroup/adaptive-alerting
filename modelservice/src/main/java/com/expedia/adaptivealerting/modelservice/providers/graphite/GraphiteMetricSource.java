@@ -34,7 +34,6 @@ import java.util.Map;
  */
 @Slf4j
 @Service
-@Configurable
 public class GraphiteMetricSource implements MetricSource {
 
     private RestTemplate restTemplate = new RestTemplate();

@@ -57,16 +57,17 @@ public class GraphiteMetricSourceTest {
     }
 
     private void initTestObjects() {
-        ObjectMother mom = ObjectMother.instance();
         this.beanUtil = new BeanUtil();
         beanUtil.setApplicationContext(ctx);
+
+        ObjectMother mom = ObjectMother.instance();
         results.add(mom.getMetricData());
     }
 
     private void initDependencies() {
         ObjectMother mom = ObjectMother.instance();
         GraphiteProperties props = new GraphiteProperties();
-        props.setUrlTemplate("https://graphiteURl/render?from=-24hours&format=json&maxDataPoints=144&target={target}");
+        props.setUrlTemplate("https://graphiteUrl/render?from=-24hours&format=json&maxDataPoints=144&target={target}");
         when(restTemplate.getForObject(anyString(), eq(GraphiteResult[].class), any(Map.class))).thenReturn(
                 mom.getGraphiteData());
         when(beanUtil.getBean(GraphiteProperties.class)).thenReturn(props);
