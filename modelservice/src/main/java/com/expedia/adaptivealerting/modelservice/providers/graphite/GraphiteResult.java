@@ -19,7 +19,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
+
+import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -28,5 +29,5 @@ import lombok.ToString;
 public class GraphiteResult {
     private String[][] datapoints;
     private String target;
-    private Tags tags;
+    private Map<String, Object> tags;
 }
