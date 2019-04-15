@@ -69,7 +69,7 @@ class MetricDataTransformer implements Transformer<String, MetricData, KeyValue<
     public void init(ProcessorContext context) {
         this.context = context;
         //TODO remove hardcode
-        this.kvStore = (KeyValueStore<String, MetricData>) context.getStateStore("es-request-buffer");
+        this.kvStore = (KeyValueStore<String, MetricData>) context.getStateStore(stateStoreName);
 
         //TODO decide PUNCTUATION time
         this.context.schedule(2000, PunctuationType.WALL_CLOCK_TIME, (timestamp) -> {

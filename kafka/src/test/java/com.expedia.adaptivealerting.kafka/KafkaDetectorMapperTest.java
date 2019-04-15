@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.kafka;
 
 import com.expedia.adaptivealerting.anomdetect.DetectorMapper;
+import com.expedia.adaptivealerting.anomdetect.mapper.Detector;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde;
 import com.expedia.adaptivealerting.kafka.serde.MetricDataJsonSerde;
@@ -29,7 +30,6 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.streams.TopologyTestDriver;
 import org.apache.kafka.streams.test.ConsumerRecordFactory;
 import org.apache.kafka.streams.test.OutputVerifier;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,6 +37,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Collections;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -51,6 +52,8 @@ public final class KafkaDetectorMapperTest {
     private static final String INPUT_TOPIC = "metrics";
     private static final String OUTPUT_TOPIC = "mapped-metrics";
     private static final String INVALID_INPUT_VALUE = "invalid-input-value";
+    private static final String stateStoreName = "es-request-buffer";
+
 
     @Mock
     private DetectorMapper mapper;
@@ -72,6 +75,8 @@ public final class KafkaDetectorMapperTest {
     private ConsumerRecordFactory<String, String> stringFactory;
     private StringDeserializer stringDeser;
     private Deserializer<MappedMetricData> mmdDeser;
+    private UUID uuid;
+    private Detector detector;
 
     @Before
     public void setUp() {
@@ -82,14 +87,10 @@ public final class KafkaDetectorMapperTest {
         initTestMachinery();
     }
 
-    @After
-    public void tearDown() {
-        logAndFailDriver.close();
-        logAndContinueDriver.close();
-    }
 
     @Test
     public void testMetricDataToMappedMetricData() {
+        initLogAndFail();
         logAndFailDriver.pipeInput(metricDataFactory.create(INPUT_TOPIC, KAFKA_KEY, metricData));
 
         // The streams app remaps the key to the detector UUID. [WLW]
@@ -97,6 +98,7 @@ public final class KafkaDetectorMapperTest {
         log.trace("outputRecord={}", outputRecord);
         val outputKafkaKey = mappedMetricData.getDetectorUuid().toString();
         OutputVerifier.compareKeyValue(outputRecord, outputKafkaKey, mappedMetricData);
+        logAndFailDriver.close();
     }
 
     /**
@@ -105,7 +107,9 @@ public final class KafkaDetectorMapperTest {
      */
     @Test
     public void nullOnDeserExceptionWithLogAndFailDriver() {
+        initLogAndFail();
         nullOnDeserException(logAndFailDriver);
+        logAndFailDriver.close();
     }
 
     /**
@@ -114,7 +118,9 @@ public final class KafkaDetectorMapperTest {
      */
     @Test
     public void nullOnDeserExceptionWithLogAndContinueDriver() {
+        initLogAndContinue();
         nullOnDeserException(logAndContinueDriver);
+        logAndContinueDriver.close();
     }
 
     private void initConfig() {
@@ -125,20 +131,29 @@ public final class KafkaDetectorMapperTest {
 
     private void initTestObjects() {
         this.metricData = TestObjectMother.metricData();
-        this.mappedMetricData = TestObjectMother.mappedMetricData(metricData);
+        this.uuid = UUID.randomUUID();
+        this.detector= new Detector(this.uuid);
+        this.mappedMetricData = TestObjectMother.mappedMetricData(metricData, uuid);
     }
 
     private void initDependencies() {
-        when(mapper.map(any(MetricData.class)))
-                .thenReturn(Collections.singleton(mappedMetricData));
+        when(mapper.getDetectorsFromCache(any(MetricData.class)))
+                .thenReturn(Collections.singletonList(detector));
     }
 
-    private void initTestMachinery() {
-
+    private void initLogAndFail(){
         // Topology test drivers
         val topology = new KafkaAnomalyDetectorMapper(saConfig, mapper).buildTopology();
         this.logAndFailDriver = TestObjectMother.topologyTestDriver(topology, MetricDataJsonSerde.class, false);
+    }
+
+    private void initLogAndContinue(){
+        // Topology test drivers
+        val topology = new KafkaAnomalyDetectorMapper(saConfig, mapper).buildTopology();
         this.logAndContinueDriver = TestObjectMother.topologyTestDriver(topology, MetricDataJsonSerde.class, true);
+    }
+
+    private void initTestMachinery() {
 
         // MetricData producer
         // The string record factory is just for experimenting with the drivers.
