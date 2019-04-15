@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * We cannot inject any Spring-managed bean in any of the provider classes because these are instantiated by JPA before Spring injects anything into it.
+ * We cannot inject any Spring-managed bean in any of the provider classes because these are instantiated before Spring injects anything into it.
  * This is a utility class to fetch any bean according to our requirements.
  * </p>
  */
