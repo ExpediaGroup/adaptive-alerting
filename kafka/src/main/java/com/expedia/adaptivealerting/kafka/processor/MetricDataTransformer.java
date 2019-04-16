@@ -53,11 +53,11 @@ class MetricDataTransformer implements Transformer<String, MetricData, KeyValue<
     private final String stateStoreName;
 
 
-    private static String addSalt(String key) {
+    private String addSalt(String key) {
         return key.concat(":").concat(UUID.randomUUID().toString());
     }
 
-    private static String removeSalt(String key) {
+    private String removeSalt(String key) {
         if (key.contains(":"))
             return key.substring(0, key.indexOf(":"));
         else

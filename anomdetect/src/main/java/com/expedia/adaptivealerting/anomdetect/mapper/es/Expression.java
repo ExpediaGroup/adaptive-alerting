@@ -20,7 +20,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class ExpressionTree {
+public class Expression {
     private Operator operator;
     List<Operand> operands;
 }
