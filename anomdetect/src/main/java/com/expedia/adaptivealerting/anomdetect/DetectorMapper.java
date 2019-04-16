@@ -19,9 +19,7 @@ package com.expedia.adaptivealerting.anomdetect;
 import com.expedia.adaptivealerting.anomdetect.comp.DetectorSource;
 import com.expedia.adaptivealerting.anomdetect.mapper.CacheUtil;
 import com.expedia.adaptivealerting.anomdetect.mapper.Detector;
-import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMapping;
 import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMatchResponse;
-import com.expedia.adaptivealerting.anomdetect.mapper.es.ExpressionTree;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.metrics.MetricData;
 import io.micrometer.core.instrument.Metrics;
@@ -29,7 +27,10 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -122,34 +123,6 @@ public class DetectorMapper {
         }
         return 0;
     }
-
-    public void removeMappings(List<DetectorMapping> disabledDetectorMappings) {
-        List<Detector> detectors = disabledDetectorMappings.stream()
-                .map(disabledDetectorMapping -> disabledDetectorMapping.getDetector())
-                .collect(Collectors.toList());
-        this.cache.removeFromCache(detectors);
-    }
-
-    public void addMappings(List<DetectorMapping> newDetectorMappings) {
-        final List<String> matchingMappings = new ArrayList<>();
-        List<Map<String, String>> listOfGroupOfTagsFromExpression = findTags(newDetectorMappings);
-        //invalidating the matching keys so that cache will be refilled
-        //from mappings store whenever any new metrics comes
-        cache.invalidateKeysMatchingTags(listOfGroupOfTagsFromExpression);
-    }
-
-    private List<Map<String, String>> findTags(List<DetectorMapping> newDetectorMappings) {
-        return newDetectorMappings.stream()
-                .map(detectorMapping ->
-                        findTagsFromDetectorMappingExpression(detectorMapping.getExpression()))
-                .collect(Collectors.toList());
-    }
-
-    private Map<String, String> findTagsFromDetectorMappingExpression(ExpressionTree expression) {
-        return expression.getOperands()
-                .stream().collect(Collectors.toMap(op -> op.getField().getKey(), op -> op.getField().getValue()));
-    }
-
 
 }
 

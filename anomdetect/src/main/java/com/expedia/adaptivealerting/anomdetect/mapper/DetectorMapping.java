@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.mapper;
 
-import com.expedia.adaptivealerting.anomdetect.mapper.es.ExpressionTree;
+import com.expedia.adaptivealerting.anomdetect.mapper.es.Expression;
 import com.expedia.adaptivealerting.anomdetect.mapper.es.User;
 import lombok.Data;
 
@@ -30,7 +30,7 @@ import java.util.List;
 public class DetectorMapping {
     private String id;
     private Detector detector;
-    private ExpressionTree expression;
+    private Expression expression;
     private User user;
     private long lastModifiedTimeInMillis;
     private long createdTimeInMillis;
