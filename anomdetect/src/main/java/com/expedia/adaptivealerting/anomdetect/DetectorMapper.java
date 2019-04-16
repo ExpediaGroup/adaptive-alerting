@@ -33,9 +33,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
-
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
  * Entry into the Adaptive Alerting runtime. Its job is find for any incoming {@link MetricData} the corresponding set
@@ -61,22 +58,6 @@ public class DetectorMapper {
     public List<Detector> getDetectorsFromCache(MetricData metricData) {
         String cacheKey = CacheUtil.getKey(metricData.getMetricDefinition().getTags().getKv());
         return cache.get(cacheKey);
-    }
-
-    /**
-     * Maps an {@link MetricData} to its corresponding set of {@link MappedMetricData}s.
-     *
-     * @param metricData MetricData to map.
-     * @return The corresponding set of {@link MappedMetricData}s: one per detector.
-     */
-    @Deprecated
-    public Set<MappedMetricData> map(MetricData metricData) {
-        notNull(metricData, "metricData can't be null");
-        return detectorSource
-                .findDetectorUuids(metricData.getMetricDefinition())
-                .stream()
-                .map(detectorUuid -> new MappedMetricData(metricData, detectorUuid))
-                .collect(Collectors.toSet());
     }
 
     public boolean isSuccessfulDetectorMappingLookup(List<Map<String, String>> cacheMissedMetricTags) {
@@ -118,7 +99,7 @@ public class DetectorMapper {
 
     //TODO - make batch size configureable
     public int optimalBatchSize() {
-        if (lastElasticLookUpLatency.longValue() == -1 || lastElasticLookUpLatency.longValue() > 100) {
+        if (lastElasticLookUpLatency.longValue() == -1L || lastElasticLookUpLatency.longValue() > 100L) {
             return 80;
         }
         return 0;

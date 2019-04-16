@@ -23,7 +23,7 @@ public class CacheUtilTest {
         tags.put("key3", "value3");
         tags.put("key4", "value4");
 
-        tagKey = "key1=value1,key2=value2,key3=value3,key4=value4";
+        tagKey = "key1->value1,key2->value2,key3->value3,key4->value4";
     }
 
     private void initDetectors() {

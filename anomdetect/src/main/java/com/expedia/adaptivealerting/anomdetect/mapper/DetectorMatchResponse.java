@@ -23,7 +23,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author shsethi
+ * The type Detector match response.
+ *
+ * Response from model service , for
+ *
+ * groupedDetectorsBySearchIndex  is map of [index of tags list] to [matching Detectors]
+ *
  */
 //same as com.expedia.adaptivealerting.modelservice.model.MatchingDetectorsResponse
 @Data

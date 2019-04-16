@@ -45,6 +45,7 @@ public class DefaultDetectorSource implements DetectorSource {
     @NonNull
     private final LegacyDetectorFactory legacyDetectorFactory;
 
+    @Deprecated
     @Override
     public List<UUID> findDetectorUuids(MetricDefinition metricDef) {
         notNull(metricDef, "metricDefinition can't be null");

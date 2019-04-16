@@ -44,6 +44,7 @@ public interface DetectorSource {
      * @return The detector UUIDs.
      * @throws DetectorException if there's a problem finding the detectors
      */
+    @Deprecated
     List<UUID> findDetectorUuids(MetricDefinition metricDef);
 
     /**

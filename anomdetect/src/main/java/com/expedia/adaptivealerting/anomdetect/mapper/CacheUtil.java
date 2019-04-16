@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public final class CacheUtil {
 
-    private static final String DELIMITER = "=";
+    private static final String DELIMITER = "->";
 
     public static String getKey(Map<String, String> tags) {
         List<String> listOfEntries = tags.entrySet()
