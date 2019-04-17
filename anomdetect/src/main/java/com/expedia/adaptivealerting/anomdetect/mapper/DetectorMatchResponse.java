@@ -23,18 +23,30 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The type Detector match response.
  *
- * Response from model service , for
- *
- * groupedDetectorsBySearchIndex  is map of [index of tags list] to [matching Detectors]
- *
+ * Response from model-service for request findMatchingDetectorMappings
+ * same as com.expedia.adaptivealerting.modelservice.model.MatchingDetectorsResponse
  */
-//same as com.expedia.adaptivealerting.modelservice.model.MatchingDetectorsResponse
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class DetectorMatchResponse {
+    /*
+    * groupedDetectorsBySearchIndex  is map of [index of tags list] to [matching Detectors]
+    * eg. if
+    *    request  is
+    *     List(tags1,tags2)  and
+    *
+    *   response is
+    *   {
+    *     {  0:[detector1, detector2],
+    *       1:[detector3, detector4]  }
+    *   }
+    *
+    *   that means
+    *       tags1 matches to detector1, detector2
+    *       tags2 matches to detector3, detector4
+    * */
     private Map<Integer, List<Detector>> groupedDetectorsBySearchIndex;
     private long lookupTimeInMillis;
 }

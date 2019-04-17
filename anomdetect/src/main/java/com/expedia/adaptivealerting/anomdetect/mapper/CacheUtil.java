@@ -17,7 +17,13 @@ package com.expedia.adaptivealerting.anomdetect.mapper;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -31,7 +37,9 @@ public final class CacheUtil {
     public static String getKey(Map<String, String> tags) {
         List<String> listOfEntries = tags.entrySet()
                 .stream()
-                .map(entry -> entry.getKey() + DELIMITER + entry.getValue()).sorted().collect(Collectors.toList());
+                .map(entry -> entry.getKey() + DELIMITER + entry.getValue())
+                .sorted()
+                .collect(Collectors.toList());
         return String.join(",", listOfEntries);
     }
 
@@ -58,7 +66,8 @@ public final class CacheUtil {
             return Collections.emptyList();
         }
         String[] detectorList = bunchOfDetectorIds.split("\\|");
-        return Arrays.asList(detectorList).stream().map(
-                detector -> new Detector(UUID.fromString(detector))).collect(Collectors.toList());
+        return Arrays.asList(detectorList).stream()
+                .map(detector -> new Detector(UUID.fromString(detector)))
+                .collect(Collectors.toList());
     }
 }
