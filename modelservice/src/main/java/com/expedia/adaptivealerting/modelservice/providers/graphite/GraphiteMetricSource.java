@@ -19,7 +19,6 @@ import com.expedia.adaptivealerting.modelservice.spi.MetricSource;
 import com.expedia.adaptivealerting.modelservice.spi.MetricSourceResult;
 import com.expedia.adaptivealerting.modelservice.util.BeanUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 

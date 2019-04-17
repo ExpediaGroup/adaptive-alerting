@@ -3,7 +3,7 @@ package com.expedia.adaptivealerting.modelservice.util;
 import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelResource;
 import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelTypeResource;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
-import com.expedia.adaptivealerting.anomdetect.detector.*;
+import com.expedia.adaptivealerting.anomdetect.detector.Detector;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Date;
