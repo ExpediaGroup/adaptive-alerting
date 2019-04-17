@@ -5,9 +5,6 @@ import org.junit.Test;
 
 import java.util.*;
 
-/**
- * @author shsethi
- */
 public class CacheUtilTest {
 
 

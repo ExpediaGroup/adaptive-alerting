@@ -22,9 +22,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
-/**
- * @author shsethi
- */
 
 @RequiredArgsConstructor
 public class MapperResult {

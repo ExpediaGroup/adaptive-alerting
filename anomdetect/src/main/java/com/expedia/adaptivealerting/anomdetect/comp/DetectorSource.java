@@ -64,9 +64,9 @@ public interface DetectorSource {
      * @return The detector UUIDs.
      * @throws DetectorException if there's a problem finding the detectors
      */
-    public List<UUID> findUpdatedDetectors(int timePeriod);
+    List<UUID> findUpdatedDetectors(int timePeriod);
 
 
-    public DetectorMatchResponse findMatchingDetectorMappings(List<Map<String, String>> metricTags);
+    DetectorMatchResponse findMatchingDetectorMappings(List<Map<String, String>> metricTags);
 
 }

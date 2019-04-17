@@ -19,9 +19,6 @@ import java.util.UUID;
 import static org.mockito.Mockito.verify;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
-/**
- * @author shsethi
- */
 public class DetectorMapperCacheTest {
 
 

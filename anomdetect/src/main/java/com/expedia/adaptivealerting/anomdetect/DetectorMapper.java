@@ -22,7 +22,6 @@ import com.expedia.adaptivealerting.anomdetect.mapper.Detector;
 import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMatchResponse;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.metrics.MetricData;
-import io.micrometer.core.instrument.Metrics;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +30,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -40,7 +38,6 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 @Slf4j
 public class DetectorMapper {
-    private AtomicLong indexSize;
     private DetectorMapperCache cache;
     private AtomicLong lastElasticLookUpLatency = new AtomicLong(-1);
     @Getter
@@ -49,9 +46,8 @@ public class DetectorMapper {
 
 
     public DetectorMapper(DetectorSource detectorSource) {
-        assert detectorSource!=null;
+        assert detectorSource != null;
         this.detectorSource = detectorSource;
-        this.indexSize = Metrics.gauge("index.size", new AtomicLong(0));
         this.cache = new DetectorMapperCache();
     }
 
@@ -79,17 +75,16 @@ public class DetectorMapper {
             });
 
             Set<Integer> searchIndexes = groupedDetectorsByIndex.keySet();
-            indexSize.set(searchIndexes.size());
 
 //For metrics with no matching detectors, set matching detectors to empty in cache to avoid repeated cache miss
-            final AtomicInteger i = new AtomicInteger(0);
-            cacheMissedMetricTags.forEach(tags -> {
-                if (!searchIndexes.contains(i.get())) {
+            int i = 0;
+            for (Map<String, String> tags : cacheMissedMetricTags) {
+                if (!searchIndexes.contains(i)) {
                     String cacheKey = CacheUtil.getKey(tags);
                     cache.put(cacheKey, Collections.EMPTY_LIST);
                 }
-                i.incrementAndGet();
-            });
+                i++;
+            }
 
         } else {
             lastElasticLookUpLatency.set(-2);
