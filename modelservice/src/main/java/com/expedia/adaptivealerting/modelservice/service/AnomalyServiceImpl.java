@@ -40,7 +40,7 @@ public class AnomalyServiceImpl implements AnomalyService {
 
     @Autowired
     @Qualifier("metricSourceServiceListFactoryBean")
-    private List<?> metricSources;
+    private List<? extends MetricSource> metricSources;
 
     @Override
     public List<AnomalyResult> getAnomalies(AnomalyRequest request) {
