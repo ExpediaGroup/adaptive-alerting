@@ -20,7 +20,9 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @Slf4j
@@ -70,6 +72,6 @@ public class GraphiteMetricSourceTest {
         props.setUrlTemplate("https://graphiteUrl/render?from=-24hours&format=json&maxDataPoints=144&target={target}");
         when(restTemplate.getForObject(anyString(), eq(GraphiteResult[].class), any(Map.class))).thenReturn(
                 mom.getGraphiteData());
-        when(beanUtil.getBean(GraphiteProperties.class)).thenReturn(props);
+        when(BeanUtil.getBean(GraphiteProperties.class)).thenReturn(props);
     }
 }

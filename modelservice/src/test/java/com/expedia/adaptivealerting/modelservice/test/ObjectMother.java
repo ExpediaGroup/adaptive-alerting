@@ -65,7 +65,7 @@ public class ObjectMother {
     }
 
 
-    private  String[][] getDataPoints(){
+    private String[][] getDataPoints() {
         String[][] datapoints = new String[2][2];
         datapoints[0][0] = String.valueOf(78.0);
         datapoints[0][1] = String.valueOf(1548829800);

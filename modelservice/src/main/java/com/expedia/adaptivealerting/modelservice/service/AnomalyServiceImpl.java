@@ -15,10 +15,11 @@
  */
 package com.expedia.adaptivealerting.modelservice.service;
 
-import com.expedia.adaptivealerting.anomdetect.detector.*;
+import com.expedia.adaptivealerting.anomdetect.detector.Detector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.util.MetricUtil;
-import com.expedia.adaptivealerting.modelservice.spi.*;
+import com.expedia.adaptivealerting.modelservice.spi.MetricSource;
+import com.expedia.adaptivealerting.modelservice.spi.MetricSourceResult;
 import com.expedia.adaptivealerting.modelservice.util.DetectorUtil;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
@@ -39,7 +40,7 @@ public class AnomalyServiceImpl implements AnomalyService {
 
     @Autowired
     @Qualifier("metricSourceServiceListFactoryBean")
-    private List<?> metricSources;
+    private List<? extends MetricSource> metricSources;
 
     @Override
     public List<AnomalyResult> getAnomalies(AnomalyRequest request) {
@@ -48,7 +49,7 @@ public class AnomalyServiceImpl implements AnomalyService {
 
     private List<AnomalyResult> findAnomaliesInTrainingData(AnomalyRequest request) {
         List<AnomalyResult> anomalyResults = new ArrayList<>();
-        ((List<MetricSource>) metricSources)
+        metricSources
                 .forEach(metricSource -> {
                     List<MetricSourceResult> results = metricSource.getMetricData(request.getMetricTags());
                     Detector detector = DetectorUtil.getDetector(request.getDetectorType(), request.getDetectorParams());
