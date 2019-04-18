@@ -33,6 +33,8 @@ management:
       tomcat: false
       system: false
       process: false
+graphite:
+  urlTemplate: "https://graphiteUrl/render?from=-7d&format=json&maxDataPoints=2016&target=seriesByTag('{tags}')"
 security:
   clientId: "id"
   secret: "secret"
