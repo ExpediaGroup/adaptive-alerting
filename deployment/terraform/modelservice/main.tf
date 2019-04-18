@@ -11,6 +11,7 @@ data "template_file" "config_data" {
   template = "${file("${local.application_yaml_file_path}")}"
   vars {
     db_endpoint = "${var.db_endpoint}"
+    graphite_url = "${var.graphite_url}"
   }
 }
 
