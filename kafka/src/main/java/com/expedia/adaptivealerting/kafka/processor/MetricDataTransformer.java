@@ -48,7 +48,10 @@ import java.util.stream.Collectors;
 * While pushing records into state store, using {@code key} can cause overriding metric of same {@code  metricDefinition} as state store is a Map.
 * Hence we use {@link #addSalt(String key)} method while inserting the record and {@link #removeSalt(String key)} while pushing result.
 * Thus we have same key through out transformation which prevents data re-partitioning.
- * */
+*
+* Note: Since we want to preserve key, using ValueTransformerWithKey might seem the right choice but it doesn't allow pushing key value pair using {@link #context.forward()}
+* https://docs.confluent.io/current/streams/javadocs/org/apache/kafka/streams/kstream/KStream.html#transformValues-org.apache.kafka.streams.kstream.ValueTransformerSupplier-java.lang.String...-
+* */
 @Slf4j
 @Data
 @RequiredArgsConstructor
