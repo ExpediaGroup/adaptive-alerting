@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.kafka;
 
-import com.expedia.adaptivealerting.anomdetect.DetectorMapper;
-import com.expedia.adaptivealerting.anomdetect.mapper.MapperResult;
+import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapper;
+import com.expedia.adaptivealerting.anomdetect.detectormapper.MapperResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.kafka.processor.MetricDataTransformerSupplier;
 import com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde;

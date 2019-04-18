@@ -1,14 +1,12 @@
-package com.expedia.adaptivealerting.anomdetect;
+package com.expedia.adaptivealerting.anomdetect.detectormapper;
 
-import com.expedia.adaptivealerting.anomdetect.mapper.CacheUtil;
-import com.expedia.adaptivealerting.anomdetect.mapper.Detector;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Metrics;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -31,15 +29,14 @@ public class DetectorMapperCache {
     }
 
     public List<Detector> get(String key) {
-        List<Detector> detectors = new ArrayList<>();
         String bunchOfCachedDetectorIds = cache.getIfPresent(key);
         if (bunchOfCachedDetectorIds == null) {
             this.cacheMiss.increment();
+            return Collections.emptyList();
         } else {
             this.cacheHit.increment();
-            detectors = CacheUtil.buildDetectors(bunchOfCachedDetectorIds);
+            return CacheUtil.buildDetectors(bunchOfCachedDetectorIds);
         }
-        return detectors;
     }
 
     public void put(String key, List<Detector> detectors) {

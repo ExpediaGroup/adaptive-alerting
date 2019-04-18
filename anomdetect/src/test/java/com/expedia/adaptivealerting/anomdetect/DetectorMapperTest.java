@@ -16,9 +16,10 @@
 package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.anomdetect.comp.DetectorSource;
-import com.expedia.adaptivealerting.anomdetect.mapper.CacheUtil;
-import com.expedia.adaptivealerting.anomdetect.mapper.Detector;
-import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMatchResponse;
+import com.expedia.adaptivealerting.anomdetect.detectormapper.CacheUtil;
+import com.expedia.adaptivealerting.anomdetect.detectormapper.Detector;
+import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapper;
+import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMatchResponse;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.TagCollection;

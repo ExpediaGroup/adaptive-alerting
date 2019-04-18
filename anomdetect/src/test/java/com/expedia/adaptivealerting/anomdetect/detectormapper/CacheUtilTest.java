@@ -1,4 +1,4 @@
-package com.expedia.adaptivealerting.anomdetect.mapper;
+package com.expedia.adaptivealerting.anomdetect.detectormapper;
 
 import org.junit.Assert;
 import org.junit.Test;

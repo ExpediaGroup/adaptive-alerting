@@ -16,7 +16,8 @@
 package com.expedia.adaptivealerting.anomdetect.comp.connector;
 
 import com.expedia.adaptivealerting.anomdetect.*;
-import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMatchResponse;
+import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapper;
+import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMatchResponse;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.metrictank.MetricTankIdFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;

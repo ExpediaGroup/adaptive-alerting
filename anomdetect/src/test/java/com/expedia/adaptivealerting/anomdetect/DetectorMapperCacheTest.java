@@ -1,7 +1,8 @@
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.anomdetect.mapper.CacheUtil;
-import com.expedia.adaptivealerting.anomdetect.mapper.Detector;
+import com.expedia.adaptivealerting.anomdetect.detectormapper.CacheUtil;
+import com.expedia.adaptivealerting.anomdetect.detectormapper.Detector;
+import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapperCache;
 import com.google.common.cache.Cache;
 import lombok.val;
 import org.junit.Assert;

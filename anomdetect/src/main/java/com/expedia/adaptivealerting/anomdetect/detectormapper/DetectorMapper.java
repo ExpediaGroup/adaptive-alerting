@@ -13,13 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect;
+package com.expedia.adaptivealerting.anomdetect.detectormapper;
 
 
 import com.expedia.adaptivealerting.anomdetect.comp.DetectorSource;
-import com.expedia.adaptivealerting.anomdetect.mapper.CacheUtil;
-import com.expedia.adaptivealerting.anomdetect.mapper.Detector;
-import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMatchResponse;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.metrics.MetricData;
 import lombok.Getter;

@@ -13,12 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.mapper.es;
+package com.expedia.adaptivealerting.anomdetect.detectormapper;
 
-import lombok.Data;
+import com.expedia.metrics.MetricData;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
-@Data
-public class Operand {
-    private Field field;
-    private Expression expression;
+import java.util.List;
+
+
+@RequiredArgsConstructor
+public class MapperResult {
+    @NonNull
+    @Getter
+    private MetricData metricData;
+    @NonNull
+    @Getter
+    private List<Detector> matchingDetectors;
+
 }
