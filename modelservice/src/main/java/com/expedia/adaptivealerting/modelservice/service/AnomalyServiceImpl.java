@@ -40,7 +40,7 @@ public class AnomalyServiceImpl implements AnomalyService {
 
     @Autowired
     @Qualifier("metricSourceServiceListFactoryBean")
-    private List<? extends MetricSource> metricSources;
+    private List metricSources;
 
     @Override
     public List<AnomalyResult> getAnomalies(AnomalyRequest request) {
@@ -49,7 +49,7 @@ public class AnomalyServiceImpl implements AnomalyService {
 
     private List<AnomalyResult> findAnomaliesInTrainingData(AnomalyRequest request) {
         List<AnomalyResult> anomalyResults = new ArrayList<>();
-        metricSources
+        ((List<MetricSource>) metricSources)
                 .forEach(metricSource -> {
                     List<MetricSourceResult> results = metricSource.getMetricData(request.getMetricTags());
                     Detector detector = DetectorUtil.getDetector(request.getDetectorType(), request.getDetectorParams());
