@@ -101,6 +101,7 @@ module "modelservice" {
 
   # App
   db_endpoint = "${var.modelservice["db_endpoint"]}"
+  graphite_url = "${var.modelservice["graphite_url"]}"
 }
 
 module "a2m-mapper" {
