@@ -17,8 +17,7 @@ package com.expedia.adaptivealerting.anomdetect.detectormapper;
 
 
 import com.expedia.adaptivealerting.anomdetect.comp.DetectorSource;
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.metrics.MetricData;
+import com.expedia.metrics.MetricDefinition;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -30,8 +29,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Entry into the Adaptive Alerting runtime. Its job is find for any incoming {@link MetricData} the corresponding set
- * of mapped detectors, creating a {@link MappedMetricData} for each.
+ * Detector mapper finds matching detectors for each incoming {@link MetricDefinition}
+ *
  */
 @Slf4j
 public class DetectorMapper {
@@ -48,8 +47,8 @@ public class DetectorMapper {
         this.cache = new DetectorMapperCache();
     }
 
-    public List<Detector> getDetectorsFromCache(MetricData metricData) {
-        String cacheKey = CacheUtil.getKey(metricData.getMetricDefinition().getTags().getKv());
+    public List<Detector> getDetectorsFromCache(MetricDefinition metricDefinition) {
+        String cacheKey = CacheUtil.getKey(metricDefinition.getTags().getKv());
         return cache.get(cacheKey);
     }
 

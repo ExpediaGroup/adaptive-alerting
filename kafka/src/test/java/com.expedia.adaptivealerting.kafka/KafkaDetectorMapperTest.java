@@ -22,6 +22,7 @@ import com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde;
 import com.expedia.adaptivealerting.kafka.serde.MetricDataJsonSerde;
 import com.expedia.adaptivealerting.kafka.util.TestObjectMother;
 import com.expedia.metrics.MetricData;
+import com.expedia.metrics.MetricDefinition;
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -90,7 +91,7 @@ public final class KafkaDetectorMapperTest {
     @Test
     public void testMetricDataToMappedMetricData() {
         initLogAndFail();
-        when(mapper.getDetectorsFromCache(any(MetricData.class)))
+        when(mapper.getDetectorsFromCache(any(MetricDefinition.class)))
                 .thenReturn(Collections.singletonList(detector));
 
         logAndFailDriver.pipeInput(metricDataFactory.create(INPUT_TOPIC, KAFKA_KEY, metricData));
@@ -154,7 +155,7 @@ public final class KafkaDetectorMapperTest {
     public void shouldOutputResultWhenReceivedMoreEntriesThanOptimumBatchSize() {
         initLogAndContinue();
 
-        when(mapper.getDetectorsFromCache(any(MetricData.class)))
+        when(mapper.getDetectorsFromCache(any(MetricDefinition.class)))
                 .thenReturn(Collections.singletonList(detector));
         when(mapper.optimalBatchSize()).thenReturn(2);
 

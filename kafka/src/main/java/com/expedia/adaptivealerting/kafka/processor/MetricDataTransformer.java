@@ -36,13 +36,26 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/*
+* A custom stateful KStream transformer that converts {@link MetricData} to {@link MapperResult}.
+* For each incoming record, {@link #transform(String key, MetricData metricData) , matching detectors are fetched from cache
+* in case of cache miss, record in pushed into a in-memory state store, for batching.
+*
+* {@link #init(ProcessorContext context), registers a scheduled a periodic operation that determines if the batch size is appropriate
+* and issues a down stream call to fetch matching detectors.
+*
+*
+* While pushing records into state store, using {@code key} can cause overriding metric of same {@code  metricDefinition} as state store is a Map.
+* Hence we use {@link #addSalt(String key)} method while inserting the record and {@link #removeSalt(String key)} while pushing result.
+* Thus we have same key through out transformation which prevents data re-partitioning.
+ * */
 @Slf4j
 @Data
 @RequiredArgsConstructor
 class MetricDataTransformer implements Transformer<String, MetricData, KeyValue<String, MapperResult>> {
 
     private ProcessorContext context;
-    private KeyValueStore<String, MetricData> kvStore;
+    private KeyValueStore<String, MetricData> metricDataKeyValueStore;
 
     @NonNull
     private DetectorMapper detectorMapper;
@@ -65,26 +78,26 @@ class MetricDataTransformer implements Transformer<String, MetricData, KeyValue<
     @SuppressWarnings("unchecked")
     public void init(ProcessorContext context) {
         this.context = context;
-        this.kvStore = (KeyValueStore<String, MetricData>) context.getStateStore(stateStoreName);
+        this.metricDataKeyValueStore = (KeyValueStore<String, MetricData>) context.getStateStore(stateStoreName);
 
         //TODO decide PUNCTUATION time
         this.context.schedule(200, PunctuationType.WALL_CLOCK_TIME, (timestamp) -> {
 
-            if (kvStore.approximateNumEntries() >= detectorMapper.optimalBatchSize()) {
-                KeyValueIterator<String, MetricData> iter = this.kvStore.all();
+            if (metricDataKeyValueStore.approximateNumEntries() >= detectorMapper.optimalBatchSize()) {
+                KeyValueIterator<String, MetricData> iter = this.metricDataKeyValueStore.all();
                 Map<String, MetricData> cacheMissedMetrics = new HashMap<>();
 
                 while (iter.hasNext()) {
                     KeyValue<String, MetricData> entry = iter.next();
                     cacheMissedMetrics.put(entry.key, entry.value);
-                    kvStore.delete(entry.key);
+                    metricDataKeyValueStore.delete(entry.key);
                 }
                 iter.close();
 
                 List<Map<String, String>> cacheMissedMetricTags = cacheMissedMetrics.values().stream().map(value -> value.getMetricDefinition().getTags().getKv()).collect(Collectors.toList());
                 if (detectorMapper.isSuccessfulDetectorMappingLookup(cacheMissedMetricTags)) {
                     cacheMissedMetrics.forEach((originalKey, metricData) -> {
-                        List<Detector> detectors = detectorMapper.getDetectorsFromCache(metricData);
+                        List<Detector> detectors = detectorMapper.getDetectorsFromCache(metricData.getMetricDefinition());
                         if (!detectors.isEmpty()) {
                             context.forward(removeSalt(originalKey), new MapperResult(metricData, detectors));
                         }
@@ -104,11 +117,11 @@ class MetricDataTransformer implements Transformer<String, MetricData, KeyValue<
     @Override
     public KeyValue<String, MapperResult> transform(String key, MetricData metricData) {
 
-        List<Detector> detectors = detectorMapper.getDetectorsFromCache(metricData);
+        List<Detector> detectors = detectorMapper.getDetectorsFromCache(metricData.getMetricDefinition());
 
         if (detectors.isEmpty()) {
             //adding salt to key to prevent incoming records with same key being over-ridden
-            this.kvStore.put(addSalt(key), metricData);
+            this.metricDataKeyValueStore.put(addSalt(key), metricData);
         } else {
             return new KeyValue<>(key, new MapperResult(metricData, detectors));
         }

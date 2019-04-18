@@ -162,7 +162,7 @@ public final class DetectorMapperTest {
         listOfMetricTags.forEach(tags -> {
             MetricData metricData = new MetricData(new MetricDefinition(new TagCollection(tags)), 0.0, 1L);
 
-            List detector = mapper.getDetectorsFromCache(metricData);
+            List detector = mapper.getDetectorsFromCache(metricData.getMetricDefinition());
             if (!detector.isEmpty())
                 detectorResults.put(CacheUtil.getKey(tags), detector);
         });
