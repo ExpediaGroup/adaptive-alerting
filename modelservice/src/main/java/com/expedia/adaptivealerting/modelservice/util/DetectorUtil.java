@@ -20,6 +20,7 @@ import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelTypeResource;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 import java.util.Date;
 import java.util.Map;
@@ -29,14 +30,12 @@ import java.util.UUID;
 public class DetectorUtil {
 
     public static Detector getDetector(String detectorType, Map paramsMap) {
-        ModelTypeResource modelTypeResource = new ModelTypeResource();
-        modelTypeResource.setKey(detectorType);
-        ModelResource resource = new ModelResource();
-        resource.setDetectorType(modelTypeResource);
+        val resource = new ModelResource();
+        resource.setDetectorType(new ModelTypeResource(detectorType));
         resource.setParams(paramsMap);
         resource.setDateCreated(new Date());
 
-        LegacyDetectorFactory factory = new LegacyDetectorFactory();
+        val factory = new LegacyDetectorFactory();
         return factory.createDetector(UUID.randomUUID(), resource);
     }
 }

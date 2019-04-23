@@ -50,6 +50,10 @@ public final class MetricUtil {
         return new HashSet<>();
     }
 
+    public static MetricDefinition metricDefinition() {
+        return new MetricDefinition(new TagCollection(defaultKvTags(), defaultVTags()));
+    }
+
     /**
      * Convenience method to create a new metric definition from the given tags. Provides defaults for null values.
      *
