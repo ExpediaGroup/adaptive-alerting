@@ -24,6 +24,14 @@ import static org.junit.Assert.*;
 public final class MetricUtilTest {
 
     @Test
+    public void testMetricDefinition_nullTags() {
+        val metricDef = MetricUtil.metricDefinition(null, null);
+        val tagCollection = metricDef.getTags();
+        assertNotNull(tagCollection.getKv());
+        assertNotNull(tagCollection.getV());
+    }
+
+    @Test
     public void testDefaultKvTags() {
         val tags = MetricUtil.defaultKvTags();
 

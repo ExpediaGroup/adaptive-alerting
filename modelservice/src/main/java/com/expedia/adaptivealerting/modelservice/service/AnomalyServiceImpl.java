@@ -15,17 +15,13 @@
  */
 package com.expedia.adaptivealerting.modelservice.service;
 
-import com.expedia.adaptivealerting.anomdetect.detector.Detector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.util.MetricUtil;
 import com.expedia.adaptivealerting.modelservice.spi.MetricSource;
-import com.expedia.adaptivealerting.modelservice.spi.MetricSourceResult;
 import com.expedia.adaptivealerting.modelservice.util.DetectorUtil;
-import com.expedia.metrics.MetricData;
-import com.expedia.metrics.MetricDefinition;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -39,7 +35,6 @@ import java.util.List;
 public class AnomalyServiceImpl implements AnomalyService {
 
     @Autowired
-    @Qualifier("metricSourceServiceListFactoryBean")
     private List<? extends MetricSource> metricSources;
 
     @Override
@@ -48,18 +43,18 @@ public class AnomalyServiceImpl implements AnomalyService {
     }
 
     private List<AnomalyResult> findAnomaliesInTrainingData(AnomalyRequest request) {
-        List<AnomalyResult> anomalyResults = new ArrayList<>();
-        metricSources
-                .forEach(metricSource -> {
-                    List<MetricSourceResult> results = metricSource.getMetricData(request.getMetricTags());
-                    Detector detector = DetectorUtil.getDetector(request.getDetectorType(), request.getDetectorParams());
-                    for (MetricSourceResult result : results) {
-                        MetricDefinition metricDefinition = MetricUtil.metricDefinition(null, null);
-                        MetricData metricData = MetricUtil.metricData(metricDefinition, result.getDataPoint(), result.getEpochSecond());
-                        AnomalyResult anomalyResult = detector.classify(metricData);
-                        anomalyResults.add(anomalyResult);
-                    }
-                });
+        val metricDef = MetricUtil.metricDefinition();
+        val detector = DetectorUtil.getDetector(request.getDetectorType(), request.getDetectorParams());
+
+        val anomalyResults = new ArrayList<AnomalyResult>();
+        metricSources.forEach(metricSource -> {
+            val results = metricSource.getMetricData(request.getMetricTags());
+            for (val result : results) {
+                val metricData = MetricUtil.metricData(metricDef, result.getDataPoint(), result.getEpochSecond());
+                val anomalyResult = detector.classify(metricData);
+                anomalyResults.add(anomalyResult);
+            }
+        });
         return anomalyResults;
     }
 }
