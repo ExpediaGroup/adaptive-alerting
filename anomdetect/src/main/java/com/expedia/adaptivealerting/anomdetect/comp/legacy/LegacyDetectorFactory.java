@@ -23,6 +23,7 @@ import com.expedia.adaptivealerting.anomdetect.detector.ForecastingDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.IndividualsDetector;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.HoltWintersForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PewmaPointForecaster;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -85,14 +86,15 @@ public class LegacyDetectorFactory {
         params.validate();
         val pointForecaster = new EwmaPointForecaster(params.toPointForecasterParams());
         val intervalForecaster = new ExponentialWelfordIntervalForecaster(params.toIntervalForecasterParams());
-        val anomalyType = AnomalyType.TWO_TAILED;
-        return new ForecastingDetector(uuid, pointForecaster, intervalForecaster, anomalyType);
+        return new ForecastingDetector(uuid, pointForecaster, intervalForecaster, AnomalyType.TWO_TAILED);
     }
 
     public Detector createHoltWintersDetector(UUID uuid, HoltWintersParams params) {
         notNull(uuid, "uuid can't be null");
         notNull(params, "params can't be null");
-        return new HoltWintersDetector(uuid, params);
+        val pointForecaster = new HoltWintersForecaster(params.toPointForecasterParams());
+        val intervalForecaster = new ExponentialWelfordIntervalForecaster(params.toIntervalForecasterParams());
+        return new ForecastingDetector(uuid, pointForecaster, intervalForecaster, AnomalyType.TWO_TAILED);
     }
 
     public Detector createPewmaDetector(UUID uuid, PewmaParams params) {
@@ -101,8 +103,7 @@ public class LegacyDetectorFactory {
         params.validate();
         val pointForecaster = new PewmaPointForecaster(params.toPointForecasterParams());
         val intervalForecaster = new ExponentialWelfordIntervalForecaster(params.toIntervalForecasterParams());
-        val anomalyType = AnomalyType.TWO_TAILED;
-        return new ForecastingDetector(uuid, pointForecaster, intervalForecaster, anomalyType);
+        return new ForecastingDetector(uuid, pointForecaster, intervalForecaster, AnomalyType.TWO_TAILED);
     }
 
     private <T> T toParams(ModelResource model, Class<T> paramsClass) {

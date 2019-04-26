@@ -16,32 +16,30 @@
 package com.expedia.adaptivealerting.anomdetect.detector;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
-import com.expedia.adaptivealerting.core.util.MathUtil;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.opencsv.bean.CsvToBeanBuilder;
-import junit.framework.TestCase;
 import lombok.val;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
 import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertSame;
 
 public class IndividualsDetectorTest {
     private static final int WARMUP_PERIOD = 25;
 
-    // TODO This tolerance is very loose. Can we tighten it up? [WLW]
-    private static final double TOLERANCE = 0.1;
+    // TODO This tolerance is a bit loose. Can we tighten it up? [WLW]
+    private static final double TOLERANCE = 0.01;
 
     private UUID detectorUuid;
-    private MetricDefinition metricDefinition;
+    private MetricDefinition metricDef;
     private long epochSecond;
     private static List<IndividualsTestRow> data;
 
@@ -54,7 +52,7 @@ public class IndividualsDetectorTest {
     @Before
     public void setUp() {
         this.detectorUuid = UUID.randomUUID();
-        this.metricDefinition = new MetricDefinition("some-key");
+        this.metricDef = new MetricDefinition("some-key");
         this.epochSecond = Instant.now().getEpochSecond();
     }
 
@@ -69,33 +67,32 @@ public class IndividualsDetectorTest {
                 .setWarmUpPeriod(WARMUP_PERIOD);
         val detector = new IndividualsDetector(detectorUuid, params);
 
+        assertEquals(detectorUuid, detector.getUuid());
+        assertSame(params, detector.getParams());
+
         int noOfDataPoints = 1;
 
         while (testRows.hasNext()) {
-            final IndividualsTestRow testRow = testRows.next();
-            final double observed = testRow.getObserved();
+            val testRow = testRows.next();
+            val observed = testRow.getObserved();
 
-            final MetricData metricData = new MetricData(metricDefinition, observed, epochSecond);
-            final AnomalyLevel level = detector.classify(metricData).getAnomalyLevel();
+            val metricData = new MetricData(metricDef, observed, epochSecond);
+            val level = detector.classify(metricData).getAnomalyLevel();
 
             if (noOfDataPoints < WARMUP_PERIOD) {
                 assertEquals(AnomalyLevel.MODEL_WARMUP, level);
             } else {
-                assertApproxEqual(testRow.getUpperControlLimit_R(), detector.getUpperControlLimit_R());
-                assertApproxEqual(testRow.getLowerControlLimit_X(), detector.getLowerControlLimit_X());
-                assertApproxEqual(testRow.getUpperControlLimit_X(), detector.getUpperControlLimit_X());
+                assertEquals(testRow.getUpperControlLimit_R(), detector.getUpperControlLimit_R(), TOLERANCE);
+                assertEquals(testRow.getLowerControlLimit_X(), detector.getLowerControlLimit_X(), TOLERANCE);
+                assertEquals(testRow.getUpperControlLimit_X(), detector.getUpperControlLimit_X(), TOLERANCE);
                 assertEquals(AnomalyLevel.valueOf(testRow.getAnomalyLevel()), level);
             }
             noOfDataPoints += 1;
         }
     }
 
-    private static void assertApproxEqual(double d1, double d2) {
-        TestCase.assertTrue(MathUtil.isApproximatelyEqual(d1, d2, TOLERANCE));
-    }
-
     private static void readDataFromCsv() {
-        final InputStream is = ClassLoader.getSystemResourceAsStream("tests/individual-chart-sample-input.csv");
+        val is = ClassLoader.getSystemResourceAsStream("tests/individual-chart-sample-input.csv");
         data = new CsvToBeanBuilder<IndividualsTestRow>(new InputStreamReader(is))
                 .withType(IndividualsTestRow.class)
                 .build()

@@ -24,6 +24,7 @@ import com.expedia.adaptivealerting.anomdetect.detector.IndividualsDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.ForecastingDetector;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.HoltWintersForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PewmaPointForecaster;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
@@ -40,7 +41,6 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@Deprecated
 public class LegacyDetectorFactoryTest {
     private LegacyDetectorFactory factoryUnderTest;
 
@@ -91,8 +91,9 @@ public class LegacyDetectorFactoryTest {
     public void testCreateDetector_holtWinters() {
         val params = new HashMap<String, Object>();
         params.put("frequency", 24);
-        val detector = buildDetector(LegacyDetectorFactory.HOLT_WINTERS, params);
-        assertTrue(detector instanceof HoltWintersDetector);
+        val detector = (ForecastingDetector) buildDetector(LegacyDetectorFactory.HOLT_WINTERS, params);
+        assertTrue(detector.getPointForecaster() instanceof HoltWintersForecaster);
+        assertTrue(detector.getIntervalForecaster() instanceof ExponentialWelfordIntervalForecaster);
     }
 
     @Test

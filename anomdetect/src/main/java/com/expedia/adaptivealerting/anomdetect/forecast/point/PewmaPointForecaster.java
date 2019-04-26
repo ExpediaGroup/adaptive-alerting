@@ -80,11 +80,13 @@ public class PewmaPointForecaster implements PointForecaster {
     }
 
     @Override
-    public double forecast(MetricData metricData) {
+    public PointForecast forecast(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
         val observed = metricData.getValue();
         updateEstimates(observed);
-        return mean;
+
+        // TODO Handle warmup
+        return new PointForecast(mean, false);
     }
 
     private void updateMeanAndStdDev() {

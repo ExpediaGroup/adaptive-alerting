@@ -25,8 +25,6 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.metrics.MetricData;
 import lombok.Generated;
 import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import java.util.UUID;
@@ -48,41 +46,49 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @see PointForecaster
  * @see IntervalForecaster
  */
-@RequiredArgsConstructor
-public class ForecastingDetector implements Detector {
+public class ForecastingDetector extends AbstractDetector {
 
     @Getter
-    @NonNull
-    @Generated // https://reflectoring.io/100-percent-test-coverage/
-    private UUID uuid;
-
-    @Getter
-    @NonNull
     @Generated // https://reflectoring.io/100-percent-test-coverage/
     private PointForecaster pointForecaster;
 
     @Getter
-    @NonNull
     @Generated // https://reflectoring.io/100-percent-test-coverage/
     private IntervalForecaster intervalForecaster;
 
     @Getter
-    @NonNull
     @Generated // https://reflectoring.io/100-percent-test-coverage/
     private AnomalyType anomalyType;
+
+    public ForecastingDetector(
+            UUID uuid,
+            PointForecaster pointForecaster,
+            IntervalForecaster intervalForecaster,
+            AnomalyType anomalyType) {
+
+        super(uuid);
+
+        notNull(pointForecaster, "pointForecaster can't be null");
+        notNull(intervalForecaster, "intervalForecaster can't be null");
+        notNull(anomalyType, "anomalyType can't be null");
+
+        this.pointForecaster = pointForecaster;
+        this.intervalForecaster = intervalForecaster;
+        this.anomalyType = anomalyType;
+    }
 
     @Override
     public AnomalyResult classify(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
 
         val pointForecast = pointForecaster.forecast(metricData);
-        val intervalForecast = intervalForecaster.forecast(metricData, pointForecast);
+        val intervalForecast = intervalForecaster.forecast(metricData, pointForecast.getValue());
         val thresholds = toAnomalyThresholds(intervalForecast);
         val observed = metricData.getValue();
         val level = new AnomalyClassifier(anomalyType).classify(thresholds, observed);
 
         return new AnomalyResult(level)
-                .setPredicted(pointForecast)
+                .setPredicted(pointForecast.getValue())
                 .setThresholds(thresholds);
     }
 

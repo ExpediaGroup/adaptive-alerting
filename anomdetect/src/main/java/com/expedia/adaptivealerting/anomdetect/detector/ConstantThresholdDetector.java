@@ -21,7 +21,6 @@ import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
-import lombok.Generated;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.val;
@@ -33,23 +32,17 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 /**
  * Anomaly detector with constant threshold for weak and strong anomalies. Supports both one- and two-tailed tests.
  */
-public final class ConstantThresholdDetector implements Detector {
+public final class ConstantThresholdDetector extends AbstractDetector {
 
     @Getter
-    @Generated // https://reflectoring.io/100-percent-test-coverage/
-    private final UUID uuid;
-
-    @Getter
-    @Generated // https://reflectoring.io/100-percent-test-coverage/
     private final Params params;
 
     private final AnomalyClassifier classifier;
 
     public ConstantThresholdDetector(UUID uuid, Params params) {
-        notNull(uuid, "uuid can't be null");
+        super(uuid);
         notNull(params, "params can't be null");
         params.validate();
-        this.uuid = uuid;
         this.params = params;
         this.classifier = new AnomalyClassifier(params.getType());
     }

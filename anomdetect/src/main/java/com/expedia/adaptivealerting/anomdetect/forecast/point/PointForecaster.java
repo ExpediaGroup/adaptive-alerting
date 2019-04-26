@@ -19,5 +19,5 @@ import com.expedia.metrics.MetricData;
 
 public interface PointForecaster {
 
-    double forecast(MetricData metricData);
+    PointForecast forecast(MetricData metricData);
 }

@@ -52,7 +52,8 @@ public class ConstantThresholdDetectorTest {
 
     @Test
     public void testAccessors() {
-        ConstantThresholdDetector detector = detector(detectorUuid, thresholds, AnomalyType.LEFT_TAILED);
+        val detector = detector(detectorUuid, thresholds, AnomalyType.LEFT_TAILED);
+        assertEquals(detectorUuid, detector.getUuid());
         assertSame(thresholds, detector.getParams().getThresholds());
     }
 

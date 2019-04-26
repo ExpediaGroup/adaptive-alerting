@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.anomdetect.detector;
 
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecast;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecast;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecaster;
 import com.expedia.adaptivealerting.anomdetect.util.TestObjectMother;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
@@ -30,6 +31,7 @@ import org.mockito.MockitoAnnotations;
 import java.time.Instant;
 import java.util.UUID;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
@@ -44,15 +46,25 @@ public class ForecastingDetectorTest {
     @Mock
     private IntervalForecaster intervalForecaster;
 
+    private UUID detectorUuid;
+    private AnomalyType anomalyType;
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         initDependencies();
-        this.detectorUnderTest = new ForecastingDetector(
-                UUID.randomUUID(),
-                pointForecaster,
-                intervalForecaster,
-                AnomalyType.TWO_TAILED);
+        this.detectorUuid= UUID.randomUUID();
+        this.anomalyType = AnomalyType.TWO_TAILED;
+        this.detectorUnderTest =
+                new ForecastingDetector(detectorUuid, pointForecaster, intervalForecaster, anomalyType);
+    }
+
+    @Test
+    public void testAccessors() {
+        assertEquals(detectorUuid, detectorUnderTest.getUuid());
+        assertEquals(pointForecaster, detectorUnderTest.getPointForecaster());
+        assertEquals(intervalForecaster, detectorUnderTest.getIntervalForecaster());
+        assertEquals(anomalyType, detectorUnderTest.getAnomalyType());
     }
 
     @Test
@@ -70,7 +82,7 @@ public class ForecastingDetectorTest {
 
     private void initDependencies() {
         when(pointForecaster.forecast(any(MetricData.class)))
-                .thenReturn(50.0);
+                .thenReturn(new PointForecast(50.0, false));
         when(intervalForecaster.forecast(any(MetricData.class), anyDouble()))
                 .thenReturn(new IntervalForecast(100.0, 90.0, 20.0, 10.0));
     }

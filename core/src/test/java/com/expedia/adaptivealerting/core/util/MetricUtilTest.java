@@ -24,6 +24,14 @@ import static org.junit.Assert.*;
 public final class MetricUtilTest {
 
     @Test
+    public void testMetricDefinition_nullTags() {
+        val metricDef = MetricUtil.metricDefinition(null, null);
+        val tagCollection = metricDef.getTags();
+        assertNotNull(tagCollection.getKv());
+        assertNotNull(tagCollection.getV());
+    }
+
+    @Test
     public void testDefaultKvTags() {
         val tags = MetricUtil.defaultKvTags();
 
@@ -53,5 +61,15 @@ public final class MetricUtilTest {
         val metricDef = MetricUtil.metricDefinition(kvTags, vTags);
         val metricData = MetricUtil.metricData(metricDef, 3.14159);
         assertEquals(3.14159, metricData.getValue(), 0.001);
+    }
+
+    @Test
+    public void testMetricData_value_and_epochSecond() {
+        val kvTags = MetricUtil.defaultKvTags();
+        val vTags = MetricUtil.defaultVTags();
+        val metricDef = MetricUtil.metricDefinition(kvTags, vTags);
+        val metricData = MetricUtil.metricData(metricDef, 3.14159, 1554702637);
+        assertEquals(3.14159, metricData.getValue(), 0.001);
+        assertEquals(1554702637, metricData.getTimestamp(), 0.001);
     }
 }

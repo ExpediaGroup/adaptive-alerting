@@ -50,6 +50,10 @@ public final class MetricUtil {
         return new HashSet<>();
     }
 
+    public static MetricDefinition metricDefinition() {
+        return new MetricDefinition(new TagCollection(defaultKvTags(), defaultVTags()));
+    }
+
     /**
      * Convenience method to create a new metric definition from the given tags. Provides defaults for null values.
      *
@@ -82,5 +86,16 @@ public final class MetricUtil {
      */
     public static MetricData metricData(MetricDefinition metricDef, double value) {
         return new MetricData(metricDef, value, Instant.now().getEpochSecond());
+    }
+
+    /**
+     * Convenience method to create a new {@link MetricData} from the given definition, value and epoch second.
+     *
+     * @param metricDef Metric definition.
+     * @param value     Value.
+     * @return Metric data.
+     */
+    public static MetricData metricData(MetricDefinition metricDef, double value, long epochSecond) {
+        return new MetricData(metricDef, value, epochSecond);
     }
 }

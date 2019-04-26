@@ -38,7 +38,6 @@ variable "detector_mapper_es_config_vars_json" {}
 variable "detector_mapper_index_name" {}
 variable "detector_mapper_doctype" {}
 
-
 # Unsure what this is, but we don't seem to be using it.
 #variable "termination_grace_period" {
 #  default = 30

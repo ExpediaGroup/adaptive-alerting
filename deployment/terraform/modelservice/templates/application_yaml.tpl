@@ -34,6 +34,8 @@ management:
       tomcat: false
       system: false
       process: false
+graphite:
+  urlTemplate: "${graphite_url}"
 security:
   signingKey: $${SIGNING_KEY}
 
