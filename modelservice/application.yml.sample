@@ -1,0 +1,51 @@
+spring:
+  main:
+    web-environment: true
+    show-banner: false
+  datasource:
+    url: "jdbc:mysql://database:3306/aa_model_service?autoReconnect=true"
+    username: ${USERNAME:root}
+    password: ${PASSWORD:""}
+    maximum-pool-size: 8
+    minimum-idle: 0
+    driver-class-name: "com.mysql.cj.jdbc.Driver"
+  jpa:
+    openInView: true
+    database: "MYSQL"
+    show-sql: false
+    generate-ddl: false
+    hibernate:
+      naming_strategy: "org.hibernate.cfg.ImprovedNamingStrategy"
+  data:
+    rest:
+      base-path: "/api"
+endpoints:
+  health:
+    sensitive: false
+
+datasource-es:
+  create.index.if.not.found: true
+  index.name: ${ES_INDEX_NAME}
+  doctype: ${ES_DOCTYPE}
+  urls: ${ES_URL}
+  config: {"connection.timeout":40000, "connection.retry.timeout":40000, "max.total.connection":200}
+
+management:
+  context-path: "/admin"
+  metrics:
+    export:
+      jmx:
+        domain: spring
+    enable:
+      jvm: false
+      tomcat: false
+      system: false
+      process: false
+graphite:
+  urlTemplate: "https://graphiteUrl/render?from=-7d&format=json&maxDataPoints=2016&target=seriesByTag('{tags}')"
+security:
+  clientId: "id"
+  secret: "secret"
+  signingKey: "1234"
+server:
+  port: 8008

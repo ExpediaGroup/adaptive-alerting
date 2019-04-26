@@ -39,7 +39,7 @@ security:
 
 datasource-es:
   create.index.if.not.found: true
-  index.name: detector_mappings
-  doctype: details
+  index.name: ${detector_mapper_index_name}
+  doctype: ${detector_mapper_doctype}
   urls: ${detector_mapper_es_urls}
   config: ${detector_mapper_es_config_vars_json}

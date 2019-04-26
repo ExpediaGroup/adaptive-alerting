@@ -106,7 +106,6 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
                     refList, XContentType.JSON);
             SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
             ConstantScoreQueryBuilder constantScoreQueryBuilder = new ConstantScoreQueryBuilder(percolateQuery);
-            log.info("Percolator query: {}", constantScoreQueryBuilder.toString());
             searchSourceBuilder.query(constantScoreQueryBuilder);
             searchSourceBuilder.timeout(new TimeValue(elasticSearchConfig.getConnectionTimeout()));
             //FIXME setting default result set size to 500.
@@ -304,10 +303,7 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
         new SearchRequest()
             .source(searchSourceBuilder)
             .indices(elasticSearchConfig.getIndexName());
-        log.info("ES lookup start for {}", tagsList.toArray());
         SearchResponse searchResponse = elasticSearchClient.search(searchRequest, RequestOptions.DEFAULT);
-        log.info("search Request {}", searchRequest.toString());
-        log.info("ES took {} for {}", searchResponse.getTook().getMillis(), tagsList.size());
         delayTimer.update(searchResponse.getTook().getMillis(), TimeUnit.MILLISECONDS);
         SearchHit hits[] = searchResponse.getHits().getHits();
         //   return Arrays.asList(hits.getHits()).stream()
@@ -317,7 +313,6 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
             .map(hit -> getDetectorMapping(hit.getSourceAsString(), hit.getId(), Optional.of(hit.getFields())))
            // .filter(detectorMapping -> detectorMapping.isEnabled()) //FIXME - move this condition into search query
             .collect(Collectors.toList());
-        log.info("ES detectormappings hits as received {}", detectorMappings.size());
         return ConverttoMatchingDetectorsResponse(new DetectorMatchResponse(detectorMappings,
                 searchResponse.getTook().getMillis()));
     }
