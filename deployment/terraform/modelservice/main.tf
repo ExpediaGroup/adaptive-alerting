@@ -11,8 +11,11 @@ data "template_file" "config_data" {
   template = "${file("${local.application_yaml_file_path}")}"
   vars {
     db_endpoint = "${var.db_endpoint}"
+    graphite_url = "${var.graphite_url}"
     detector_mapper_es_urls = "${var.detector_mapper_es_urls}"
     detector_mapper_es_config_vars_json = "${var.detector_mapper_es_config_vars_json}"
+    detector_mapper_index_name = "{var.modelservice["detector_mapper_index_name"]}"
+    detector_mapper_doctype = "{var.modelservice["detector_mapper_doctype"]}"
   }
 }
 
