@@ -15,11 +15,9 @@
  */
 package com.expedia.adaptivealerting.anomdetect.comp.connector;
 
-import com.expedia.adaptivealerting.anomdetect.DetectorDeserializationException;
-import com.expedia.adaptivealerting.anomdetect.DetectorException;
-import com.expedia.adaptivealerting.anomdetect.DetectorMapper;
-import com.expedia.adaptivealerting.anomdetect.DetectorNotFoundException;
-import com.expedia.adaptivealerting.anomdetect.DetectorRetrievalException;
+import com.expedia.adaptivealerting.anomdetect.*;
+import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapper;
+import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMatchResponse;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.metrictank.MetricTankIdFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,6 +26,8 @@ import lombok.val;
 import org.apache.http.client.fluent.Content;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
@@ -54,6 +54,7 @@ public class ModelServiceConnector {
     public static final String API_PATH_DETECTOR_BY_METRIC_HASH = "/api/detectors/search/findByMetricHash?hash=%s";
     public static final String API_PATH_MODEL_BY_DETECTOR_UUID = "/api/models/search/findLatestByDetectorUuid?uuid=%s";
     public static final String API_PATH_DETECTOR_UPDATES = "/api/detectors/search/getLastUpdatedDetectors?interval=%d";
+    public static final String API_PATH_MATCHING_DETECTOR_BY_TAGS = "/api/detector-mapping/findMatchingByTags";
 
     private final MetricTankIdFactory metricTankIdFactory = new MetricTankIdFactory();
     private final HttpClientWrapper httpClient;
@@ -80,6 +81,7 @@ public class ModelServiceConnector {
      *                                          detector list (e.g., invalid detector models)
      * @throws DetectorException                if there's any other problem finding the detector list
      */
+    @Deprecated
     public DetectorResources findDetectors(MetricDefinition metricDefinition) {
         notNull(metricDefinition, "metricDefinition can't be null");
 
@@ -180,4 +182,34 @@ public class ModelServiceConnector {
         }
 
     }
+
+    /**
+     * Find matching detectors for a list of metrics, represented by a set of tags
+     *
+     * @param tagsList list of metric tags
+     * @return the detector match response
+     */
+    public DetectorMatchResponse findMatchingDetectorMappings(List<Map<String, String>> tagsList) {
+        val uri = baseUri + API_PATH_MATCHING_DETECTOR_BY_TAGS;
+        Content content;
+        try {
+            String body = objectMapper.writeValueAsString(tagsList);
+            content = httpClient.post(uri, body);
+        } catch (IOException e) {
+            val message = "IOException while getting matching detectors for" +
+                    ": tags=" + tagsList +
+                    ", httpMethod=GET" +
+                    ", uri=" + uri;
+            throw new DetectorRetrievalException(message, e); // TODO CHANGE
+        }
+        try {
+            return objectMapper.readValue(content.asBytes(), DetectorMatchResponse.class);
+        } catch (IOException e) {
+            val message = "IOException while deserializing detectorMatchResponse" +
+                    ": tags=" + tagsList;
+            throw new DetectorDeserializationException(message, e);
+        }
+
+    }
+
 }

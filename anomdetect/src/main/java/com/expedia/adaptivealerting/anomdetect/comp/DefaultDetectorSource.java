@@ -18,14 +18,14 @@ package com.expedia.adaptivealerting.anomdetect.comp;
 import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelServiceConnector;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
+import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMatchResponse;
 import com.expedia.metrics.MetricDefinition;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -45,6 +45,7 @@ public class DefaultDetectorSource implements DetectorSource {
     @NonNull
     private final LegacyDetectorFactory legacyDetectorFactory;
 
+    @Deprecated
     @Override
     public List<UUID> findDetectorUuids(MetricDefinition metricDef) {
         notNull(metricDef, "metricDefinition can't be null");
@@ -81,5 +82,9 @@ public class DefaultDetectorSource implements DetectorSource {
                 .stream()
                 .map(resource -> UUID.fromString(resource.getUuid()))
                 .collect(Collectors.toList());
+    }
+    @Override
+    public DetectorMatchResponse findMatchingDetectorMappings(List<Map<String, String>> metricTags){
+        return connector.findMatchingDetectorMappings(metricTags);
     }
 }
