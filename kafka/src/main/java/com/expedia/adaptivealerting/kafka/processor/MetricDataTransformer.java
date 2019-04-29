@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-/*
+/**
  * A custom stateful KStream transformer that converts {@link MetricData} to {@link MapperResult}.
  * For each incoming record, {@link #transform(String key, MetricData metricData) , matching detectors are fetched from cache
  * in case of cache miss, record in pushed into a in-memory state store, for batching.
@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
  *
  * Note: Since we want to preserve key, using ValueTransformerWithKey might seem the right choice but it doesn't allow pushing key value pair using {@link #context.forward()}
  * https://docs.confluent.io/current/streams/javadocs/org/apache/kafka/streams/kstream/KStream.html#transformValues-org.apache.kafka.streams.kstream.ValueTransformerSupplier-java.lang.String...-
- * */
+ */
 @Slf4j
 @Data
 @RequiredArgsConstructor
