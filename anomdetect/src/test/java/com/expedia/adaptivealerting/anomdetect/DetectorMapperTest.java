@@ -27,10 +27,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
+import com.typesafe.config.Config;
 import org.hamcrest.collection.IsMapContaining;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -56,11 +56,13 @@ import static org.mockito.Mockito.when;
  * {@link DetectorMapper} unit test.
  */
 public final class DetectorMapperTest {
-    @InjectMocks
     private DetectorMapper mapper;
 
     @Mock
     private DetectorSource detectorSource;
+
+    @Mock
+    private Config config;
 
     private List<Map<String, String>> tags = new ArrayList<>();
     private List<Map<String, String>> tags_cantRetrieve = new ArrayList<>();
@@ -77,7 +79,7 @@ public final class DetectorMapperTest {
         MockitoAnnotations.initMocks(this);
         initTestObjects();
         initDependencies();
-        this.mapper = new DetectorMapper(detectorSource);
+        this.mapper = new DetectorMapper(detectorSource, config);
     }
 
     @Test
@@ -87,7 +89,7 @@ public final class DetectorMapperTest {
 
     @Test(expected = AssertionError.class)
     public void testModelServiceConnectorNotNull() {
-        new DetectorMapper(null);
+        new DetectorMapper(null,config);
     }
 
     @Test
@@ -143,6 +145,8 @@ public final class DetectorMapperTest {
         when(detectorSource.findMatchingDetectorMappings(tags)).thenReturn(detectorMatchResponse);
         when(detectorSource.findMatchingDetectorMappings(tag_bigList)).thenReturn(detectorMatchResponse_withMoreLookupTime);
         when(detectorSource.findMatchingDetectorMappings(tags_cantRetrieve)).thenReturn(emptyDetectorMatchResponse);
+
+        when(config.getInt("detector-mapping-cache-update-period")).thenReturn(5);
     }
 
     private void initTagsFromFile() throws IOException {

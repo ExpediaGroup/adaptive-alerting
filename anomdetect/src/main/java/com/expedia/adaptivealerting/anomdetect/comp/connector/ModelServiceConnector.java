@@ -19,10 +19,14 @@ import com.expedia.adaptivealerting.anomdetect.DetectorDeserializationException;
 import com.expedia.adaptivealerting.anomdetect.DetectorException;
 import com.expedia.adaptivealerting.anomdetect.DetectorNotFoundException;
 import com.expedia.adaptivealerting.anomdetect.DetectorRetrievalException;
+import com.expedia.adaptivealerting.anomdetect.DetectorMappingDeserializationException;
+import com.expedia.adaptivealerting.anomdetect.DetectorMappingRetrievalException;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapper;
+import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapping;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMatchResponse;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.metrictank.MetricTankIdFactory;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -57,6 +61,7 @@ public class ModelServiceConnector {
     public static final String API_PATH_DETECTOR_BY_METRIC_HASH = "/api/detectors/search/findByMetricHash?hash=%s";
     public static final String API_PATH_MODEL_BY_DETECTOR_UUID = "/api/models/search/findLatestByDetectorUuid?uuid=%s";
     public static final String API_PATH_DETECTOR_UPDATES = "/api/detectors/search/getLastUpdatedDetectors?interval=%d";
+    public static final String API_PATH_DETECTOR_MAPPING_UPDATES = "/api/detector-mapping/last-updated?interval=%d"; //TODO CHANGE
     public static final String API_PATH_MATCHING_DETECTOR_BY_TAGS = "/api/detector-mapping/findMatchingByTags";
 
     private final MetricTankIdFactory metricTankIdFactory = new MetricTankIdFactory();
@@ -186,6 +191,7 @@ public class ModelServiceConnector {
 
     }
 
+
     /**
      * Find matching detectors for a list of metrics, represented by a set of tags
      *
@@ -215,4 +221,29 @@ public class ModelServiceConnector {
 
     }
 
+    public List<DetectorMapping> findUpdatedDetectorMappings(int timePeriod) {
+        //TODO implement
+        isTrue(timePeriod > 0, "timePeriod must be strictly positive");
+
+        val uri = String.format(baseUri + API_PATH_DETECTOR_MAPPING_UPDATES, timePeriod);
+        Content content;
+        try {
+            content = httpClient.get(uri);
+        } catch (IOException e) {
+            val message = "IOException while getting last updated detectors mappings" +
+                    ": timePeriod=" + timePeriod +
+                    ", httpMethod=GET" +
+                    ", uri=" + uri;
+            throw new DetectorMappingRetrievalException(message, e);
+        }
+
+        try {
+            return objectMapper.readValue(content.asBytes(), new TypeReference<List<DetectorMapping>>() {
+            });
+        } catch (IOException e) {
+            val message = "IOException while deserializing updated detectors mappings" +
+                    ": timePeriod=" + timePeriod;
+            throw new DetectorMappingDeserializationException(message, e);
+        }
+    }
 }
