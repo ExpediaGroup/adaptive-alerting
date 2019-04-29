@@ -15,7 +15,10 @@
  */
 package com.expedia.adaptivealerting.anomdetect.comp.connector;
 
-import com.expedia.adaptivealerting.anomdetect.*;
+import com.expedia.adaptivealerting.anomdetect.DetectorDeserializationException;
+import com.expedia.adaptivealerting.anomdetect.DetectorException;
+import com.expedia.adaptivealerting.anomdetect.DetectorNotFoundException;
+import com.expedia.adaptivealerting.anomdetect.DetectorRetrievalException;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapper;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMatchResponse;
 import com.expedia.metrics.MetricDefinition;

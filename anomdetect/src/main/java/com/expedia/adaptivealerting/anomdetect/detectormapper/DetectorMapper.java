@@ -30,7 +30,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Detector mapper finds matching detectors for each incoming {@link MetricDefinition}
- *
  */
 @Slf4j
 public class DetectorMapper {

@@ -120,7 +120,7 @@ public class DetectorManager {
             cachedDetectors.remove(key);
         });
 
-        log.info("Removed detectors on refresh : {}",updatedDetectors);
+        log.info("Removed detectors on refresh : {}", updatedDetectors);
         return updatedDetectors;
     }
 }

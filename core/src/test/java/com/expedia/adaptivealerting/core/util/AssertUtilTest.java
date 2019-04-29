@@ -17,7 +17,9 @@ package com.expedia.adaptivealerting.core.util;
 
 import org.junit.Test;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.*;
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isBetween;
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
+import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 public final class AssertUtilTest {
 

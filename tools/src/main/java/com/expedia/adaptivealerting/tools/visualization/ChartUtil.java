@@ -40,7 +40,9 @@ public final class ChartUtil {
     private static final Color MIDPOINT_COLOR = Color.DARK_GRAY;
     private static final Color THRESHOLD_COLOR = new Color(204, 204, 204, 80);
 
-    /** Prevent instantiation */
+    /**
+     * Prevent instantiation
+     */
     private ChartUtil() {
     }
 

@@ -31,10 +31,10 @@ import java.util.Map;
 /**
  * Serde implementation that enriches a {@link MetricData} with fields required by Metrictank, set to default values:
  * <ul>
- *     <li>orgId: 1</li>
- *     <li>mtype: gauge</li>
- *     <li>unit: [empty string]</li>
- *     <li>interval: 300</li>
+ * <li>orgId: 1</li>
+ * <li>mtype: gauge</li>
+ * <li>unit: [empty string]</li>
+ * <li>interval: 300</li>
  * </ul>
  */
 @Slf4j

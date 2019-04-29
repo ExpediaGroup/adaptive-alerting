@@ -29,11 +29,11 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * historical samples.
  *
  * <ul>
- *     <li>https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Online_algorithm</li>
- *     <li>https://en.wikipedia.org/wiki/Moving_average#Exponentially_weighted_moving_variance_and_standard_deviation</li>
- *     <li>http://people.ds.cam.ac.uk/fanf2/hermes/doc/antiforgery/stats.pdf</li>
- *     <li>https://www.johndcook.com/blog/standard_deviation/</li>
- *     <li>https://www.johndcook.com/blog/2008/09/26/comparing-three-methods-of-computing-standard-deviation/</li>
+ * <li>https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Online_algorithm</li>
+ * <li>https://en.wikipedia.org/wiki/Moving_average#Exponentially_weighted_moving_variance_and_standard_deviation</li>
+ * <li>http://people.ds.cam.ac.uk/fanf2/hermes/doc/antiforgery/stats.pdf</li>
+ * <li>https://www.johndcook.com/blog/standard_deviation/</li>
+ * <li>https://www.johndcook.com/blog/2008/09/26/comparing-three-methods-of-computing-standard-deviation/</li>
  * </ul>
  */
 public class ExponentialWelfordIntervalForecaster implements IntervalForecaster {
