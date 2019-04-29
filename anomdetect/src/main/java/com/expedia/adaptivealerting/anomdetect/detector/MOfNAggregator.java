@@ -27,8 +27,8 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * m-of-n aggregator. The returned anomaly level is
  *
  * <ul>
- *     <li>STRONG if at least m of the past n anomalies were either WEAK or STRONG;</li>
- *     <li>otherwise, it's the anomaly level of the passed anomaly result.</li>
+ * <li>STRONG if at least m of the past n anomalies were either WEAK or STRONG;</li>
+ * <li>otherwise, it's the anomaly level of the passed anomaly result.</li>
  * </ul>
  */
 public class MOfNAggregator implements Aggregator {

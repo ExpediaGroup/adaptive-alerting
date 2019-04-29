@@ -35,9 +35,17 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
-import static com.expedia.adaptivealerting.anomdetect.comp.connector.ModelServiceConnector.*;
+import static com.expedia.adaptivealerting.anomdetect.comp.connector.ModelServiceConnector.API_PATH_DETECTOR_BY_METRIC_HASH;
+import static com.expedia.adaptivealerting.anomdetect.comp.connector.ModelServiceConnector.API_PATH_DETECTOR_UPDATES;
+import static com.expedia.adaptivealerting.anomdetect.comp.connector.ModelServiceConnector.API_PATH_MATCHING_DETECTOR_BY_TAGS;
+import static com.expedia.adaptivealerting.anomdetect.comp.connector.ModelServiceConnector.API_PATH_MODEL_BY_DETECTOR_UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
@@ -84,7 +92,7 @@ public class ModelServiceConnectorTest {
     private byte[] detectorMatchBytesContent__cantDeserialize;
 
     private List<Map<String, String>> tags = new ArrayList<>();
-    private List<Map<String, String>> tags_cantRetrieve = new ArrayList<>();;
+    private List<Map<String, String>> tags_cantRetrieve = new ArrayList<>();
     private List<Map<String, String>> tags_cantDeserialize = new ArrayList<>();
 
 

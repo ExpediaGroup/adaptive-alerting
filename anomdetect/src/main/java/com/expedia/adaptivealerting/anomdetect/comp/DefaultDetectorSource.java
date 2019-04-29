@@ -25,7 +25,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -83,8 +85,9 @@ public class DefaultDetectorSource implements DetectorSource {
                 .map(resource -> UUID.fromString(resource.getUuid()))
                 .collect(Collectors.toList());
     }
+
     @Override
-    public DetectorMatchResponse findMatchingDetectorMappings(List<Map<String, String>> metricTags){
+    public DetectorMatchResponse findMatchingDetectorMappings(List<Map<String, String>> metricTags) {
         return connector.findMatchingDetectorMappings(metricTags);
     }
 }

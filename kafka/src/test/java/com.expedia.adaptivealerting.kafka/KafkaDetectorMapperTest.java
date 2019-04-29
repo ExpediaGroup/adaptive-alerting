@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.kafka;
 
-import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapper;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.Detector;
+import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapper;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde;
 import com.expedia.adaptivealerting.kafka.serde.MetricDataJsonSerde;
@@ -103,6 +103,7 @@ public final class KafkaDetectorMapperTest {
         OutputVerifier.compareKeyValue(outputRecord, outputKafkaKey, mappedMetricData);
         logAndFailDriver.close();
     }
+
     /**
      * Addresses bug https://github.com/ExpediaDotCom/adaptive-alerting/issues/253
      * See also https://stackoverflow.com/questions/51136942/how-to-handle-serializationexception-after-deserialization
@@ -164,7 +165,7 @@ public final class KafkaDetectorMapperTest {
         kvStore = logAndContinueDriver.getKeyValueStore(stateStoreName);
         val outputRecord = logAndContinueDriver.readOutput(OUTPUT_TOPIC, stringDeser, mmdDeser);
 
-        OutputVerifier.compareKeyValue( outputRecord, detector.getUuid().toString(), mappedMetricData);
+        OutputVerifier.compareKeyValue(outputRecord, detector.getUuid().toString(), mappedMetricData);
         Assert.assertEquals(kvStore.approximateNumEntries(), 0);
 
         logAndContinueDriver.close();

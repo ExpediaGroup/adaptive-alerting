@@ -25,9 +25,9 @@ import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.kstream.Transformer;
 import org.apache.kafka.streams.kstream.TransformerSupplier;
 
-/*
+/**
  * an instance of {@link TransformerSupplier} that generates a {@link MetricDataTransformer}
- * */
+ */
 @RequiredArgsConstructor
 @Data
 public class MetricDataTransformerSupplier implements TransformerSupplier<String, MetricData, KeyValue<String, MapperResult>> {

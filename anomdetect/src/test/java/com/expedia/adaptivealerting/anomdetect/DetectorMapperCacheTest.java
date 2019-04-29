@@ -46,10 +46,10 @@ public class DetectorMapperCacheTest {
 
         Mockito.when(cache.getIfPresent(key)).thenReturn(detectorIds);
 
-        Assert.assertEquals(detectors,detectorMapperCache.get(key));
+        Assert.assertEquals(detectors, detectorMapperCache.get(key));
         verify(cache, times(1)).getIfPresent(key);
 
-        Assert.assertEquals(Collections.emptyList(),detectorMapperCache.get(key2));
+        Assert.assertEquals(Collections.emptyList(), detectorMapperCache.get(key2));
         verify(cache, times(1)).getIfPresent(key);
 
     }
@@ -58,7 +58,7 @@ public class DetectorMapperCacheTest {
     public void put() {
         detectors = Collections.singletonList(new Detector(UUID.randomUUID()));
 
-        detectorMapperCache.put("key",detectors);
+        detectorMapperCache.put("key", detectors);
         detectorIds = CacheUtil.getDetectorIds(detectors);
         verify(cache, times(1)).put("key", detectorIds);
     }

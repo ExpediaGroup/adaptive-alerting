@@ -53,7 +53,7 @@ public class ForecastingDetectorTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         initDependencies();
-        this.detectorUuid= UUID.randomUUID();
+        this.detectorUuid = UUID.randomUUID();
         this.anomalyType = AnomalyType.TWO_TAILED;
         this.detectorUnderTest =
                 new ForecastingDetector(detectorUuid, pointForecaster, intervalForecaster, anomalyType);
