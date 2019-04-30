@@ -13,13 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect;
+package com.expedia.adaptivealerting.anomdetect.detectormapper;
 
 import com.expedia.adaptivealerting.anomdetect.comp.DetectorSource;
-import com.expedia.adaptivealerting.anomdetect.detectormapper.CacheUtil;
-import com.expedia.adaptivealerting.anomdetect.detectormapper.Detector;
-import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapper;
-import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMatchResponse;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.TagCollection;
@@ -50,16 +46,22 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
  * {@link DetectorMapper} unit test.
  */
 public final class DetectorMapperTest {
-    private DetectorMapper mapper;
-
+    private DetectorMapper detectorMapper;
+    private int detectorMappingCacheUpdatePeriod = 5;
     @Mock
     private DetectorSource detectorSource;
+
+    @Mock
+    private DetectorMapperCache cache;
 
     @Mock
     private Config config;
@@ -79,28 +81,28 @@ public final class DetectorMapperTest {
         MockitoAnnotations.initMocks(this);
         initTestObjects();
         initDependencies();
-        this.mapper = new DetectorMapper(detectorSource, config);
+        this.detectorMapper = new DetectorMapper(detectorSource, cache, detectorMappingCacheUpdatePeriod);
     }
 
     @Test
     public void testConstructorInjection() {
-        assertSame(detectorSource, mapper.getDetectorSource());
+        assertSame(detectorSource, detectorMapper.getDetectorSource());
     }
 
     @Test(expected = AssertionError.class)
     public void testModelServiceConnectorNotNull() {
-        new DetectorMapper(null,config);
+        new DetectorMapper(null, config);
     }
 
     @Test
     public void testMap_metricDataWithDetectors() {
-        boolean results = mapper.isSuccessfulDetectorMappingLookup(tags);
-        int batchSize = mapper.optimalBatchSize();
+        boolean results = detectorMapper.isSuccessfulDetectorMappingLookup(tags);
+        int batchSize = detectorMapper.optimalBatchSize();
         assertEquals(0, batchSize);
         assertTrue(results);
 
-        results = mapper.isSuccessfulDetectorMappingLookup(tag_bigList);
-        batchSize = mapper.optimalBatchSize();
+        results = detectorMapper.isSuccessfulDetectorMappingLookup(tag_bigList);
+        batchSize = detectorMapper.optimalBatchSize();
         assertEquals(80, batchSize);
         assertTrue(results);
 
@@ -108,8 +110,8 @@ public final class DetectorMapperTest {
 
     @Test
     public void testMap_metricDataWithoutDetectors() {
-        final boolean results = mapper.isSuccessfulDetectorMappingLookup(tags_cantRetrieve);
-        final int batchSize = mapper.optimalBatchSize();
+        final boolean results = detectorMapper.isSuccessfulDetectorMappingLookup(tags_cantRetrieve);
+        final int batchSize = detectorMapper.optimalBatchSize();
         assertEquals(0, batchSize);
         assertFalse(results);
 
@@ -146,7 +148,7 @@ public final class DetectorMapperTest {
         when(detectorSource.findMatchingDetectorMappings(tag_bigList)).thenReturn(detectorMatchResponse_withMoreLookupTime);
         when(detectorSource.findMatchingDetectorMappings(tags_cantRetrieve)).thenReturn(emptyDetectorMatchResponse);
 
-        when(config.getInt("detector-mapping-cache-update-period")).thenReturn(5);
+        when(config.getInt("detector-mapping-cache-update-period")).thenReturn(detectorMappingCacheUpdatePeriod);
     }
 
     private void initTagsFromFile() throws IOException {
@@ -158,7 +160,7 @@ public final class DetectorMapperTest {
 
 
         DetectorMatchResponse detectorMatchResponse = mapper.readValue(
-                new File(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("testDetectorMapping.json")).getFile()),
+                new File(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("groupedDetectors.json")).getFile()),
                 DetectorMatchResponse.class);
 
         when(detectorSource.findMatchingDetectorMappings(listOfMetricTags)).thenReturn(detectorMatchResponse);
@@ -166,16 +168,20 @@ public final class DetectorMapperTest {
 
     @Test
     public void testGetDetectorsFromCache() throws IOException {
+
+        //testing detector Mapper with actual cache
+        this.detectorMapper = new DetectorMapper(detectorSource,config);
+
         this.initTagsFromFile();
         //populate cache
-        mapper.isSuccessfulDetectorMappingLookup(listOfMetricTags);
+        detectorMapper.isSuccessfulDetectorMappingLookup(listOfMetricTags);
 
         Map<String, List<Detector>> detectorResults = new HashMap<>();
 
         listOfMetricTags.forEach(tags -> {
             MetricData metricData = new MetricData(new MetricDefinition(new TagCollection(tags)), 0.0, 1L);
 
-            List detector = mapper.getDetectorsFromCache(metricData.getMetricDefinition());
+            List detector = detectorMapper.getDetectorsFromCache(metricData.getMetricDefinition());
             if (!detector.isEmpty())
                 detectorResults.put(CacheUtil.getKey(tags), detector);
         });
@@ -184,6 +190,27 @@ public final class DetectorMapperTest {
         assertThat(detectorResults, IsMapContaining.hasEntry("key->DvFWUhv25h,name->61EKBCrwvI", Collections.singletonList(new Detector(UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689")))));
         assertThat(detectorResults, IsMapContaining.hasEntry("key->dAqbZZVPZ8,name->fbWTiRlxkt", Collections.singletonList(new Detector(UUID.fromString("5eaa54e9-7406-4a1d-bd9b-e055eca1a423")))));
         assertThat(detectorResults, IsMapContaining.hasEntry("name->hiw,region->us-west-2", Collections.singletonList(new Detector(UUID.fromString("d86b798c-cfee-4a2c-a17a-aa2ba79ccf51")))));
+
+    }
+
+    @Test
+    public void detectorCacheUpdateTest() {
+        List<DetectorMapping> updateDetectorMappings = new ArrayList<>();
+
+        DetectorMapping disabledDetectorMapping = new DetectorMapping(null, new Detector(UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689")), null, 0, 0, false, new ArrayList<>());
+        DetectorMapping modifiedDetectorMapping = new DetectorMapping(null, new Detector(UUID.fromString("4d49ba26-1a7d-43f4-b70c-ee644a2c1689")), null, 0, 0, true, new ArrayList<>());
+        updateDetectorMappings.add(disabledDetectorMapping);
+        updateDetectorMappings.add(modifiedDetectorMapping);
+
+        when(detectorSource.findUpdatedDetectorMappings(detectorMappingCacheUpdatePeriod)).thenReturn(updateDetectorMappings);
+        doAnswer((e) -> null).when(cache).removeDisabledDetectorMappings(anyList());
+        doAnswer((e) -> null).when(cache).updateCache(anyList());
+
+        detectorMapper.detectorCacheUpdate();
+
+        verify(cache).removeDisabledDetectorMappings(Collections.singletonList(disabledDetectorMapping));
+        verify(cache).updateCache(Collections.singletonList(modifiedDetectorMapping));
+
 
     }
 }

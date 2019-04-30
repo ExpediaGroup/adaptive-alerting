@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 public class DetectorMapperCache {
 
     /*
-     *  cache [ metric-key, concatenated detectorUUIds]
+     *  cache Map[key: metric-key, value: concatenated detectorUUIds]
      * */
     private Cache<String, String> cache;
     private Counter cacheHit;
@@ -71,8 +71,8 @@ public class DetectorMapperCache {
     }
 
 
-    public void remove(List<DetectorMapping> disabledDetectorMappings) {
-        List<UUID> detectorIdsOfDisabledMappings = disabledDetectorMappings.stream().map(detectorMapping -> detectorMapping.getDetector().getUuid()).collect(Collectors.toList());
+    public void removeDisabledDetectorMappings(List<DetectorMapping> mappings) {
+        List<UUID> detectorIdsOfDisabledMappings = mappings.stream().map(detectorMapping -> detectorMapping.getDetector().getUuid()).collect(Collectors.toList());
 
         Map<String, String> mappingsWhichNeedsAnUpdate = new HashMap<>();
 
@@ -105,6 +105,10 @@ public class DetectorMapperCache {
         return CacheUtil.getDetectorIds(detectors);
     }
 
+/*
+* Removes metrics whose tags match the mappings that have been updated.
+* Which force those metrics to be queried on backend(ES) to fetch latest mapping
+* */
     public void updateCache(List<DetectorMapping> newDetectorMappings) {
         final List<String> matchingMappings = new ArrayList<>();
         List<Map<String, String>> listOfTagsFromExpression = findTags(newDetectorMappings);

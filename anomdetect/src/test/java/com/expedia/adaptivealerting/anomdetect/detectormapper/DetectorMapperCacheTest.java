@@ -1,8 +1,5 @@
-package com.expedia.adaptivealerting.anomdetect;
+package com.expedia.adaptivealerting.anomdetect.detectormapper;
 
-import com.expedia.adaptivealerting.anomdetect.detectormapper.CacheUtil;
-import com.expedia.adaptivealerting.anomdetect.detectormapper.Detector;
-import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapperCache;
 import com.google.common.cache.Cache;
 import lombok.val;
 import org.junit.Assert;
@@ -61,13 +58,5 @@ public class DetectorMapperCacheTest {
         detectorMapperCache.put("key", detectors);
         detectorIds = CacheUtil.getDetectorIds(detectors);
         verify(cache, times(1)).put("key", detectorIds);
-    }
-
-    @Test
-    public void removeFromCache() {
-    }
-
-    @Test
-    public void invalidateKeysMatchingTags() {
     }
 }

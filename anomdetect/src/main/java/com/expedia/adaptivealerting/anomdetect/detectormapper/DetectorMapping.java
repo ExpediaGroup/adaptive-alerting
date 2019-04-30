@@ -15,7 +15,9 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detectormapper;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -25,6 +27,8 @@ import java.util.List;
  * searchIndexes: index of matching metric-tag in request batch of metric-tags
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class DetectorMapping {
     private String id;
     private Detector detector;
@@ -33,4 +37,5 @@ public class DetectorMapping {
     private long createdTimeInMillis;
     private boolean isEnabled;
     private List<Integer> searchIndexes;
+
 }

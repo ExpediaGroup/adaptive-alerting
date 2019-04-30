@@ -22,14 +22,11 @@ import com.typesafe.config.Config;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import lombok.var;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -51,11 +48,15 @@ public class DetectorMapper {
     private DetectorMapperCache cache;
     private int detectorCacheUpdateTimePeriod;
 
-    public DetectorMapper(DetectorSource detectorSource, Config config) {
+    public DetectorMapper(DetectorSource detectorSource, DetectorMapperCache cache, int detectorCacheUpdateTimePeriod) {
         assert detectorSource != null;
         this.detectorSource = detectorSource;
-        this.detectorCacheUpdateTimePeriod = config.getInt(CK_DETECTOR_CACHE_UPDATE_PERIOD);
-        this.cache = new DetectorMapperCache();
+        this.cache = cache;
+        this.detectorCacheUpdateTimePeriod = detectorCacheUpdateTimePeriod;
+    }
+
+    public DetectorMapper(DetectorSource detectorSource, Config config) {
+        this(detectorSource, new DetectorMapperCache(), config.getInt(CK_DETECTOR_CACHE_UPDATE_PERIOD));
         this.initScheduler();
     }
 
@@ -120,16 +121,15 @@ public class DetectorMapper {
     }
 
 
-    private List<UUID> detectorCacheUpdate() {
+    void detectorCacheUpdate() {
 
-        var updatedDetectors = new ArrayList<UUID>();
         List<DetectorMapping> detectorMappings = detectorSource.findUpdatedDetectorMappings(detectorCacheUpdateTimePeriod);
 
         List<DetectorMapping> disabledDetectorMappings = detectorMappings.stream()
                 .filter(dt -> !dt.isEnabled())
                 .collect(Collectors.toList());
         if (!disabledDetectorMappings.isEmpty()) {
-            cache.remove(disabledDetectorMappings);
+            cache.removeDisabledDetectorMappings(disabledDetectorMappings);
         }
         List<DetectorMapping> newDetectorMappings = detectorMappings.stream()
                 .filter(DetectorMapping::isEnabled)
@@ -137,10 +137,6 @@ public class DetectorMapper {
         if (!newDetectorMappings.isEmpty()) {
             cache.updateCache(newDetectorMappings);
         }
-
-
-        log.info("Removed detectors on refresh : {}", updatedDetectors);
-        return updatedDetectors;
     }
 
 }
