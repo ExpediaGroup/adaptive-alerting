@@ -21,9 +21,6 @@ import com.expedia.adaptivealerting.anomdetect.detector.CusumDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
 import com.expedia.adaptivealerting.anomdetect.detector.ForecastingDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.IndividualsDetector;
-import com.expedia.adaptivealerting.anomdetect.detector.config.ConstantThresholdDetectorConfig;
-import com.expedia.adaptivealerting.anomdetect.detector.config.CusumDetectorConfig;
-import com.expedia.adaptivealerting.anomdetect.detector.config.IndividualsDetectorConfig;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PewmaPointForecaster;
@@ -65,15 +62,15 @@ public class LegacyDetectorFactory {
 
         // Note that constant threshold, cusum and individuals are still using the original config schema.
         if (CONSTANT_THRESHOLD.equals(legacyDetectorType)) {
-            detector = new ConstantThresholdDetector(uuid, toParams(model, ConstantThresholdDetectorConfig.class));
+            detector = new ConstantThresholdDetector(uuid, toParams(model, ConstantThresholdDetector.Params.class));
         } else if (CUSUM.equals(legacyDetectorType)) {
-            detector = new CusumDetector(uuid, toParams(model, CusumDetectorConfig.class));
+            detector = new CusumDetector(uuid, toParams(model, CusumDetector.Params.class));
         } else if (EWMA.equals(legacyDetectorType)) {
             detector = createEwmaDetector(uuid, toParams(model, EwmaParams.class));
         } else if (HOLT_WINTERS.equals(legacyDetectorType)) {
             detector = createHoltWintersDetector(uuid, toParams(model, HoltWintersParams.class));
         } else if (INDIVIDUALS.equals(legacyDetectorType)) {
-            detector = new IndividualsDetector(uuid, toParams(model, IndividualsDetectorConfig.class));
+            detector = new IndividualsDetector(uuid, toParams(model, IndividualsDetector.Params.class));
         } else if (PEWMA.equals(legacyDetectorType)) {
             detector = createPewmaDetector(uuid, toParams(model, PewmaParams.class));
         } else {

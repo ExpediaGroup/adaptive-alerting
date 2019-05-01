@@ -75,6 +75,7 @@ public class LegacyDetectorFactoryTest {
     @Test
     public void testCreateDetector_cusum() {
         val params = new HashMap<String, Object>();
+        params.put("@type", "cusum");
         params.put("type", AnomalyType.LEFT_TAILED);
         val detector = buildDetector(LegacyDetectorFactory.CUSUM, params);
         assertEquals(CusumDetector.class, detector.getClass());
@@ -100,6 +101,7 @@ public class LegacyDetectorFactoryTest {
     @Test
     public void testCreateDetector_individuals() {
         val params = new HashMap<String, Object>();
+        params.put("@type", "individuals");
         val detector = buildDetector(LegacyDetectorFactory.INDIVIDUALS, params);
         assertTrue(detector instanceof IndividualsDetector);
     }

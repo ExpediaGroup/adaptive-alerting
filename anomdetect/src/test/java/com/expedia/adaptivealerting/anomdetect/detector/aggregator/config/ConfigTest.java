@@ -15,16 +15,18 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detector.aggregator.config;
 
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.expedia.adaptivealerting.anomdetect.detector.aggregator.MOfNAggregator;
+import org.junit.Test;
 
-/**
- * Dummy config for config deserialization. We don't actually use it for anything since it has no config params.
- */
-@Data
-@NoArgsConstructor
-@Setter(AccessLevel.NONE)
-public class PassThroughAggregatorConfig implements AggregatorConfig {
+public class ConfigTest {
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testValidate_mZero() {
+        new MOfNAggregator.Config(0, 5);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testValidate_nGreaterThanM() {
+        new MOfNAggregator.Config(5, 3);
+    }
 }

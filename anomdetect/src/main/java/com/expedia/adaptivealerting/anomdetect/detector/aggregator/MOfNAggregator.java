@@ -15,13 +15,19 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detector.aggregator;
 
-import com.expedia.adaptivealerting.anomdetect.detector.aggregator.config.MOfNAggregatorConfig;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AccessLevel;
+import lombok.Data;
 import lombok.Generated;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.val;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
@@ -36,7 +42,7 @@ public class MOfNAggregator implements Aggregator {
 
     @Getter
     @Generated // https://reflectoring.io/100-percent-test-coverage/
-    private MOfNAggregatorConfig config;
+    private Config config;
 
     private final AnomalyLevel[] buffer;
     private int bufferIndex = 0;
@@ -45,10 +51,10 @@ public class MOfNAggregator implements Aggregator {
      * Creates a 3-of-5 aggregator.
      */
     public MOfNAggregator() {
-        this(new MOfNAggregatorConfig(3, 5));
+        this(new Config(3, 5));
     }
 
-    public MOfNAggregator(MOfNAggregatorConfig config) {
+    public MOfNAggregator(Config config) {
         notNull(config, "config can't be null");
         this.config = config;
         this.buffer = new AnomalyLevel[config.getN()];
@@ -83,5 +89,22 @@ public class MOfNAggregator implements Aggregator {
             }
         }
         return numAnomalies;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @Setter(AccessLevel.NONE)
+    public static class Config implements AggregatorConfig {
+        private int m;
+        private int n;
+
+        @JsonCreator
+        public Config(@JsonProperty("m") int m, @JsonProperty("n") int n) {
+            isTrue(m > 0, "Required: m > 0");
+            isTrue(n >= m, "Required: n > m");
+
+            this.m = m;
+            this.n = n;
+        }
     }
 }

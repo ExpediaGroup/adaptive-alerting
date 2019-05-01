@@ -16,10 +16,13 @@
 package com.expedia.adaptivealerting.anomdetect.detector;
 
 import com.expedia.adaptivealerting.anomdetect.comp.AnomalyClassifier;
-import com.expedia.adaptivealerting.anomdetect.detector.config.ConstantThresholdDetectorConfig;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.metrics.MetricData;
+import lombok.Data;
 import lombok.Getter;
+import lombok.experimental.Accessors;
 import lombok.val;
 
 import java.util.UUID;
@@ -32,25 +35,45 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 public final class ConstantThresholdDetector extends AbstractDetector {
 
     @Getter
-    private final ConstantThresholdDetectorConfig config;
+    private final Params params;
 
     private final AnomalyClassifier classifier;
 
-    public ConstantThresholdDetector(UUID uuid, ConstantThresholdDetectorConfig config) {
+    public ConstantThresholdDetector(UUID uuid, Params params) {
         super(uuid);
-        notNull(config, "config can't be null");
-        config.validate();
+        notNull(params, "params can't be null");
+        params.validate();
 
-        this.config = config;
-        this.classifier = new AnomalyClassifier(config.getType());
+        this.params = params;
+        this.classifier = new AnomalyClassifier(params.getType());
     }
 
     @Override
     public AnomalyResult classify(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
-        val thresholds = config.getThresholds();
+        val thresholds = params.getThresholds();
         val level = classifier.classify(thresholds, metricData.getValue());
         return new AnomalyResult(level).setThresholds(thresholds);
     }
 
+    @Data
+    @Accessors(chain = true)
+    public static final class Params implements DetectorConfig {
+
+        /**
+         * Detector type: left-, right- or two-tailed.
+         */
+        private AnomalyType type;
+
+        /**
+         * Constant thresholds.
+         */
+        private AnomalyThresholds thresholds;
+
+        @Override
+        public void validate() {
+            notNull(type, "type can't be null");
+            notNull(thresholds, "thresholds can't be null");
+        }
+    }
 }

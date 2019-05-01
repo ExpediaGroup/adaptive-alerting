@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detector.aggregator;
 
-import com.expedia.adaptivealerting.anomdetect.detector.aggregator.config.MOfNAggregatorConfig;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
@@ -53,7 +52,7 @@ public final class MOfNAggregatorTest {
 
     @Test
     public void testConstructor() {
-        val config = new MOfNAggregatorConfig(4, 6);
+        val config = new MOfNAggregator.Config(4, 6);
         val aggregator = new MOfNAggregator(config);
         assertEquals(config, aggregator.getConfig());
     }

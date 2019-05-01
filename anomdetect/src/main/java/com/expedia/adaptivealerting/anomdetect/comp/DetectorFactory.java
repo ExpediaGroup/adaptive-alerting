@@ -16,9 +16,8 @@
 package com.expedia.adaptivealerting.anomdetect.comp;
 
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
-import com.expedia.adaptivealerting.anomdetect.detector.config.DetectorConfig;
+import com.expedia.adaptivealerting.anomdetect.detector.DetectorConfig;
 import com.expedia.adaptivealerting.anomdetect.detector.ForecastingDetector;
-import com.expedia.adaptivealerting.anomdetect.detector.config.ForecastingDetectorConfig;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.AdditiveIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecasterParams;
@@ -39,14 +38,14 @@ public class DetectorFactory {
 
         // TODO Think about a more elegant way to do this.
         //  It would be nice not to have to hardcode if/else logic to create detectors.
-        if (config instanceof ForecastingDetectorConfig) {
-            return createForecastingDetector(uuid, (ForecastingDetectorConfig) config);
+        if (config instanceof ForecastingDetector.Params) {
+            return createForecastingDetector(uuid, (ForecastingDetector.Params) config);
         } else {
             throw new UnsupportedOperationException("Unsupported config type: " + config.getClass());
         }
     }
 
-    private Detector createForecastingDetector(UUID uuid, ForecastingDetectorConfig config) {
+    private Detector createForecastingDetector(UUID uuid, ForecastingDetector.Params config) {
         val pointForecaster = createPointForecaster(config.getPointForecasterParams());
         val intervalForecaster = createIntervalForecaster(config.getIntervalForecasterParams());
         val anomalyType = config.getAnomalyType();

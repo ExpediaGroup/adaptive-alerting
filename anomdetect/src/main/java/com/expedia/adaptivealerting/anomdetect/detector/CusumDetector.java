@@ -15,11 +15,13 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detector;
 
-import com.expedia.adaptivealerting.anomdetect.detector.config.CusumDetectorConfig;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.metrics.MetricData;
+import lombok.Data;
 import lombok.Getter;
+import lombok.experimental.Accessors;
 import lombok.val;
 
 import java.util.UUID;
@@ -43,7 +45,7 @@ public final class CusumDetector extends AbstractDetector {
     private static final double STD_DEV_DIVISOR = 1.128;
 
     @Getter
-    private CusumDetectorConfig params;
+    private Params params;
 
     /**
      * Total number of data points seen so far.
@@ -72,7 +74,7 @@ public final class CusumDetector extends AbstractDetector {
      */
     private double prevValue = 0.0;
 
-    public CusumDetector(UUID uuid, CusumDetectorConfig params) {
+    public CusumDetector(UUID uuid, Params params) {
         super(uuid);
         notNull(params, "params can't be null");
         params.validate();
@@ -173,4 +175,48 @@ public final class CusumDetector extends AbstractDetector {
         return movingRange;
     }
 
+    @Data
+    @Accessors(chain = true)
+    public static final class Params implements DetectorConfig {
+
+        /**
+         * Detector type: left-, right- or two-tailed.
+         */
+        private AnomalyType type;
+
+        /**
+         * Target value (i.e., the set point).
+         */
+        private double targetValue = 0.0;
+
+        /**
+         * Weak threshold sigmas.
+         */
+        private double weakSigmas = 3.0;
+
+        /**
+         * Strong threshold sigmas.
+         */
+        private double strongSigmas = 4.0;
+
+        /**
+         * Slack param to calculate slack value k where k = slack_param * stdev.
+         */
+        private double slackParam = 0.5;
+
+        /**
+         * Initial mean estimate.
+         */
+        private double initMeanEstimate = 0.0;
+
+        /**
+         * Minimum number of data points required before this anomaly detector is available for use.
+         */
+        private int warmUpPeriod = 25;
+
+        @Override
+        public void validate() {
+            // Not currently implemented
+        }
+    }
 }

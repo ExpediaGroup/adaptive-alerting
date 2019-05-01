@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detector;
 
-import com.expedia.adaptivealerting.anomdetect.detector.config.CusumDetectorConfig;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.adaptivealerting.core.util.MathUtil;
@@ -63,7 +62,7 @@ public class CusumDetectorTest {
     public void testClassify_leftTailed() {
         val anomalyType = AnomalyType.LEFT_TAILED;
 
-        val params = new CusumDetectorConfig()
+        val params = new CusumDetector.Params()
                 .setType(anomalyType)
                 .setTargetValue(1000.0)
                 .setWeakSigmas(WEAK_SIGMAS)
@@ -88,7 +87,7 @@ public class CusumDetectorTest {
 
         val anomalyType = AnomalyType.RIGHT_TAILED;
 
-        val params = new CusumDetectorConfig()
+        val params = new CusumDetector.Params()
                 .setType(anomalyType)
                 .setTargetValue(0.16)
                 .setWeakSigmas(WEAK_SIGMAS)
@@ -123,7 +122,7 @@ public class CusumDetectorTest {
     public void testClassify_twoTailed() {
         val anomalyType = AnomalyType.TWO_TAILED;
 
-        val params = new CusumDetectorConfig()
+        val params = new CusumDetector.Params()
                 .setType(anomalyType)
                 .setTargetValue(1000.0)
                 .setWeakSigmas(WEAK_SIGMAS)
@@ -142,7 +141,7 @@ public class CusumDetectorTest {
         testClassify(params, anomalyType, testRows);
     }
 
-    private void testClassify(CusumDetectorConfig params, AnomalyType anomalyType, CusumTestRow[] testRows) {
+    private void testClassify(CusumDetector.Params params, AnomalyType anomalyType, CusumTestRow[] testRows) {
         val detector = new CusumDetector(detectorUuid, params);
         assertEquals(detectorUuid, detector.getUuid());
         assertSame(params, detector.getParams());

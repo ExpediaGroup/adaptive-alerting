@@ -13,16 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.detector.config;
+package com.expedia.adaptivealerting.anomdetect.detector;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = ConstantThresholdDetectorConfig.class, name="constant-threshold"),
-        @JsonSubTypes.Type(value = ForecastingDetectorConfig.class, name = "forecasting"),
-        @JsonSubTypes.Type(value = IndividualsDetectorConfig.class, name = "individuals"),
+        @JsonSubTypes.Type(value = ConstantThresholdDetector.Params.class, name="constant-threshold"),
+        @JsonSubTypes.Type(value = CusumDetector.Params.class, name="cusum"),
+        @JsonSubTypes.Type(value = ForecastingDetector.Params.class, name = "forecasting"),
+        @JsonSubTypes.Type(value = IndividualsDetector.Params.class, name = "individuals"),
 })
 public interface DetectorConfig {
 

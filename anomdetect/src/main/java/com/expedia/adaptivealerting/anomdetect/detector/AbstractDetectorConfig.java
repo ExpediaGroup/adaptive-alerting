@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.detector.config;
+package com.expedia.adaptivealerting.anomdetect.detector;
 
-import com.expedia.adaptivealerting.anomdetect.detector.aggregator.config.AggregatorConfig;
-import com.expedia.adaptivealerting.anomdetect.detector.AbstractDetector;
+import com.expedia.adaptivealerting.anomdetect.detector.aggregator.AggregatorConfig;
 import lombok.Data;
 
 /**

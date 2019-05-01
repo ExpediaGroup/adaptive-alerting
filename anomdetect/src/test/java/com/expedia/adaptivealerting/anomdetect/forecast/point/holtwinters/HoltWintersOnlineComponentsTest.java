@@ -33,7 +33,7 @@ public class HoltWintersOnlineComponentsTest {
         double[] initSeasonalEstimates = {1, 2, 3, 4};
         final HoltWintersPointForecasterParams params = buildAustouristsParams(SeasonalityType.MULTIPLICATIVE, initLevelEstimate, initBaseEstimate, initSeasonalEstimates);
         HoltWintersOnlineComponents subject = new HoltWintersOnlineComponents(params);
-//        assertEquals(params, subject.getConfig());
+//        assertEquals(params, subject.getParams());
         assertEquals(0, subject.getN());
         assertEquals(initLevelEstimate, subject.getLevel(), TOLERANCE);
         assertEquals(initBaseEstimate, subject.getBase(), TOLERANCE);

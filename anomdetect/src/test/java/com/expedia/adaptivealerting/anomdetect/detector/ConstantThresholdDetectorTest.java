@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detector;
 
-import com.expedia.adaptivealerting.anomdetect.detector.config.ConstantThresholdDetectorConfig;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
@@ -55,7 +54,7 @@ public class ConstantThresholdDetectorTest {
     public void testAccessors() {
         val detector = detector(detectorUuid, thresholds, AnomalyType.LEFT_TAILED);
         assertEquals(detectorUuid, detector.getUuid());
-        assertSame(thresholds, detector.getConfig().getThresholds());
+        assertSame(thresholds, detector.getParams().getThresholds());
     }
 
     @Test
@@ -103,7 +102,7 @@ public class ConstantThresholdDetectorTest {
     }
 
     private ConstantThresholdDetector detector(UUID uuid, AnomalyThresholds thresholds, AnomalyType type) {
-        val params = new ConstantThresholdDetectorConfig()
+        val params = new ConstantThresholdDetector.Params()
                 .setThresholds(thresholds)
                 .setType(type);
         return new ConstantThresholdDetector(uuid, params);
