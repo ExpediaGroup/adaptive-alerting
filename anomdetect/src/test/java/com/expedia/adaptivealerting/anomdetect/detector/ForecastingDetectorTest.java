@@ -15,8 +15,10 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detector;
 
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.AdditiveIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecast;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecast;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecaster;
 import com.expedia.adaptivealerting.anomdetect.util.TestObjectMother;
@@ -78,6 +80,33 @@ public class ForecastingDetectorTest {
     @Test(expected = IllegalArgumentException.class)
     public void testClassify_nullMetricData() {
         detectorUnderTest.classify(null);
+    }
+
+    @Test
+    public void testValidate() {
+        new ForecastingDetector.Params()
+                .setPointForecasterParams(new EwmaPointForecaster.Params())
+                .setIntervalForecasterParams(new AdditiveIntervalForecaster.Params())
+                .setAnomalyType(AnomalyType.TWO_TAILED)
+                .validate();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testValidate_nullPointForecasterParams() {
+        new ForecastingDetector.Params()
+                .setPointForecasterParams(null)
+                .setIntervalForecasterParams(new AdditiveIntervalForecaster.Params())
+                .setAnomalyType(AnomalyType.TWO_TAILED)
+                .validate();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testValidate_nullIntervalForecasterParams() {
+        new ForecastingDetector.Params()
+                .setPointForecasterParams(new EwmaPointForecaster.Params())
+                .setIntervalForecasterParams(null)
+                .setAnomalyType(AnomalyType.TWO_TAILED)
+                .validate();
     }
 
     private void initDependencies() {

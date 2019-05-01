@@ -58,7 +58,7 @@ public class LegacyDetectorFactory {
         notNull(model, "model can't be null");
 
         Detector detector;
-        
+
         // TODO Rename to legacyDetectorType [WLW]
         val detectorType = model.getDetectorType().getKey();
 
