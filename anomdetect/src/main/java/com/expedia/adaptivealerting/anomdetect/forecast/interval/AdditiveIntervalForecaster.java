@@ -15,12 +15,14 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.interval;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.interval.config.AdditiveIntervalForecasterParams;
 import com.expedia.metrics.MetricData;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 @RequiredArgsConstructor
@@ -28,7 +30,7 @@ public class AdditiveIntervalForecaster implements IntervalForecaster {
 
     @Getter
     @NonNull
-    private AdditiveIntervalForecasterParams params;
+    private Params params;
 
     @Override
     public IntervalForecast forecast(MetricData metricData, double pointForecast) {
@@ -39,5 +41,18 @@ public class AdditiveIntervalForecaster implements IntervalForecaster {
                 pointForecast + params.getWeakValue(),
                 pointForecast - params.getWeakValue(),
                 pointForecast - params.getStrongValue());
+    }
+
+    @Data
+    @Accessors(chain = true)
+    public static final class Params implements IntervalForecasterParams {
+        private double weakValue;
+        private double strongValue;
+
+        @Override
+        public void validate() {
+            isTrue(weakValue >= 0.0, "Required: weakValue >= 0.0");
+            isTrue(strongValue >= weakValue, "Required: strongValue >= weakValue");
+        }
     }
 }

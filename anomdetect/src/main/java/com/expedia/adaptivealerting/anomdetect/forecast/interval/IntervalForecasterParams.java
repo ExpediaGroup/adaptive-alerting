@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.forecast.interval.config;
+package com.expedia.adaptivealerting.anomdetect.forecast.interval;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = AdditiveIntervalForecasterParams.class, name = "additive"),
-        @JsonSubTypes.Type(value = ExponentialWelfordIntervalForecasterParams.class, name = "exponential-welford"),
-        @JsonSubTypes.Type(value = MultiplicativeIntervalForecasterParams.class, name = "multiplicative"),
-        @JsonSubTypes.Type(value = PowerLawIntervalForecasterParams.class, name = "power-law"),
+        @JsonSubTypes.Type(value = AdditiveIntervalForecaster.Params.class, name = "additive"),
+        @JsonSubTypes.Type(value = ExponentialWelfordIntervalForecaster.Params.class, name = "exponential-welford"),
+        @JsonSubTypes.Type(value = MultiplicativeIntervalForecaster.Params.class, name = "multiplicative"),
+        @JsonSubTypes.Type(value = PowerLawIntervalForecaster.Params.class, name = "power-law"),
 })
 public interface IntervalForecasterParams {
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.forecast.point.config;
+package com.expedia.adaptivealerting.anomdetect.forecast.point;
 
 import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersPointForecasterParams;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -21,9 +21,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = EwmaPointForecasterParams.class, name = "ewma"),
+        @JsonSubTypes.Type(value = EwmaPointForecaster.Params.class, name = "ewma"),
         @JsonSubTypes.Type(value = HoltWintersPointForecasterParams.class, name = "holt-winters"),
-        @JsonSubTypes.Type(value = PewmaPointForecasterParams.class, name = "pewma"),
+        @JsonSubTypes.Type(value = PewmaPointForecaster.Params.class, name = "pewma"),
 })
 public interface PointForecasterParams {
 

@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.interval.config.ExponentialWelfordIntervalForecasterParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersPointForecasterParams;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersSeasonalEstimatesValidator;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersTrainingMethod;
@@ -149,12 +149,12 @@ public final class HoltWintersParams {
                 .setInitTrainingMethod(initTrainingMethod);
     }
 
-    public ExponentialWelfordIntervalForecasterParams toIntervalForecasterParams() {
+    public ExponentialWelfordIntervalForecaster.Params toIntervalForecasterParams() {
 
         // Currently we simply use a default alpha here. I'm not marking this as a TODO
         // since this HoltWintersParams class is deprecated anyway, and we want to start
         // using explicitly selected and tuned interval forecasters. [WLW]
-        return new ExponentialWelfordIntervalForecasterParams()
+        return new ExponentialWelfordIntervalForecaster.Params()
                 .setAlpha(DEFAULT_EXP_WELFORD_ALPHA)
                 .setInitVarianceEstimate(0.0)
                 .setWeakSigmas(weakSigmas)

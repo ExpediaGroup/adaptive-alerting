@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.point;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.point.config.EwmaPointForecasterParams;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.opencsv.bean.CsvToBeanBuilder;
@@ -54,7 +53,7 @@ public final class EwmaPointForecasterTest {
         val testRow0 = testRows.next();
         val observed0 = testRow0.getObserved();
 
-        val params = new EwmaPointForecasterParams()
+        val params = new EwmaPointForecaster.Params()
                 .setAlpha(0.05)
                 .setInitMeanEstimate(observed0);
         val forecaster = new EwmaPointForecaster(params);

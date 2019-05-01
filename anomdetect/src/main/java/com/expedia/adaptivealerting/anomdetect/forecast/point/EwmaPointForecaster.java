@@ -15,29 +15,31 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.point;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.point.config.EwmaPointForecasterParams;
 import com.expedia.metrics.MetricData;
+import lombok.Data;
 import lombok.Generated;
 import lombok.Getter;
+import lombok.experimental.Accessors;
 import lombok.val;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isBetween;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 public class EwmaPointForecaster implements PointForecaster {
 
     @Getter
     @Generated // https://reflectoring.io/100-percent-test-coverage/
-    private EwmaPointForecasterParams params;
+    private Params params;
 
     @Getter
     @Generated // https://reflectoring.io/100-percent-test-coverage/
     private double mean;
 
     public EwmaPointForecaster() {
-        this(new EwmaPointForecasterParams());
+        this(new Params());
     }
 
-    public EwmaPointForecaster(EwmaPointForecasterParams params) {
+    public EwmaPointForecaster(Params params) {
         notNull(params, "params can't be null");
         params.validate();
         this.params = params;
@@ -60,5 +62,26 @@ public class EwmaPointForecaster implements PointForecaster {
         val residual = observed - this.mean;
         val incr = params.getAlpha() * residual;
         this.mean += incr;
+    }
+
+    @Data
+    @Accessors(chain = true)
+    public static final class Params implements PointForecasterParams {
+
+        /**
+         * Smoothing param. Somewhat misnamed because higher values lead to less smoothing, but it's called the smoothing
+         * parameter in the literature.
+         */
+        private double alpha = 0.15;
+
+        /**
+         * Initial mean estimate.
+         */
+        public double initMeanEstimate = 0.0;
+
+        @Override
+        public void validate() {
+            isBetween(alpha, 0.0, 1.0, "Required: 0.0 <= alpha <= 1.0");
+        }
     }
 }

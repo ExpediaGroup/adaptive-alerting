@@ -16,8 +16,8 @@
 package com.expedia.adaptivealerting.anomdetect.detector.config;
 
 import com.expedia.adaptivealerting.anomdetect.detector.ForecastingDetector;
-import com.expedia.adaptivealerting.anomdetect.forecast.interval.config.IntervalForecasterParams;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.config.PointForecasterParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecasterParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecasterParams;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import lombok.Data;
 import lombok.experimental.Accessors;

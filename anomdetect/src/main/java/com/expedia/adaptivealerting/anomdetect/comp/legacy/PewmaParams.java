@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.interval.config.ExponentialWelfordIntervalForecasterParams;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.config.PewmaPointForecasterParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.PewmaPointForecaster;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -55,16 +55,16 @@ public final class PewmaParams {
      */
     private int warmUpPeriod = 30;
 
-    public PewmaPointForecasterParams toPointForecasterParams() {
-        return new PewmaPointForecasterParams()
+    public PewmaPointForecaster.Params toPointForecasterParams() {
+        return new PewmaPointForecaster.Params()
                 .setAlpha(alpha)
                 .setBeta(beta)
                 .setInitMeanEstimate(initMeanEstimate)
                 .setWarmUpPeriod(warmUpPeriod);
     }
 
-    public ExponentialWelfordIntervalForecasterParams toIntervalForecasterParams() {
-        return new ExponentialWelfordIntervalForecasterParams()
+    public ExponentialWelfordIntervalForecaster.Params toIntervalForecasterParams() {
+        return new ExponentialWelfordIntervalForecaster.Params()
                 .setAlpha(alpha)
                 .setInitVarianceEstimate(0.0)
                 .setWeakSigmas(weakSigmas)

@@ -27,7 +27,7 @@ import com.expedia.adaptivealerting.anomdetect.detector.config.IndividualsDetect
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PewmaPointForecaster;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersPointForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersForecaster;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -96,7 +96,7 @@ public class LegacyDetectorFactory {
     public Detector createHoltWintersDetector(UUID uuid, HoltWintersParams params) {
         notNull(uuid, "uuid can't be null");
         notNull(params, "params can't be null");
-        val pointForecaster = new HoltWintersPointForecaster(params.toPointForecasterParams());
+        val pointForecaster = new HoltWintersForecaster(params.toPointForecasterParams());
         val intervalForecaster = new ExponentialWelfordIntervalForecaster(params.toIntervalForecasterParams());
         return new ForecastingDetector(uuid, pointForecaster, intervalForecaster, AnomalyType.TWO_TAILED);
     }

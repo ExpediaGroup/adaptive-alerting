@@ -15,13 +15,15 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.interval;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.interval.config.PowerLawIntervalForecasterParams;
 import com.expedia.metrics.MetricData;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
 import lombok.val;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 @RequiredArgsConstructor
@@ -29,7 +31,7 @@ public class PowerLawIntervalForecaster implements IntervalForecaster {
 
     @Getter
     @NonNull
-    private PowerLawIntervalForecasterParams params;
+    private Params params;
 
     @Override
     public IntervalForecast forecast(MetricData metricData, double pointForecast) {
@@ -44,5 +46,22 @@ public class PowerLawIntervalForecaster implements IntervalForecaster {
                 pointForecast + weakWidth,
                 pointForecast - weakWidth,
                 pointForecast - strongWidth);
+    }
+
+    @Data
+    @Accessors(chain = true)
+    public static final class Params implements IntervalForecasterParams {
+        private double alpha;
+        private double beta;
+        private double weakMultiplier;
+        private double strongMultiplier;
+
+        @Override
+        public void validate() {
+            isTrue(alpha > 0.0, "Required: alpha >= 0.0");
+            isTrue(beta > 0.0, "Required: beta >= 0.0");
+            isTrue(weakMultiplier >= 0.0, "Required: weakMultiplier >= 0.0");
+            isTrue(strongMultiplier >= weakMultiplier, "Required: strongMultiplier >= weakMultiplier");
+        }
     }
 }

@@ -25,7 +25,8 @@ import lombok.val;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 import static java.lang.String.format;
 
-public class HoltWintersPointForecaster implements PointForecaster {
+// TODO Rename to HoltWintersPointForecaster [WLW]
+public class HoltWintersForecaster implements PointForecaster {
 
     @Getter
     @Generated // https://reflectoring.io/100-percent-test-coverage/
@@ -38,7 +39,7 @@ public class HoltWintersPointForecaster implements PointForecaster {
     private HoltWintersSimpleTrainingModel holtWintersSimpleTrainingModel;
     private HoltWintersOnlineAlgorithm holtWintersOnlineAlgorithm;
 
-    public HoltWintersPointForecaster(HoltWintersPointForecasterParams params) {
+    public HoltWintersForecaster(HoltWintersPointForecasterParams params) {
         notNull(params, "params can't be null");
         params.validate();
         this.params = params;

@@ -15,19 +15,22 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.point;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.point.config.PewmaPointForecasterParams;
 import com.expedia.metrics.MetricData;
+import lombok.Data;
 import lombok.Generated;
 import lombok.Getter;
+import lombok.experimental.Accessors;
 import lombok.val;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isBetween;
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 public class PewmaPointForecaster implements PointForecaster {
 
     @Getter
     @Generated // https://reflectoring.io/100-percent-test-coverage/
-    private PewmaPointForecasterParams params;
+    private Params params;
 
     /**
      * Adjusted alpha, to match the way alpha is used in the paper that describes the algorithm.
@@ -62,10 +65,10 @@ public class PewmaPointForecaster implements PointForecaster {
     private double stdDev;
 
     public PewmaPointForecaster() {
-        this(new PewmaPointForecasterParams());
+        this(new Params());
     }
 
-    public PewmaPointForecaster(PewmaPointForecasterParams params) {
+    public PewmaPointForecaster(Params params) {
         notNull(params, "params can't be null");
         this.params = params;
 
@@ -113,5 +116,40 @@ public class PewmaPointForecaster implements PointForecaster {
             return 1.0 - 1.0 / this.trainingCount;
         }
         return (1.0 - params.getBeta() * pt) * this.adjAlpha;
+    }
+
+    @Data
+    @Accessors(chain = true)
+    public static class Params implements PointForecasterParams {
+
+        // TODO Describe why we chose these defaults as appropriate.
+        //  For example if the paper recommends them, we should say that.
+
+        /**
+         * Smoothing param.
+         */
+        private double alpha = 0.15;
+
+        /**
+         * Anomaly weighting param.
+         */
+        private double beta = 1.0;
+
+        /**
+         * Initial mean estimate.
+         */
+        private double initMeanEstimate = 0.0;
+
+        /**
+         * How many iterations to train for.
+         */
+        private int warmUpPeriod = 30;
+
+        @Override
+        public void validate() {
+            isBetween(alpha, 0.0, 1.0, "Required: 0.0 <= alpha <= 1.0");
+            isBetween(beta, 0.0, 1.0, "Required: 0.0 <= beta <= 1.0");
+            isTrue(warmUpPeriod >= 0, "Required: warmUpPeriod >= 0");
+        }
     }
 }

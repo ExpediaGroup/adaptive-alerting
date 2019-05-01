@@ -38,7 +38,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Tests Holt-Winters functionality by comparing with data generated from Hyndman's R "fpp2" library - see GenerateAustouristsTests.R
  */
-public final class HoltWintersPointForecasterTest {
+public final class HoltWintersForecasterTest {
 
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
@@ -137,7 +137,7 @@ public final class HoltWintersPointForecasterTest {
                 buildAustouristsParams(seasonalityType).setInitTrainingMethod(HoltWintersTrainingMethod.SIMPLE) :
                 buildAustouristsParams(seasonalityType, initLevelEstimate, initBaseEstimate, initSeasonalEstimates);
 
-        val subject = new HoltWintersPointForecaster(params);
+        val subject = new HoltWintersForecaster(params);
 
         while (testRows.hasNext()) {
             final HoltWintersAustouristsTestRow testRow = testRows.next();
@@ -150,7 +150,7 @@ public final class HoltWintersPointForecasterTest {
         }
     }
 
-    private void checkValues(HoltWintersAustouristsTestRow testRow, double forecastBeforeObservation, HoltWintersPointForecaster subject, PointForecast result) {
+    private void checkValues(HoltWintersAustouristsTestRow testRow, double forecastBeforeObservation, HoltWintersForecaster subject, PointForecast result) {
 //        assertEquals(testRow.getL(), subject.getComponents().getLevel(), TOLERANCE);
 //        assertEquals(testRow.getB(), subject.getComponents().getBase(), TOLERANCE);
         double[] expectedReverseSeasonals = {testRow.getS1(), testRow.getS2(), testRow.getS3(), testRow.getS4()};

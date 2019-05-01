@@ -20,13 +20,11 @@ import com.expedia.adaptivealerting.anomdetect.detector.config.DetectorConfig;
 import com.expedia.adaptivealerting.anomdetect.detector.ForecastingDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.config.ForecastingDetectorConfig;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.AdditiveIntervalForecaster;
-import com.expedia.adaptivealerting.anomdetect.forecast.interval.config.AdditiveIntervalForecasterParams;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecaster;
-import com.expedia.adaptivealerting.anomdetect.forecast.interval.config.IntervalForecasterParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecasterParams;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaster;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.config.EwmaPointForecasterParams;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecaster;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.config.PointForecasterParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecasterParams;
 import lombok.val;
 
 import java.util.UUID;
@@ -56,16 +54,16 @@ public class DetectorFactory {
     }
 
     private PointForecaster createPointForecaster(PointForecasterParams params) {
-        if (params instanceof EwmaPointForecasterParams) {
-            return new EwmaPointForecaster((EwmaPointForecasterParams) params);
+        if (params instanceof EwmaPointForecaster.Params) {
+            return new EwmaPointForecaster((EwmaPointForecaster.Params) params);
         } else {
             throw new UnsupportedOperationException("Unsupported params type: " + params.getClass());
         }
     }
 
     private IntervalForecaster createIntervalForecaster(IntervalForecasterParams params) {
-        if (params instanceof AdditiveIntervalForecasterParams) {
-            return new AdditiveIntervalForecaster((AdditiveIntervalForecasterParams) params);
+        if (params instanceof AdditiveIntervalForecaster.Params) {
+            return new AdditiveIntervalForecaster((AdditiveIntervalForecaster.Params) params);
         } else {
             throw new UnsupportedOperationException("Unsupported params type: " + params.getClass());
         }

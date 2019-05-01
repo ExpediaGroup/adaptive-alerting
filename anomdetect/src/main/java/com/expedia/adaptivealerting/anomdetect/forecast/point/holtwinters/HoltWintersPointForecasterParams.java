@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.point.config.PointForecasterParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecasterParams;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
