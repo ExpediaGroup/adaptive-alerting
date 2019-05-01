@@ -108,6 +108,16 @@ public class ExponentialWelfordIntervalForecasterTest {
                 .validate();
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testValidate_invalidStrongSigmas() {
+        new ExponentialWelfordIntervalForecaster.Params()
+                .setAlpha(0.15)
+                .setInitVarianceEstimate(1.0)
+                .setWeakSigmas(3.0)
+                .setStrongSigmas(2.0)
+                .validate();
+    }
+
     private static List<TestRow> readTestData() {
         val is = ClassLoader.getSystemResourceAsStream(TEST_DATA_FILE);
         return new CsvToBeanBuilder<TestRow>(new InputStreamReader(is))
