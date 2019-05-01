@@ -15,6 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters;
 
+import com.expedia.adaptivealerting.anomdetect.forecast.point.HoltWintersForecaster;
+
 import java.util.Arrays;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.isFalse;

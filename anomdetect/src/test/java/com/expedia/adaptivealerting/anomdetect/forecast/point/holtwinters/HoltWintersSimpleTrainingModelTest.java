@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters;
 
+import com.expedia.adaptivealerting.anomdetect.forecast.point.HoltWintersForecaster;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;

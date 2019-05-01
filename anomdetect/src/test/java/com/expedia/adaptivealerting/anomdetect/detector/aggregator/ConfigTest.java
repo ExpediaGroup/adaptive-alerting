@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.detector.aggregator.config;
+package com.expedia.adaptivealerting.anomdetect.detector.aggregator;
 
-import com.expedia.adaptivealerting.anomdetect.detector.aggregator.MOfNAggregator;
 import org.junit.Test;
 
 public class ConfigTest {
