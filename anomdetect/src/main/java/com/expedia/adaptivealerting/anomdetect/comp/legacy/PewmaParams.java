@@ -23,7 +23,7 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 @Deprecated
-public final class LegacyPewmaDetectorConfig {
+public final class PewmaParams {
 
     /**
      * Smoothing param.

@@ -26,21 +26,21 @@ import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 
-public class LegacyHoltWintersDetectorConfigTest {
+public class HoltWintersParamsTest {
     private static final HoltWintersTrainingMethod INITIAL_TRAINING_METHOD = HoltWintersTrainingMethod.NONE;
     private static final double[] INSUFFICIENT_SEASONAL_ESTIMATES = {1, 2, 3};
     private static final double[] DUMMY_SEASONAL_ESTIMATES = {1.1, 0.9, 0.9, 1.1};
     private static final int INITIAL_WARM_UP_PERIOD = 0;
     private static final int DUMMY_FREQUENCY = 4;
 
-    private LegacyHoltWintersDetectorConfig subject;
+    private HoltWintersParams subject;
 
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
 
     @Before
     public void setUp() {
-        subject = new LegacyHoltWintersDetectorConfig();
+        subject = new HoltWintersParams();
     }
 
     @Test(expected = IllegalArgumentException.class)

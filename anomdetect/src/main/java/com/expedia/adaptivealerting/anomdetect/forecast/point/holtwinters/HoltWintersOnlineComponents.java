@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters;
 
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyHoltWintersDetectorConfig;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.HoltWintersParams;
 import lombok.Data;
 import lombok.NonNull;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
@@ -24,7 +24,7 @@ import java.util.Arrays;
 
 /**
  * Encapsulates the values that represent the components for the {@link HoltWintersOnlineAlgorithm} logic.
- * This represents the model's online data as opposed to {@link LegacyHoltWintersDetectorConfig} which represents the users values for
+ * This represents the model's online data as opposed to {@link HoltWintersParams} which represents the users values for
  * the model's parameters.
  *
  * @see <a href="https://otexts.org/fpp2/holt-winters.html">Holt-Winters' Seasonal Method</a> and

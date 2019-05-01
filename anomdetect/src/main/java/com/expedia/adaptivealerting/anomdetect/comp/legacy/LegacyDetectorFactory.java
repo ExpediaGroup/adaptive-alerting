@@ -69,13 +69,13 @@ public class LegacyDetectorFactory {
         } else if (CUSUM.equals(legacyDetectorType)) {
             detector = new CusumDetector(uuid, toParams(model, CusumDetectorConfig.class));
         } else if (EWMA.equals(legacyDetectorType)) {
-            detector = createEwmaDetector(uuid, toParams(model, LegacyEwmaDetectorConfig.class));
+            detector = createEwmaDetector(uuid, toParams(model, EwmaParams.class));
         } else if (HOLT_WINTERS.equals(legacyDetectorType)) {
-            detector = createHoltWintersDetector(uuid, toParams(model, LegacyHoltWintersDetectorConfig.class));
+            detector = createHoltWintersDetector(uuid, toParams(model, HoltWintersParams.class));
         } else if (INDIVIDUALS.equals(legacyDetectorType)) {
             detector = new IndividualsDetector(uuid, toParams(model, IndividualsDetectorConfig.class));
         } else if (PEWMA.equals(legacyDetectorType)) {
-            detector = createPewmaDetector(uuid, toParams(model, LegacyPewmaDetectorConfig.class));
+            detector = createPewmaDetector(uuid, toParams(model, PewmaParams.class));
         } else {
             throw new IllegalArgumentException("Unknown detector type: " + legacyDetectorType);
         }
@@ -84,7 +84,7 @@ public class LegacyDetectorFactory {
         return detector;
     }
 
-    public Detector createEwmaDetector(UUID uuid, LegacyEwmaDetectorConfig params) {
+    public Detector createEwmaDetector(UUID uuid, EwmaParams params) {
         notNull(uuid, "uuid can't be null");
         notNull(params, "params can't be null");
         params.validate();
@@ -93,7 +93,7 @@ public class LegacyDetectorFactory {
         return new ForecastingDetector(uuid, pointForecaster, intervalForecaster, AnomalyType.TWO_TAILED);
     }
 
-    public Detector createHoltWintersDetector(UUID uuid, LegacyHoltWintersDetectorConfig params) {
+    public Detector createHoltWintersDetector(UUID uuid, HoltWintersParams params) {
         notNull(uuid, "uuid can't be null");
         notNull(params, "params can't be null");
         val pointForecaster = new HoltWintersPointForecaster(params.toPointForecasterParams());
@@ -101,7 +101,7 @@ public class LegacyDetectorFactory {
         return new ForecastingDetector(uuid, pointForecaster, intervalForecaster, AnomalyType.TWO_TAILED);
     }
 
-    public Detector createPewmaDetector(UUID uuid, LegacyPewmaDetectorConfig params) {
+    public Detector createPewmaDetector(UUID uuid, PewmaParams params) {
         notNull(uuid, "uuid can't be null");
         notNull(params, "params can't be null");
         params.validate();

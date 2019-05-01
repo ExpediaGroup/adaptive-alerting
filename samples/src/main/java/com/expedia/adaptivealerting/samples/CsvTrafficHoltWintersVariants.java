@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyHoltWintersDetectorConfig;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.HoltWintersParams;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.SeasonalityType;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
@@ -88,7 +88,7 @@ public class CsvTrafficHoltWintersVariants {
 
     private static AnomalyChartSink buildChartWithInitialEstimates(MetricFrameMetricSource source, SeasonalityType seasonalityType,
                                                                    double[] seasonal, double alpha, double beta, double gamma, String... titleSuffix) {
-        final LegacyHoltWintersDetectorConfig params = buildHoltWintersParamsWithInitEstimates(seasonalityType, LEVEL, BASE, seasonal,
+        final HoltWintersParams params = buildHoltWintersParamsWithInitEstimates(seasonalityType, LEVEL, BASE, seasonal,
                 alpha, beta, gamma)
                 .setWeakSigmas(WEAK_SIGMAS)
                 .setStrongSigmas(STRONG_SIGMAS);
@@ -98,7 +98,7 @@ public class CsvTrafficHoltWintersVariants {
 
     private static AnomalyChartSink buildChartWithoutInitEstimates(MetricFrameMetricSource source, SeasonalityType seasonalityType,
                                                                    double alpha, double beta, double gamma, String... titleSuffix) {
-        final LegacyHoltWintersDetectorConfig params = buildHoltWintersParams(seasonalityType, alpha, beta, gamma)
+        final HoltWintersParams params = buildHoltWintersParams(seasonalityType, alpha, beta, gamma)
                 .setWeakSigmas(WEAK_SIGMAS)
                 .setStrongSigmas(STRONG_SIGMAS);
         String[] suffix = ArrayUtils.addAll(titleSuffix, "No Init Estimates");
@@ -107,7 +107,7 @@ public class CsvTrafficHoltWintersVariants {
 
     private static AnomalyChartSink buildChartWithInitialTrainings(MetricFrameMetricSource source, SeasonalityType seasonalityType,
                                                                    double alpha, double beta, double gamma, String... titleSuffix) {
-        final LegacyHoltWintersDetectorConfig params = buildHoltWintersParams(seasonalityType, alpha, beta, gamma)
+        final HoltWintersParams params = buildHoltWintersParams(seasonalityType, alpha, beta, gamma)
                 .setWeakSigmas(WEAK_SIGMAS)
                 .setStrongSigmas(STRONG_SIGMAS)
                 .setInitTrainingMethod(SIMPLE);
@@ -115,17 +115,17 @@ public class CsvTrafficHoltWintersVariants {
         return buildChart(source, seasonalityType, params, alpha, beta, gamma, suffix);
     }
 
-    private static LegacyHoltWintersDetectorConfig buildHoltWintersParamsWithInitEstimates(SeasonalityType seasonalityType,
-                                                                                           double level, double base, double[] seasonal,
-                                                                                           double alpha, double beta, double gamma) {
+    private static HoltWintersParams buildHoltWintersParamsWithInitEstimates(SeasonalityType seasonalityType,
+                                                                             double level, double base, double[] seasonal,
+                                                                             double alpha, double beta, double gamma) {
         return buildHoltWintersParams(seasonalityType, alpha, beta, gamma)
                 .setInitLevelEstimate(level)
                 .setInitBaseEstimate(base)
                 .setInitSeasonalEstimates(seasonal);
     }
 
-    private static LegacyHoltWintersDetectorConfig buildHoltWintersParams(SeasonalityType seasonalityType, double alpha, double beta, double gamma) {
-        return new LegacyHoltWintersDetectorConfig()
+    private static HoltWintersParams buildHoltWintersParams(SeasonalityType seasonalityType, double alpha, double beta, double gamma) {
+        return new HoltWintersParams()
                 .setFrequency(PERIOD)
                 .setAlpha(alpha)
                 .setBeta(beta)
@@ -134,11 +134,11 @@ public class CsvTrafficHoltWintersVariants {
                 .setWarmUpPeriod(PERIOD);
     }
 
-    private static AnomalyChartSink buildChart(MetricFrameMetricSource source, SeasonalityType seasonalityType, LegacyHoltWintersDetectorConfig params,
+    private static AnomalyChartSink buildChart(MetricFrameMetricSource source, SeasonalityType seasonalityType, HoltWintersParams params,
                                                double alpha, double beta, double gammaLow, String... titleSuffix) {
 
         val factory = new LegacyDetectorFactory();
-        val detector = factory.createHoltWintersDetector(UUID.randomUUID(), new LegacyHoltWintersDetectorConfig());
+        val detector = factory.createHoltWintersDetector(UUID.randomUUID(), new HoltWintersParams());
         val detectorFilter = new DetectorFilter(detector);
         val evalFilter = new EvaluatorFilter(new RmseEvaluator());
         val chartSink = PipelineFactory.createChartSink(String.format(

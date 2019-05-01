@@ -38,7 +38,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 @Accessors(chain = true)
 @Slf4j
 @Deprecated
-public final class LegacyHoltWintersDetectorConfig {
+public final class HoltWintersParams {
 
     /**
      * A default alpha value for the exponential Welford interval forecaster.

@@ -25,7 +25,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 @Data
 @Accessors(chain = true)
 @Deprecated
-public final class LegacyEwmaDetectorConfig {
+public final class EwmaParams {
 
     /**
      * Smoothing param. Somewhat misnamed because higher values lead to less smoothing, but it's called the
