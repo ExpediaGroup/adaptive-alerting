@@ -17,11 +17,18 @@ package com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters;
 
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecast;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecasterParams;
 import com.expedia.metrics.MetricData;
+import lombok.Data;
 import lombok.Generated;
 import lombok.Getter;
+import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
+import java.util.Arrays;
+
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 import static java.lang.String.format;
 
@@ -30,7 +37,7 @@ public class HoltWintersForecaster implements PointForecaster {
 
     @Getter
     @Generated // https://reflectoring.io/100-percent-test-coverage/
-    private HoltWintersPointForecasterParams params;
+    private Params params;
 
     @Getter
     @Generated // https://reflectoring.io/100-percent-test-coverage/
@@ -39,7 +46,7 @@ public class HoltWintersForecaster implements PointForecaster {
     private HoltWintersSimpleTrainingModel holtWintersSimpleTrainingModel;
     private HoltWintersOnlineAlgorithm holtWintersOnlineAlgorithm;
 
-    public HoltWintersForecaster(HoltWintersPointForecasterParams params) {
+    public HoltWintersForecaster(Params params) {
         notNull(params, "params can't be null");
         params.validate();
         this.params = params;
@@ -93,4 +100,121 @@ public class HoltWintersForecaster implements PointForecaster {
         return components.getN() <= params.getWarmUpPeriod();
     }
 
+    @Data
+    @Accessors(chain = true)
+    @Slf4j
+    public static final class Params implements PointForecasterParams {
+
+        /**
+         * SeasonalityType parameter used to determine which Seasonality method (Multiplicative or Additive) to use.
+         */
+        private SeasonalityType seasonalityType = SeasonalityType.MULTIPLICATIVE;
+
+        /**
+         * Frequency parameter representing periodicity of the data.
+         * E.g. 24 = data is provided in hourly samples and seasons are represented as single days.
+         * E.g.  7 = data is provided in daily samples and seasons are represented as single weeks.
+         * E.g. 12 = data is provided in monthly samples and seasons are represented as single years.
+         * E.g.  4 = data is provided in quarterly samples and seasons are represented as single years.
+         */
+        private int frequency = 0;
+
+        /**
+         * Alpha smoothing parameter used for "level" calculation.
+         * A double between 0-1 inclusive.
+         */
+        private double alpha = 0.15;
+
+        /**
+         * Beta smoothing parameter used for "base" or "trend" calculation.
+         * A double between 0-1 inclusive.
+         */
+        private double beta = 0.15;
+
+        /**
+         * Gamma smoothing parameter used for "seasonality" calculation.
+         * A double between 0-1 inclusive.
+         */
+        private double gamma = 0.15;
+
+        /**
+         * Minimum number of data points required before the anomaly detector is ready for use.
+         * A value of 0 means the detector could begin emitting anomalies immediately on first observation.
+         * A minimum equivalent to "frequency" is suggested, with 2 * frequency being ideal for a lot of scenarios.
+         * If no initial Base/Level/Seasonal estimate parameters are supplied, then warmUpPeriod = (2 * frequency) is an ideal minimum
+         * - it allows the detector to "warm up" the seasonal components with at least 2 observations each, providing the ability
+         * to calculate a standard deviation.
+         */
+        private int warmUpPeriod = 0;
+
+        /**
+         * Initial estimate for Level component.
+         * Only applies if initTrainingMethod = HoltWintersTrainingMethod.NONE.
+         * If not set, then 1.0 will be used for MULTIPLICATIVE seasonality and 0.0 for ADDITIVE seasonality.
+         */
+        private double initLevelEstimate = Double.NaN;
+
+        /**
+         * Initial estimate for Base component.
+         * Only applies if initTrainingMethod = HoltWintersTrainingMethod.NONE.
+         * If not set, then 1.0 will be used for MULTIPLICATIVE seasonality and 0.0 for ADDITIVE seasonality.
+         */
+        private double initBaseEstimate = Double.NaN;
+
+        /**
+         * Initial estimates for Seasonal components.
+         * Only applies if initTrainingMethod = HoltWintersTrainingMethod.NONE.
+         * Either 0 or n=frequency values must be provided.
+         */
+        private double[] initSeasonalEstimates = {};
+
+        /**
+         * Initial training method to use. See {@link HoltWintersTrainingMethod} for details.
+         */
+        private HoltWintersTrainingMethod initTrainingMethod = HoltWintersTrainingMethod.NONE;
+
+        private final HoltWintersSeasonalEstimatesValidator seasonalEstimatesValidator = new HoltWintersSeasonalEstimatesValidator();
+
+        public boolean isMultiplicative() {
+            return seasonalityType.equals(SeasonalityType.MULTIPLICATIVE);
+        }
+
+        /**
+         * Calculates the initial training period (if applicable) based on initTrainingMethod and frequency.
+         * Used to determine whether to perform training or forecasting on an observation.
+         *
+         * @return Length of initial training period in number of observations.
+         */
+        public int calculateInitTrainingPeriod() {
+            return (initTrainingMethod == HoltWintersTrainingMethod.SIMPLE) ? (frequency * 2) : 0;
+        }
+
+        // TODO Call this from the constructor
+        public void validate() {
+            notNull(seasonalityType, "Required: seasonalityType one of " + Arrays.toString(SeasonalityType.values()));
+            notNull(initTrainingMethod, "Required: initTrainingMethod one of " + Arrays.toString(HoltWintersTrainingMethod.values()));
+            isTrue(0 < frequency, "Required: frequency value greater than 0");
+            isTrue(0.0 <= alpha && alpha <= 1.0, "Required: alpha in the range [0, 1]");
+            isTrue(0.0 <= beta && beta <= 1.0, "Required: beta in the range [0, 1]");
+            isTrue(0.0 <= gamma && gamma <= 1.0, "Required: gamma in the range [0, 1]");
+            validateInitTrainingMethod();
+            validateInitSeasonalEstimates();
+        }
+
+        private void validateInitTrainingMethod() {
+            if (initTrainingMethod == HoltWintersTrainingMethod.SIMPLE) {
+                int minWarmUpPeriod = calculateInitTrainingPeriod();
+                if (warmUpPeriod < minWarmUpPeriod) {
+                    log.warn(format("warmUpPeriod (%d) should be greater than or equal to (frequency * 2) (%d), " +
+                                    "as the detector will not emit anomalies during training. Setting warmUpPeriod to %d.",
+                            warmUpPeriod, minWarmUpPeriod, minWarmUpPeriod));
+                    warmUpPeriod = minWarmUpPeriod;
+                }
+            }
+        }
+
+        private void validateInitSeasonalEstimates() {
+            seasonalEstimatesValidator.validate(initSeasonalEstimates, frequency, seasonalityType);
+        }
+    }
 }

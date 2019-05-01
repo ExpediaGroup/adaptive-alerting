@@ -54,14 +54,14 @@ public final class HoltWintersForecasterTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testInit_frequency0() {
-        new HoltWintersPointForecasterParams()
+        new HoltWintersForecaster.Params()
                 .setFrequency(0)
                 .validate();
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testValidateParams_alphaLT0() {
-        new HoltWintersPointForecasterParams()
+        new HoltWintersForecaster.Params()
                 .setFrequency(24)
                 .setAlpha(-0.1)
                 .validate();
@@ -69,7 +69,7 @@ public final class HoltWintersForecasterTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testInit_alphaGT1() {
-        new HoltWintersPointForecasterParams()
+        new HoltWintersForecaster.Params()
                 .setFrequency(24)
                 .setAlpha(2.0)
                 .validate();
@@ -77,7 +77,7 @@ public final class HoltWintersForecasterTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testValidateParams_betaLT0() {
-        new HoltWintersPointForecasterParams()
+        new HoltWintersForecaster.Params()
                 .setFrequency(24)
                 .setBeta(-0.1)
                 .validate();
@@ -85,7 +85,7 @@ public final class HoltWintersForecasterTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testInit_betaGT1() {
-        new HoltWintersPointForecasterParams()
+        new HoltWintersForecaster.Params()
                 .setFrequency(24)
                 .setBeta(2.0)
                 .validate();
@@ -93,7 +93,7 @@ public final class HoltWintersForecasterTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testValidateParams_gammeLT0() {
-        new HoltWintersPointForecasterParams()
+        new HoltWintersForecaster.Params()
                 .setFrequency(24)
                 .setGamma(-0.1)
                 .validate();
@@ -101,7 +101,7 @@ public final class HoltWintersForecasterTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testInit_gammaGT1() {
-        new HoltWintersPointForecasterParams()
+        new HoltWintersForecaster.Params()
                 .setFrequency(24)
                 .setGamma(2.0)
                 .validate();
@@ -133,7 +133,7 @@ public final class HoltWintersForecasterTest {
         double initLevelEstimate = firstRow.getL();
         double initBaseEstimate = firstRow.getB();
         double[] initSeasonalEstimates = {firstRow.getS4(), firstRow.getS3(), firstRow.getS2(), firstRow.getS1()};
-        final HoltWintersPointForecasterParams params = withTraining ?
+        final HoltWintersForecaster.Params params = withTraining ?
                 buildAustouristsParams(seasonalityType).setInitTrainingMethod(HoltWintersTrainingMethod.SIMPLE) :
                 buildAustouristsParams(seasonalityType, initLevelEstimate, initBaseEstimate, initSeasonalEstimates);
 

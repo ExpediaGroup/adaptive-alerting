@@ -40,8 +40,8 @@ public class HoltWintersAustouristsTestHelper {
     public static final String AUSTOURISTS_MULT_FILE = "tests/austourists-tests-holtwinters-multiplicative.csv";
     public static List<HoltWintersAustouristsTestRow> AUSTOURISTS_MULT_DATA = readData(AUSTOURISTS_MULT_FILE, HoltWintersAustouristsTestRow.class);
 
-    public static HoltWintersPointForecasterParams buildAustouristsParams(SeasonalityType seasonalityType) {
-        return new HoltWintersPointForecasterParams()
+    public static HoltWintersForecaster.Params buildAustouristsParams(SeasonalityType seasonalityType) {
+        return new HoltWintersForecaster.Params()
                 .setFrequency(AUSTOURISTS_FREQUENCY)
                 .setAlpha(AUSTOURISTS_ALPHA)
                 .setBeta(AUSTOURISTS_BETA)
@@ -50,8 +50,8 @@ public class HoltWintersAustouristsTestHelper {
                 .setWarmUpPeriod(AUSTOURISTS_FREQUENCY);
     }
 
-    public static HoltWintersPointForecasterParams buildAustouristsParams(SeasonalityType seasonalityType, double level, double base, double[] seasonal) {
-        return new HoltWintersPointForecasterParams()
+    public static HoltWintersForecaster.Params buildAustouristsParams(SeasonalityType seasonalityType, double level, double base, double[] seasonal) {
+        return new HoltWintersForecaster.Params()
                 .setFrequency(AUSTOURISTS_FREQUENCY)
                 .setAlpha(AUSTOURISTS_ALPHA)
                 .setBeta(AUSTOURISTS_BETA)

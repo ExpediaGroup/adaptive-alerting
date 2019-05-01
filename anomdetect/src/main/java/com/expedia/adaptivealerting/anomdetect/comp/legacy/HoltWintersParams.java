@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersPointForecasterParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersSeasonalEstimatesValidator;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersTrainingMethod;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.SeasonalityType;
@@ -135,8 +135,8 @@ public final class HoltWintersParams {
         return (initTrainingMethod == HoltWintersTrainingMethod.SIMPLE) ? (frequency * 2) : 0;
     }
 
-    public HoltWintersPointForecasterParams toPointForecasterParams() {
-        return new HoltWintersPointForecasterParams()
+    public HoltWintersForecaster.Params toPointForecasterParams() {
+        return new HoltWintersForecaster.Params()
                 .setSeasonalityType(seasonalityType)
                 .setFrequency(frequency)
                 .setAlpha(alpha)

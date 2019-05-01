@@ -31,7 +31,7 @@ public class HoltWintersOnlineComponentsTest {
         double initLevelEstimate = 80000;
         double initBaseEstimate = 2;
         double[] initSeasonalEstimates = {1, 2, 3, 4};
-        final HoltWintersPointForecasterParams params = buildAustouristsParams(SeasonalityType.MULTIPLICATIVE, initLevelEstimate, initBaseEstimate, initSeasonalEstimates);
+        final HoltWintersForecaster.Params params = buildAustouristsParams(SeasonalityType.MULTIPLICATIVE, initLevelEstimate, initBaseEstimate, initSeasonalEstimates);
         HoltWintersOnlineComponents subject = new HoltWintersOnlineComponents(params);
 //        assertEquals(params, subject.getParams());
         assertEquals(0, subject.getN());
@@ -50,14 +50,14 @@ public class HoltWintersOnlineComponentsTest {
 
     @Test
     public void testConstructorNoInitSeasonalsMultiplicative() {
-        final HoltWintersPointForecasterParams params = buildAustouristsParams(SeasonalityType.MULTIPLICATIVE);
+        final HoltWintersForecaster.Params params = buildAustouristsParams(SeasonalityType.MULTIPLICATIVE);
         HoltWintersOnlineComponents subject = new HoltWintersOnlineComponents(params);
         assertArrayEquals(MULTIPLICATIVE_IDENTITY_SEASONALS, subject.getSeasonal(), TOLERANCE);
     }
 
     @Test
     public void testConstructorNoInitSeasonalsAdditive() {
-        final HoltWintersPointForecasterParams params = buildAustouristsParams(SeasonalityType.ADDITIVE);
+        final HoltWintersForecaster.Params params = buildAustouristsParams(SeasonalityType.ADDITIVE);
         HoltWintersOnlineComponents subject = new HoltWintersOnlineComponents(params);
         assertArrayEquals(ADDITIVE_IDENTITY_SEASONALS, subject.getSeasonal(), TOLERANCE);
     }
@@ -67,7 +67,7 @@ public class HoltWintersOnlineComponentsTest {
         double initLevelEstimate = 80000;
         double initBaseEstimate = 2;
         double[] initSeasonalEstimates = {1, 2, 3};
-        final HoltWintersPointForecasterParams params = buildAustouristsParams(SeasonalityType.MULTIPLICATIVE, initLevelEstimate, initBaseEstimate, initSeasonalEstimates);
+        final HoltWintersForecaster.Params params = buildAustouristsParams(SeasonalityType.MULTIPLICATIVE, initLevelEstimate, initBaseEstimate, initSeasonalEstimates);
         new HoltWintersOnlineComponents(params);
     }
 }
