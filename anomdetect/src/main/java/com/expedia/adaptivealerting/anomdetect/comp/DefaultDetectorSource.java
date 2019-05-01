@@ -29,6 +29,7 @@ import lombok.val;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 // Non-final because we currently need to mock this in DetectorManagerTest. [WLW]
@@ -87,7 +88,7 @@ public class DefaultDetectorSource implements DetectorSource {
 
     @Override
     public List<DetectorMapping> findUpdatedDetectorMappings(int timePeriod) {
-        notNull(timePeriod, "timePeriod can't be null");
+        isTrue(timePeriod > 0, "timePeriod must be strictly positive");
 
         return connector
                 .findUpdatedDetectorMappings(timePeriod);

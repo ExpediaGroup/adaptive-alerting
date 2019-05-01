@@ -38,11 +38,6 @@ public class DetectorMapperCacheRefreshTest {
 
         UUID updateId1 = UUID.randomUUID();
         UUID updateId2 = UUID.randomUUID();
-
-
-
-
-
         List<DetectorMapping> detectorIdsOfDisabledMappings = new ArrayList<DetectorMapping>();
         detectorIdsOfDisabledMappings.add(new DetectorMapping(null, new Detector(updateId1), null, 0, 0, false, new ArrayList<>()));
         detectorIdsOfDisabledMappings.add(new DetectorMapping(null, new Detector(updateId2), null, 0, 0, false, new ArrayList<>()));

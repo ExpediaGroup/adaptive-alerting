@@ -25,6 +25,7 @@ import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelTypeResource;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
 import com.expedia.adaptivealerting.anomdetect.detector.ForecastingDetector;
+import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapping;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaster;
 import com.expedia.adaptivealerting.anomdetect.util.TestObjectMother;
@@ -38,6 +39,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.UUID;
@@ -69,6 +71,7 @@ public final class DefaultDetectorSourceTest {
     private DetectorResources updatedDetectorResources;
     private ModelResource modelResource_ewma;
     private Detector detector;
+    private DetectorMapping detectorMapping;
 
     @Before
     public void setUp() {
@@ -99,6 +102,17 @@ public final class DefaultDetectorSourceTest {
 
         val result = results.get(0);
         assertEquals(DETECTOR_UUID_EWMA, result);
+    }
+
+    @Test
+    public void testFindUpdatedDetectorMappings() {
+        val results = sourceUnderTest.findUpdatedDetectorMappings(1);
+        assertEquals(1, results.size());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFindUpdatedDetectorMappingsFail() {
+        sourceUnderTest.findUpdatedDetectorMappings(-1);
     }
 
     @Test
@@ -143,6 +157,7 @@ public final class DefaultDetectorSourceTest {
                 new ModelTypeResource(DETECTOR_TYPE_EWMA),
                 true);
         this.updatedDetectorResources = new DetectorResources(Collections.singletonList(updatedDetectorsResource));
+        this.detectorMapping = new DetectorMapping(null, new com.expedia.adaptivealerting.anomdetect.detectormapper.Detector(UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689")), null, 0, 0, false, new ArrayList<>());
     }
 
     private void initTestObjects_findLatestModel() {
@@ -175,6 +190,8 @@ public final class DefaultDetectorSourceTest {
                 .thenThrow(new DetectorNotFoundException("No models found"));
         when(connector.findLatestModel(DETECTOR_UUID_EXCEPTION))
                 .thenThrow(new DetectorRetrievalException("Error finding latest model", new IOException()));
+        when(connector.findUpdatedDetectorMappings(1))
+                .thenReturn(Collections.singletonList(this.detectorMapping));
 
         when(legacyDetectorFactory.createDetector(any(UUID.class), any(ModelResource.class)))
                 .thenReturn(detector);

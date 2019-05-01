@@ -17,10 +17,10 @@ package com.expedia.adaptivealerting.anomdetect.comp.connector;
 
 import com.expedia.adaptivealerting.anomdetect.DetectorDeserializationException;
 import com.expedia.adaptivealerting.anomdetect.DetectorException;
-import com.expedia.adaptivealerting.anomdetect.DetectorNotFoundException;
-import com.expedia.adaptivealerting.anomdetect.DetectorRetrievalException;
 import com.expedia.adaptivealerting.anomdetect.DetectorMappingDeserializationException;
 import com.expedia.adaptivealerting.anomdetect.DetectorMappingRetrievalException;
+import com.expedia.adaptivealerting.anomdetect.DetectorNotFoundException;
+import com.expedia.adaptivealerting.anomdetect.DetectorRetrievalException;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapper;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapping;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMatchResponse;
@@ -222,9 +222,6 @@ public class ModelServiceConnector {
     }
 
     public List<DetectorMapping> findUpdatedDetectorMappings(int timePeriod) {
-        //TODO implement
-        isTrue(timePeriod > 0, "timePeriod must be strictly positive");
-
         val uri = String.format(baseUri + API_PATH_DETECTOR_MAPPING_UPDATES, timePeriod);
         Content content;
         try {
@@ -238,8 +235,10 @@ public class ModelServiceConnector {
         }
 
         try {
-            return objectMapper.readValue(content.asBytes(), new TypeReference<List<DetectorMapping>>() {
+            List<DetectorMapping> result = objectMapper.readValue(content.asBytes(), new TypeReference<List<DetectorMapping>>() {
             });
+            if (result == null) throw new IOException();
+            return result;
         } catch (IOException e) {
             val message = "IOException while deserializing updated detectors mappings" +
                     ": timePeriod=" + timePeriod;
