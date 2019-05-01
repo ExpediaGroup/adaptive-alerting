@@ -15,13 +15,12 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detector;
 
+import com.expedia.adaptivealerting.anomdetect.detector.config.IndividualsDetectorConfig;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.metrics.MetricData;
-import lombok.Data;
 import lombok.Getter;
-import lombok.experimental.Accessors;
 import lombok.val;
 
 import java.util.UUID;
@@ -55,7 +54,7 @@ public final class IndividualsDetector implements Detector {
     private UUID uuid;
 
     @Getter
-    private Params params;
+    private IndividualsDetectorConfig params;
 
     /**
      * Aggregate Moving range. Used to calculate avg. moving range.
@@ -105,7 +104,7 @@ public final class IndividualsDetector implements Detector {
      */
     private double mean;
 
-    public IndividualsDetector(UUID uuid, Params params) {
+    public IndividualsDetector(UUID uuid, IndividualsDetectorConfig params) {
         notNull(uuid, "uuid can't be null");
         notNull(params, "params can't be null");
         params.validate();
@@ -184,32 +183,4 @@ public final class IndividualsDetector implements Detector {
         return movingRangeSum / Math.max(1, totalDataPoints - 1);
     }
 
-    @Data
-    @Accessors(chain = true)
-    public static final class Params {
-
-        /**
-         * Initial mean estimate.
-         */
-        private double initValue = 0.0;
-
-        /**
-         * Minimum number of data points required before the anomaly detector is ready for use.
-         */
-        private int warmUpPeriod = 30;
-
-        /**
-         * Strong threshold sigmas.
-         */
-        private double strongSigmas = 3.0;
-
-        /**
-         * Initial mean estimate.
-         */
-        private double initMeanEstimate = 0.0;
-
-        public void validate() {
-            // Not currently implemented
-        }
-    }
 }

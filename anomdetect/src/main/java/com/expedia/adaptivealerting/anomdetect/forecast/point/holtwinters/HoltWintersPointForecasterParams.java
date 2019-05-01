@@ -13,13 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.comp.legacy;
+package com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.HoltWintersForecaster;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersSeasonalEstimatesValidator;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersTrainingMethod;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.SeasonalityType;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.config.PointForecasterParams;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -29,21 +25,10 @@ import java.util.Arrays;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
-/**
- * @see <a href="https://otexts.org/fpp2/holt-winters.html">Holt-Winters' Seasonal Method</a>
- * and <a href="https://robjhyndman.com/hyndsight/seasonal-periods/">https://robjhyndman.com/hyndsight/seasonal-periods/</a> for naming conventions
- * (e.g. usage of "frequency" and "cycle").
- */
 @Data
 @Accessors(chain = true)
 @Slf4j
-@Deprecated
-public final class HoltWintersParams {
-
-    /**
-     * A default alpha value for the exponential Welford interval forecaster.
-     */
-    private static final double DEFAULT_EXP_WELFORD_ALPHA = 0.15;
+public final class HoltWintersPointForecasterParams implements PointForecasterParams {
 
     /**
      * SeasonalityType parameter used to determine which Seasonality method (Multiplicative or Additive) to use.
@@ -88,16 +73,6 @@ public final class HoltWintersParams {
     private int warmUpPeriod = 0;
 
     /**
-     * Weak threshold sigmas.
-     */
-    private double weakSigmas = 3.0;
-
-    /**
-     * Strong threshold sigmas.
-     */
-    private double strongSigmas = 4.0;
-
-    /**
      * Initial estimate for Level component.
      * Only applies if initTrainingMethod = HoltWintersTrainingMethod.NONE.
      * If not set, then 1.0 will be used for MULTIPLICATIVE seasonality and 0.0 for ADDITIVE seasonality.
@@ -125,6 +100,10 @@ public final class HoltWintersParams {
 
     private final HoltWintersSeasonalEstimatesValidator seasonalEstimatesValidator = new HoltWintersSeasonalEstimatesValidator();
 
+    public boolean isMultiplicative() {
+        return seasonalityType.equals(SeasonalityType.MULTIPLICATIVE);
+    }
+
     /**
      * Calculates the initial training period (if applicable) based on initTrainingMethod and frequency.
      * Used to determine whether to perform training or forecasting on an observation.
@@ -135,32 +114,7 @@ public final class HoltWintersParams {
         return (initTrainingMethod == HoltWintersTrainingMethod.SIMPLE) ? (frequency * 2) : 0;
     }
 
-    public HoltWintersForecaster.Params toPointForecasterParams() {
-        return new HoltWintersForecaster.Params()
-                .setSeasonalityType(seasonalityType)
-                .setFrequency(frequency)
-                .setAlpha(alpha)
-                .setBeta(beta)
-                .setGamma(gamma)
-                .setWarmUpPeriod(warmUpPeriod)
-                .setInitLevelEstimate(initLevelEstimate)
-                .setInitBaseEstimate(initBaseEstimate)
-                .setInitSeasonalEstimates(initSeasonalEstimates)
-                .setInitTrainingMethod(initTrainingMethod);
-    }
-
-    public ExponentialWelfordIntervalForecaster.Params toIntervalForecasterParams() {
-
-        // Currently we simply use a default alpha here. I'm not marking this as a TODO
-        // since this HoltWintersParams class is deprecated anyway, and we want to start
-        // using explicitly selected and tuned interval forecasters. [WLW]
-        return new ExponentialWelfordIntervalForecaster.Params()
-                .setAlpha(DEFAULT_EXP_WELFORD_ALPHA)
-                .setInitVarianceEstimate(0.0)
-                .setWeakSigmas(weakSigmas)
-                .setStrongSigmas(strongSigmas);
-    }
-
+    // TODO Call this from the constructor
     public void validate() {
         notNull(seasonalityType, "Required: seasonalityType one of " + Arrays.toString(SeasonalityType.values()));
         notNull(initTrainingMethod, "Required: initTrainingMethod one of " + Arrays.toString(HoltWintersTrainingMethod.values()));
@@ -168,8 +122,6 @@ public final class HoltWintersParams {
         isTrue(0.0 <= alpha && alpha <= 1.0, "Required: alpha in the range [0, 1]");
         isTrue(0.0 <= beta && beta <= 1.0, "Required: beta in the range [0, 1]");
         isTrue(0.0 <= gamma && gamma <= 1.0, "Required: gamma in the range [0, 1]");
-        isTrue(weakSigmas > 0.0, "Required: weakSigmas > 0.0");
-        isTrue(strongSigmas > weakSigmas, "Required: strongSigmas > weakSigmas");
         validateInitTrainingMethod();
         validateInitSeasonalEstimates();
     }
@@ -189,5 +141,4 @@ public final class HoltWintersParams {
     private void validateInitSeasonalEstimates() {
         seasonalEstimatesValidator.validate(initSeasonalEstimates, frequency, seasonalityType);
     }
-
 }

@@ -15,12 +15,11 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.interval;
 
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.config.PowerLawIntervalForecasterParams;
 import com.expedia.metrics.MetricData;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.Accessors;
 import lombok.val;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -30,7 +29,7 @@ public class PowerLawIntervalForecaster implements IntervalForecaster {
 
     @Getter
     @NonNull
-    private Params params;
+    private PowerLawIntervalForecasterParams params;
 
     @Override
     public IntervalForecast forecast(MetricData metricData, double pointForecast) {
@@ -45,18 +44,5 @@ public class PowerLawIntervalForecaster implements IntervalForecaster {
                 pointForecast + weakWidth,
                 pointForecast - weakWidth,
                 pointForecast - strongWidth);
-    }
-
-    @Data
-    @Accessors(chain = true)
-    public static final class Params {
-        private double alpha;
-        private double beta;
-        private double weakMultiplier;
-        private double strongMultiplier;
-
-        public void validate() {
-            // TODO Implement
-        }
     }
 }

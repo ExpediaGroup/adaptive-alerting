@@ -15,9 +15,9 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.EwmaParams;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyEwmaDetectorConfig;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.PewmaParams;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyPewmaDetectorConfig;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.tools.pipeline.filter.DetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
@@ -41,8 +41,8 @@ public class WhiteNoiseRmse {
         val source = new WhiteNoiseMetricSource("white-noise", 1000L, 0.0, 1.0);
 
         val factory = new LegacyDetectorFactory();
-        val ewmaFilter = new DetectorFilter(factory.createEwmaDetector(UUID.randomUUID(), new EwmaParams()));
-        val pewmaFilter = new DetectorFilter(factory.createPewmaDetector(UUID.randomUUID(), new PewmaParams()));
+        val ewmaFilter = new DetectorFilter(factory.createEwmaDetector(UUID.randomUUID(), new LegacyEwmaDetectorConfig()));
+        val pewmaFilter = new DetectorFilter(factory.createPewmaDetector(UUID.randomUUID(), new LegacyPewmaDetectorConfig()));
 
         val ewmaEval = new EvaluatorFilter(new RmseEvaluator());
         val pewmaEval = new EvaluatorFilter(new RmseEvaluator());

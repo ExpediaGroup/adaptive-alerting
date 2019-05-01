@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.interval;
 
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.config.ExponentialWelfordIntervalForecasterParams;
 import com.expedia.adaptivealerting.anomdetect.util.TestObjectMother;
 import com.expedia.metrics.MetricData;
 import com.opencsv.bean.CsvBindByName;
@@ -47,7 +48,7 @@ public class ExponentialWelfordIntervalForecasterTest {
 
     @Before
     public void setUp() {
-        val params = new ExponentialWelfordIntervalForecaster.Params()
+        val params = new ExponentialWelfordIntervalForecasterParams()
                 .setAlpha(0.15)
                 .setInitVarianceEstimate(1.0)
                 .setWeakSigmas(3.0)

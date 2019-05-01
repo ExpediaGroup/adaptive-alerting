@@ -15,8 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.point.HoltWintersForecaster;
-
 import java.util.Arrays;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.isFalse;
@@ -36,7 +34,7 @@ public class HoltWintersSimpleTrainingModel {
     private final double[] firstCycle;
     private final double[] secondCycle;
 
-    public HoltWintersSimpleTrainingModel(HoltWintersForecaster.Params params) {
+    public HoltWintersSimpleTrainingModel(HoltWintersPointForecasterParams params) {
         this.firstCycle = new double[params.getFrequency()];
         this.secondCycle = new double[params.getFrequency()];
     }
@@ -57,7 +55,7 @@ public class HoltWintersSimpleTrainingModel {
      * @param params     model parameters
      * @param components model components
      */
-    public void observeAndTrain(double y, HoltWintersForecaster.Params params, HoltWintersOnlineComponents components) {
+    public void observeAndTrain(double y, HoltWintersPointForecasterParams params, HoltWintersOnlineComponents components) {
         checkNulls(params, components);
         checkTrainingMethod(params);
         checkStillInInitialTraining(params);
@@ -79,14 +77,14 @@ public class HoltWintersSimpleTrainingModel {
         n++;
     }
 
-    public boolean isTrainingComplete(HoltWintersForecaster.Params params) {
+    public boolean isTrainingComplete(HoltWintersPointForecasterParams params) {
         return n >= (params.calculateInitTrainingPeriod());
     }
 
     /**
      * Update the level, base and seasonal components by running the main algorithm over each of the observations to this point.
      */
-    private void updateComponentsAndForecast(HoltWintersForecaster.Params params, HoltWintersOnlineComponents components) {
+    private void updateComponentsAndForecast(HoltWintersPointForecasterParams params, HoltWintersOnlineComponents components) {
         HoltWintersOnlineAlgorithm algorithm = new HoltWintersOnlineAlgorithm();
         concat(Arrays.stream(firstCycle), Arrays.stream(secondCycle)).forEach(y -> algorithm.observeValueAndUpdateForecast(y, params, components));
     }
@@ -95,12 +93,12 @@ public class HoltWintersSimpleTrainingModel {
         components.setLevel(mean(firstCycle));
     }
 
-    private void setBase(HoltWintersForecaster.Params params, HoltWintersOnlineComponents components) {
+    private void setBase(HoltWintersPointForecasterParams params, HoltWintersOnlineComponents components) {
         double base = (mean(secondCycle) - components.getLevel()) / params.getFrequency();
         components.setBase(base);
     }
 
-    private void setSeasonals(double y, HoltWintersForecaster.Params params, HoltWintersOnlineComponents components) {
+    private void setSeasonals(double y, HoltWintersPointForecasterParams params, HoltWintersOnlineComponents components) {
         for (int i = 0; i < params.getFrequency(); i++) {
             double s = params.isMultiplicative()
                     ? firstCycle[i] / components.getLevel()
@@ -109,17 +107,17 @@ public class HoltWintersSimpleTrainingModel {
         }
     }
 
-    private void checkNulls(HoltWintersForecaster.Params params, HoltWintersOnlineComponents components) {
+    private void checkNulls(HoltWintersPointForecasterParams params, HoltWintersOnlineComponents components) {
         notNull(params, "params can't be null");
         notNull(components, "components can't be null");
     }
 
-    private void checkTrainingMethod(HoltWintersForecaster.Params params) {
+    private void checkTrainingMethod(HoltWintersPointForecasterParams params) {
         isTrue(HoltWintersTrainingMethod.SIMPLE.equals(params.getInitTrainingMethod()),
                 String.format("Expected training method to be %s but was %s", HoltWintersTrainingMethod.SIMPLE, params.getInitTrainingMethod()));
     }
 
-    private void checkStillInInitialTraining(HoltWintersForecaster.Params params) {
+    private void checkStillInInitialTraining(HoltWintersPointForecasterParams params) {
         isFalse(isTrainingComplete(params),
                 String.format("Training invoked %d times which is greater than the training window of frequency * 2 (%d * 2 = %d) observations.",
                         n + 1, params.getFrequency(), params.calculateInitTrainingPeriod()));

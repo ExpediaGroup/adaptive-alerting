@@ -15,11 +15,10 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.point;
 
+import com.expedia.adaptivealerting.anomdetect.forecast.point.config.PewmaPointForecasterParams;
 import com.expedia.metrics.MetricData;
-import lombok.Data;
 import lombok.Generated;
 import lombok.Getter;
-import lombok.experimental.Accessors;
 import lombok.val;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
@@ -28,7 +27,7 @@ public class PewmaPointForecaster implements PointForecaster {
 
     @Getter
     @Generated // https://reflectoring.io/100-percent-test-coverage/
-    private Params params;
+    private PewmaPointForecasterParams params;
 
     /**
      * Adjusted alpha, to match the way alpha is used in the paper that describes the algorithm.
@@ -63,10 +62,10 @@ public class PewmaPointForecaster implements PointForecaster {
     private double stdDev;
 
     public PewmaPointForecaster() {
-        this(new Params());
+        this(new PewmaPointForecasterParams());
     }
 
-    public PewmaPointForecaster(Params params) {
+    public PewmaPointForecaster(PewmaPointForecasterParams params) {
         notNull(params, "params can't be null");
         this.params = params;
 
@@ -114,32 +113,5 @@ public class PewmaPointForecaster implements PointForecaster {
             return 1.0 - 1.0 / this.trainingCount;
         }
         return (1.0 - params.getBeta() * pt) * this.adjAlpha;
-    }
-
-    // TODO Describe why we chose these defaults as appropriate.
-    //  For example if the paper recommends them, we should say that.
-    @Data
-    @Accessors(chain = true)
-    public static class Params {
-
-        /**
-         * Smoothing param.
-         */
-        private double alpha = 0.15;
-
-        /**
-         * Anomaly weighting param.
-         */
-        private double beta = 1.0;
-
-        /**
-         * Initial mean estimate.
-         */
-        private double initMeanEstimate = 0.0;
-
-        /**
-         * How many iterations to train for.
-         */
-        private int warmUpPeriod = 30;
     }
 }

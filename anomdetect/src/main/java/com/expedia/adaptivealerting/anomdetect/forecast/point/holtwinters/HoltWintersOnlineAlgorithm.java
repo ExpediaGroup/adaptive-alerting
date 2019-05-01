@@ -15,8 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.point.HoltWintersForecaster;
-
 /**
  * Encapsulates the algorithm for forecasting one-step ahead estimate using Holt-Winters (Triple-Exponential Smoothing) method.
  *
@@ -31,7 +29,7 @@ public class HoltWintersOnlineAlgorithm {
      * @param params     Contains the parameters for model
      * @param components Contains the online values used to calculate level, base and seasonality components (based on most recent history from observation at t-1).
      */
-    public void observeValueAndUpdateForecast(double y, HoltWintersForecaster.Params params, HoltWintersOnlineComponents components) {
+    public void observeValueAndUpdateForecast(double y, HoltWintersPointForecasterParams params, HoltWintersOnlineComponents components) {
         // Retrieve the model's parameters as set by user (or defaults)
         double alpha = params.getAlpha();
         double beta = params.getBeta();

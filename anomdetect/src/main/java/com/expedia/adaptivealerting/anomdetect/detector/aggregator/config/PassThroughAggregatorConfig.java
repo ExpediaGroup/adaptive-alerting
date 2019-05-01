@@ -13,20 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.detector;
+package com.expedia.adaptivealerting.anomdetect.detector.aggregator.config;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
- * "Aggregator" that simply returns the passed {@link AnomalyResult}.
+ * Dummy config for config deserialization. We don't actually use it for anything since it has no config params.
  */
-public class PassThroughAggregator implements Aggregator {
-
-    @Override
-    public AnomalyResult aggregate(AnomalyResult result) {
-        notNull(result, "result can't be null");
-        return result;
-    }
+@Data
+@NoArgsConstructor
+@Setter(AccessLevel.NONE)
+public class PassThroughAggregatorConfig implements AggregatorConfig {
 }

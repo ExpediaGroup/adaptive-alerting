@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.samples;
 
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.PewmaParams;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyPewmaDetectorConfig;
 import com.expedia.adaptivealerting.core.data.MetricFrameLoader;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.tools.pipeline.filter.DetectorFilter;
@@ -42,7 +42,7 @@ public final class CsvTrafficPewma {
 
         val factory = new LegacyDetectorFactory();
 
-        val detector = factory.createPewmaDetector(UUID.randomUUID(), new PewmaParams());
+        val detector = factory.createPewmaDetector(UUID.randomUUID(), new LegacyPewmaDetectorConfig());
         val filter = new DetectorFilter(detector);
         val evaluator = new EvaluatorFilter(new RmseEvaluator());
         val chartWrapper = PipelineFactory.createChartSink("PEWMA");

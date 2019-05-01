@@ -13,14 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.detector;
+package com.expedia.adaptivealerting.anomdetect.detector.config;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-/**
- * Interface for anomaly aggregation strategies,
- */
-public interface Aggregator {
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = ConstantThresholdDetectorConfig.class, name="constant-threshold"),
+        @JsonSubTypes.Type(value = ForecastingDetectorConfig.class, name = "forecasting"),
+        @JsonSubTypes.Type(value = IndividualsDetectorConfig.class, name = "individuals"),
+})
+public interface DetectorConfig {
 
-    AnomalyResult aggregate(AnomalyResult result);
+    void validate();
 }

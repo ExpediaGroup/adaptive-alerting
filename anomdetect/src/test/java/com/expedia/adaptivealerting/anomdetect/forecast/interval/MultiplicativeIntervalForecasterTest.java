@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.interval;
 
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.config.MultiplicativeIntervalForecasterParams;
 import com.expedia.metrics.MetricData;
 import lombok.val;
 import org.junit.Before;
@@ -34,7 +35,7 @@ public class MultiplicativeIntervalForecasterTest {
 
     @Before
     public void setUp() {
-        val params = new MultiplicativeIntervalForecaster.Params()
+        val params = new MultiplicativeIntervalForecasterParams()
                 .setWeakMultiplier(10.0)
                 .setStrongMultiplier(20.0);
         params.validate();

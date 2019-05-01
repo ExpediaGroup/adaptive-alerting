@@ -24,7 +24,7 @@ import com.expedia.adaptivealerting.anomdetect.detector.ForecastingDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.IndividualsDetector;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaster;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.HoltWintersForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersPointForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PewmaPointForecaster;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
@@ -65,6 +65,7 @@ public class LegacyDetectorFactoryTest {
     @Test
     public void testCreateDetector_constantThreshold() {
         val params = new HashMap<String, Object>();
+        params.put("@type", "constant-threshold");
         params.put("type", AnomalyType.TWO_TAILED);
         params.put("thresholds", new AnomalyThresholds(100.0, 90.0, 20.0, 10.0));
         val detector = buildDetector(LegacyDetectorFactory.CONSTANT_THRESHOLD, params);
@@ -92,7 +93,7 @@ public class LegacyDetectorFactoryTest {
         val params = new HashMap<String, Object>();
         params.put("frequency", 24);
         val detector = (ForecastingDetector) buildDetector(LegacyDetectorFactory.HOLT_WINTERS, params);
-        assertTrue(detector.getPointForecaster() instanceof HoltWintersForecaster);
+        assertTrue(detector.getPointForecaster() instanceof HoltWintersPointForecaster);
         assertTrue(detector.getIntervalForecaster() instanceof ExponentialWelfordIntervalForecaster);
     }
 
@@ -113,8 +114,7 @@ public class LegacyDetectorFactoryTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateDetector_unknown() {
-        val params = new HashMap<String, Object>();
-        buildDetector("some-unknown-detector-type", params);
+        buildDetector("some-unknown-detector-type", new HashMap<>());
     }
 
     private Detector buildDetector(String type, Map<String, Object> params) {
@@ -123,10 +123,9 @@ public class LegacyDetectorFactoryTest {
     }
 
     private ModelResource buildModelResource(String type, Map<String, Object> params) {
-        val model = new ModelResource();
-        model.setDetectorType(new ModelTypeResource(type));
-        model.setParams(params);
-        model.setDateCreated(new Date());
-        return model;
+        return new ModelResource()
+                .setDetectorType(new ModelTypeResource(type))
+                .setParams(params)
+                .setDateCreated(new Date());
     }
 }

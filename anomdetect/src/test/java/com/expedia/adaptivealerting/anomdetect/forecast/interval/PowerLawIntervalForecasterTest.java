@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.interval;
 
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.config.PowerLawIntervalForecasterParams;
 import com.expedia.metrics.MetricData;
 import lombok.val;
 import org.junit.Before;
@@ -34,7 +35,7 @@ public class PowerLawIntervalForecasterTest {
 
     @Before
     public void setUp() {
-        val params = new PowerLawIntervalForecaster.Params()
+        val params = new PowerLawIntervalForecasterParams()
                 .setAlpha(0.5)
                 .setBeta(0.85)
                 .setWeakMultiplier(3.0)

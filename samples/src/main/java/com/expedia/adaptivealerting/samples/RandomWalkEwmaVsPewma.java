@@ -15,9 +15,9 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.EwmaParams;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyEwmaDetectorConfig;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.PewmaParams;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyPewmaDetectorConfig;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.tools.pipeline.filter.DetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
@@ -39,7 +39,7 @@ public class RandomWalkEwmaVsPewma {
         val source = new RandomWalkMetricSource();
         val factory = new LegacyDetectorFactory();
 
-        val ewmaDetector = factory.createEwmaDetector(UUID.randomUUID(), new EwmaParams());
+        val ewmaDetector = factory.createEwmaDetector(UUID.randomUUID(), new LegacyEwmaDetectorConfig());
         val ewmaFilter = new DetectorFilter(ewmaDetector);
         val ewmaEval = new EvaluatorFilter(new RmseEvaluator());
         val ewmaChart = PipelineFactory.createChartSink("EWMA");
@@ -48,7 +48,7 @@ public class RandomWalkEwmaVsPewma {
         ewmaFilter.addSubscriber(ewmaChart);
         ewmaEval.addSubscriber(ewmaChart);
 
-        val pewmaDetector = factory.createPewmaDetector(UUID.randomUUID(), new PewmaParams());
+        val pewmaDetector = factory.createPewmaDetector(UUID.randomUUID(), new LegacyPewmaDetectorConfig());
         val pewmaFilter = new DetectorFilter(pewmaDetector);
         val pewmaEval = new EvaluatorFilter(new RmseEvaluator());
         val pewmaChart = PipelineFactory.createChartSink("PEWMA");

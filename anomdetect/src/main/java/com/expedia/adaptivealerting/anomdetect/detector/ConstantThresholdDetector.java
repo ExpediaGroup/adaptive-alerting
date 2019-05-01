@@ -16,13 +16,10 @@
 package com.expedia.adaptivealerting.anomdetect.detector;
 
 import com.expedia.adaptivealerting.anomdetect.comp.AnomalyClassifier;
+import com.expedia.adaptivealerting.anomdetect.detector.config.ConstantThresholdDetectorConfig;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.metrics.MetricData;
-import lombok.Data;
 import lombok.Getter;
-import lombok.experimental.Accessors;
 import lombok.val;
 
 import java.util.UUID;
@@ -35,42 +32,25 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 public final class ConstantThresholdDetector extends AbstractDetector {
 
     @Getter
-    private final Params params;
+    private final ConstantThresholdDetectorConfig config;
 
     private final AnomalyClassifier classifier;
 
-    public ConstantThresholdDetector(UUID uuid, Params params) {
+    public ConstantThresholdDetector(UUID uuid, ConstantThresholdDetectorConfig config) {
         super(uuid);
-        notNull(params, "params can't be null");
-        params.validate();
-        this.params = params;
-        this.classifier = new AnomalyClassifier(params.getType());
+        notNull(config, "config can't be null");
+        config.validate();
+
+        this.config = config;
+        this.classifier = new AnomalyClassifier(config.getType());
     }
 
     @Override
     public AnomalyResult classify(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
-        val thresholds = params.getThresholds();
+        val thresholds = config.getThresholds();
         val level = classifier.classify(thresholds, metricData.getValue());
         return new AnomalyResult(level).setThresholds(thresholds);
     }
 
-    @Data
-    @Accessors(chain = true)
-    public static final class Params {
-
-        /**
-         * Detector type: left-, right- or two-tailed.
-         */
-        private AnomalyType type;
-
-        /**
-         * Constant thresholds.
-         */
-        private AnomalyThresholds thresholds;
-
-        public void validate() {
-            // Not currently implemented
-        }
-    }
 }

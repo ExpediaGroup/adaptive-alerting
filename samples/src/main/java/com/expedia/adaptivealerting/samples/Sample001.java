@@ -15,10 +15,11 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.EwmaParams;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyEwmaDetectorConfig;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.PewmaParams;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyPewmaDetectorConfig;
 import com.expedia.adaptivealerting.anomdetect.detector.CusumDetector;
+import com.expedia.adaptivealerting.anomdetect.detector.config.CusumDetectorConfig;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
 import com.expedia.adaptivealerting.tools.pipeline.filter.DetectorFilter;
@@ -38,7 +39,7 @@ public final class Sample001 {
         val source = buildMetricFrameMetricSource("samples/sample001.csv", 200L);
         val factory = new LegacyDetectorFactory();
 
-        val ewmaParams = new EwmaParams()
+        val ewmaParams = new LegacyEwmaDetectorConfig()
                 .setAlpha(0.20)
                 .setWeakSigmas(4.5)
                 .setStrongSigmas(5.5);
@@ -51,7 +52,7 @@ public final class Sample001 {
         ewmaFilter.addSubscriber(ewmaChart);
         ewmaEval.addSubscriber(ewmaChart);
 
-        val pewmaParams = new PewmaParams()
+        val pewmaParams = new LegacyPewmaDetectorConfig()
                 .setAlpha(0.20)
                 .setWeakSigmas(5.0)
                 .setStrongSigmas(6.0);
@@ -64,7 +65,7 @@ public final class Sample001 {
         pewmaFilter.addSubscriber(pewmaChart);
         pewmaEval.addSubscriber(pewmaChart);
 
-        val cusumParams = new CusumDetector.Params()
+        val cusumParams = new CusumDetectorConfig()
                 .setType(AnomalyType.RIGHT_TAILED)
                 .setTargetValue(20_000_000)
                 .setWeakSigmas(3.0)

@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.config.ExponentialWelfordIntervalForecasterParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.config.EwmaPointForecasterParams;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -25,7 +25,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 @Data
 @Accessors(chain = true)
 @Deprecated
-public final class EwmaParams {
+public final class LegacyEwmaDetectorConfig {
 
     /**
      * Smoothing param. Somewhat misnamed because higher values lead to less smoothing, but it's called the
@@ -48,14 +48,14 @@ public final class EwmaParams {
      */
     private double initMeanEstimate = 0.0;
 
-    public EwmaPointForecaster.Params toPointForecasterParams() {
-        return new EwmaPointForecaster.Params()
+    public EwmaPointForecasterParams toPointForecasterParams() {
+        return new EwmaPointForecasterParams()
                 .setAlpha(alpha)
                 .setInitMeanEstimate(initMeanEstimate);
     }
 
-    public ExponentialWelfordIntervalForecaster.Params toIntervalForecasterParams() {
-        return new ExponentialWelfordIntervalForecaster.Params()
+    public ExponentialWelfordIntervalForecasterParams toIntervalForecasterParams() {
+        return new ExponentialWelfordIntervalForecasterParams()
                 .setAlpha(alpha)
                 .setInitVarianceEstimate(0.0)
                 .setWeakSigmas(weakSigmas)

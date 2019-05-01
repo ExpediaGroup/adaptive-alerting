@@ -15,8 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters;
 
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.HoltWintersParams;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.HoltWintersForecaster;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyHoltWintersDetectorConfig;
 import lombok.Data;
 import lombok.NonNull;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
@@ -25,7 +24,7 @@ import java.util.Arrays;
 
 /**
  * Encapsulates the values that represent the components for the {@link HoltWintersOnlineAlgorithm} logic.
- * This represents the model's online data as opposed to {@link HoltWintersParams} which represents the users values for
+ * This represents the model's online data as opposed to {@link LegacyHoltWintersDetectorConfig} which represents the users values for
  * the model's parameters.
  *
  * @see <a href="https://otexts.org/fpp2/holt-winters.html">Holt-Winters' Seasonal Method</a> and
@@ -37,7 +36,7 @@ public class HoltWintersOnlineComponents {
     private static final double MULTIPLICATIVE_IDENTITY = 1;
     private static final double ADDITIVE_IDENTITY = 0;
     @NonNull
-    private final HoltWintersForecaster.Params params;
+    private final HoltWintersPointForecasterParams params;
     private double level = 0;
     private double base = 0;
     @NonNull
@@ -51,7 +50,7 @@ public class HoltWintersOnlineComponents {
      *
      * @param params User-supplied parameters for the model.  Assumed to be valid.
      */
-    public HoltWintersOnlineComponents(HoltWintersForecaster.Params params) {
+    public HoltWintersOnlineComponents(HoltWintersPointForecasterParams params) {
         this.params = params;
         initLevelFromParams(params);
         initBaseFromParams(params);
@@ -106,15 +105,15 @@ public class HoltWintersOnlineComponents {
         return (int) (getN() % params.getFrequency());
     }
 
-    private void initLevelFromParams(HoltWintersForecaster.Params params) {
+    private void initLevelFromParams(HoltWintersPointForecasterParams params) {
         this.level = Double.isNaN(params.getInitLevelEstimate()) ? seasonalityIdentity() : params.getInitLevelEstimate();
     }
 
-    private void initBaseFromParams(HoltWintersForecaster.Params params) {
+    private void initBaseFromParams(HoltWintersPointForecasterParams params) {
         this.base = Double.isNaN(params.getInitBaseEstimate()) ? seasonalityIdentity() : params.getInitBaseEstimate();
     }
 
-    private void initSeasonalsFromParams(HoltWintersForecaster.Params params) {
+    private void initSeasonalsFromParams(HoltWintersPointForecasterParams params) {
         int s = params.getInitSeasonalEstimates().length;
         if (s == 0) {
             fillSeasonalsWithIdentity();
@@ -136,7 +135,7 @@ public class HoltWintersOnlineComponents {
                 : ADDITIVE_IDENTITY;
     }
 
-    private void initSeasonalStatistics(HoltWintersForecaster.Params params) {
+    private void initSeasonalStatistics(HoltWintersPointForecasterParams params) {
         seasonalSummaryStatistics = new SummaryStatistics[params.getFrequency()];
         for (int i = 0; i < params.getFrequency(); i++) {
             seasonalSummaryStatistics[i] = new SummaryStatistics();

@@ -15,8 +15,9 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.point;
 
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.EwmaParams;
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.PewmaParams;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyEwmaDetectorConfig;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyPewmaDetectorConfig;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.config.PewmaPointForecasterParams;
 import com.expedia.adaptivealerting.anomdetect.util.TestObjectMother;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
@@ -58,12 +59,12 @@ public final class PewmaPointForecasterTest {
         val testRows = readData_sampleInput().listIterator();
         val observed0 = Double.parseDouble(testRows.next()[0]);
 
-        val ewmaParams = new EwmaParams()
+        val ewmaParams = new LegacyEwmaDetectorConfig()
                 .setAlpha(DEFAULT_ALPHA)
                 .setInitMeanEstimate(observed0);
         val ewmaPointForecaster = new EwmaPointForecaster(ewmaParams.toPointForecasterParams());
 
-        val pewmaParams = new PewmaParams()
+        val pewmaParams = new LegacyPewmaDetectorConfig()
                 .setAlpha(DEFAULT_ALPHA)
                 .setBeta(beta)
                 .setInitMeanEstimate(observed0);
@@ -86,7 +87,7 @@ public final class PewmaPointForecasterTest {
         val testRows = readData_calInflow().listIterator();
         val observed0 = testRows.next().getObserved();
 
-        val params = new PewmaPointForecaster.Params()
+        val params = new PewmaPointForecasterParams()
                 .setAlpha(DEFAULT_ALPHA)
                 .setBeta(0.5)
                 .setInitMeanEstimate(observed0);

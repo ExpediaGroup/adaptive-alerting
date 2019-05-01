@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detector;
 
+import com.expedia.adaptivealerting.anomdetect.detector.config.IndividualsDetectorConfig;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
@@ -62,7 +63,7 @@ public class IndividualsDetectorTest {
         val testRow0 = testRows.next();
         val observed0 = testRow0.getObserved();
 
-        val params = new IndividualsDetector.Params()
+        val params = new IndividualsDetectorConfig()
                 .setInitValue(observed0)
                 .setWarmUpPeriod(WARMUP_PERIOD);
         val detector = new IndividualsDetector(detectorUuid, params);

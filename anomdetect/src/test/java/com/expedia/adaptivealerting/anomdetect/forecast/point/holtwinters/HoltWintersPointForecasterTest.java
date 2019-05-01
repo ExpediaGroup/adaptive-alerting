@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.forecast.point;
+package com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersAustouristsTestRow;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersTrainingMethod;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.SeasonalityType;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecast;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import lombok.val;
@@ -40,7 +38,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Tests Holt-Winters functionality by comparing with data generated from Hyndman's R "fpp2" library - see GenerateAustouristsTests.R
  */
-public final class HoltWintersForecasterTest {
+public final class HoltWintersPointForecasterTest {
 
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
@@ -56,14 +54,14 @@ public final class HoltWintersForecasterTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testInit_frequency0() {
-        new HoltWintersForecaster.Params()
+        new HoltWintersPointForecasterParams()
                 .setFrequency(0)
                 .validate();
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testValidateParams_alphaLT0() {
-        new HoltWintersForecaster.Params()
+        new HoltWintersPointForecasterParams()
                 .setFrequency(24)
                 .setAlpha(-0.1)
                 .validate();
@@ -71,7 +69,7 @@ public final class HoltWintersForecasterTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testInit_alphaGT1() {
-        new HoltWintersForecaster.Params()
+        new HoltWintersPointForecasterParams()
                 .setFrequency(24)
                 .setAlpha(2.0)
                 .validate();
@@ -79,7 +77,7 @@ public final class HoltWintersForecasterTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testValidateParams_betaLT0() {
-        new HoltWintersForecaster.Params()
+        new HoltWintersPointForecasterParams()
                 .setFrequency(24)
                 .setBeta(-0.1)
                 .validate();
@@ -87,7 +85,7 @@ public final class HoltWintersForecasterTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testInit_betaGT1() {
-        new HoltWintersForecaster.Params()
+        new HoltWintersPointForecasterParams()
                 .setFrequency(24)
                 .setBeta(2.0)
                 .validate();
@@ -95,7 +93,7 @@ public final class HoltWintersForecasterTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testValidateParams_gammeLT0() {
-        new HoltWintersForecaster.Params()
+        new HoltWintersPointForecasterParams()
                 .setFrequency(24)
                 .setGamma(-0.1)
                 .validate();
@@ -103,7 +101,7 @@ public final class HoltWintersForecasterTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testInit_gammaGT1() {
-        new HoltWintersForecaster.Params()
+        new HoltWintersPointForecasterParams()
                 .setFrequency(24)
                 .setGamma(2.0)
                 .validate();
@@ -135,11 +133,11 @@ public final class HoltWintersForecasterTest {
         double initLevelEstimate = firstRow.getL();
         double initBaseEstimate = firstRow.getB();
         double[] initSeasonalEstimates = {firstRow.getS4(), firstRow.getS3(), firstRow.getS2(), firstRow.getS1()};
-        final HoltWintersForecaster.Params params = withTraining ?
+        final HoltWintersPointForecasterParams params = withTraining ?
                 buildAustouristsParams(seasonalityType).setInitTrainingMethod(HoltWintersTrainingMethod.SIMPLE) :
                 buildAustouristsParams(seasonalityType, initLevelEstimate, initBaseEstimate, initSeasonalEstimates);
 
-        val subject = new HoltWintersForecaster(params);
+        val subject = new HoltWintersPointForecaster(params);
 
         while (testRows.hasNext()) {
             final HoltWintersAustouristsTestRow testRow = testRows.next();
@@ -152,7 +150,7 @@ public final class HoltWintersForecasterTest {
         }
     }
 
-    private void checkValues(HoltWintersAustouristsTestRow testRow, double forecastBeforeObservation, HoltWintersForecaster subject, PointForecast result) {
+    private void checkValues(HoltWintersAustouristsTestRow testRow, double forecastBeforeObservation, HoltWintersPointForecaster subject, PointForecast result) {
 //        assertEquals(testRow.getL(), subject.getComponents().getLevel(), TOLERANCE);
 //        assertEquals(testRow.getB(), subject.getComponents().getBase(), TOLERANCE);
         double[] expectedReverseSeasonals = {testRow.getS1(), testRow.getS2(), testRow.getS3(), testRow.getS4()};

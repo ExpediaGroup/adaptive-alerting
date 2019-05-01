@@ -17,7 +17,9 @@ package com.expedia.adaptivealerting.core.anomaly;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Setter;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.isFalse;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
@@ -28,6 +30,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
  * Weak and strong thresholds to support both one- and two-tailed tests.
  */
 @Data
+@Setter(AccessLevel.NONE)
 public class AnomalyThresholds {
     private Double upperStrong;
     private Double upperWeak;

@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.detector;
+package com.expedia.adaptivealerting.anomdetect.detector.aggregator;
 
+import com.expedia.adaptivealerting.anomdetect.detector.aggregator.config.MOfNAggregatorConfig;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import lombok.Generated;
 import lombok.Getter;
 import lombok.val;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
@@ -34,10 +35,8 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 public class MOfNAggregator implements Aggregator {
 
     @Getter
-    private final int m;
-
-    @Getter
-    private final int n;
+    @Generated // https://reflectoring.io/100-percent-test-coverage/
+    private MOfNAggregatorConfig config;
 
     private final AnomalyLevel[] buffer;
     private int bufferIndex = 0;
@@ -46,15 +45,13 @@ public class MOfNAggregator implements Aggregator {
      * Creates a 3-of-5 aggregator.
      */
     public MOfNAggregator() {
-        this(3, 5);
+        this(new MOfNAggregatorConfig(3, 5));
     }
 
-    public MOfNAggregator(int m, int n) {
-        isTrue(m > 0, "Required: m > 0");
-        isTrue(n >= m, "Required: n > m");
-        this.m = m;
-        this.n = n;
-        this.buffer = new AnomalyLevel[n];
+    public MOfNAggregator(MOfNAggregatorConfig config) {
+        notNull(config, "config can't be null");
+        this.config = config;
+        this.buffer = new AnomalyLevel[config.getN()];
     }
 
     @Override
@@ -62,7 +59,7 @@ public class MOfNAggregator implements Aggregator {
         notNull(result, "result can't be null");
 
         buffer[bufferIndex++] = result.getAnomalyLevel();
-        if (bufferIndex >= n) {
+        if (bufferIndex >= config.getN()) {
             bufferIndex = 0;
         }
 
@@ -71,7 +68,7 @@ public class MOfNAggregator implements Aggregator {
                 .setPredicted(result.getPredicted())
                 .setThresholds(result.getThresholds());
 
-        if (numAnomalies() >= m) {
+        if (numAnomalies() >= config.getM()) {
             aggregatedResult.setAnomalyLevel(AnomalyLevel.STRONG);
         }
 

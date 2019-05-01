@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.EwmaParams;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyEwmaDetectorConfig;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
 import com.expedia.adaptivealerting.core.data.MetricFrameLoader;
 import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
@@ -41,7 +41,7 @@ public final class CsvTrafficEwma {
         val source = new MetricFrameMetricSource(frame, "data", 200L);
         val factory = new LegacyDetectorFactory();
 
-        val detector = factory.createEwmaDetector(UUID.randomUUID(), new EwmaParams());
+        val detector = factory.createEwmaDetector(UUID.randomUUID(), new LegacyEwmaDetectorConfig());
         val detectorFilter = new DetectorFilter(detector);
         val evaluator = new EvaluatorFilter(new RmseEvaluator());
         val chartWrapper = PipelineFactory.createChartSink("EWMA");

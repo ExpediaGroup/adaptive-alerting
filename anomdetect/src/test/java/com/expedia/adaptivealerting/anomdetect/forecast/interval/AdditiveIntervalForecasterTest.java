@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.interval;
 
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.config.AdditiveIntervalForecasterParams;
 import com.expedia.metrics.MetricData;
 import lombok.val;
 import org.junit.Before;
@@ -34,7 +35,7 @@ public class AdditiveIntervalForecasterTest {
 
     @Before
     public void setUp() {
-        val params = new AdditiveIntervalForecaster.Params()
+        val params = new AdditiveIntervalForecasterParams()
                 .setWeakValue(10.0)
                 .setStrongValue(20.0);
         params.validate();

@@ -1,11 +1,11 @@
 package com.expedia.adaptivealerting.modelservice.test;
 
-import com.expedia.adaptivealerting.modelservice.entity.Metric;
 import com.expedia.adaptivealerting.modelservice.providers.graphite.GraphiteResult;
 import com.expedia.adaptivealerting.modelservice.service.AnomalyRequest;
 import com.expedia.adaptivealerting.modelservice.spi.MetricSourceResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import lombok.val;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,32 +38,26 @@ public class ObjectMother {
     }
 
     public AnomalyRequest getAnomalyRequest() {
-        AnomalyRequest request = new AnomalyRequest();
-        request.setDetectorParams(getDetectorParams());
-        request.setDetectorType("constant-detector");
-        request.setMetricTags("what=bookings");
-        return request;
+        return new AnomalyRequest()
+                .setDetectorParams(getDetectorParams())
+                // FIXME This is a legacy detector type
+                .setDetectorType("constant-detector")
+                .setMetricTags("what=bookings");
     }
 
     public Map<String, Object> getDetectorParams() {
-        String thresholds = "{\"thresholds\": {\"lowerStrong\": \"70\", \"lowerWeak\": \"90\"}}";
-        Map<String, Object> detectorParams = toObject(thresholds);
+        val thresholds = "{\"thresholds\": {\"lowerStrong\": \"70\", \"lowerWeak\": \"90\"}}";
+        val detectorParams = toObject(thresholds);
+        // This is the new detector type
+        detectorParams.put("@type", "constant-threshold");
         detectorParams.put("type", "LEFT_TAILED");
         return detectorParams;
-    }
-
-    public Metric getMetric() {
-        Metric metric = new Metric();
-        metric.setHash("1.3dec7f4218c57c1839147f8ca190ed55");
-        metric.setKey("key");
-        return metric;
     }
 
     @SneakyThrows
     private Map<String, Object> toObject(String message) {
         return new ObjectMapper().readValue(message, HashMap.class);
     }
-
 
     private String[][] getDataPoints() {
         String[][] datapoints = new String[2][2];

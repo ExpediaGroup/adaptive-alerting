@@ -15,12 +15,11 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.interval;
 
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.config.MultiplicativeIntervalForecasterParams;
 import com.expedia.metrics.MetricData;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.Accessors;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
@@ -29,7 +28,7 @@ public class MultiplicativeIntervalForecaster implements IntervalForecaster {
 
     @Getter
     @NonNull
-    private Params params;
+    private MultiplicativeIntervalForecasterParams params;
 
     @Override
     public IntervalForecast forecast(MetricData metricData, double pointForecast) {
@@ -39,26 +38,5 @@ public class MultiplicativeIntervalForecaster implements IntervalForecaster {
                 pointForecast * (1.0 + params.getWeakMultiplier()),
                 pointForecast * (1.0 - params.getWeakMultiplier()),
                 pointForecast * (1.0 - params.getStrongMultiplier()));
-    }
-
-    @Data
-    @Accessors(chain = true)
-    public static final class Params {
-
-        /**
-         * Multiplier against the level, used to generate the weak interval:
-         * [pointForecast - weakMultiplier * level, pointForecast + weakMultiplier * level].
-         */
-        private double weakMultiplier;
-
-        /**
-         * Multiplier against the level, used to generate the strong interval:
-         * [pointForecast - strongMultiplier * level, pointForecast + strongMultiplier * level].
-         */
-        private double strongMultiplier;
-
-        public void validate() {
-            // TODO Implement
-        }
     }
 }
