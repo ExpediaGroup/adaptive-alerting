@@ -138,6 +138,15 @@ public final class PewmaPointForecasterTest {
                 .validate();
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testValidate_invalidWarmUpPeriod() {
+        new PewmaPointForecaster.Params()
+                .setAlpha(0.15)
+                .setBeta(0.25)
+                .setWarmUpPeriod(-8)
+                .validate();
+    }
+
     private static List<String[]> readData_sampleInput() throws IOException {
         val is = ClassLoader.getSystemResourceAsStream(SAMPLE_INPUT_PATH);
         val reader = new CSVReader(new InputStreamReader(is));

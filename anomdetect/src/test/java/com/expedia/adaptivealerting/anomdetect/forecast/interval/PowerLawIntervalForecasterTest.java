@@ -61,4 +61,54 @@ public class PowerLawIntervalForecasterTest {
         assertEquals(pointForecast - weakWidth, forecastResult.getLowerWeak(), TOLERANCE);
         assertEquals(pointForecast - strongWidth, forecastResult.getLowerStrong(), TOLERANCE);
     }
+
+    @Test
+    public void testValidate() {
+        new PowerLawIntervalForecaster.Params()
+                .setAlpha(0.15)
+                .setBeta(0.85)
+                .setWeakMultiplier(3.0)
+                .setStrongMultiplier(4.0)
+                .validate();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testValidate_invalidAlpha() {
+        new PowerLawIntervalForecaster.Params()
+                .setAlpha(-0.15)
+                .setBeta(0.85)
+                .setWeakMultiplier(3.0)
+                .setStrongMultiplier(4.0)
+                .validate();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testValidate_invalidBeta() {
+        new PowerLawIntervalForecaster.Params()
+                .setAlpha(0.15)
+                .setBeta(-0.85)
+                .setWeakMultiplier(3.0)
+                .setStrongMultiplier(4.0)
+                .validate();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testValidate_invalidWeakMultiplier() {
+        new PowerLawIntervalForecaster.Params()
+                .setAlpha(0.15)
+                .setBeta(0.85)
+                .setWeakMultiplier(-3.0)
+                .setStrongMultiplier(4.0)
+                .validate();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testValidate_invalidStrongMultiplier() {
+        new PowerLawIntervalForecaster.Params()
+                .setAlpha(0.15)
+                .setBeta(0.85)
+                .setWeakMultiplier(3.0)
+                .setStrongMultiplier(2.0)
+                .validate();
+    }
 }

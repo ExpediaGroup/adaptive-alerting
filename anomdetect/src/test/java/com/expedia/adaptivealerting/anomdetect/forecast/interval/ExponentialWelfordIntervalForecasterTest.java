@@ -88,13 +88,22 @@ public class ExponentialWelfordIntervalForecasterTest {
                 .validate();
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testValidate_invalidInitVarianceEstimate() {
+        new ExponentialWelfordIntervalForecaster.Params()
+                .setAlpha(0.15)
+                .setInitVarianceEstimate(-0.25)
+                .setWeakSigmas(3.0)
+                .setStrongSigmas(4.0)
+                .validate();
+    }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testValidate_invalidSigmas() {
+    public void testValidate_invalidWeakSigmas() {
         new ExponentialWelfordIntervalForecaster.Params()
                 .setAlpha(0.15)
                 .setInitVarianceEstimate(1.0)
-                .setWeakSigmas(4.0)
+                .setWeakSigmas(-1.0)
                 .setStrongSigmas(3.0)
                 .validate();
     }
