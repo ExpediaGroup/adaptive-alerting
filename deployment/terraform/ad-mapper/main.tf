@@ -12,7 +12,7 @@ data "template_file" "config_data" {
   vars {
     kafka_endpoint = "${var.kafka_endpoint}"
     modelservice_base_uri = "${var.modelservice_base_uri}"
-    detector_refresh_period = "${var.detector_refresh_period}"
+    detector_mapping_cache_update_period = "${var.detector_mapping_cache_update_period}"
   }
 }
 
