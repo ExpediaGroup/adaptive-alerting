@@ -21,11 +21,13 @@ import com.expedia.adaptivealerting.modelservice.model.Operator;
 import com.expedia.adaptivealerting.modelservice.model.Detector;
 import com.expedia.adaptivealerting.modelservice.model.User;
 import com.expedia.adaptivealerting.modelservice.dao.es.DetectorMappingEntity;
+import lombok.Generated;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 @Component
+@Generated //(exclude from code coverage)
 public class RequestValidator {
 
     public void validateUser(User user) {

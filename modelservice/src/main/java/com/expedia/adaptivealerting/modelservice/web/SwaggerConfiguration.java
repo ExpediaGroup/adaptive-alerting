@@ -24,6 +24,7 @@ import com.google.common.base.Predicate;
 
 import com.fasterxml.classmate.TypeResolver;
 
+import lombok.Generated;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,7 +32,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.context.request.async.DeferredResult;
-
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.schema.WildcardType;
@@ -43,8 +43,11 @@ import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger.web.UiConfiguration;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+
+
 @EnableSwagger2
 @Configuration
+@Generated //(exclude from code coverage)
 @SuppressWarnings("unused")
 public class SwaggerConfiguration {
 

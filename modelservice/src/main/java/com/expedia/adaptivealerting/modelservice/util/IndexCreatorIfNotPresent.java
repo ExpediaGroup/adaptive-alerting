@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.modelservice.util;
 import com.expedia.adaptivealerting.modelservice.dao.es.ElasticSearchClient;
 import com.expedia.adaptivealerting.modelservice.dao.es.ElasticSearchConfig;
 import com.google.gson.JsonObject;
+import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
@@ -43,6 +44,7 @@ import static com.expedia.adaptivealerting.modelservice.dao.es.DetectorMappingEn
  */
 @Component
 @Slf4j
+@Generated //(exclude from code coverage)
 public class IndexCreatorIfNotPresent implements ApplicationListener<ApplicationReadyEvent> {
 
     @Autowired
