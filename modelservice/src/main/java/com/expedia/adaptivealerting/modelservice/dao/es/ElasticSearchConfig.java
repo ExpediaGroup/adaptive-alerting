@@ -19,6 +19,7 @@ import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.google.common.base.Supplier;
 import lombok.Data;
+import lombok.Generated;
 import lombok.val;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
@@ -66,6 +67,7 @@ public class ElasticSearchConfig {
     private RestHighLevelClient client;
 
     @PostConstruct
+    @Generated // (excluding from code coverage)
     public void init() {
         RestClientBuilder builder  = RestClient
                 .builder(HttpHost.create(urls))

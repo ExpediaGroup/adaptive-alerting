@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.modelservice.dao.es;
 
+import lombok.Generated;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequest;
@@ -37,6 +38,7 @@ import java.io.IOException;
  * So this wrapper class will help to address the issue.
  */
 @Component
+@Generated // (excluding from code coverage)
 public class ElasticSearchClient {
 
     @Autowired
