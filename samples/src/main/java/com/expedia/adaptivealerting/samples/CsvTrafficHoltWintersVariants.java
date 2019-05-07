@@ -138,7 +138,7 @@ public class CsvTrafficHoltWintersVariants {
                                                double alpha, double beta, double gammaLow, String... titleSuffix) {
 
         val factory = new LegacyDetectorFactory();
-        val detector = factory.createHoltWintersDetector(UUID.randomUUID(), new HoltWintersParams());
+        val detector = factory.createHoltWintersDetector(UUID.randomUUID(), params);
         val detectorFilter = new DetectorFilter(detector);
         val evalFilter = new EvaluatorFilter(new RmseEvaluator());
         val chartSink = PipelineFactory.createChartSink(String.format(
