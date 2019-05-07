@@ -18,19 +18,21 @@ package com.expedia.adaptivealerting.modelservice.dao.es;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.expedia.adaptivealerting.modelservice.model.Detector;
-import com.expedia.adaptivealerting.modelservice.model.DetectorMapping;
-import com.expedia.adaptivealerting.modelservice.model.MatchingDetectorsResponse;
-import com.expedia.adaptivealerting.modelservice.model.SearchMappingsRequest;
+import com.expedia.adaptivealerting.modelservice.model.*;
 import lombok.val;
+import org.elasticsearch.action.DocWriteResponse;
+import org.elasticsearch.action.delete.DeleteRequest;
+import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequest;
+import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.get.GetResponse;
+import org.elasticsearch.action.DocWriteResponse.Result;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.common.bytes.BytesArray;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.document.DocumentField;
+import org.elasticsearch.common.io.stream.ByteBufferStreamInput;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -41,23 +43,14 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.nio.ByteBuffer;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ElasticSearchDetectorMappingServiceTest {
@@ -215,6 +208,36 @@ public class ElasticSearchDetectorMappingServiceTest {
         detectorMappingService.findLastUpdated(TimeinSeconds);
     }
 
+    @Test
+    public void disableDetectorMapping() throws IOException {
+        val id = "adsvade8^szx";
+        GetResponse getResponse = mockGetResponse(id);
+        when(elasticSearchClient.get(any(GetRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(getResponse);
+        detectorMappingService.disableDetectorMapping(id);
+        verify(elasticSearchClient, atLeastOnce()).get(any(GetRequest.class), eq(RequestOptions.DEFAULT));
+    }
+
+    @Test
+    public void deleteDetectorMapping_successful() throws Exception {
+        val id = "adsvade8^szx";
+        DeleteResponse deleteResponse = mockDeleteResponse(id);
+        when(elasticSearchClient.delete(any(DeleteRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(new DeleteResponse());
+        detectorMappingService.deleteDetectorMapping(id);
+        verify(elasticSearchClient, atLeastOnce()).delete(any(DeleteRequest.class), eq(RequestOptions.DEFAULT));
+        assertEquals(id,deleteResponse.getId());
+        assertEquals(elasticSearchConfig.getIndexName(), deleteResponse.getIndex());
+        assertEquals("DELETED", deleteResponse.getResult().toString());
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void deleteDetectorMapping_fail() throws IOException {
+        val id = "adsvade8^szx";
+        DeleteRequest deleteRequest = new DeleteRequest(elasticSearchConfig.getIndexName(),
+                elasticSearchConfig.getDocType(), id);
+        when(elasticSearchClient.delete(any(DeleteRequest.class), eq(RequestOptions.DEFAULT))).thenThrow(new IOException());
+        detectorMappingService.deleteDetectorMapping(id);
+    }
+
     private SearchResponse mockSearchResponse(String searchIndex,int lookUpTime, String detectorUuid){
         SearchResponse searchResponse = mock(SearchResponse.class);
         Map<String, DocumentField> fields = new HashMap<>();
@@ -245,5 +268,23 @@ public class ElasticSearchDetectorMappingServiceTest {
         when(getResponse.getSourceAsString()).thenReturn(source);
         when(getResponse.getId()).thenReturn(id);
         return getResponse;
+    }
+
+    private DeleteResponse mockDeleteResponse(String id) {
+        DeleteResponse deleteResponse = mock(DeleteResponse.class);
+        Result ResultOpt;
+        when(deleteResponse.getId()).thenReturn(id);
+        String indexName = elasticSearchConfig.getIndexName();
+        when(deleteResponse.getIndex()).thenReturn(indexName);
+        try {
+            byte[] byteopt = new byte[]{2}; // 2 - DELETED, DeleteResponse.Result
+            ByteBuffer byteBuffer = ByteBuffer.wrap(byteopt);
+            ByteBufferStreamInput byteoptbytebufferstream = new ByteBufferStreamInput(byteBuffer);
+            ResultOpt = DocWriteResponse.Result.readFrom(byteoptbytebufferstream);
+            when(deleteResponse.getResult()).thenReturn(ResultOpt);
+        }
+        catch (IOException e) {
+        }
+        return deleteResponse;
     }
 }
