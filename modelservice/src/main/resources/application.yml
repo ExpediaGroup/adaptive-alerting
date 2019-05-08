@@ -3,12 +3,13 @@ spring:
     web-environment: true
     show-banner: false
   datasource:
-    url: "jdbc:mysql://database:3306/aa_model_service?autoReconnect=true"
-    username: ${USERNAME:root}
-    password: ${PASSWORD:""}
+    url: "jdbc:mysql://localhost:3306/aa_model_service?autoReconnect=true"
+    username: "root"
+    password: ""
     maximum-pool-size: 8
     minimum-idle: 0
     driver-class-name: "com.mysql.cj.jdbc.Driver"
+
   jpa:
     openInView: true
     database: "MYSQL"
@@ -33,11 +34,16 @@ management:
       tomcat: false
       system: false
       process: false
+elasticsearch:
+  clusterName: elasticsearch_kashah
+  hostName: localhost
+  port: 9300
+
 graphite:
-  urlTemplate: "https://graphiteUrl/render?from=-7d&format=json&maxDataPoints=2016&target=seriesByTag('{tags}')"
+  urlTemplate: "https://graphite.test.monitoring.expedia.com/render?from=-24hours&format=json&maxDataPoints=144&target=seriesByTag('{tags}')"
 security:
   clientId: "id"
   secret: "secret"
   signingKey: "1234"
 server:
-  port: 8008
+  port: 8080

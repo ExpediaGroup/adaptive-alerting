@@ -1,9 +1,11 @@
 package com.expedia.adaptivealerting.modelservice.test;
 
+import com.expedia.adaptivealerting.modelservice.entity.ElasticSearchDetector;
 import com.expedia.adaptivealerting.modelservice.entity.Metric;
 import com.expedia.adaptivealerting.modelservice.providers.graphite.GraphiteResult;
 import com.expedia.adaptivealerting.modelservice.service.AnomalyRequest;
 import com.expedia.adaptivealerting.modelservice.spi.MetricSourceResult;
+import com.expedia.adaptivealerting.modelservice.util.DateUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 
@@ -57,6 +59,17 @@ public class ObjectMother {
         metric.setHash("1.3dec7f4218c57c1839147f8ca190ed55");
         metric.setKey("key");
         return metric;
+    }
+
+    public ElasticSearchDetector getElasticSearchDetector() {
+        ElasticSearchDetector elasticSearchDetector = new ElasticSearchDetector();
+        elasticSearchDetector.setId("1");
+        elasticSearchDetector.setCreatedBy("user");
+        elasticSearchDetector.setUuid("uuid");
+        elasticSearchDetector.setDetectorConfig(new HashMap<>());
+        elasticSearchDetector.setEnabled(true);
+        elasticSearchDetector.setLastUpdateTimestamp(DateUtil.toUTCDate("2019-04-06 22:00:00"));
+        return elasticSearchDetector;
     }
 
     @SneakyThrows

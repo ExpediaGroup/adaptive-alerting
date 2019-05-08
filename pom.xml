@@ -83,6 +83,7 @@
         <apache.commons.math.version>3.6.1</apache.commons.math.version>
         <apache.httpcomponents.version>4.5.6</apache.httpcomponents.version>
         <codahale.metrics.version>3.0.2</codahale.metrics.version>
+        <elastic.search.client.version>5.6.0</elastic.search.client.version>
         <jackson.version>2.9.8</jackson.version>
         <jfreechart.version>1.0.19</jfreechart.version>
         <jopt.version>4.9</jopt.version>
@@ -107,6 +108,7 @@
         <scala.library.version>2.12.7</scala.library.version>
         <slf4j.version>1.7.25</slf4j.version>
         <spring.boot.version>2.0.5.RELEASE</spring.boot.version>
+        <spring.elasticsearch.version>3.0.8.RELEASE</spring.elasticsearch.version>
         <spring.security.jwt.version>1.0.9.RELEASE</spring.security.jwt.version>
         <spring.security.oauth2.version>2.3.5.RELEASE</spring.security.oauth2.version>
 
@@ -279,6 +281,11 @@
                 <version>${tomcat.jdbc.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.elasticsearch.client</groupId>
+                <artifactId>transport</artifactId>
+                <version>${elastic.search.client.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.jfree</groupId>
                 <artifactId>jfreechart</artifactId>
                 <version>${jfreechart.version}</version>
@@ -304,6 +311,7 @@
                 <artifactId>slf4j-api</artifactId>
                 <version>${slf4j.version}</version>
             </dependency>
+
 
             <!-- The exclusions below remove Logback, which competes with slf4j. [WLW] -->
             <dependency>
@@ -404,6 +412,11 @@
                 <groupId>org.springframework.security.oauth</groupId>
                 <artifactId>spring-security-oauth2</artifactId>
                 <version>${spring.security.oauth2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.data</groupId>
+                <artifactId>spring-data-elasticsearch</artifactId>
+                <version>${spring.elasticsearch.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.hateoas</groupId>
