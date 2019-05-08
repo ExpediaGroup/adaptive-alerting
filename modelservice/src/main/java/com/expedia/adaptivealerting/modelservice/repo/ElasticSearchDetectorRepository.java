@@ -22,6 +22,9 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
+/**
+ * Spring Data repository for detectors stored in elastic search.
+ */
 public interface ElasticSearchDetectorRepository extends ElasticsearchRepository<ElasticSearchDetector, String>, ElasticSearchDetectorRepoCustom {
 
     /**

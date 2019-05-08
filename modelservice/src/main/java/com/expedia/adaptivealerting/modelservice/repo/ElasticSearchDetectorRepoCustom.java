@@ -19,6 +19,9 @@ import com.expedia.adaptivealerting.modelservice.entity.ElasticSearchDetector;
 
 import java.util.List;
 
+/**
+ * Custom data repository for detectors stored in elastic search
+ */
 public interface ElasticSearchDetectorRepoCustom {
 
     void toggleDetector(ElasticSearchDetector detector, Boolean enabled);

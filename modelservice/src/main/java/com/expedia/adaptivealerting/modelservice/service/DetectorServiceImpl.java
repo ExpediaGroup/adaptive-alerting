@@ -26,6 +26,9 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+/**
+ * Service to fetch and modify detectors stored in elastic search
+ */
 @Slf4j
 @Service
 public class DetectorServiceImpl implements DetectorService {

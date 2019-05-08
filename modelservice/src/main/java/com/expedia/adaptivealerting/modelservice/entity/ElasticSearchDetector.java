@@ -31,7 +31,7 @@ import java.util.Map;
  * ElasticSearchDetector entity.
  */
 @Data
-@Document(indexName = "detectors", type = "detector")
+@Document(indexName = "detectors2", type = "detector")
 public class ElasticSearchDetector {
 
     @Id
