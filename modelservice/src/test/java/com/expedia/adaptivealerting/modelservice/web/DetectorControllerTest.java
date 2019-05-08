@@ -2,7 +2,7 @@ package com.expedia.adaptivealerting.modelservice.web;
 
 import com.expedia.adaptivealerting.modelservice.entity.ElasticSearchDetector;
 import com.expedia.adaptivealerting.modelservice.repo.ElasticSearchDetectorRepository;
-import com.expedia.adaptivealerting.modelservice.service.DetectorService;
+import com.expedia.adaptivealerting.modelservice.service.ElasticSearchService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +25,7 @@ public class DetectorControllerTest {
     private DetectorController detectorController;
 
     @Mock
-    private DetectorService detectorService;
+    private ElasticSearchService elasticSearchService;
 
     @Mock
     private ElasticSearchDetectorRepository repo;
@@ -37,13 +37,13 @@ public class DetectorControllerTest {
 
     @Test
     public void testToggleDetector() {
-        detectorService.toggleDetector("uuid", true);
+        elasticSearchService.toggleDetector("uuid", true);
     }
 
     @Test
     public void testGetLastUpdatedDetectors() {
         int interval = 5;
-        List<ElasticSearchDetector> detectors = detectorService.getLastUpdatedDetectors(interval);
+        List<ElasticSearchDetector> detectors = elasticSearchService.getLastUpdatedDetectors(interval);
         assertNotNull(detectors);
     }
 

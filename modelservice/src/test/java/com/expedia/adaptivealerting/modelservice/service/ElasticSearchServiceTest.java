@@ -21,10 +21,10 @@ import static org.junit.Assert.assertNotNull;
 
 @Slf4j
 @RunWith(MockitoJUnitRunner.class)
-public class DetectorServiceTest {
+public class ElasticSearchServiceTest {
 
     @InjectMocks
-    private DetectorService detectorService = new DetectorServiceImpl();
+    private ElasticSearchService elasticSearchService = new ElasticSearchServiceImpl();
 
     @Mock
     private ElasticSearchDetectorRepository elasticSearchDetectorRepository;
@@ -42,12 +42,12 @@ public class DetectorServiceTest {
 
     @Test
     public void testToggleDetector() {
-        detectorService.toggleDetector("uuid", true);
+        elasticSearchService.toggleDetector("uuid", true);
     }
 
     @Test
     public void testGetLastUpdatedDetectors() {
-        List<ElasticSearchDetector> actualDetectors = detectorService.getLastUpdatedDetectors(10);
+        List<ElasticSearchDetector> actualDetectors = elasticSearchService.getLastUpdatedDetectors(10);
         assertNotNull(actualDetectors);
         Assert.assertEquals(1, actualDetectors.size());
         Assert.assertEquals("uuid", actualDetectors.get(0).getUuid());

@@ -48,5 +48,4 @@ public class ElasticSearchDetector {
     private String createdBy;
 
     private Boolean enabled;
-
 }

@@ -31,7 +31,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
-public class DetectorServiceImpl implements DetectorService {
+public class ElasticSearchServiceImpl implements ElasticSearchService {
 
     @Autowired
     private ElasticSearchDetectorRepository elasticSearchDetectorRepository;

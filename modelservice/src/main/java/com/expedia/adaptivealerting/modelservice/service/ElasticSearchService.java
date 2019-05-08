@@ -19,7 +19,7 @@ import com.expedia.adaptivealerting.modelservice.entity.ElasticSearchDetector;
 
 import java.util.List;
 
-public interface DetectorService {
+public interface ElasticSearchService {
 
     void toggleDetector(String uuid, Boolean enabled);
 
