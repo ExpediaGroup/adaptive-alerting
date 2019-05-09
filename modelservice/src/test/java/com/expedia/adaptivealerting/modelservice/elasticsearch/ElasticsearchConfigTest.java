@@ -26,7 +26,6 @@ public class ElasticsearchConfigTest {
     @Test
     public void testGetClient() {
         Client elasticsearchClient = elasticsearchConfig.client();
-        System.out.println(elasticsearchClient.getClass());
         assertEquals(PreBuiltTransportClient.class, elasticsearchClient.getClass());
         assertNotNull(elasticsearchClient);
     }

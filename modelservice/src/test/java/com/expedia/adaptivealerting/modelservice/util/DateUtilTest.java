@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import org.junit.Test;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
@@ -41,5 +42,13 @@ public class DateUtilTest {
         Date actual = DateUtil.toUTCDate(instString);
         Date expected = format.parse("2016-11-07 21:51:40");
         assertEquals(actual, expected);
+    }
+
+    @Test(expected = ParseException.class)
+    @SneakyThrows
+    public void testToUTCDateThrowsException() {
+        DateFormat format = new SimpleDateFormat(dateFormat);
+        format.setTimeZone(TimeZone.getTimeZone("UTC"));
+        Date expected = format.parse("2016-11-07T21:51:40Z");
     }
 }

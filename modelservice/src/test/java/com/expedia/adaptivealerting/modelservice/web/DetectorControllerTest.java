@@ -13,8 +13,11 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
 @Slf4j
@@ -27,8 +30,12 @@ public class DetectorControllerTest {
     @Mock
     private ElasticsearchDetectorRepository repo;
 
+    @Mock
+    private List<ElasticsearchDetector> detectors;
+
     @Before
     public void setUp() {
+        when(elasticsearchService.getLastUpdatedDetectors(anyInt())).thenReturn(detectors);
     }
 
     @Test
@@ -40,8 +47,9 @@ public class DetectorControllerTest {
     @Test
     public void testGetLastUpdatedDetectors() {
         int interval = 5;
-        List<ElasticsearchDetector> detectors = elasticsearchService.getLastUpdatedDetectors(interval);
+        List<ElasticsearchDetector> actualDetectors = elasticsearchService.getLastUpdatedDetectors(interval);
         assertNotNull(detectors);
+        assertSame(detectors, actualDetectors);
     }
 
 }
