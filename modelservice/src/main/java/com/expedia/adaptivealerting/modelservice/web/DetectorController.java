@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.modelservice.web;
 
-import com.expedia.adaptivealerting.modelservice.entity.ElasticSearchDetector;
-import com.expedia.adaptivealerting.modelservice.service.ElasticSearchService;
+import com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetector;
+import com.expedia.adaptivealerting.modelservice.service.ElasticsearchService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,15 +33,15 @@ import java.util.List;
 public class DetectorController {
 
     @Autowired
-    private ElasticSearchService elasticSearchService;
+    private ElasticsearchService elasticsearchService;
 
     @PostMapping(path = "/toggleDetector", consumes = "application/json", produces = "application/json")
     public void toggleDetector(@RequestParam String uuid, @RequestParam Boolean enabled) {
-        elasticSearchService.toggleDetector(uuid, enabled);
+        elasticsearchService.toggleDetector(uuid, enabled);
     }
 
     @GetMapping(path = "/getLastUpdatedDetectors")
-    public List<ElasticSearchDetector> getLastUpdatedDetectors(@RequestParam int interval) {
-        return elasticSearchService.getLastUpdatedDetectors(interval);
+    public List<ElasticsearchDetector> getLastUpdatedDetectors(@RequestParam int interval) {
+        return elasticsearchService.getLastUpdatedDetectors(interval);
     }
 }

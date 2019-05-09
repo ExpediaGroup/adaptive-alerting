@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice;
+package com.expedia.adaptivealerting.modelservice.elasticsearch;
 
 import lombok.SneakyThrows;
 import org.elasticsearch.client.Client;
@@ -32,10 +32,10 @@ import java.net.InetAddress;
 
 @Configuration
 @EnableElasticsearchRepositories(basePackages = "com.expedia.adaptivealerting.modelservice.repo")
-public class ElasticSearchConfig {
+public class ElasticsearchConfig {
 
     @Autowired
-    private ElasticSearchSettings settings;
+    private ElasticsearchSettings settings;
 
     @Bean
     @SneakyThrows

@@ -13,19 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.repo;
+package com.expedia.adaptivealerting.modelservice.service;
 
-import com.expedia.adaptivealerting.modelservice.entity.ElasticSearchDetector;
+import com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetector;
 
 import java.util.List;
 
-/**
- * Custom data repository for detectors stored in elastic search
- */
-public interface ElasticSearchDetectorRepoCustom {
+public interface ElasticsearchService {
 
-    void toggleDetector(ElasticSearchDetector detector, Boolean enabled);
+    void toggleDetector(String uuid, Boolean enabled);
 
-    List<ElasticSearchDetector> getLastUpdatedDetectors(String fromDate, String toDate);
-
+    List<ElasticsearchDetector> getLastUpdatedDetectors(int interval);
 }

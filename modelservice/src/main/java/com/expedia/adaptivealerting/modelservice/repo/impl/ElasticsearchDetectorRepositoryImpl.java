@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.modelservice.repo.impl;
 
-import com.expedia.adaptivealerting.modelservice.entity.ElasticSearchDetector;
-import com.expedia.adaptivealerting.modelservice.repo.ElasticSearchDetectorRepoCustom;
+import com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetector;
+import com.expedia.adaptivealerting.modelservice.repo.ElasticsearchDetectorRepoCustom;
 import com.expedia.adaptivealerting.modelservice.util.DateUtil;
 import lombok.val;
 import org.elasticsearch.action.index.IndexRequest;
@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ElasticSearchDetectorRepositoryImpl implements ElasticSearchDetectorRepoCustom {
+public class ElasticsearchDetectorRepositoryImpl implements ElasticsearchDetectorRepoCustom {
 
     private static final int RESULTS_SIZE = 500;
 
@@ -43,19 +43,19 @@ public class ElasticSearchDetectorRepositoryImpl implements ElasticSearchDetecto
     private Client elasticSearchClient;
 
     @Override
-    public void toggleDetector(ElasticSearchDetector detector, Boolean enabled) {
+    public void toggleDetector(ElasticsearchDetector detector, Boolean enabled) {
         val indexRequest = new IndexRequest();
         indexRequest.source("enabled", enabled);
-        val updateQuery = new UpdateQueryBuilder().withId(detector.getId()).withClass(ElasticSearchDetector.class).withIndexRequest(indexRequest).build();
+        val updateQuery = new UpdateQueryBuilder().withId(detector.getId()).withClass(ElasticsearchDetector.class).withIndexRequest(indexRequest).build();
         elasticsearchTemplate.update(updateQuery);
     }
 
     @Override
-    public List<ElasticSearchDetector> getLastUpdatedDetectors(String fromDate, String toDate) {
+    public List<ElasticsearchDetector> getLastUpdatedDetectors(String fromDate, String toDate) {
 
         val matchDocumentsWithinRange = buildQueryBuilder(fromDate, toDate);
         val hits = getElasticSearchResponse(matchDocumentsWithinRange).getHits();
-        List<ElasticSearchDetector> elasticSearchDetectors = new ArrayList<>();
+        List<ElasticsearchDetector> elasticSearchDetectors = new ArrayList<>();
 
         for (val hit : hits) {
             val source = hit.getSource();
@@ -77,8 +77,8 @@ public class ElasticSearchDetectorRepositoryImpl implements ElasticSearchDetecto
                 .execute().actionGet();
     }
 
-    private ElasticSearchDetector getElasticSearchDetector(Map<String, Object> source) {
-        return ElasticSearchDetector.builder()
+    private ElasticsearchDetector getElasticSearchDetector(Map<String, Object> source) {
+        return ElasticsearchDetector.builder()
                 .id((String) source.get("id"))
                 .createdBy((String) source.get("createdBy"))
                 .uuid((String) source.get("uuid"))

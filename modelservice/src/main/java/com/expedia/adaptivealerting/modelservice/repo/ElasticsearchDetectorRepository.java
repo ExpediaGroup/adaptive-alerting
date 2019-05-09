@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.repo;
 
 
-import com.expedia.adaptivealerting.modelservice.entity.ElasticSearchDetector;
+import com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetector;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.data.repository.query.Param;
 
@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * Spring Data repository for detectors stored in elastic search.
  */
-public interface ElasticSearchDetectorRepository extends ElasticsearchRepository<ElasticSearchDetector, String>, ElasticSearchDetectorRepoCustom {
+public interface ElasticsearchDetectorRepository extends ElasticsearchRepository<ElasticsearchDetector, String>, ElasticsearchDetectorRepoCustom {
 
     /**
      * Finds a detector by its unique uuid, if any.
@@ -33,7 +33,7 @@ public interface ElasticSearchDetectorRepository extends ElasticsearchRepository
      * @param uuid Detector uuid.
      * @return Detector identified by the unique key.
      */
-    ElasticSearchDetector findElasticSearchDetectorByUuid(@Param("uuid") String uuid);
+    ElasticsearchDetector findElasticSearchDetectorByUuid(@Param("uuid") String uuid);
 
     /**
      * Finds a list of detectors created by provided user, if any.
@@ -41,7 +41,7 @@ public interface ElasticSearchDetectorRepository extends ElasticsearchRepository
      * @param user Detector user.
      * @return List of detectors for the provided user.
      */
-    List<ElasticSearchDetector> findElasticSearchDetectorByCreatedBy(@Param("user") String user);
+    List<ElasticsearchDetector> findElasticSearchDetectorByCreatedBy(@Param("user") String user);
 
 }
 

@@ -34,7 +34,7 @@ import java.util.Map;
 @Data
 @Builder
 @Document(indexName = "detectors", type = "detector")
-public class ElasticSearchDetector {
+public class ElasticsearchDetector {
 
     @Id
     private String id;

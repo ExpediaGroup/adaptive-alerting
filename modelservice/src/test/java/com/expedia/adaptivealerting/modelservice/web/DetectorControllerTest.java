@@ -1,8 +1,8 @@
 package com.expedia.adaptivealerting.modelservice.web;
 
-import com.expedia.adaptivealerting.modelservice.entity.ElasticSearchDetector;
-import com.expedia.adaptivealerting.modelservice.repo.ElasticSearchDetectorRepository;
-import com.expedia.adaptivealerting.modelservice.service.ElasticSearchService;
+import com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetector;
+import com.expedia.adaptivealerting.modelservice.repo.ElasticsearchDetectorRepository;
+import com.expedia.adaptivealerting.modelservice.service.ElasticsearchService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,10 +22,10 @@ import static org.mockito.Mockito.verify;
 public class DetectorControllerTest {
 
     @Mock
-    private ElasticSearchService elasticSearchService;
+    private ElasticsearchService elasticsearchService;
 
     @Mock
-    private ElasticSearchDetectorRepository repo;
+    private ElasticsearchDetectorRepository repo;
 
     @Before
     public void setUp() {
@@ -33,14 +33,14 @@ public class DetectorControllerTest {
 
     @Test
     public void testToggleDetector() {
-        elasticSearchService.toggleDetector("uuid", true);
-        verify(elasticSearchService, atLeastOnce()).toggleDetector("uuid", true);
+        elasticsearchService.toggleDetector("uuid", true);
+        verify(elasticsearchService, atLeastOnce()).toggleDetector("uuid", true);
     }
 
     @Test
     public void testGetLastUpdatedDetectors() {
         int interval = 5;
-        List<ElasticSearchDetector> detectors = elasticSearchService.getLastUpdatedDetectors(interval);
+        List<ElasticsearchDetector> detectors = elasticsearchService.getLastUpdatedDetectors(interval);
         assertNotNull(detectors);
     }
 

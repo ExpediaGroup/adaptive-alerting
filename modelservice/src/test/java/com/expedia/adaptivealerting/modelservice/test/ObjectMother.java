@@ -1,6 +1,6 @@
 package com.expedia.adaptivealerting.modelservice.test;
 
-import com.expedia.adaptivealerting.modelservice.entity.ElasticSearchDetector;
+import com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetector;
 import com.expedia.adaptivealerting.modelservice.entity.Metric;
 import com.expedia.adaptivealerting.modelservice.providers.graphite.GraphiteResult;
 import com.expedia.adaptivealerting.modelservice.service.AnomalyRequest;
@@ -61,8 +61,8 @@ public class ObjectMother {
         return metric;
     }
 
-    public ElasticSearchDetector getElasticSearchDetector() {
-        ElasticSearchDetector elasticSearchDetector = ElasticSearchDetector.builder()
+    public ElasticsearchDetector getElasticsearchDetector() {
+        ElasticsearchDetector elasticSearchDetector = ElasticsearchDetector.builder()
                 .id("1")
                 .createdBy("user")
                 .uuid("uuid")

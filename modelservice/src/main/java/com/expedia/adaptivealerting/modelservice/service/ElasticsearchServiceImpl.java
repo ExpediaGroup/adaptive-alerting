@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.modelservice.service;
 
-import com.expedia.adaptivealerting.modelservice.entity.ElasticSearchDetector;
-import com.expedia.adaptivealerting.modelservice.repo.ElasticSearchDetectorRepository;
+import com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetector;
+import com.expedia.adaptivealerting.modelservice.repo.ElasticsearchDetectorRepository;
 import com.expedia.adaptivealerting.modelservice.util.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,17 +31,17 @@ import java.util.List;
  */
 @Slf4j
 @Service
-public class ElasticSearchServiceImpl implements ElasticSearchService {
+public class ElasticsearchServiceImpl implements ElasticsearchService {
 
     @Autowired
-    private ElasticSearchDetectorRepository elasticSearchDetectorRepository;
+    private ElasticsearchDetectorRepository elasticSearchDetectorRepository;
 
     public void toggleDetector(String uuid, Boolean enabled) {
-        ElasticSearchDetector detector = elasticSearchDetectorRepository.findElasticSearchDetectorByUuid(uuid);
+        ElasticsearchDetector detector = elasticSearchDetectorRepository.findElasticSearchDetectorByUuid(uuid);
         elasticSearchDetectorRepository.toggleDetector(detector, enabled);
     }
 
-    public List<ElasticSearchDetector> getLastUpdatedDetectors(int interval) {
+    public List<ElasticsearchDetector> getLastUpdatedDetectors(int interval) {
         Instant now = DateUtil.now().toInstant();
         String toDate = DateUtil.toUtcDateString(now);
         String fromDate = DateUtil.toUtcDateString((now.minus(interval, ChronoUnit.MINUTES)));

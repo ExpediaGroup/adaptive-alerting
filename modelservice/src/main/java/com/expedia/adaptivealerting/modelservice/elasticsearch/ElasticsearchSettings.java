@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice;
+package com.expedia.adaptivealerting.modelservice.elasticsearch;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConfigurationProperties(prefix = "elasticsearch")
-public class ElasticSearchSettings {
+public class ElasticsearchSettings {
     private String clusterName;
     private String hostName;
     private int port;
