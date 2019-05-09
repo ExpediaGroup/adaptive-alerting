@@ -16,12 +16,14 @@
 package com.expedia.adaptivealerting.modelservice.dao.es;
 import com.expedia.adaptivealerting.modelservice.model.Detector;
 import com.expedia.adaptivealerting.modelservice.model.User;
-import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class DetectorMappingEntity {
     // Prefixing variable names with 'aa_' to reserve these fields to be used in ES mappings.
     public static final String AA_PREFIX = "aa_";
@@ -34,16 +36,16 @@ public class DetectorMappingEntity {
     public static final String LAST_MOD_TIME_KEYWORD = AA_PREFIX + "lastModifiedTime";
     public static final String CREATE_TIME_KEYWORD = AA_PREFIX + "createdTime";
 
-    @SerializedName(USER_KEYWORD)
+    @JsonProperty(USER_KEYWORD)
     private User user;
-    @SerializedName(DETECTOR_KEYWORD)
+    @JsonProperty(DETECTOR_KEYWORD)
     private Detector detector;
-    @SerializedName(QUERY_KEYWORD)
+    @JsonProperty(QUERY_KEYWORD)
     private Query query;
-    @SerializedName(ENABLED)
+    @JsonProperty(ENABLED)
     private boolean enabled;
-    @SerializedName(LAST_MOD_TIME_KEYWORD)
+    @JsonProperty(LAST_MOD_TIME_KEYWORD)
     private long lastModifiedTimeInMillis;
-    @SerializedName(CREATE_TIME_KEYWORD)
+    @JsonProperty(CREATE_TIME_KEYWORD)
     private long createdTimeInMillis;
 }

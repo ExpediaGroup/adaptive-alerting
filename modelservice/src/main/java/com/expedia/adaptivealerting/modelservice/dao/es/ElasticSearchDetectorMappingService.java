@@ -26,7 +26,7 @@ import com.expedia.adaptivealerting.modelservice.model.DetectorMatchResponse;
 import com.expedia.adaptivealerting.modelservice.model.MatchingDetectorsResponse;
 import com.expedia.adaptivealerting.modelservice.model.SearchMappingsRequest;
 import com.expedia.adaptivealerting.modelservice.util.QueryUtil;
-import com.google.gson.Gson;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsRequest;
@@ -75,7 +75,7 @@ import static com.expedia.adaptivealerting.modelservice.dao.es.DetectorMappingEn
 @Slf4j
 @SuppressWarnings({"PMD.ExcessiveImports", "PMD.AvoidThrowingRawExceptionTypes"})
 public class ElasticSearchDetectorMappingService implements DetectorMappingService {
-    private static Gson gson = new Gson();
+    private static ObjectMapper objectmapper    = new ObjectMapper();
 
     @Autowired
     private ElasticSearchConfig elasticSearchConfig;
@@ -128,12 +128,12 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
             System.currentTimeMillis(), System.currentTimeMillis());
         final IndexRequest indexRequest = new IndexRequest(elasticSearchConfig.getIndexName(),
             elasticSearchConfig.getDocType());
-        indexRequest.source(gson.toJson(detectorMappingEntity), XContentType.JSON);
+        indexRequest.source(DetectorMappingEntityToJson(detectorMappingEntity), XContentType.JSON);
         try {
             IndexResponse indexResponse = elasticSearchClient.index(indexRequest, RequestOptions.DEFAULT);
             return indexResponse.getId();
         } catch (IOException e) {
-            log.error(String.format("Indexing mapping %s failed", gson.toJson(detectorMappingEntity)), e);
+            log.error(String.format("Indexing mapping %s failed", DetectorMappingEntityToJson(detectorMappingEntity), e));
             throw new RuntimeException(e);
         }
     }
@@ -184,7 +184,7 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
     private void updateDetectorMapping(String index, DetectorMappingEntity detectorMappingEntity) {
         final IndexRequest indexRequest = new IndexRequest(elasticSearchConfig.getIndexName(),
                 elasticSearchConfig.getDocType(), index);
-        indexRequest.source(gson.toJson(detectorMappingEntity), XContentType.JSON);
+        indexRequest.source(DetectorMappingEntityToJson(detectorMappingEntity), XContentType.JSON);
         try {
             elasticSearchClient.index(indexRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
@@ -319,7 +319,7 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
 
     private DetectorMapping getDetectorMapping(String json, String id,
                                                Optional<Map<String, DocumentField>> documentFieldMap) {
-        DetectorMappingEntity detectorEntity = gson.fromJson(json, DetectorMappingEntity.class);
+        DetectorMappingEntity detectorEntity = DetectorMappingEntityFromJson(json);
         DetectorMapping detectorMapping = new DetectorMapping();
         detectorMapping.setId(id);
         detectorMapping.setDetector(new Detector(detectorEntity.getDetector().getId()));
@@ -353,5 +353,25 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
 
         });
         return new MatchingDetectorsResponse(groupedDetectorsByIndex, res.getLookupTimeInMillis());
+    }
+
+    private String DetectorMappingEntityToJson(DetectorMappingEntity detectorMappingEntity) {
+        try {
+            return objectmapper.writeValueAsString(detectorMappingEntity);
+        }
+        catch (Exception e) {
+            log.error("Serialization error", e);
+        }
+        return null;
+    }
+
+    private DetectorMappingEntity DetectorMappingEntityFromJson(String json) {
+        try {
+            return objectmapper.readValue(json, DetectorMappingEntity.class);
+        }
+        catch (Exception e) {
+            log.error("Deserialization error", e);
+        }
+        return null;
     }
 }

@@ -17,8 +17,10 @@ package com.expedia.adaptivealerting.modelservice.dao.es;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class Query {
     private BoolCondition bool;
