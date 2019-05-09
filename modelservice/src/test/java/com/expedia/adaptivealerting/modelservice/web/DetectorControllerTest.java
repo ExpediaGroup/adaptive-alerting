@@ -7,7 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
@@ -24,6 +26,9 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class DetectorControllerTest {
 
+    @InjectMocks
+    private DetectorController controller;
+
     @Mock
     private ElasticsearchService elasticsearchService;
 
@@ -35,20 +40,21 @@ public class DetectorControllerTest {
 
     @Before
     public void setUp() {
+        this.controller = new DetectorController();
+        MockitoAnnotations.initMocks(this);
         when(elasticsearchService.getLastUpdatedDetectors(anyInt())).thenReturn(detectors);
     }
 
     @Test
     public void testToggleDetector() {
-        elasticsearchService.toggleDetector("uuid", true);
-        verify(elasticsearchService, atLeastOnce()).toggleDetector("uuid", true);
+        controller.toggleDetector("uuid", true);
     }
 
     @Test
     public void testGetLastUpdatedDetectors() {
         int interval = 5;
-        List<ElasticsearchDetector> actualDetectors = elasticsearchService.getLastUpdatedDetectors(interval);
-        assertNotNull(detectors);
+        List<ElasticsearchDetector> actualDetectors = controller.getLastUpdatedDetectors(interval);
+        assertNotNull(actualDetectors);
         assertSame(detectors, actualDetectors);
     }
 
