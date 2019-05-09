@@ -40,7 +40,7 @@ security:
   signingKey: $${SIGNING_KEY}
 
 datasource-es:
-  create.index.if.not.found: true
+  createIndexIfNotFound: true
   index.name: ${detector_mapper_index_name}
   doctype: ${detector_mapper_doctype}
   urls: ${detector_mapper_es_urls}
