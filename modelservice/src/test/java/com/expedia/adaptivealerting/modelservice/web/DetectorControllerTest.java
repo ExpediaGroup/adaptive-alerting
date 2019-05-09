@@ -7,22 +7,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
 
 
 @Slf4j
 @RunWith(MockitoJUnitRunner.class)
 public class DetectorControllerTest {
-
-    @InjectMocks
-    private DetectorController detectorController;
 
     @Mock
     private ElasticSearchService elasticSearchService;
@@ -32,12 +29,12 @@ public class DetectorControllerTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
     }
 
     @Test
     public void testToggleDetector() {
         elasticSearchService.toggleDetector("uuid", true);
+        verify(elasticSearchService, atLeastOnce()).toggleDetector("uuid", true);
     }
 
     @Test

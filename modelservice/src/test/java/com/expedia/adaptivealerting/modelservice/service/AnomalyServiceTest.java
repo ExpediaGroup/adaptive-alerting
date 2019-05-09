@@ -54,7 +54,6 @@ public class AnomalyServiceTest {
         initDependencies();
         metricSources.add(graphiteMetricSource);
         metricSourceResults.add(metricSourceResult);
-        MockitoAnnotations.initMocks(this);
     }
 
     @Test

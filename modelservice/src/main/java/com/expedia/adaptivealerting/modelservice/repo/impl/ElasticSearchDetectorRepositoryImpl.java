@@ -78,14 +78,13 @@ public class ElasticSearchDetectorRepositoryImpl implements ElasticSearchDetecto
     }
 
     private ElasticSearchDetector getElasticSearchDetector(Map<String, Object> source) {
-
-        val elasticSearchDetector = new ElasticSearchDetector();
-        elasticSearchDetector.setId((String) source.get("id"));
-        elasticSearchDetector.setCreatedBy((String) source.get("createdBy"));
-        elasticSearchDetector.setUuid((String) source.get("uuid"));
-        elasticSearchDetector.setDetectorConfig((Map<String, Object>) source.get("detectorConfig"));
-        elasticSearchDetector.setEnabled((Boolean) source.get("enabled"));
-        elasticSearchDetector.setLastUpdateTimestamp(DateUtil.toUTCDate((String) source.get("lastUpdateTimestamp")));
-        return elasticSearchDetector;
+        return ElasticSearchDetector.builder()
+                .id((String) source.get("id"))
+                .createdBy((String) source.get("createdBy"))
+                .uuid((String) source.get("uuid"))
+                .detectorConfig((Map<String, Object>) source.get("detectorConfig"))
+                .enabled((Boolean) source.get("enabled"))
+                .lastUpdateTimestamp(DateUtil.toUTCDate((String) source.get("lastUpdateTimestamp")))
+                .build();
     }
 }

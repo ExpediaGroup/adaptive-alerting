@@ -34,7 +34,7 @@ management:
       system: false
       process: false
 elasticsearch:
-  clusterName: elasticsearch_kashah
+  clusterName: elasticsearch
   hostName: localhost
   port: 9300
 graphite:

@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
@@ -31,6 +32,7 @@ import java.util.Map;
  * ElasticSearchDetector entity.
  */
 @Data
+@Builder
 @Document(indexName = "detectors", type = "detector")
 public class ElasticSearchDetector {
 
@@ -48,4 +50,5 @@ public class ElasticSearchDetector {
     private String createdBy;
 
     private Boolean enabled;
+
 }

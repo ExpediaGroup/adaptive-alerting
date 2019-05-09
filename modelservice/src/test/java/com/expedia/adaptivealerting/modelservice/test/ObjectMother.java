@@ -62,12 +62,12 @@ public class ObjectMother {
     }
 
     public ElasticSearchDetector getElasticSearchDetector() {
-        ElasticSearchDetector elasticSearchDetector = new ElasticSearchDetector();
-        elasticSearchDetector.setId("1");
-        elasticSearchDetector.setCreatedBy("user");
-        elasticSearchDetector.setUuid("uuid");
-        elasticSearchDetector.setDetectorConfig(new HashMap<>());
-        elasticSearchDetector.setEnabled(true);
+        ElasticSearchDetector elasticSearchDetector = ElasticSearchDetector.builder()
+                .id("1")
+                .createdBy("user")
+                .uuid("uuid")
+                .detectorConfig(new HashMap<>())
+                .enabled(true).build();
         elasticSearchDetector.setLastUpdateTimestamp(DateUtil.toUTCDate("2019-04-06 22:00:00"));
         return elasticSearchDetector;
     }
