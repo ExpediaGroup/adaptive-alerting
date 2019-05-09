@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.modelservice.repo.impl;
 import com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetector;
 import com.expedia.adaptivealerting.modelservice.repo.ElasticsearchDetectorRepoCustom;
 import com.expedia.adaptivealerting.modelservice.util.DateUtil;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public class ElasticsearchDetectorRepositoryImpl implements ElasticsearchDetectorRepoCustom {
 
     private static final int RESULTS_SIZE = 500;
@@ -54,9 +56,10 @@ public class ElasticsearchDetectorRepositoryImpl implements ElasticsearchDetecto
     public List<ElasticsearchDetector> getLastUpdatedDetectors(String fromDate, String toDate) {
 
         val matchDocumentsWithinRange = buildQueryBuilder(fromDate, toDate);
-        val hits = getElasticSearchResponse(matchDocumentsWithinRange).getHits();
-        List<ElasticsearchDetector> elasticSearchDetectors = new ArrayList<>();
+        val elasticsearchResponse = getElasticSearchResponse(matchDocumentsWithinRange);
+        val hits = elasticsearchResponse.getHits().getHits();
 
+        List<ElasticsearchDetector> elasticSearchDetectors = new ArrayList<>();
         for (val hit : hits) {
             val source = hit.getSource();
             elasticSearchDetectors.add(getElasticSearchDetector(source));
@@ -74,7 +77,8 @@ public class ElasticsearchDetectorRepositoryImpl implements ElasticsearchDetecto
         return elasticSearchClient.prepareSearch()
                 .setSize(RESULTS_SIZE)
                 .setQuery(queryBuilder)
-                .execute().actionGet();
+                .execute()
+                .actionGet();
     }
 
     private ElasticsearchDetector getElasticSearchDetector(Map<String, Object> source) {

@@ -22,23 +22,6 @@ public class ObjectMother {
     private ObjectMother() {
     }
 
-    public GraphiteResult[] getGraphiteData() {
-        GraphiteResult[] results = new GraphiteResult[1];
-        GraphiteResult result = new GraphiteResult();
-        result.setDatapoints(getDataPoints());
-        result.setTags(getTags());
-        result.setTarget("target");
-        results[0] = result;
-        return results;
-    }
-
-    public MetricSourceResult getMetricData() {
-        MetricSourceResult result = new MetricSourceResult();
-        result.setDataPoint(78.0);
-        result.setEpochSecond(1548830400);
-        return result;
-    }
-
     public AnomalyRequest getAnomalyRequest() {
         AnomalyRequest request = new AnomalyRequest();
         request.setDetectorParams(getDetectorParams());
@@ -54,11 +37,14 @@ public class ObjectMother {
         return detectorParams;
     }
 
-    public Metric getMetric() {
-        Metric metric = new Metric();
-        metric.setHash("1.3dec7f4218c57c1839147f8ca190ed55");
-        metric.setKey("key");
-        return metric;
+    public GraphiteResult[] getGraphiteData() {
+        GraphiteResult[] results = new GraphiteResult[1];
+        GraphiteResult result = new GraphiteResult();
+        result.setDatapoints(getDataPoints());
+        result.setTags(getTags());
+        result.setTarget("target");
+        results[0] = result;
+        return results;
     }
 
     public ElasticsearchDetector getElasticsearchDetector() {
@@ -72,11 +58,28 @@ public class ObjectMother {
         return elasticSearchDetector;
     }
 
+    public Map<String, Object> getElasticSearchSource() {
+        Map<String, Object> source = new HashMap<>();
+        source.put("lastUpdateTimestamp", "2019-10-05 12:00:00");
+        source.put("createdBy", "kashah");
+        source.put("uuid", "uuid");
+        source.put("enabled", true);
+        source.put("detectorConfig", new HashMap<>());
+        return source;
+    }
+
+    public MetricSourceResult getMetricData() {
+        MetricSourceResult result = new MetricSourceResult();
+        result.setDataPoint(78.0);
+        result.setEpochSecond(1548830400);
+        return result;
+    }
+
+
     @SneakyThrows
     private Map<String, Object> toObject(String message) {
         return new ObjectMapper().readValue(message, HashMap.class);
     }
-
 
     private String[][] getDataPoints() {
         String[][] datapoints = new String[2][2];
