@@ -43,7 +43,7 @@ public class ElasticSearchConfig {
 
     @Value("${datasource-es.index.name}")
     private String indexName;
-    @Value("${datasource-es.create.index.if.not.found:false}")
+    @Value("${datasource-createIndexIfNotFound:false}")
     private boolean createIndexIfNotFound;
     @Value("${datasource-es.doctype}")
     private String docType;

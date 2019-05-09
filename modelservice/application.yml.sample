@@ -24,7 +24,7 @@ endpoints:
     sensitive: false
 
 datasource-es:
-  create.index.if.not.found: true
+  createIndexIfNotFound: true
   index.name: ${ES_INDEX_NAME}
   doctype: ${ES_DOCTYPE}
   urls: ${ES_URL}

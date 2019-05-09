@@ -19,7 +19,6 @@ import com.expedia.adaptivealerting.modelservice.model.CreateDetectorMappingRequ
 import com.expedia.adaptivealerting.modelservice.model.DetectorMapping;
 import com.expedia.adaptivealerting.modelservice.model.MatchingDetectorsResponse;
 import com.expedia.adaptivealerting.modelservice.model.SearchMappingsRequest;
-import com.expedia.adaptivealerting.modelservice.model.UpdateDetectorMappingRequest;
 
 import java.util.List;
 import java.util.Map;

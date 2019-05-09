@@ -27,7 +27,6 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 @Component
-@Generated //(exclude from code coverage)
 public class RequestValidator {
 
     public void validateUser(User user) {
