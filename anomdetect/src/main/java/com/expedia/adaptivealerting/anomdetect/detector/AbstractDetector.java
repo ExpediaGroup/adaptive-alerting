@@ -15,12 +15,20 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detector;
 
+import com.expedia.adaptivealerting.anomdetect.detector.aggregator.Aggregator;
+import com.expedia.adaptivealerting.anomdetect.detector.aggregator.PassThroughAggregator;
+import lombok.Getter;
+
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 public abstract class AbstractDetector implements Detector {
+
+    @Getter
     private UUID uuid;
+
+    @Getter
     private Aggregator aggregator;
 
     public AbstractDetector(UUID uuid) {
@@ -30,11 +38,9 @@ public abstract class AbstractDetector implements Detector {
     public AbstractDetector(UUID uuid, Aggregator aggregator) {
         notNull(uuid, "uuid can't be null");
         notNull(aggregator, "aggregator can't be null");
+
         this.uuid = uuid;
         this.aggregator = aggregator;
     }
 
-    public UUID getUuid() {
-        return uuid;
-    }
 }

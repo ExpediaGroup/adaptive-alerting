@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.val;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 @RequiredArgsConstructor
@@ -49,14 +50,18 @@ public class PowerLawIntervalForecaster implements IntervalForecaster {
 
     @Data
     @Accessors(chain = true)
-    public static final class Params {
+    public static final class Params implements IntervalForecasterParams {
         private double alpha;
         private double beta;
         private double weakMultiplier;
         private double strongMultiplier;
 
+        @Override
         public void validate() {
-            // TODO Implement
+            isTrue(alpha > 0.0, "Required: alpha >= 0.0");
+            isTrue(beta > 0.0, "Required: beta >= 0.0");
+            isTrue(weakMultiplier >= 0.0, "Required: weakMultiplier >= 0.0");
+            isTrue(strongMultiplier >= weakMultiplier, "Required: strongMultiplier >= weakMultiplier");
         }
     }
 }

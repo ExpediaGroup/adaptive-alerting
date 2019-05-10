@@ -55,4 +55,28 @@ public class MultiplicativeIntervalForecasterTest {
         assertEquals(pointForecast * (1.0 - params.getWeakMultiplier()), forecastResult.getLowerWeak(), TOLERANCE);
         assertEquals(pointForecast * (1.0 - params.getStrongMultiplier()), forecastResult.getLowerStrong(), TOLERANCE);
     }
+
+    @Test
+    public void testValidate() {
+        new MultiplicativeIntervalForecaster.Params()
+                .setWeakMultiplier(3.0)
+                .setStrongMultiplier(4.0)
+                .validate();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testValidate_invalidWeakMultiplier() {
+        new MultiplicativeIntervalForecaster.Params()
+                .setWeakMultiplier(-3.0)
+                .setStrongMultiplier(4.0)
+                .validate();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testValidate_invalidStrongMultiplier() {
+        new MultiplicativeIntervalForecaster.Params()
+                .setWeakMultiplier(3.0)
+                .setStrongMultiplier(2.0)
+                .validate();
+    }
 }

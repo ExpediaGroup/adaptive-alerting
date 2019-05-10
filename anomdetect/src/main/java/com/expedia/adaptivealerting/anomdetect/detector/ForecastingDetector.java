@@ -18,13 +18,17 @@ package com.expedia.adaptivealerting.anomdetect.detector;
 import com.expedia.adaptivealerting.anomdetect.comp.AnomalyClassifier;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecast;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecasterParams;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecasterParams;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.metrics.MetricData;
+import lombok.Data;
 import lombok.Generated;
 import lombok.Getter;
+import lombok.experimental.Accessors;
 import lombok.val;
 
 import java.util.UUID;
@@ -98,5 +102,23 @@ public class ForecastingDetector extends AbstractDetector {
                 intervalForecast.getUpperWeak(),
                 intervalForecast.getLowerWeak(),
                 intervalForecast.getLowerStrong());
+    }
+
+    /**
+     * {@link ForecastingDetector} configuration object.
+     */
+    @Data
+    @Accessors(chain = true)
+    public static final class Params extends AbstractDetectorConfig {
+        private PointForecasterParams pointForecasterParams;
+        private IntervalForecasterParams intervalForecasterParams;
+        private AnomalyType anomalyType;
+
+        @Override
+        public void validate() {
+            notNull(pointForecasterParams, "pointForecasterParams can't be null");
+            notNull(intervalForecasterParams, "intervalForecasterParams can't be null");
+            notNull(anomalyType, "anomalyType can't be null");
+        }
     }
 }

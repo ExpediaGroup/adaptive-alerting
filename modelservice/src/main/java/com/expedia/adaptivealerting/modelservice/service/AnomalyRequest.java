@@ -16,10 +16,12 @@
 package com.expedia.adaptivealerting.modelservice.service;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.util.Map;
 
 @Data
+@Accessors(chain = true)
 public class AnomalyRequest {
     private String metricTags;
     private String detectorType;

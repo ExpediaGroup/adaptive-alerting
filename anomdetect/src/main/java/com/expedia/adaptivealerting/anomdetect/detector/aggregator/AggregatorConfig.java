@@ -13,20 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.comp.connector;
+package com.expedia.adaptivealerting.anomdetect.detector.aggregator;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
-import lombok.experimental.Accessors;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-import java.util.Date;
-import java.util.Map;
-
-@Data
-@Accessors(chain = true)
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class ModelResource {
-    private ModelTypeResource detectorType;
-    private Map<String, Object> params;
-    private Date dateCreated;
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = MOfNAggregator.Config.class, name = "mOfN"),
+        @JsonSubTypes.Type(value = PassThroughAggregator.Config.class, name = "passThrough"),
+})
+public interface AggregatorConfig {
 }

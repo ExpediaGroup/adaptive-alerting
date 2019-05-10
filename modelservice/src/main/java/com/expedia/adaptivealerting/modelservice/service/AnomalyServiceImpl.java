@@ -15,17 +15,22 @@
  */
 package com.expedia.adaptivealerting.modelservice.service;
 
+import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelResource;
+import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelTypeResource;
+import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.detector.Detector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.util.MetricUtil;
 import com.expedia.adaptivealerting.modelservice.spi.MetricSource;
-import com.expedia.adaptivealerting.modelservice.util.DetectorUtil;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Service to fetch anomalies for a given metric and detector.
@@ -39,12 +44,8 @@ public class AnomalyServiceImpl implements AnomalyService {
 
     @Override
     public List<AnomalyResult> getAnomalies(AnomalyRequest request) {
-        return findAnomaliesInTrainingData(request);
-    }
-
-    private List<AnomalyResult> findAnomaliesInTrainingData(AnomalyRequest request) {
         val metricDef = MetricUtil.metricDefinition();
-        val detector = DetectorUtil.getDetector(request.getDetectorType(), request.getDetectorParams());
+        val detector = getDetector(request);
 
         val anomalyResults = new ArrayList<AnomalyResult>();
         metricSources.forEach(metricSource -> {
@@ -56,5 +57,15 @@ public class AnomalyServiceImpl implements AnomalyService {
             }
         });
         return anomalyResults;
+    }
+
+    private Detector getDetector(AnomalyRequest request) {
+        val legacyDetectorType = request.getDetectorType();
+        val paramsMap = request.getDetectorParams();
+        val model = new ModelResource()
+                .setDetectorType(new ModelTypeResource(legacyDetectorType))
+                .setParams(paramsMap)
+                .setDateCreated(new Date());
+        return new LegacyDetectorFactory().createDetector(UUID.randomUUID(), model);
     }
 }

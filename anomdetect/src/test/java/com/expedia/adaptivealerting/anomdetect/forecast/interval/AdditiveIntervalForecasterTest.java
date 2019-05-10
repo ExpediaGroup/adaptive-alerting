@@ -55,4 +55,28 @@ public class AdditiveIntervalForecasterTest {
         assertEquals(pointForecast - params.getWeakValue(), forecastResult.getLowerWeak(), TOLERANCE);
         assertEquals(pointForecast - params.getStrongValue(), forecastResult.getLowerStrong(), TOLERANCE);
     }
+
+    @Test
+    public void testValidate() {
+        new AdditiveIntervalForecaster.Params()
+                .setWeakValue(10.0)
+                .setStrongValue(20.0)
+                .validate();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testValidate_invalidWeakValue() {
+        new AdditiveIntervalForecaster.Params()
+                .setWeakValue(-10.0)
+                .setStrongValue(20.0)
+                .validate();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testValidate_invalidStrongValue() {
+        new AdditiveIntervalForecaster.Params()
+                .setWeakValue(10.0)
+                .setStrongValue(5.0)
+                .validate();
+    }
 }

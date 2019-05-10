@@ -22,6 +22,7 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.val;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isBetween;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 public class EwmaPointForecaster implements PointForecaster {
@@ -40,6 +41,7 @@ public class EwmaPointForecaster implements PointForecaster {
 
     public EwmaPointForecaster(Params params) {
         notNull(params, "params can't be null");
+        params.validate();
         this.params = params;
         this.mean = params.getInitMeanEstimate();
     }
@@ -64,19 +66,22 @@ public class EwmaPointForecaster implements PointForecaster {
 
     @Data
     @Accessors(chain = true)
-    public static class Params {
+    public static final class Params implements PointForecasterParams {
 
         /**
-         * Smoothing param. Somewhat misnamed because higher values lead to less smoothing, but it's called the
-         * smoothing parameter in the literature.
+         * Smoothing param. Somewhat misnamed because higher values lead to less smoothing, but it's called the smoothing
+         * parameter in the literature.
          */
-        @Generated // https://reflectoring.io/100-percent-test-coverage/
         private double alpha = 0.15;
 
         /**
          * Initial mean estimate.
          */
-        @Generated // https://reflectoring.io/100-percent-test-coverage/
         public double initMeanEstimate = 0.0;
+
+        @Override
+        public void validate() {
+            isBetween(alpha, 0.0, 1.0, "Required: 0.0 <= alpha <= 1.0");
+        }
     }
 }

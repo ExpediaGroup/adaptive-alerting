@@ -22,6 +22,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 @RequiredArgsConstructor
@@ -44,12 +45,14 @@ public class AdditiveIntervalForecaster implements IntervalForecaster {
 
     @Data
     @Accessors(chain = true)
-    public static final class Params {
+    public static final class Params implements IntervalForecasterParams {
         private double weakValue;
         private double strongValue;
 
+        @Override
         public void validate() {
-            // TODO Implement
+            isTrue(weakValue >= 0.0, "Required: weakValue >= 0.0");
+            isTrue(strongValue >= weakValue, "Required: strongValue >= weakValue");
         }
     }
 }

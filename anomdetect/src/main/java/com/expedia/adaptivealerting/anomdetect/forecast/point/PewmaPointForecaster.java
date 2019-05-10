@@ -22,6 +22,8 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.val;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isBetween;
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 public class PewmaPointForecaster implements PointForecaster {
@@ -116,11 +118,12 @@ public class PewmaPointForecaster implements PointForecaster {
         return (1.0 - params.getBeta() * pt) * this.adjAlpha;
     }
 
-    // TODO Describe why we chose these defaults as appropriate.
-    //  For example if the paper recommends them, we should say that.
     @Data
     @Accessors(chain = true)
-    public static class Params {
+    public static class Params implements PointForecasterParams {
+
+        // TODO Describe why we chose these defaults as appropriate.
+        //  For example if the paper recommends them, we should say that.
 
         /**
          * Smoothing param.
@@ -141,5 +144,12 @@ public class PewmaPointForecaster implements PointForecaster {
          * How many iterations to train for.
          */
         private int warmUpPeriod = 30;
+
+        @Override
+        public void validate() {
+            isBetween(alpha, 0.0, 1.0, "Required: 0.0 <= alpha <= 1.0");
+            isBetween(beta, 0.0, 1.0, "Required: 0.0 <= beta <= 1.0");
+            isTrue(warmUpPeriod >= 0, "Required: warmUpPeriod >= 0");
+        }
     }
 }

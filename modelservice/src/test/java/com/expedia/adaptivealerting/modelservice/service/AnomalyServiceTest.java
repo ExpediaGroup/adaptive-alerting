@@ -1,29 +1,31 @@
 package com.expedia.adaptivealerting.modelservice.service;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.modelservice.providers.graphite.GraphiteMetricSource;
 import com.expedia.adaptivealerting.modelservice.spi.MetricSource;
 import com.expedia.adaptivealerting.modelservice.spi.MetricSourceResult;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Assert;
+import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.verification.VerificationMode;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.atMost;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
 @Slf4j
@@ -31,7 +33,7 @@ import static org.junit.Assert.assertNotNull;
 public class AnomalyServiceTest {
 
     @InjectMocks
-    private AnomalyService anomalyService = new AnomalyServiceImpl();
+    private AnomalyService serviceUnderTest = new AnomalyServiceImpl();
 
     @Spy
     @Qualifier("metricSourceServiceListFactoryBean")
@@ -59,25 +61,20 @@ public class AnomalyServiceTest {
 
     @Test
     public void testGetAnomalies() {
-        List<AnomalyResult> actualResults = anomalyService.getAnomalies(anomalyRequest);
-        verifyNumberOfSourceCalls(graphiteMetricSource, Mockito.atMost(1));
+        val actualResults = serviceUnderTest.getAnomalies(anomalyRequest);
         assertNotNull(actualResults);
-        Assert.assertEquals(1, actualResults.size());
-        Assert.assertEquals(AnomalyLevel.WEAK, actualResults.get(0).getAnomalyLevel());
+        assertEquals(1, actualResults.size());
+        assertEquals(AnomalyLevel.WEAK, actualResults.get(0).getAnomalyLevel());
+        verify(graphiteMetricSource, atMost(1)).getMetricData(anyString());
     }
 
     private void initTestObjects() {
-        ObjectMother mom = ObjectMother.instance();
+        val mom = ObjectMother.instance();
         anomalyRequest = mom.getAnomalyRequest();
         metricSourceResult = mom.getMetricData();
     }
 
     private void initDependencies() {
-        Mockito.when(graphiteMetricSource.getMetricData(Mockito.anyString())).thenReturn(metricSourceResults);
-    }
-
-
-    private void verifyNumberOfSourceCalls(MetricSource metricSource, VerificationMode verifMode) {
-        Mockito.verify(metricSource, verifMode).getMetricData(Mockito.anyString());
+        when(graphiteMetricSource.getMetricData(anyString())).thenReturn(metricSourceResults);
     }
 }

@@ -23,8 +23,8 @@ import com.expedia.adaptivealerting.anomdetect.detector.ForecastingDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.IndividualsDetector;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaster;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.HoltWintersForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PewmaPointForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.HoltWintersForecaster;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -58,8 +58,11 @@ public class LegacyDetectorFactory {
         notNull(model, "model can't be null");
 
         Detector detector;
+
+        // TODO Rename to legacyDetectorType [WLW]
         val detectorType = model.getDetectorType().getKey();
 
+        // Note that constant threshold, cusum and individuals are still using the original config schema.
         if (CONSTANT_THRESHOLD.equals(detectorType)) {
             detector = new ConstantThresholdDetector(uuid, toParams(model, ConstantThresholdDetector.Params.class));
         } else if (CUSUM.equals(detectorType)) {

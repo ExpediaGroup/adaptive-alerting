@@ -13,20 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.comp.connector;
+package com.expedia.adaptivealerting.anomdetect.forecast.point;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
-import lombok.experimental.Accessors;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-import java.util.Date;
-import java.util.Map;
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = EwmaPointForecaster.Params.class, name = "ewma"),
+        @JsonSubTypes.Type(value = HoltWintersForecaster.Params.class, name = "holt-winters"),
+        @JsonSubTypes.Type(value = PewmaPointForecaster.Params.class, name = "pewma"),
+})
+public interface PointForecasterParams {
 
-@Data
-@Accessors(chain = true)
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class ModelResource {
-    private ModelTypeResource detectorType;
-    private Map<String, Object> params;
-    private Date dateCreated;
+    void validate();
 }

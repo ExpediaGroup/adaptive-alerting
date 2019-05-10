@@ -13,20 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.comp.connector;
+package com.expedia.adaptivealerting.anomdetect.detector;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.expedia.adaptivealerting.anomdetect.detector.aggregator.AggregatorConfig;
 import lombok.Data;
-import lombok.experimental.Accessors;
 
-import java.util.Date;
-import java.util.Map;
-
+/**
+ * Abstract base class for implementing {@link AbstractDetector} configuration objects.
+ */
 @Data
-@Accessors(chain = true)
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class ModelResource {
-    private ModelTypeResource detectorType;
-    private Map<String, Object> params;
-    private Date dateCreated;
+public abstract class AbstractDetectorConfig implements DetectorConfig {
+    private AggregatorConfig aggregatorConfig;
 }

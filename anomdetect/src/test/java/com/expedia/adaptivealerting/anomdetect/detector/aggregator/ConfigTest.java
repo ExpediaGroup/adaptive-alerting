@@ -13,20 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.comp.connector;
+package com.expedia.adaptivealerting.anomdetect.detector.aggregator;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
-import lombok.experimental.Accessors;
+import org.junit.Test;
 
-import java.util.Date;
-import java.util.Map;
+public class ConfigTest {
 
-@Data
-@Accessors(chain = true)
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class ModelResource {
-    private ModelTypeResource detectorType;
-    private Map<String, Object> params;
-    private Date dateCreated;
+    @Test(expected = IllegalArgumentException.class)
+    public void testValidate_mZero() {
+        new MOfNAggregator.Config(0, 5);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testValidate_nGreaterThanM() {
+        new MOfNAggregator.Config(5, 3);
+    }
 }

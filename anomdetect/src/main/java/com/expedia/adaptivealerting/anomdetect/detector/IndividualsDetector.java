@@ -186,7 +186,7 @@ public final class IndividualsDetector implements Detector {
 
     @Data
     @Accessors(chain = true)
-    public static final class Params {
+    public static final class Params implements DetectorConfig {
 
         /**
          * Initial mean estimate.
@@ -208,6 +208,7 @@ public final class IndividualsDetector implements Detector {
          */
         private double initMeanEstimate = 0.0;
 
+        @Override
         public void validate() {
             // Not currently implemented
         }

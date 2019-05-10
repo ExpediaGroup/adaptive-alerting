@@ -43,6 +43,7 @@ public final class ConstantThresholdDetector extends AbstractDetector {
         super(uuid);
         notNull(params, "params can't be null");
         params.validate();
+
         this.params = params;
         this.classifier = new AnomalyClassifier(params.getType());
     }
@@ -57,7 +58,7 @@ public final class ConstantThresholdDetector extends AbstractDetector {
 
     @Data
     @Accessors(chain = true)
-    public static final class Params {
+    public static final class Params implements DetectorConfig {
 
         /**
          * Detector type: left-, right- or two-tailed.
@@ -69,8 +70,10 @@ public final class ConstantThresholdDetector extends AbstractDetector {
          */
         private AnomalyThresholds thresholds;
 
+        @Override
         public void validate() {
-            // Not currently implemented
+            notNull(type, "type can't be null");
+            notNull(thresholds, "thresholds can't be null");
         }
     }
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.detector;
+package com.expedia.adaptivealerting.anomdetect.detector.aggregator;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import lombok.val;

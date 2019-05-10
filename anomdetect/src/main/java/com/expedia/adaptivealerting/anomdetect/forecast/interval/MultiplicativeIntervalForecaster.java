@@ -22,6 +22,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 @RequiredArgsConstructor
@@ -43,7 +44,7 @@ public class MultiplicativeIntervalForecaster implements IntervalForecaster {
 
     @Data
     @Accessors(chain = true)
-    public static final class Params {
+    public static final class Params implements IntervalForecasterParams {
 
         /**
          * Multiplier against the level, used to generate the weak interval:
@@ -57,8 +58,10 @@ public class MultiplicativeIntervalForecaster implements IntervalForecaster {
          */
         private double strongMultiplier;
 
+        @Override
         public void validate() {
-            // TODO Implement
+            isTrue(weakMultiplier >= 0.0, "Required: weakMultiplier >= 0.0");
+            isTrue(strongMultiplier >= weakMultiplier, "Required: strongMultiplier >= weakMultiplier");
         }
     }
 }

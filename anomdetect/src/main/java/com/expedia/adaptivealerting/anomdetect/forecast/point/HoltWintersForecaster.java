@@ -36,6 +36,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 import static java.lang.String.format;
 
+// TODO Rename to HoltWintersPointForecaster [WLW]
 public class HoltWintersForecaster implements PointForecaster {
 
     @Getter
@@ -106,7 +107,7 @@ public class HoltWintersForecaster implements PointForecaster {
     @Data
     @Accessors(chain = true)
     @Slf4j
-    public static final class Params {
+    public static final class Params implements PointForecasterParams {
 
         /**
          * SeasonalityType parameter used to determine which Seasonality method (Multiplicative or Additive) to use.
@@ -192,6 +193,7 @@ public class HoltWintersForecaster implements PointForecaster {
             return (initTrainingMethod == HoltWintersTrainingMethod.SIMPLE) ? (frequency * 2) : 0;
         }
 
+        // TODO Call this from the constructor
         public void validate() {
             notNull(seasonalityType, "Required: seasonalityType one of " + Arrays.toString(SeasonalityType.values()));
             notNull(initTrainingMethod, "Required: initTrainingMethod one of " + Arrays.toString(HoltWintersTrainingMethod.values()));
@@ -207,7 +209,7 @@ public class HoltWintersForecaster implements PointForecaster {
             if (initTrainingMethod == HoltWintersTrainingMethod.SIMPLE) {
                 int minWarmUpPeriod = calculateInitTrainingPeriod();
                 if (warmUpPeriod < minWarmUpPeriod) {
-                    log.warn(String.format("warmUpPeriod (%d) should be greater than or equal to (frequency * 2) (%d), " +
+                    log.warn(format("warmUpPeriod (%d) should be greater than or equal to (frequency * 2) (%d), " +
                                     "as the detector will not emit anomalies during training. Setting warmUpPeriod to %d.",
                             warmUpPeriod, minWarmUpPeriod, minWarmUpPeriod));
                     warmUpPeriod = minWarmUpPeriod;

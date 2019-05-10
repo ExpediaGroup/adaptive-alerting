@@ -15,12 +15,17 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detector;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-/**
- * Interface for anomaly aggregation strategies,
- */
-public interface Aggregator {
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = ConstantThresholdDetector.Params.class, name="constant-threshold"),
+        @JsonSubTypes.Type(value = CusumDetector.Params.class, name="cusum"),
+        @JsonSubTypes.Type(value = ForecastingDetector.Params.class, name = "forecasting"),
+        @JsonSubTypes.Type(value = IndividualsDetector.Params.class, name = "individuals"),
+})
+public interface DetectorConfig {
 
-    AnomalyResult aggregate(AnomalyResult result);
+    void validate();
 }

@@ -21,6 +21,8 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.val;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isBetween;
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 /**
@@ -82,15 +84,19 @@ public class ExponentialWelfordIntervalForecaster implements IntervalForecaster 
 
     @Data
     @Accessors(chain = true)
-    public static final class Params {
+    public static final class Params implements IntervalForecasterParams {
         private double alpha = 0.15;
         private double initVarianceEstimate = 0.0;
         private double weakSigmas = 3.0;
         private double strongSigmas = 4.0;
         // TODO Add warmup period
 
+        @Override
         public void validate() {
-            // TODO Implement
+            isBetween(alpha, 0.0, 1.0, "Required: 0.0 <= alpha <= 1.0");
+            isTrue(initVarianceEstimate >= 0.0, "Required: initVarianceEstimate >= 0.0");
+            isTrue(weakSigmas >= 0.0, "Required: weakSigmas >= 0.0");
+            isTrue(strongSigmas >= weakSigmas, "Required: strongSigmas >= weakSigmas");
         }
     }
 }

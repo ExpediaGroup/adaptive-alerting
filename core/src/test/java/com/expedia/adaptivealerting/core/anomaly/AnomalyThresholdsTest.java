@@ -26,21 +26,10 @@ public class AnomalyThresholdsTest {
     @Test
     public void testConstructor_happyPath() {
         val thresholds = new AnomalyThresholds(100.0, 90.0, 20.0, 10.0);
-
         assertEquals(100.0, thresholds.getUpperStrong(), TOLERANCE);
         assertEquals(90.0, thresholds.getUpperWeak(), TOLERANCE);
         assertEquals(20.0, thresholds.getLowerWeak(), TOLERANCE);
         assertEquals(10.0, thresholds.getLowerStrong(), TOLERANCE);
-
-        thresholds.setUpperStrong(200.0);
-        thresholds.setUpperWeak(180.0);
-        thresholds.setLowerWeak(40.0);
-        thresholds.setLowerStrong(20.0);
-
-        assertEquals(200.0, thresholds.getUpperStrong(), TOLERANCE);
-        assertEquals(180.0, thresholds.getUpperWeak(), TOLERANCE);
-        assertEquals(40.0, thresholds.getLowerWeak(), TOLERANCE);
-        assertEquals(20.0, thresholds.getLowerStrong(), TOLERANCE);
     }
 
     @Test(expected = IllegalArgumentException.class)

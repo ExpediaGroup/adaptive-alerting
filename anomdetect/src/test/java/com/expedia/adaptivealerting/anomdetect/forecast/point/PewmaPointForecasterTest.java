@@ -111,6 +111,42 @@ public final class PewmaPointForecasterTest {
         forecaster.forecast(null);
     }
 
+    @Test
+    public void testValidate_valid() {
+        new PewmaPointForecaster.Params()
+                .setAlpha(0.15)
+                .setBeta(0.35)
+                .setWarmUpPeriod(25)
+                .validate();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testValidate_invalidAlpha() {
+        new PewmaPointForecaster.Params()
+                .setAlpha(1.30)
+                .setBeta(0.25)
+                .setWarmUpPeriod(25)
+                .validate();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testValidate_invalidBeta() {
+        new PewmaPointForecaster.Params()
+                .setAlpha(0.15)
+                .setBeta(1.30)
+                .setWarmUpPeriod(25)
+                .validate();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testValidate_invalidWarmUpPeriod() {
+        new PewmaPointForecaster.Params()
+                .setAlpha(0.15)
+                .setBeta(0.25)
+                .setWarmUpPeriod(-8)
+                .validate();
+    }
+
     private static List<String[]> readData_sampleInput() throws IOException {
         val is = ClassLoader.getSystemResourceAsStream(SAMPLE_INPUT_PATH);
         val reader = new CSVReader(new InputStreamReader(is));

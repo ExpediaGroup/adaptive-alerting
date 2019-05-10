@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.detector;
+package com.expedia.adaptivealerting.anomdetect.detector.aggregator;
 
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
@@ -52,21 +52,9 @@ public final class MOfNAggregatorTest {
 
     @Test
     public void testConstructor() {
-        val m = 4;
-        val n = 6;
-        val aggregator = new MOfNAggregator(m, n);
-        assertEquals(m, aggregator.getM());
-        assertEquals(n, aggregator.getN());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testConstructor_mZero() {
-        new MOfNAggregator(0, 5);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testConstructor_nGreaterThanM() {
-        new MOfNAggregator(5, 3);
+        val config = new MOfNAggregator.Config(4, 6);
+        val aggregator = new MOfNAggregator(config);
+        assertEquals(config, aggregator.getConfig());
     }
 
     @Test

@@ -177,7 +177,7 @@ public final class CusumDetector extends AbstractDetector {
 
     @Data
     @Accessors(chain = true)
-    public static final class Params {
+    public static final class Params implements DetectorConfig {
 
         /**
          * Detector type: left-, right- or two-tailed.
@@ -214,6 +214,7 @@ public final class CusumDetector extends AbstractDetector {
          */
         private int warmUpPeriod = 25;
 
+        @Override
         public void validate() {
             // Not currently implemented
         }
