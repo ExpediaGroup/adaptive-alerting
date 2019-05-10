@@ -34,54 +34,49 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("${spring.data.rest.base-path}/detectorMapping")
 public class DetectorMappingController {
 
     @Autowired
     private DetectorMappingService detectorMappingService;
-    
-    @Autowired
-    private RequestValidator requestValidator;
 
-    @RequestMapping(value = "/detector-mapping", produces = "application/json", method = RequestMethod.GET)
+    @RequestMapping(produces = "application/json", method = RequestMethod.GET)
     public DetectorMapping getDetectorMapping(@RequestParam String id) {
         return detectorMappingService.findDetectorMapping(id);
     }
 
-    @RequestMapping(value = "/detector-mapping", method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<String> createDetectorMapping(@RequestBody CreateDetectorMappingRequest request) {
-        requestValidator.validateExpression(request.getExpression());
-        requestValidator.validateUser(request.getUser());
-        requestValidator.validateDetector(request.getDetector());
+        request.validate();
         return new ResponseEntity(detectorMappingService.createDetectorMapping(request), HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/detector-mapping/disable", method = RequestMethod.PUT)
+    @RequestMapping(value = "/disable", method = RequestMethod.PUT)
     public ResponseEntity disableDeleteDetectorMapping(@RequestParam String id) {
         detectorMappingService.disableDetectorMapping(id);
         return new ResponseEntity(HttpStatus.OK);
     }
     
-    @RequestMapping(value = "/detector-mapping", method = RequestMethod.DELETE)
+    @RequestMapping(method = RequestMethod.DELETE)
     public ResponseEntity deleteDetectorMapping(@RequestParam String id) {
         detectorMappingService.deleteDetectorMapping(id);
         return new ResponseEntity(HttpStatus.OK);
     }
     
-    @RequestMapping(value = "/detector-mapping/search", method = RequestMethod.POST)
+    @RequestMapping(value = "/search", method = RequestMethod.POST)
     public List<DetectorMapping> searchDetectorMapping(@RequestBody SearchMappingsRequest request) {
         Assert.isTrue(request.getUserId() != null || request.getDetectorUuid() != null,
                 "Both userId and detectorId can't be null");
         return detectorMappingService.search(request);
     }
     
-    @RequestMapping(value = "/detector-mapping/last-updated", method = RequestMethod.GET)
+    @RequestMapping(value = "/lastUpdated", method = RequestMethod.GET)
     public List<DetectorMapping> findDetectorMapping(@RequestParam int timeInSecs) {
         Assert.notNull(timeInSecs, "timeInSecs can't be null");
         return detectorMappingService.findLastUpdated(timeInSecs);
     }
 
-    @RequestMapping(value = "/detector-mapping/findMatchingByTags", method = RequestMethod.POST)
+    @RequestMapping(value = "/findMatchingByTags", method = RequestMethod.POST)
     public MatchingDetectorsResponse searchDetectorMapping(@RequestBody List<Map<String, String>> tagsList) {
         return detectorMappingService.findMatchingDetectorMappings(tagsList);
     }

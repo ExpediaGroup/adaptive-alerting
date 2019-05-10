@@ -108,8 +108,7 @@ public class SwaggerConfiguration {
     private Predicate<String> paths() {
         return or(
                 // regex("/additional_endpoints/.*?"),
-                regex("/api/.*?"),
-                regex("/detector-mapping.*?")
+                regex("/api/.*?")
         );
     }
 

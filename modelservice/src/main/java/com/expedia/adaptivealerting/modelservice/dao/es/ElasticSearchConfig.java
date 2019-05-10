@@ -87,7 +87,7 @@ public class ElasticSearchConfig {
     }
     
     private void addAWSRequestSignerInterceptor(RestClientBuilder clientBuilder) {
-        if (needsAWSIAMAuth) {
+        if (needsAWSIAMAuth) { // this is optional security for elastic search running in AWS
             AWSSigningRequestInterceptor signingInterceptor = getAWSRequestSignerInterceptor();
             clientBuilder.setHttpClientConfigCallback(
                     clientConf -> clientConf.addInterceptorLast(signingInterceptor));
