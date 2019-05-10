@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("${spring.data.rest.base-path}/detectorMapping")
+@RequestMapping("/api/detectorMappings")
 public class DetectorMappingController {
 
     @Autowired
