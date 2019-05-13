@@ -13,30 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.web;
+package com.expedia.adaptivealerting.modelservice.util;
 
 import com.expedia.adaptivealerting.modelservice.model.Expression;
 import com.expedia.adaptivealerting.modelservice.model.Operand;
 import com.expedia.adaptivealerting.modelservice.model.Operator;
 import com.expedia.adaptivealerting.modelservice.model.Detector;
 import com.expedia.adaptivealerting.modelservice.model.User;
-import com.expedia.adaptivealerting.modelservice.dao.es.DetectorMappingEntity;
-import lombok.Generated;
-import org.springframework.stereotype.Component;
+import com.expedia.adaptivealerting.modelservice.repo.es.DetectorMappingEntity;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-@Component
 public class RequestValidator {
 
-    public void validateUser(User user) {
+    public static void validateUser(User user) {
         Assert.notNull(user, "subscription user can't null");
         Assert.isTrue(!StringUtils.isEmpty(user.getId()), "subscription userId can't empty");
         Assert.isTrue(!StringUtils.containsWhitespace(user.getId()), "subscription userId can't " +
             "contain whitespaces");
     }
 
-    public void validateExpression(Expression expression) {
+    public static void validateExpression(Expression expression) {
         Assert.notNull(expression, "subscription expression can't null");
         //Only AND operator is supported now
         Assert.isTrue(Operator.AND.equals(expression.getOperator()), "Only AND operator is supported now");
@@ -46,7 +43,7 @@ public class RequestValidator {
         });
     }
 
-    private void validateOperand(Operand operand) {
+    private static void validateOperand(Operand operand) {
         //Nested conditions are not supported now
         Assert.isNull(operand.getExpression(), "Nested expressions are not supported");
         Assert.notNull(operand.getField(), "Operands can't be empty");
@@ -57,7 +54,7 @@ public class RequestValidator {
                 operand.getField().getKey(), DetectorMappingEntity.AA_PREFIX));
     }
     
-    public void validateDetector(Detector detector) {
+    public static void validateDetector(Detector detector) {
         Assert.notNull(detector, "Detector can't be null");
         Assert.notNull(detector.getId(), "Detector id can't be null");
     }

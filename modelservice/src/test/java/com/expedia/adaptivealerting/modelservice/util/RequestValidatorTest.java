@@ -1,7 +1,8 @@
-package com.expedia.adaptivealerting.modelservice.web;
+package com.expedia.adaptivealerting.modelservice.util;
 
 
 import com.expedia.adaptivealerting.modelservice.model.*;
+import com.expedia.adaptivealerting.modelservice.util.RequestValidator;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;

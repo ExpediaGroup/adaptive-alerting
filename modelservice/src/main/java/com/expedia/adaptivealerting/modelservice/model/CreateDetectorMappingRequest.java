@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.modelservice.model;
 
-import com.expedia.adaptivealerting.modelservice.web.RequestValidator;
+import com.expedia.adaptivealerting.modelservice.util.RequestValidator;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,13 +25,10 @@ public class CreateDetectorMappingRequest {
     private Detector detector;
     private User user;
 
-    @Autowired
-    private RequestValidator requestValidator;
-
     public void validate() {
-        requestValidator.validateExpression(this.getExpression());
-        requestValidator.validateUser(this.getUser());
-        requestValidator.validateDetector(this.getDetector());
+        RequestValidator.validateExpression(this.getExpression());
+        RequestValidator.validateUser(this.getUser());
+        RequestValidator.validateDetector(this.getDetector());
     }
 }
 

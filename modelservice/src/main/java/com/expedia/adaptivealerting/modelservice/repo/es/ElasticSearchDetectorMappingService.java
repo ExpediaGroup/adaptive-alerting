@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.dao.es;
+package com.expedia.adaptivealerting.modelservice.repo.es;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.expedia.adaptivealerting.modelservice.dao.DetectorMappingService;
+import com.expedia.adaptivealerting.modelservice.repo.DetectorMappingService;
 import com.expedia.adaptivealerting.modelservice.model.CreateDetectorMappingRequest;
 import com.expedia.adaptivealerting.modelservice.model.Detector;
 import com.expedia.adaptivealerting.modelservice.model.DetectorMapping;
@@ -69,7 +69,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static com.expedia.adaptivealerting.modelservice.dao.es.DetectorMappingEntity.LAST_MOD_TIME_KEYWORD;
+import static com.expedia.adaptivealerting.modelservice.repo.es.DetectorMappingEntity.LAST_MOD_TIME_KEYWORD;
 
 @Component
 @Slf4j

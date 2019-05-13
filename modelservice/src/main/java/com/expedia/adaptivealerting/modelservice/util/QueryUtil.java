@@ -19,9 +19,9 @@ import com.expedia.adaptivealerting.modelservice.model.Expression;
 import com.expedia.adaptivealerting.modelservice.model.Field;
 import com.expedia.adaptivealerting.modelservice.model.Operand;
 import com.expedia.adaptivealerting.modelservice.model.Operator;
-import com.expedia.adaptivealerting.modelservice.dao.es.BoolCondition;
-import com.expedia.adaptivealerting.modelservice.dao.es.MustCondition;
-import com.expedia.adaptivealerting.modelservice.dao.es.Query;
+import com.expedia.adaptivealerting.modelservice.repo.es.BoolCondition;
+import com.expedia.adaptivealerting.modelservice.repo.es.MustCondition;
+import com.expedia.adaptivealerting.modelservice.repo.es.Query;
 
 import java.util.HashMap;
 import java.util.List;

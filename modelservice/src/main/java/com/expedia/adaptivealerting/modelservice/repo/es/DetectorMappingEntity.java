@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.dao.es;
+package com.expedia.adaptivealerting.modelservice.repo.es;
 import com.expedia.adaptivealerting.modelservice.model.Detector;
 import com.expedia.adaptivealerting.modelservice.model.User;
 import lombok.AllArgsConstructor;

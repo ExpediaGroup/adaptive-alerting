@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.modelservice.util;
 
-import com.expedia.adaptivealerting.modelservice.dao.es.ElasticSearchClient;
-import com.expedia.adaptivealerting.modelservice.dao.es.ElasticSearchConfig;
+import com.expedia.adaptivealerting.modelservice.repo.es.ElasticSearchClient;
+import com.expedia.adaptivealerting.modelservice.repo.es.ElasticSearchConfig;
 import com.google.gson.JsonObject;
 import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
@@ -33,11 +33,11 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-import static com.expedia.adaptivealerting.modelservice.dao.es.DetectorMappingEntity.CREATE_TIME_KEYWORD;
-import static com.expedia.adaptivealerting.modelservice.dao.es.DetectorMappingEntity.DETECTOR_KEYWORD;
-import static com.expedia.adaptivealerting.modelservice.dao.es.DetectorMappingEntity.LAST_MOD_TIME_KEYWORD;
-import static com.expedia.adaptivealerting.modelservice.dao.es.DetectorMappingEntity.QUERY_KEYWORD;
-import static com.expedia.adaptivealerting.modelservice.dao.es.DetectorMappingEntity.USER_KEYWORD;
+import static com.expedia.adaptivealerting.modelservice.repo.es.DetectorMappingEntity.CREATE_TIME_KEYWORD;
+import static com.expedia.adaptivealerting.modelservice.repo.es.DetectorMappingEntity.DETECTOR_KEYWORD;
+import static com.expedia.adaptivealerting.modelservice.repo.es.DetectorMappingEntity.LAST_MOD_TIME_KEYWORD;
+import static com.expedia.adaptivealerting.modelservice.repo.es.DetectorMappingEntity.QUERY_KEYWORD;
+import static com.expedia.adaptivealerting.modelservice.repo.es.DetectorMappingEntity.USER_KEYWORD;
 
 /**
  * Util class to create index with mappings if not found.

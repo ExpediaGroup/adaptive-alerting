@@ -13,15 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.dao.es;
+package com.expedia.adaptivealerting.modelservice.repo.es;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Query {
-    private BoolCondition bool;
+public class BoolCondition {
+    private List<MustCondition> must;
 }
