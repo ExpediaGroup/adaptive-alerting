@@ -19,6 +19,9 @@ import com.expedia.adaptivealerting.modelservice.util.RequestValidator;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @Data
 public class CreateDetectorMappingRequest {
     private Expression expression;
@@ -29,6 +32,11 @@ public class CreateDetectorMappingRequest {
         RequestValidator.validateExpression(this.getExpression());
         RequestValidator.validateUser(this.getUser());
         RequestValidator.validateDetector(this.getDetector());
+    }
+
+    public Set<String> getFields() {
+        return this.expression.getOperands().stream()
+                .map(operand -> operand.getField().getKey()).collect(Collectors.toSet());
     }
 }
 

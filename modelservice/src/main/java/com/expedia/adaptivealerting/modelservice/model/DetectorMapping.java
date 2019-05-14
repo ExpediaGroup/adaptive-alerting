@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.model;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.util.List;
 
@@ -25,6 +26,7 @@ import java.util.List;
  * searchIndexes: index of matching metric-tag in request batch of metric-tags
  */
 @Data
+@Accessors(chain = true)
 public class DetectorMapping {
     private String id;
     private Detector detector;

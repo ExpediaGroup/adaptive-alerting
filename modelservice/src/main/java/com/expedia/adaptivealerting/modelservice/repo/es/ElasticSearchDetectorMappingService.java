@@ -68,6 +68,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.expedia.adaptivealerting.modelservice.repo.es.DetectorMappingEntity.LAST_MOD_TIME_KEYWORD;
 
@@ -75,10 +76,10 @@ import static com.expedia.adaptivealerting.modelservice.repo.es.DetectorMappingE
 @Slf4j
 @SuppressWarnings({"PMD.ExcessiveImports", "PMD.AvoidThrowingRawExceptionTypes"})
 public class ElasticSearchDetectorMappingService implements DetectorMappingService {
-    private static ObjectMapper objectmapper    = new ObjectMapper();
+    private ObjectMapper objectMapper    = new ObjectMapper();
 
     @Autowired
-    private ElasticSearchConfig elasticSearchConfig;
+    private ElasticSearchProperties elasticSearchProperties;
 
     @Autowired
     private ElasticSearchClient elasticSearchClient;
@@ -101,18 +102,17 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
                 xContent.map(tags);
                 refList.add(BytesReference.bytes(xContent));
             }
-            PercolateQueryBuilder percolateQuery =
-                new PercolateQueryBuilder(DetectorMappingEntity.QUERY_KEYWORD, elasticSearchConfig.getDocType(),
+            PercolateQueryBuilder percolateQuery = new PercolateQueryBuilder(DetectorMappingEntity.QUERY_KEYWORD,
                     refList, XContentType.JSON);
             SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
             ConstantScoreQueryBuilder constantScoreQueryBuilder = new ConstantScoreQueryBuilder(percolateQuery);
             searchSourceBuilder.query(constantScoreQueryBuilder);
-            searchSourceBuilder.timeout(new TimeValue(elasticSearchConfig.getConnectionTimeout()));
+            searchSourceBuilder.timeout(new TimeValue(elasticSearchProperties.getConfig().getConnectionTimeout()));
             //FIXME setting default result set size to 500.
+            // This is for returning detectors matching for set of metrics
             searchSourceBuilder.size(500);
             return getDetectorMappings(searchSourceBuilder, tagsList);
         } catch (IOException e) {
-            this.exceptionCount.inc();
             log.error("Error ES lookup", e);
             throw new RuntimeException(e);
         }
@@ -120,36 +120,45 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
 
     @Override
     public String createDetectorMapping(CreateDetectorMappingRequest createRequest) {
-        Set<String> fields = getFields(createRequest);
-        Set<String> newFieldMappings = getFieldsWithoutExistingMapping(fields);
+        Set<String> fields = createRequest.getFields();
+        Set<String> newFieldMappings = removeFieldsHavingExistingMapping(fields);
         updateIndexMappings(newFieldMappings);
-        final DetectorMappingEntity detectorMappingEntity = new DetectorMappingEntity(createRequest.getUser(),
-            createRequest.getDetector(), QueryUtil.buildQuery(createRequest.getExpression()), true,
-            System.currentTimeMillis(), System.currentTimeMillis());
-        final IndexRequest indexRequest = new IndexRequest(elasticSearchConfig.getIndexName(),
-            elasticSearchConfig.getDocType());
-        indexRequest.source(DetectorMappingEntityToJson(detectorMappingEntity), XContentType.JSON);
+        final DetectorMappingEntity detectorMappingEntity = new DetectorMappingEntity()
+                .setUser(createRequest.getUser())
+                .setDetector(createRequest.getDetector())
+                .setEnabled(true)
+                .setLastModifiedTimeInMillis(System.currentTimeMillis())
+                .setCreatedTimeInMillis(System.currentTimeMillis());
+        final IndexRequest indexRequest = new IndexRequest(elasticSearchProperties.getIndexName(),
+            elasticSearchProperties.getDocType());
+
+        String json = null;
         try {
+            json = objectMapper.writeValueAsString(detectorMappingEntity);
+            indexRequest.source(json, XContentType.JSON);
             IndexResponse indexResponse = elasticSearchClient.index(indexRequest, RequestOptions.DEFAULT);
             return indexResponse.getId();
         } catch (IOException e) {
-            log.error(String.format("Indexing mapping %s failed", DetectorMappingEntityToJson(detectorMappingEntity), e));
+            log.error(String.format("Indexing mapping %s failed", json, e));
             throw new RuntimeException(e);
         }
     }
     
     private void updateIndexMappings(Set<String> newFieldMappings) {
-        PutMappingRequest request = new PutMappingRequest(elasticSearchConfig.getIndexName());
+        PutMappingRequest request = new PutMappingRequest(elasticSearchProperties.getIndexName());
         Map<String, Object> jsonMap = new HashMap<>();
         Map<String, Object> type = new HashMap<>();
         type.put("type", "keyword");
+
         Map<String, Object> properties = new HashMap<>();
         newFieldMappings.forEach(field -> {
             properties.put(field, type);
         });
+
         jsonMap.put("properties", properties);
         request.source(jsonMap);
-        request.type(elasticSearchConfig.getDocType());
+        request.type(elasticSearchProperties.getDocType());
+
         try {
             elasticSearchClient.indices().putMapping(request, RequestOptions.DEFAULT);
         } catch (IOException e) {
@@ -158,17 +167,20 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
         }
     }
     
-    private Set<String> getFieldsWithoutExistingMapping(Set<String> fields) {
+    private Set<String> removeFieldsHavingExistingMapping(Set<String> fields) {
         GetMappingsRequest request = new GetMappingsRequest();
-        request.indices(elasticSearchConfig.getIndexName());
+        request.indices(elasticSearchProperties.getIndexName());
         
         try {
             GetMappingsResponse mappingsResponse = elasticSearchClient.indices().getMapping(request, RequestOptions.DEFAULT);
-            Set<String> mappeddFields = ((Map<String, String>)mappingsResponse.getMappings()
-                    .get(elasticSearchConfig.getIndexName())
-                    .get(elasticSearchConfig.getDocType()).sourceAsMap().get("properties")).entrySet().stream()
+            Map<String, String> mapProperties = ((Map<String, String>)mappingsResponse.getMappings()
+                    .get(elasticSearchProperties.getIndexName())
+                    .get(elasticSearchProperties.getDocType())
+                    .sourceAsMap().get("properties"));
+
+            Set<String> mappedFields = mapProperties.entrySet().stream()
                     .map(en -> en.getKey()).collect(Collectors.toSet());
-            fields.removeAll(mappeddFields);
+            fields.removeAll(mappedFields);
             return fields;
         } catch (IOException e) {
             log.error("Error finding mappings", e);
@@ -176,16 +188,13 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
         }
     }
     
-    private Set<String> getFields(CreateDetectorMappingRequest createRequest) {
-        return createRequest.getExpression().getOperands().stream()
-                .map(operand -> operand.getField().getKey()).collect(Collectors.toSet());
-    }
-    
     private void updateDetectorMapping(String index, DetectorMappingEntity detectorMappingEntity) {
-        final IndexRequest indexRequest = new IndexRequest(elasticSearchConfig.getIndexName(),
-                elasticSearchConfig.getDocType(), index);
-        indexRequest.source(DetectorMappingEntityToJson(detectorMappingEntity), XContentType.JSON);
+        final IndexRequest indexRequest = new IndexRequest(elasticSearchProperties.getIndexName(),
+                elasticSearchProperties.getDocType(), index);
+        String json = null;
         try {
+            json = objectMapper.writeValueAsString(detectorMappingEntity);
+            indexRequest.source(json, XContentType.JSON);
             elasticSearchClient.index(indexRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
             log.error("Update Index failed", e);
@@ -195,8 +204,8 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
 
     @Override
     public void deleteDetectorMapping(String id) {
-        final DeleteRequest deleteRequest = new DeleteRequest(elasticSearchConfig.getIndexName(),
-                elasticSearchConfig.getDocType(), id);
+        final DeleteRequest deleteRequest = new DeleteRequest(elasticSearchProperties.getIndexName(),
+                elasticSearchProperties.getDocType(), id);
         try {
             elasticSearchClient.delete(deleteRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
@@ -209,18 +218,21 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
     public void disableDetectorMapping(String id) {
         DetectorMapping detectorMapping = findDetectorMapping(id);
         if (detectorMapping.isEnabled()) {
-            final DetectorMappingEntity detectorMappingEntity = new DetectorMappingEntity(detectorMapping.getUser(),
-                    detectorMapping.getDetector(), QueryUtil.buildQuery(detectorMapping.getExpression()),
-                    false,
-                    System.currentTimeMillis(), detectorMapping.getCreatedTimeInMillis());
+            final DetectorMappingEntity detectorMappingEntity = new DetectorMappingEntity()
+                    .setUser(detectorMapping.getUser())
+                    .setDetector(detectorMapping.getDetector())
+                    .setQuery(QueryUtil.buildQuery(detectorMapping.getExpression()))
+                    .setEnabled(false)
+                    .setLastModifiedTimeInMillis(System.currentTimeMillis())
+                    .setCreatedTimeInMillis(detectorMapping.getCreatedTimeInMillis());
             updateDetectorMapping(id, detectorMappingEntity);
         }
     }
 
     @Override
     public DetectorMapping findDetectorMapping(String id) {
-        GetRequest getRequest = new GetRequest(elasticSearchConfig.getIndexName(),
-            elasticSearchConfig.getDocType(), id);
+        GetRequest getRequest = new GetRequest(elasticSearchProperties.getIndexName(),
+            elasticSearchProperties.getDocType(), id);
         try {
             GetResponse response = elasticSearchClient.get(getRequest, RequestOptions.DEFAULT);
             return getDetectorMapping(response.getSourceAsString(), response.getId(), Optional.empty());
@@ -232,8 +244,8 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
     
     @Override
     public List<DetectorMapping> search(SearchMappingsRequest searchMappingsRequest) {
-        SearchRequest searchRequest = new SearchRequest(elasticSearchConfig.getIndexName());
-        searchRequest.types(elasticSearchConfig.getDocType());
+        SearchRequest searchRequest = new SearchRequest(elasticSearchProperties.getIndexName());
+        searchRequest.types(elasticSearchProperties.getDocType());
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         if (searchMappingsRequest.getUserId() != null) {
             query.must(userIdQuery(searchMappingsRequest));
@@ -243,8 +255,8 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
         }
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         searchSourceBuilder.query(query);
-        //FIXME setting default result set size to 10000 until we have pagination.
-        searchSourceBuilder.size(10000);
+        //FIXME setting default result set size to 500 until we have pagination.
+        searchSourceBuilder.size(500);
         searchRequest.source(searchSourceBuilder);
         List<DetectorMapping> result = getDetectorMappings(searchRequest);
         //FIXME - move this condition to search query.
@@ -263,8 +275,8 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
         final SearchRequest searchRequest =
                 new SearchRequest()
                         .source(sourceBuilder)
-                        .indices(elasticSearchConfig.getIndexName())
-                        .types(elasticSearchConfig.getDocType());
+                        .indices(elasticSearchProperties.getIndexName())
+                        .types(elasticSearchProperties.getDocType());
         return getDetectorMappings(searchRequest);
     }
     
@@ -302,7 +314,7 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
         final SearchRequest searchRequest =
         new SearchRequest()
             .source(searchSourceBuilder)
-            .indices(elasticSearchConfig.getIndexName());
+            .indices(elasticSearchProperties.getIndexName());
         SearchResponse searchResponse = elasticSearchClient.search(searchRequest, RequestOptions.DEFAULT);
         delayTimer.update(searchResponse.getTook().getMillis(), TimeUnit.MILLISECONDS);
         SearchHit hits[] = searchResponse.getHits().getHits();
@@ -313,21 +325,27 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
             .map(hit -> getDetectorMapping(hit.getSourceAsString(), hit.getId(), Optional.of(hit.getFields())))
            // .filter(detectorMapping -> detectorMapping.isEnabled()) //FIXME - move this condition into search query
             .collect(Collectors.toList());
-        return ConverttoMatchingDetectorsResponse(new DetectorMatchResponse(detectorMappings,
+        return convertToMatchingDetectorsResponse(new DetectorMatchResponse(detectorMappings,
                 searchResponse.getTook().getMillis()));
     }
 
     private DetectorMapping getDetectorMapping(String json, String id,
                                                Optional<Map<String, DocumentField>> documentFieldMap) {
-        DetectorMappingEntity detectorEntity = DetectorMappingEntityFromJson(json);
-        DetectorMapping detectorMapping = new DetectorMapping();
-        detectorMapping.setId(id);
-        detectorMapping.setDetector(new Detector(detectorEntity.getDetector().getId()));
-        detectorMapping.setExpression(QueryUtil.buildExpression(detectorEntity.getQuery()));
-        detectorMapping.setEnabled(detectorEntity.isEnabled());
-        detectorMapping.setCreatedTimeInMillis(detectorEntity.getCreatedTimeInMillis());
-        detectorMapping.setLastModifiedTimeInMillis(detectorEntity.getLastModifiedTimeInMillis());
-        detectorMapping.setUser(detectorEntity.getUser());
+        DetectorMappingEntity detectorEntity = new DetectorMappingEntity();
+        try {
+            detectorEntity = objectMapper.readValue(json, DetectorMappingEntity.class);
+        }
+        catch (Exception e) {
+            log.error("Deserilisation error", e);
+        }
+        DetectorMapping detectorMapping = new DetectorMapping()
+                .setId(id)
+                .setDetector(new Detector(detectorEntity.getDetector().getId()))
+                .setExpression(QueryUtil.buildExpression(detectorEntity.getQuery()))
+                .setEnabled(detectorEntity.isEnabled())
+                .setCreatedTimeInMillis(detectorEntity.getCreatedTimeInMillis())
+                .setLastModifiedTimeInMillis(detectorEntity.getLastModifiedTimeInMillis())
+                .setUser(detectorEntity.getUser());
         documentFieldMap.ifPresent(dfm -> {
             List values = dfm.get("_percolator_document_slot").getValues();
             List<Integer> indexes = new ArrayList<>();
@@ -339,7 +357,7 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
         return detectorMapping;
     }
 
-    private MatchingDetectorsResponse ConverttoMatchingDetectorsResponse(DetectorMatchResponse res) {
+    private MatchingDetectorsResponse convertToMatchingDetectorsResponse(DetectorMatchResponse res) {
         Map<Integer, List<Detector>> groupedDetectorsByIndex = new HashMap<>();
         log.info("Mapping-Cache: found {} matching mappings", res.getDetectorMappings().size());
         res.getDetectorMappings().forEach(detectorMapping -> {
@@ -355,9 +373,10 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
         return new MatchingDetectorsResponse(groupedDetectorsByIndex, res.getLookupTimeInMillis());
     }
 
-    private String DetectorMappingEntityToJson(DetectorMappingEntity detectorMappingEntity) {
+    /*
+    private String detectorMappingEntityToJson(DetectorMappingEntity detectorMappingEntity) {
         try {
-            return objectmapper.writeValueAsString(detectorMappingEntity);
+            return objectMapper.writeValueAsString(detectorMappingEntity);
         }
         catch (Exception e) {
             log.error("Serialization error", e);
@@ -365,13 +384,14 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
         return null;
     }
 
-    private DetectorMappingEntity DetectorMappingEntityFromJson(String json) {
+    private DetectorMappingEntity detectorMappingEntityFromJson(String json) {
         try {
-            return objectmapper.readValue(json, DetectorMappingEntity.class);
+            return objectMapper.readValue(json, DetectorMappingEntity.class);
         }
         catch (Exception e) {
             log.error("Deserialization error", e);
         }
         return null;
     }
+    */
 }

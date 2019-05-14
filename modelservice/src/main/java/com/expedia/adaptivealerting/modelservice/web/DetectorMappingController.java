@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.List;
 import java.util.Map;
@@ -46,27 +47,28 @@ public class DetectorMappingController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<String> createDetectorMapping(@RequestBody CreateDetectorMappingRequest request) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public String createDetectorMapping(@RequestBody CreateDetectorMappingRequest request) {
         request.validate();
-        return new ResponseEntity(detectorMappingService.createDetectorMapping(request), HttpStatus.CREATED);
+        return detectorMappingService.createDetectorMapping(request);
     }
 
     @RequestMapping(value = "/disable", method = RequestMethod.PUT)
-    public ResponseEntity disableDeleteDetectorMapping(@RequestParam String id) {
+    @ResponseStatus(HttpStatus.OK)
+    public void disableDeleteDetectorMapping(@RequestParam String id) {
         detectorMappingService.disableDetectorMapping(id);
-        return new ResponseEntity(HttpStatus.OK);
     }
     
     @RequestMapping(method = RequestMethod.DELETE)
-    public ResponseEntity deleteDetectorMapping(@RequestParam String id) {
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteDetectorMapping(@RequestParam String id) {
         detectorMappingService.deleteDetectorMapping(id);
-        return new ResponseEntity(HttpStatus.OK);
     }
     
     @RequestMapping(value = "/search", method = RequestMethod.POST)
     public List<DetectorMapping> searchDetectorMapping(@RequestBody SearchMappingsRequest request) {
         Assert.isTrue(request.getUserId() != null || request.getDetectorUuid() != null,
-                "Both userId and detectorId can't be null");
+                "userId and detectorId can't both be null");
         return detectorMappingService.search(request);
     }
     

@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.util;
 
 import com.expedia.adaptivealerting.modelservice.repo.es.ElasticSearchClient;
-import com.expedia.adaptivealerting.modelservice.repo.es.ElasticSearchConfig;
+import com.expedia.adaptivealerting.modelservice.repo.es.ElasticSearchProperties;
 import com.google.gson.JsonObject;
 import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
@@ -51,18 +51,18 @@ public class IndexCreatorIfNotPresent implements ApplicationListener<Application
     private ElasticSearchClient elasticSearchClient;
 
     @Autowired
-    private ElasticSearchConfig elasticSearchConfig;
+    private ElasticSearchProperties elasticSearchProperties;
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {
-        if (elasticSearchConfig.isCreateIndexIfNotFound()) {
+        if (elasticSearchProperties.isCreateIndexIfNotFound()) {
             try {
                 GetIndexRequest getIndexRequest = new GetIndexRequest();
-                getIndexRequest.indices(elasticSearchConfig.getIndexName());
+                getIndexRequest.indices(elasticSearchProperties.getIndexName());
                 boolean isPresent = elasticSearchClient.indices().exists(getIndexRequest, RequestOptions.DEFAULT);
 
                 if (!isPresent) {
-                    CreateIndexRequest createIndexRequest = new CreateIndexRequest(elasticSearchConfig.getIndexName());
+                    CreateIndexRequest createIndexRequest = new CreateIndexRequest(elasticSearchProperties.getIndexName());
                     createIndexRequest.settings(Settings.builder()
                             .put("index.number_of_shards", 5)
                             .put("index.number_of_replicas", 3)
@@ -72,15 +72,15 @@ public class IndexCreatorIfNotPresent implements ApplicationListener<Application
                     docObject.addProperty("dynamic", "false");
                     docObject.add("properties", buildMappingsJson());
                     JsonObject mapObject = new JsonObject();
-                    mapObject.add(elasticSearchConfig.getDocType(), docObject);
-                    createIndexRequest.mapping(elasticSearchConfig.getDocType(), mapObject.toString(),
+                    mapObject.add(elasticSearchProperties.getDocType(), docObject);
+                    createIndexRequest.mapping(elasticSearchProperties.getDocType(), mapObject.toString(),
                             XContentType.JSON);
                     CreateIndexResponse response = elasticSearchClient.indices().create(createIndexRequest,
                             RequestOptions.DEFAULT);
                     if (!response.isAcknowledged()) {
                         throw new RuntimeException("Index Creation failed");
                     }
-                    log.info("Successfully created index : " + elasticSearchConfig.getIndexName());
+                    log.info("Successfully created index : " + elasticSearchProperties.getIndexName());
                 }
             } catch (IOException e) {
                 log.error("Index creation failed", e);

@@ -25,10 +25,13 @@ endpoints:
 
 datasource-es:
   createIndexIfNotFound: true
-  index.name: ${ES_INDEX_NAME}
+  indexName: ${ES_INDEX_NAME}
   doctype: ${ES_DOCTYPE}
   urls: ${ES_URL}
-  config: {"connection.timeout":40000, "connection.retry.timeout":40000, "max.total.connection":200}
+  config:
+    connectionTimeout: 40000
+    connectionRetryTimeout: 40000
+    maxTotalConnection: 200
 
 management:
   context-path: "/admin"

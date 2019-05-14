@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.modelservice.model;
 
-import com.expedia.adaptivealerting.modelservice.model.Detector;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

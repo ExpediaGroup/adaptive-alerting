@@ -20,7 +20,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.expedia.adaptivealerting.modelservice.model.*;
 import com.expedia.adaptivealerting.modelservice.repo.es.ElasticSearchClient;
-import com.expedia.adaptivealerting.modelservice.repo.es.ElasticSearchConfig;
+import com.expedia.adaptivealerting.modelservice.repo.es.ElasticSearchProperties;
 import com.expedia.adaptivealerting.modelservice.repo.es.ElasticSearchDetectorMappingService;
 import lombok.val;
 import org.elasticsearch.action.DocWriteResponse;
@@ -62,19 +62,21 @@ public class ElasticSearchDetectorMappingServiceTest {
     @Mock
     private ElasticSearchClient elasticSearchClient;
     @Mock
-    private ElasticSearchConfig elasticSearchConfig;
+    private ElasticSearchProperties elasticSearchProperties;
     private ElasticSearchDetectorMappingService detectorMappingService;
 
     @Before
     public void beforeTest() {
         when(metricRegistry.timer(any())).thenReturn(mock(Timer.class));
         when(metricRegistry.counter(any())).thenReturn(mock(Counter.class));
-        when(elasticSearchConfig.getIndexName()).thenReturn("detector-mappings");
-        when(elasticSearchConfig.getDocType()).thenReturn("details");
-        when(elasticSearchConfig.getConnectionTimeout()).thenReturn(100);
+        when(elasticSearchProperties.getIndexName()).thenReturn("detector-mappings");
+        when(elasticSearchProperties.getDocType()).thenReturn("details");
+        ElasticSearchProperties.Config config = new ElasticSearchProperties.Config()
+                .setConnectionTimeout(100);
+        when(elasticSearchProperties.getConfig()).thenReturn(config);
         detectorMappingService = new ElasticSearchDetectorMappingService(metricRegistry);
         ReflectionTestUtils.setField(detectorMappingService, "elasticSearchClient", elasticSearchClient);
-        ReflectionTestUtils.setField(detectorMappingService, "elasticSearchConfig", elasticSearchConfig);
+        ReflectionTestUtils.setField(detectorMappingService, "elasticSearchProperties", elasticSearchProperties);
     }
 
     @Test
@@ -228,15 +230,15 @@ public class ElasticSearchDetectorMappingServiceTest {
         detectorMappingService.deleteDetectorMapping(id);
         verify(elasticSearchClient, atLeastOnce()).delete(any(DeleteRequest.class), eq(RequestOptions.DEFAULT));
         assertEquals(id,deleteResponse.getId());
-        assertEquals(elasticSearchConfig.getIndexName(), deleteResponse.getIndex());
+        assertEquals(elasticSearchProperties.getIndexName(), deleteResponse.getIndex());
         assertEquals("DELETED", deleteResponse.getResult().toString());
     }
 
     @Test(expected = RuntimeException.class)
     public void deleteDetectorMapping_fail() throws IOException {
         val id = "adsvade8^szx";
-        DeleteRequest deleteRequest = new DeleteRequest(elasticSearchConfig.getIndexName(),
-                elasticSearchConfig.getDocType(), id);
+        DeleteRequest deleteRequest = new DeleteRequest(elasticSearchProperties.getIndexName(),
+                elasticSearchProperties.getDocType(), id);
         when(elasticSearchClient.delete(any(DeleteRequest.class), eq(RequestOptions.DEFAULT))).thenThrow(new IOException());
         detectorMappingService.deleteDetectorMapping(id);
     }
@@ -277,7 +279,7 @@ public class ElasticSearchDetectorMappingServiceTest {
         DeleteResponse deleteResponse = mock(DeleteResponse.class);
         Result ResultOpt;
         when(deleteResponse.getId()).thenReturn(id);
-        String indexName = elasticSearchConfig.getIndexName();
+        String indexName = elasticSearchProperties.getIndexName();
         when(deleteResponse.getIndex()).thenReturn(indexName);
         try {
             byte[] byteopt = new byte[]{2}; // 2 - DELETED, DeleteResponse.Result

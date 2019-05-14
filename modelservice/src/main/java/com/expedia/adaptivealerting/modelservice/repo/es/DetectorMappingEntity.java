@@ -16,14 +16,13 @@
 package com.expedia.adaptivealerting.modelservice.repo.es;
 import com.expedia.adaptivealerting.modelservice.model.Detector;
 import com.expedia.adaptivealerting.modelservice.model.User;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@Accessors(chain = true)
 public class DetectorMappingEntity {
     // Prefixing variable names with 'aa_' to reserve these fields to be used in ES mappings.
     public static final String AA_PREFIX = "aa_";

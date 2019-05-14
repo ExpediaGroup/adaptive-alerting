@@ -19,9 +19,8 @@ public class RequestValidatorTest {
     @Mock
     private User user;
 
-    /* Class under test */
     @InjectMocks
-    private RequestValidator requestValidator;
+    private RequestValidator requestValidatorUndertest;
 
     @Before
     public void setUp() {
@@ -31,19 +30,19 @@ public class RequestValidatorTest {
     @Test
     public void testValidateUser_successful() {
         User user = new User("test-user");
-        requestValidator.validateUser(user);
+        requestValidatorUndertest.validateUser(user);
     }
 
     @Test(expected=RuntimeException.class)
     public void testValidateUser_idempty() throws IllegalArgumentException  {
         User user = new User("");
-        requestValidator.validateUser(user);
+        requestValidatorUndertest.validateUser(user);
     }
 
     @Test(expected=RuntimeException.class)
     public void testValidateUser_idcontainswhitespaces() throws IllegalArgumentException {
         User user = new User("test user");
-        requestValidator.validateUser(user);
+        requestValidatorUndertest.validateUser(user);
     }
 
     @Test
@@ -69,29 +68,29 @@ public class RequestValidatorTest {
         operandsList.add(operand1);
         operandsList.add(operand2);
         expression.setOperands(operandsList);
-        requestValidator.validateExpression(expression);
+        requestValidatorUndertest.validateExpression(expression);
     }
 
     @Test
     public void testValidateDetector_successful() {
         Detector detector = new Detector(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"));
-        requestValidator.validateDetector(detector);
+        requestValidatorUndertest.validateDetector(detector);
     }
 
     @Test(expected=RuntimeException.class)
-    public void testValidateOperand_keyempty() throws IllegalArgumentException {
+    public void testValidateOperand_keyempty() {
         Expression expression = new Expression();
         expression.setOperator(Operator.AND);
         List<Operand> operandsList = new ArrayList<>();
-        Operand testoperand = new Operand();
-        testoperand.setField(new Field("", "sample-app"));
-        operandsList.add(testoperand);
+        Operand testOperand = new Operand();
+        testOperand.setField(new Field("", "sample-app"));
+        operandsList.add(testOperand);
         expression.setOperands(operandsList);
-        requestValidator.validateExpression(expression);
+        requestValidatorUndertest.validateExpression(expression);
     }
 
     @Test(expected=RuntimeException.class)
-    public void testValidateOperand_valueempty() throws IllegalArgumentException {
+    public void testValidateOperand_valueempty() {
         Expression expression = new Expression();
         expression.setOperator(Operator.AND);
         List<Operand> operandsList = new ArrayList<>();
@@ -99,11 +98,11 @@ public class RequestValidatorTest {
         testoperand.setField(new Field("name", ""));
         operandsList.add(testoperand);
         expression.setOperands(operandsList);
-        requestValidator.validateExpression(expression);
+        requestValidatorUndertest.validateExpression(expression);
     }
 
     @Test(expected=RuntimeException.class)
-    public void testValidateOperand_keystartswithDetectorMappingEntityAAPREFIX() throws IllegalArgumentException  {
+    public void testValidateOperand_keystartswithDetectorMappingEntityAAPREFIX() {
         Expression expression = new Expression();
         expression.setOperator(Operator.AND);
         List<Operand> operandsList = new ArrayList<>();
@@ -111,7 +110,7 @@ public class RequestValidatorTest {
         testOperand.setField(new Field("aa_name", "sample-app"));
         operandsList.add(testOperand);
         expression.setOperands(operandsList);
-        requestValidator.validateExpression(expression);
+        requestValidatorUndertest.validateExpression(expression);
     }
 
 }
