@@ -372,26 +372,4 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
         });
         return new MatchingDetectorsResponse(groupedDetectorsByIndex, res.getLookupTimeInMillis());
     }
-
-    /*
-    private String detectorMappingEntityToJson(DetectorMappingEntity detectorMappingEntity) {
-        try {
-            return objectMapper.writeValueAsString(detectorMappingEntity);
-        }
-        catch (Exception e) {
-            log.error("Serialization error", e);
-        }
-        return null;
-    }
-
-    private DetectorMappingEntity detectorMappingEntityFromJson(String json) {
-        try {
-            return objectMapper.readValue(json, DetectorMappingEntity.class);
-        }
-        catch (Exception e) {
-            log.error("Deserialization error", e);
-        }
-        return null;
-    }
-    */
 }
