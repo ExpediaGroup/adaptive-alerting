@@ -38,3 +38,10 @@ graphite:
   urlTemplate: "${graphite_url}"
 security:
   signingKey: $${SIGNING_KEY}
+
+datasource-es:
+  createIndexIfNotFound: true
+  index.name: ${detector_mapper_index_name}
+  doctype: ${detector_mapper_doctype}
+  urls: ${detector_mapper_es_urls}
+  config: ${detector_mapper_es_config_vars_json}

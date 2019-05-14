@@ -22,6 +22,17 @@ spring:
 endpoints:
   health:
     sensitive: false
+
+datasource-es:
+  createIndexIfNotFound: true
+  indexName: ${ES_INDEX_NAME}
+  doctype: ${ES_DOCTYPE}
+  urls: ${ES_URL}
+  config:
+    connectionTimeout: 40000
+    connectionRetryTimeout: 40000
+    maxTotalConnection: 200
+
 management:
   context-path: "/admin"
   metrics:
