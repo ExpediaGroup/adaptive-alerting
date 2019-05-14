@@ -174,12 +174,12 @@ public class ModelServiceConnectorTest {
         assertEquals(this.detectorMatchResponse, result);
     }
 
-    @Test(expected = DetectorRetrievalException.class)
+    @Test(expected = DetectorMappingRetrievalException.class)
     public void testFindMatchingDetectorMappings_cantRetrieve() {
         connectorUnderTest.findMatchingDetectorMappings(tags_cantRetrieve);
     }
 
-    @Test(expected = DetectorDeserializationException.class)
+    @Test(expected = DetectorMappingDeserializationException.class)
     public void testFindMatchingDetectorMappings_cantDeserialize() {
         connectorUnderTest.findMatchingDetectorMappings(tags_cantDeserialize);
     }

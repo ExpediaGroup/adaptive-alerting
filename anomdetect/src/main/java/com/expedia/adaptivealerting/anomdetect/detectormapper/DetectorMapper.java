@@ -123,7 +123,7 @@ public class DetectorMapper {
 
     void detectorCacheUpdate() {
 
-        List<DetectorMapping> detectorMappings = detectorSource.findUpdatedDetectorMappings(detectorCacheUpdateTimePeriod);
+        List<DetectorMapping> detectorMappings = detectorSource.findUpdatedDetectorMappings(detectorCacheUpdateTimePeriod * 60);
 
         List<DetectorMapping> disabledDetectorMappings = detectorMappings.stream()
                 .filter(dt -> !dt.isEnabled())

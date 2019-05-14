@@ -33,6 +33,7 @@ import org.mockito.MockitoAnnotations;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -170,7 +171,7 @@ public final class DetectorMapperTest {
     public void testGetDetectorsFromCache() throws IOException {
 
         //testing detector Mapper with actual cache
-        this.detectorMapper = new DetectorMapper(detectorSource,config);
+        this.detectorMapper = new DetectorMapper(detectorSource, config);
 
         this.initTagsFromFile();
         //populate cache
@@ -195,14 +196,13 @@ public final class DetectorMapperTest {
 
     @Test
     public void detectorCacheUpdateTest() {
-        List<DetectorMapping> updateDetectorMappings = new ArrayList<>();
 
-        DetectorMapping disabledDetectorMapping = new DetectorMapping(null, new Detector(UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689")), null, 0, 0, false, new ArrayList<>());
-        DetectorMapping modifiedDetectorMapping = new DetectorMapping(null, new Detector(UUID.fromString("4d49ba26-1a7d-43f4-b70c-ee644a2c1689")), null, 0, 0, true, new ArrayList<>());
-        updateDetectorMappings.add(disabledDetectorMapping);
-        updateDetectorMappings.add(modifiedDetectorMapping);
+        DetectorMapping disabledDetectorMapping = new DetectorMapping(null, new Detector(UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689")), null, 0, 0, false);
+        DetectorMapping modifiedDetectorMapping = new DetectorMapping(null, new Detector(UUID.fromString("4d49ba26-1a7d-43f4-b70c-ee644a2c1689")), null, 0, 0, true);
+        List<DetectorMapping> updateDetectorMappings = Arrays.asList(disabledDetectorMapping, modifiedDetectorMapping);
 
-        when(detectorSource.findUpdatedDetectorMappings(detectorMappingCacheUpdatePeriod)).thenReturn(updateDetectorMappings);
+
+        when(detectorSource.findUpdatedDetectorMappings(detectorMappingCacheUpdatePeriod * 60)).thenReturn(updateDetectorMappings);
         doAnswer((e) -> null).when(cache).removeDisabledDetectorMappings(anyList());
         doAnswer((e) -> null).when(cache).updateCache(anyList());
 

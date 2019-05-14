@@ -19,13 +19,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
-/**
- * The type Detector mapping.
- * <p>
- * searchIndexes: index of matching metric-tag in request batch of metric-tags
- */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -36,6 +29,5 @@ public class DetectorMapping {
     private long lastModifiedTimeInMillis;
     private long createdTimeInMillis;
     private boolean isEnabled;
-    private List<Integer> searchIndexes;
 
 }

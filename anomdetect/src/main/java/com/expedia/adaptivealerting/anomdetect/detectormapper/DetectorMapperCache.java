@@ -32,6 +32,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
+/**
+ * <p>
+ * Cache for metric to detector-uuid mapping backed by Guava cache<br>
+ * metric is identified by metric-key generated using {@link CacheUtil#getKey(Map)} <br>
+ * detector's list is stored as concatenated string of detector uuid generated using {@link CacheUtil#getDetectorIds(List)}
+ * </p>
+ * <p>
+ * The DetectorMapperCache can be updated using methods {@link #removeDisabledDetectorMappings(List)} and {@link #updateCache(List)} }
+ * </p>
+ */
 @Slf4j
 public class DetectorMapperCache {
 
@@ -43,6 +53,9 @@ public class DetectorMapperCache {
     private Counter cacheMiss;
     private AtomicLong cacheSize;
 
+    /**
+     * Instantiates a new Detector mapper cache.
+     */
     public DetectorMapperCache() {
         this.cache = CacheBuilder.newBuilder()
                 .expireAfterWrite(120, TimeUnit.MINUTES)
@@ -52,6 +65,12 @@ public class DetectorMapperCache {
         this.cacheMiss = Metrics.counter("cache.miss");
     }
 
+    /**
+     * Get list.
+     *
+     * @param key the key
+     * @return the list
+     */
     public List<Detector> get(String key) {
         String bunchOfCachedDetectorIds = cache.getIfPresent(key);
         if (bunchOfCachedDetectorIds == null) {
@@ -63,6 +82,12 @@ public class DetectorMapperCache {
         }
     }
 
+    /**
+     * Put.
+     *
+     * @param key       the key
+     * @param detectors the detectors
+     */
     public void put(String key, List<Detector> detectors) {
         String bunchOfDetectorIds = CacheUtil.getDetectorIds(detectors);
         log.trace("Updating cache with {} - {}", key, bunchOfDetectorIds);
@@ -71,8 +96,13 @@ public class DetectorMapperCache {
     }
 
 
-    public void removeDisabledDetectorMappings(List<DetectorMapping> mappings) {
-        List<UUID> detectorIdsOfDisabledMappings = mappings.stream().map(detectorMapping -> detectorMapping.getDetector().getUuid()).collect(Collectors.toList());
+    /**
+     * Remove disabled detector mappings from cache.
+     *
+     * @param disabledMappings the list of mappings
+     */
+    public void removeDisabledDetectorMappings(List<DetectorMapping> disabledMappings) {
+        List<UUID> detectorIdsOfDisabledMappings = disabledMappings.stream().map(detectorMapping -> detectorMapping.getDetector().getUuid()).collect(Collectors.toList());
 
         Map<String, String> mappingsWhichNeedsAnUpdate = new HashMap<>();
 
@@ -105,10 +135,12 @@ public class DetectorMapperCache {
         return CacheUtil.getDetectorIds(detectors);
     }
 
-/*
-* Removes metrics whose tags match the mappings that have been updated.
-* Which force those metrics to be queried on backend(ES) to fetch latest mapping
-* */
+    /**
+     * Removes metrics whose tags match the mappings that have been updated.
+     * Which force those metrics to be queried on backend(ES) to fetch latest mapping
+     *
+     * @param newDetectorMappings the new detector mappings
+     */
     public void updateCache(List<DetectorMapping> newDetectorMappings) {
         final List<String> matchingMappings = new ArrayList<>();
         List<Map<String, String>> listOfTagsFromExpression = findTags(newDetectorMappings);

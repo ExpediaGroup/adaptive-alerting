@@ -39,7 +39,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.UUID;
@@ -157,7 +156,7 @@ public final class DefaultDetectorSourceTest {
                 new ModelTypeResource(DETECTOR_TYPE_EWMA),
                 true);
         this.updatedDetectorResources = new DetectorResources(Collections.singletonList(updatedDetectorsResource));
-        this.detectorMapping = new DetectorMapping(null, new com.expedia.adaptivealerting.anomdetect.detectormapper.Detector(UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689")), null, 0, 0, false, new ArrayList<>());
+        this.detectorMapping = new DetectorMapping(null, new com.expedia.adaptivealerting.anomdetect.detectormapper.Detector(UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689")), null, 0, 0, false);
     }
 
     private void initTestObjects_findLatestModel() {
