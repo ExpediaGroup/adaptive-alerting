@@ -61,7 +61,7 @@ public class ModelServiceConnector {
     public static final String API_PATH_DETECTOR_BY_METRIC_HASH = "/api/detectors/search/findByMetricHash?hash=%s";
     public static final String API_PATH_MODEL_BY_DETECTOR_UUID = "/api/models/search/findLatestByDetectorUuid?uuid=%s";
     public static final String API_PATH_DETECTOR_UPDATES = "/api/detectors/search/getLastUpdatedDetectors?interval=%d";
-    public static final String API_PATH_DETECTOR_MAPPING_UPDATES = "/api/detectorMappings/lastUpdated?timeInSecs=%d"; //TODO CHANGE
+    public static final String API_PATH_DETECTOR_MAPPING_UPDATES = "/api/detectorMappings/lastUpdated?timeInSecs=%d";
     public static final String API_PATH_MATCHING_DETECTOR_BY_TAGS = "/api/detectorMappings/findMatchingByTags";
 
     private final MetricTankIdFactory metricTankIdFactory = new MetricTankIdFactory();

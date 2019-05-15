@@ -33,21 +33,37 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 /**
- * <p>
- * Cache for metric to detector-uuid mapping backed by Guava cache<br>
+ * <p>Cache for metric to detector-uuid mapping backed by Guava cache
+ *
+ *     {@code Map[key: metric-key, value: concatenated detectorUUIds] }<br>
+ *
  * metric is identified by metric-key generated using {@link CacheUtil#getKey(Map)} <br>
  * detector's list is stored as concatenated string of detector uuid generated using {@link CacheUtil#getDetectorIds(List)}
- * </p>
- * <p>
- * The DetectorMapperCache can be updated using methods {@link #removeDisabledDetectorMappings(List)} and {@link #updateCache(List)} }
- * </p>
+ * <pre>
+ * eg. if <em>
+ *     Metric1
+ *        {
+ *          tag : {
+ *                  k1:v1,
+ *                  k2,v2
+*                 }
+ *        }</em>
+ *
+ *   has two matching detectors <em> D1(uuid= UUID_ONE), D2(uuid= UUID_TWO) </em>
+ *   it will be stored in cache as <em> "k1:v1,k2:v2" : "UUID_ONE,UUID_TWO" </em>
+ * </pre>
+ *
+ *  The DetectorMapperCache can be updated using methods {@link #removeDisabledDetectorMappings(List)} and {@link #updateCache(List)} }
+ * <pre>
+ * eg. if detector D1(uuid=UUID_ONE) is disabled, we need to remove it from all the values in cache.
+ *
+ *    <em> "k1:v1,k2:v2" : "UUID_ONE,UUID_TWO"</em>  changes to
+ *    <em>"k1:v1,k2:v2" : "UUID_TWO"</em>
+ * </pre>
  */
 @Slf4j
 public class DetectorMapperCache {
 
-    /*
-     *  cache Map[key: metric-key, value: concatenated detectorUUIds]
-     * */
     private Cache<String, String> cache;
     private Counter cacheHit;
     private Counter cacheMiss;
@@ -66,10 +82,8 @@ public class DetectorMapperCache {
     }
 
     /**
-     * Get list.
-     *
-     * @param key the key
-     * @return the list
+     * @param key the metric-key generated using {@link CacheUtil#getKey(Map)} <br>
+     * @return the list of Detectors
      */
     public List<Detector> get(String key) {
         String bunchOfCachedDetectorIds = cache.getIfPresent(key);
@@ -83,9 +97,7 @@ public class DetectorMapperCache {
     }
 
     /**
-     * Put.
-     *
-     * @param key       the key
+     * @param key       the metric-key generated using {@link CacheUtil#getKey(Map)} <br>
      * @param detectors the detectors
      */
     public void put(String key, List<Detector> detectors) {
@@ -136,8 +148,10 @@ public class DetectorMapperCache {
     }
 
     /**
-     * Removes metrics whose tags match the mappings that have been updated.
-     * Which force those metrics to be queried on backend(ES) to fetch latest mapping
+     * When a detector is updated, old mapping may still not be valid as metrics' tags might not match with new mapping expression
+     * So this method removes metrics from cache which were previously  detectors the mappings that have been updated.
+     *
+     * This causes a cache-miss for removed metrics, and then eventually are re-populated by a call to backend
      *
      * @param newDetectorMappings the new detector mappings
      */
