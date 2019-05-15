@@ -103,9 +103,11 @@ module "modelservice" {
   db_endpoint = "${var.modelservice["db_endpoint"]}"
   graphite_url = "${var.modelservice["graphite_url"]}"
   detector_mapper_es_urls = "${var.modelservice["detector_mapper_es_urls"]}"
-  detector_mapper_es_config_vars_json = "${var.modelservice["detector_mapper_es_config_vars_json"]}"
   detector_mapper_index_name = "${var.modelservice["detector_mapper_index_name"]}"
   detector_mapper_doctype = "${var.modelservice["detector_mapper_doctype"]}"
+  detector_mapper_es_config_connection_timeout = "${var.modelservice["detector_mapper_es_config_connection_timeout"]}"
+  detector_mapper_es_config_connection_retry_timeout = "${var.modelservice["detector_mapper_es_config_connection_retry_timeout"]}"
+  detector_mapper_es_config_max_total_connection = "${var.modelservice["detector_mapper_es_config_max_total_connection"]}"
 }
 
 module "a2m-mapper" {
