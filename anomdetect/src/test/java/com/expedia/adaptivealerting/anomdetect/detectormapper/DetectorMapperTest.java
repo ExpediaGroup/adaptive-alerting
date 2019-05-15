@@ -204,12 +204,12 @@ public final class DetectorMapperTest {
 
         when(detectorSource.findUpdatedDetectorMappings(detectorMappingCacheUpdatePeriod * 60)).thenReturn(updateDetectorMappings);
         doAnswer((e) -> null).when(cache).removeDisabledDetectorMappings(anyList());
-        doAnswer((e) -> null).when(cache).updateCache(anyList());
+        doAnswer((e) -> null).when(cache).invalidateMetricsWithOldDetectorMappings(anyList());
 
         detectorMapper.detectorCacheUpdate();
 
         verify(cache).removeDisabledDetectorMappings(Collections.singletonList(disabledDetectorMapping));
-        verify(cache).updateCache(Collections.singletonList(modifiedDetectorMapping));
+        verify(cache).invalidateMetricsWithOldDetectorMappings(Collections.singletonList(modifiedDetectorMapping));
 
 
     }

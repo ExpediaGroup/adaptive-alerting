@@ -33,33 +33,25 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 /**
- * <p>Cache for metric to detector-uuid mapping backed by Guava cache
+ * <p>
+ *     Ad-mapper attaches detectors to each incoming metric.
+ *     Detectors matching to a given metric are fetched from modelservice, which are cached in {@linkplain DetectorMapperCache}. <br>
+ *     Since this cache can grow in size, for space optimization we transform <br>
  *
- *     {@code Map[key: metric-key, value: concatenated detectorUUIds] }<br>
- *
- * metric is identified by metric-key generated using {@link CacheUtil#getKey(Map)} <br>
- * detector's list is stored as concatenated string of detector uuid generated using {@link CacheUtil#getDetectorIds(List)}
+ *      - metric into metric-key generated using {@link CacheUtil#getKey(Map)} <br>
+ *      - detector's list into a concatenated string of detector uuid generated using {@link CacheUtil#getDetectorIds(List)} <br>
+ * eg.
  * <pre>
- * eg. if <em>
- *     Metric1
- *        {
- *          tag : {
- *                  k1:v1,
- *                  k2,v2
-*                 }
- *        }</em>
+ *   Metric1
+ *     {  tag : {
+ *                k1: v1,
+ *                k2: v2
+ *              }
+ *      }
  *
- *   has two matching detectors <em> D1(uuid= UUID_ONE), D2(uuid= UUID_TWO) </em>
- *   it will be stored in cache as <em> "k1:v1,k2:v2" : "UUID_ONE,UUID_TWO" </em>
+ * has two matching detectors <em> D1(uuid= UUID_ONE), D2(uuid= UUID_TWO) </em> it will be stored in cache as <em>("k1:v1,k2:v2" : "UUID_ONE,UUID_TWO") </em>
  * </pre>
- *
- *  The DetectorMapperCache can be updated using methods {@link #removeDisabledDetectorMappings(List)} and {@link #updateCache(List)} }
- * <pre>
- * eg. if detector D1(uuid=UUID_ONE) is disabled, we need to remove it from all the values in cache.
- *
- *    <em> "k1:v1,k2:v2" : "UUID_ONE,UUID_TWO"</em>  changes to
- *    <em>"k1:v1,k2:v2" : "UUID_TWO"</em>
- * </pre>
+ * The DetectorMapperCache can be updated using methods {@link #removeDisabledDetectorMappings(List)} and {@link #invalidateMetricsWithOldDetectorMappings(List)} }
  */
 @Slf4j
 public class DetectorMapperCache {
@@ -110,6 +102,16 @@ public class DetectorMapperCache {
 
     /**
      * Remove disabled detector mappings from cache.
+     *  <pre>
+     *  eg. If cache has entries
+     *  <em> ("k1:v1,k2:v2" : "UUID_ONE,UUID_TWO")</em>
+     *  <em> ("k3:v3,k3:v4" : "UUID_FIVE,UUID_ONE,UUID_THREE")</em>
+     *
+     *  and detector  <em> D1(uuid=UUID_ONE)</em> is disabled, this method removes UUID_ONE from all cache entry values.
+     *
+     *   <em> ("k1:v1,k2:v2" : "UUID_TWO")</em>
+     *   <em> ("k3:v3,k3:v4" : "UUID_FIVE,UUID_THREE")</em>
+     * </pre>
      *
      * @param disabledMappings the list of mappings
      */
@@ -148,16 +150,15 @@ public class DetectorMapperCache {
     }
 
     /**
-     * When a detector is updated, old mapping may still not be valid as metrics' tags might not match with new mapping expression
-     * So this method removes metrics from cache which were previously  detectors the mappings that have been updated.
+     * Removes metrics from cache which contain detectors which are now updated.
      *
-     * This causes a cache-miss for removed metrics, and then eventually are re-populated by a call to backend
+     * This causes a cache-miss and eventually removed metrics are re-populated with new mappings.
      *
-     * @param newDetectorMappings the new detector mappings
+     * @param detectorMappings the new detector mappings
      */
-    public void updateCache(List<DetectorMapping> newDetectorMappings) {
+    public void invalidateMetricsWithOldDetectorMappings(List<DetectorMapping> detectorMappings) {
         final List<String> matchingMappings = new ArrayList<>();
-        List<Map<String, String>> listOfTagsFromExpression = findTags(newDetectorMappings);
+        List<Map<String, String>> listOfTagsFromExpression = findTags(detectorMappings);
 
         //iterate over the list of cache entries and find for matches and invalidate those from cache.
         //FIXME - This is a brute force approach with time complexity of O(n * m).
@@ -171,7 +172,7 @@ public class DetectorMapperCache {
         });
         log.info("invalidating cache entries: {} for input : {}",
                 Arrays.toString(matchingMappings.toArray()),
-                Arrays.toString(newDetectorMappings.stream()
+                Arrays.toString(detectorMappings.stream()
                         .map(mapping -> mapping.getDetector().getUuid().toString())
                         .toArray()));
         //invalidate matches.

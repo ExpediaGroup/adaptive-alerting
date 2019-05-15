@@ -135,7 +135,7 @@ public class DetectorMapper {
                 .filter(DetectorMapping::isEnabled)
                 .collect(Collectors.toList());
         if (!newDetectorMappings.isEmpty()) {
-            cache.updateCache(newDetectorMappings);
+            cache.invalidateMetricsWithOldDetectorMappings(newDetectorMappings);
         }
     }
 

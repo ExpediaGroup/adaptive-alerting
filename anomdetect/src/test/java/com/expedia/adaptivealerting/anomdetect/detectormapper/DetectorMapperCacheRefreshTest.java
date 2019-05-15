@@ -79,7 +79,7 @@ public class DetectorMapperCacheRefreshTest {
         detectorMapperCache.put(notMatchingMetricKey, detectors);
         detectorMapperCache.put(matchingMetricKey, detectors);
 
-        detectorMapperCache.updateCache(newDetectorMappings);
+        detectorMapperCache.invalidateMetricsWithOldDetectorMappings(newDetectorMappings);
 
 
         assertTrue(detectorMapperCache.get(notMatchingMetricKey).contains(d));
