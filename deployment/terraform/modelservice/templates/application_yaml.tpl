@@ -45,3 +45,10 @@ datasource-es:
   doctype: ${detector_mapper_doctype}
   urls: ${detector_mapper_es_urls}
   config: ${detector_mapper_es_config_vars_json}
+
+# Swagger Documentation
+swagger:
+  service:
+    version: "1.0.0"
+    title: "Model service detector mapper"
+    description: "API documentation for model service detector mappings"

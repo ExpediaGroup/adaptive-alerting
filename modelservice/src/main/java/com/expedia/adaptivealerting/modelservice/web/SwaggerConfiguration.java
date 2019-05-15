@@ -60,25 +60,7 @@ public class SwaggerConfiguration {
     @Value("${swagger.service.description}")
     private String serviceDescription;
 
-    @Value("${swagger.service.termsPath}")
-    private String serviceTermsPath;
-
-    @Value("${swagger.service.contact.email}")
-    private String serviceEmail;
-
-    @Value("${swagger.service.licenceType}")
-    private String serviceLicenceType;
-
-    @Value("${swagger.service.licencePath}")
-    private String serviceLicencePath;
-
     private TypeResolver typeResolver;
-
-    @Value("${swagger.service.contact.name}")
-    private String contactName;
-
-    @Value("${swagger.service.contact.email}")
-    private String contactEmail;
 
     /**
      * @return Returns a Swagger 2.0 Specification for the current application
@@ -101,14 +83,13 @@ public class SwaggerConfiguration {
                                 typeResolver.resolve(ResponseEntity.class, WildcardType.class)),
                                 typeResolver.resolve(WildcardType.class))
                 )
-                .tags(new Tag("default", "Basic endpoints for adaptive-alerting-detector-mapper"))
                 .useDefaultResponseMessages(false);
     }
 
     private Predicate<String> paths() {
         return or(
                 // regex("/additional_endpoints/.*?"),
-                regex("/api/.*?")
+                regex("/api/detectorMappings.*?")
         );
     }
 
@@ -117,10 +98,6 @@ public class SwaggerConfiguration {
                 .title(serviceTitle)
                 .description(serviceDescription)
                 .version(serviceVersion)
-                .termsOfServiceUrl(serviceTermsPath)
-                .contact(new Contact(contactName, "", contactEmail))
-                .license(serviceLicenceType)
-                .licenseUrl(serviceLicencePath)
                 .build();
     }
 
