@@ -38,3 +38,13 @@ graphite:
   urlTemplate: "${graphite_url}"
 security:
   signingKey: $${SIGNING_KEY}
+
+datasource-es:
+  createIndexIfNotFound: true
+  indexName: ${detector_mapper_index_name}
+  doctype: ${detector_mapper_doctype}
+  urls: ${detector_mapper_es_urls}
+  config: 
+    connectionTimeout: ${detector_mapper_es_config_connection_timeout}
+    connectionRetryTimeout: ${detector_mapper_es_config_connection_retry_timeout}
+    maxTotalConnection:  ${detector_mapper_es_config_max_total_connection}
