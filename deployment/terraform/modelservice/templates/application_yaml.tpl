@@ -48,3 +48,10 @@ datasource-es:
     connectionTimeout: ${detector_mapper_es_config_connection_timeout}
     connectionRetryTimeout: ${detector_mapper_es_config_connection_retry_timeout}
     maxTotalConnection:  ${detector_mapper_es_config_max_total_connection}
+
+# Swagger Documentation
+swagger:
+  service:
+    version: "1.0.0"
+    title: "Model service detector mapper"
+    description: "API documentation for model service detector mappings"
