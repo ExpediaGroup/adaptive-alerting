@@ -41,10 +41,13 @@ security:
 
 datasource-es:
   createIndexIfNotFound: true
-  index.name: ${detector_mapper_index_name}
+  indexName: ${detector_mapper_index_name}
   doctype: ${detector_mapper_doctype}
   urls: ${detector_mapper_es_urls}
-  config: ${detector_mapper_es_config_vars_json}
+  config: 
+    connectionTimeout: ${detector_mapper_es_config_connection_timeout}
+    connectionRetryTimeout: ${detector_mapper_es_config_connection_retry_timeout}
+    maxTotalConnection:  ${detector_mapper_es_config_max_total_connection}
 
 # Swagger Documentation
 swagger:
