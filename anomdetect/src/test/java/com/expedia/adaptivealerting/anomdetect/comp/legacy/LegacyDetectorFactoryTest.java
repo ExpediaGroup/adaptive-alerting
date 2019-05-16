@@ -53,7 +53,7 @@ public class LegacyDetectorFactoryTest {
     @Test(expected = IllegalArgumentException.class)
     public void testCreateDetector_nullUuid() {
         val params = new HashMap<String, Object>();
-        val modelResource = buildModelResource(LegacyDetectorFactory.EWMA, params);
+        val modelResource = buildLegacyDetectorConfig(LegacyDetectorFactory.EWMA, params);
         factoryUnderTest.createDetector(null, modelResource);
     }
 
@@ -65,7 +65,8 @@ public class LegacyDetectorFactoryTest {
     @Test
     public void testCreateDetector_constantThreshold() {
         val params = new HashMap<String, Object>();
-        params.put("@type", "constant-threshold");
+        // Disabling this, because the legacy schema doesn't include this field. [WLW]
+//        params.put("@type", "constant-threshold");
         params.put("type", AnomalyType.TWO_TAILED);
         params.put("thresholds", new AnomalyThresholds(100.0, 90.0, 20.0, 10.0));
         val detector = buildDetector(LegacyDetectorFactory.CONSTANT_THRESHOLD, params);
@@ -75,7 +76,8 @@ public class LegacyDetectorFactoryTest {
     @Test
     public void testCreateDetector_cusum() {
         val params = new HashMap<String, Object>();
-        params.put("@type", "cusum");
+        // Disabling this, because the legacy schema doesn't include this field. [WLW]
+//        params.put("@type", "cusum");
         params.put("type", AnomalyType.LEFT_TAILED);
         val detector = buildDetector(LegacyDetectorFactory.CUSUM, params);
         assertEquals(CusumDetector.class, detector.getClass());
@@ -101,6 +103,7 @@ public class LegacyDetectorFactoryTest {
     @Test
     public void testCreateDetector_individuals() {
         val params = new HashMap<String, Object>();
+        // TODO
         params.put("@type", "individuals");
         val detector = buildDetector(LegacyDetectorFactory.INDIVIDUALS, params);
         assertTrue(detector instanceof IndividualsDetector);
@@ -120,11 +123,11 @@ public class LegacyDetectorFactoryTest {
     }
 
     private Detector buildDetector(String type, Map<String, Object> params) {
-        val modelResource = buildModelResource(type, params);
-        return factoryUnderTest.createDetector(UUID.randomUUID(), modelResource);
+        val legacyDetectorConfig = buildLegacyDetectorConfig(type, params);
+        return factoryUnderTest.createDetector(UUID.randomUUID(), legacyDetectorConfig);
     }
 
-    private ModelResource buildModelResource(String type, Map<String, Object> params) {
+    private ModelResource buildLegacyDetectorConfig(String type, Map<String, Object> params) {
         return new ModelResource()
                 .setDetectorType(new ModelTypeResource(type))
                 .setParams(params)

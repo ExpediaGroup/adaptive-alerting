@@ -53,28 +53,33 @@ public class LegacyDetectorFactory {
 
     // TODO Currently we use a legacy process to find the detector. The legacy process couples point forecast algos
     //  with interval forecast algos. We will decouple these shortly. [WLW]
-    public Detector createDetector(UUID uuid, ModelResource model) {
+    public Detector createDetector(UUID uuid, ModelResource legacyDetectorConfig) {
         notNull(uuid, "uuid can't be null");
-        notNull(model, "model can't be null");
+        notNull(legacyDetectorConfig, "legacyDetectorConfig can't be null");
 
         Detector detector;
 
         // TODO Rename to legacyDetectorType [WLW]
-        val detectorType = model.getDetectorType().getKey();
+        val detectorType = legacyDetectorConfig.getDetectorType().getKey();
 
         // Note that constant threshold, cusum and individuals are still using the original config schema.
         if (CONSTANT_THRESHOLD.equals(detectorType)) {
-            detector = new ConstantThresholdDetector(uuid, toParams(model, ConstantThresholdDetector.Params.class));
+            val params = toParams(legacyDetectorConfig, ConstantThresholdParams.class).toNewParams();
+            detector = new ConstantThresholdDetector(uuid, params);
         } else if (CUSUM.equals(detectorType)) {
-            detector = new CusumDetector(uuid, toParams(model, CusumDetector.Params.class));
+            val params = toParams(legacyDetectorConfig, CusumParams.class).toNewParams();
+            detector = new CusumDetector(uuid, params);
         } else if (EWMA.equals(detectorType)) {
-            detector = createEwmaDetector(uuid, toParams(model, EwmaParams.class));
+            detector = createEwmaDetector(uuid, toParams(legacyDetectorConfig, EwmaParams.class));
         } else if (HOLT_WINTERS.equals(detectorType)) {
-            detector = createHoltWintersDetector(uuid, toParams(model, HoltWintersParams.class));
+            detector = createHoltWintersDetector(uuid, toParams(legacyDetectorConfig, HoltWintersParams.class));
         } else if (INDIVIDUALS.equals(detectorType)) {
-            detector = new IndividualsDetector(uuid, toParams(model, IndividualsDetector.Params.class));
+            // FIXME This doesn't work with the legacy config schema. If we want this to work we'd have to do the same
+            //  thing we're doing with constant threshold and cusum above. But we're not currently using individuals
+            //  so we can just wait til we've migrated over to the new schema. [WLW]
+            detector = new IndividualsDetector(uuid, toParams(legacyDetectorConfig, IndividualsDetector.Params.class));
         } else if (PEWMA.equals(detectorType)) {
-            detector = createPewmaDetector(uuid, toParams(model, PewmaParams.class));
+            detector = createPewmaDetector(uuid, toParams(legacyDetectorConfig, PewmaParams.class));
         } else {
             throw new IllegalArgumentException("Unknown detector type: " + detectorType);
         }

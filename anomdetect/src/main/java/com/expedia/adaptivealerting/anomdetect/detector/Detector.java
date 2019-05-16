@@ -21,7 +21,8 @@ import com.expedia.metrics.MetricData;
 import java.util.UUID;
 
 /**
- * Anomaly detector interface.
+ * Anomaly detector interface. An anomaly detector takes a metric data point as an input, and classifies it as
+ * anomalous or not as an output. See {@link AnomalyResult} for more details on the classification.
  */
 public interface Detector {
 
