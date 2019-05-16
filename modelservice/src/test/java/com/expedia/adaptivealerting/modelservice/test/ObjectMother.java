@@ -48,8 +48,6 @@ public class ObjectMother {
     public Map<String, Object> getDetectorParams() {
         val thresholds = "{\"thresholds\": {\"lowerStrong\": \"70\", \"lowerWeak\": \"90\"}}";
         val detectorParams = toObject(thresholds);
-        // This is the new detector type
-        detectorParams.put("@type", "constant-threshold");
         detectorParams.put("type", "LEFT_TAILED");
         return detectorParams;
     }

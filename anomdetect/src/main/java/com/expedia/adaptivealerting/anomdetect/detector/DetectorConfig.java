@@ -18,10 +18,15 @@ package com.expedia.adaptivealerting.anomdetect.detector;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+/**
+ * Detector configuration interface. The nature of the configuration depends on the detector type. For example, a
+ * constant threshold detector will specify a number of thresholds. A forecasting detector on the other hand will
+ * include a point forecast model and an interval forecast model, with model configurations for each.
+ */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = ConstantThresholdDetector.Params.class, name="constant-threshold"),
-        @JsonSubTypes.Type(value = CusumDetector.Params.class, name="cusum"),
+        @JsonSubTypes.Type(value = ConstantThresholdDetector.Params.class, name = "constant-threshold"),
+        @JsonSubTypes.Type(value = CusumDetector.Params.class, name = "cusum"),
         @JsonSubTypes.Type(value = ForecastingDetector.Params.class, name = "forecasting"),
         @JsonSubTypes.Type(value = IndividualsDetector.Params.class, name = "individuals"),
 })
