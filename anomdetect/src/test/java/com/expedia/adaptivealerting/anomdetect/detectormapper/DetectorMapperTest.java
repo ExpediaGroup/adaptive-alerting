@@ -90,7 +90,7 @@ public final class DetectorMapperTest {
         assertSame(detectorSource, detectorMapper.getDetectorSource());
     }
 
-    @Test(expected = AssertionError.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testModelServiceConnectorNotNull() {
         new DetectorMapper(null, config);
     }
@@ -197,8 +197,8 @@ public final class DetectorMapperTest {
     @Test
     public void detectorCacheUpdateTest() {
 
-        DetectorMapping disabledDetectorMapping = new DetectorMapping(null, new Detector(UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689")), null, 0, 0, false);
-        DetectorMapping modifiedDetectorMapping = new DetectorMapping(null, new Detector(UUID.fromString("4d49ba26-1a7d-43f4-b70c-ee644a2c1689")), null, 0, 0, true);
+        DetectorMapping disabledDetectorMapping = new DetectorMapping().setDetector(new Detector(UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689"))).setEnabled(false);
+        DetectorMapping modifiedDetectorMapping = new DetectorMapping().setDetector(new Detector(UUID.fromString("4d49ba26-1a7d-43f4-b70c-ee644a2c1689"))).setEnabled(true);
         List<DetectorMapping> updateDetectorMappings = Arrays.asList(disabledDetectorMapping, modifiedDetectorMapping);
 
 

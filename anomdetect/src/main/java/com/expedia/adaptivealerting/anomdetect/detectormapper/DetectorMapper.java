@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.anomdetect.detectormapper;
 
 
 import com.expedia.adaptivealerting.anomdetect.comp.DetectorSource;
+import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.metrics.MetricDefinition;
 import com.typesafe.config.Config;
 import lombok.Getter;
@@ -49,15 +50,16 @@ public class DetectorMapper {
     private int detectorCacheUpdateTimePeriod;
 
     public DetectorMapper(DetectorSource detectorSource, DetectorMapperCache cache, int detectorCacheUpdateTimePeriod) {
-        assert detectorSource != null;
+        AssertUtil.notNull(detectorSource, "detectorSource can't be null");
+
         this.detectorSource = detectorSource;
         this.cache = cache;
         this.detectorCacheUpdateTimePeriod = detectorCacheUpdateTimePeriod;
+        this.initScheduler();
     }
 
     public DetectorMapper(DetectorSource detectorSource, Config config) {
         this(detectorSource, new DetectorMapperCache(), config.getInt(CK_DETECTOR_CACHE_UPDATE_PERIOD));
-        this.initScheduler();
     }
 
     private void initScheduler() {

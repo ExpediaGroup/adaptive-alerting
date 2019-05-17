@@ -15,13 +15,11 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detectormapper;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Accessors(chain = true)
 public class DetectorMapping {
     private String id;
     private Detector detector;

@@ -156,7 +156,7 @@ public final class DefaultDetectorSourceTest {
                 new ModelTypeResource(DETECTOR_TYPE_EWMA),
                 true);
         this.updatedDetectorResources = new DetectorResources(Collections.singletonList(updatedDetectorsResource));
-        this.detectorMapping = new DetectorMapping(null, new com.expedia.adaptivealerting.anomdetect.detectormapper.Detector(UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689")), null, 0, 0, false);
+        this.detectorMapping = new DetectorMapping().setDetector(new com.expedia.adaptivealerting.anomdetect.detectormapper.Detector(UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689"))).setEnabled(false);
     }
 
     private void initTestObjects_findLatestModel() {

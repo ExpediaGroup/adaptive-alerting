@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.kafka;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapper;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.MapperResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.adaptivealerting.kafka.processor.MetricDataTransformerSupplier;
 import com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde;
 import com.expedia.adaptivealerting.kafka.serde.MetricDataJsonSerde;
@@ -108,7 +109,7 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
 
 
     private Iterable<? extends KeyValue<String, MappedMetricData>> metricsByDetector(String key, MapperResult mmRes) {
-        assert mmRes != null;
+        AssertUtil.notNull(mmRes, "MapperResult mmRes can't be null");
         return mmRes.getMatchingDetectors().stream()
                 .map(detector -> KeyValue.pair(detector.getUuid().toString(), new MappedMetricData(mmRes.getMetricData(), detector.getUuid())))
                 .collect(Collectors.toSet());
