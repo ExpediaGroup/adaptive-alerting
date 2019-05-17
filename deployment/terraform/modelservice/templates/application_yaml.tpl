@@ -34,11 +34,8 @@ management:
       tomcat: false
       system: false
       process: false
-graphite:
-  urlTemplate: "${graphite_url}"
-security:
-  signingKey: $${SIGNING_KEY}
 
+# Elasticsearch
 datasource-es:
   createIndexIfNotFound: true
   indexName: ${detector_mapper_index_name}
@@ -50,9 +47,17 @@ datasource-es:
     maxTotalConnection:  ${detector_mapper_es_config_max_total_connection}
     awsIamAuthRequired: ${detector_mapper_es_config_aws_iam_auth_required}
 
+# Graphite data source
+graphite:
+  urlTemplate: "${graphite_url}"
+
 # Swagger Documentation
 swagger:
   service:
     version: "1.0.0"
     title: "Model service detector mapper"
     description: "API documentation for model service detector mappings"
+
+# AWS
+security:
+  signingKey: $${SIGNING_KEY}
