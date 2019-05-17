@@ -108,6 +108,8 @@ module "modelservice" {
   detector_mapper_es_config_connection_timeout = "${var.modelservice["detector_mapper_es_config_connection_timeout"]}"
   detector_mapper_es_config_connection_retry_timeout = "${var.modelservice["detector_mapper_es_config_connection_retry_timeout"]}"
   detector_mapper_es_config_max_total_connection = "${var.modelservice["detector_mapper_es_config_max_total_connection"]}"
+  # Additional security for es in AWS
+  detector_mapper_es_config_aws_iam_auth_required = "${var.modelservice["detector_mapper_es_config_aws_iam_auth_required"]}"
 }
 
 module "a2m-mapper" {

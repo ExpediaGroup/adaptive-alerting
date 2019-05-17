@@ -39,6 +39,7 @@ variable "detector_mapper_doctype" {}
 variable "detector_mapper_es_config_connection_timeout" {}
 variable "detector_mapper_es_config_connection_retry_timeout" {}
 variable "detector_mapper_es_config_max_total_connection" {}
+variable "detector_mapper_es_config_aws_iam_auth_required" {}
 
 # Unsure what this is, but we don't seem to be using it.
 #variable "termination_grace_period" {

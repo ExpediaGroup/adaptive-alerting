@@ -18,6 +18,7 @@ data "template_file" "config_data" {
     detector_mapper_es_config_connection_timeout = "${var.detector_mapper_es_config_connection_timeout}"
     detector_mapper_es_config_connection_retry_timeout = "${var.detector_mapper_es_config_connection_retry_timeout}"
     detector_mapper_es_config_max_total_connection = "${var.detector_mapper_es_config_max_total_connection}"
+    detector_mapper_es_config_aws_iam_auth_required = "${var.modelservice["detector_mapper_es_config_aws_iam_auth_required"]}"
   }
 }
 
