@@ -18,14 +18,13 @@ package com.expedia.adaptivealerting.modelservice.web;
 import lombok.Generated;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 @Controller
 @Generated //(exclude from code coverage)
 public class SwaggerDefinitionController {
 
-  @RequestMapping("/swagger-ui")
-  public String home() {
-    return "redirect:swagger-ui.html";
-  }
+    @RequestMapping("/swagger-ui")
+    public String home() {
+        return "redirect:swagger-ui.html";
+    }
 }
