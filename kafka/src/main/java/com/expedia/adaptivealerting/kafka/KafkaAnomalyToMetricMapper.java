@@ -19,6 +19,7 @@ import com.expedia.adaptivealerting.anomdetect.AnomalyToMetricMapper;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.adaptivealerting.kafka.util.ConfigUtil;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
@@ -167,7 +168,7 @@ public class KafkaAnomalyToMetricMapper implements Runnable {
     private ProducerRecord<String, MetricData> toMetricDataRecord(
             ConsumerRecord<String, MappedMetricData> anomalyRecord) {
 
-        assert (anomalyRecord != null);
+        AssertUtil.notNull(anomalyRecord, "anomalyRecord can't be null");
 
         val mmd = anomalyRecord.value();
         val metricData = mmd.getMetricData();

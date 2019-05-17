@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.kafka;
 import com.expedia.adaptivealerting.anomdetect.DetectorManager;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.adaptivealerting.core.util.ErrorUtil;
 import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
 import lombok.Generated;
@@ -80,7 +81,7 @@ public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
     }
 
     private MappedMetricData toAnomalyMmd(MappedMetricData mmd) {
-        assert mmd != null;
+        AssertUtil.notNull(mmd, "mappedMetricData can't be null");
 
         AnomalyResult anomalyResult = null;
         try {

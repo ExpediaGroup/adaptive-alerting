@@ -17,7 +17,9 @@ package com.expedia.adaptivealerting.anomdetect.detectormapper;
 
 
 import com.expedia.adaptivealerting.anomdetect.comp.DetectorSource;
+import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.metrics.MetricDefinition;
+import com.typesafe.config.Config;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -26,24 +28,49 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 /**
  * Detector mapper finds matching detectors for each incoming {@link MetricDefinition}
  */
 @Slf4j
 public class DetectorMapper {
-    private DetectorMapperCache cache;
+    private static final String CK_DETECTOR_CACHE_UPDATE_PERIOD = "detector-mapping-cache-update-period";
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private AtomicLong lastElasticLookUpLatency = new AtomicLong(-1);
+
     @Getter
     @NonNull
     private DetectorSource detectorSource;
+    private DetectorMapperCache cache;
+    private int detectorCacheUpdateTimePeriod;
 
+    public DetectorMapper(DetectorSource detectorSource, DetectorMapperCache cache, int detectorCacheUpdateTimePeriod) {
+        AssertUtil.notNull(detectorSource, "detectorSource can't be null");
 
-    public DetectorMapper(DetectorSource detectorSource) {
-        assert detectorSource != null;
         this.detectorSource = detectorSource;
-        this.cache = new DetectorMapperCache();
+        this.cache = cache;
+        this.detectorCacheUpdateTimePeriod = detectorCacheUpdateTimePeriod;
+        this.initScheduler();
+    }
+
+    public DetectorMapper(DetectorSource detectorSource, Config config) {
+        this(detectorSource, new DetectorMapperCache(), config.getInt(CK_DETECTOR_CACHE_UPDATE_PERIOD));
+    }
+
+    private void initScheduler() {
+        scheduler.scheduleWithFixedDelay(() -> {
+            try {
+                log.trace("Updating detector mapping cache");
+                this.detectorCacheUpdate();
+            } catch (Exception e) {
+                log.error("Error updating detectors mapping cache", e);
+            }
+        }, 1, detectorCacheUpdateTimePeriod, TimeUnit.MINUTES);
     }
 
     public List<Detector> getDetectorsFromCache(MetricDefinition metricDefinition) {
@@ -93,6 +120,25 @@ public class DetectorMapper {
             return 80;
         }
         return 0;
+    }
+
+
+    void detectorCacheUpdate() {
+
+        List<DetectorMapping> detectorMappings = detectorSource.findUpdatedDetectorMappings(detectorCacheUpdateTimePeriod * 60);
+
+        List<DetectorMapping> disabledDetectorMappings = detectorMappings.stream()
+                .filter(dt -> !dt.isEnabled())
+                .collect(Collectors.toList());
+        if (!disabledDetectorMappings.isEmpty()) {
+            cache.removeDisabledDetectorMappings(disabledDetectorMappings);
+        }
+        List<DetectorMapping> newDetectorMappings = detectorMappings.stream()
+                .filter(DetectorMapping::isEnabled)
+                .collect(Collectors.toList());
+        if (!newDetectorMappings.isEmpty()) {
+            cache.invalidateMetricsWithOldDetectorMappings(newDetectorMappings);
+        }
     }
 
 }

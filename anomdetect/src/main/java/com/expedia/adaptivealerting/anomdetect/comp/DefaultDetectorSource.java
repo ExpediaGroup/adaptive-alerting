@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.anomdetect.comp;
 import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelServiceConnector;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
+import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapping;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMatchResponse;
 import com.expedia.metrics.MetricDefinition;
 import lombok.NonNull;
@@ -25,11 +26,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
 // Non-final because we currently need to mock this in DetectorManagerTest. [WLW]
@@ -85,6 +85,15 @@ public class DefaultDetectorSource implements DetectorSource {
                 .map(resource -> UUID.fromString(resource.getUuid()))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<DetectorMapping> findUpdatedDetectorMappings(int timeInSecs) {
+        isTrue(timeInSecs > 0, "timeInSecs must be strictly positive");
+
+        return connector
+                .findUpdatedDetectorMappings(timeInSecs);
+    }
+
 
     @Override
     public DetectorMatchResponse findMatchingDetectorMappings(List<Map<String, String>> metricTags) {

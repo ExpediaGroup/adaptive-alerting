@@ -16,6 +16,8 @@
 package com.expedia.adaptivealerting.anomdetect.comp.connector;
 
 import com.expedia.adaptivealerting.anomdetect.DetectorDeserializationException;
+import com.expedia.adaptivealerting.anomdetect.DetectorMappingDeserializationException;
+import com.expedia.adaptivealerting.anomdetect.DetectorMappingRetrievalException;
 import com.expedia.adaptivealerting.anomdetect.DetectorNotFoundException;
 import com.expedia.adaptivealerting.anomdetect.DetectorRetrievalException;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.Detector;
@@ -43,6 +45,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.anomdetect.comp.connector.ModelServiceConnector.API_PATH_DETECTOR_BY_METRIC_HASH;
+import static com.expedia.adaptivealerting.anomdetect.comp.connector.ModelServiceConnector.API_PATH_DETECTOR_MAPPING_UPDATES;
 import static com.expedia.adaptivealerting.anomdetect.comp.connector.ModelServiceConnector.API_PATH_DETECTOR_UPDATES;
 import static com.expedia.adaptivealerting.anomdetect.comp.connector.ModelServiceConnector.API_PATH_MATCHING_DETECTOR_BY_TAGS;
 import static com.expedia.adaptivealerting.anomdetect.comp.connector.ModelServiceConnector.API_PATH_MODEL_BY_DETECTOR_UUID;
@@ -103,6 +106,10 @@ public class ModelServiceConnectorTest {
     private byte[] detectorResourcesBytes_cantDeserialize;
     private DetectorResources detectorResources;
 
+    @Mock
+    private Content detectorMappingContent_cantDeserialize;
+    private byte[] detectorMappingBytes_cantDeserialize;
+
     // Test objects - find latest model
     private Content modelResourcesContent;
     @Mock
@@ -150,18 +157,29 @@ public class ModelServiceConnectorTest {
         connectorUnderTest.findUpdatedDetectors(timePeriod_cantDeserialize);
     }
 
+    @Test(expected = DetectorMappingRetrievalException.class)
+    public void testFindUpdatedDetectorMappings_cantRetrieve() {
+        val result = connectorUnderTest.findUpdatedDetectorMappings(timePeriod_cantRetrieve);
+        assertEquals(this.detectorMatchResponse, result);
+    }
+
+    @Test(expected = DetectorMappingDeserializationException.class)
+    public void testFindUpdatedDetectorMappings_cantDeserialize() {
+        connectorUnderTest.findUpdatedDetectorMappings(timePeriod_cantDeserialize);
+    }
+
     @Test
     public void testFindMatchingDetectorMappings() {
         val result = connectorUnderTest.findMatchingDetectorMappings(tags);
         assertEquals(this.detectorMatchResponse, result);
     }
 
-    @Test(expected = DetectorRetrievalException.class)
+    @Test(expected = DetectorMappingRetrievalException.class)
     public void testFindMatchingDetectorMappings_cantRetrieve() {
         connectorUnderTest.findMatchingDetectorMappings(tags_cantRetrieve);
     }
 
-    @Test(expected = DetectorDeserializationException.class)
+    @Test(expected = DetectorMappingDeserializationException.class)
     public void testFindMatchingDetectorMappings_cantDeserialize() {
         connectorUnderTest.findMatchingDetectorMappings(tags_cantDeserialize);
     }
@@ -244,6 +262,9 @@ public class ModelServiceConnectorTest {
         // Find detectors - cant deserialize
         this.detectorMatchBytesContent__cantDeserialize = "detectorMatchBytesContent__cantDeserialize".getBytes();
         when(detectorMatchResponseContent_cantDeserialize.asBytes()).thenReturn(detectorResourcesBytes_cantDeserialize);
+
+        this.detectorMappingBytes_cantDeserialize = "detectorMappingBytes_cantDeserialize".getBytes();
+        when(detectorMappingContent_cantDeserialize.asBytes()).thenReturn(detectorMappingBytes_cantDeserialize);
     }
 
     private void initDependencies() throws IOException {
@@ -252,6 +273,7 @@ public class ModelServiceConnectorTest {
         initDependencies_findLatestModel_httpClient();
         initDependencies_findLatestModel_objectMapper();
         initDependencies_findUpdatedDetectors_httpClient();
+        initDependencies_findUpdatedDetectorMappings_httpClient();
         initDependencies_findMatchingDetectorMappings_httpClient();
         initDependencies_findMatchingDetectorMappings_objectMapper();
     }
@@ -352,6 +374,14 @@ public class ModelServiceConnectorTest {
 
         when(httpClient.get(uri_cantRetrieve)).thenThrow(new IOException());
         when(httpClient.get(uri_cantDeserialize)).thenReturn(detectorResourcesContent_cantDeserialize);
+    }
+
+    private void initDependencies_findUpdatedDetectorMappings_httpClient() throws IOException {
+        val uri_cantRetrieve = String.format(URI_TEMPLATE + API_PATH_DETECTOR_MAPPING_UPDATES, timePeriod_cantRetrieve);
+        val uri_cantDeserialize = String.format(URI_TEMPLATE + API_PATH_DETECTOR_MAPPING_UPDATES, timePeriod_cantDeserialize);
+
+        when(httpClient.get(uri_cantRetrieve)).thenThrow(new IOException());
+        when(httpClient.get(uri_cantDeserialize)).thenReturn(detectorMappingContent_cantDeserialize);
     }
 
     private void initDependencies_findDetectors_objectMapper() throws IOException {

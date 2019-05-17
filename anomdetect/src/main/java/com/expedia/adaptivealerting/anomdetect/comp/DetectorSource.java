@@ -17,9 +17,10 @@ package com.expedia.adaptivealerting.anomdetect.comp;
 
 import com.expedia.adaptivealerting.anomdetect.DetectorException;
 import com.expedia.adaptivealerting.anomdetect.DetectorManager;
+import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapper;
 import com.expedia.adaptivealerting.anomdetect.DetectorNotFoundException;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
-import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapper;
+import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapping;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMatchResponse;
 import com.expedia.metrics.MetricDefinition;
 
@@ -65,6 +66,9 @@ public interface DetectorSource {
      * @throws DetectorException if there's a problem finding the detectors
      */
     List<UUID> findUpdatedDetectors(int timePeriod);
+
+
+    List<DetectorMapping> findUpdatedDetectorMappings(int timePeriod);
 
 
     DetectorMatchResponse findMatchingDetectorMappings(List<Map<String, String>> metricTags);
