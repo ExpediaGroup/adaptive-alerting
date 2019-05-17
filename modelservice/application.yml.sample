@@ -57,10 +57,3 @@ swagger:
     version: "1.0.0"
     title: "Model service detector mappings"
     description: "API documentation for model service detector mappings"
-
-# AWS
-# TODO Remove? [WLW]
-security:
-  clientId: "id"
-  secret: "secret"
-  signingKey: "1234"
