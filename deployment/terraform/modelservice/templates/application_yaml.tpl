@@ -48,6 +48,7 @@ datasource-es:
     connectionTimeout: ${detector_mapper_es_config_connection_timeout}
     connectionRetryTimeout: ${detector_mapper_es_config_connection_retry_timeout}
     maxTotalConnection:  ${detector_mapper_es_config_max_total_connection}
+    awsIamAuthRequired: ${detector_mapper_es_config_aws_iam_auth_required}
 
 # Swagger Documentation
 swagger:
