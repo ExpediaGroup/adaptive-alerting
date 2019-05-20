@@ -22,14 +22,13 @@ import com.expedia.adaptivealerting.modelservice.model.SearchMappingsRequest;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorMappingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
@@ -58,20 +57,20 @@ public class DetectorMappingController {
     public void disableDeleteDetectorMapping(@RequestParam String id) {
         detectorMappingService.disableDetectorMapping(id);
     }
-    
+
     @RequestMapping(method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.OK)
     public void deleteDetectorMapping(@RequestParam String id) {
         detectorMappingService.deleteDetectorMapping(id);
     }
-    
+
     @RequestMapping(value = "/search", method = RequestMethod.POST)
     public List<DetectorMapping> searchDetectorMapping(@RequestBody SearchMappingsRequest request) {
         Assert.isTrue(request.getUserId() != null || request.getDetectorUuid() != null,
                 "userId and detectorId can't both be null");
         return detectorMappingService.search(request);
     }
-    
+
     @RequestMapping(value = "/lastUpdated", method = RequestMethod.GET)
     public List<DetectorMapping> findDetectorMapping(@RequestParam int timeInSecs) {
         Assert.notNull(timeInSecs, "timeInSecs can't be null");

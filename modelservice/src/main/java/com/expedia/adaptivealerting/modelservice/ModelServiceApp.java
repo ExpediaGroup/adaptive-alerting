@@ -30,8 +30,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-import java.io.IOException;
+
 import javax.annotation.PreDestroy;
+import java.io.IOException;
 
 @SpringBootApplication
 @EnableConfigurationProperties
@@ -100,7 +101,7 @@ public class ModelServiceApp {
     }
 
     @PreDestroy
-      public void destroy() throws IOException {
-         restHighLevelClient.close();
-     }
+    public void destroy() throws IOException {
+        restHighLevelClient.close();
+    }
 }

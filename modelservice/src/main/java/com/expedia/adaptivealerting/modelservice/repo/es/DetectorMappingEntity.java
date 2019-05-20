@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 package com.expedia.adaptivealerting.modelservice.repo.es;
+
 import com.expedia.adaptivealerting.modelservice.model.Detector;
 import com.expedia.adaptivealerting.modelservice.model.User;
-import lombok.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 @Data

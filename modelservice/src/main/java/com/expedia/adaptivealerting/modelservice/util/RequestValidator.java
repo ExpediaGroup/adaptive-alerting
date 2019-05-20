@@ -15,10 +15,10 @@
  */
 package com.expedia.adaptivealerting.modelservice.util;
 
+import com.expedia.adaptivealerting.modelservice.model.Detector;
 import com.expedia.adaptivealerting.modelservice.model.Expression;
 import com.expedia.adaptivealerting.modelservice.model.Operand;
 import com.expedia.adaptivealerting.modelservice.model.Operator;
-import com.expedia.adaptivealerting.modelservice.model.Detector;
 import com.expedia.adaptivealerting.modelservice.model.User;
 import com.expedia.adaptivealerting.modelservice.repo.es.DetectorMappingEntity;
 import org.springframework.util.Assert;
@@ -30,7 +30,7 @@ public class RequestValidator {
         Assert.notNull(user, "subscription user can't null");
         Assert.isTrue(!StringUtils.isEmpty(user.getId()), "subscription userId can't empty");
         Assert.isTrue(!StringUtils.containsWhitespace(user.getId()), "subscription userId can't " +
-            "contain whitespaces");
+                "contain whitespaces");
     }
 
     public static void validateExpression(Expression expression) {
@@ -50,10 +50,10 @@ public class RequestValidator {
         Assert.isTrue(!StringUtils.isEmpty(operand.getField().getKey()), "Invalid operand field key");
         Assert.isTrue(!StringUtils.isEmpty(operand.getField().getValue()), "Invalid operand field value");
         Assert.isTrue(!operand.getField().getKey().startsWith(DetectorMappingEntity.AA_PREFIX),
-            String.format("Invalid operand field key '%s'. %s is a reserved prefix",
-                operand.getField().getKey(), DetectorMappingEntity.AA_PREFIX));
+                String.format("Invalid operand field key '%s'. %s is a reserved prefix",
+                        operand.getField().getKey(), DetectorMappingEntity.AA_PREFIX));
     }
-    
+
     public static void validateDetector(Detector detector) {
         Assert.notNull(detector, "Detector can't be null");
         Assert.notNull(detector.getId(), "Detector id can't be null");

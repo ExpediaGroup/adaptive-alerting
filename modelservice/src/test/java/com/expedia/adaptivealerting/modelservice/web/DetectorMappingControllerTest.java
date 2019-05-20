@@ -3,10 +3,14 @@ package com.expedia.adaptivealerting.modelservice.web;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.expedia.adaptivealerting.modelservice.model.Detector;
+import com.expedia.adaptivealerting.modelservice.model.DetectorMapping;
+import com.expedia.adaptivealerting.modelservice.model.MatchingDetectorsResponse;
+import com.expedia.adaptivealerting.modelservice.model.SearchMappingsRequest;
+import com.expedia.adaptivealerting.modelservice.model.User;
 import com.expedia.adaptivealerting.modelservice.repo.es.ElasticSearchClient;
-import com.expedia.adaptivealerting.modelservice.repo.es.ElasticSearchProperties;
 import com.expedia.adaptivealerting.modelservice.repo.es.ElasticSearchDetectorMappingService;
-import com.expedia.adaptivealerting.modelservice.model.*;
+import com.expedia.adaptivealerting.modelservice.repo.es.ElasticSearchProperties;
 import lombok.val;
 import org.junit.Assert;
 import org.junit.Before;
@@ -22,7 +26,11 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -74,7 +82,7 @@ public class DetectorMappingControllerTest {
         assertNotNull("Response can't be null", detectorMappingreturned);
         assertEquals(UUID.fromString(detectorUuid), detectorMappingreturned.getDetector().getId());
         assertEquals(id, detectorMappingreturned.getId());
-        assertEquals(userVal, detectorMapping.getUser().getId().toString());
+        assertEquals(userVal, detectorMapping.getUser().getId());
         assertEquals(true, detectorMapping.isEnabled());
     }
 
@@ -88,13 +96,13 @@ public class DetectorMappingControllerTest {
     }
 
     @Test
-    @ResponseStatus(value=HttpStatus.OK)
+    @ResponseStatus(value = HttpStatus.OK)
     public void testdisableDetectorMappings() throws IOException {
         controllerUnderTest.disableDeleteDetectorMapping(id);
     }
 
     @Test
-    @ResponseStatus(value=HttpStatus.OK)
+    @ResponseStatus(value = HttpStatus.OK)
     public void testdeleteDetectorMappings() throws IOException {
         controllerUnderTest.deleteDetectorMapping(id);
     }
@@ -128,7 +136,7 @@ public class DetectorMappingControllerTest {
         searchMappingsRequest.setUserId(userVal);
         when(detectorMappingService.search(searchMappingsRequest)).thenReturn(detectorMappingslist);
         List<DetectorMapping> detectorMappingsResponse = controllerUnderTest.searchDetectorMapping(searchMappingsRequest);
-        assertEquals(id, detectorMappingsResponse.get(0).getId().toString());
+        assertEquals(id, detectorMappingsResponse.get(0).getId());
         assertEquals(detectorUuid, detectorMappingsResponse.get(0).getDetector().getId().toString());
         assertEquals("test-user", detectorMappingsResponse.get(0).getUser().getId());
     }
@@ -137,7 +145,7 @@ public class DetectorMappingControllerTest {
     public void testfindMatchingByTags() throws Exception {
         val lookuptime = 60;
         List<Map<String, String>> tagsList = new ArrayList<>();
-        MatchingDetectorsResponse mockmatchingDetectorsResponse = mockMatchingDetectorsResponse(lookuptime,detectorUuid);
+        MatchingDetectorsResponse mockmatchingDetectorsResponse = mockMatchingDetectorsResponse(lookuptime, detectorUuid);
         when(detectorMappingService.findMatchingDetectorMappings(tagsList)).thenReturn(mockmatchingDetectorsResponse);
         MatchingDetectorsResponse matchingDetectorsResult = controllerUnderTest.searchDetectorMapping(tagsList);
         Assert.assertEquals(1, matchingDetectorsResult.getGroupedDetectorsBySearchIndex().size());
@@ -169,11 +177,11 @@ public class DetectorMappingControllerTest {
     }
 
     private MatchingDetectorsResponse mockMatchingDetectorsResponse(int lookuptime, String detectorUuid) {
-        Map <Integer, List<Detector>>  matchingDetectorsResponseMap = new HashMap<>();
+        Map<Integer, List<Detector>> matchingDetectorsResponseMap = new HashMap<>();
         List<Detector> DetectorList = new ArrayList<>();
         DetectorList.add(new Detector(UUID.fromString(detectorUuid)));
         matchingDetectorsResponseMap.put(1, DetectorList);
-        MatchingDetectorsResponse matchingDetectorsResponse = new MatchingDetectorsResponse(matchingDetectorsResponseMap,lookuptime);
+        MatchingDetectorsResponse matchingDetectorsResponse = new MatchingDetectorsResponse(matchingDetectorsResponseMap, lookuptime);
         return matchingDetectorsResponse;
     }
 }

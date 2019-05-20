@@ -1,8 +1,12 @@
 package com.expedia.adaptivealerting.modelservice.util;
 
 
-import com.expedia.adaptivealerting.modelservice.model.*;
-import com.expedia.adaptivealerting.modelservice.util.RequestValidator;
+import com.expedia.adaptivealerting.modelservice.model.Detector;
+import com.expedia.adaptivealerting.modelservice.model.Expression;
+import com.expedia.adaptivealerting.modelservice.model.Field;
+import com.expedia.adaptivealerting.modelservice.model.Operand;
+import com.expedia.adaptivealerting.modelservice.model.Operator;
+import com.expedia.adaptivealerting.modelservice.model.User;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -30,19 +34,19 @@ public class RequestValidatorTest {
     @Test
     public void testValidateUser_successful() {
         User user = new User("test-user");
-        requestValidatorUndertest.validateUser(user);
+        RequestValidator.validateUser(user);
     }
 
-    @Test(expected=RuntimeException.class)
-    public void testValidateUser_idempty() throws IllegalArgumentException  {
+    @Test(expected = RuntimeException.class)
+    public void testValidateUser_idempty() throws IllegalArgumentException {
         User user = new User("");
-        requestValidatorUndertest.validateUser(user);
+        RequestValidator.validateUser(user);
     }
 
-    @Test(expected=RuntimeException.class)
+    @Test(expected = RuntimeException.class)
     public void testValidateUser_idcontainswhitespaces() throws IllegalArgumentException {
         User user = new User("test user");
-        requestValidatorUndertest.validateUser(user);
+        RequestValidator.validateUser(user);
     }
 
     @Test
@@ -68,16 +72,16 @@ public class RequestValidatorTest {
         operandsList.add(operand1);
         operandsList.add(operand2);
         expression.setOperands(operandsList);
-        requestValidatorUndertest.validateExpression(expression);
+        RequestValidator.validateExpression(expression);
     }
 
     @Test
     public void testValidateDetector_successful() {
         Detector detector = new Detector(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"));
-        requestValidatorUndertest.validateDetector(detector);
+        RequestValidator.validateDetector(detector);
     }
 
-    @Test(expected=RuntimeException.class)
+    @Test(expected = RuntimeException.class)
     public void testValidateOperand_keyempty() {
         Expression expression = new Expression();
         expression.setOperator(Operator.AND);
@@ -86,10 +90,10 @@ public class RequestValidatorTest {
         testOperand.setField(new Field("", "sample-app"));
         operandsList.add(testOperand);
         expression.setOperands(operandsList);
-        requestValidatorUndertest.validateExpression(expression);
+        RequestValidator.validateExpression(expression);
     }
 
-    @Test(expected=RuntimeException.class)
+    @Test(expected = RuntimeException.class)
     public void testValidateOperand_valueempty() {
         Expression expression = new Expression();
         expression.setOperator(Operator.AND);
@@ -98,10 +102,10 @@ public class RequestValidatorTest {
         testoperand.setField(new Field("name", ""));
         operandsList.add(testoperand);
         expression.setOperands(operandsList);
-        requestValidatorUndertest.validateExpression(expression);
+        RequestValidator.validateExpression(expression);
     }
 
-    @Test(expected=RuntimeException.class)
+    @Test(expected = RuntimeException.class)
     public void testValidateOperand_keystartswithDetectorMappingEntityAAPREFIX() {
         Expression expression = new Expression();
         expression.setOperator(Operator.AND);
@@ -110,7 +114,7 @@ public class RequestValidatorTest {
         testOperand.setField(new Field("aa_name", "sample-app"));
         operandsList.add(testOperand);
         expression.setOperands(operandsList);
-        requestValidatorUndertest.validateExpression(expression);
+        RequestValidator.validateExpression(expression);
     }
 
 }
