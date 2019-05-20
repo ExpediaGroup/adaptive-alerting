@@ -17,7 +17,6 @@ package com.expedia.adaptivealerting.modelservice.model;
 
 import com.expedia.adaptivealerting.modelservice.util.RequestValidator;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Set;
 import java.util.stream.Collectors;

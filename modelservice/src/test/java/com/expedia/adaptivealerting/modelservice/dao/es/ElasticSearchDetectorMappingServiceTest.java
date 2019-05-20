@@ -18,19 +18,22 @@ package com.expedia.adaptivealerting.modelservice.dao.es;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.expedia.adaptivealerting.modelservice.model.*;
+import com.expedia.adaptivealerting.modelservice.model.Detector;
+import com.expedia.adaptivealerting.modelservice.model.DetectorMapping;
+import com.expedia.adaptivealerting.modelservice.model.MatchingDetectorsResponse;
+import com.expedia.adaptivealerting.modelservice.model.SearchMappingsRequest;
 import com.expedia.adaptivealerting.modelservice.repo.es.ElasticSearchClient;
-import com.expedia.adaptivealerting.modelservice.repo.es.ElasticSearchProperties;
 import com.expedia.adaptivealerting.modelservice.repo.es.ElasticSearchDetectorMappingService;
+import com.expedia.adaptivealerting.modelservice.repo.es.ElasticSearchProperties;
 import lombok.val;
 import org.elasticsearch.action.DocWriteResponse;
+import org.elasticsearch.action.DocWriteResponse.Result;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.DocWriteResponse.Result;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.common.bytes.BytesArray;
 import org.elasticsearch.common.bytes.BytesReference;
@@ -46,14 +49,24 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.nio.ByteBuffer;
 import java.io.IOException;
-import java.util.*;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ElasticSearchDetectorMappingServiceTest {
@@ -109,7 +122,7 @@ public class ElasticSearchDetectorMappingServiceTest {
         List<Map<String, String>> tagsList = new ArrayList<>();
         val detectorUuid = "aeb4d849-847a-45c0-8312-dc0fcf22b639";
         String id = "adsvade8^szx";
-        Long LastModifiedTimeInMillis = new Long (1554828886);
+        Long LastModifiedTimeInMillis = new Long(1554828886);
         Long CreatedTimeInMillis = new Long(1554828886);
         GetResponse getResponse = mockGetResponse(id);
         when(elasticSearchClient.get(any(GetRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(getResponse);
@@ -117,7 +130,7 @@ public class ElasticSearchDetectorMappingServiceTest {
         verify(elasticSearchClient, atLeastOnce()).get(any(GetRequest.class), eq(RequestOptions.DEFAULT));
         assertNotNull("Response can't be null", detectorMapping);
         assertEquals(id, detectorMapping.getId());
-        assertEquals("test-user", detectorMapping.getUser().getId().toString());
+        assertEquals("test-user", detectorMapping.getUser().getId());
         assertEquals(LastModifiedTimeInMillis, Long.valueOf(detectorMapping.getLastModifiedTimeInMillis()));
         assertEquals(CreatedTimeInMillis, Long.valueOf(detectorMapping.getCreatedTimeInMillis()));
         assertTrue(detectorMapping.isEnabled());
@@ -148,7 +161,7 @@ public class ElasticSearchDetectorMappingServiceTest {
     public void findLastUpdated_successful() throws IOException {
         List<DetectorMapping> tagsList = new ArrayList<>();
         Map<String, String> tags = new HashMap<>();
-        Long LastModifiedTimeInMillis = new Long (1554828886);
+        Long LastModifiedTimeInMillis = new Long(1554828886);
         Long CreatedTimeInMillis = new Long(1554828886);
         val searchIndex = "2";
         val lookUpTime = 100;
@@ -161,7 +174,7 @@ public class ElasticSearchDetectorMappingServiceTest {
         assertNotNull("Response can't be null", tagsList);
         assertEquals(1, tagsList.size());
         assertEquals(UUID.fromString(detectorUuid), tagsList.get(0).getDetector().getId());
-        assertEquals("test-user", tagsList.get(0).getUser().getId().toString());
+        assertEquals("test-user", tagsList.get(0).getUser().getId());
         assertEquals(LastModifiedTimeInMillis, Long.valueOf(tagsList.get(0).getLastModifiedTimeInMillis()));
         assertEquals(CreatedTimeInMillis, Long.valueOf(tagsList.get(0).getCreatedTimeInMillis()));
         assertTrue(tagsList.get(0).isEnabled());
@@ -178,7 +191,7 @@ public class ElasticSearchDetectorMappingServiceTest {
     public void search_successful() throws IOException {
         List<DetectorMapping> tagsList = new ArrayList<>();
         Map<String, String> tags = new HashMap<>();
-        Long LastModifiedTimeInMillis = new Long (1554828886);
+        Long LastModifiedTimeInMillis = new Long(1554828886);
         Long CreatedTimeInMillis = new Long(1554828886);
         val searchIndex = "2";
         val lookUpTime = 100;
@@ -191,7 +204,7 @@ public class ElasticSearchDetectorMappingServiceTest {
         assertNotNull("Response can't be null", tagsList);
         assertEquals(1, tagsList.size());
         assertEquals(UUID.fromString(detectorUuid), tagsList.get(0).getDetector().getId());
-        assertEquals("test-user", tagsList.get(0).getUser().getId().toString());
+        assertEquals("test-user", tagsList.get(0).getUser().getId());
         assertEquals(LastModifiedTimeInMillis, Long.valueOf(tagsList.get(0).getLastModifiedTimeInMillis()));
         assertEquals(CreatedTimeInMillis, Long.valueOf(tagsList.get(0).getCreatedTimeInMillis()));
         assertTrue(tagsList.get(0).isEnabled());
@@ -229,7 +242,7 @@ public class ElasticSearchDetectorMappingServiceTest {
         when(elasticSearchClient.delete(any(DeleteRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(new DeleteResponse());
         detectorMappingService.deleteDetectorMapping(id);
         verify(elasticSearchClient, atLeastOnce()).delete(any(DeleteRequest.class), eq(RequestOptions.DEFAULT));
-        assertEquals(id,deleteResponse.getId());
+        assertEquals(id, deleteResponse.getId());
         assertEquals(elasticSearchProperties.getIndexName(), deleteResponse.getIndex());
         assertEquals("DELETED", deleteResponse.getResult().toString());
     }
@@ -243,7 +256,7 @@ public class ElasticSearchDetectorMappingServiceTest {
         detectorMappingService.deleteDetectorMapping(id);
     }
 
-    private SearchResponse mockSearchResponse(String searchIndex,int lookUpTime, String detectorUuid){
+    private SearchResponse mockSearchResponse(String searchIndex, int lookUpTime, String detectorUuid) {
         SearchResponse searchResponse = mock(SearchResponse.class);
         Map<String, DocumentField> fields = new HashMap<>();
         fields.put("_percolator_document_slot", new DocumentField("_percolator_document_slot", Arrays.asList(new Integer(searchIndex))));
@@ -266,10 +279,10 @@ public class ElasticSearchDetectorMappingServiceTest {
         GetResponse getResponse = mock(GetResponse.class);
         Map<String, DocumentField> fields = new HashMap<>();
         val detectorUuid = "aeb4d849-847a-45c0-8312-dc0fcf22b639";
-        String source = new String("{\"aa_user\":{\"id\":\"test-user\"},\"aa_detector\":" +
+        String source = "{\"aa_user\":{\"id\":\"test-user\"},\"aa_detector\":" +
                 "{\"id\":\"" + detectorUuid + "\"},\"aa_query\":{\"bool\":{\"must\":[{\"match\":" +
                 "{\"name\":\"sample-web\",\"env\":\"prod\"}}]}},\"aa_enabled\":true,\"aa_lastModifiedTime\":1554828886," +
-                "\"aa_createdTime\":1554828886}\n");
+                "\"aa_createdTime\":1554828886}\n";
         when(getResponse.getSourceAsString()).thenReturn(source);
         when(getResponse.getId()).thenReturn(id);
         return getResponse;
@@ -287,8 +300,7 @@ public class ElasticSearchDetectorMappingServiceTest {
             ByteBufferStreamInput byteoptbytebufferstream = new ByteBufferStreamInput(byteBuffer);
             ResultOpt = DocWriteResponse.Result.readFrom(byteoptbytebufferstream);
             when(deleteResponse.getResult()).thenReturn(ResultOpt);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
         }
         return deleteResponse;
     }

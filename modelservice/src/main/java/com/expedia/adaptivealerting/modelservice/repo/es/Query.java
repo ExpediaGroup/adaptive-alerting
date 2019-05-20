@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.modelservice.repo.es;
 
-import com.expedia.adaptivealerting.modelservice.repo.es.BoolCondition;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -18,7 +18,6 @@ package com.expedia.adaptivealerting.modelservice.repo.es;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.google.common.base.Supplier;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.val;
@@ -62,7 +61,7 @@ public class ElasticSearchProperties {
                     clientConf -> clientConf.addInterceptorLast(signingInterceptor));
         }
     }
-    
+
     private AWSSigningRequestInterceptor getAWSRequestSignerInterceptor() {
         final Supplier<LocalDateTime> clock = () -> LocalDateTime.now(ZoneOffset.UTC);
         AWSCredentialsProvider credentialsProvider = new DefaultAWSCredentialsProviderChain();

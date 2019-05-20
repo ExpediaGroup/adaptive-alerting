@@ -22,7 +22,7 @@ import java.util.List;
 
 /**
  * The type Detector mapping.
- *
+ * <p>
  * searchIndexes: index of matching metric-tag in request batch of metric-tags
  */
 @Data
