@@ -203,6 +203,8 @@ public class ModelServiceConnector {
      * @return the detector match response
      */
     public DetectorMatchResponse findMatchingDetectorMappings(List<Map<String, String>> tagsList) {
+        isTrue(tagsList.size() > 0, "tagsList must not be empty");
+
         val uri = baseUri + API_PATH_MATCHING_DETECTOR_BY_TAGS;
         Content content;
         try {
@@ -211,7 +213,7 @@ public class ModelServiceConnector {
         } catch (IOException e) {
             val message = "IOException while getting matching detectors for" +
                     ": tags=" + tagsList +
-                    ", httpMethod=GET" +
+                    ", httpMethod=POST" +
                     ", uri=" + uri;
             throw new DetectorMappingRetrievalException(message, e); // TODO CHANGE
         }

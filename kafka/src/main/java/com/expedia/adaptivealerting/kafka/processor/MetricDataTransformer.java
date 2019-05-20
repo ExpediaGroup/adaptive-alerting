@@ -98,7 +98,7 @@ class MetricDataTransformer implements Transformer<String, MetricData, KeyValue<
                 iter.close();
 
                 List<Map<String, String>> cacheMissedMetricTags = cacheMissedMetrics.values().stream().map(value -> value.getMetricDefinition().getTags().getKv()).collect(Collectors.toList());
-                if (detectorMapper.isSuccessfulDetectorMappingLookup(cacheMissedMetricTags)) {
+                if (!cacheMissedMetricTags.isEmpty() && detectorMapper.isSuccessfulDetectorMappingLookup(cacheMissedMetricTags)) {
                     cacheMissedMetrics.forEach((originalKey, metricData) -> {
                         List<Detector> detectors = detectorMapper.getDetectorsFromCache(metricData.getMetricDefinition());
                         if (!detectors.isEmpty()) {
