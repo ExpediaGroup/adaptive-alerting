@@ -15,10 +15,11 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detectormapper;
 
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.Metrics;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -29,17 +30,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 /**
  * <p>
- *     Ad-mapper attaches detectors to each incoming metric.
- *     Detectors matching to a given metric are fetched from modelservice, which are cached in {@linkplain DetectorMapperCache}. <br>
- *     Since this cache can grow in size, for space optimization we transform <br>
- *
- *      - metric into metric-key generated using {@link CacheUtil#getKey(Map)} <br>
- *      - detector's list into a concatenated string of detector uuid generated using {@link CacheUtil#getDetectorIds(List)} <br>
+ * Ad-mapper attaches detectors to each incoming metric.
+ * Detectors matching to a given metric are fetched from modelservice, which are cached in {@linkplain DetectorMapperCache}. <br>
+ * Since this cache can grow in size, for space optimization we transform <br>
+ * <p>
+ * - metric into metric-key generated using {@link CacheUtil#getKey(Map)} <br>
+ * - detector's list into a concatenated string of detector uuid generated using {@link CacheUtil#getDetectorIds(List)} <br>
  * eg.
  * <pre>
  *   Metric1
@@ -59,18 +59,19 @@ public class DetectorMapperCache {
     private Cache<String, String> cache;
     private Counter cacheHit;
     private Counter cacheMiss;
-    private AtomicLong cacheSize;
+    private Gauge cacheSize;
 
     /**
      * Instantiates a new Detector mapper cache.
      */
-    public DetectorMapperCache() {
+    public DetectorMapperCache(MetricRegistry metricRegistry) {
         this.cache = CacheBuilder.newBuilder()
                 .expireAfterWrite(120, TimeUnit.MINUTES)
                 .build();
-        this.cacheSize = Metrics.gauge("cache.size", new AtomicLong(0));
-        this.cacheHit = Metrics.counter("cache.hit");
-        this.cacheMiss = Metrics.counter("cache.miss");
+        this.cacheHit = metricRegistry.counter("cache.hit");
+        this.cacheMiss = metricRegistry.counter("cache.miss");
+        this.cacheSize = (Gauge<Long>) () -> cache.size();
+        metricRegistry.register("cache.size", cacheSize);
     }
 
     /**
@@ -80,10 +81,10 @@ public class DetectorMapperCache {
     public List<Detector> get(String key) {
         String bunchOfCachedDetectorIds = cache.getIfPresent(key);
         if (bunchOfCachedDetectorIds == null) {
-            this.cacheMiss.increment();
+            this.cacheMiss.inc();
             return Collections.emptyList();
         } else {
-            this.cacheHit.increment();
+            this.cacheHit.inc();
             return CacheUtil.buildDetectors(bunchOfCachedDetectorIds);
         }
     }
@@ -96,13 +97,12 @@ public class DetectorMapperCache {
         String bunchOfDetectorIds = CacheUtil.getDetectorIds(detectors);
         log.trace("Updating cache with {} - {}", key, bunchOfDetectorIds);
         cache.put(key, bunchOfDetectorIds);
-        this.cacheSize.set(cache.size());
     }
 
 
     /**
      * Remove disabled detector mappings from cache.
-     *  <pre>
+     * <pre>
      *  eg. If cache has entries
      *  <em> ("k1:v1,k2:v2" : "UUID_ONE,UUID_TWO")</em>
      *  <em> ("k3:v3,k3:v4" : "UUID_FIVE,UUID_ONE,UUID_THREE")</em>
@@ -151,7 +151,7 @@ public class DetectorMapperCache {
 
     /**
      * Removes metrics from cache which contain detectors which are now updated.
-     *
+     * <p>
      * This causes a cache-miss and eventually removed metrics are re-populated with new mappings.
      *
      * @param detectorMappings the new detector mappings

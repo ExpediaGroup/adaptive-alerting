@@ -41,6 +41,7 @@ import org.apache.kafka.streams.state.Stores;
 import java.util.stream.Collectors;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static org.apache.kafka.streams.StreamsConfig.APPLICATION_ID_CONFIG;
 
 /**
  * Kafka Streams adapter for {@link DetectorMapper}. Reads metric data from an input topic, classifies individual metric
@@ -64,7 +65,7 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
         val config = new TypesafeConfigLoader(CK_AD_MAPPER).loadMergedConfig();
         val saConfig = new StreamsAppConfig(config);
         val detectorSource = DetectorUtil.buildDetectorSource(config);
-        val mapper = new DetectorMapper(detectorSource,config);
+        val mapper = new DetectorMapper(detectorSource,config, getMetricRegistry(saConfig.getStreamsConfig().getString(APPLICATION_ID_CONFIG)));
         new KafkaAnomalyDetectorMapper(saConfig, mapper).start();
     }
 

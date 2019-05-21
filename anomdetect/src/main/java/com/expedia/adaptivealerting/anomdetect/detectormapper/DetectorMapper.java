@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.detectormapper;
 
 
+import com.codahale.metrics.MetricRegistry;
 import com.expedia.adaptivealerting.anomdetect.comp.DetectorSource;
 import com.expedia.adaptivealerting.core.util.AssertUtil;
 import com.expedia.metrics.MetricDefinition;
@@ -58,8 +59,8 @@ public class DetectorMapper {
         this.initScheduler();
     }
 
-    public DetectorMapper(DetectorSource detectorSource, Config config) {
-        this(detectorSource, new DetectorMapperCache(), config.getInt(CK_DETECTOR_CACHE_UPDATE_PERIOD));
+    public DetectorMapper(DetectorSource detectorSource, Config config, MetricRegistry metricRegistry) {
+        this(detectorSource, new DetectorMapperCache(metricRegistry), config.getInt(CK_DETECTOR_CACHE_UPDATE_PERIOD));
     }
 
     private void initScheduler() {
@@ -81,7 +82,12 @@ public class DetectorMapper {
     public boolean isSuccessfulDetectorMappingLookup(List<Map<String, String>> cacheMissedMetricTags) {
 
         log.info("Mapping-Cache: lookup for {} metrics", cacheMissedMetricTags.size());
-        DetectorMatchResponse matchingDetectorMappings = detectorSource.findMatchingDetectorMappings(cacheMissedMetricTags);
+        DetectorMatchResponse matchingDetectorMappings = null;
+        try {
+            matchingDetectorMappings = detectorSource.findMatchingDetectorMappings(cacheMissedMetricTags);
+        } catch (RuntimeException e) {
+            log.error(e.getMessage());
+        }
 
         if (matchingDetectorMappings != null) {
 
