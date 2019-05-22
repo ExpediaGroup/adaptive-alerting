@@ -49,11 +49,10 @@ public class DetectorServiceImpl implements DetectorService {
     private static final String DETECTOR_INDEX = "detectors";
     private static final String DETECTOR_DOC_TYPE = "detector";
 
-    private ObjectMapper objectMapper = new ObjectMapper();
-
     @Autowired
     private ElasticSearchClient elasticSearchClient;
 
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public List<ElasticsearchDetector> findByUuid(String uuid) {
@@ -97,7 +96,7 @@ public class DetectorServiceImpl implements DetectorService {
     }
 
     private List<ElasticsearchDetector> getDetectorsFromElasticSearch(SearchRequest searchRequest) {
-        SearchResponse response = new SearchResponse();
+        SearchResponse response;
         try {
             response = elasticSearchClient.search(searchRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
@@ -106,17 +105,15 @@ public class DetectorServiceImpl implements DetectorService {
         }
 
         SearchHit[] hits = response.getHits().getHits();
-
-
         List<ElasticsearchDetector> elasticsearchDetectors = new ArrayList<>();
         for (val hit : hits) {
-            ElasticsearchDetector elasticsearchDetector = getElasticSearchDetector(hit.getSourceAsString(), hit.getId(), Optional.of(hit.getFields()));
+            ElasticsearchDetector elasticsearchDetector = getElasticSearchDetector(hit.getSourceAsString(), Optional.of(hit.getFields()));
             elasticsearchDetectors.add(elasticsearchDetector);
         }
         return elasticsearchDetectors;
     }
 
-    private ElasticsearchDetector getElasticSearchDetector(String json, String id, Optional<Map<String, DocumentField>> documentFieldMap) {
+    private ElasticsearchDetector getElasticSearchDetector(String json, Optional<Map<String, DocumentField>> documentFieldMap) {
         ElasticsearchDetector elasticsearchDetector;
         try {
             elasticsearchDetector = objectMapper.readValue(json, ElasticsearchDetector.class);
@@ -124,6 +121,7 @@ public class DetectorServiceImpl implements DetectorService {
             log.error(String.format("Deserialization error", json, e));
             throw new RuntimeException(e);
         }
+
         val newElasticSearchDetector = new ElasticsearchDetector();
         newElasticSearchDetector.setUuid(elasticsearchDetector.getUuid());
         newElasticSearchDetector.setCreatedBy(elasticsearchDetector.getCreatedBy());
