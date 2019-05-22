@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.repo;
+package com.expedia.adaptivealerting.modelservice.service;
 
-import com.expedia.adaptivealerting.modelservice.model.CreateDetectorMappingRequest;
-import com.expedia.adaptivealerting.modelservice.model.DetectorMapping;
-import com.expedia.adaptivealerting.modelservice.model.MatchingDetectorsResponse;
-import com.expedia.adaptivealerting.modelservice.model.SearchMappingsRequest;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.CreateDetectorMappingRequest;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.DetectorMapping;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.MatchingDetectorsResponse;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.SearchMappingsRequest;
 
 import java.util.List;
 import java.util.Map;

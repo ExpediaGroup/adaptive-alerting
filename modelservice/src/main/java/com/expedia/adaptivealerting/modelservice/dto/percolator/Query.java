@@ -13,18 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.model;
+package com.expedia.adaptivealerting.modelservice.dto.percolator;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.util.List;
-import java.util.Map;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
-public class MatchingDetectorsResponse {
-    private Map<Integer, List<Detector>> groupedDetectorsBySearchIndex;
-    private long lookupTimeInMillis;
-
+public class Query {
+    private BoolCondition bool;
 }

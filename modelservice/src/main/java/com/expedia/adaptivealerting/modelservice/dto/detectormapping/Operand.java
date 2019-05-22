@@ -13,27 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.model;
+package com.expedia.adaptivealerting.modelservice.dto.detectormapping;
 
 import lombok.Data;
-import lombok.experimental.Accessors;
 
-import java.util.List;
-
-/**
- * The type Detector mapping.
- * <p>
- * searchIndexes: index of matching metric-tag in request batch of metric-tags
- */
 @Data
-@Accessors(chain = true)
-public class DetectorMapping {
-    private String id;
-    private Detector detector;
+public class Operand {
+    private Field field;
     private Expression expression;
-    private User user;
-    private long lastModifiedTimeInMillis;
-    private long createdTimeInMillis;
-    private boolean isEnabled;
-    private List<Integer> searchIndexes;
 }

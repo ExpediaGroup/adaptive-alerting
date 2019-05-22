@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.dao.es;
+package com.expedia.adaptivealerting.modelservice.service;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.expedia.adaptivealerting.modelservice.model.Detector;
-import com.expedia.adaptivealerting.modelservice.model.DetectorMapping;
-import com.expedia.adaptivealerting.modelservice.model.MatchingDetectorsResponse;
-import com.expedia.adaptivealerting.modelservice.model.SearchMappingsRequest;
-import com.expedia.adaptivealerting.modelservice.repo.es.ElasticSearchClient;
-import com.expedia.adaptivealerting.modelservice.repo.es.ElasticSearchDetectorMappingService;
-import com.expedia.adaptivealerting.modelservice.repo.es.ElasticSearchProperties;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.DetectorMapping;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.MatchingDetectorsResponse;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.SearchMappingsRequest;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
+import com.expedia.adaptivealerting.modelservice.service.DetectorMappingServiceImpl;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
 import lombok.val;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.DocWriteResponse.Result;
@@ -69,14 +69,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ElasticSearchDetectorMappingServiceTest {
+public class DetectorMappingServiceImplTest {
     @Mock
     private MetricRegistry metricRegistry;
     @Mock
     private ElasticSearchClient elasticSearchClient;
     @Mock
     private ElasticSearchProperties elasticSearchProperties;
-    private ElasticSearchDetectorMappingService detectorMappingService;
+    private DetectorMappingServiceImpl detectorMappingService;
 
     @Before
     public void beforeTest() {
@@ -87,7 +87,7 @@ public class ElasticSearchDetectorMappingServiceTest {
         ElasticSearchProperties.Config config = new ElasticSearchProperties.Config()
                 .setConnectionTimeout(100);
         when(elasticSearchProperties.getConfig()).thenReturn(config);
-        detectorMappingService = new ElasticSearchDetectorMappingService(metricRegistry);
+        detectorMappingService = new DetectorMappingServiceImpl(metricRegistry);
         ReflectionTestUtils.setField(detectorMappingService, "elasticSearchClient", elasticSearchClient);
         ReflectionTestUtils.setField(detectorMappingService, "elasticSearchProperties", elasticSearchProperties);
     }

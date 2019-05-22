@@ -13,14 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.model;
+package com.expedia.adaptivealerting.modelservice.dto.detectormapping;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Map;
 
 @Data
-public class Expression {
-    private Operator operator;
-    List<Operand> operands;
+@AllArgsConstructor
+public class MatchingDetectorsResponse {
+    private Map<Integer, List<Detector>> groupedDetectorsBySearchIndex;
+    private long lookupTimeInMillis;
+
 }

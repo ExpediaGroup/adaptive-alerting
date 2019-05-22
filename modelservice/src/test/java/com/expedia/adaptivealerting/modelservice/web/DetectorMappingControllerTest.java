@@ -3,14 +3,14 @@ package com.expedia.adaptivealerting.modelservice.web;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.expedia.adaptivealerting.modelservice.model.Detector;
-import com.expedia.adaptivealerting.modelservice.model.DetectorMapping;
-import com.expedia.adaptivealerting.modelservice.model.MatchingDetectorsResponse;
-import com.expedia.adaptivealerting.modelservice.model.SearchMappingsRequest;
-import com.expedia.adaptivealerting.modelservice.model.User;
-import com.expedia.adaptivealerting.modelservice.repo.es.ElasticSearchClient;
-import com.expedia.adaptivealerting.modelservice.repo.es.ElasticSearchDetectorMappingService;
-import com.expedia.adaptivealerting.modelservice.repo.es.ElasticSearchProperties;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.DetectorMapping;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.MatchingDetectorsResponse;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.SearchMappingsRequest;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.User;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
+import com.expedia.adaptivealerting.modelservice.service.DetectorMappingServiceImpl;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
 import lombok.val;
 import org.junit.Assert;
 import org.junit.Before;
@@ -50,7 +50,7 @@ public class DetectorMappingControllerTest {
     @Mock
     private ElasticSearchProperties elasticSearchProperties;
     @Mock
-    private ElasticSearchDetectorMappingService detectorMappingService;
+    private DetectorMappingServiceImpl detectorMappingService;
 
     private String id = "adsvade8^szx";
     private String detectorUuid = "aeb4d849-847a-45c0-8312-dc0fcf22b639";
@@ -69,7 +69,7 @@ public class DetectorMappingControllerTest {
     public void beforeTest() {
         when(metricRegistry.timer(any())).thenReturn(mock(Timer.class));
         when(metricRegistry.counter(any())).thenReturn(mock(Counter.class));
-        detectorMappingService = new ElasticSearchDetectorMappingService(metricRegistry);
+        detectorMappingService = new DetectorMappingServiceImpl(metricRegistry);
         ReflectionTestUtils.setField(detectorMappingService, "elasticSearchClient", elasticSearchClient);
         ReflectionTestUtils.setField(detectorMappingService, "elasticSearchProperties", elasticSearchProperties);
     }

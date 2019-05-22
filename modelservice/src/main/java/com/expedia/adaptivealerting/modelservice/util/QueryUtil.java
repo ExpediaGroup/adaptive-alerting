@@ -15,13 +15,13 @@
  */
 package com.expedia.adaptivealerting.modelservice.util;
 
-import com.expedia.adaptivealerting.modelservice.model.Expression;
-import com.expedia.adaptivealerting.modelservice.model.Field;
-import com.expedia.adaptivealerting.modelservice.model.Operand;
-import com.expedia.adaptivealerting.modelservice.model.Operator;
-import com.expedia.adaptivealerting.modelservice.repo.es.BoolCondition;
-import com.expedia.adaptivealerting.modelservice.repo.es.MustCondition;
-import com.expedia.adaptivealerting.modelservice.repo.es.Query;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Expression;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Field;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Operand;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Operator;
+import com.expedia.adaptivealerting.modelservice.dto.percolator.BoolCondition;
+import com.expedia.adaptivealerting.modelservice.dto.percolator.MustCondition;
+import com.expedia.adaptivealerting.modelservice.dto.percolator.Query;
 
 import java.util.HashMap;
 import java.util.List;

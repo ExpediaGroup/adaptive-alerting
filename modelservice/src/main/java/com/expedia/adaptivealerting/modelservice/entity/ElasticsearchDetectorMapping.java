@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.repo.es;
+package com.expedia.adaptivealerting.modelservice.entity;
 
-import com.expedia.adaptivealerting.modelservice.model.Detector;
-import com.expedia.adaptivealerting.modelservice.model.User;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.User;
+import com.expedia.adaptivealerting.modelservice.dto.percolator.Query;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,7 +26,7 @@ import lombok.experimental.Accessors;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-public class DetectorMappingEntity {
+public class ElasticsearchDetectorMapping {
     // Prefixing variable names with 'aa_' to reserve these fields to be used in ES mappings.
     public static final String AA_PREFIX = "aa_";
     public static final String USER_KEYWORD = AA_PREFIX + "user";

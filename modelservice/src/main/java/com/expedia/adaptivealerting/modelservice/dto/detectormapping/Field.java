@@ -13,14 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.model;
+package com.expedia.adaptivealerting.modelservice.dto.detectormapping;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.util.UUID;
+import lombok.NoArgsConstructor;
 
 @Data
-public class SearchMappingsRequest {
-    private String userId;
-    private UUID detectorUuid;
+@NoArgsConstructor
+@AllArgsConstructor
+public class Field {
+    private String key;
+    private String value;
 }

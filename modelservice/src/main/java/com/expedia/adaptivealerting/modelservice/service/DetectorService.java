@@ -13,8 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.model;
+package com.expedia.adaptivealerting.modelservice.service;
 
-public enum Operator {
-    AND, OR
+import com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetector;
+
+import java.util.List;
+
+public interface DetectorService {
+
+    List<ElasticsearchDetector> findByUuid(String uuid);
+
+    List<ElasticsearchDetector> findByCreatedBy(String user);
+
+    List<ElasticsearchDetector> getLastUpdatedDetectors(int interval);
+
+    void toggleDetector(String uuid, Boolean enabled);
 }

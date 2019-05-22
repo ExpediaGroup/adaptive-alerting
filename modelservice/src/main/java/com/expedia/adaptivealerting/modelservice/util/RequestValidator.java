@@ -15,12 +15,12 @@
  */
 package com.expedia.adaptivealerting.modelservice.util;
 
-import com.expedia.adaptivealerting.modelservice.model.Detector;
-import com.expedia.adaptivealerting.modelservice.model.Expression;
-import com.expedia.adaptivealerting.modelservice.model.Operand;
-import com.expedia.adaptivealerting.modelservice.model.Operator;
-import com.expedia.adaptivealerting.modelservice.model.User;
-import com.expedia.adaptivealerting.modelservice.repo.es.DetectorMappingEntity;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Expression;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Operand;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Operator;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.User;
+import com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetectorMapping;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -49,9 +49,9 @@ public class RequestValidator {
         Assert.notNull(operand.getField(), "Operands can't be empty");
         Assert.isTrue(!StringUtils.isEmpty(operand.getField().getKey()), "Invalid operand field key");
         Assert.isTrue(!StringUtils.isEmpty(operand.getField().getValue()), "Invalid operand field value");
-        Assert.isTrue(!operand.getField().getKey().startsWith(DetectorMappingEntity.AA_PREFIX),
+        Assert.isTrue(!operand.getField().getKey().startsWith(ElasticsearchDetectorMapping.AA_PREFIX),
                 String.format("Invalid operand field key '%s'. %s is a reserved prefix",
-                        operand.getField().getKey(), DetectorMappingEntity.AA_PREFIX));
+                        operand.getField().getKey(), ElasticsearchDetectorMapping.AA_PREFIX));
     }
 
     public static void validateDetector(Detector detector) {

@@ -1,8 +1,10 @@
 package com.expedia.adaptivealerting.modelservice.test;
 
+import com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetector;
 import com.expedia.adaptivealerting.modelservice.providers.graphite.GraphiteResult;
 import com.expedia.adaptivealerting.modelservice.service.AnomalyRequest;
 import com.expedia.adaptivealerting.modelservice.spi.MetricSourceResult;
+import com.expedia.adaptivealerting.modelservice.util.DateUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -51,6 +53,27 @@ public class ObjectMother {
         detectorParams.put("type", "LEFT_TAILED");
         return detectorParams;
     }
+
+    public ElasticsearchDetector getElasticsearchDetector() {
+        ElasticsearchDetector elasticSearchDetector = new ElasticsearchDetector();
+        elasticSearchDetector.setUuid("uuid");
+        elasticSearchDetector.setCreatedBy("user");
+        elasticSearchDetector.setDetectorConfig(new HashMap<>());
+        elasticSearchDetector.setEnabled(true);
+        elasticSearchDetector.setLastUpdateTimestamp(DateUtil.toUTCDate("2019-04-06 22:00:00"));
+        return elasticSearchDetector;
+    }
+
+    public Map<String, Object> getElasticSearchSource() {
+        Map<String, Object> source = new HashMap<>();
+        source.put("lastUpdateTimestamp", "2019-10-05 12:00:00");
+        source.put("createdBy", "kashah");
+        source.put("uuid", "uuid");
+        source.put("enabled", true);
+        source.put("detectorConfig", new HashMap<>());
+        return source;
+    }
+
 
     @SneakyThrows
     private Map<String, Object> toObject(String message) {

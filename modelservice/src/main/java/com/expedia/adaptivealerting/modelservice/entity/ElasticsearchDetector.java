@@ -13,17 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.model;
+package com.expedia.adaptivealerting.modelservice.entity;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
-import java.util.UUID;
+import javax.persistence.Id;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
+/**
+ * ElasticSearchDetector entity.
+ */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class Detector {
-    private UUID id;
+public class ElasticsearchDetector {
+
+    private String uuid;
+
+    private String createdBy;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date lastUpdateTimestamp;
+
+    private Map<String, Object> detectorConfig = new HashMap<>();
+
+    private Boolean enabled;
+
 }

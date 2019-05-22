@@ -13,12 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.model;
+package com.expedia.adaptivealerting.modelservice.dto.percolator;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.Map;
 
 @Data
-public class Operand {
-    private Field field;
-    private Expression expression;
+@NoArgsConstructor
+@AllArgsConstructor
+public class MustCondition {
+    private Map<String, String> match;
 }

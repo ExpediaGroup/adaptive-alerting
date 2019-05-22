@@ -13,18 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.repo.es;
+package com.expedia.adaptivealerting.modelservice.service;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.expedia.adaptivealerting.modelservice.model.CreateDetectorMappingRequest;
-import com.expedia.adaptivealerting.modelservice.model.Detector;
-import com.expedia.adaptivealerting.modelservice.model.DetectorMapping;
-import com.expedia.adaptivealerting.modelservice.model.DetectorMatchResponse;
-import com.expedia.adaptivealerting.modelservice.model.MatchingDetectorsResponse;
-import com.expedia.adaptivealerting.modelservice.model.SearchMappingsRequest;
-import com.expedia.adaptivealerting.modelservice.repo.DetectorMappingService;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.CreateDetectorMappingRequest;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.DetectorMapping;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.DetectorMatchResponse;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.MatchingDetectorsResponse;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.SearchMappingsRequest;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
+import com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetectorMapping;
 import com.expedia.adaptivealerting.modelservice.util.QueryUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -69,12 +71,12 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static com.expedia.adaptivealerting.modelservice.repo.es.DetectorMappingEntity.LAST_MOD_TIME_KEYWORD;
+import static com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetectorMapping.LAST_MOD_TIME_KEYWORD;
 
 @Component
 @Slf4j
 @SuppressWarnings({"PMD.ExcessiveImports", "PMD.AvoidThrowingRawExceptionTypes"})
-public class ElasticSearchDetectorMappingService implements DetectorMappingService {
+public class DetectorMappingServiceImpl implements DetectorMappingService {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
@@ -87,7 +89,7 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
     private final Counter exceptionCount;
 
     @Autowired
-    public ElasticSearchDetectorMappingService(MetricRegistry metricRegistry) {
+    public DetectorMappingServiceImpl(MetricRegistry metricRegistry) {
         this.delayTimer = metricRegistry.timer("es-lookup.time-delay");
         this.exceptionCount = metricRegistry.counter("es-lookup.exception");
     }
@@ -101,7 +103,7 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
                 xContent.map(tags);
                 refList.add(BytesReference.bytes(xContent));
             }
-            PercolateQueryBuilder percolateQuery = new PercolateQueryBuilder(DetectorMappingEntity.QUERY_KEYWORD,
+            PercolateQueryBuilder percolateQuery = new PercolateQueryBuilder(ElasticsearchDetectorMapping.QUERY_KEYWORD,
                     refList, XContentType.JSON);
             SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
             ConstantScoreQueryBuilder constantScoreQueryBuilder = new ConstantScoreQueryBuilder(percolateQuery);
@@ -122,7 +124,7 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
         Set<String> fields = createRequest.getFields();
         Set<String> newFieldMappings = removeFieldsHavingExistingMapping(fields);
         updateIndexMappings(newFieldMappings);
-        final DetectorMappingEntity detectorMappingEntity = new DetectorMappingEntity()
+        final ElasticsearchDetectorMapping elasticsearchDetectorMapping = new ElasticsearchDetectorMapping()
                 .setUser(createRequest.getUser())
                 .setDetector(createRequest.getDetector())
                 .setEnabled(true)
@@ -133,7 +135,7 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
 
         String json = null;
         try {
-            json = objectMapper.writeValueAsString(detectorMappingEntity);
+            json = objectMapper.writeValueAsString(elasticsearchDetectorMapping);
             indexRequest.source(json, XContentType.JSON);
             IndexResponse indexResponse = elasticSearchClient.index(indexRequest, RequestOptions.DEFAULT);
             return indexResponse.getId();
@@ -187,12 +189,12 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
         }
     }
 
-    private void updateDetectorMapping(String index, DetectorMappingEntity detectorMappingEntity) {
+    private void updateDetectorMapping(String index, ElasticsearchDetectorMapping elasticsearchDetectorMapping) {
         final IndexRequest indexRequest = new IndexRequest(elasticSearchProperties.getIndexName(),
                 elasticSearchProperties.getDocType(), index);
         String json = null;
         try {
-            json = objectMapper.writeValueAsString(detectorMappingEntity);
+            json = objectMapper.writeValueAsString(elasticsearchDetectorMapping);
             indexRequest.source(json, XContentType.JSON);
             elasticSearchClient.index(indexRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
@@ -217,14 +219,14 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
     public void disableDetectorMapping(String id) {
         DetectorMapping detectorMapping = findDetectorMapping(id);
         if (detectorMapping.isEnabled()) {
-            final DetectorMappingEntity detectorMappingEntity = new DetectorMappingEntity()
+            final ElasticsearchDetectorMapping elasticsearchDetectorMapping = new ElasticsearchDetectorMapping()
                     .setUser(detectorMapping.getUser())
                     .setDetector(detectorMapping.getDetector())
                     .setQuery(QueryUtil.buildQuery(detectorMapping.getExpression()))
                     .setEnabled(false)
                     .setLastModifiedTimeInMillis(System.currentTimeMillis())
                     .setCreatedTimeInMillis(detectorMapping.getCreatedTimeInMillis());
-            updateDetectorMapping(id, detectorMappingEntity);
+            updateDetectorMapping(id, elasticsearchDetectorMapping);
         }
     }
 
@@ -293,17 +295,17 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
     }
 
     private NestedQueryBuilder detectorIdQuery(SearchMappingsRequest searchMappingsRequest) {
-        return QueryBuilders.nestedQuery(DetectorMappingEntity.DETECTOR_KEYWORD,
+        return QueryBuilders.nestedQuery(ElasticsearchDetectorMapping.DETECTOR_KEYWORD,
                 QueryBuilders.boolQuery().must(QueryBuilders.matchPhraseQuery(
-                        DetectorMappingEntity.DETECTOR_KEYWORD + "." + DetectorMappingEntity.DETECTOR_ID_KEYWORD,
+                        ElasticsearchDetectorMapping.DETECTOR_KEYWORD + "." + ElasticsearchDetectorMapping.DETECTOR_ID_KEYWORD,
                         searchMappingsRequest.getDetectorUuid().toString())),
                 ScoreMode.None);
     }
 
     private NestedQueryBuilder userIdQuery(SearchMappingsRequest searchMappingsRequest) {
-        return QueryBuilders.nestedQuery(DetectorMappingEntity.USER_KEYWORD,
+        return QueryBuilders.nestedQuery(ElasticsearchDetectorMapping.USER_KEYWORD,
                 QueryBuilders.boolQuery().must(QueryBuilders.matchPhraseQuery(
-                        DetectorMappingEntity.USER_KEYWORD + "." + DetectorMappingEntity.USER_ID_KEYWORD,
+                        ElasticsearchDetectorMapping.USER_KEYWORD + "." + ElasticsearchDetectorMapping.USER_ID_KEYWORD,
                         searchMappingsRequest.getUserId())),
                 ScoreMode.None);
     }
@@ -330,9 +332,9 @@ public class ElasticSearchDetectorMappingService implements DetectorMappingServi
 
     private DetectorMapping getDetectorMapping(String json, String id,
                                                Optional<Map<String, DocumentField>> documentFieldMap) {
-        DetectorMappingEntity detectorEntity = new DetectorMappingEntity();
+        ElasticsearchDetectorMapping detectorEntity = new ElasticsearchDetectorMapping();
         try {
-            detectorEntity = objectMapper.readValue(json, DetectorMappingEntity.class);
+            detectorEntity = objectMapper.readValue(json, ElasticsearchDetectorMapping.class);
         } catch (Exception e) {
             log.error("Deserilisation error", e);
         }

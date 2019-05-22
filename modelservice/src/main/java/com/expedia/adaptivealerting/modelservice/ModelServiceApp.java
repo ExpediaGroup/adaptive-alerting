@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.modelservice;
 
 import com.codahale.metrics.MetricRegistry;
-import com.expedia.adaptivealerting.modelservice.repo.es.ElasticSearchProperties;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
 import org.apache.http.HttpHost;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.elasticsearch.client.RestClient;
