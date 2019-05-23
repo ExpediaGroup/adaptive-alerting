@@ -26,8 +26,6 @@ public class DetectorMapperCacheTest {
     @InjectMocks
     private DetectorMapperCache detectorMapperCache = new DetectorMapperCache(new MetricRegistry());
 
-    @Mock
-    private MetricRegistry metricRegistry = new MetricRegistry();
 
     private String detectorIds;
     private List<Detector> detectors;

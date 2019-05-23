@@ -84,7 +84,7 @@ class MetricDataTransformer implements Transformer<String, MetricData, KeyValue<
         this.metricDataKeyValueStore = (KeyValueStore<String, MetricData>) context.getStateStore(stateStoreName);
 
         //TODO decide PUNCTUATION time
-        this.context.schedule(20000, PunctuationType.WALL_CLOCK_TIME, (timestamp) -> {
+        this.context.schedule(200, PunctuationType.WALL_CLOCK_TIME, (timestamp) -> {
 
             if (metricDataKeyValueStore.approximateNumEntries() >= detectorMapper.optimalBatchSize()) {
                 KeyValueIterator<String, MetricData> iter = this.metricDataKeyValueStore.all();
