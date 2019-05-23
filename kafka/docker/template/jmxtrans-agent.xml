@@ -24,7 +24,7 @@
         <query objectName="java.lang:type=Memory" attribute="NonHeapMemoryUsage" key="committed" resultAlias="jvm.nonHeapMemoryUsage.committed"/>
         <query objectName="java.lang:type=Threading" attribute="ThreadCount" resultAlias="jvm.thread"/>
         <query objectName="java.lang:type=OperatingSystem" attribute="SystemCpuLoad" resultAlias="jvm.cpu.usage"/>
-      
+
         <!-- kafka producer metrics -->
         <query objectName="kafka.producer:type=producer-metrics,client-id=*" attribute="record-send-rate" resultAlias="kafka-producer-%client-id%.record-send.rate"/>
         <query objectName="kafka.producer:type=producer-metrics,client-id=*" attribute="buffer-exhausted-rate" resultAlias="kafka-producer-%client-id%.buffer-exhausted.rate"/>
@@ -45,7 +45,7 @@
         <query objectName="kafka.consumer:type=consumer-metrics,client-id=*" attribute="incoming-byte-rate" resultAlias="kafka-consumer-%client-id%.incoming-byte.rate"/>
         <query objectName="kafka.consumer:type=consumer-fetch-manager-metrics,client-id=*" attribute="records-lag-max" resultAlias="kafka-consumer-%client-id%.records-lag.max"/>
         <query objectName="kafka.consumer:type=consumer-fetch-manager-metrics,client-id=*" attribute="records-consumed-rate" resultAlias="kafka-consumer-%client-id%.records-consumed.rate"/>
-      
+
         <!-- commented to control the number of metrics/series in influxDb.
              Uncomment them, if required, to troubleshoot any KStreams related issue -->
         <!-- kafka streams mbeans -->
@@ -78,6 +78,13 @@
         <query objectName="metrics:name=count.metric.compute.time" attributes="50thPercentile,99thPercentile,OneMinuteRate" resultAlias="count-metric.compute.time.#attribute#"/>
 
         <query objectName="metrics:name=metricprocessor.trendcount.*" resultAlias="%name%.#attribute#"/>
+
+
+        <!--ad-mapper-->
+        <query objectName="metrics:name=cache.size" attributes="Value" resultAlias="mapping-cache.size"/>
+        <query objectName="metrics:name=cache.hit" attributes="Count" resultAlias="mapping-cache.hit"/>
+        <query objectName="metrics:name=cache.miss" attributes="Count" resultAlias="mapping-cache.miss"/>
+
     </queries>
 
     <outputWriter class="org.jmxtrans.agent.GraphitePlainTextTcpOutputWriter">

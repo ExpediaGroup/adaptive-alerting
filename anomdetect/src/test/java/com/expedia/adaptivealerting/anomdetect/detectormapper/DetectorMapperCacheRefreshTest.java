@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 
 import java.io.File;
@@ -24,7 +23,6 @@ import static org.junit.Assert.assertTrue;
 
 public class DetectorMapperCacheRefreshTest {
 
-    @InjectMocks
     private DetectorMapperCache detectorMapperCache;
 
     @Before

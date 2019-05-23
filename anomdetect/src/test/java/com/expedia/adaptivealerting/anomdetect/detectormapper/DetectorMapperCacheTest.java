@@ -1,5 +1,6 @@
 package com.expedia.adaptivealerting.anomdetect.detectormapper;
 
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.cache.Cache;
 import lombok.val;
 import org.junit.Assert;
@@ -19,12 +20,15 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 public class DetectorMapperCacheTest {
 
-
     @Mock
     private Cache<String, String> cache;
 
     @InjectMocks
-    private DetectorMapperCache detectorMapperCache;
+    private DetectorMapperCache detectorMapperCache = new DetectorMapperCache(new MetricRegistry());
+
+    @Mock
+    private MetricRegistry metricRegistry = new MetricRegistry();
+
     private String detectorIds;
     private List<Detector> detectors;
 

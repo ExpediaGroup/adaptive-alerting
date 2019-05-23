@@ -17,14 +17,12 @@ package com.expedia.adaptivealerting.kafka;
 
 import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.SharedMetricRegistries;
 import lombok.Getter;
 import lombok.val;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.Topology;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
-import static org.apache.kafka.streams.StreamsConfig.APPLICATION_ID_CONFIG;
 
 /**
  * Abstract base class for Kafka Streams apps. See
@@ -44,13 +42,16 @@ public abstract class AbstractStreamsApp {
     public AbstractStreamsApp(StreamsAppConfig config) {
         notNull(config, "config can't be null");
         this.config = config;
-        this.jmxReporter = JmxReporter.forRegistry(SharedMetricRegistries.getOrCreate(config.getStreamsConfig().getString(APPLICATION_ID_CONFIG)))
+        this.jmxReporter = JmxReporter.forRegistry(new MetricRegistry())
                 .build();
 
     }
 
-    public static MetricRegistry getMetricRegistry(String registryName){
-        return SharedMetricRegistries.getOrCreate(registryName);
+    public AbstractStreamsApp(StreamsAppConfig config, JmxReporter reporter) {
+        notNull(config, "config can't be null");
+        notNull(reporter, "reporter can't be null");
+        this.config = config;
+        this.jmxReporter = reporter;
     }
 
     public void start() {
