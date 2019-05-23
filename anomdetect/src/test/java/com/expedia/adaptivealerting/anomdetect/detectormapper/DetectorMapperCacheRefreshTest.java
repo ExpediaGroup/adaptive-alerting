@@ -1,12 +1,12 @@
 package com.expedia.adaptivealerting.anomdetect.detectormapper;
 
+import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 
 import java.io.File;
@@ -23,13 +23,12 @@ import static org.junit.Assert.assertTrue;
 
 public class DetectorMapperCacheRefreshTest {
 
-    @InjectMocks
     private DetectorMapperCache detectorMapperCache;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        this.detectorMapperCache = new DetectorMapperCache();
+        this.detectorMapperCache = new DetectorMapperCache(new MetricRegistry());
     }
 
 

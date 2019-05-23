@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.kafka;
 
+import com.expedia.adaptivealerting.anomdetect.JmxReporterFactory;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.Detector;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapper;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
@@ -187,13 +188,13 @@ public final class KafkaDetectorMapperTest {
 
     private void initLogAndFail() {
         // Topology test drivers
-        val topology = new KafkaAnomalyDetectorMapper(saConfig, mapper).buildTopology();
+        val topology = new KafkaAnomalyDetectorMapper(saConfig, mapper , new JmxReporterFactory()).buildTopology();
         this.logAndFailDriver = TestObjectMother.topologyTestDriver(topology, MetricDataJsonSerde.class, false);
     }
 
     private void initLogAndContinue() {
         // Topology test drivers
-        val topology = new KafkaAnomalyDetectorMapper(saConfig, mapper).buildTopology();
+        val topology = new KafkaAnomalyDetectorMapper(saConfig, mapper, new JmxReporterFactory()).buildTopology();
         this.logAndContinueDriver = TestObjectMother.topologyTestDriver(topology, MetricDataJsonSerde.class, true);
     }
 

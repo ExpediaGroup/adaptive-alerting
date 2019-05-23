@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.kafka;
 
+import com.expedia.adaptivealerting.anomdetect.JmxReporterFactory;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapper;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.MapperResult;
 import com.expedia.adaptivealerting.core.data.MappedMetricData;
@@ -64,8 +65,9 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
         val config = new TypesafeConfigLoader(CK_AD_MAPPER).loadMergedConfig();
         val saConfig = new StreamsAppConfig(config);
         val detectorSource = DetectorUtil.buildDetectorSource(config);
-        val mapper = new DetectorMapper(detectorSource,config);
-        new KafkaAnomalyDetectorMapper(saConfig, mapper).start();
+        val jmxReporterFactory = new JmxReporterFactory();
+        val mapper = new DetectorMapper(detectorSource, config, jmxReporterFactory.getMetricRegistry());
+        new KafkaAnomalyDetectorMapper(saConfig, mapper, jmxReporterFactory).start();
     }
 
     /**
@@ -74,8 +76,8 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
      * @param config Streams app configuration.
      * @param mapper Anomaly detector mapper.
      */
-    public KafkaAnomalyDetectorMapper(StreamsAppConfig config, DetectorMapper mapper) {
-        super(config);
+    public KafkaAnomalyDetectorMapper(StreamsAppConfig config, DetectorMapper mapper, JmxReporterFactory jmxReporterFactory) {
+        super(config, jmxReporterFactory.getJmxReporter());
         notNull(mapper, "mapper can't be null");
         this.mapper = mapper;
     }

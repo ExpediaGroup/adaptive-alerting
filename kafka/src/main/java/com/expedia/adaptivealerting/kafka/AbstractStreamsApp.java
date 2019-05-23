@@ -42,7 +42,16 @@ public abstract class AbstractStreamsApp {
     public AbstractStreamsApp(StreamsAppConfig config) {
         notNull(config, "config can't be null");
         this.config = config;
-        this.jmxReporter = JmxReporter.forRegistry(new MetricRegistry()).build();
+        this.jmxReporter = JmxReporter.forRegistry(new MetricRegistry())
+                .build();
+
+    }
+
+    public AbstractStreamsApp(StreamsAppConfig config, JmxReporter reporter) {
+        notNull(config, "config can't be null");
+        notNull(reporter, "reporter can't be null");
+        this.config = config;
+        this.jmxReporter = reporter;
     }
 
     public void start() {

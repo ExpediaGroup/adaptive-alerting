@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detectormapper;
 
+import com.codahale.metrics.MetricRegistry;
 import com.expedia.adaptivealerting.anomdetect.comp.DetectorSource;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
@@ -92,7 +93,7 @@ public final class DetectorMapperTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testModelServiceConnectorNotNull() {
-        new DetectorMapper(null, config);
+        new DetectorMapper(null, config, new MetricRegistry());
     }
 
     @Test
@@ -171,7 +172,7 @@ public final class DetectorMapperTest {
     public void testGetDetectorsFromCache() throws IOException {
 
         //testing detector Mapper with actual cache
-        this.detectorMapper = new DetectorMapper(detectorSource, config);
+        this.detectorMapper = new DetectorMapper(detectorSource, config, new MetricRegistry());
 
         this.initTagsFromFile();
         //populate cache
