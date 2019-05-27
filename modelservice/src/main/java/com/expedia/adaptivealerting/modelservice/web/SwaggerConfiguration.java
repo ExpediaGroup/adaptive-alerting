@@ -80,7 +80,7 @@ public class SwaggerConfiguration {
     private Predicate<String> paths() {
         return or(
                 // regex("/additional_endpoints/.*?"),
-                regex("/api/elasticsearchDetectorMappings.*?")
+                regex("/api/detectorMappings.*?")
         );
     }
 
