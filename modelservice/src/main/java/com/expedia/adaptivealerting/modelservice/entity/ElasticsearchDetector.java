@@ -36,6 +36,8 @@ public class ElasticsearchDetector {
 
     private String createdBy;
 
+    private String type;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Date lastUpdateTimestamp;
 

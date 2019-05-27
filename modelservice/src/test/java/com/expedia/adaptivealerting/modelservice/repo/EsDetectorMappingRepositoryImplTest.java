@@ -13,25 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.service;
+package com.expedia.adaptivealerting.modelservice.repo;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.CreateDetectorMappingRequest;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.DetectorMapping;
+import com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping;
+import com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetectorMapping;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.MatchingDetectorsResponse;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.SearchMappingsRequest;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
-import com.expedia.adaptivealerting.modelservice.service.DetectorMappingServiceImpl;
+import com.expedia.adaptivealerting.modelservice.repo.impl.EsDetectorMappingRepositoryImpl;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
+import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
+import com.expedia.adaptivealerting.modelservice.util.ElasticsearchUtil;
+import com.expedia.adaptivealerting.modelservice.util.ObjectMapperUtil;
+import lombok.SneakyThrows;
 import lombok.val;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.DocWriteResponse.Result;
+import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsRequest;
+import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -40,12 +50,15 @@ import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.document.DocumentField;
 import org.elasticsearch.common.io.stream.ByteBufferStreamInput;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -53,7 +66,9 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -62,6 +77,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
@@ -69,17 +85,31 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class DetectorMappingServiceImplTest {
+public class EsDetectorMappingRepositoryImplTest {
+
     @Mock
     private MetricRegistry metricRegistry;
+
     @Mock
     private ElasticSearchClient elasticSearchClient;
+
     @Mock
     private ElasticSearchProperties elasticSearchProperties;
-    private DetectorMappingServiceImpl detectorMappingService;
+
+    @Mock
+    private ObjectMapperUtil objectMapperUtil;
+
+    @Mock
+    private ElasticsearchUtil elasticsearchUtil;
+
+    private EsDetectorMappingRepositoryImpl detectorMappingRepository;
+
+    private PercolatorDetectorMapping percolatorDetectorMapping;
 
     @Before
     public void beforeTest() {
+        ObjectMother mom = ObjectMother.instance();
+        percolatorDetectorMapping = mom.getPercolatorDetectorMapping();
         when(metricRegistry.timer(any())).thenReturn(mock(Timer.class));
         when(metricRegistry.counter(any())).thenReturn(mock(Counter.class));
         when(elasticSearchProperties.getIndexName()).thenReturn("detector-mappings");
@@ -87,9 +117,18 @@ public class DetectorMappingServiceImplTest {
         ElasticSearchProperties.Config config = new ElasticSearchProperties.Config()
                 .setConnectionTimeout(100);
         when(elasticSearchProperties.getConfig()).thenReturn(config);
-        detectorMappingService = new DetectorMappingServiceImpl(metricRegistry);
-        ReflectionTestUtils.setField(detectorMappingService, "elasticSearchClient", elasticSearchClient);
-        ReflectionTestUtils.setField(detectorMappingService, "elasticSearchProperties", elasticSearchProperties);
+        detectorMappingRepository = new EsDetectorMappingRepositoryImpl(metricRegistry);
+        ReflectionTestUtils.setField(detectorMappingRepository, "elasticSearchClient", elasticSearchClient);
+        ReflectionTestUtils.setField(detectorMappingRepository, "elasticSearchProperties", elasticSearchProperties);
+        ReflectionTestUtils.setField(detectorMappingRepository, "elasticsearchUtil", elasticsearchUtil);
+        ReflectionTestUtils.setField(detectorMappingRepository, "objectMapperUtil", objectMapperUtil);
+
+        when(elasticsearchUtil.getSourceBuilder(any(QueryBuilder.class))).thenReturn(new SearchSourceBuilder());
+        when(elasticsearchUtil.getSearchRequest(any(SearchSourceBuilder.class), anyString(), anyString())).thenReturn(new SearchRequest());
+        when(elasticsearchUtil.getIndexResponse(any(IndexRequest.class), anyString())).thenReturn(new IndexResponse());
+
+        when(objectMapperUtil.convertToString(any())).thenReturn(new String());
+        when(objectMapperUtil.convertToObject(anyString(), any())).thenReturn(percolatorDetectorMapping);
     }
 
     @Test
@@ -100,7 +139,7 @@ public class DetectorMappingServiceImplTest {
         val detectorUuid = "aeb4d849-847a-45c0-8312-dc0fcf22b639";
         SearchResponse searchResponse = mockSearchResponse(searchIndex, lookUpTime, detectorUuid);
         when(elasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(searchResponse);
-        MatchingDetectorsResponse response = detectorMappingService.findMatchingDetectorMappings(tagsList);
+        MatchingDetectorsResponse response = detectorMappingRepository.findMatchingDetectorMappings(tagsList);
         verify(elasticSearchClient, atLeastOnce()).search(any(SearchRequest.class), eq(RequestOptions.DEFAULT));
         assertNotNull("Response can't be null", response);
         assertEquals("ES lookup time didn't match", lookUpTime, response.getLookupTimeInMillis());
@@ -114,7 +153,7 @@ public class DetectorMappingServiceImplTest {
     public void findMatchingDetectorMappings_fail() throws IOException {
         List<Map<String, String>> tagsList = new ArrayList<>();
         when(elasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenThrow(new IOException());
-        detectorMappingService.findMatchingDetectorMappings(tagsList);
+        detectorMappingRepository.findMatchingDetectorMappings(tagsList);
     }
 
     @Test
@@ -126,15 +165,15 @@ public class DetectorMappingServiceImplTest {
         Long CreatedTimeInMillis = new Long(1554828886);
         GetResponse getResponse = mockGetResponse(id);
         when(elasticSearchClient.get(any(GetRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(getResponse);
-        DetectorMapping detectorMapping = detectorMappingService.findDetectorMapping(id);
+        ElasticsearchDetectorMapping elasticsearchDetectorMapping = detectorMappingRepository.findDetectorMapping(id);
         verify(elasticSearchClient, atLeastOnce()).get(any(GetRequest.class), eq(RequestOptions.DEFAULT));
-        assertNotNull("Response can't be null", detectorMapping);
-        assertEquals(id, detectorMapping.getId());
-        assertEquals("test-user", detectorMapping.getUser().getId());
-        assertEquals(LastModifiedTimeInMillis, Long.valueOf(detectorMapping.getLastModifiedTimeInMillis()));
-        assertEquals(CreatedTimeInMillis, Long.valueOf(detectorMapping.getCreatedTimeInMillis()));
-        assertTrue(detectorMapping.isEnabled());
-        assertEquals(UUID.fromString(detectorUuid), detectorMapping.getDetector().getId());
+        assertNotNull("Response can't be null", elasticsearchDetectorMapping);
+        assertEquals(id, elasticsearchDetectorMapping.getId());
+        assertEquals("test-user", elasticsearchDetectorMapping.getUser().getId());
+        assertEquals(LastModifiedTimeInMillis, Long.valueOf(elasticsearchDetectorMapping.getLastModifiedTimeInMillis()));
+        assertEquals(CreatedTimeInMillis, Long.valueOf(elasticsearchDetectorMapping.getCreatedTimeInMillis()));
+        assertTrue(elasticsearchDetectorMapping.isEnabled());
+        assertEquals(UUID.fromString(detectorUuid), elasticsearchDetectorMapping.getDetector().getId());
 
     }
 
@@ -142,7 +181,7 @@ public class DetectorMappingServiceImplTest {
     public void findDetectorMapping_fail() throws IOException {
         String id = "adsvade8^szx";
         when(elasticSearchClient.get(any(GetRequest.class), eq(RequestOptions.DEFAULT))).thenThrow(new IOException());
-        detectorMappingService.findDetectorMapping(id);
+        detectorMappingRepository.findDetectorMapping(id);
     }
 
     @Test(expected = RuntimeException.class)
@@ -154,12 +193,12 @@ public class DetectorMappingServiceImplTest {
         tags.put("type", "gauge");
         tagsList.add(tags);
         when(elasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenThrow(new IOException());
-        detectorMappingService.findMatchingDetectorMappings(tagsList);
+        detectorMappingRepository.findMatchingDetectorMappings(tagsList);
     }
 
     @Test
     public void findLastUpdated_successful() throws IOException {
-        List<DetectorMapping> tagsList = new ArrayList<>();
+        List<ElasticsearchDetectorMapping> tagsList = new ArrayList<>();
         Map<String, String> tags = new HashMap<>();
         Long LastModifiedTimeInMillis = new Long(1554828886);
         Long CreatedTimeInMillis = new Long(1554828886);
@@ -169,7 +208,7 @@ public class DetectorMappingServiceImplTest {
         int TimeinSeconds = 60;
         SearchResponse searchResponse = mockSearchResponse(searchIndex, lookUpTime, detectorUuid);
         when(elasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(searchResponse);
-        tagsList = detectorMappingService.findLastUpdated(TimeinSeconds);
+        tagsList = detectorMappingRepository.findLastUpdated(TimeinSeconds);
         verify(elasticSearchClient, atLeastOnce()).search(any(SearchRequest.class), eq(RequestOptions.DEFAULT));
         assertNotNull("Response can't be null", tagsList);
         assertEquals(1, tagsList.size());
@@ -184,12 +223,12 @@ public class DetectorMappingServiceImplTest {
     public void findLastUpdated_fail() throws IOException {
         int TimeinSeconds = 60;
         when(elasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenThrow(new IOException());
-        detectorMappingService.findLastUpdated(TimeinSeconds);
+        detectorMappingRepository.findLastUpdated(TimeinSeconds);
     }
 
     @Test
     public void search_successful() throws IOException {
-        List<DetectorMapping> tagsList = new ArrayList<>();
+        List<ElasticsearchDetectorMapping> tagsList = new ArrayList<>();
         Map<String, String> tags = new HashMap<>();
         Long LastModifiedTimeInMillis = new Long(1554828886);
         Long CreatedTimeInMillis = new Long(1554828886);
@@ -199,7 +238,9 @@ public class DetectorMappingServiceImplTest {
         SearchMappingsRequest searchMappingsRequest = new SearchMappingsRequest();
         SearchResponse searchResponse = mockSearchResponse(searchIndex, lookUpTime, detectorUuid);
         when(elasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(searchResponse);
-        tagsList = detectorMappingService.search(searchMappingsRequest);
+        Mockito.when(elasticsearchUtil.getSourceBuilder(any(QueryBuilder.class))).thenReturn(new SearchSourceBuilder());
+
+        tagsList = detectorMappingRepository.search(searchMappingsRequest);
         verify(elasticSearchClient, atLeastOnce()).search(any(SearchRequest.class), eq(RequestOptions.DEFAULT));
         assertNotNull("Response can't be null", tagsList);
         assertEquals(1, tagsList.size());
@@ -216,14 +257,14 @@ public class DetectorMappingServiceImplTest {
         searchMappingsRequest.setUserId("test-user");
         searchMappingsRequest.setDetectorUuid(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"));
         when(elasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenThrow(new IOException());
-        detectorMappingService.search(searchMappingsRequest);
+        detectorMappingRepository.search(searchMappingsRequest);
     }
 
     @Test(expected = RuntimeException.class)
     public void search_fail() throws IOException {
         int TimeinSeconds = 60;
         when(elasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenThrow(new IOException());
-        detectorMappingService.findLastUpdated(TimeinSeconds);
+        detectorMappingRepository.findLastUpdated(TimeinSeconds);
     }
 
     @Test
@@ -231,7 +272,7 @@ public class DetectorMappingServiceImplTest {
         val id = "adsvade8^szx";
         GetResponse getResponse = mockGetResponse(id);
         when(elasticSearchClient.get(any(GetRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(getResponse);
-        detectorMappingService.disableDetectorMapping(id);
+        detectorMappingRepository.disableDetectorMapping(id);
         verify(elasticSearchClient, atLeastOnce()).get(any(GetRequest.class), eq(RequestOptions.DEFAULT));
     }
 
@@ -240,7 +281,7 @@ public class DetectorMappingServiceImplTest {
         val id = "adsvade8^szx";
         DeleteResponse deleteResponse = mockDeleteResponse(id);
         when(elasticSearchClient.delete(any(DeleteRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(new DeleteResponse());
-        detectorMappingService.deleteDetectorMapping(id);
+        detectorMappingRepository.deleteDetectorMapping(id);
         verify(elasticSearchClient, atLeastOnce()).delete(any(DeleteRequest.class), eq(RequestOptions.DEFAULT));
         assertEquals(id, deleteResponse.getId());
         assertEquals(elasticSearchProperties.getIndexName(), deleteResponse.getIndex());
@@ -253,7 +294,13 @@ public class DetectorMappingServiceImplTest {
         DeleteRequest deleteRequest = new DeleteRequest(elasticSearchProperties.getIndexName(),
                 elasticSearchProperties.getDocType(), id);
         when(elasticSearchClient.delete(any(DeleteRequest.class), eq(RequestOptions.DEFAULT))).thenThrow(new IOException());
-        detectorMappingService.deleteDetectorMapping(id);
+        detectorMappingRepository.deleteDetectorMapping(id);
+    }
+
+    private IndexResponse mockIndexResponse() {
+        IndexResponse indexResponse = mock(IndexResponse.class);
+        when(indexResponse.getId()).thenReturn("1");
+        return indexResponse;
     }
 
     private SearchResponse mockSearchResponse(String searchIndex, int lookUpTime, String detectorUuid) {

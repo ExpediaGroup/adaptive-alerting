@@ -42,6 +42,12 @@ public class DateUtil {
         return buildDateFormat().format(Date.from(instant));
     }
 
+    @SneakyThrows
+    public static String instantToDate(Instant instant) {
+        Date date = new Date(instant.getEpochSecond() * 1000);
+        return buildDateFormat().format(date);
+    }
+
     private static DateFormat buildDateFormat() {
         DateFormat format = new SimpleDateFormat(DATE_FORMAT);
         format.setTimeZone(UTC_TIME_ZONE);

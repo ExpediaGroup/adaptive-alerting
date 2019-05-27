@@ -22,5 +22,5 @@ import java.util.List;
 @Data
 public class Expression {
     private Operator operator;
-    List<Operand> operands;
+    private List<Operand> operands;
 }

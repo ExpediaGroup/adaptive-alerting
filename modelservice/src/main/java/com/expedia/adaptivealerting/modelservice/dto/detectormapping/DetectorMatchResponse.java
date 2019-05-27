@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.modelservice.dto.detectormapping;
 
+import com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetectorMapping;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -23,6 +24,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class DetectorMatchResponse {
-    private List<DetectorMapping> detectorMappings;
+    private List<ElasticsearchDetectorMapping> elasticsearchDetectorMappings;
     private long lookupTimeInMillis;
 }

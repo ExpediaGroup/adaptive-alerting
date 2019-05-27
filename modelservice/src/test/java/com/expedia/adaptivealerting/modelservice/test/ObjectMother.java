@@ -1,5 +1,13 @@
 package com.expedia.adaptivealerting.modelservice.test;
 
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.MatchingDetectorsResponse;
+import com.expedia.adaptivealerting.modelservice.dto.percolator.BoolCondition;
+import com.expedia.adaptivealerting.modelservice.dto.percolator.MustCondition;
+import com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping;
+import com.expedia.adaptivealerting.modelservice.dto.percolator.Query;
+import com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetectorMapping;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.User;
 import com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetector;
 import com.expedia.adaptivealerting.modelservice.providers.graphite.GraphiteResult;
 import com.expedia.adaptivealerting.modelservice.service.AnomalyRequest;
@@ -9,8 +17,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.val;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class ObjectMother {
     private static final ObjectMother MOM = new ObjectMother();
@@ -56,24 +67,52 @@ public class ObjectMother {
 
     public ElasticsearchDetector getElasticsearchDetector() {
         ElasticsearchDetector elasticSearchDetector = new ElasticsearchDetector();
-        elasticSearchDetector.setUuid("uuid");
-        elasticSearchDetector.setCreatedBy("user");
+        elasticSearchDetector.setUuid("aeb4d849-847a-45c0-8312-dc0fcf22b639");
+        elasticSearchDetector.setCreatedBy("test-user");
         elasticSearchDetector.setDetectorConfig(new HashMap<>());
         elasticSearchDetector.setEnabled(true);
         elasticSearchDetector.setLastUpdateTimestamp(DateUtil.toUTCDate("2019-04-06 22:00:00"));
         return elasticSearchDetector;
     }
 
-    public Map<String, Object> getElasticSearchSource() {
-        Map<String, Object> source = new HashMap<>();
-        source.put("lastUpdateTimestamp", "2019-10-05 12:00:00");
-        source.put("createdBy", "kashah");
-        source.put("uuid", "uuid");
-        source.put("enabled", true);
-        source.put("detectorConfig", new HashMap<>());
-        return source;
+    public ElasticsearchDetectorMapping getDetectorMapping() {
+        ElasticsearchDetectorMapping elasticsearchDetectorMapping = new ElasticsearchDetectorMapping();
+        elasticsearchDetectorMapping.setCreatedTimeInMillis(10000);
+        elasticsearchDetectorMapping.setEnabled(true);
+        elasticsearchDetectorMapping.setUser(new User("test-user"));
+        elasticsearchDetectorMapping.setDetector(new Detector(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639")));
+        return elasticsearchDetectorMapping;
     }
 
+    public PercolatorDetectorMapping getPercolatorDetectorMapping() {
+        PercolatorDetectorMapping percolatorDetectorMapping = new PercolatorDetectorMapping();
+        Query query = new Query();
+        BoolCondition boolCondition = new BoolCondition();
+        List<MustCondition> mustConditions = new ArrayList<>();
+        MustCondition mustCondition = new MustCondition();
+        Map match = new HashMap<>();
+        match.put("name", "sample-web");
+        mustCondition.setMatch(match);
+        mustConditions.add(mustCondition);
+        boolCondition.setMust(mustConditions);
+        query.setBool(boolCondition);
+        percolatorDetectorMapping.setCreatedTimeInMillis(1554828886);
+        percolatorDetectorMapping.setEnabled(true);
+        percolatorDetectorMapping.setLastModifiedTimeInMillis(1554828886);
+        percolatorDetectorMapping.setUser(new User("test-user"));
+        percolatorDetectorMapping.setDetector(new Detector(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639")));
+        percolatorDetectorMapping.setQuery(query);
+        return percolatorDetectorMapping;
+    }
+
+    public MatchingDetectorsResponse getMatchingDetectorsResponse() {
+        Map<Integer, List<Detector>> groupedDetectorsByIndex = new HashMap<>();
+        Detector detector = new Detector(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"));
+        List<Detector> detectors = new ArrayList<>();
+        detectors.add(detector);
+        groupedDetectorsByIndex.put(0, detectors);
+        return new MatchingDetectorsResponse(groupedDetectorsByIndex, 10000);
+    }
 
     @SneakyThrows
     private Map<String, Object> toObject(String message) {

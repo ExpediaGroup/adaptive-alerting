@@ -33,11 +33,11 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-import static com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetectorMapping.CREATE_TIME_KEYWORD;
-import static com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetectorMapping.DETECTOR_KEYWORD;
-import static com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetectorMapping.LAST_MOD_TIME_KEYWORD;
-import static com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetectorMapping.QUERY_KEYWORD;
-import static com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetectorMapping.USER_KEYWORD;
+import static com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping.CREATE_TIME_KEYWORD;
+import static com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping.DETECTOR_KEYWORD;
+import static com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping.LAST_MOD_TIME_KEYWORD;
+import static com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping.QUERY_KEYWORD;
+import static com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping.USER_KEYWORD;
 
 /**
  * Util class to create index with mappings if not found.

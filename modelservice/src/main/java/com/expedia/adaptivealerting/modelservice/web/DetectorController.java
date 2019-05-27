@@ -19,10 +19,15 @@ import com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetector;
 import com.expedia.adaptivealerting.modelservice.service.DetectorService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -35,23 +40,46 @@ public class DetectorController {
     @Autowired
     private DetectorService detectorService;
 
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public String createDetector(@RequestBody ElasticsearchDetector elasticsearchDetector) {
+        return detectorService.createDetector(elasticsearchDetector);
+    }
+
+    @PutMapping
+    @ResponseStatus(HttpStatus.OK)
+    public void updateDetector(@RequestParam String uuid, @RequestBody ElasticsearchDetector elasticsearchDetector) {
+        detectorService.updateDetector(uuid, elasticsearchDetector);
+    }
+
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteDetector(@RequestParam String uuid) {
+        detectorService.deleteDetector(uuid);
+    }
+
     @GetMapping(path = "/findByUuid", produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
     public List<ElasticsearchDetector> findByUuid(@RequestParam String uuid) {
         return detectorService.findByUuid(uuid);
     }
 
     @GetMapping(path = "/findByCreatedBy", produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
     public List<ElasticsearchDetector> findByCreatedBy(@RequestParam String user) {
         return detectorService.findByCreatedBy(user);
     }
 
     @PostMapping(path = "/toggleDetector", consumes = "application/json", produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
     public void toggleDetector(@RequestParam String uuid, @RequestParam Boolean enabled) {
         detectorService.toggleDetector(uuid, enabled);
     }
 
     @GetMapping(path = "/getLastUpdatedDetectors", produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
     public List<ElasticsearchDetector> getLastUpdatedDetectors(@RequestParam int interval) {
         return detectorService.getLastUpdatedDetectors(interval);
     }
+
 } 

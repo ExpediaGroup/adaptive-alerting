@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.web;
 
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.CreateDetectorMappingRequest;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.DetectorMapping;
+import com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetectorMapping;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.MatchingDetectorsResponse;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.SearchMappingsRequest;
 import com.expedia.adaptivealerting.modelservice.service.DetectorMappingService;
@@ -41,7 +41,7 @@ public class DetectorMappingController {
     private DetectorMappingService detectorMappingService;
 
     @RequestMapping(produces = "application/json", method = RequestMethod.GET)
-    public DetectorMapping getDetectorMapping(@RequestParam String id) {
+    public ElasticsearchDetectorMapping getDetectorMapping(@RequestParam String id) {
         return detectorMappingService.findDetectorMapping(id);
     }
 
@@ -65,14 +65,14 @@ public class DetectorMappingController {
     }
 
     @RequestMapping(value = "/search", method = RequestMethod.POST)
-    public List<DetectorMapping> searchDetectorMapping(@RequestBody SearchMappingsRequest request) {
+    public List<ElasticsearchDetectorMapping> searchDetectorMapping(@RequestBody SearchMappingsRequest request) {
         Assert.isTrue(request.getUserId() != null || request.getDetectorUuid() != null,
                 "userId and detectorId can't both be null");
         return detectorMappingService.search(request);
     }
 
     @RequestMapping(value = "/lastUpdated", method = RequestMethod.GET)
-    public List<DetectorMapping> findDetectorMapping(@RequestParam int timeInSecs) {
+    public List<ElasticsearchDetectorMapping> findDetectorMapping(@RequestParam int timeInSecs) {
         Assert.notNull(timeInSecs, "timeInSecs can't be null");
         return detectorMappingService.findLastUpdated(timeInSecs);
     }
