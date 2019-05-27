@@ -19,6 +19,7 @@ import lombok.val;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -112,6 +113,18 @@ public class ObjectMother {
         detectors.add(detector);
         groupedDetectorsByIndex.put(0, detectors);
         return new MatchingDetectorsResponse(groupedDetectorsByIndex, 10000);
+    }
+
+    public Map getTestObject(){
+        Map object = new LinkedHashMap<>();
+        object.put("test1", 1);
+        object.put("test2", 2);
+        object.put("test3", 3);
+        return object;
+    }
+
+    public String getTestString(){
+        return "{\"test1\":1,\"test2\":2,\"test3\":3}";
     }
 
     @SneakyThrows

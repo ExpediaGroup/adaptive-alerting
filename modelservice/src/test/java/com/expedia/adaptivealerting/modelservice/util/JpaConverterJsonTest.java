@@ -15,7 +15,9 @@
  */
 package com.expedia.adaptivealerting.modelservice.util;
 
+import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -62,18 +64,12 @@ public class JpaConverterJsonTest {
     }
 
     private void initTestObjects() {
-
-        this.expectedObject = new LinkedHashMap<>();
-        expectedObject.put("test1", 1);
-        expectedObject.put("test2", 2);
-        expectedObject.put("test3", 3);
-
-        this.expectedString = "{\"test1\":1,\"test2\":2,\"test3\":3}";
+        val mom = ObjectMother.instance();
+        expectedObject = mom.getTestObject();
+        expectedString = mom.getTestString();
     }
 
     private void initDependencies() {
-        ObjectMapper mockObjectMapper = Mockito.mock(ObjectMapper.class);
-
         try {
             Mockito.when(mapper.writeValueAsString(expectedObject)).thenReturn("");
         } catch (IOException e) {
