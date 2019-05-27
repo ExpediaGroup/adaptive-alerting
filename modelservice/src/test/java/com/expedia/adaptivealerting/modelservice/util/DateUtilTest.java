@@ -34,14 +34,17 @@ public class DateUtilTest {
     }
 
     @Test
-    @SneakyThrows
     public void testToUTCDate() {
         DateFormat format = new SimpleDateFormat(dateFormat);
         format.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         Date actual = DateUtil.toUTCDate(instString);
-        Date expected = format.parse("2016-11-07 21:51:40");
-        assertEquals(actual, expected);
+        try {
+            Date expected = format.parse("2016-11-07 21:51:40");
+            assertEquals(actual, expected);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test(expected = ParseException.class)

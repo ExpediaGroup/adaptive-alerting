@@ -1,16 +1,20 @@
 package com.expedia.adaptivealerting.modelservice.util;
 
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.hibernate.HibernateException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -44,11 +48,25 @@ public class ObjectMapperUtilTest {
         assertEquals(expectedString, actualString);
     }
 
+
+    @Test(expected = RuntimeException.class)
+    public void testConvertToString_fail() throws JsonProcessingException {
+        when(mapper.writeValueAsString(any())).thenThrow(new RuntimeException());
+        String actualString = objectMapperUtil.convertToString(new Object());
+    }
+
     @Test
     public void testConvertToObject() {
         Object actualObject = objectMapperUtil.convertToObject("", new TypeReference<Map>() {
         });
         assertEquals(expectedObject, actualObject);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testConvertToObject_fail() throws IOException {
+        when(mapper.readValue(anyString(), any(TypeReference.class))).thenThrow(new RuntimeException());
+        Object actualObject = objectMapperUtil.convertToObject("", new TypeReference<Map>() {
+        });
     }
 
     private void initTestObjects() {
