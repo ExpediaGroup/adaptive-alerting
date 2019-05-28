@@ -82,8 +82,11 @@
 
         <!--ad-mapper-->
         <query objectName="metrics:name=cache.size" attributes="Value" resultAlias="mapping-cache.size"/>
-        <query objectName="metrics:name=cache.hit" attributes="Count" resultAlias="mapping-cache.hit"/>
-        <query objectName="metrics:name=cache.miss" attributes="Count" resultAlias="mapping-cache.miss"/>
+        <query objectName="metrics:name=cache.hitRate" attributes="Value" resultAlias="mapping-cache.hitRate"/>
+        <query objectName="metrics:name=cache.hitCount" attributes="Value" resultAlias="mapping-cache.hitCount"/>
+        <query objectName="metrics:name=cache.missCount" attributes="Value" resultAlias="mapping-cache.missCount"/>
+        <query objectName="metrics:name=cache.missRate" attributes="Value" resultAlias="mapping-cache.missRate"/>
+        <query objectName="metrics:name=cache.evictionCount" attributes="Value" resultAlias="mapping-cache.evictionCount"/>
 
     </queries>
 

@@ -15,9 +15,10 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detectormapper;
 
-import com.codahale.metrics.Counter;
 import com.codahale.metrics.Gauge;
+import com.codahale.metrics.Metric;
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.MetricSet;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static com.codahale.metrics.MetricRegistry.name;
 
 /**
  * <p>
@@ -57,21 +60,35 @@ import java.util.stream.Collectors;
 public class DetectorMapperCache {
 
     private Cache<String, String> cache;
-    private Counter cacheHit;
-    private Counter cacheMiss;
-    private Gauge cacheSize;
 
     /**
      * Instantiates a new Detector mapper cache.
      */
     public DetectorMapperCache(MetricRegistry metricRegistry) {
         this.cache = CacheBuilder.newBuilder()
-                .expireAfterWrite(120, TimeUnit.MINUTES)
+                .expireAfterAccess(120, TimeUnit.MINUTES)
                 .build();
-        this.cacheHit = metricRegistry.counter("cache.hit");
-        this.cacheMiss = metricRegistry.counter("cache.miss");
-        this.cacheSize = (Gauge<Long>) () -> cache.size();
-        metricRegistry.register("cache.size", cacheSize);
+        metricRegistry.registerAll(metricsFor("cache", cache));
+
+    }
+
+    private MetricSet metricsFor(String cacheName, final Cache cache) {
+
+        HashMap<String, Metric> metrics = new HashMap<>();
+
+        metrics.put(name(cacheName, "hitRate"), (Gauge<Double>) () -> cache.stats().hitRate());
+
+        metrics.put(name(cacheName, "hitCount"), (Gauge<Long>) () -> cache.stats().hitCount());
+
+        metrics.put(name(cacheName, "missCount"), (Gauge<Long>) () -> cache.stats().missCount());
+
+        metrics.put(name(cacheName, "missRate"), (Gauge<Double>) () -> cache.stats().missRate());
+
+        metrics.put(name(cacheName, "evictionCount"), (Gauge<Long>) () -> cache.stats().evictionCount());
+
+        metrics.put(name(cacheName, "size"), (Gauge<Long>) cache::size);
+
+        return () -> metrics;
     }
 
     /**
@@ -81,10 +98,8 @@ public class DetectorMapperCache {
     public List<Detector> get(String key) {
         String bunchOfCachedDetectorIds = cache.getIfPresent(key);
         if (bunchOfCachedDetectorIds == null) {
-            this.cacheMiss.inc();
             return Collections.emptyList();
         } else {
-            this.cacheHit.inc();
             return CacheUtil.buildDetectors(bunchOfCachedDetectorIds);
         }
     }
