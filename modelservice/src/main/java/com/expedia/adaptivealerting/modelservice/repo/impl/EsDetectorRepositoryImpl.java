@@ -31,7 +31,6 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +43,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 
 @Slf4j
 @Service
@@ -64,16 +62,9 @@ public class EsDetectorRepositoryImpl implements EsDetectorRepository {
 
     @Override
     public String createDetector(ElasticsearchDetector elasticsearchDetector) {
-        val newElasticSearchDetector = new ElasticsearchDetector();
-        newElasticSearchDetector.setUuid(elasticsearchDetector.getUuid());
-        newElasticSearchDetector.setCreatedBy(elasticsearchDetector.getCreatedBy());
-        newElasticSearchDetector.setType(elasticsearchDetector.getType());
-        newElasticSearchDetector.setDetectorConfig(elasticsearchDetector.getDetectorConfig());
-        newElasticSearchDetector.setEnabled(elasticsearchDetector.getEnabled());
-        newElasticSearchDetector.setLastUpdateTimestamp(elasticsearchDetector.getLastUpdateTimestamp());
-
+        val newElasticsearchDetector = getElasticSearchDetector(elasticsearchDetector);
         val indexRequest = new IndexRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, elasticsearchDetector.getUuid());
-        String json = objectMapperUtil.convertToString(newElasticSearchDetector);
+        String json = objectMapperUtil.convertToString(newElasticsearchDetector);
         return elasticsearchUtil.getIndexResponse(indexRequest, json).getId();
     }
 
@@ -166,22 +157,21 @@ public class EsDetectorRepositoryImpl implements EsDetectorRepository {
         SearchHit[] hits = response.getHits().getHits();
         List<ElasticsearchDetector> elasticsearchDetectors = new ArrayList<>();
         for (val hit : hits) {
-            ElasticsearchDetector elasticsearchDetector = getElasticSearchDetector(hit.getSourceAsString());
-            elasticsearchDetectors.add(elasticsearchDetector);
+            val elasticsearchDetector = (ElasticsearchDetector) objectMapperUtil.convertToObject(hit.getSourceAsString(), new TypeReference<ElasticsearchDetector>() {});
+            val newElasticsearchDetector = getElasticSearchDetector(elasticsearchDetector);
+            elasticsearchDetectors.add(newElasticsearchDetector);
         }
         return elasticsearchDetectors;
     }
 
-    private ElasticsearchDetector getElasticSearchDetector(String json) {
-        ElasticsearchDetector elasticsearchDetector = (ElasticsearchDetector) objectMapperUtil.convertToObject(json, new TypeReference<ElasticsearchDetector>() {
-        });
-        val newElasticSearchDetector = new ElasticsearchDetector();
-        newElasticSearchDetector.setUuid(elasticsearchDetector.getUuid());
-        newElasticSearchDetector.setCreatedBy(elasticsearchDetector.getCreatedBy());
-        newElasticSearchDetector.setType(elasticsearchDetector.getType());
-        newElasticSearchDetector.setDetectorConfig(elasticsearchDetector.getDetectorConfig());
-        newElasticSearchDetector.setEnabled(elasticsearchDetector.getEnabled());
-        newElasticSearchDetector.setLastUpdateTimestamp(elasticsearchDetector.getLastUpdateTimestamp());
-        return newElasticSearchDetector;
+    private ElasticsearchDetector getElasticSearchDetector(ElasticsearchDetector elasticsearchDetector) {
+        return new ElasticsearchDetector()
+                .setUuid(elasticsearchDetector.getUuid())
+                .setCreatedBy(elasticsearchDetector.getCreatedBy())
+                .setType(elasticsearchDetector.getType())
+                .setDetectorConfig(elasticsearchDetector.getDetectorConfig())
+                .setEnabled(elasticsearchDetector.getEnabled())
+                .setLastUpdateTimestamp(elasticsearchDetector.getLastUpdateTimestamp());
     }
+
 }

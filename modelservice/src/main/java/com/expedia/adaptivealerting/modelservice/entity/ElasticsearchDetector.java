@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.modelservice.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -26,6 +27,7 @@ import java.util.Map;
  * ElasticSearchDetector entity.
  */
 @Data
+@Accessors(chain = true)
 public class ElasticsearchDetector {
 
     private String uuid;
