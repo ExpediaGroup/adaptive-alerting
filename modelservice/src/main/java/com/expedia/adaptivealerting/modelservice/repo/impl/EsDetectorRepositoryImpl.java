@@ -81,7 +81,6 @@ public class EsDetectorRepositoryImpl implements EsDetectorRepository {
     }
 
     @Override
-    @SneakyThrows
     public void updateDetector(String uuid, ElasticsearchDetector elasticsearchDetector) {
 
         val updateRequest = new UpdateRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, uuid);
@@ -91,7 +90,14 @@ public class EsDetectorRepositoryImpl implements EsDetectorRepository {
             field.setAccessible(true);
             String name = field.getName();
             if (!name.isEmpty()) {
-                Object value = field.get(elasticsearchDetector);
+                Object value;
+                try {
+                    value = field.get(elasticsearchDetector);
+                }
+                catch (IllegalAccessException e) {
+                    log.error(String.format("Updating elastic search failed", e));
+                    throw new RuntimeException(e);
+                }
                 if (name.equals("lastUpdateTimestamp")) {
                     Date d = (Date) value;
                     value = DateUtil.instantToDate(d.toInstant());
