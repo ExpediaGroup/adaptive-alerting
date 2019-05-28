@@ -45,5 +45,4 @@ public class ObjectMapperUtil {
             throw new HibernateException("unable to read object from result set", e);
         }
     }
-
 }

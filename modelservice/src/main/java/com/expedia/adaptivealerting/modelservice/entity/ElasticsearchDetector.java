@@ -16,12 +16,8 @@
 package com.expedia.adaptivealerting.modelservice.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
-import javax.persistence.Id;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;

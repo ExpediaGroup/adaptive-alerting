@@ -27,7 +27,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 
-
+/**
+ * Service to fetch and modify metric detector mappings in elastic search
+ */
 @Service
 @Slf4j
 @SuppressWarnings({"PMD.ExcessiveImports", "PMD.AvoidThrowingRawExceptionTypes"})

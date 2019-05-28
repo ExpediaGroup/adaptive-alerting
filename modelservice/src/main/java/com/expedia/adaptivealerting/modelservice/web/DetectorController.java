@@ -17,7 +17,6 @@ package com.expedia.adaptivealerting.modelservice.web;
 
 import com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetector;
 import com.expedia.adaptivealerting.modelservice.service.DetectorService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -34,7 +33,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path = "/api/elasticSearchDetectors")
-@Slf4j
 public class DetectorController {
 
     @Autowired

@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.modelservice.util;
 import lombok.SneakyThrows;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
@@ -28,9 +29,12 @@ public class DateUtil {
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
     public static final TimeZone UTC_TIME_ZONE = TimeZone.getTimeZone("UTC");
 
-    @SneakyThrows
     public static Date toUTCDate(String dateStr) {
-        return buildDateFormat().parse(dateStr);
+        try {
+            return buildDateFormat().parse(dateStr);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static Date now() {
@@ -42,7 +46,6 @@ public class DateUtil {
         return buildDateFormat().format(Date.from(instant));
     }
 
-    @SneakyThrows
     public static String instantToDate(Instant instant) {
         Date date = new Date(instant.getEpochSecond() * 1000);
         return buildDateFormat().format(date);
