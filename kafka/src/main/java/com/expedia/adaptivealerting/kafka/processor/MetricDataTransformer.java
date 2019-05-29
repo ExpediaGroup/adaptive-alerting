@@ -40,15 +40,15 @@ import java.util.stream.Collectors;
  * A custom stateful KStream transformer that converts {@link MetricData} to {@link MapperResult}.
  * For each incoming record, {@link #transform(String key, MetricData metricData) , matching detectors are fetched from cache
  * in case of cache miss, record in pushed into a in-memory state store, for batching.
- * <p>
+ *
  * {@link #init(ProcessorContext context), registers a scheduled a periodic operation that determines if the batch size is appropriate
  * and issues a down stream call to fetch matching detectors.
- * <p>
- * <p>
+ *
+ *
  * While pushing records into state store, using {@code key} can cause overriding metric of same {@code  metricDefinition} as state store is a Map.
  * Hence we use {@link #addSalt(String key)} method while inserting the record and {@link #removeSalt(String key)} while pushing result.
  * Thus we have same key through out transformation which prevents data re-partitioning.
- * <p>
+ *
  * Note: Since we want to preserve key, using ValueTransformerWithKey might seem the right choice but it doesn't allow pushing key value pair using {@link #context.forward()}
  * https://docs.confluent.io/current/streams/javadocs/org/apache/kafka/streams/kstream/KStream.html#transformValues-org.apache.kafka.streams.kstream.ValueTransformerSupplier-java.lang.String...-
  */
@@ -83,6 +83,10 @@ class MetricDataTransformer implements Transformer<String, MetricData, KeyValue<
         this.context = context;
         this.metricDataKeyValueStore = (KeyValueStore<String, MetricData>) context.getStateStore(stateStoreName);
 
+        /*
+        *  Requests to model-service to fetch detectors for metrics are throttled
+        *  This is done by buffering them in kafka KV store and periodically clearing that buffer
+        * */
         //TODO decide PUNCTUATION time
         this.context.schedule(200, PunctuationType.WALL_CLOCK_TIME, (timestamp) -> {
 
@@ -98,7 +102,9 @@ class MetricDataTransformer implements Transformer<String, MetricData, KeyValue<
                 iter.close();
 
                 List<Map<String, String>> cacheMissedMetricTags = cacheMissedMetrics.values().stream().map(value -> value.getMetricDefinition().getTags().getKv()).collect(Collectors.toList());
-                if (!cacheMissedMetricTags.isEmpty() && detectorMapper.isSuccessfulDetectorMappingLookup(cacheMissedMetricTags)) {
+
+                if (detectorMapper.isSuccessfulDetectorMappingLookup(cacheMissedMetricTags)) {
+
                     cacheMissedMetrics.forEach((originalKey, metricData) -> {
                         List<Detector> detectors = detectorMapper.getDetectorsFromCache(metricData.getMetricDefinition());
                         if (!detectors.isEmpty()) {
