@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.modelservice.service;
 
-import com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetector;
-import com.expedia.adaptivealerting.modelservice.repo.EsDetectorRepository;
+import com.expedia.adaptivealerting.modelservice.entity.Detector;
+import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
 import com.expedia.adaptivealerting.modelservice.util.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -34,11 +34,11 @@ import java.util.List;
 public class DetectorServiceImpl implements DetectorService {
 
     @Autowired
-    private EsDetectorRepository detectorRepository;
+    private DetectorRepository detectorRepository;
 
     @Override
-    public String createDetector(ElasticsearchDetector elasticsearchDetector) {
-        return detectorRepository.createDetector(elasticsearchDetector);
+    public String createDetector(Detector detector) {
+        return detectorRepository.createDetector(detector);
     }
 
     @Override
@@ -47,17 +47,17 @@ public class DetectorServiceImpl implements DetectorService {
     }
 
     @Override
-    public void updateDetector(String uuid, ElasticsearchDetector elasticsearchDetector) {
-        detectorRepository.updateDetector(uuid, elasticsearchDetector);
+    public void updateDetector(String uuid, Detector detector) {
+        detectorRepository.updateDetector(uuid, detector);
     }
 
     @Override
-    public List<ElasticsearchDetector> findByUuid(String uuid) {
+    public List<Detector> findByUuid(String uuid) {
         return detectorRepository.findByUuid(uuid);
     }
 
     @Override
-    public List<ElasticsearchDetector> findByCreatedBy(String user) {
+    public List<Detector> findByCreatedBy(String user) {
         return detectorRepository.findByCreatedBy(user);
     }
 
@@ -67,7 +67,7 @@ public class DetectorServiceImpl implements DetectorService {
     }
 
     @Override
-    public List<ElasticsearchDetector> getLastUpdatedDetectors(int interval) {
+    public List<Detector> getLastUpdatedDetectors(int interval) {
         val now = DateUtil.now().toInstant();
         val fromDate = DateUtil.toUtcDateString((now.minus(interval, ChronoUnit.MINUTES)));
         val toDate = DateUtil.toUtcDateString(now);

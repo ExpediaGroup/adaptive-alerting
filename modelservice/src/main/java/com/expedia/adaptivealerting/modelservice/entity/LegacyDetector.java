@@ -15,28 +15,53 @@
  */
 package com.expedia.adaptivealerting.modelservice.entity;
 
+import com.expedia.adaptivealerting.modelservice.util.JpaConverterJson;
 import lombok.Data;
 
+import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import java.sql.Timestamp;
+import java.util.Map;
 
+/**
+ * Legacy Detector entity. Based on MYSQL.
+ */
 @Data
 @Entity
-public class MetricDetectorMapping {
+@Table(name = "detector")
+public class LegacyDetector {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "metric_id")
-    private Metric metric;
+    private String uuid;
 
     @ManyToOne
-    @JoinColumn(name = "detector_id")
-    private Detector detector;
+    @JoinColumn(name = "model_type_id")
+    private ModelType type;
+
+    @Convert(converter = JpaConverterJson.class)
+    private Map<String, Object> hyperparams;
+
+    @Column(name = "training_meta")
+    @Convert(converter = JpaConverterJson.class)
+    private Map<String, Object> trainingMetaData;
+
+    @Column(name = "created_by")
+    private String createdBy;
+
+    @Column(name = "last_update_timestamp", insertable = false)
+    private Timestamp lastUpdateTimestamp;
+
+    @Column(name = "enabled", insertable = false)
+    private Boolean enabled;
+
 }

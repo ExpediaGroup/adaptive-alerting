@@ -16,13 +16,12 @@
 package com.expedia.adaptivealerting.modelservice.repo.impl;
 
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
-import com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetector;
-import com.expedia.adaptivealerting.modelservice.repo.EsDetectorRepository;
+import com.expedia.adaptivealerting.modelservice.entity.Detector;
+import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
 import com.expedia.adaptivealerting.modelservice.util.DateUtil;
 import com.expedia.adaptivealerting.modelservice.util.ElasticsearchUtil;
 import com.expedia.adaptivealerting.modelservice.util.ObjectMapperUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.elasticsearch.action.delete.DeleteRequest;
@@ -46,7 +45,7 @@ import java.util.Map;
 
 @Slf4j
 @Service
-public class EsDetectorRepositoryImpl implements EsDetectorRepository {
+public class DetectorRepositoryImpl implements DetectorRepository {
 
     private static final String DETECTOR_INDEX = "detectors";
     private static final String DETECTOR_DOC_TYPE = "detector";
@@ -61,10 +60,10 @@ public class EsDetectorRepositoryImpl implements EsDetectorRepository {
     private ElasticsearchUtil elasticsearchUtil;
 
     @Override
-    public String createDetector(ElasticsearchDetector elasticsearchDetector) {
-        val newElasticsearchDetector = getElasticSearchDetector(elasticsearchDetector);
-        val indexRequest = new IndexRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, elasticsearchDetector.getUuid());
-        String json = objectMapperUtil.convertToString(newElasticsearchDetector);
+    public String createDetector(Detector detector) {
+        val newElasticsearchDetector = getElasticSearchDetector(detector);
+        val indexRequest = new IndexRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, detector.getUuid());
+        String json = objectMapperUtil.convertToString(detector);
         return elasticsearchUtil.getIndexResponse(indexRequest, json).getId();
     }
 
@@ -81,18 +80,18 @@ public class EsDetectorRepositoryImpl implements EsDetectorRepository {
     }
 
     @Override
-    public void updateDetector(String uuid, ElasticsearchDetector elasticsearchDetector) {
+    public void updateDetector(String uuid, Detector detector) {
 
         val updateRequest = new UpdateRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, uuid);
         Map<String, Object> jsonMap = new HashMap<>();
 
-        for (Field field : elasticsearchDetector.getClass().getDeclaredFields()) {
+        for (Field field : detector.getClass().getDeclaredFields()) {
             field.setAccessible(true);
             String name = field.getName();
             if (!name.isEmpty()) {
                 Object value;
                 try {
-                    value = field.get(elasticsearchDetector);
+                    value = field.get(detector);
                 }
                 catch (IllegalAccessException e) {
                     log.error(String.format("Updating elastic search failed", e));
@@ -115,7 +114,7 @@ public class EsDetectorRepositoryImpl implements EsDetectorRepository {
     }
 
     @Override
-    public List<ElasticsearchDetector> findByUuid(String uuid) {
+    public List<Detector> findByUuid(String uuid) {
         val queryBuilder = QueryBuilders.matchQuery("uuid", uuid);
         val searchSourceBuilder = elasticsearchUtil.getSourceBuilder(queryBuilder);
         val searchRequest = elasticsearchUtil.getSearchRequest(searchSourceBuilder, DETECTOR_INDEX, DETECTOR_DOC_TYPE);
@@ -123,7 +122,7 @@ public class EsDetectorRepositoryImpl implements EsDetectorRepository {
     }
 
     @Override
-    public List<ElasticsearchDetector> findByCreatedBy(String user) {
+    public List<Detector> findByCreatedBy(String user) {
         val queryBuilder = QueryBuilders.matchQuery("createdBy", user);
         val searchSourceBuilder = elasticsearchUtil.getSourceBuilder(queryBuilder);
         val searchRequest = elasticsearchUtil.getSearchRequest(searchSourceBuilder, DETECTOR_INDEX, DETECTOR_DOC_TYPE);
@@ -143,7 +142,7 @@ public class EsDetectorRepositoryImpl implements EsDetectorRepository {
     }
 
     @Override
-    public List<ElasticsearchDetector> getLastUpdatedDetectors(String fromDate, String toDate) {
+    public List<Detector> getLastUpdatedDetectors(String fromDate, String toDate) {
         val queryBuilder = QueryBuilders.rangeQuery("lastUpdateTimestamp").from(fromDate).to(toDate);
         val searchSourceBuilder = elasticsearchUtil.getSourceBuilder(queryBuilder);
         val searchRequest = elasticsearchUtil.getSearchRequest(searchSourceBuilder, DETECTOR_INDEX, DETECTOR_DOC_TYPE);
@@ -151,7 +150,7 @@ public class EsDetectorRepositoryImpl implements EsDetectorRepository {
     }
 
 
-    private List<ElasticsearchDetector> getDetectorsFromElasticSearch(SearchRequest searchRequest) {
+    private List<Detector> getDetectorsFromElasticSearch(SearchRequest searchRequest) {
         SearchResponse response = new SearchResponse();
         try {
             response = elasticSearchClient.search(searchRequest, RequestOptions.DEFAULT);
@@ -161,23 +160,23 @@ public class EsDetectorRepositoryImpl implements EsDetectorRepository {
         }
 
         SearchHit[] hits = response.getHits().getHits();
-        List<ElasticsearchDetector> elasticsearchDetectors = new ArrayList<>();
+        List<Detector> detectors = new ArrayList<>();
         for (val hit : hits) {
-            val elasticsearchDetector = (ElasticsearchDetector) objectMapperUtil.convertToObject(hit.getSourceAsString(), new TypeReference<ElasticsearchDetector>() {});
-            val newElasticsearchDetector = getElasticSearchDetector(elasticsearchDetector);
-            elasticsearchDetectors.add(newElasticsearchDetector);
+            val detector = (Detector) objectMapperUtil.convertToObject(hit.getSourceAsString(), new TypeReference<Detector>() {});
+            val newElasticsearchDetector = getElasticSearchDetector(detector);
+            detectors.add(newElasticsearchDetector);
         }
-        return elasticsearchDetectors;
+        return detectors;
     }
 
-    private ElasticsearchDetector getElasticSearchDetector(ElasticsearchDetector elasticsearchDetector) {
-        return new ElasticsearchDetector()
-                .setUuid(elasticsearchDetector.getUuid())
-                .setCreatedBy(elasticsearchDetector.getCreatedBy())
-                .setType(elasticsearchDetector.getType())
-                .setDetectorConfig(elasticsearchDetector.getDetectorConfig())
-                .setEnabled(elasticsearchDetector.getEnabled())
-                .setLastUpdateTimestamp(elasticsearchDetector.getLastUpdateTimestamp());
+    private Detector getElasticSearchDetector(Detector detector) {
+        return new Detector()
+                .setUuid(detector.getUuid())
+                .setCreatedBy(detector.getCreatedBy())
+                .setType(detector.getType())
+                .setDetectorConfig(detector.getDetectorConfig())
+                .setEnabled(detector.getEnabled())
+                .setLastUpdateTimestamp(detector.getLastUpdateTimestamp());
     }
 
 }

@@ -1,13 +1,10 @@
 package com.expedia.adaptivealerting.modelservice.web;
 
-import com.codahale.metrics.MetricRegistry;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.MatchingDetectorsResponse;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.SearchMappingsRequest;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.User;
-import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
-import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
-import com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetectorMapping;
+import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
 import com.expedia.adaptivealerting.modelservice.service.DetectorMappingServiceImpl;
 import lombok.val;
 import org.junit.Assert;
@@ -37,7 +34,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 @AutoConfigureMockMvc
-public class ElasticsearchDetectorMappingControllerTest {
+public class DetectorMappingControllerTest {
 
     @Mock
     private DetectorMappingServiceImpl detectorMappingService;
@@ -62,9 +59,9 @@ public class ElasticsearchDetectorMappingControllerTest {
 
     @Test
     public void testgetDetectorMappings_successful() throws IOException {
-        ElasticsearchDetectorMapping detectorMapping = mockDetectorMapping(id);
+        DetectorMapping detectorMapping = mockDetectorMapping(id);
         when(detectorMappingService.findDetectorMapping(id)).thenReturn(detectorMapping);
-        ElasticsearchDetectorMapping detectorMappingreturned = controllerUnderTest.getDetectorMapping(id);
+        DetectorMapping detectorMappingreturned = controllerUnderTest.getDetectorMapping(id);
         assertNotNull("Response can't be null", detectorMappingreturned);
         assertEquals(UUID.fromString(detectorUuid), detectorMappingreturned.getDetector().getId());
         assertEquals(id, detectorMappingreturned.getId());
@@ -74,8 +71,8 @@ public class ElasticsearchDetectorMappingControllerTest {
 
     @Test(expected = RuntimeException.class)
     public void testgetDetectorMappings_fail() throws IOException {
-        when(detectorMappingService.findDetectorMapping(id)).thenReturn(new ElasticsearchDetectorMapping());
-        ElasticsearchDetectorMapping detectorMappingreturned = controllerUnderTest.getDetectorMapping(id);
+        when(detectorMappingService.findDetectorMapping(id)).thenReturn(new DetectorMapping());
+        DetectorMapping detectorMappingreturned = controllerUnderTest.getDetectorMapping(id);
         assertNotNull("Response can't be null", detectorMappingreturned);
         assertEquals(detectorUuid, detectorMappingreturned.getDetector().getId());
         assertEquals(id, detectorMappingreturned.getId());
@@ -96,9 +93,9 @@ public class ElasticsearchDetectorMappingControllerTest {
     @Test
     public void testgetLastUpdated_successful() throws IOException {
         val timeInSecs = 60;
-        List<ElasticsearchDetectorMapping> mockeddetectorMappingsList = mockDetectorMappingsList();
+        List<DetectorMapping> mockeddetectorMappingsList = mockDetectorMappingsList();
         when(detectorMappingService.findLastUpdated(timeInSecs)).thenReturn(mockeddetectorMappingsList);
-        List<ElasticsearchDetectorMapping> listofdetectorMappingsreturned = controllerUnderTest.findDetectorMapping(timeInSecs);
+        List<DetectorMapping> listofdetectorMappingsreturned = controllerUnderTest.findDetectorMapping(timeInSecs);
         assertNotNull("Response can't be null", listofdetectorMappingsreturned);
         assertEquals(1, listofdetectorMappingsreturned.size());
         assertEquals(UUID.fromString(detectorUuid), listofdetectorMappingsreturned.get(0).getDetector().getId());
@@ -109,19 +106,19 @@ public class ElasticsearchDetectorMappingControllerTest {
     public void testgetLastUpdated_fail() throws IOException {
         val TimeinSecs = 60;
         when(detectorMappingService.findLastUpdated(TimeinSecs)).thenThrow(new IOException());
-        List<ElasticsearchDetectorMapping> listofdetectorMappingsreturned = controllerUnderTest.findDetectorMapping(TimeinSecs);
+        List<DetectorMapping> listofdetectorMappingsreturned = controllerUnderTest.findDetectorMapping(TimeinSecs);
         assertNotNull("Response can't be null", listofdetectorMappingsreturned);
         assertEquals(0, listofdetectorMappingsreturned.size());
     }
 
     @Test
     public void testdetectorMappingsearch() throws Exception {
-        List<ElasticsearchDetectorMapping> detectorMappingslist = mockDetectorMappingsList();
+        List<DetectorMapping> detectorMappingslist = mockDetectorMappingsList();
         SearchMappingsRequest searchMappingsRequest = new SearchMappingsRequest();
         searchMappingsRequest.setDetectorUuid(UUID.fromString(detectorUuid));
         searchMappingsRequest.setUserId(userVal);
         when(detectorMappingService.search(searchMappingsRequest)).thenReturn(detectorMappingslist);
-        List<ElasticsearchDetectorMapping> detectorMappingsResponse = controllerUnderTest.searchDetectorMapping(searchMappingsRequest);
+        List<DetectorMapping> detectorMappingsResponse = controllerUnderTest.searchDetectorMapping(searchMappingsRequest);
         assertEquals(id, detectorMappingsResponse.get(0).getId());
         assertEquals(detectorUuid, detectorMappingsResponse.get(0).getDetector().getId().toString());
         assertEquals("test-user", detectorMappingsResponse.get(0).getUser().getId());
@@ -140,8 +137,8 @@ public class ElasticsearchDetectorMappingControllerTest {
         assertEquals(UUID.fromString(detectorUuid), detectors.get(0).getId());
     }
 
-    private ElasticsearchDetectorMapping mockDetectorMapping(String id) {
-        ElasticsearchDetectorMapping detectorMapping = mock(ElasticsearchDetectorMapping.class);
+    private DetectorMapping mockDetectorMapping(String id) {
+        DetectorMapping detectorMapping = mock(DetectorMapping.class);
         Detector detector = new Detector(UUID.fromString(detectorUuid));
         User user = new User(userVal);
         when(detectorMapping.getDetector()).thenReturn(detector);
@@ -151,9 +148,9 @@ public class ElasticsearchDetectorMappingControllerTest {
         return detectorMapping;
     }
 
-    private List<ElasticsearchDetectorMapping> mockDetectorMappingsList() {
-        ElasticsearchDetectorMapping detectorMapping = mock(ElasticsearchDetectorMapping.class);
-        List<ElasticsearchDetectorMapping> detectorMappingsList = new ArrayList<>();
+    private List<DetectorMapping> mockDetectorMappingsList() {
+        DetectorMapping detectorMapping = mock(DetectorMapping.class);
+        List<DetectorMapping> detectorMappingsList = new ArrayList<>();
         Detector detector = new Detector(UUID.fromString(detectorUuid));
         when(detectorMapping.getDetector()).thenReturn(detector);
         when(detectorMapping.getId()).thenReturn(id);

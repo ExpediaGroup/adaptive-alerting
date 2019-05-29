@@ -42,7 +42,7 @@ public class Model {
 
     @ManyToOne
     @JoinColumn(name = "detector_id")
-    private Detector detector;
+    private LegacyDetector detector;
 
     @Convert(converter = JpaConverterJson.class)
     private Map<String, Object> params;

@@ -20,11 +20,11 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector;
 import com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping;
-import com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetectorMapping;
+import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.MatchingDetectorsResponse;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.SearchMappingsRequest;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
-import com.expedia.adaptivealerting.modelservice.repo.impl.EsDetectorMappingRepositoryImpl;
+import com.expedia.adaptivealerting.modelservice.repo.impl.DetectorMappingRepositoryImpl;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import com.expedia.adaptivealerting.modelservice.util.ElasticsearchUtil;
@@ -79,7 +79,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class EsDetectorMappingRepositoryImplTest {
+public class DetectorMappingRepositoryImplTest {
 
     @Mock
     private MetricRegistry metricRegistry;
@@ -96,7 +96,7 @@ public class EsDetectorMappingRepositoryImplTest {
     @Mock
     private ElasticsearchUtil elasticsearchUtil;
 
-    private EsDetectorMappingRepositoryImpl detectorMappingRepository;
+    private DetectorMappingRepositoryImpl detectorMappingRepository;
 
     private PercolatorDetectorMapping percolatorDetectorMapping;
 
@@ -111,7 +111,7 @@ public class EsDetectorMappingRepositoryImplTest {
         ElasticSearchProperties.Config config = new ElasticSearchProperties.Config()
                 .setConnectionTimeout(100);
         when(elasticSearchProperties.getConfig()).thenReturn(config);
-        detectorMappingRepository = new EsDetectorMappingRepositoryImpl(metricRegistry);
+        detectorMappingRepository = new DetectorMappingRepositoryImpl(metricRegistry);
         ReflectionTestUtils.setField(detectorMappingRepository, "elasticSearchClient", elasticSearchClient);
         ReflectionTestUtils.setField(detectorMappingRepository, "elasticSearchProperties", elasticSearchProperties);
         ReflectionTestUtils.setField(detectorMappingRepository, "elasticsearchUtil", elasticsearchUtil);
@@ -159,15 +159,15 @@ public class EsDetectorMappingRepositoryImplTest {
         Long CreatedTimeInMillis = new Long(1554828886);
         GetResponse getResponse = mockGetResponse(id);
         when(elasticSearchClient.get(any(GetRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(getResponse);
-        ElasticsearchDetectorMapping elasticsearchDetectorMapping = detectorMappingRepository.findDetectorMapping(id);
+        DetectorMapping detectorMapping = detectorMappingRepository.findDetectorMapping(id);
         verify(elasticSearchClient, atLeastOnce()).get(any(GetRequest.class), eq(RequestOptions.DEFAULT));
-        assertNotNull("Response can't be null", elasticsearchDetectorMapping);
-        assertEquals(id, elasticsearchDetectorMapping.getId());
-        assertEquals("test-user", elasticsearchDetectorMapping.getUser().getId());
-        assertEquals(LastModifiedTimeInMillis, Long.valueOf(elasticsearchDetectorMapping.getLastModifiedTimeInMillis()));
-        assertEquals(CreatedTimeInMillis, Long.valueOf(elasticsearchDetectorMapping.getCreatedTimeInMillis()));
-        assertTrue(elasticsearchDetectorMapping.isEnabled());
-        assertEquals(UUID.fromString(detectorUuid), elasticsearchDetectorMapping.getDetector().getId());
+        assertNotNull("Response can't be null", detectorMapping);
+        assertEquals(id, detectorMapping.getId());
+        assertEquals("test-user", detectorMapping.getUser().getId());
+        assertEquals(LastModifiedTimeInMillis, Long.valueOf(detectorMapping.getLastModifiedTimeInMillis()));
+        assertEquals(CreatedTimeInMillis, Long.valueOf(detectorMapping.getCreatedTimeInMillis()));
+        assertTrue(detectorMapping.isEnabled());
+        assertEquals(UUID.fromString(detectorUuid), detectorMapping.getDetector().getId());
 
     }
 
@@ -192,7 +192,7 @@ public class EsDetectorMappingRepositoryImplTest {
 
     @Test
     public void findLastUpdated_successful() throws IOException {
-        List<ElasticsearchDetectorMapping> tagsList = new ArrayList<>();
+        List<DetectorMapping> tagsList = new ArrayList<>();
         Map<String, String> tags = new HashMap<>();
         Long LastModifiedTimeInMillis = new Long(1554828886);
         Long CreatedTimeInMillis = new Long(1554828886);
@@ -222,7 +222,7 @@ public class EsDetectorMappingRepositoryImplTest {
 
     @Test
     public void search_successful() throws IOException {
-        List<ElasticsearchDetectorMapping> tagsList = new ArrayList<>();
+        List<DetectorMapping> tagsList = new ArrayList<>();
         Map<String, String> tags = new HashMap<>();
         Long LastModifiedTimeInMillis = new Long(1554828886);
         Long CreatedTimeInMillis = new Long(1554828886);

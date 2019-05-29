@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.modelservice.entity.projection;
 
-import com.expedia.adaptivealerting.modelservice.entity.Detector;
+import com.expedia.adaptivealerting.modelservice.entity.LegacyDetector;
 import com.expedia.adaptivealerting.modelservice.entity.ModelType;
 import org.springframework.data.rest.core.config.Projection;
 
@@ -27,7 +27,7 @@ import java.util.Map;
 /**
  * Projection for finding models by metric.
  */
-@Projection(name = "inlineType", types = Detector.class)
+@Projection(name = "inlineType", types = LegacyDetector.class)
 public interface InlineType {
 
     String getId();

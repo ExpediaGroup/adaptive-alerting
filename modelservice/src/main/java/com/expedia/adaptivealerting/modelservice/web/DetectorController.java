@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.modelservice.web;
 
-import com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetector;
+import com.expedia.adaptivealerting.modelservice.entity.Detector;
 import com.expedia.adaptivealerting.modelservice.service.DetectorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/api/elasticSearchDetectors")
+@RequestMapping(path = "/api/detectors/v2")
 public class DetectorController {
 
     @Autowired
@@ -40,14 +40,14 @@ public class DetectorController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public String createDetector(@RequestBody ElasticsearchDetector elasticsearchDetector) {
-        return detectorService.createDetector(elasticsearchDetector);
+    public String createDetector(@RequestBody Detector detector) {
+        return detectorService.createDetector(detector);
     }
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
-    public void updateDetector(@RequestParam String uuid, @RequestBody ElasticsearchDetector elasticsearchDetector) {
-        detectorService.updateDetector(uuid, elasticsearchDetector);
+    public void updateDetector(@RequestParam String uuid, @RequestBody Detector detector) {
+        detectorService.updateDetector(uuid, detector);
     }
 
     @DeleteMapping
@@ -58,13 +58,13 @@ public class DetectorController {
 
     @GetMapping(path = "/findByUuid", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public List<ElasticsearchDetector> findByUuid(@RequestParam String uuid) {
+    public List<Detector> findByUuid(@RequestParam String uuid) {
         return detectorService.findByUuid(uuid);
     }
 
     @GetMapping(path = "/findByCreatedBy", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public List<ElasticsearchDetector> findByCreatedBy(@RequestParam String user) {
+    public List<Detector> findByCreatedBy(@RequestParam String user) {
         return detectorService.findByCreatedBy(user);
     }
 
@@ -76,7 +76,7 @@ public class DetectorController {
 
     @GetMapping(path = "/getLastUpdatedDetectors", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public List<ElasticsearchDetector> getLastUpdatedDetectors(@RequestParam int interval) {
+    public List<Detector> getLastUpdatedDetectors(@RequestParam int interval) {
         return detectorService.getLastUpdatedDetectors(interval);
     }
 

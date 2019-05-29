@@ -1,10 +1,10 @@
 package com.expedia.adaptivealerting.modelservice.service;
 
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.CreateDetectorMappingRequest;
-import com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetectorMapping;
+import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.MatchingDetectorsResponse;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.SearchMappingsRequest;
-import com.expedia.adaptivealerting.modelservice.repo.EsDetectorMappingRepository;
+import com.expedia.adaptivealerting.modelservice.repo.DetectorMappingRepository;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,13 +36,13 @@ public class DetectorMappingServiceTest {
     private DetectorMappingService detectorMappingService = new DetectorMappingServiceImpl();
 
     @Mock
-    private EsDetectorMappingRepository detectorMappingRepository;
+    private DetectorMappingRepository detectorMappingRepository;
 
-    private ElasticsearchDetectorMapping elasticsearchDetectorMapping;
+    private DetectorMapping detectorMapping;
 
     private MatchingDetectorsResponse matchingDetectorsResponse;
 
-    private List<ElasticsearchDetectorMapping> elasticsearchDetectorMappings = new ArrayList<>();
+    private List<DetectorMapping> detectorMappings = new ArrayList<>();
 
     @Before
     public void setUp() {
@@ -76,23 +76,23 @@ public class DetectorMappingServiceTest {
 
     @Test
     public void testFindDetectorMapping() {
-        ElasticsearchDetectorMapping elasticsearchDetectorMapping = detectorMappingService.findDetectorMapping("id");
-        assertNotNull(elasticsearchDetectorMapping);
-        assertCheck(elasticsearchDetectorMapping);
+        DetectorMapping detectorMapping = detectorMappingService.findDetectorMapping("id");
+        assertNotNull(detectorMapping);
+        assertCheck(detectorMapping);
     }
 
     @Test
     public void testSearch() {
-        List<ElasticsearchDetectorMapping> elasticsearchDetectorMappings = detectorMappingService.search(new SearchMappingsRequest());
-        assertNotNull(elasticsearchDetectorMappings);
-        assertCheck(elasticsearchDetectorMappings.get(0));
+        List<DetectorMapping> detectorMappings = detectorMappingService.search(new SearchMappingsRequest());
+        assertNotNull(detectorMappings);
+        assertCheck(detectorMappings.get(0));
     }
 
     @Test
     public void testFindLastUpdated() {
-        List<ElasticsearchDetectorMapping> elasticsearchDetectorMappings = detectorMappingService.findLastUpdated(1000);
-        assertNotNull(elasticsearchDetectorMappings);
-        assertCheck(elasticsearchDetectorMappings.get(0));
+        List<DetectorMapping> detectorMappings = detectorMappingService.findLastUpdated(1000);
+        assertNotNull(detectorMappings);
+        assertCheck(detectorMappings.get(0));
     }
 
     @Test
@@ -105,23 +105,23 @@ public class DetectorMappingServiceTest {
 
     private void initTestObjects() {
         ObjectMother mom = ObjectMother.instance();
-        elasticsearchDetectorMapping = mom.getDetectorMapping();
+        detectorMapping = mom.getDetectorMapping();
         matchingDetectorsResponse = mom.getMatchingDetectorsResponse();
-        elasticsearchDetectorMappings.add(elasticsearchDetectorMapping);
+        detectorMappings.add(detectorMapping);
     }
 
     private void initDependencies() {
         Mockito.when(detectorMappingRepository.findMatchingDetectorMappings(Mockito.any(List.class))).thenReturn(matchingDetectorsResponse);
-        Mockito.when(detectorMappingRepository.findDetectorMapping(anyString())).thenReturn(elasticsearchDetectorMapping);
-        Mockito.when(detectorMappingRepository.search(Mockito.any(SearchMappingsRequest.class))).thenReturn(elasticsearchDetectorMappings);
-        Mockito.when(detectorMappingRepository.findLastUpdated(Mockito.anyInt())).thenReturn(elasticsearchDetectorMappings);
+        Mockito.when(detectorMappingRepository.findDetectorMapping(anyString())).thenReturn(detectorMapping);
+        Mockito.when(detectorMappingRepository.search(Mockito.any(SearchMappingsRequest.class))).thenReturn(detectorMappings);
+        Mockito.when(detectorMappingRepository.findLastUpdated(Mockito.anyInt())).thenReturn(detectorMappings);
         Mockito.when(detectorMappingRepository.createDetectorMapping(Mockito.any(CreateDetectorMappingRequest.class))).thenReturn("1");
     }
 
-    private void assertCheck(ElasticsearchDetectorMapping elasticsearchDetectorMapping) {
-        Assert.assertEquals("aeb4d849-847a-45c0-8312-dc0fcf22b639", elasticsearchDetectorMapping.getDetector().getId().toString());
-        Assert.assertEquals("test-user", elasticsearchDetectorMapping.getUser().getId());
-        Assert.assertEquals(10000, elasticsearchDetectorMapping.getCreatedTimeInMillis());
-        Assert.assertEquals(true, elasticsearchDetectorMapping.isEnabled());
+    private void assertCheck(DetectorMapping detectorMapping) {
+        Assert.assertEquals("aeb4d849-847a-45c0-8312-dc0fcf22b639", detectorMapping.getDetector().getId().toString());
+        Assert.assertEquals("test-user", detectorMapping.getUser().getId());
+        Assert.assertEquals(10000, detectorMapping.getCreatedTimeInMillis());
+        Assert.assertEquals(true, detectorMapping.isEnabled());
     }
 }

@@ -15,13 +15,16 @@
  */
 package com.expedia.adaptivealerting.modelservice.repo;
 
-import com.expedia.adaptivealerting.modelservice.entity.MetricDetectorMapping;
+import com.expedia.adaptivealerting.modelservice.entity.LegacyMetricDetectorMapping;
+import com.expedia.adaptivealerting.modelservice.entity.projection.InlineType;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 /**
  * Spring Data repository for metric/model mappings.
  */
-public interface MetricDetectorMappingRepository extends PagingAndSortingRepository<MetricDetectorMapping, Long> {
+@RepositoryRestResource(collectionResourceRel = "metricDetectorMappings", path = "metricDetectorMappings")
+public interface LegacyMetricDetectorMappingRepository extends PagingAndSortingRepository<LegacyMetricDetectorMapping, Long> {
 
 }
 

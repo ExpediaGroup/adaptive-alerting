@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.service;
 
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.CreateDetectorMappingRequest;
-import com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetectorMapping;
+import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.MatchingDetectorsResponse;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.SearchMappingsRequest;
 
@@ -31,11 +31,11 @@ public interface DetectorMappingService {
 
     void deleteDetectorMapping(String id);
 
-    ElasticsearchDetectorMapping findDetectorMapping(String id);
+    DetectorMapping findDetectorMapping(String id);
 
-    List<ElasticsearchDetectorMapping> search(SearchMappingsRequest searchMappingsRequest);
+    List<DetectorMapping> search(SearchMappingsRequest searchMappingsRequest);
 
-    List<ElasticsearchDetectorMapping> findLastUpdated(int timeInSeconds);
+    List<DetectorMapping> findLastUpdated(int timeInSeconds);
 
     void disableDetectorMapping(String id);
 }

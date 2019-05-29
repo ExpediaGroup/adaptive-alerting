@@ -1,7 +1,7 @@
 package com.expedia.adaptivealerting.modelservice.service;
 
-import com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetector;
-import com.expedia.adaptivealerting.modelservice.repo.EsDetectorRepository;
+import com.expedia.adaptivealerting.modelservice.entity.Detector;
+import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,11 +36,11 @@ public class DetectorServiceTest {
     private DetectorService detectorService = new DetectorServiceImpl();
 
     @Mock
-    private EsDetectorRepository detectorRepository;
+    private DetectorRepository detectorRepository;
 
-    private ElasticsearchDetector elasticsearchDetector;
+    private Detector detector;
 
-    private List<ElasticsearchDetector> elasticsearchDetectors = new ArrayList<>();
+    private List<Detector> detectors = new ArrayList<>();
 
     @Before
     public void setUp() {
@@ -51,7 +51,7 @@ public class DetectorServiceTest {
 
     @Test
     public void testCreateDetector() {
-        String acutalCreateId = detectorService.createDetector(elasticsearchDetector);
+        String acutalCreateId = detectorService.createDetector(detector);
         assertNotNull(acutalCreateId);
         assertEquals("1", acutalCreateId);
     }
@@ -67,28 +67,28 @@ public class DetectorServiceTest {
     @Test
     public void testUpdateDetector() {
         DetectorService detectorService = mock(DetectorService.class);
-        doNothing().when(detectorService).updateDetector(anyString(), any(ElasticsearchDetector.class));
-        detectorService.updateDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", elasticsearchDetector);
-        verify(detectorService, times(1)).updateDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", elasticsearchDetector);
+        doNothing().when(detectorService).updateDetector(anyString(), any(Detector.class));
+        detectorService.updateDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", detector);
+        verify(detectorService, times(1)).updateDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", detector);
     }
 
     @Test
     public void testFindByUuid() {
-        List<ElasticsearchDetector> actualDetectors = detectorService.findByUuid("uuid");
+        List<Detector> actualDetectors = detectorService.findByUuid("uuid");
         assertNotNull(actualDetectors);
         assertCheck(actualDetectors);
     }
 
     @Test
     public void testFindByCreatedBy() {
-        List<ElasticsearchDetector> actualDetectors = detectorService.findByCreatedBy("test-user");
+        List<Detector> actualDetectors = detectorService.findByCreatedBy("test-user");
         assertNotNull(actualDetectors);
         assertCheck(actualDetectors);
     }
 
     @Test
     public void testGetLastUpdatedDetectors() {
-        List<ElasticsearchDetector> actualDetectors = detectorService.getLastUpdatedDetectors(10);
+        List<Detector> actualDetectors = detectorService.getLastUpdatedDetectors(10);
         assertNotNull(actualDetectors);
         assertCheck(actualDetectors);
     }
@@ -105,18 +105,18 @@ public class DetectorServiceTest {
 
     private void initTestObjects() {
         ObjectMother mom = ObjectMother.instance();
-        elasticsearchDetector = mom.getElasticsearchDetector();
-        elasticsearchDetectors.add(elasticsearchDetector);
+        detector = mom.getElasticsearchDetector();
+        detectors.add(detector);
     }
 
     private void initDependencies() {
         Mockito.when(detectorRepository.createDetector(any())).thenReturn("1");
-        Mockito.when(detectorRepository.findByUuid(Mockito.anyString())).thenReturn(elasticsearchDetectors);
-        Mockito.when(detectorRepository.findByCreatedBy(Mockito.anyString())).thenReturn(elasticsearchDetectors);
-        Mockito.when(detectorRepository.getLastUpdatedDetectors(Mockito.anyString(), Mockito.anyString())).thenReturn(elasticsearchDetectors);
+        Mockito.when(detectorRepository.findByUuid(Mockito.anyString())).thenReturn(detectors);
+        Mockito.when(detectorRepository.findByCreatedBy(Mockito.anyString())).thenReturn(detectors);
+        Mockito.when(detectorRepository.getLastUpdatedDetectors(Mockito.anyString(), Mockito.anyString())).thenReturn(detectors);
     }
 
-    private void assertCheck(List<ElasticsearchDetector> actualDetectors) {
+    private void assertCheck(List<Detector> actualDetectors) {
         Assert.assertEquals(1, actualDetectors.size());
         Assert.assertEquals("aeb4d849-847a-45c0-8312-dc0fcf22b639", actualDetectors.get(0).getUuid());
         Assert.assertEquals("test-user", actualDetectors.get(0).getCreatedBy());

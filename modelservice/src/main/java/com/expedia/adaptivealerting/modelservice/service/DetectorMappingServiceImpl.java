@@ -16,10 +16,10 @@
 package com.expedia.adaptivealerting.modelservice.service;
 
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.CreateDetectorMappingRequest;
-import com.expedia.adaptivealerting.modelservice.entity.ElasticsearchDetectorMapping;
+import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.MatchingDetectorsResponse;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.SearchMappingsRequest;
-import com.expedia.adaptivealerting.modelservice.repo.EsDetectorMappingRepository;
+import com.expedia.adaptivealerting.modelservice.repo.DetectorMappingRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,7 +36,7 @@ import java.util.Map;
 public class DetectorMappingServiceImpl implements DetectorMappingService {
 
     @Autowired
-    private EsDetectorMappingRepository detectorMappingRepository;
+    private DetectorMappingRepository detectorMappingRepository;
 
     @Override
     public MatchingDetectorsResponse findMatchingDetectorMappings(List<Map<String, String>> tagsList) {
@@ -59,17 +59,17 @@ public class DetectorMappingServiceImpl implements DetectorMappingService {
     }
 
     @Override
-    public ElasticsearchDetectorMapping findDetectorMapping(String id) {
+    public DetectorMapping findDetectorMapping(String id) {
         return detectorMappingRepository.findDetectorMapping(id);
     }
 
     @Override
-    public List<ElasticsearchDetectorMapping> search(SearchMappingsRequest searchMappingsRequest) {
+    public List<DetectorMapping> search(SearchMappingsRequest searchMappingsRequest) {
         return detectorMappingRepository.search(searchMappingsRequest);
     }
 
     @Override
-    public List<ElasticsearchDetectorMapping> findLastUpdated(int timeInSeconds) {
+    public List<DetectorMapping> findLastUpdated(int timeInSeconds) {
         return detectorMappingRepository.findLastUpdated(timeInSeconds);
     }
 }

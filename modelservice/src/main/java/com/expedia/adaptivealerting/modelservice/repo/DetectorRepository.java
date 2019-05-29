@@ -16,63 +16,24 @@
 package com.expedia.adaptivealerting.modelservice.repo;
 
 import com.expedia.adaptivealerting.modelservice.entity.Detector;
-import com.expedia.adaptivealerting.modelservice.entity.projection.InlineType;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.data.repository.query.Param;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@RepositoryRestResource(excerptProjection = InlineType.class)
-public interface DetectorRepository extends PagingAndSortingRepository<Detector, Long> {
+public interface DetectorRepository {
 
-    /**
-     * Finds a detector by its unique uuid, if any.
-     *
-     * @param uuid Detector uuid.
-     * @return Detector identified by the unique key.
-     */
-    List<Detector> findByUuid(@Param("uuid") String uuid);
+    String createDetector(Detector detector);
 
-    /**
-     * Finds a list of detectors created by provided user, if any.
-     *
-     * @param user Detector user.
-     * @return List of detectors for the provided user.
-     */
-    List<Detector> findByCreatedBy(@Param("user") String user);
+    void deleteDetector(String uuid);
 
-    /**
-     * Finds a list of detectors attached to a given metric hash
-     *
-     * @param hash Metric hash.
-     * @return Metric identified by the unique key.
-     */
-    @Query("select mmm.detector from MetricDetectorMapping mmm where mmm.metric.hash = :hash")
-    List<Detector> findByMetricHash(@Param("hash") String hash);
+    void updateDetector(String uuid, Detector detector);
 
-    /**
-     * Finds a list of detectors attached to a given metric hash
-     *
-     * @param interval time in minutes.
-     * @return list of detectors updated withing interval.
-     */
-    @Query(nativeQuery = true, value = "SELECT * from detector WHERE detector.last_update_timestamp > DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL :interval MINUTE)")
-    List<Detector> getLastUpdatedDetectors(@Param("interval") int interval);
+    List<Detector> findByUuid(String uuid);
 
-    /**
-     * Toggle a detector enabled status
-     *
-     * @param enabled boolean
-     * @param uuid    detectorUUID
-     * @return number of updated rows
-     */
-    @Modifying
-    @Transactional
-    @Query("update Detector d set d.enabled = :enabled where d.uuid = :uuid")
-    int toggleDetector(@Param("enabled") Boolean enabled, @Param("uuid") String uuid);
+    List<Detector> findByCreatedBy(String user);
+
+    void toggleDetector(String uuid, Boolean enabled);
+
+    List<Detector> getLastUpdatedDetectors(String fromDate, String toDate);
+
 
 }
