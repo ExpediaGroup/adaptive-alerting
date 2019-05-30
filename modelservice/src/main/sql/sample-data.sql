@@ -1,7 +1,7 @@
 USE `aa_model_service`;
 
 INSERT INTO `metric` (`ukey`, `hash`, `tags`) VALUES
-  ('karmalab.stats.gauges.AirBoss.chelappabo003_karmalab_net.java.lang.Threading.ThreadCount', '1.71828d68a2938ff1ef96c340f12e2dd6', '{"unit": "unknown", "mtype": "gauge", "org_id": "1", "interval": "30"}')
+  ('sample.metric', '1.71828d68a2938ff1ef96c340f12e2dd6', '{"unit": "unknown", "mtype": "gauge", "org_id": "1", "interval": "30"}')
 ;
 INSERT INTO `metric` (`ukey`, `hash`, `tags`) VALUES
   ('dummy.metric', '1.25345234523452352253452f12e2dd6', '{"unit": "unknown", "mtype": "gauge", "org_id": "1", "interval": "30"}')
