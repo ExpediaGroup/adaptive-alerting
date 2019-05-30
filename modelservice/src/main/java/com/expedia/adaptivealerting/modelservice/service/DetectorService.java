@@ -13,27 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.repo;
+package com.expedia.adaptivealerting.modelservice.service;
 
 import com.expedia.adaptivealerting.modelservice.entity.Detector;
 
 import java.util.List;
 
-public interface DetectorRepository {
+public interface DetectorService {
 
-    String createDetector(Detector detector);
+    String createDetector(Detector elasticsearchDetector);
 
     void deleteDetector(String uuid);
 
-    void updateDetector(String uuid, Detector detector);
+    void updateDetector(String uuid, Detector elasticsearchDetector);
 
     List<Detector> findByUuid(String uuid);
 
     List<Detector> findByCreatedBy(String user);
 
+    List<Detector> getLastUpdatedDetectors(int interval);
+
     void toggleDetector(String uuid, Boolean enabled);
-
-    List<Detector> getLastUpdatedDetectors(String fromDate, String toDate);
-
-
 }

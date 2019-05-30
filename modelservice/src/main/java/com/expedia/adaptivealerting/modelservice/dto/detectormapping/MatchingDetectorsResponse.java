@@ -13,34 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.entity;
+package com.expedia.adaptivealerting.modelservice.dto.detectormapping;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.experimental.Accessors;
 
-import java.util.Date;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-/**
- * Detector entity. Based on elastic search.
- */
 @Data
-@Accessors(chain = true)
-public class Detector {
-
-    private String uuid;
-
-    private String createdBy;
-
-    private String type;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date lastUpdateTimestamp;
-
-    private Map<String, Object> detectorConfig = new HashMap<>();
-
-    private Boolean enabled;
+@AllArgsConstructor
+public class MatchingDetectorsResponse {
+    private Map<Integer, List<Detector>> groupedDetectorsBySearchIndex;
+    private long lookupTimeInMillis;
 
 }

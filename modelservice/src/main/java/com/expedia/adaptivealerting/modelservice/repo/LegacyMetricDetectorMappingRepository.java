@@ -15,25 +15,16 @@
  */
 package com.expedia.adaptivealerting.modelservice.repo;
 
-import com.expedia.adaptivealerting.modelservice.entity.Detector;
+import com.expedia.adaptivealerting.modelservice.entity.LegacyMetricDetectorMapping;
+import com.expedia.adaptivealerting.modelservice.entity.projection.InlineType;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
-import java.util.List;
-
-public interface DetectorRepository {
-
-    String createDetector(Detector detector);
-
-    void deleteDetector(String uuid);
-
-    void updateDetector(String uuid, Detector detector);
-
-    List<Detector> findByUuid(String uuid);
-
-    List<Detector> findByCreatedBy(String user);
-
-    void toggleDetector(String uuid, Boolean enabled);
-
-    List<Detector> getLastUpdatedDetectors(String fromDate, String toDate);
-
+/**
+ * Spring Data repository for metric/model mappings.
+ */
+@RepositoryRestResource(collectionResourceRel = "metricDetectorMappings", path = "metricDetectorMappings")
+public interface LegacyMetricDetectorMappingRepository extends PagingAndSortingRepository<LegacyMetricDetectorMapping, Long> {
 
 }
+

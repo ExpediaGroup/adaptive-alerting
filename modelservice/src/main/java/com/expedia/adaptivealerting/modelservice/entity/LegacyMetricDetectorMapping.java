@@ -15,32 +15,33 @@
  */
 package com.expedia.adaptivealerting.modelservice.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import lombok.experimental.Accessors;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 /**
- * Detector entity. Based on elastic search.
+ * Legacy LegacyMetricDetectorMapping entity. Based on MYSQL.
  */
 @Data
-@Accessors(chain = true)
-public class Detector {
+@Entity
+@Table(name = "metric_detector_mapping")
+public class LegacyMetricDetectorMapping {
 
-    private String uuid;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    private String createdBy;
+    @ManyToOne
+    @JoinColumn(name = "metric_id")
+    private Metric metric;
 
-    private String type;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date lastUpdateTimestamp;
-
-    private Map<String, Object> detectorConfig = new HashMap<>();
-
-    private Boolean enabled;
-
+    @ManyToOne
+    @JoinColumn(name = "detector_id")
+    private LegacyDetector detector;
 }

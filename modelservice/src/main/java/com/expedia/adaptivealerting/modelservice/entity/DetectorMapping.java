@@ -15,32 +15,28 @@
  */
 package com.expedia.adaptivealerting.modelservice.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Expression;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.User;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 /**
- * Detector entity. Based on elastic search.
+ * The type Detector mapping. Based on elastic search.
+ * <p>
+ * searchIndexes: index of matching metric-tag in request batch of metric-tags
  */
 @Data
 @Accessors(chain = true)
-public class Detector {
-
-    private String uuid;
-
-    private String createdBy;
-
-    private String type;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date lastUpdateTimestamp;
-
-    private Map<String, Object> detectorConfig = new HashMap<>();
-
-    private Boolean enabled;
-
+public class DetectorMapping {
+    private String id;
+    private Detector detector;
+    private Expression expression;
+    private User user;
+    private long lastModifiedTimeInMillis;
+    private long createdTimeInMillis;
+    private boolean isEnabled;
+    private List<Integer> searchIndexes;
 }

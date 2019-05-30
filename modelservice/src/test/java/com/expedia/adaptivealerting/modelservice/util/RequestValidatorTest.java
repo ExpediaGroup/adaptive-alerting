@@ -1,12 +1,12 @@
 package com.expedia.adaptivealerting.modelservice.util;
 
 
-import com.expedia.adaptivealerting.modelservice.model.Detector;
-import com.expedia.adaptivealerting.modelservice.model.Expression;
-import com.expedia.adaptivealerting.modelservice.model.Field;
-import com.expedia.adaptivealerting.modelservice.model.Operand;
-import com.expedia.adaptivealerting.modelservice.model.Operator;
-import com.expedia.adaptivealerting.modelservice.model.User;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Expression;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Field;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Operand;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Operator;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.User;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;

@@ -1,16 +1,11 @@
 package com.expedia.adaptivealerting.modelservice.web;
 
-import com.codahale.metrics.Counter;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.Timer;
-import com.expedia.adaptivealerting.modelservice.model.Detector;
-import com.expedia.adaptivealerting.modelservice.model.DetectorMapping;
-import com.expedia.adaptivealerting.modelservice.model.MatchingDetectorsResponse;
-import com.expedia.adaptivealerting.modelservice.model.SearchMappingsRequest;
-import com.expedia.adaptivealerting.modelservice.model.User;
-import com.expedia.adaptivealerting.modelservice.repo.es.ElasticSearchClient;
-import com.expedia.adaptivealerting.modelservice.repo.es.ElasticSearchDetectorMappingService;
-import com.expedia.adaptivealerting.modelservice.repo.es.ElasticSearchProperties;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.MatchingDetectorsResponse;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.SearchMappingsRequest;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.User;
+import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
+import com.expedia.adaptivealerting.modelservice.service.DetectorMappingServiceImpl;
 import lombok.val;
 import org.junit.Assert;
 import org.junit.Before;
@@ -22,7 +17,6 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.io.IOException;
@@ -34,7 +28,6 @@ import java.util.UUID;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -44,13 +37,7 @@ import static org.mockito.Mockito.when;
 public class DetectorMappingControllerTest {
 
     @Mock
-    private MetricRegistry metricRegistry;
-    @Mock
-    private ElasticSearchClient elasticSearchClient;
-    @Mock
-    private ElasticSearchProperties elasticSearchProperties;
-    @Mock
-    private ElasticSearchDetectorMappingService detectorMappingService;
+    private DetectorMappingServiceImpl detectorMappingService;
 
     private String id = "adsvade8^szx";
     private String detectorUuid = "aeb4d849-847a-45c0-8312-dc0fcf22b639";
@@ -67,11 +54,7 @@ public class DetectorMappingControllerTest {
 
     @Before
     public void beforeTest() {
-        when(metricRegistry.timer(any())).thenReturn(mock(Timer.class));
-        when(metricRegistry.counter(any())).thenReturn(mock(Counter.class));
-        detectorMappingService = new ElasticSearchDetectorMappingService(metricRegistry);
-        ReflectionTestUtils.setField(detectorMappingService, "elasticSearchClient", elasticSearchClient);
-        ReflectionTestUtils.setField(detectorMappingService, "elasticSearchProperties", elasticSearchProperties);
+        detectorMappingService = new DetectorMappingServiceImpl();
     }
 
     @Test

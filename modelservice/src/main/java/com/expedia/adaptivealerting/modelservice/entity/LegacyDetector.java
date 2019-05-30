@@ -26,27 +26,42 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import java.util.Date;
+import javax.persistence.Table;
+import java.sql.Timestamp;
 import java.util.Map;
 
 /**
- * Anomaly detection model.
+ * Legacy Detector entity. Based on MYSQL.
  */
 @Data
 @Entity
-public class Model {
+@Table(name = "detector")
+public class LegacyDetector {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String uuid;
+
     @ManyToOne
-    @JoinColumn(name = "detector_id")
-    private LegacyDetector detector;
+    @JoinColumn(name = "model_type_id")
+    private ModelType type;
 
     @Convert(converter = JpaConverterJson.class)
-    private Map<String, Object> params;
+    private Map<String, Object> hyperparams;
 
-    @Column(name = "date_created", insertable = false)
-    private Date dateCreated;
+    @Column(name = "training_meta")
+    @Convert(converter = JpaConverterJson.class)
+    private Map<String, Object> trainingMetaData;
+
+    @Column(name = "created_by")
+    private String createdBy;
+
+    @Column(name = "last_update_timestamp", insertable = false)
+    private Timestamp lastUpdateTimestamp;
+
+    @Column(name = "enabled", insertable = false)
+    private Boolean enabled;
+
 }
