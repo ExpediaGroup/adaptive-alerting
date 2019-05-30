@@ -66,6 +66,7 @@ public class DetectorMapperCache {
      */
     public DetectorMapperCache(MetricRegistry metricRegistry) {
         this.cache = CacheBuilder.newBuilder()
+                .recordStats()
                 .expireAfterAccess(120, TimeUnit.MINUTES)
                 .build();
         metricRegistry.registerAll(metricsFor("cache", cache));
