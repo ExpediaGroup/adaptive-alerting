@@ -133,6 +133,7 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
         final PercolatorDetectorMapping percolatorDetectorMapping = new PercolatorDetectorMapping()
                 .setUser(createRequest.getUser())
                 .setDetector(createRequest.getDetector())
+                .setQuery(QueryUtil.buildQuery(createRequest.getExpression()))
                 .setEnabled(true)
                 .setLastModifiedTimeInMillis(System.currentTimeMillis())
                 .setCreatedTimeInMillis(System.currentTimeMillis());
