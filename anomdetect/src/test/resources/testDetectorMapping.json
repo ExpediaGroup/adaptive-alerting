@@ -15,6 +15,9 @@
         }
       ]
     },
-    "enabled": true
+    "enabled": true,
+    "user": {
+      "id": "shouldBeIngnoredWhileDeserialisation"
+    }
   }
 ]

@@ -15,11 +15,13 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detectormapper;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class DetectorMapping {
     private String id;
     private Detector detector;

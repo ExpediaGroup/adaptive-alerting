@@ -2,7 +2,6 @@ package com.expedia.adaptivealerting.anomdetect.detectormapper;
 
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
@@ -61,7 +60,7 @@ public class DetectorMapperCacheRefreshTest {
 
     @Test
     public void updateTest() throws IOException {
-        ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        ObjectMapper mapper = new ObjectMapper();
 
         List<DetectorMapping> newDetectorMappings = mapper.readValue(
                 new File(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("testDetectorMapping.json")).getFile()),
