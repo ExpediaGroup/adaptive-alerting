@@ -80,47 +80,6 @@ public class ModelServiceConnector {
     }
 
     /**
-     * Calls the Model Service to finds the detectors for the given metric definition.
-     *
-     * @param metricDefinition metric definition
-     * @return detectors for the given metric definition
-     * @throws DetectorRetrievalException       if there's a problem calling the Model Service
-     * @throws DetectorDeserializationException if there's a problem deserializing the Model Service response into a
-     *                                          detector list (e.g., invalid detector models)
-     * @throws DetectorException                if there's any other problem finding the detector list
-     */
-    @Deprecated
-    public DetectorResources findDetectors(MetricDefinition metricDefinition) {
-        notNull(metricDefinition, "metricDefinition can't be null");
-
-        val metricId = metricTankIdFactory.getId(metricDefinition);
-
-        // http://modelservice/api/detectors/search/findByMetricHash?hash=%s
-        // http://modelservice/api/detectors/search/findByMetricHash?hash=1.bbbad54f9232ba765e20368fe9c1a9c4
-        val uri = String.format(baseUri + API_PATH_DETECTOR_BY_METRIC_HASH, metricId);
-
-        Content content;
-        try {
-            content = httpClient.get(uri);
-        } catch (IOException e) {
-            val message = "IOException while getting detectors" +
-                    ": metricDefinition=" + metricDefinition +
-                    ", metricId=" + metricId +
-                    ", httpMethod=GET" +
-                    ", uri=" + uri;
-            throw new DetectorRetrievalException(message, e);
-        }
-
-        try {
-            return objectMapper.readValue(content.asBytes(), DetectorResources.class);
-        } catch (IOException e) {
-            val message = "IOException while deserializing detectors" +
-                    ": metricDefinition=" + metricDefinition;
-            throw new DetectorDeserializationException(message, e);
-        }
-    }
-
-    /**
      * Finds the latest model for the given detector.
      *
      * @param detectorUuid detector UUID
@@ -131,7 +90,7 @@ public class ModelServiceConnector {
      * @throws DetectorNotFoundException        if the detector doesn't have any models
      * @throws DetectorException                if there's any other problem finding the detector
      */
-    public ModelResource findLatestModel(UUID detectorUuid) {
+    public DetectorResource findLatestModel(UUID detectorUuid) {
         notNull(detectorUuid, "detectorUuid can't be null");
 
         // http://modelservice/api/models/search/findLatestByDetectorUuid?uuid=%s
@@ -150,25 +109,24 @@ public class ModelServiceConnector {
             throw new DetectorRetrievalException(message, e);
         }
 
-        ModelResources modelResources;
+        DetectorResource detectorResource;
         try {
-            modelResources = objectMapper.readValue(content.asBytes(), ModelResources.class);
+            detectorResource = objectMapper.readValue(content.asBytes(), DetectorResource.class);
         } catch (IOException e) {
             val message = "IOException while deserializing models for detector " + detectorUuid;
             throw new DetectorDeserializationException(message, e);
         }
 
-        val modelResourceList = modelResources.getEmbedded().getModels();
-        if (modelResourceList.isEmpty()) {
+        if (detectorResource == null) {
             throw new DetectorNotFoundException("No models for detectorUuid=" + detectorUuid);
         }
 
-        return modelResourceList.get(0);
+        return detectorResource;
     }
 
     /**
      * @param sinceMinutes the time period in minutes
-     * @return the list of detectormappings that were modified in last since minutes
+     * @return the list of detectorMappings that were modified in last since minutes
      */
     public DetectorResources findUpdatedDetectors(int sinceMinutes) {
         isTrue(sinceMinutes > 0, "timePeriod must be strictly positive");
@@ -192,7 +150,6 @@ public class ModelServiceConnector {
                     ": timePeriod=" + sinceMinutes;
             throw new DetectorDeserializationException(message, e);
         }
-
     }
 
 

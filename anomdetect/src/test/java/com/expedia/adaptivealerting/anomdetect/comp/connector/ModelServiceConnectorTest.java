@@ -22,9 +22,6 @@ import com.expedia.adaptivealerting.anomdetect.DetectorNotFoundException;
 import com.expedia.adaptivealerting.anomdetect.DetectorRetrievalException;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.Detector;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMatchResponse;
-import com.expedia.metrics.MetricDefinition;
-import com.expedia.metrics.TagCollection;
-import com.expedia.metrics.metrictank.MetricTankIdFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +36,7 @@ import org.mockito.MockitoAnnotations;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,18 +67,12 @@ public class ModelServiceConnectorTest {
     private static final String URI_TEMPLATE = "http://example.com";
 
     private ModelServiceConnector connectorUnderTest;
-    private MetricTankIdFactory metricTankIdFactory = new MetricTankIdFactory();
 
     @Mock
     private HttpClientWrapper httpClient;
 
     @Mock
     private ObjectMapper objectMapper;
-
-    // Test objects - find detectors
-    private MetricDefinition metricDef;
-    private MetricDefinition metricDef_cantRetrieve;
-    private MetricDefinition metricDef_cantDeserialize;
 
     // Test objects - find last updated detectors
     private int invalidTimePeriod = 0;
@@ -92,14 +84,13 @@ public class ModelServiceConnectorTest {
     private Content detectorMatchResponseContent;
     @Mock
     private Content detectorMatchResponseContent_cantDeserialize;
-    private byte[] detectorMatchBytesContent__cantDeserialize;
 
     private List<Map<String, String>> tags = new ArrayList<>();
     private List<Map<String, String>> tags_cantRetrieve = new ArrayList<>();
     private List<Map<String, String>> tags_cantDeserialize = new ArrayList<>();
 
-
     private List<DetectorResource> detectorResourceList;
+
     private Content detectorResourcesContent;
     @Mock
     private Content detectorResourcesContent_cantDeserialize;
@@ -116,8 +107,11 @@ public class ModelServiceConnectorTest {
     private Content modelResourcesContent_cantDeserialize;
     private Content modelResourcesContent_noModels;
     private byte[] modelResourcesBytes_cantDeserialize;
-    private ModelResources modelResources;
-    private ModelResources modelResources_noModels;
+    private DetectorResources modelResources;
+    private DetectorResource modelResource;
+    private DetectorResource modelResources_noModel;
+
+    private DetectorResources modelResources_noModels;
 
     @Before
     public void setUp() throws Exception {
@@ -185,24 +179,9 @@ public class ModelServiceConnectorTest {
     }
 
     @Test
-    public void testFindDetectors() {
-        val result = connectorUnderTest.findDetectors(metricDef);
-        assertEquals(detectorResourceList.size(), result.getEmbedded().getDetectors().size());
-    }
-
-    @Test(expected = DetectorRetrievalException.class)
-    public void testFindDetector_cantRetrieve() {
-        connectorUnderTest.findDetectors(metricDef_cantRetrieve);
-    }
-
-    @Test(expected = DetectorDeserializationException.class)
-    public void testFindDetector_cantDeserialize() {
-        connectorUnderTest.findDetectors(metricDef_cantDeserialize);
-    }
-
-    @Test
     public void testFindLatestModel() {
         val result = connectorUnderTest.findLatestModel(DETECTOR_UUID);
+        log.info("result:{}", result);
         assertNotNull(result);
     }
 
@@ -260,7 +239,6 @@ public class ModelServiceConnectorTest {
 
 
         // Find detectors - cant deserialize
-        this.detectorMatchBytesContent__cantDeserialize = "detectorMatchBytesContent__cantDeserialize".getBytes();
         when(detectorMatchResponseContent_cantDeserialize.asBytes()).thenReturn(detectorResourcesBytes_cantDeserialize);
 
         this.detectorMappingBytes_cantDeserialize = "detectorMappingBytes_cantDeserialize".getBytes();
@@ -268,7 +246,6 @@ public class ModelServiceConnectorTest {
     }
 
     private void initDependencies() throws IOException {
-        initDependencies_findDetectors_httpClient();
         initDependencies_findDetectors_objectMapper();
         initDependencies_findLatestModel_httpClient();
         initDependencies_findLatestModel_objectMapper();
@@ -279,31 +256,13 @@ public class ModelServiceConnectorTest {
     }
 
     private void initTestObjects_findDetectors() throws IOException {
-
-        // Metrics
-        val tags = new HashMap<String, String>();
-        tags.put("org_id", "1");
-        tags.put("mtype", "count");
-        tags.put("unit", "");
-        tags.put("what", "bookings");
-        tags.put("interval", "5");
-
-        this.metricDef =
-                new MetricDefinition("metric", new TagCollection(tags), TagCollection.EMPTY);
-        this.metricDef_cantRetrieve =
-                new MetricDefinition("metric-cant-retrieve", new TagCollection(tags), TagCollection.EMPTY);
-        this.metricDef_cantDeserialize =
-                new MetricDefinition("metric-cant-deserialize", new TagCollection(tags), TagCollection.EMPTY);
-
         // Find detectors - happy path
         this.detectorResourceList = new ArrayList<>();
-        detectorResourceList.add(new DetectorResource(
-                "3217d4be-9c33-490f-828e-c976b393b000",
-                new ModelTypeResource(CONSTANT_DETECTOR), true));
-        detectorResourceList.add(new DetectorResource(
-                "90c37a3c-f6bb-4c00-b41b-191909cccfb7",
-                new ModelTypeResource(EWMA_DETECTOR), true));
+        detectorResourceList.add(new DetectorResource("3217d4be-9c33-490f-828e-c976b393b000", "kashah", "constant-detector", new Date(), new HashMap<>(), true));
+        detectorResourceList.add(new DetectorResource("90c37a3c-f6bb-4c00-b41b-191909cccfb7", "kashah", "ewma-detector", new Date(), new HashMap<>(), true));
+
         this.detectorResources = new DetectorResources(detectorResourceList);
+
         val detectorResourcesBytes = new ObjectMapper().writeValueAsBytes(detectorResources);
         this.detectorResourcesContent = new Content(detectorResourcesBytes, ContentType.APPLICATION_JSON);
 
@@ -315,7 +274,8 @@ public class ModelServiceConnectorTest {
     private void initTestObjects_findLatestModel() throws IOException {
 
         // Find latest model - happy path
-        this.modelResources = new ModelResources(Collections.singletonList(new ModelResource()));
+        this.modelResource = new DetectorResource();
+        this.modelResources = new DetectorResources(Collections.singletonList(new DetectorResource("3217d4be-9c33-490f-828e-c976b393b000", "kashah", "constant-detector", new Date(), new HashMap<>(), true)));
         val modelResourcesBytes = new ObjectMapper().writeValueAsBytes(modelResources);
         this.modelResourcesContent = new Content(modelResourcesBytes, ContentType.APPLICATION_JSON);
 
@@ -324,23 +284,10 @@ public class ModelServiceConnectorTest {
         when(modelResourcesContent_cantDeserialize.asBytes()).thenReturn(modelResourcesBytes_cantDeserialize);
 
         // Find latest model - no models
-        this.modelResources_noModels = new ModelResources(Collections.EMPTY_LIST);
+        this.modelResources_noModels = new DetectorResources(Collections.EMPTY_LIST);
+        this.modelResources_noModel = null;
         val modelResourcesBytes_noModels = new ObjectMapper().writeValueAsBytes(modelResources_noModels);
         this.modelResourcesContent_noModels = new Content(modelResourcesBytes_noModels, ContentType.APPLICATION_JSON);
-    }
-
-    private void initDependencies_findDetectors_httpClient() throws IOException {
-        val metricId = metricTankIdFactory.getId(metricDef);
-        val metricId_cantRetrieve = metricTankIdFactory.getId(metricDef_cantRetrieve);
-        val metricId_cantDeserialize = metricTankIdFactory.getId(metricDef_cantDeserialize);
-
-        val uri = String.format(URI_TEMPLATE + API_PATH_DETECTOR_BY_METRIC_HASH, metricId);
-        val uri_cantRetrieve = String.format(URI_TEMPLATE + API_PATH_DETECTOR_BY_METRIC_HASH, metricId_cantRetrieve);
-        val uri_cantDeserialize = String.format(URI_TEMPLATE + API_PATH_DETECTOR_BY_METRIC_HASH, metricId_cantDeserialize);
-
-        when(httpClient.get(uri)).thenReturn(detectorResourcesContent);
-        when(httpClient.get(uri_cantRetrieve)).thenThrow(new IOException());
-        when(httpClient.get(uri_cantDeserialize)).thenReturn(detectorResourcesContent_cantDeserialize);
     }
 
     private void initDependencies_findMatchingDetectorMappings_httpClient() throws IOException {
@@ -404,11 +351,11 @@ public class ModelServiceConnectorTest {
     }
 
     private void initDependencies_findLatestModel_objectMapper() throws IOException {
-        when(objectMapper.readValue(modelResourcesContent.asBytes(), ModelResources.class))
-                .thenReturn(modelResources);
-        when(objectMapper.readValue(modelResourcesBytes_cantDeserialize, ModelResources.class))
+        when(objectMapper.readValue(modelResourcesContent.asBytes(), DetectorResource.class))
+                .thenReturn(modelResource);
+        when(objectMapper.readValue(modelResourcesBytes_cantDeserialize, DetectorResource.class))
                 .thenThrow(new IOException());
-        when(objectMapper.readValue(modelResourcesContent_noModels.asBytes(), ModelResources.class))
-                .thenReturn(modelResources_noModels);
+        when(objectMapper.readValue(modelResourcesContent_noModels.asBytes(), DetectorResource.class))
+                .thenReturn(modelResources_noModel);
     }
 }

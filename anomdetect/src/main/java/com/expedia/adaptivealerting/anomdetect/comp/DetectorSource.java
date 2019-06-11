@@ -39,16 +39,6 @@ import java.util.UUID;
 public interface DetectorSource {
 
     /**
-     * Finds the list of detector UUIDs for a given metric.
-     *
-     * @param metricDef The metric.
-     * @return The detector UUIDs.
-     * @throws DetectorException if there's a problem finding the detectors
-     */
-    @Deprecated
-    List<UUID> findDetectorUuids(MetricDefinition metricDef);
-
-    /**
      * Finds the detector for a given detector and, optionally, metric.
      *
      * @param uuid Detector UUID.

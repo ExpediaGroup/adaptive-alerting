@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.modelservice.service;
 
+import com.expedia.adaptivealerting.anomdetect.comp.connector.DetectorResource;
 import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelResource;
 import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelTypeResource;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
@@ -29,7 +30,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -62,10 +65,13 @@ public class AnomalyServiceImpl implements AnomalyService {
     private Detector getDetector(AnomalyRequest request) {
         val legacyDetectorType = request.getDetectorType();
         val paramsMap = request.getDetectorParams();
-        val model = new ModelResource()
-                .setDetectorType(new ModelTypeResource(legacyDetectorType))
-                .setParams(paramsMap)
-                .setDateCreated(new Date());
-        return new LegacyDetectorFactory().createDetector(UUID.randomUUID(), model);
+        Map detectorConfig = new HashMap<>();
+        detectorConfig.put("params", paramsMap);
+        val detector = new DetectorResource()
+                .setType(legacyDetectorType)
+                .setCreatedBy("adaptive-alerting")
+                .setLastUpdateTimestamp(new Date())
+                .setDetectorConfig(detectorConfig);
+        return new LegacyDetectorFactory().createDetector(UUID.randomUUID(), detector);
     }
 }

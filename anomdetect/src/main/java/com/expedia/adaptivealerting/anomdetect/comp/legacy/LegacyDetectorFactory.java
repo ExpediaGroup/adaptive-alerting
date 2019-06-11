@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
+import com.expedia.adaptivealerting.anomdetect.comp.connector.DetectorResource;
 import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelResource;
 import com.expedia.adaptivealerting.anomdetect.detector.ConstantThresholdDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.CusumDetector;
@@ -53,33 +54,37 @@ public class LegacyDetectorFactory {
 
     // TODO Currently we use a legacy process to find the detector. The legacy process couples point forecast algos
     //  with interval forecast algos. We will decouple these shortly. [WLW]
-    public Detector createDetector(UUID uuid, ModelResource legacyDetectorConfig) {
+    public Detector createDetector(UUID uuid, DetectorResource detectorResource) {
         notNull(uuid, "uuid can't be null");
-        notNull(legacyDetectorConfig, "legacyDetectorConfig can't be null");
+        notNull(detectorResource, "detectorResource can't be null");
+
+        // TODO Rename to legacyDetectorType [WLW]
+        val detectorType = detectorResource.getType();
+        val detectorConfig = detectorResource.getDetectorConfig();
+
+        notNull(detectorConfig, "legacyDetectorConfig can't be null");
+        val detectorParams = detectorConfig.get("params");
 
         Detector detector;
 
-        // TODO Rename to legacyDetectorType [WLW]
-        val detectorType = legacyDetectorConfig.getDetectorType().getKey();
-
         // Note that constant threshold, cusum and individuals are still using the original config schema.
         if (CONSTANT_THRESHOLD.equals(detectorType)) {
-            val params = toParams(legacyDetectorConfig, ConstantThresholdParams.class).toNewParams();
+            val params = toParams(detectorParams, ConstantThresholdParams.class).toNewParams();
             detector = new ConstantThresholdDetector(uuid, params);
         } else if (CUSUM.equals(detectorType)) {
-            val params = toParams(legacyDetectorConfig, CusumParams.class).toNewParams();
+            val params = toParams(detectorParams, CusumParams.class).toNewParams();
             detector = new CusumDetector(uuid, params);
         } else if (EWMA.equals(detectorType)) {
-            detector = createEwmaDetector(uuid, toParams(legacyDetectorConfig, EwmaParams.class));
+            detector = createEwmaDetector(uuid, toParams(detectorParams, EwmaParams.class));
         } else if (HOLT_WINTERS.equals(detectorType)) {
-            detector = createHoltWintersDetector(uuid, toParams(legacyDetectorConfig, HoltWintersParams.class));
+            detector = createHoltWintersDetector(uuid, toParams(detectorParams, HoltWintersParams.class));
         } else if (INDIVIDUALS.equals(detectorType)) {
             // FIXME This doesn't work with the legacy config schema. If we want this to work we'd have to do the same
             //  thing we're doing with constant threshold and cusum above. But we're not currently using individuals
             //  so we can just wait til we've migrated over to the new schema. [WLW]
-            detector = new IndividualsDetector(uuid, toParams(legacyDetectorConfig, IndividualsDetector.Params.class));
+            detector = new IndividualsDetector(uuid, toParams(detectorParams, IndividualsDetector.Params.class));
         } else if (PEWMA.equals(detectorType)) {
-            detector = createPewmaDetector(uuid, toParams(legacyDetectorConfig, PewmaParams.class));
+            detector = createPewmaDetector(uuid, toParams(detectorParams, PewmaParams.class));
         } else {
             throw new IllegalArgumentException("Unknown detector type: " + detectorType);
         }
@@ -114,7 +119,7 @@ public class LegacyDetectorFactory {
         return new ForecastingDetector(uuid, pointForecaster, intervalForecaster, AnomalyType.TWO_TAILED);
     }
 
-    private <T> T toParams(ModelResource model, Class<T> paramsClass) {
-        return objectMapper.convertValue(model.getParams(), paramsClass);
+    private <T> T toParams(Object object, Class<T> paramsClass) {
+        return objectMapper.convertValue(object, paramsClass);
     }
 }

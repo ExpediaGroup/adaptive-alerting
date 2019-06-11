@@ -47,19 +47,6 @@ public class DefaultDetectorSource implements DetectorSource {
     @NonNull
     private final LegacyDetectorFactory legacyDetectorFactory;
 
-    @Deprecated
-    @Override
-    public List<UUID> findDetectorUuids(MetricDefinition metricDef) {
-        notNull(metricDef, "metricDefinition can't be null");
-        return connector
-                .findDetectors(metricDef)
-                .getEmbedded()
-                .getDetectors()
-                .stream()
-                .map(resource -> UUID.fromString(resource.getUuid()))
-                .collect(Collectors.toList());
-    }
-
     @Override
     public Detector findDetector(UUID uuid) {
         notNull(uuid, "uuid can't be null");
@@ -68,9 +55,9 @@ public class DefaultDetectorSource implements DetectorSource {
         //  These are basic detectors backed by single statistical models, as opposed to being ML models that we have to
         //  refresh/retrain periodically. So we probably want to simplify this by just collapsing the model concept into
         //  the detector. [WLW]
-        val modelResource = connector.findLatestModel(uuid);
+        val detectorResource = connector.findLatestModel(uuid);
 
-        return legacyDetectorFactory.createDetector(uuid, modelResource);
+        return legacyDetectorFactory.createDetector(uuid, detectorResource);
     }
 
     @Override
@@ -79,8 +66,7 @@ public class DefaultDetectorSource implements DetectorSource {
 
         return connector
                 .findUpdatedDetectors(timePeriod)
-                .getEmbedded()
-                .getDetectors()
+                .getDetectorResources()
                 .stream()
                 .map(resource -> UUID.fromString(resource.getUuid()))
                 .collect(Collectors.toList());
