@@ -81,7 +81,6 @@ public class DetectorMapper {
 
     public boolean isSuccessfulDetectorMappingLookup(List<Map<String, String>> cacheMissedMetricTags) {
 
-        log.info("Mapping-Cache: lookup for {} metrics", cacheMissedMetricTags.size());
         DetectorMatchResponse matchingDetectorMappings = null;
         try {
             matchingDetectorMappings = detectorSource.findMatchingDetectorMappings(cacheMissedMetricTags);

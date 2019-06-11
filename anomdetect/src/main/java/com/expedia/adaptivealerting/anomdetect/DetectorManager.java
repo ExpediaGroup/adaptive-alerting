@@ -61,12 +61,17 @@ public class DetectorManager {
 
     // TODO Consider making this an explicit class so we can mock it and verify interactions
     //  against it. [WLW]
-    private final Map<UUID, Detector> cachedDetectors = new HashMap<>();
+    private final Map<UUID, Detector> cachedDetectors;
+
+    public DetectorManager(DetectorSource detectorSource, int detectorRefreshTimePeriod, Map<UUID, Detector> cachedDetectors) {
+        this.detectorSource = detectorSource;
+        this.detectorRefreshTimePeriod = detectorRefreshTimePeriod;
+        this.cachedDetectors = cachedDetectors;
+        this.initScheduler();
+    }
 
     public DetectorManager(DetectorSource detectorSource, Config config) {
-        this.detectorSource = detectorSource;
-        this.detectorRefreshTimePeriod = config.getInt(CK_DETECTOR_REFRESH_PERIOD);
-        this.initScheduler();
+        this(detectorSource, config.getInt(CK_DETECTOR_REFRESH_PERIOD), new HashMap<>());
     }
 
     private void initScheduler() {
@@ -122,8 +127,10 @@ public class DetectorManager {
 
         var updatedDetectors = new ArrayList<UUID>();
         detectorSource.findUpdatedDetectors(detectorRefreshTimePeriod).forEach(key -> {
-            updatedDetectors.add(key);
-            cachedDetectors.remove(key);
+            if (cachedDetectors.containsKey(key)) {
+                cachedDetectors.remove(key);
+                updatedDetectors.add(key);
+            }
         });
 
         log.info("Removed detectors on refresh : {}", updatedDetectors);
