@@ -62,9 +62,8 @@ public class DetectorRepositoryImpl implements DetectorRepository {
 
     @Override
     public String createDetector(Detector detector) {
-        val newElasticsearchDetector = getElasticSearchDetector(detector);
         val indexRequest = new IndexRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, detector.getUuid());
-        String json = objectMapperUtil.convertToString(newElasticsearchDetector);
+        String json = objectMapperUtil.convertToString(getElasticSearchDetector(detector));
         return elasticsearchUtil.getIndexResponse(indexRequest, json).getId();
     }
 

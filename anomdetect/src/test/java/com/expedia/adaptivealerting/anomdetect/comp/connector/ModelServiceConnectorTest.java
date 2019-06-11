@@ -171,23 +171,23 @@ public class ModelServiceConnectorTest {
 
     @Test
     public void testFindLatestModel() {
-        val result = connectorUnderTest.findLatestModel(DETECTOR_UUID);
+        val result = connectorUnderTest.findLatestDetector(DETECTOR_UUID);
         assertNotNull(result);
     }
 
     @Test(expected = DetectorRetrievalException.class)
     public void testFindLatestModel_retrievalException() {
-        connectorUnderTest.findLatestModel(DETECTOR_UUID_CANT_RETRIEVE);
+        connectorUnderTest.findLatestDetector(DETECTOR_UUID_CANT_RETRIEVE);
     }
 
     @Test(expected = DetectorDeserializationException.class)
     public void testFindLatestModel_deserializationException() {
-        connectorUnderTest.findLatestModel(DETECTOR_UUID_CANT_DESERIALIZE);
+        connectorUnderTest.findLatestDetector(DETECTOR_UUID_CANT_DESERIALIZE);
     }
 
     @Test(expected = DetectorNotFoundException.class)
     public void testFindLatestModel_notFound() {
-        connectorUnderTest.findLatestModel(DETECTOR_UUID_NO_MODELS);
+        connectorUnderTest.findLatestDetector(DETECTOR_UUID_NO_MODELS);
     }
 
     private void initTestObjects() throws IOException {

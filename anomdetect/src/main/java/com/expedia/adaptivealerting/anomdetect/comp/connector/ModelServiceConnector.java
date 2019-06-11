@@ -56,8 +56,8 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  */
 @Slf4j
 public class ModelServiceConnector {
-    public static final String API_PATH_MODEL_BY_DETECTOR_UUID = "/api/models/search/findLatestByDetectorUuid?uuid=%s";
-    public static final String API_PATH_DETECTOR_UPDATES = "/api/detectors/search/getLastUpdatedDetectors?interval=%d";
+    public static final String API_PATH_MODEL_BY_DETECTOR_UUID = "/api/v2/detectors/findByUuid?uuid=%s";
+    public static final String API_PATH_DETECTOR_UPDATES = "/api/v2/detectors/getLastUpdatedDetectors?interval=%d";
     public static final String API_PATH_DETECTOR_MAPPING_UPDATES = "/api/detectorMappings/lastUpdated?timeInSecs=%d";
     public static final String API_PATH_MATCHING_DETECTOR_BY_TAGS = "/api/detectorMappings/findMatchingByTags";
 
@@ -86,7 +86,7 @@ public class ModelServiceConnector {
      * @throws DetectorNotFoundException        if the detector doesn't have any models
      * @throws DetectorException                if there's any other problem finding the detector
      */
-    public DetectorResource findLatestModel(UUID detectorUuid) {
+    public DetectorResource findLatestDetector(UUID detectorUuid) {
         notNull(detectorUuid, "detectorUuid can't be null");
 
         // http://modelservice/api/models/search/findLatestByDetectorUuid?uuid=%s
@@ -168,7 +168,7 @@ public class ModelServiceConnector {
                     ": tags=" + tagsList +
                     ", httpMethod=POST" +
                     ", uri=" + uri;
-            throw new DetectorMappingRetrievalException(message, e); // TODO CHANGE
+            throw new DetectorMappingRetrievalException(message, e);
         }
         try {
             return objectMapper.readValue(content.asBytes(), DetectorMatchResponse.class);

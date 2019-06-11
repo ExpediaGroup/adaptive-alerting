@@ -57,7 +57,6 @@ public class LegacyDetectorFactory {
         notNull(uuid, "uuid can't be null");
         notNull(detectorResource, "detectorResource can't be null");
 
-        // TODO Rename to legacyDetectorType [WLW]
         val detectorType = detectorResource.getType();
         val detectorConfig = detectorResource.getDetectorConfig();
 

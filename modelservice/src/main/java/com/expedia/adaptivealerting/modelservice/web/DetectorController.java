@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/api/detectors/v2")
+@RequestMapping(path = "/api/v2/detectors")
 public class DetectorController {
 
     @Autowired

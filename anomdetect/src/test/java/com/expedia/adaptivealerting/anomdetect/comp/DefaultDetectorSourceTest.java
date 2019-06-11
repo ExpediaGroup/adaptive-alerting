@@ -174,11 +174,11 @@ public final class DefaultDetectorSourceTest {
     private void initDependencies() {
         when(connector.findUpdatedDetectors(1))
                 .thenReturn(updatedDetectorResources);
-        when(connector.findLatestModel(DETECTOR_UUID_EWMA))
+        when(connector.findLatestDetector(DETECTOR_UUID_EWMA))
                 .thenReturn(detectorResource_ewma);
-        when(connector.findLatestModel(DETECTOR_UUID_MISSING_DETECTOR))
+        when(connector.findLatestDetector(DETECTOR_UUID_MISSING_DETECTOR))
                 .thenThrow(new DetectorNotFoundException("No models found"));
-        when(connector.findLatestModel(DETECTOR_UUID_EXCEPTION))
+        when(connector.findLatestDetector(DETECTOR_UUID_EXCEPTION))
                 .thenThrow(new DetectorRetrievalException("Error finding latest model", new IOException()));
         when(connector.findUpdatedDetectorMappings(1))
                 .thenReturn(Collections.singletonList(this.detectorMapping));
