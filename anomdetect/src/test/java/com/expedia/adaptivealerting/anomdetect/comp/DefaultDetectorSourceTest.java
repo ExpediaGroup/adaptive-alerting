@@ -67,9 +67,6 @@ public final class DefaultDetectorSourceTest {
     @Mock
     private LegacyDetectorFactory legacyDetectorFactory;
 
-    private MetricDefinition metricDef;
-    private MetricDefinition metricDefException;
-    private LegacyDetectorResources legacyDetectorResources;
     private DetectorResources detectorResources;
     private DetectorResources updatedDetectorResources;
     private DetectorResource detectorResource_ewma;
@@ -132,15 +129,6 @@ public final class DefaultDetectorSourceTest {
     }
 
     private void initTestObjects_findDetectors() {
-        this.metricDef = TestObjectMother.metricDefinition();
-        this.metricDefException = new MetricDefinition("metric-that-causes-exception");
-
-        val legacyDetectorResource = new LegacyDetectorResource(
-                DETECTOR_UUID_EWMA.toString(),
-                new ModelTypeResource(DETECTOR_TYPE_EWMA),
-                true);
-        this.legacyDetectorResources = new LegacyDetectorResources(Collections.singletonList(legacyDetectorResource));
-
         val detectorResource = new DetectorResource(
                 DETECTOR_UUID_EWMA.toString(),
                 "kashah",

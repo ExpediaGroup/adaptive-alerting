@@ -26,6 +26,7 @@ import java.util.List;
 /**
  * Legacy Detector resources.
  */
+@Deprecated
 @Data
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)

@@ -42,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.expedia.adaptivealerting.anomdetect.comp.connector.ModelServiceConnector.API_PATH_DETECTOR_BY_METRIC_HASH;
 import static com.expedia.adaptivealerting.anomdetect.comp.connector.ModelServiceConnector.API_PATH_DETECTOR_MAPPING_UPDATES;
 import static com.expedia.adaptivealerting.anomdetect.comp.connector.ModelServiceConnector.API_PATH_DETECTOR_UPDATES;
 import static com.expedia.adaptivealerting.anomdetect.comp.connector.ModelServiceConnector.API_PATH_MATCHING_DETECTOR_BY_TAGS;
@@ -56,8 +55,6 @@ import static org.mockito.Mockito.when;
  */
 @Slf4j
 public class ModelServiceConnectorTest {
-    private static final String CONSTANT_DETECTOR = "constant-detector";
-    private static final String EWMA_DETECTOR = "ewma-detector";
     private static final UUID DETECTOR_UUID = UUID.randomUUID();
     private static final UUID DETECTOR_UUID_CANT_RETRIEVE = UUID.randomUUID();
     private static final UUID DETECTOR_UUID_CANT_DESERIALIZE = UUID.randomUUID();
@@ -91,27 +88,24 @@ public class ModelServiceConnectorTest {
 
     private List<DetectorResource> detectorResourceList;
 
-    private Content detectorResourcesContent;
-    @Mock
-    private Content detectorResourcesContent_cantDeserialize;
-    private byte[] detectorResourcesBytes_cantDeserialize;
-    private DetectorResources detectorResources;
-
     @Mock
     private Content detectorMappingContent_cantDeserialize;
     private byte[] detectorMappingBytes_cantDeserialize;
 
     // Test objects - find latest model
-    private Content modelResourcesContent;
+    @Mock
+    private Content detectorResourcesContent_cantDeserialize;
+    private Content detectorResourcesContent;
+    private byte[] detectorResourcesBytes_cantDeserialize;
+    private DetectorResources detectorResources;
+    private DetectorResource detectorResource;
+    private Content detectorResourcesContent_noModels;
+    private DetectorResource detectorResources_noModel;
+    private DetectorResources detectorResources_noModels;
+
     @Mock
     private Content modelResourcesContent_cantDeserialize;
-    private Content modelResourcesContent_noModels;
     private byte[] modelResourcesBytes_cantDeserialize;
-    private DetectorResources modelResources;
-    private DetectorResource modelResource;
-    private DetectorResource modelResources_noModel;
-
-    private DetectorResources modelResources_noModels;
 
     @Before
     public void setUp() throws Exception {
@@ -274,20 +268,20 @@ public class ModelServiceConnectorTest {
     private void initTestObjects_findLatestModel() throws IOException {
 
         // Find latest model - happy path
-        this.modelResource = new DetectorResource();
-        this.modelResources = new DetectorResources(Collections.singletonList(new DetectorResource("3217d4be-9c33-490f-828e-c976b393b000", "kashah", "constant-detector", new Date(), new HashMap<>(), true)));
-        val modelResourcesBytes = new ObjectMapper().writeValueAsBytes(modelResources);
-        this.modelResourcesContent = new Content(modelResourcesBytes, ContentType.APPLICATION_JSON);
+        this.detectorResource = new DetectorResource();
+        this.detectorResources = new DetectorResources(Collections.singletonList(new DetectorResource("3217d4be-9c33-490f-828e-c976b393b000", "kashah", "constant-detector", new Date(), new HashMap<>(), true)));
+        val detectorResourcesBytes = new ObjectMapper().writeValueAsBytes(detectorResources);
+        this.detectorResourcesContent = new Content(detectorResourcesBytes, ContentType.APPLICATION_JSON);
 
         // Find latest model - can't deserialize
         modelResourcesBytes_cantDeserialize = "modelResourcesBytes.cantDeserialize".getBytes();
         when(modelResourcesContent_cantDeserialize.asBytes()).thenReturn(modelResourcesBytes_cantDeserialize);
 
         // Find latest model - no models
-        this.modelResources_noModels = new DetectorResources(Collections.EMPTY_LIST);
-        this.modelResources_noModel = null;
-        val modelResourcesBytes_noModels = new ObjectMapper().writeValueAsBytes(modelResources_noModels);
-        this.modelResourcesContent_noModels = new Content(modelResourcesBytes_noModels, ContentType.APPLICATION_JSON);
+        this.detectorResources_noModels = new DetectorResources(Collections.EMPTY_LIST);
+        this.detectorResources_noModel = null;
+        val detectorResourcesBytes_noModels = new ObjectMapper().writeValueAsBytes(detectorResources_noModels);
+        this.detectorResourcesContent_noModels = new Content(detectorResourcesBytes_noModels, ContentType.APPLICATION_JSON);
     }
 
     private void initDependencies_findMatchingDetectorMappings_httpClient() throws IOException {
@@ -344,18 +338,18 @@ public class ModelServiceConnectorTest {
         val uri_cantDeserialize = String.format(URI_TEMPLATE + API_PATH_MODEL_BY_DETECTOR_UUID, DETECTOR_UUID_CANT_DESERIALIZE);
         val uri_noModels = String.format(URI_TEMPLATE + API_PATH_MODEL_BY_DETECTOR_UUID, DETECTOR_UUID_NO_MODELS);
 
-        when(httpClient.get(uri)).thenReturn(modelResourcesContent);
+        when(httpClient.get(uri)).thenReturn(detectorResourcesContent);
         when(httpClient.get(uri_cantRetrieve)).thenThrow(new IOException());
         when(httpClient.get(uri_cantDeserialize)).thenReturn(modelResourcesContent_cantDeserialize);
-        when(httpClient.get(uri_noModels)).thenReturn(modelResourcesContent_noModels);
+        when(httpClient.get(uri_noModels)).thenReturn(detectorResourcesContent_noModels);
     }
 
     private void initDependencies_findLatestModel_objectMapper() throws IOException {
-        when(objectMapper.readValue(modelResourcesContent.asBytes(), DetectorResource.class))
-                .thenReturn(modelResource);
+        when(objectMapper.readValue(detectorResourcesContent.asBytes(), DetectorResource.class))
+                .thenReturn(detectorResource);
         when(objectMapper.readValue(modelResourcesBytes_cantDeserialize, DetectorResource.class))
                 .thenThrow(new IOException());
-        when(objectMapper.readValue(modelResourcesContent_noModels.asBytes(), DetectorResource.class))
-                .thenReturn(modelResources_noModel);
+        when(objectMapper.readValue(detectorResourcesContent_noModels.asBytes(), DetectorResource.class))
+                .thenReturn(detectorResources_noModel);
     }
 }

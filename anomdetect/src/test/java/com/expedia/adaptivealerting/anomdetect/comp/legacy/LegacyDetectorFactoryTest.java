@@ -57,7 +57,7 @@ public class LegacyDetectorFactoryTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCreateDetector_nullModelResource() {
+    public void testCreateDetector_nullDetectorResource() {
         factoryUnderTest.createDetector(UUID.randomUUID(), null);
     }
 
@@ -126,14 +126,13 @@ public class LegacyDetectorFactoryTest {
         return factoryUnderTest.createDetector(UUID.randomUUID(), legacyDetectorConfig);
     }
 
-    private DetectorResource buildLegacyDetectorConfig(String type, Map<String, Object> modelParams) {
-        Map<String, Object> parms = new HashMap<>();
-        parms.put("params", modelParams);
-
+    private DetectorResource buildLegacyDetectorConfig(String type, Map<String, Object> detectorParams) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("params", detectorParams);
         return new DetectorResource()
                 .setType(type)
-                .setCreatedBy("kashah")
+                .setCreatedBy("user")
                 .setLastUpdateTimestamp(new Date())
-                .setDetectorConfig(parms);
+                .setDetectorConfig(params);
     }
 }

@@ -24,8 +24,6 @@ import com.expedia.adaptivealerting.anomdetect.DetectorRetrievalException;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapper;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapping;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMatchResponse;
-import com.expedia.metrics.MetricDefinition;
-import com.expedia.metrics.metrictank.MetricTankIdFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -58,13 +56,11 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  */
 @Slf4j
 public class ModelServiceConnector {
-    public static final String API_PATH_DETECTOR_BY_METRIC_HASH = "/api/detectors/search/findByMetricHash?hash=%s";
     public static final String API_PATH_MODEL_BY_DETECTOR_UUID = "/api/models/search/findLatestByDetectorUuid?uuid=%s";
     public static final String API_PATH_DETECTOR_UPDATES = "/api/detectors/search/getLastUpdatedDetectors?interval=%d";
     public static final String API_PATH_DETECTOR_MAPPING_UPDATES = "/api/detectorMappings/lastUpdated?timeInSecs=%d";
     public static final String API_PATH_MATCHING_DETECTOR_BY_TAGS = "/api/detectorMappings/findMatchingByTags";
 
-    private final MetricTankIdFactory metricTankIdFactory = new MetricTankIdFactory();
     private final HttpClientWrapper httpClient;
     private final String baseUri;
     private final ObjectMapper objectMapper;

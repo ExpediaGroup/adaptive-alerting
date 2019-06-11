@@ -16,7 +16,6 @@
 package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
 import com.expedia.adaptivealerting.anomdetect.comp.connector.DetectorResource;
-import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelResource;
 import com.expedia.adaptivealerting.anomdetect.detector.ConstantThresholdDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.CusumDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;

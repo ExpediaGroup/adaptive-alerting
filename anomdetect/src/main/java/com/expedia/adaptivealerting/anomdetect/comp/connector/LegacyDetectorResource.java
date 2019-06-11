@@ -24,6 +24,7 @@ import lombok.NoArgsConstructor;
 /**
  * Legacy Detector resource.
  */
+@Deprecated
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
