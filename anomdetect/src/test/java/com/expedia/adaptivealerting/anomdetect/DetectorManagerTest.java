@@ -31,6 +31,7 @@ import org.mockito.MockitoAnnotations;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
@@ -47,10 +48,14 @@ public final class DetectorManagerTest {
     private final int detectorRefreshPeriod = 1;
     private final int badDetectorRefreshPeriod = 0;
 
+//    @InjectMocks
     private DetectorManager managerUnderTest;
 
     @Mock
     private DetectorSource detectorSource;
+
+    @Mock
+    private Map<UUID, Detector> cachedDetectors;
 
     private UUID mappedUuid;
     private UUID unmappedUuid;
@@ -83,7 +88,7 @@ public final class DetectorManagerTest {
         MockitoAnnotations.initMocks(this);
         initTestObjects();
         initDependencies();
-        this.managerUnderTest = new DetectorManager(detectorSource, config);
+        this.managerUnderTest = new DetectorManager(detectorSource, detectorRefreshPeriod, cachedDetectors);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -146,6 +151,8 @@ public final class DetectorManagerTest {
 
     private void initDependencies() {
         when(detector.classify(goodMetricData)).thenReturn(anomalyResult);
+
+        when(cachedDetectors.containsKey(updatedDetectors.get(0))).thenReturn(true);
 
         when(detectorSource.findDetector(mappedUuid)).thenReturn(detector);
         when(detectorSource.findDetector(unmappedUuid)).thenReturn(null);
