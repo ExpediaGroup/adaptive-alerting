@@ -96,7 +96,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
                     log.error(String.format("Updating elastic search failed", e));
                     throw new RuntimeException(e);
                 }
-                if (name.equals("lastUpdateTimestamp")) {
+                if (name.equals("lastUpdateTimestamp") && value != null) {
                     Date d = (Date) value;
                     value = DateUtil.instantToDate(d.toInstant());
                 }
