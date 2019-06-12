@@ -13,19 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.core.util;
+package com.expedia.adaptivealerting.anomdetect.breakout;
 
-import lombok.SneakyThrows;
-import lombok.experimental.UtilityClass;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-/**
- * Thread utilities.
- */
-@UtilityClass
-public final class ThreadUtil {
-
-    @SneakyThrows
-    public static void sleep(long millis) {
-        Thread.sleep(millis);
-    }
+@Data
+@AllArgsConstructor
+public class BreakoutResult {
+    private int location;
+    private double stat;
 }

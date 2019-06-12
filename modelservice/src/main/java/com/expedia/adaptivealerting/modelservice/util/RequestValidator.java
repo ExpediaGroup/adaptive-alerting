@@ -21,9 +21,11 @@ import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Operand;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Operator;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.User;
 import com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping;
+import lombok.experimental.UtilityClass;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+@UtilityClass
 public class RequestValidator {
 
     public static void validateUser(User user) {

@@ -17,14 +17,13 @@ package com.expedia.adaptivealerting.core.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.experimental.UtilityClass;
 
 /**
  * Object mapper utilities.
  */
-public final class ObjectMapperUtil {
-
-    private ObjectMapperUtil() {
-    }
+@UtilityClass
+public class ObjectMapperUtil {
 
     public static String writeValueAsString(ObjectMapper objectMapper, Object value) {
         try {

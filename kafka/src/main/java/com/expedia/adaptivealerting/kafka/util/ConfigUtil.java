@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.kafka.util;
 
 import com.typesafe.config.Config;
+import lombok.experimental.UtilityClass;
 import lombok.val;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -25,7 +26,8 @@ import java.util.Properties;
 /**
  * Kafka configuration utilities.
  */
-public final class ConfigUtil {
+@UtilityClass
+public class ConfigUtil {
 
     public static Properties toConsumerConfig(Config config) {
         val keys = new String[]{

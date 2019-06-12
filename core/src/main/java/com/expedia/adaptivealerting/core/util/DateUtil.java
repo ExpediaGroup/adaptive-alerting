@@ -15,6 +15,8 @@
  */
 package com.expedia.adaptivealerting.core.util;
 
+import lombok.experimental.UtilityClass;
+
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.Instant;
@@ -27,13 +29,8 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 /**
  * Date and time utilities.
  */
-public final class DateUtil {
-
-    /**
-     * Prevent instantiation.
-     */
-    private DateUtil() {
-    }
+@UtilityClass
+public class DateUtil {
 
     /**
      * Returns the largest day either before or equal to the given date.

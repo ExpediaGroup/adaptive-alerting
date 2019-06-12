@@ -15,19 +15,15 @@
  */
 package com.expedia.adaptivealerting.core.util;
 
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * Reflection utilities.
  */
+@UtilityClass
 @Slf4j
-public final class ReflectionUtil {
-
-    /**
-     * Prevent instantiation.
-     */
-    private ReflectionUtil() {
-    }
+public class ReflectionUtil {
 
     public static <T> T newInstance(Class<T> clazz) {
         try {
