@@ -20,9 +20,9 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.isBetween;
-import static com.expedia.adaptivealerting.core.util.AssertUtil.isEqual;
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isBetween;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isEqual;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 import static java.lang.String.format;
 import static java.util.Comparator.comparing;
 

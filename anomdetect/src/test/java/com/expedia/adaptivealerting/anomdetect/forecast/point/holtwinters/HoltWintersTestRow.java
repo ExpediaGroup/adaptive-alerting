@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
-import com.expedia.adaptivealerting.core.anomaly.StringToAnomalyLevelConverter;
+import com.expedia.adaptivealerting.anomdetect.detector.AnomalyLevel;
+import com.expedia.adaptivealerting.anomdetect.detector.StringToAnomalyLevelConverter;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvCustomBindByName;
 import lombok.Data;

@@ -15,9 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detector;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import lombok.val;

@@ -19,7 +19,7 @@ import com.expedia.adaptivealerting.anomdetect.detector.DetectorConfig;
 import com.expedia.adaptivealerting.anomdetect.detector.ForecastingDetector;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.AdditiveIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaster;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
+import com.expedia.adaptivealerting.anomdetect.detector.AnomalyType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;

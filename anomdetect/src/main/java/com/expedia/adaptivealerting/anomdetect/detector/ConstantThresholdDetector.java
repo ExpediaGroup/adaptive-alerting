@@ -16,9 +16,6 @@
 package com.expedia.adaptivealerting.anomdetect.detector;
 
 import com.expedia.adaptivealerting.anomdetect.comp.AnomalyClassifier;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
 import lombok.Getter;
@@ -27,7 +24,7 @@ import lombok.val;
 
 import java.util.UUID;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 /**
  * Anomaly detector with constant threshold for weak and strong anomalies. Supports both one- and two-tailed tests.

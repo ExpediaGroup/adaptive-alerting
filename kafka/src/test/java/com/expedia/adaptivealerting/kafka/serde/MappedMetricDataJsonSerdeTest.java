@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.kafka.serde;
 
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.detector.MappedMetricData;
 import com.expedia.adaptivealerting.kafka.util.TestObjectMother;
 import com.expedia.metrics.jackson.MetricsJavaModule;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -19,9 +19,9 @@ import com.expedia.adaptivealerting.anomdetect.forecast.point.HoltWintersForecas
 
 import java.util.Arrays;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.isFalse;
-import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isFalse;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isTrue;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 import static java.util.stream.DoubleStream.concat;
 
 /**

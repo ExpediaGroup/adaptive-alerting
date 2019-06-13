@@ -25,7 +25,7 @@ import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelf
 import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.HoltWintersForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PewmaPointForecaster;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
+import com.expedia.adaptivealerting.anomdetect.detector.AnomalyType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +33,7 @@ import lombok.val;
 
 import java.util.UUID;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 /**
  * Builds detectors based on legacy detector configurations.

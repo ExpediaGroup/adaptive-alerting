@@ -15,10 +15,10 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.adaptivealerting.core.util.MetricUtil;
+import com.expedia.adaptivealerting.anomdetect.detector.AnomalyLevel;
+import com.expedia.adaptivealerting.anomdetect.detector.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detector.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.util.MetricUtil;
 import com.expedia.metrics.MetricDefinition;
 import lombok.val;
 import org.junit.Before;

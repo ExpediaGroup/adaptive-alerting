@@ -21,7 +21,7 @@ import lombok.Getter;
 
 import java.util.UUID;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 public abstract class AbstractDetector implements Detector {
 

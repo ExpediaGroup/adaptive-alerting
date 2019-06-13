@@ -15,13 +15,13 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detector.aggregator;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detector.AnomalyResult;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 /**
  * "Aggregator" that simply returns the passed {@link AnomalyResult}.

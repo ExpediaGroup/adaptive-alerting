@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detector.aggregator;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detector.AnomalyLevel;
+import com.expedia.adaptivealerting.anomdetect.detector.AnomalyResult;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
@@ -27,8 +27,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.val;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isTrue;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 /**
  * m-of-n aggregator. The returned anomaly level is

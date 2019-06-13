@@ -30,7 +30,7 @@ import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapping;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaster;
 import com.expedia.adaptivealerting.anomdetect.util.TestObjectMother;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
+import com.expedia.adaptivealerting.anomdetect.detector.AnomalyType;
 import com.expedia.metrics.MetricDefinition;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;

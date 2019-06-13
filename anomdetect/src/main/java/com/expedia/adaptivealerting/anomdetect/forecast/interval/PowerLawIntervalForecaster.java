@@ -23,8 +23,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.val;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isTrue;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 @RequiredArgsConstructor
 public class PowerLawIntervalForecaster implements IntervalForecaster {

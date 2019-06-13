@@ -21,9 +21,6 @@ import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecas
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecasterParams;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecasterParams;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
 import lombok.Generated;
@@ -33,7 +30,7 @@ import lombok.val;
 
 import java.util.UUID;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 /**
  * <p>

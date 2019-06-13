@@ -26,8 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isTrue;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 /**
  * @see <a href="https://otexts.org/fpp2/holt-winters.html">Holt-Winters' Seasonal Method</a>

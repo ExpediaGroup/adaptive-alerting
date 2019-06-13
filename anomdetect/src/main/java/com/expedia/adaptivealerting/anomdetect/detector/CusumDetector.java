@@ -15,9 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detector;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
 import lombok.Getter;
@@ -26,11 +23,11 @@ import lombok.val;
 
 import java.util.UUID;
 
-import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.MODEL_WARMUP;
-import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.NORMAL;
-import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.STRONG;
-import static com.expedia.adaptivealerting.core.anomaly.AnomalyLevel.WEAK;
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.anomdetect.detector.AnomalyLevel.MODEL_WARMUP;
+import static com.expedia.adaptivealerting.anomdetect.detector.AnomalyLevel.NORMAL;
+import static com.expedia.adaptivealerting.anomdetect.detector.AnomalyLevel.STRONG;
+import static com.expedia.adaptivealerting.anomdetect.detector.AnomalyLevel.WEAK;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 /**
  * <p>

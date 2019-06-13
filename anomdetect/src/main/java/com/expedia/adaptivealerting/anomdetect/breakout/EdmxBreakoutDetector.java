@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.breakout;
 
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detector.AnomalyResult;
 import com.expedia.metrics.MetricData;
 import lombok.Getter;
 import lombok.NonNull;

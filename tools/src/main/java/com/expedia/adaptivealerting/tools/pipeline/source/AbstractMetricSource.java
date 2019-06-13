@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isTrue;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 /**
  * Abstract base class for implementing metric sources. Uses a timer to simulate timing behavior.

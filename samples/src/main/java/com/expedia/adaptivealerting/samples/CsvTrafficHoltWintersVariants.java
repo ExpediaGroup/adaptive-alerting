@@ -18,7 +18,7 @@ package com.expedia.adaptivealerting.samples;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.HoltWintersParams;
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.SeasonalityType;
-import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
+import com.expedia.adaptivealerting.anomdetect.forecast.evaluate.RmseEvaluator;
 import com.expedia.adaptivealerting.tools.pipeline.filter.DetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartSink;

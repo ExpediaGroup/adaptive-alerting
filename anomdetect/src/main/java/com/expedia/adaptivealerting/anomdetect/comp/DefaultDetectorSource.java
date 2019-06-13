@@ -29,8 +29,8 @@ import lombok.val;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isTrue;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 // Non-final because we currently need to mock this in DetectorManagerTest. [WLW]
 

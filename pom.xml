@@ -46,7 +46,6 @@
 
     <modules>
         <module>anomdetect</module>
-        <module>core</module>
         <module>kafka</module>
         <module>modelservice</module>
         <module>samples</module>
@@ -119,6 +118,7 @@
         <tomcat.jdbc.version>9.0.8</tomcat.jdbc.version>
         <typesafe.config.version>1.3.3</typesafe.config.version>
         <wiremock.version>2.18.0</wiremock.version>
+        <zookeeper.version>3.5.5</zookeeper.version>
 
         <!-- Maven plugins -->
         <jacoco-maven-plugin-version>0.8.3</jacoco-maven-plugin-version>
@@ -478,14 +478,11 @@
             </dependency>
 
             <!-- TODO This fixes a Zookeeper version conflict in the Kafka unit tests.
-                 Would like to get rid of it. [WLW] -->
+                  Would like to get rid of it. [WLW] -->
             <dependency>
                 <groupId>org.apache.zookeeper</groupId>
                 <artifactId>zookeeper</artifactId>
-                <!--
-                <version>3.5.3-beta</version>
-                -->
-                <version>3.5.5</version>
+                <version>${zookeeper.version}</version>
                 <scope>test</scope>
             </dependency>
 

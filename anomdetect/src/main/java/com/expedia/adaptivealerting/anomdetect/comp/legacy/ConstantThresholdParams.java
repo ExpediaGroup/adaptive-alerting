@@ -16,8 +16,8 @@
 package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
 import com.expedia.adaptivealerting.anomdetect.detector.ConstantThresholdDetector;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
+import com.expedia.adaptivealerting.anomdetect.detector.AnomalyThresholds;
+import com.expedia.adaptivealerting.anomdetect.detector.AnomalyType;
 import lombok.Data;
 import lombok.experimental.Accessors;
 

@@ -15,14 +15,14 @@
  */
 package com.expedia.adaptivealerting.anomdetect.comp;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
+import com.expedia.adaptivealerting.anomdetect.detector.AnomalyLevel;
+import com.expedia.adaptivealerting.anomdetect.detector.AnomalyThresholds;
+import com.expedia.adaptivealerting.anomdetect.detector.AnomalyType;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 @RequiredArgsConstructor
 public class AnomalyClassifier {

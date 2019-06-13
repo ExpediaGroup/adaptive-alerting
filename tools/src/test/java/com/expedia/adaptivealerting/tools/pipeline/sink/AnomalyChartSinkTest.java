@@ -15,11 +15,11 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.sink;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.adaptivealerting.core.evaluator.ModelEvaluation;
+import com.expedia.adaptivealerting.anomdetect.detector.AnomalyLevel;
+import com.expedia.adaptivealerting.anomdetect.detector.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detector.AnomalyThresholds;
+import com.expedia.adaptivealerting.anomdetect.detector.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.forecast.evaluate.ModelEvaluation;
 import com.expedia.adaptivealerting.tools.util.TestObjectMother;
 import com.expedia.adaptivealerting.tools.visualization.ChartSeries;
 import com.expedia.metrics.MetricData;

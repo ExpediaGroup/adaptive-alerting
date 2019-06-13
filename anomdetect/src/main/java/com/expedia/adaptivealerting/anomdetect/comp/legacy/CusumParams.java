@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
 import com.expedia.adaptivealerting.anomdetect.detector.CusumDetector;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
+import com.expedia.adaptivealerting.anomdetect.detector.AnomalyType;
 import lombok.Data;
 import lombok.experimental.Accessors;
 

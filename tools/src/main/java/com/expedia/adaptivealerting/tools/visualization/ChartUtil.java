@@ -28,7 +28,7 @@ import org.jfree.ui.RefineryUtilities;
 import javax.swing.*;
 import java.awt.*;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 /**
  * Chart utilities.

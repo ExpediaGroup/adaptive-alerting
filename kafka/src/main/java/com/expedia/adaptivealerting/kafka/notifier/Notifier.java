@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.kafka.notifier;
 
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.detector.MappedMetricData;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;

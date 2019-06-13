@@ -35,8 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isTrue;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 // FIXME Currently this class uses the URI template in an inconsistent way. In some methods it fills in a detector UUID
 // whereas in others it fills in a metric ID. The only reason it currently works is that no existing client uses both

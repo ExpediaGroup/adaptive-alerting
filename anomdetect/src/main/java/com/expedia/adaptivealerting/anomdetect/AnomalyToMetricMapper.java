@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.adaptivealerting.core.util.AssertUtil;
+import com.expedia.adaptivealerting.anomdetect.detector.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.util.AssertUtil;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.TagCollection;

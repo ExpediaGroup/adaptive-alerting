@@ -25,8 +25,8 @@ import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelf
 import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.HoltWintersForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PewmaPointForecaster;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyThresholds;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
+import com.expedia.adaptivealerting.anomdetect.detector.AnomalyThresholds;
+import com.expedia.adaptivealerting.anomdetect.detector.AnomalyType;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;

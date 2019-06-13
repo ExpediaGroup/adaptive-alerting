@@ -23,8 +23,8 @@ import com.expedia.adaptivealerting.anomdetect.source.HttpClientWrapper
 import com.expedia.adaptivealerting.anomdetect.source.util.ModelServiceConnector
 import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector
 import com.expedia.adaptivealerting.anomdetect.DetectorManager
+import com.expedia.adaptivealerting.anomdetect.detector.AnomalyResult
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapper
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult
 import com.expedia.adaptivealerting.kafka.KafkaConfigProps._
 import com.expedia.adaptivealerting.kafka.KafkaAnomalyDetectorManager
 import com.expedia.adaptivealerting.kafka.KafkaAnomalyDetectorMapper

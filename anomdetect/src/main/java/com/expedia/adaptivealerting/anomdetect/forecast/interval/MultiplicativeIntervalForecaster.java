@@ -22,8 +22,8 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isTrue;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 @RequiredArgsConstructor
 public class MultiplicativeIntervalForecaster implements IntervalForecaster {

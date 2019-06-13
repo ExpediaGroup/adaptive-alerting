@@ -20,7 +20,7 @@ import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaste
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isTrue;
 
 @Data
 @Accessors(chain = true)

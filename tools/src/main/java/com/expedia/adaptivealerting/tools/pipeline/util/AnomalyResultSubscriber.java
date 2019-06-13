@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.util;
 
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.detector.MappedMetricData;
 
 /**
  * Interface for processors that subscribe to an anomaly result channel.

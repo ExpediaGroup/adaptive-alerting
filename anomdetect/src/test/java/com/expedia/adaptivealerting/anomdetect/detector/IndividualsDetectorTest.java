@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detector;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.opencsv.bean.CsvToBeanBuilder;

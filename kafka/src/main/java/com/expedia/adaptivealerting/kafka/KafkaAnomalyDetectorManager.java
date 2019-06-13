@@ -16,10 +16,10 @@
 package com.expedia.adaptivealerting.kafka;
 
 import com.expedia.adaptivealerting.anomdetect.DetectorManager;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.adaptivealerting.core.util.AssertUtil;
-import com.expedia.adaptivealerting.core.util.ErrorUtil;
+import com.expedia.adaptivealerting.anomdetect.detector.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detector.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.util.AssertUtil;
+import com.expedia.adaptivealerting.anomdetect.util.ErrorUtil;
 import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
 import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +28,7 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.KStream;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 /**
  * <p>

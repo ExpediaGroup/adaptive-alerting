@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.isTrue;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isTrue;
 
 @Data
 @NoArgsConstructor

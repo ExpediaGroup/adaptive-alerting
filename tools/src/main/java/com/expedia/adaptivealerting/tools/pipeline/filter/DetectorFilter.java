@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.tools.pipeline.filter;
 
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.detector.MappedMetricData;
 import com.expedia.adaptivealerting.tools.pipeline.util.AnomalyResultSubscriber;
 import com.expedia.adaptivealerting.tools.pipeline.util.MetricDataSubscriber;
 import com.expedia.metrics.MetricData;
@@ -26,7 +26,7 @@ import lombok.val;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 /**
  * Stream filter that applies an outlier detector to metrics and generates outlier detector results.

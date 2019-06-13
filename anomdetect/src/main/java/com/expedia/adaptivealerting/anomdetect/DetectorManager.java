@@ -17,8 +17,8 @@ package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.anomdetect.comp.DetectorSource;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.detector.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detector.MappedMetricData;
 import com.typesafe.config.Config;
 import lombok.Getter;
 import lombok.NonNull;
@@ -36,7 +36,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 /**
  * Component that manages a given set of anomaly detectors.

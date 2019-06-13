@@ -22,7 +22,6 @@ import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaste
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecast;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecaster;
 import com.expedia.adaptivealerting.anomdetect.util.TestObjectMother;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
 import com.expedia.metrics.MetricData;
 import lombok.val;
 import org.junit.Before;

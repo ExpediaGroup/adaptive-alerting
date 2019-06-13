@@ -22,8 +22,8 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.val;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.isBetween;
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isBetween;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 public class EwmaPointForecaster implements PointForecaster {
 
