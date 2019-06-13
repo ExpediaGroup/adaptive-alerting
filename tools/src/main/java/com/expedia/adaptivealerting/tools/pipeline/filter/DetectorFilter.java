@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.filter;
 
-import com.expedia.adaptivealerting.anomdetect.detector.Detector;
-import com.expedia.adaptivealerting.anomdetect.detector.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.Detector;
+import com.expedia.adaptivealerting.anomdetect.MappedMetricData;
 import com.expedia.adaptivealerting.tools.pipeline.util.AnomalyResultSubscriber;
 import com.expedia.adaptivealerting.tools.pipeline.util.MetricDataSubscriber;
 import com.expedia.metrics.MetricData;

@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.kafka.processor;
 
-import com.expedia.adaptivealerting.anomdetect.detector.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.MappedMetricData;
 import lombok.val;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.streams.processor.TimestampExtractor;

@@ -15,11 +15,11 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.filter;
 
-import com.expedia.adaptivealerting.anomdetect.detector.ForecastingDetector;
-import com.expedia.adaptivealerting.anomdetect.forecast.interval.ExponentialWelfordIntervalForecaster;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.EwmaPointForecaster;
-import com.expedia.adaptivealerting.anomdetect.detector.AnomalyType;
-import com.expedia.adaptivealerting.anomdetect.detector.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.outlier.ForecastingOutlierDetector;
+import com.expedia.adaptivealerting.anomdetect.outlier.forecast.interval.ExponentialWelfordIntervalForecaster;
+import com.expedia.adaptivealerting.anomdetect.outlier.forecast.point.EwmaPointForecaster;
+import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyType;
+import com.expedia.adaptivealerting.anomdetect.MappedMetricData;
 import com.expedia.adaptivealerting.tools.pipeline.util.AnomalyResultSubscriber;
 import com.expedia.adaptivealerting.tools.util.TestObjectMother;
 import com.expedia.metrics.MetricData;
@@ -38,7 +38,7 @@ public final class DetectorFilterTest {
 
     @Before
     public void setUp() {
-        val detector = new ForecastingDetector(
+        val detector = new ForecastingOutlierDetector(
                 UUID.randomUUID(),
                 new EwmaPointForecaster(),
                 new ExponentialWelfordIntervalForecaster(),

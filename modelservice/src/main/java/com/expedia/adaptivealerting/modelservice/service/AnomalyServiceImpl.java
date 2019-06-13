@@ -15,12 +15,10 @@
  */
 package com.expedia.adaptivealerting.modelservice.service;
 
-import com.expedia.adaptivealerting.anomdetect.comp.connector.DetectorResource;
-import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelResource;
-import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelTypeResource;
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
-import com.expedia.adaptivealerting.anomdetect.detector.Detector;
-import com.expedia.adaptivealerting.anomdetect.detector.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.connector.DetectorResource;
+import com.expedia.adaptivealerting.anomdetect.outlier.legacy.LegacyDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.Detector;
+import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyResult;
 import com.expedia.adaptivealerting.anomdetect.util.MetricUtil;
 import com.expedia.adaptivealerting.modelservice.spi.MetricSource;
 import lombok.extern.slf4j.Slf4j;

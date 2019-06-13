@@ -15,10 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.anomdetect.comp.DetectorSource;
-import com.expedia.adaptivealerting.anomdetect.detector.Detector;
-import com.expedia.adaptivealerting.anomdetect.detector.AnomalyResult;
-import com.expedia.adaptivealerting.anomdetect.detector.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyResult;
 import com.typesafe.config.Config;
 import lombok.Getter;
 import lombok.NonNull;

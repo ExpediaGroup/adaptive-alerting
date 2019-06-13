@@ -15,9 +15,9 @@
  */
 package com.expedia.adaptivealerting.kafka;
 
-import com.expedia.adaptivealerting.anomdetect.detector.AnomalyLevel;
-import com.expedia.adaptivealerting.anomdetect.detector.AnomalyResult;
-import com.expedia.adaptivealerting.anomdetect.detector.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyLevel;
+import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.util.ObjectMapperUtil;
 import com.expedia.adaptivealerting.kafka.serde.AlertJsonSerde;
 import com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde;

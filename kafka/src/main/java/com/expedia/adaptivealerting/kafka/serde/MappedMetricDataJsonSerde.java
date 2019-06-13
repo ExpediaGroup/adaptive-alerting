@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.kafka.serde;
 
-import com.expedia.adaptivealerting.anomdetect.detector.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.MappedMetricData;
 import com.expedia.metrics.jackson.MetricsJavaModule;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.Serde;

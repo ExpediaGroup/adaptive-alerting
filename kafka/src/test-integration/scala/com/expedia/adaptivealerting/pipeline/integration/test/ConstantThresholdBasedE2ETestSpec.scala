@@ -18,12 +18,13 @@ package com.expedia.adaptivealerting.pipeline.integration.test
 import java.time.Instant
 
 import com.expedia.adaptivealerting.anomdetect.comp.HttpClientWrapper
-import com.expedia.adaptivealerting.anomdetect.comp.connector.{HttpClientWrapper, ModelServiceConnector}
+import com.expedia.adaptivealerting.anomdetect.comp.connector.HttpClientWrapper
 import com.expedia.adaptivealerting.anomdetect.source.HttpClientWrapper
 import com.expedia.adaptivealerting.anomdetect.source.util.ModelServiceConnector
 import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector
 import com.expedia.adaptivealerting.anomdetect.DetectorManager
-import com.expedia.adaptivealerting.anomdetect.detector.AnomalyResult
+import com.expedia.adaptivealerting.anomdetect.connector.{HttpClientWrapper, ModelServiceConnector}
+import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyResult
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapper
 import com.expedia.adaptivealerting.kafka.KafkaConfigProps._
 import com.expedia.adaptivealerting.kafka.KafkaAnomalyDetectorManager

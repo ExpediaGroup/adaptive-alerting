@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.util;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.evaluate.ModelEvaluation;
+import com.expedia.adaptivealerting.anomdetect.outlier.forecast.evaluate.ModelEvaluation;
 
 /**
  * Interface for processors that subscribe to a model evaluation channel.

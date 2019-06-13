@@ -15,11 +15,11 @@
  */
 package com.expedia.adaptivealerting.kafka.util;
 
-import com.expedia.adaptivealerting.anomdetect.comp.DefaultDetectorSource;
-import com.expedia.adaptivealerting.anomdetect.comp.DetectorSource;
-import com.expedia.adaptivealerting.anomdetect.comp.connector.HttpClientWrapper;
-import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelServiceConnector;
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.DefaultDetectorSource;
+import com.expedia.adaptivealerting.anomdetect.DetectorSource;
+import com.expedia.adaptivealerting.anomdetect.connector.HttpClientWrapper;
+import com.expedia.adaptivealerting.anomdetect.connector.ModelServiceConnector;
+import com.expedia.adaptivealerting.anomdetect.outlier.legacy.LegacyDetectorFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import lombok.experimental.UtilityClass;
