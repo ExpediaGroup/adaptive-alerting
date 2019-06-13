@@ -24,8 +24,6 @@ import com.expedia.adaptivealerting.anomdetect.DetectorRetrievalException;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapper;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapping;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMatchResponse;
-import com.expedia.metrics.MetricDefinition;
-import com.expedia.metrics.metrictank.MetricTankIdFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -58,13 +56,11 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  */
 @Slf4j
 public class ModelServiceConnector {
-    public static final String API_PATH_DETECTOR_BY_METRIC_HASH = "/api/detectors/search/findByMetricHash?hash=%s";
-    public static final String API_PATH_MODEL_BY_DETECTOR_UUID = "/api/models/search/findLatestByDetectorUuid?uuid=%s";
-    public static final String API_PATH_DETECTOR_UPDATES = "/api/detectors/search/getLastUpdatedDetectors?interval=%d";
+    public static final String API_PATH_MODEL_BY_DETECTOR_UUID = "/api/v2/detectors/findByUuid?uuid=%s";
+    public static final String API_PATH_DETECTOR_UPDATES = "/api/v2/detectors/getLastUpdatedDetectors?interval=%d";
     public static final String API_PATH_DETECTOR_MAPPING_UPDATES = "/api/detectorMappings/lastUpdated?timeInSecs=%d";
     public static final String API_PATH_MATCHING_DETECTOR_BY_TAGS = "/api/detectorMappings/findMatchingByTags";
 
-    private final MetricTankIdFactory metricTankIdFactory = new MetricTankIdFactory();
     private final HttpClientWrapper httpClient;
     private final String baseUri;
     private final ObjectMapper objectMapper;
@@ -80,47 +76,6 @@ public class ModelServiceConnector {
     }
 
     /**
-     * Calls the Model Service to finds the detectors for the given metric definition.
-     *
-     * @param metricDefinition metric definition
-     * @return detectors for the given metric definition
-     * @throws DetectorRetrievalException       if there's a problem calling the Model Service
-     * @throws DetectorDeserializationException if there's a problem deserializing the Model Service response into a
-     *                                          detector list (e.g., invalid detector models)
-     * @throws DetectorException                if there's any other problem finding the detector list
-     */
-    @Deprecated
-    public DetectorResources findDetectors(MetricDefinition metricDefinition) {
-        notNull(metricDefinition, "metricDefinition can't be null");
-
-        val metricId = metricTankIdFactory.getId(metricDefinition);
-
-        // http://modelservice/api/detectors/search/findByMetricHash?hash=%s
-        // http://modelservice/api/detectors/search/findByMetricHash?hash=1.bbbad54f9232ba765e20368fe9c1a9c4
-        val uri = String.format(baseUri + API_PATH_DETECTOR_BY_METRIC_HASH, metricId);
-
-        Content content;
-        try {
-            content = httpClient.get(uri);
-        } catch (IOException e) {
-            val message = "IOException while getting detectors" +
-                    ": metricDefinition=" + metricDefinition +
-                    ", metricId=" + metricId +
-                    ", httpMethod=GET" +
-                    ", uri=" + uri;
-            throw new DetectorRetrievalException(message, e);
-        }
-
-        try {
-            return objectMapper.readValue(content.asBytes(), DetectorResources.class);
-        } catch (IOException e) {
-            val message = "IOException while deserializing detectors" +
-                    ": metricDefinition=" + metricDefinition;
-            throw new DetectorDeserializationException(message, e);
-        }
-    }
-
-    /**
      * Finds the latest model for the given detector.
      *
      * @param detectorUuid detector UUID
@@ -131,7 +86,7 @@ public class ModelServiceConnector {
      * @throws DetectorNotFoundException        if the detector doesn't have any models
      * @throws DetectorException                if there's any other problem finding the detector
      */
-    public ModelResource findLatestModel(UUID detectorUuid) {
+    public DetectorResource findLatestDetector(UUID detectorUuid) {
         notNull(detectorUuid, "detectorUuid can't be null");
 
         // http://modelservice/api/models/search/findLatestByDetectorUuid?uuid=%s
@@ -150,25 +105,24 @@ public class ModelServiceConnector {
             throw new DetectorRetrievalException(message, e);
         }
 
-        ModelResources modelResources;
+        DetectorResource detectorResource;
         try {
-            modelResources = objectMapper.readValue(content.asBytes(), ModelResources.class);
+            detectorResource = objectMapper.readValue(content.asBytes(), DetectorResource.class);
         } catch (IOException e) {
             val message = "IOException while deserializing models for detector " + detectorUuid;
             throw new DetectorDeserializationException(message, e);
         }
 
-        val modelResourceList = modelResources.getEmbedded().getModels();
-        if (modelResourceList.isEmpty()) {
+        if (detectorResource == null) {
             throw new DetectorNotFoundException("No models for detectorUuid=" + detectorUuid);
         }
 
-        return modelResourceList.get(0);
+        return detectorResource;
     }
 
     /**
      * @param sinceMinutes the time period in minutes
-     * @return the list of detectormappings that were modified in last since minutes
+     * @return the list of detectorMappings that were modified in last since minutes
      */
     public DetectorResources findUpdatedDetectors(int sinceMinutes) {
         isTrue(sinceMinutes > 0, "timePeriod must be strictly positive");
@@ -192,7 +146,6 @@ public class ModelServiceConnector {
                     ": timePeriod=" + sinceMinutes;
             throw new DetectorDeserializationException(message, e);
         }
-
     }
 
 
@@ -215,7 +168,7 @@ public class ModelServiceConnector {
                     ": tags=" + tagsList +
                     ", httpMethod=POST" +
                     ", uri=" + uri;
-            throw new DetectorMappingRetrievalException(message, e); // TODO CHANGE
+            throw new DetectorMappingRetrievalException(message, e);
         }
         try {
             return objectMapper.readValue(content.asBytes(), DetectorMatchResponse.class);

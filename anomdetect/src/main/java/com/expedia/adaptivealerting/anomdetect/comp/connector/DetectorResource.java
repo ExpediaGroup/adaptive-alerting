@@ -18,8 +18,12 @@ package com.expedia.adaptivealerting.anomdetect.comp.connector;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Generated;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Detector resource.
@@ -27,10 +31,19 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Generated // https://reflectoring.io/100-percent-test-coverage/
 public class DetectorResource {
+
     private String uuid;
-    private ModelTypeResource type;
+
+    private String createdBy;
+
+    private String type;
+
+    private Date lastUpdateTimestamp;
+
+    private Map<String, Object> detectorConfig = new HashMap<>();
+
     private Boolean enabled;
 }

@@ -15,18 +15,23 @@
  */
 package com.expedia.adaptivealerting.anomdetect.comp.connector;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Generated;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 /**
- * Detector resources.
+ * Legacy Detector resource.
  */
+@Deprecated
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DetectorResources {
-    private List<DetectorResource> detectorResources;
+@JsonIgnoreProperties(ignoreUnknown = true)
+@Generated // https://reflectoring.io/100-percent-test-coverage/
+public class LegacyDetectorResource {
+    private String uuid;
+    private ModelTypeResource type;
+    private Boolean enabled;
 }

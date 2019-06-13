@@ -49,6 +49,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
 
     private static final String DETECTOR_INDEX = "detectors";
     private static final String DETECTOR_DOC_TYPE = "detector";
+    private static final int DEFAULT_ES_RESULTS_SIZE = 500;
 
     @Autowired
     private ElasticSearchClient elasticSearchClient;
@@ -61,9 +62,8 @@ public class DetectorRepositoryImpl implements DetectorRepository {
 
     @Override
     public String createDetector(Detector detector) {
-        val newElasticsearchDetector = getElasticSearchDetector(detector);
         val indexRequest = new IndexRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, detector.getUuid());
-        String json = objectMapperUtil.convertToString(detector);
+        String json = objectMapperUtil.convertToString(getElasticSearchDetector(detector));
         return elasticsearchUtil.getIndexResponse(indexRequest, json).getId();
     }
 
@@ -92,14 +92,13 @@ public class DetectorRepositoryImpl implements DetectorRepository {
                 Object value;
                 try {
                     value = field.get(detector);
-                }
-                catch (IllegalAccessException e) {
+                } catch (IllegalAccessException e) {
                     log.error(String.format("Updating elastic search failed", e));
                     throw new RuntimeException(e);
                 }
                 if (name.equals("lastUpdateTimestamp")) {
-                    Date d = (Date) value;
-                    value = DateUtil.instantToDate(d.toInstant());
+                    Date nowDate = DateUtil.now();
+                    value = DateUtil.instantToDate(nowDate.toInstant());
                 }
                 jsonMap.put(name, value);
             }
@@ -116,7 +115,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
     @Override
     public List<Detector> findByUuid(String uuid) {
         val queryBuilder = QueryBuilders.matchQuery("uuid", uuid);
-        val searchSourceBuilder = elasticsearchUtil.getSourceBuilder(queryBuilder);
+        val searchSourceBuilder = elasticsearchUtil.getSourceBuilder(queryBuilder).size(DEFAULT_ES_RESULTS_SIZE);
         val searchRequest = elasticsearchUtil.getSearchRequest(searchSourceBuilder, DETECTOR_INDEX, DETECTOR_DOC_TYPE);
         return getDetectorsFromElasticSearch(searchRequest);
     }
@@ -124,7 +123,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
     @Override
     public List<Detector> findByCreatedBy(String user) {
         val queryBuilder = QueryBuilders.matchQuery("createdBy", user);
-        val searchSourceBuilder = elasticsearchUtil.getSourceBuilder(queryBuilder);
+        val searchSourceBuilder = elasticsearchUtil.getSourceBuilder(queryBuilder).size(DEFAULT_ES_RESULTS_SIZE);
         val searchRequest = elasticsearchUtil.getSearchRequest(searchSourceBuilder, DETECTOR_INDEX, DETECTOR_DOC_TYPE);
         return getDetectorsFromElasticSearch(searchRequest);
     }
@@ -144,11 +143,10 @@ public class DetectorRepositoryImpl implements DetectorRepository {
     @Override
     public List<Detector> getLastUpdatedDetectors(String fromDate, String toDate) {
         val queryBuilder = QueryBuilders.rangeQuery("lastUpdateTimestamp").from(fromDate).to(toDate);
-        val searchSourceBuilder = elasticsearchUtil.getSourceBuilder(queryBuilder);
+        val searchSourceBuilder = elasticsearchUtil.getSourceBuilder(queryBuilder).size(DEFAULT_ES_RESULTS_SIZE);
         val searchRequest = elasticsearchUtil.getSearchRequest(searchSourceBuilder, DETECTOR_INDEX, DETECTOR_DOC_TYPE);
         return getDetectorsFromElasticSearch(searchRequest);
     }
-
 
     private List<Detector> getDetectorsFromElasticSearch(SearchRequest searchRequest) {
         SearchResponse response = new SearchResponse();
@@ -162,7 +160,8 @@ public class DetectorRepositoryImpl implements DetectorRepository {
         SearchHit[] hits = response.getHits().getHits();
         List<Detector> detectors = new ArrayList<>();
         for (val hit : hits) {
-            val detector = (Detector) objectMapperUtil.convertToObject(hit.getSourceAsString(), new TypeReference<Detector>() {});
+            val detector = (Detector) objectMapperUtil.convertToObject(hit.getSourceAsString(), new TypeReference<Detector>() {
+            });
             val newElasticsearchDetector = getElasticSearchDetector(detector);
             detectors.add(newElasticsearchDetector);
         }

@@ -15,8 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.comp.legacy;
 
-import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelResource;
-import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelTypeResource;
+import com.expedia.adaptivealerting.anomdetect.comp.connector.DetectorResource;
 import com.expedia.adaptivealerting.anomdetect.detector.ConstantThresholdDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.CusumDetector;
 import com.expedia.adaptivealerting.anomdetect.detector.Detector;
@@ -53,12 +52,12 @@ public class LegacyDetectorFactoryTest {
     @Test(expected = IllegalArgumentException.class)
     public void testCreateDetector_nullUuid() {
         val params = new HashMap<String, Object>();
-        val modelResource = buildLegacyDetectorConfig(LegacyDetectorFactory.EWMA, params);
-        factoryUnderTest.createDetector(null, modelResource);
+        val detectorResource = buildLegacyDetectorConfig(LegacyDetectorFactory.EWMA, params);
+        factoryUnderTest.createDetector(null, detectorResource);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCreateDetector_nullModelResource() {
+    public void testCreateDetector_nullDetectorResource() {
         factoryUnderTest.createDetector(UUID.randomUUID(), null);
     }
 
@@ -127,10 +126,13 @@ public class LegacyDetectorFactoryTest {
         return factoryUnderTest.createDetector(UUID.randomUUID(), legacyDetectorConfig);
     }
 
-    private ModelResource buildLegacyDetectorConfig(String type, Map<String, Object> params) {
-        return new ModelResource()
-                .setDetectorType(new ModelTypeResource(type))
-                .setParams(params)
-                .setDateCreated(new Date());
+    private DetectorResource buildLegacyDetectorConfig(String type, Map<String, Object> detectorParams) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("params", detectorParams);
+        return new DetectorResource()
+                .setType(type)
+                .setCreatedBy("user")
+                .setLastUpdateTimestamp(new Date())
+                .setDetectorConfig(params);
     }
 }
