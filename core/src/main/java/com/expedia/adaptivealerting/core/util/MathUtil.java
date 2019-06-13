@@ -15,16 +15,13 @@
  */
 package com.expedia.adaptivealerting.core.util;
 
+import lombok.experimental.UtilityClass;
+
 /**
  * Math utilities.
  */
-public final class MathUtil {
-
-    /**
-     * Prevent instantiation.
-     */
-    private MathUtil() {
-    }
+@UtilityClass
+public class MathUtil {
 
     /**
      * Indicates whether the distance between d1 and d2 is less than or equal to the given threshold.

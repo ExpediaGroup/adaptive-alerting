@@ -15,10 +15,14 @@
  */
 package com.expedia.adaptivealerting.core.util;
 
+import lombok.experimental.UtilityClass;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+@UtilityClass
 public class ErrorUtil {
+
     public static String fullExceptionDetails(Exception e) {
         return stackTraceString(e);
     }

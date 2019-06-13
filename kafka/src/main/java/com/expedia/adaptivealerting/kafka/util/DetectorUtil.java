@@ -22,14 +22,16 @@ import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelServiceConnec
 import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 /**
  * Detector utilities.
  */
+@UtilityClass
 @Slf4j
-public final class DetectorUtil {
+public class DetectorUtil {
     private static final String CK_MODEL_SERVICE_URI_TEMPLATE = "model-service-base-uri";
 
     public static DetectorSource buildDetectorSource(Config config) {

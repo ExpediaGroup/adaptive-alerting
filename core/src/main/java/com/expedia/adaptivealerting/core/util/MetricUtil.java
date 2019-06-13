@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.core.util;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.TagCollection;
+import lombok.experimental.UtilityClass;
 import lombok.val;
 
 import java.time.Instant;
@@ -31,13 +32,8 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 /**
  * Metric utilities.
  */
-public final class MetricUtil {
-
-    /**
-     * Prevent instantiation.
-     */
-    private MetricUtil() {
-    }
+@UtilityClass
+public class MetricUtil {
 
     public static Map<String, String> defaultKvTags() {
         val kvTags = new HashMap<String, String>();

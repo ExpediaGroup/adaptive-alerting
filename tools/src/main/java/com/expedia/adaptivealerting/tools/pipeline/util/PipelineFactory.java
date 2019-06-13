@@ -18,15 +18,13 @@ package com.expedia.adaptivealerting.tools.pipeline.util;
 import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartSink;
 import com.expedia.adaptivealerting.tools.visualization.ChartSeries;
 import com.expedia.adaptivealerting.tools.visualization.ChartUtil;
+import lombok.experimental.UtilityClass;
 import lombok.val;
 
 import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
 
+@UtilityClass
 public final class PipelineFactory {
-
-    // Prevent instantiation
-    private PipelineFactory() {
-    }
 
     public static AnomalyChartSink createChartSink(String title) {
         notNull(title, "title can't be null");

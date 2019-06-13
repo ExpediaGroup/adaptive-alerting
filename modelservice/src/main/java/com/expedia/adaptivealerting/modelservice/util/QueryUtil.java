@@ -22,6 +22,7 @@ import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Operator;
 import com.expedia.adaptivealerting.modelservice.dto.percolator.BoolCondition;
 import com.expedia.adaptivealerting.modelservice.dto.percolator.MustCondition;
 import com.expedia.adaptivealerting.modelservice.dto.percolator.Query;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
@@ -30,10 +31,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
+@UtilityClass
 public class QueryUtil {
-
-    private QueryUtil() {
-    }
 
     public static Expression buildExpression(Query query) {
         Expression expression = new Expression();

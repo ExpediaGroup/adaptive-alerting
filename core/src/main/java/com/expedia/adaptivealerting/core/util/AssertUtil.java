@@ -15,16 +15,13 @@
  */
 package com.expedia.adaptivealerting.core.util;
 
+import lombok.experimental.UtilityClass;
+
 /**
  * Assertion utilities.
  */
+@UtilityClass
 public class AssertUtil {
-
-    /**
-     * Prevent instantiation.
-     */
-    private AssertUtil() {
-    }
 
     public static void isTrue(boolean b, String message) {
         if (!b) {

@@ -27,7 +27,6 @@ import java.io.IOException;
 @Component
 @Slf4j
 public class ObjectMapperUtil {
-
     private ObjectMapper objectMapper = new ObjectMapper();
 
     public String convertToString(Object object) {

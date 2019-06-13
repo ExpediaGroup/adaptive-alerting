@@ -9,7 +9,6 @@ import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Operator;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.User;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -22,9 +21,6 @@ public class RequestValidatorTest {
 
     @Mock
     private User user;
-
-    @InjectMocks
-    private RequestValidator requestValidatorUndertest;
 
     @Before
     public void setUp() {
