@@ -13,31 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.detector;
+package com.expedia.adaptivealerting.anomdetect.breakout;
 
+import com.expedia.adaptivealerting.anomdetect.detector.Detector;
 import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
 import com.expedia.metrics.MetricData;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
 
-/**
- * Anomaly detector interface. An anomaly detector takes a metric data point as an input, and classifies it as
- * anomalous or not as an output. See {@link AnomalyResult} for more details on the classification.
- */
-public interface Detector {
+@RequiredArgsConstructor
+public final class EdmxBreakoutDetector implements Detector {
 
-    /**
-     * Returns the anomaly detector UUID.
-     *
-     * @return Anomaly detector UUID.
-     */
-    UUID getUuid();
+    @NonNull
+    @Getter
+    private UUID uuid;
 
-    /**
-     * Classifies a given metric data point.
-     *
-     * @param metricData Metric data point.
-     * @return Anomaly result.
-     */
-    AnomalyResult detect(MetricData metricData);
+    @Override
+    public AnomalyResult detect(MetricData metricData) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
 }

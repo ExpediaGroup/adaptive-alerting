@@ -31,6 +31,35 @@ public class EdmxTest {
     private static final double TOLERANCE = 0.001;
 
     @Test
+    public void testEdmx_range0() {
+        val data = new double[100];
+        for (int i = 0; i < data.length; i++) {
+            data[i] = 1.0;
+        }
+        val result = Edmx.edmx(data, 24);
+        log.trace("result={}", result);
+
+        // TODO Might want to make this series throu
+        assertEquals(-1, result.getLocation());
+    }
+
+    @Test
+    public void testEdmx_noBreakout() {
+        val data = new double[100];
+        for (int i = 0; i < data.length; i += 2) {
+            data[i] = 1.0;
+            data[i + 1] = 1.2;
+        }
+        val result = Edmx.edmx(data, 5);
+        log.trace("result={}", result);
+
+        // Note that while I would prefer that EDM-X not return any breakout here at all, in fact the R implementation
+        // returns the following location and test statistic. Here we're just trying to replicate that behavior.
+        assertEquals(49, result.getLocation());
+        assertEquals(24.99, result.getStat(), TOLERANCE);
+    }
+
+    @Test
     public void testEdmx_whiteNoiseWithBreakout1() throws Exception {
         val is = ClassLoader.getSystemResourceAsStream("datasets/white-noise-with-breakout-1.csv");
         val isr = new BufferedReader(new InputStreamReader(is));

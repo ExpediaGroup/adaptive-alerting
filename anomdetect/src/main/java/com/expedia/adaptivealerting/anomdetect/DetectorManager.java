@@ -101,7 +101,7 @@ public class DetectorManager {
             return null;
         }
         val metricData = mappedMetricData.getMetricData();
-        return detector.classify(metricData);
+        return detector.detect(metricData);
     }
 
     private Detector detectorFor(MappedMetricData mappedMetricData) {

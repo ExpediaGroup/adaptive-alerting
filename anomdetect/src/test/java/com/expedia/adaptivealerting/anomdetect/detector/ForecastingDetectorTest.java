@@ -73,13 +73,13 @@ public class ForecastingDetectorTest {
     public void testClassify() {
         val metricDef = TestObjectMother.metricDefinition();
         val metricData = new MetricData(metricDef, 100.0, Instant.now().getEpochSecond());
-        val result = detectorUnderTest.classify(metricData);
+        val result = detectorUnderTest.detect(metricData);
         assertNotNull(result);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testClassify_nullMetricData() {
-        detectorUnderTest.classify(null);
+        detectorUnderTest.detect(null);
     }
 
     @Test

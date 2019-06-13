@@ -50,7 +50,7 @@ import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
  * @see PointForecaster
  * @see IntervalForecaster
  */
-public class ForecastingDetector extends AbstractDetector {
+public final class ForecastingDetector extends AbstractDetector {
 
     @Getter
     @Generated // https://reflectoring.io/100-percent-test-coverage/
@@ -82,7 +82,7 @@ public class ForecastingDetector extends AbstractDetector {
     }
 
     @Override
-    public AnomalyResult classify(MetricData metricData) {
+    public AnomalyResult detect(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
 
         val pointForecast = pointForecaster.forecast(metricData);

@@ -77,7 +77,7 @@ public class IndividualsDetectorTest {
             val observed = testRow.getObserved();
 
             val metricData = new MetricData(metricDef, observed, epochSecond);
-            val level = detector.classify(metricData).getAnomalyLevel();
+            val level = detector.detect(metricData).getAnomalyLevel();
 
             if (noOfDataPoints < WARMUP_PERIOD) {
                 assertEquals(AnomalyLevel.MODEL_WARMUP, level);

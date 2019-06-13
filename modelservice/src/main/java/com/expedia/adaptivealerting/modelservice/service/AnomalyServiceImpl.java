@@ -55,7 +55,7 @@ public class AnomalyServiceImpl implements AnomalyService {
             val results = metricSource.getMetricData(request.getMetricTags());
             for (val result : results) {
                 val metricData = MetricUtil.metricData(metricDef, result.getDataPoint(), result.getEpochSecond());
-                val anomalyResult = detector.classify(metricData);
+                val anomalyResult = detector.detect(metricData);
                 anomalyResults.add(anomalyResult);
             }
         });

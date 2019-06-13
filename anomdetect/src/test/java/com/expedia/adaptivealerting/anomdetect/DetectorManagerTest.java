@@ -150,7 +150,7 @@ public final class DetectorManagerTest {
     }
 
     private void initDependencies() {
-        when(detector.classify(goodMetricData)).thenReturn(anomalyResult);
+        when(detector.detect(goodMetricData)).thenReturn(anomalyResult);
 
         when(cachedDetectors.containsKey(updatedDetectors.get(0))).thenReturn(true);
 

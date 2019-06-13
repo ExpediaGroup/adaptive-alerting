@@ -32,10 +32,8 @@ public final class RunningMedian {
 
         // Add the value to one or the other heap
         if (upperHalf.isEmpty() || value <= (Double) upperHalf.peek()) {
-            log.trace("Adding {} to lowerHalf", value);
             lowerHalf.add(value);
         } else {
-            log.trace("Adding {} to upperHalf", value);
             upperHalf.add(value);
         }
 
@@ -48,8 +46,6 @@ public final class RunningMedian {
     }
 
     public double getMedian() {
-        log.trace("lowerHalf.size={}, upperHalf.size={}", lowerHalf.size(), upperHalf.size());
-
         if (upperHalf.isEmpty() && lowerHalf.isEmpty()) {
             throw new RuntimeException("Add values before getting the median");
         }

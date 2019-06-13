@@ -45,7 +45,7 @@ public final class DetectorFilter implements MetricDataSubscriber {
     public void next(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
         val anomaly = new MappedMetricData(metricData, detector.getUuid());
-        val anomalyResult = detector.classify(metricData);
+        val anomalyResult = detector.detect(metricData);
         anomaly.setAnomalyResult(anomalyResult);
         publish(anomaly);
     }

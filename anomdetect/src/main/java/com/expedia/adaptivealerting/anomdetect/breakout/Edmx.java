@@ -63,7 +63,6 @@ public class Edmx {
                 val diff = mL - mR;
 
                 // Order matters here, as we want to avoid integer division
-//                val stat = diff * diff * i * (j - i) / j;
                 val stat = diff * diff * i * (j - i) / j;
 
                 if (stat > bestStat) {
@@ -87,8 +86,10 @@ public class Edmx {
         val min = summaryStats.getMin();
         val max = summaryStats.getMax();
         val range = max - min;
+        val denom = (range == 0.0 ? 1.0 : range);
+
         return Arrays.stream(data)
-                .map(value -> (value - min) / range)
+                .map(value -> (value - min) / denom)
                 .toArray();
     }
 }

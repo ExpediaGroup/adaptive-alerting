@@ -49,7 +49,7 @@ public final class ConstantThresholdDetector extends AbstractDetector {
     }
 
     @Override
-    public AnomalyResult classify(MetricData metricData) {
+    public AnomalyResult detect(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
         val thresholds = params.getThresholds();
         val level = classifier.classify(thresholds, metricData.getValue());

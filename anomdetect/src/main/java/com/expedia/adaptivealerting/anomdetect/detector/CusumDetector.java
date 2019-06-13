@@ -83,7 +83,7 @@ public final class CusumDetector extends AbstractDetector {
     }
 
     @Override
-    public AnomalyResult classify(MetricData metricData) {
+    public AnomalyResult detect(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
 
         val params = getParams();

@@ -117,7 +117,7 @@ public final class IndividualsDetector implements Detector {
     }
 
     @Override
-    public AnomalyResult classify(MetricData metricData) {
+    public AnomalyResult detect(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
 
         val params = getParams();
@@ -129,7 +129,7 @@ public final class IndividualsDetector implements Detector {
 
         val currentRange = Math.abs(prevValue - observed);
 
-        // TODO Modify this to use AnomalyClassifier.classify() so we can get tail checks. [WLW]
+        // TODO Modify this to use AnomalyClassifier.detect() so we can get tail checks. [WLW]
 
         // Looks like currently this detector supports only a single anomaly level (strong).
         val thresholds = new AnomalyThresholds(

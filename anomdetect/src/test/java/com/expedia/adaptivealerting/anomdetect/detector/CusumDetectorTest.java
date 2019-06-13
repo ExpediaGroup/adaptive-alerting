@@ -104,7 +104,7 @@ public class CusumDetectorTest {
             val testRow = testRows.next();
             val observed = testRow.getObserved();
             val metricData = new MetricData(metricDefinition, observed, epochSecond);
-            val level = detector.classify(metricData).getAnomalyLevel();
+            val level = detector.detect(metricData).getAnomalyLevel();
 
             assertEquals(AnomalyLevel.valueOf(testRow.getLevel()), level);
 
@@ -151,7 +151,7 @@ public class CusumDetectorTest {
 
         for (int i = 0; i < adjWarmupPeriod; i++) {
             val metricData = new MetricData(metricDefinition, 1000.0, 1000 * i);
-            val anomalyResult = detector.classify(metricData);
+            val anomalyResult = detector.detect(metricData);
             val anomalyLevel = anomalyResult.getAnomalyLevel();
             assertEquals(AnomalyLevel.MODEL_WARMUP, anomalyLevel);
         }
@@ -161,7 +161,7 @@ public class CusumDetectorTest {
             val value = testRow.getObserved();
             val timestamp = (adjWarmupPeriod + i) * 1000L;
             val metricData = new MetricData(metricDefinition, value, timestamp);
-            val anomalyResult = detector.classify(metricData);
+            val anomalyResult = detector.detect(metricData);
             val anomalyLevel = anomalyResult.getAnomalyLevel();
             assertEquals(AnomalyLevel.valueOf(testRow.getLevel()), anomalyLevel);
         }
