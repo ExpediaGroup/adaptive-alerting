@@ -114,7 +114,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
 
     @Override
     public Detector findByUuid(String uuid) {
-        val queryBuilder = QueryBuilders.matchQuery("uuid", uuid);
+        val queryBuilder = QueryBuilders.termQuery("uuid", uuid);
         val searchSourceBuilder = elasticsearchUtil.getSourceBuilder(queryBuilder).size(DEFAULT_ES_RESULTS_SIZE);
         val searchRequest = elasticsearchUtil.getSearchRequest(searchSourceBuilder, DETECTOR_INDEX, DETECTOR_DOC_TYPE);
         return getDetectorsFromElasticSearch(searchRequest).get(0);
@@ -122,7 +122,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
 
     @Override
     public List<Detector> findByCreatedBy(String user) {
-        val queryBuilder = QueryBuilders.matchQuery("createdBy", user);
+        val queryBuilder = QueryBuilders.termQuery("createdBy", user);
         val searchSourceBuilder = elasticsearchUtil.getSourceBuilder(queryBuilder).size(DEFAULT_ES_RESULTS_SIZE);
         val searchRequest = elasticsearchUtil.getSearchRequest(searchSourceBuilder, DETECTOR_INDEX, DETECTOR_DOC_TYPE);
         return getDetectorsFromElasticSearch(searchRequest);
