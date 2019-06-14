@@ -22,7 +22,7 @@ import org.apache.kafka.streams.StreamsConfig;
 
 import java.util.Properties;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 /**
  * Kafka streams application configuration. Consolidates both Typesafe Config and Streams Config.

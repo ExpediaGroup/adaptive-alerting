@@ -4,7 +4,6 @@ import com.expedia.adaptivealerting.modelservice.entity.Detector;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import lombok.extern.slf4j.Slf4j;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

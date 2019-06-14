@@ -1,6 +1,6 @@
 package com.expedia.adaptivealerting.modelservice.service;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyLevel;
+import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyLevel;
 import com.expedia.adaptivealerting.modelservice.providers.graphite.GraphiteMetricSource;
 import com.expedia.adaptivealerting.modelservice.spi.MetricSource;
 import com.expedia.adaptivealerting.modelservice.spi.MetricSourceResult;

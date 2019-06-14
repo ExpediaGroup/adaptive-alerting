@@ -15,12 +15,12 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.EwmaParams;
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.PewmaParams;
-import com.expedia.adaptivealerting.anomdetect.detector.CusumDetector;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyType;
-import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
+import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyType;
+import com.expedia.adaptivealerting.anomdetect.outlier.CusumOutlierDetector;
+import com.expedia.adaptivealerting.anomdetect.outlier.forecast.evaluate.RmseEvaluator;
+import com.expedia.adaptivealerting.anomdetect.outlier.legacy.EwmaParams;
+import com.expedia.adaptivealerting.anomdetect.outlier.legacy.LegacyDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.outlier.legacy.PewmaParams;
 import com.expedia.adaptivealerting.tools.pipeline.filter.DetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
@@ -64,13 +64,13 @@ public final class Sample001 {
         pewmaFilter.addSubscriber(pewmaChart);
         pewmaEval.addSubscriber(pewmaChart);
 
-        val cusumParams = new CusumDetector.Params()
+        val cusumParams = new CusumOutlierDetector.Params()
                 .setType(AnomalyType.RIGHT_TAILED)
                 .setTargetValue(20_000_000)
                 .setWeakSigmas(3.0)
                 .setStrongSigmas(4.0)
                 .setInitMeanEstimate(13_000_000);
-        val cusumDetector = new CusumDetector(UUID.randomUUID(), cusumParams);
+        val cusumDetector = new CusumOutlierDetector(UUID.randomUUID(), cusumParams);
         val cusumFilter = new DetectorFilter(cusumDetector);
         val cusumChart = PipelineFactory.createChartSink("CUSUM");
         source.addSubscriber(cusumFilter);

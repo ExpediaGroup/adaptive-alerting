@@ -15,10 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.anomdetect.comp.DetectorSource;
-import com.expedia.adaptivealerting.anomdetect.detector.Detector;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
 import com.typesafe.config.Config;
 import lombok.Getter;
 import lombok.NonNull;
@@ -36,7 +32,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 /**
  * Component that manages a given set of anomaly detectors.
@@ -92,7 +88,7 @@ public class DetectorManager {
      * @param mappedMetricData Mapped metric data.
      * @return The anomaly result, or {@code null} if there's no associated detector.
      */
-    public AnomalyResult classify(MappedMetricData mappedMetricData) {
+    public DetectorResult detect(MappedMetricData mappedMetricData) {
         notNull(mappedMetricData, "mappedMetricData can't be null");
 
         val detector = detectorFor(mappedMetricData);
@@ -101,7 +97,7 @@ public class DetectorManager {
             return null;
         }
         val metricData = mappedMetricData.getMetricData();
-        return detector.classify(metricData);
+        return detector.detect(metricData);
     }
 
     private Detector detectorFor(MappedMetricData mappedMetricData) {

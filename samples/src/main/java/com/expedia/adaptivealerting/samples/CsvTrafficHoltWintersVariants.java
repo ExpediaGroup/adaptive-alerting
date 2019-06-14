@@ -15,10 +15,10 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.HoltWintersParams;
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.SeasonalityType;
-import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
+import com.expedia.adaptivealerting.anomdetect.outlier.forecast.evaluate.RmseEvaluator;
+import com.expedia.adaptivealerting.anomdetect.outlier.forecast.point.holtwinters.SeasonalityType;
+import com.expedia.adaptivealerting.anomdetect.outlier.legacy.HoltWintersParams;
+import com.expedia.adaptivealerting.anomdetect.outlier.legacy.LegacyDetectorFactory;
 import com.expedia.adaptivealerting.tools.pipeline.filter.DetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.sink.AnomalyChartSink;
@@ -33,9 +33,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import static com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.HoltWintersTrainingMethod.SIMPLE;
-import static com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.SeasonalityType.ADDITIVE;
-import static com.expedia.adaptivealerting.anomdetect.forecast.point.holtwinters.SeasonalityType.MULTIPLICATIVE;
+import static com.expedia.adaptivealerting.anomdetect.outlier.forecast.point.holtwinters.HoltWintersTrainingMethod.SIMPLE;
+import static com.expedia.adaptivealerting.anomdetect.outlier.forecast.point.holtwinters.SeasonalityType.ADDITIVE;
+import static com.expedia.adaptivealerting.anomdetect.outlier.forecast.point.holtwinters.SeasonalityType.MULTIPLICATIVE;
 import static com.expedia.adaptivealerting.samples.MetricGenerationHelper.buildMetricFrameMetricSource;
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.createChartFrame;
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showChartFrame;

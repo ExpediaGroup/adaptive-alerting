@@ -15,13 +15,11 @@
  */
 package com.expedia.adaptivealerting.modelservice.service;
 
-import com.expedia.adaptivealerting.anomdetect.comp.connector.DetectorResource;
-import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelResource;
-import com.expedia.adaptivealerting.anomdetect.comp.connector.ModelTypeResource;
-import com.expedia.adaptivealerting.anomdetect.comp.legacy.LegacyDetectorFactory;
-import com.expedia.adaptivealerting.anomdetect.detector.Detector;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.util.MetricUtil;
+import com.expedia.adaptivealerting.anomdetect.Detector;
+import com.expedia.adaptivealerting.anomdetect.connector.DetectorResource;
+import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.outlier.legacy.LegacyDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.util.MetricUtil;
 import com.expedia.adaptivealerting.modelservice.spi.MetricSource;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -55,7 +53,7 @@ public class AnomalyServiceImpl implements AnomalyService {
             val results = metricSource.getMetricData(request.getMetricTags());
             for (val result : results) {
                 val metricData = MetricUtil.metricData(metricDef, result.getDataPoint(), result.getEpochSecond());
-                val anomalyResult = detector.classify(metricData);
+                val anomalyResult = (AnomalyResult) detector.detect(metricData);
                 anomalyResults.add(anomalyResult);
             }
         });

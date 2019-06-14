@@ -21,7 +21,7 @@ import com.expedia.adaptivealerting.tools.visualization.ChartUtil;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 @UtilityClass
 public final class PipelineFactory {

@@ -15,10 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.anomdetect.comp.DetectorSource;
-import com.expedia.adaptivealerting.anomdetect.detector.Detector;
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyResult;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.typesafe.config.Config;
@@ -111,24 +108,24 @@ public final class DetectorManagerTest {
 
     @Test
     public void testClassify() {
-        val result = managerUnderTest.classify(goodMappedMetricData);
+        val result = managerUnderTest.detect(goodMappedMetricData);
         assertNotNull(result);
         assertSame(anomalyResult, result);
     }
 
     @Test
     public void testClassify_getCached() {
-        managerUnderTest.classify(goodMappedMetricData);
+        managerUnderTest.detect(goodMappedMetricData);
 
         // This one grabs the cached detector
         // TODO Come up with some way to actually prove this. E.g. mock the cache and verify().
         //  For now I just put a log.trace() in there. [WLW]
-        managerUnderTest.classify(goodMappedMetricData);
+        managerUnderTest.detect(goodMappedMetricData);
     }
 
     @Test
     public void testClassifyMetricThatCantBeFound() {
-        val result = managerUnderTest.classify(badMappedMetricData);
+        val result = managerUnderTest.detect(badMappedMetricData);
         assertNull(result);
     }
 
@@ -150,7 +147,7 @@ public final class DetectorManagerTest {
     }
 
     private void initDependencies() {
-        when(detector.classify(goodMetricData)).thenReturn(anomalyResult);
+        when(detector.detect(goodMetricData)).thenReturn(anomalyResult);
 
         when(cachedDetectors.containsKey(updatedDetectors.get(0))).thenReturn(true);
 

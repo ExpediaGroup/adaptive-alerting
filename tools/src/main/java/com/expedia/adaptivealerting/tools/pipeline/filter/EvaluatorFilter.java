@@ -15,9 +15,9 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.filter;
 
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.adaptivealerting.core.evaluator.Evaluator;
-import com.expedia.adaptivealerting.core.evaluator.ModelEvaluation;
+import com.expedia.adaptivealerting.anomdetect.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.outlier.forecast.evaluate.Evaluator;
+import com.expedia.adaptivealerting.anomdetect.outlier.forecast.evaluate.ModelEvaluation;
 import com.expedia.adaptivealerting.tools.pipeline.util.AnomalyResultSubscriber;
 import com.expedia.adaptivealerting.tools.pipeline.util.ModelEvaluationSubscriber;
 import lombok.val;
@@ -25,7 +25,7 @@ import lombok.val;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 /**
  * Stream filter that applies model evaluator to metrics and publishes the score.

@@ -37,12 +37,8 @@
 
         <!-- Compile -->
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-math3</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.expedia.adaptivealerting</groupId>
-            <artifactId>adaptive-alerting-core</artifactId>
+            <groupId>com.codahale.metrics</groupId>
+            <artifactId>metrics-core</artifactId>
         </dependency>
         <dependency>
             <groupId>com.expedia</groupId>
@@ -57,12 +53,20 @@
             <artifactId>jackson-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>fluent-hc</artifactId>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.codahale.metrics</groupId>
-            <artifactId>metrics-core</artifactId>
+            <groupId>com.typesafe</groupId>
+            <artifactId>config</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>fluent-hc</artifactId>
         </dependency>
 
         <!--Test-->

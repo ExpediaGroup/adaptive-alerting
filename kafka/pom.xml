@@ -58,24 +58,20 @@
             <artifactId>metrics-java-jackson</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.expedia.adaptivealerting</groupId>
-            <artifactId>adaptive-alerting-core</artifactId>
+            <groupId>com.expedia</groupId>
+            <artifactId>metrics-java-metrictank</artifactId>
         </dependency>
         <dependency>
             <groupId>com.expedia.adaptivealerting</groupId>
             <artifactId>adaptive-alerting-anomdetect</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka-streams</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.expedia</groupId>
-            <artifactId>metrics-java-metrictank</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.expedia.alertmanager</groupId>
             <artifactId>alert-manager-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-streams</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

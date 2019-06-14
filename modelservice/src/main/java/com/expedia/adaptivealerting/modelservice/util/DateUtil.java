@@ -15,8 +15,6 @@
  */
 package com.expedia.adaptivealerting.modelservice.util;
 
-import lombok.SneakyThrows;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

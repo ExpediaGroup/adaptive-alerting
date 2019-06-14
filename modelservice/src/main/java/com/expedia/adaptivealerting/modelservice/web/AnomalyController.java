@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.modelservice.web;
 
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyResult;
 import com.expedia.adaptivealerting.modelservice.service.AnomalyRequest;
 import com.expedia.adaptivealerting.modelservice.service.AnomalyService;
 import org.springframework.beans.factory.annotation.Autowired;

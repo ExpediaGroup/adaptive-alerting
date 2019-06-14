@@ -17,24 +17,15 @@ package com.expedia.adaptivealerting.pipeline.integration.test
 
 import java.time.Instant
 
-import com.expedia.adaptivealerting.anomdetect.comp.HttpClientWrapper
-import com.expedia.adaptivealerting.anomdetect.comp.connector.{HttpClientWrapper, ModelServiceConnector}
-import com.expedia.adaptivealerting.anomdetect.source.HttpClientWrapper
-import com.expedia.adaptivealerting.anomdetect.source.util.ModelServiceConnector
-import com.expedia.adaptivealerting.anomdetect.util.ModelServiceConnector
 import com.expedia.adaptivealerting.anomdetect.DetectorManager
+import com.expedia.adaptivealerting.anomdetect.connector.{HttpClientWrapper, ModelServiceConnector}
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapper
-import com.expedia.adaptivealerting.core.anomaly.AnomalyResult
-import com.expedia.adaptivealerting.kafka.KafkaConfigProps._
-import com.expedia.adaptivealerting.kafka.KafkaAnomalyDetectorManager
-import com.expedia.adaptivealerting.kafka.KafkaAnomalyDetectorMapper
-import com.expedia.adaptivealerting.pipeline.integration.{EmbeddedKafka, IntegrationTestSpec}
+import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyResult
+import com.expedia.adaptivealerting.kafka.{KafkaAnomalyDetectorManager, KafkaAnomalyDetectorMapper}
 import com.expedia.metrics.{MetricData, MetricDefinition}
 import com.typesafe.config.Config
 import org.apache.kafka.clients.admin.AdminClient
 import org.apache.kafka.streams.KeyValue
-import org.apache.kafka.streams.integration.utils.IntegrationTestUtils
-import org.scalatest.Ignore
 
 // FIXME Fix this test
 @Ignore

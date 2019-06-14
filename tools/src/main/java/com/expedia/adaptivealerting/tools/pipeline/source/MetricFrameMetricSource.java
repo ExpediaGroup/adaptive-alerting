@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.source;
 
-import com.expedia.adaptivealerting.core.data.MetricFrame;
+import com.expedia.adaptivealerting.anomdetect.util.MetricFrame;
 import com.expedia.metrics.MetricData;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;

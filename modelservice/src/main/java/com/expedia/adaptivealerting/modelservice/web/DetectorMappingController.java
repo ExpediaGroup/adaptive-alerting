@@ -16,9 +16,9 @@
 package com.expedia.adaptivealerting.modelservice.web;
 
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.CreateDetectorMappingRequest;
-import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.MatchingDetectorsResponse;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.SearchMappingsRequest;
+import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
 import com.expedia.adaptivealerting.modelservice.service.DetectorMappingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

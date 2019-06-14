@@ -16,9 +16,9 @@
 package com.expedia.adaptivealerting.modelservice.service;
 
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.CreateDetectorMappingRequest;
-import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.MatchingDetectorsResponse;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.SearchMappingsRequest;
+import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorMappingRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

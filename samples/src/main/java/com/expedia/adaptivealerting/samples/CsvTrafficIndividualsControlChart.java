@@ -15,9 +15,9 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.detector.IndividualsDetector;
-import com.expedia.adaptivealerting.core.data.MetricFrameLoader;
-import com.expedia.adaptivealerting.core.evaluator.RmseEvaluator;
+import com.expedia.adaptivealerting.anomdetect.outlier.IndividualsOutlierDetector;
+import com.expedia.adaptivealerting.anomdetect.outlier.forecast.evaluate.RmseEvaluator;
+import com.expedia.adaptivealerting.anomdetect.util.MetricFrameLoader;
 import com.expedia.adaptivealerting.tools.pipeline.filter.DetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.source.MetricFrameMetricSource;
@@ -43,7 +43,7 @@ public final class CsvTrafficIndividualsControlChart {
         val frame = MetricFrameLoader.loadCsv(new MetricDefinition("csv"), is, true);
         val source = new MetricFrameMetricSource(frame, "data", 200L);
 
-        val detector = new IndividualsDetector(UUID.randomUUID(), new IndividualsDetector.Params());
+        val detector = new IndividualsOutlierDetector(UUID.randomUUID(), new IndividualsOutlierDetector.Params());
         val detectorFilter = new DetectorFilter(detector);
         val evaluator = new EvaluatorFilter(new RmseEvaluator());
         val chartWrapper = PipelineFactory.createChartSink("IndividualsControlChart");

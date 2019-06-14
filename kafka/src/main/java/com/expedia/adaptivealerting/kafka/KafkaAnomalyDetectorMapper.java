@@ -16,10 +16,10 @@
 package com.expedia.adaptivealerting.kafka;
 
 import com.expedia.adaptivealerting.anomdetect.JmxReporterFactory;
+import com.expedia.adaptivealerting.anomdetect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapper;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.MapperResult;
-import com.expedia.adaptivealerting.core.data.MappedMetricData;
-import com.expedia.adaptivealerting.core.util.AssertUtil;
+import com.expedia.adaptivealerting.anomdetect.util.AssertUtil;
 import com.expedia.adaptivealerting.kafka.processor.MetricDataTransformerSupplier;
 import com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde;
 import com.expedia.adaptivealerting.kafka.serde.MetricDataJsonSerde;
@@ -41,7 +41,7 @@ import org.apache.kafka.streams.state.Stores;
 
 import java.util.stream.Collectors;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 /**
  * Kafka Streams adapter for {@link DetectorMapper}. Reads metric data from an input topic, classifies individual metric

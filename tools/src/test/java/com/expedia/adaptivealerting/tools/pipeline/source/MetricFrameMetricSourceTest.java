@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.source;
 
-import com.expedia.adaptivealerting.core.data.MetricFrame;
-import com.expedia.adaptivealerting.core.util.ThreadUtil;
+import com.expedia.adaptivealerting.anomdetect.util.MetricFrame;
+import com.expedia.adaptivealerting.anomdetect.util.ThreadUtil;
 import com.expedia.adaptivealerting.tools.pipeline.util.MetricDataSubscriber;
 import com.expedia.adaptivealerting.tools.util.TestObjectMother;
 import com.expedia.metrics.MetricData;

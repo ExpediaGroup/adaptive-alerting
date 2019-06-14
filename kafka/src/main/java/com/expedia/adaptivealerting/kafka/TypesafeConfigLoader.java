@@ -22,7 +22,7 @@ import lombok.val;
 
 import java.io.File;
 
-import static com.expedia.adaptivealerting.core.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 /**
  * Loads the Typesafe base configuration from the classpath.

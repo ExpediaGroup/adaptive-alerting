@@ -11,8 +11,8 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import static com.expedia.adaptivealerting.modelservice.util.DateUtil.now;
-import static org.junit.Assert.assertEquals;
 import static com.expedia.adaptivealerting.modelservice.util.DateUtil.toUtcDateString;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class DateUtilTest {
