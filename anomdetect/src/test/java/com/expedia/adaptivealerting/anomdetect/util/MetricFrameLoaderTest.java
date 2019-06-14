@@ -22,7 +22,6 @@ import lombok.val;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
@@ -39,7 +38,7 @@ public class MetricFrameLoaderTest {
     private static final double TOLERANCE = 0.001;
 
     @Test
-    public void testLoadCsv_files() throws IOException {
+    public void testLoadCsv_files() throws Exception {
         val defFilename = ClassLoader.getSystemResource(DEF_FILENAME).getFile();
         val dataFilename = ClassLoader.getSystemResource(DATA_FILENAME).getFile();
         val defFile = new File(defFilename);
@@ -51,7 +50,7 @@ public class MetricFrameLoaderTest {
     }
 
     @Test
-    public void testLoadCsv() throws IOException {
+    public void testLoadCsv() throws Exception {
         val metric = new MetricDefinition(new TagCollection(new HashMap<String, String>() {{
             put("unit", "dummy");
             put("mtype", "dummy");

@@ -15,13 +15,12 @@
  */
 package com.expedia.adaptivealerting.anomdetect.breakout;
 
-import com.opencsv.CSVReaderBuilder;
+import com.expedia.adaptivealerting.anomdetect.util.MetricFrameLoader;
+import com.expedia.adaptivealerting.anomdetect.util.TestObjectMother;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.Test;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
@@ -61,11 +60,12 @@ public class EdmxTest {
 
     @Test
     public void testEdmx_whiteNoiseWithBreakout1() throws Exception {
-        val is = ClassLoader.getSystemResourceAsStream("datasets/white-noise-with-breakout-1.csv");
-        val isr = new BufferedReader(new InputStreamReader(is));
-        val rows = new CSVReaderBuilder(isr).build().readAll();
-        val data = rows.stream()
-                .mapToDouble(row -> Double.parseDouble(row[0]))
+        val metricDef = TestObjectMother.metricDefinition();
+        val is = ClassLoader.getSystemResourceAsStream("datasets/white-noise-with-breakout-at-row-600.csv");
+        val metricFrame = MetricFrameLoader.loadCsv(metricDef, is, false);
+        val metricDataList = metricFrame.getMetricData();
+        val data = metricDataList.stream()
+                .mapToDouble(metricData -> metricData.getValue())
                 .toArray();
 
         val result = Edmx.edmx(data, 24);

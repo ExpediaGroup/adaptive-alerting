@@ -18,14 +18,19 @@ package com.expedia.adaptivealerting.samples;
 import com.expedia.adaptivealerting.anomdetect.util.MetricFrameLoader;
 import com.expedia.adaptivealerting.tools.pipeline.source.MetricFrameMetricSource;
 import com.expedia.metrics.MetricDefinition;
+import lombok.experimental.UtilityClass;
 import lombok.val;
 
 import java.io.IOException;
+import java.text.ParseException;
 
+@UtilityClass
 public class MetricGenerationHelper {
 
     // TODO: Use this from other Sample classes
-    public static MetricFrameMetricSource buildMetricFrameMetricSource(String filename, long periodMs) throws IOException {
+    public static MetricFrameMetricSource buildMetricFrameMetricSource(String filename, long periodMs)
+            throws IOException, ParseException {
+
         val is = ClassLoader.getSystemResourceAsStream(filename);
         // TODO Use the FileDataConnector rather than the MetricFrameLoader. [WLW]
         val frame = MetricFrameLoader.loadCsv(new MetricDefinition("csv"), is, true);

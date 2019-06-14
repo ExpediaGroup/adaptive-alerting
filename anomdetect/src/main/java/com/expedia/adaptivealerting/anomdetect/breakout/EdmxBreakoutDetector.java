@@ -36,6 +36,7 @@ public final class EdmxBreakoutDetector implements Detector {
     @Override
     public AnomalyResult detect(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
-        throw new UnsupportedOperationException("Not yet implemented");
+//        throw new UnsupportedOperationException("Not yet implemented");
+        return null;
     }
 }

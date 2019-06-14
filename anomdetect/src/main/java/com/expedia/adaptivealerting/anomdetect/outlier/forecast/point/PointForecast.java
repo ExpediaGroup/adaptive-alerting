@@ -15,17 +15,12 @@
  */
 package com.expedia.adaptivealerting.anomdetect.outlier.forecast.point;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 @Data
-@RequiredArgsConstructor
+@AllArgsConstructor
 public final class PointForecast {
-
-    @NonNull
     private double value;
-
-    @NonNull
     private boolean warmup;
 }
