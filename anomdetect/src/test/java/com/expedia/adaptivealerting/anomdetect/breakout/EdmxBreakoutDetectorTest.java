@@ -13,24 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.util;
+package com.expedia.adaptivealerting.anomdetect.breakout;
 
+import org.junit.Before;
 import org.junit.Test;
 
-import static com.expedia.adaptivealerting.anomdetect.util.MathUtil.isApproximatelyEqual;
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertFalse;
+import java.util.UUID;
 
-public class MathUtilTest {
+public final class EdmxBreakoutDetectorTest {
+    private EdmxBreakoutDetector detectorUnderTest;
 
-    @Test
-    public void testIsApproximatelyEqual() {
-        assertTrue(isApproximatelyEqual(2.0, 2.0, 0.0));
-        assertTrue(isApproximatelyEqual(2.0, 2.0, 0.1));
+    @Before
+    public void setUp() {
+        this.detectorUnderTest = new EdmxBreakoutDetector(UUID.randomUUID());
+    }
 
-        // This is surprising, but it's because floating point is only approximate.
-        assertFalse(isApproximatelyEqual(2.0, 2.1, 0.1));
-
-        assertTrue(isApproximatelyEqual(2.0, 2.1, 0.11));
+    @Test(expected = IllegalArgumentException.class)
+    public void testDetect_nullMetricData() {
+        detectorUnderTest.detect(null);
     }
 }

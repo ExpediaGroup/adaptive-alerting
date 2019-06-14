@@ -18,17 +18,11 @@ package com.expedia.adaptivealerting.pipeline.integration
 import java.util.Properties
 import java.util.concurrent.{Executors, ScheduledExecutorService, TimeUnit}
 
-import com.expedia.adaptivealerting.kafka.util.AppUtil
 import com.expedia.metrics.MetricData
 import com.typesafe.config.{Config, ConfigValue, ConfigValueFactory}
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.producer.ProducerConfig
-import org.apache.kafka.streams.integration.utils.{EmbeddedKafkaCluster, IntegrationTestUtils}
 import org.apache.kafka.streams.{KeyValue, StreamsConfig}
-import org.scalatest._
-
-import scala.collection.JavaConverters._
-import scala.concurrent.duration.FiniteDuration
 
 object EmbeddedKafka {
   val CLUSTER = new EmbeddedKafkaCluster(1)

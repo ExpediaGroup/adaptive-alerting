@@ -15,10 +15,10 @@
  */
 package com.expedia.adaptivealerting.anomdetect.outlier.forecast.point;
 
+import com.expedia.adaptivealerting.anomdetect.outlier.forecast.point.holtwinters.HoltWintersAustouristsTestHelper;
 import com.expedia.adaptivealerting.anomdetect.outlier.forecast.point.holtwinters.HoltWintersAustouristsTestRow;
 import com.expedia.adaptivealerting.anomdetect.outlier.forecast.point.holtwinters.HoltWintersTrainingMethod;
 import com.expedia.adaptivealerting.anomdetect.outlier.forecast.point.holtwinters.SeasonalityType;
-import com.expedia.adaptivealerting.anomdetect.outlier.forecast.point.holtwinters.HoltWintersAustouristsTestHelper;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import lombok.val;
@@ -32,8 +32,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.ListIterator;
 
-import static com.expedia.adaptivealerting.anomdetect.outlier.forecast.point.holtwinters.HoltWintersAustouristsTestHelper.buildAustouristsParams;
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 /**

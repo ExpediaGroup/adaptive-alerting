@@ -16,7 +16,6 @@
 package com.expedia.adaptivealerting.modelservice.repo;
 
 import com.expedia.adaptivealerting.modelservice.entity.LegacyMetricDetectorMapping;
-import com.expedia.adaptivealerting.modelservice.entity.projection.InlineType;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 

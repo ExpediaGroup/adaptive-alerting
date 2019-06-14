@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.outlier;
 
+import com.expedia.adaptivealerting.anomdetect.DetectorResult;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,7 +31,7 @@ import lombok.experimental.Accessors;
 @RequiredArgsConstructor
 @Accessors(chain = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AnomalyResult {
+public class AnomalyResult implements DetectorResult {
 
     @NonNull
     private AnomalyLevel anomalyLevel;

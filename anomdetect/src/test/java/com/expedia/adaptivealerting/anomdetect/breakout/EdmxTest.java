@@ -39,7 +39,7 @@ public class EdmxTest {
         val result = Edmx.edmx(data, 24);
         log.trace("result={}", result);
 
-        // TODO Might want to make this series throu
+        // TODO Might want to make this series throw an exception since the R package fails on division by 0.
         assertEquals(-1, result.getLocation());
     }
 
@@ -53,8 +53,8 @@ public class EdmxTest {
         val result = Edmx.edmx(data, 5);
         log.trace("result={}", result);
 
-        // Note that while I would prefer that EDM-X not return any breakout here at all, in fact the R implementation
-        // returns the following location and test statistic. Here we're just trying to replicate that behavior.
+        // This is the correct behavior when there's no permutation test.
+        // TODO Implement permutation test so we can avoid reporting a breakout where none exists.
         assertEquals(49, result.getLocation());
         assertEquals(24.99, result.getStat(), TOLERANCE);
     }

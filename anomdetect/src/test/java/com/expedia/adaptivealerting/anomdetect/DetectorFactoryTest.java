@@ -15,10 +15,10 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.anomdetect.outlier.forecast.interval.AdditiveIntervalForecaster;
-import com.expedia.adaptivealerting.anomdetect.outlier.forecast.point.EwmaPointForecaster;
 import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyType;
 import com.expedia.adaptivealerting.anomdetect.outlier.ForecastingOutlierDetector;
+import com.expedia.adaptivealerting.anomdetect.outlier.forecast.interval.AdditiveIntervalForecaster;
+import com.expedia.adaptivealerting.anomdetect.outlier.forecast.point.EwmaPointForecaster;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;

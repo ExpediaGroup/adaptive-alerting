@@ -24,6 +24,8 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
 
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
+
 @RequiredArgsConstructor
 public final class EdmxBreakoutDetector implements Detector {
 
@@ -33,6 +35,7 @@ public final class EdmxBreakoutDetector implements Detector {
 
     @Override
     public AnomalyResult detect(MetricData metricData) {
+        notNull(metricData, "metricData can't be null");
         throw new UnsupportedOperationException("Not yet implemented");
     }
 }

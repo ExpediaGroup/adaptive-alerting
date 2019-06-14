@@ -19,7 +19,6 @@ import com.expedia.adaptivealerting.anomdetect.outlier.forecast.point.HoltWinter
 import org.junit.Assert;
 import org.junit.Test;
 
-import static com.expedia.adaptivealerting.anomdetect.outlier.forecast.point.holtwinters.HoltWintersAustouristsTestHelper.buildAustouristsParams;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 

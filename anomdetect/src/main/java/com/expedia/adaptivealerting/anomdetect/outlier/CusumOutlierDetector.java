@@ -16,8 +16,10 @@
 package com.expedia.adaptivealerting.anomdetect.outlier;
 
 import com.expedia.adaptivealerting.anomdetect.DetectorConfig;
+import com.expedia.adaptivealerting.anomdetect.DetectorResult;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.val;
@@ -81,7 +83,7 @@ public final class CusumOutlierDetector extends AbstractOutlierDetector {
     }
 
     @Override
-    public AnomalyResult detect(MetricData metricData) {
+    public DetectorResult detect(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
 
         val params = getParams();
@@ -175,6 +177,7 @@ public final class CusumOutlierDetector extends AbstractOutlierDetector {
 
     @Data
     @Accessors(chain = true)
+    @EqualsAndHashCode(callSuper = false)
     public static final class Params implements DetectorConfig {
 
         /**

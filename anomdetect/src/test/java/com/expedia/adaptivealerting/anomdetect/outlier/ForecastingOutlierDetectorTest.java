@@ -72,7 +72,7 @@ public class ForecastingOutlierDetectorTest {
     public void testClassify() {
         val metricDef = TestObjectMother.metricDefinition();
         val metricData = new MetricData(metricDef, 100.0, Instant.now().getEpochSecond());
-        val result = detectorUnderTest.detect(metricData);
+        val result = (AnomalyResult) detectorUnderTest.detect(metricData);
         assertNotNull(result);
     }
 

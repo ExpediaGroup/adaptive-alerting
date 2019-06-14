@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyResult;
 import com.typesafe.config.Config;
 import lombok.Getter;
 import lombok.NonNull;
@@ -89,7 +88,7 @@ public class DetectorManager {
      * @param mappedMetricData Mapped metric data.
      * @return The anomaly result, or {@code null} if there's no associated detector.
      */
-    public AnomalyResult classify(MappedMetricData mappedMetricData) {
+    public DetectorResult detect(MappedMetricData mappedMetricData) {
         notNull(mappedMetricData, "mappedMetricData can't be null");
 
         val detector = detectorFor(mappedMetricData);

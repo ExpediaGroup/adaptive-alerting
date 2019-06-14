@@ -16,9 +16,9 @@
 package com.expedia.adaptivealerting.kafka;
 
 import com.expedia.adaptivealerting.anomdetect.DetectorManager;
+import com.expedia.adaptivealerting.anomdetect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyLevel;
 import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyResult;
-import com.expedia.adaptivealerting.anomdetect.MappedMetricData;
 import com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde;
 import com.expedia.adaptivealerting.kafka.util.TestObjectMother;
 import com.typesafe.config.Config;
@@ -155,12 +155,12 @@ public final class KafkaDetectorManagerTest {
     }
 
     private void initDependencies() {
-        when(manager.classify(metric_normalAnomaly)).thenReturn(new AnomalyResult(AnomalyLevel.NORMAL));
-        when(manager.classify(metric_weakAnomaly)).thenReturn(new AnomalyResult(AnomalyLevel.WEAK));
-        when(manager.classify(metric_strongAnomaly)).thenReturn(new AnomalyResult(AnomalyLevel.STRONG));
-        when(manager.classify(metric_modelWarmup)).thenReturn(new AnomalyResult(AnomalyLevel.MODEL_WARMUP));
-        when(manager.classify(metric_unknownAnomaly)).thenReturn(new AnomalyResult(AnomalyLevel.UNKNOWN));
-        when(manager.classify(metric_invalid)).thenThrow(new RuntimeException("Classification error"));
+        when(manager.detect(metric_normalAnomaly)).thenReturn(new AnomalyResult(AnomalyLevel.NORMAL));
+        when(manager.detect(metric_weakAnomaly)).thenReturn(new AnomalyResult(AnomalyLevel.WEAK));
+        when(manager.detect(metric_strongAnomaly)).thenReturn(new AnomalyResult(AnomalyLevel.STRONG));
+        when(manager.detect(metric_modelWarmup)).thenReturn(new AnomalyResult(AnomalyLevel.MODEL_WARMUP));
+        when(manager.detect(metric_unknownAnomaly)).thenReturn(new AnomalyResult(AnomalyLevel.UNKNOWN));
+        when(manager.detect(metric_invalid)).thenThrow(new RuntimeException("Classification error"));
     }
 
     private void initTestMachinery() {

@@ -76,7 +76,8 @@ public class IndividualsOutlierDetectorTest {
             val observed = testRow.getObserved();
 
             val metricData = new MetricData(metricDef, observed, epochSecond);
-            val level = detector.detect(metricData).getAnomalyLevel();
+            val result = (AnomalyResult) detector.detect(metricData);
+            val level = result.getAnomalyLevel();
 
             if (noOfDataPoints < WARMUP_PERIOD) {
                 assertEquals(AnomalyLevel.MODEL_WARMUP, level);

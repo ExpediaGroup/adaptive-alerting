@@ -16,8 +16,10 @@
 package com.expedia.adaptivealerting.anomdetect.outlier;
 
 import com.expedia.adaptivealerting.anomdetect.DetectorConfig;
+import com.expedia.adaptivealerting.anomdetect.DetectorResult;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.val;
@@ -46,7 +48,7 @@ public final class ConstantThresholdOutlierDetector extends AbstractOutlierDetec
     }
 
     @Override
-    public AnomalyResult detect(MetricData metricData) {
+    public DetectorResult detect(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
         val thresholds = params.getThresholds();
         val level = classifier.classify(thresholds, metricData.getValue());
@@ -55,6 +57,7 @@ public final class ConstantThresholdOutlierDetector extends AbstractOutlierDetec
 
     @Data
     @Accessors(chain = true)
+    @EqualsAndHashCode(callSuper = false)
     public static final class Params implements DetectorConfig {
 
         /**

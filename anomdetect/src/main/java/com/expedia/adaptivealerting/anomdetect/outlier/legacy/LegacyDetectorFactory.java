@@ -15,17 +15,17 @@
  */
 package com.expedia.adaptivealerting.anomdetect.outlier.legacy;
 
+import com.expedia.adaptivealerting.anomdetect.Detector;
 import com.expedia.adaptivealerting.anomdetect.connector.DetectorResource;
+import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyType;
 import com.expedia.adaptivealerting.anomdetect.outlier.ConstantThresholdOutlierDetector;
 import com.expedia.adaptivealerting.anomdetect.outlier.CusumOutlierDetector;
-import com.expedia.adaptivealerting.anomdetect.Detector;
 import com.expedia.adaptivealerting.anomdetect.outlier.ForecastingOutlierDetector;
 import com.expedia.adaptivealerting.anomdetect.outlier.IndividualsOutlierDetector;
 import com.expedia.adaptivealerting.anomdetect.outlier.forecast.interval.ExponentialWelfordIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.outlier.forecast.point.EwmaPointForecaster;
 import com.expedia.adaptivealerting.anomdetect.outlier.forecast.point.HoltWintersForecaster;
 import com.expedia.adaptivealerting.anomdetect.outlier.forecast.point.PewmaPointForecaster;
-import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

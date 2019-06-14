@@ -1,13 +1,13 @@
 package com.expedia.adaptivealerting.modelservice.test;
 
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.MatchingDetectorsResponse;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.User;
 import com.expedia.adaptivealerting.modelservice.dto.percolator.BoolCondition;
 import com.expedia.adaptivealerting.modelservice.dto.percolator.MustCondition;
 import com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping;
 import com.expedia.adaptivealerting.modelservice.dto.percolator.Query;
 import com.expedia.adaptivealerting.modelservice.entity.Detector;
 import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.User;
 import com.expedia.adaptivealerting.modelservice.providers.graphite.GraphiteResult;
 import com.expedia.adaptivealerting.modelservice.service.AnomalyRequest;
 import com.expedia.adaptivealerting.modelservice.spi.MetricSourceResult;

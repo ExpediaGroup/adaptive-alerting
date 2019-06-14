@@ -43,5 +43,4 @@ public abstract class AbstractOutlierDetector implements Detector {
         this.uuid = uuid;
         this.aggregator = aggregator;
     }
-
 }

@@ -168,11 +168,6 @@
             </dependency>
             <dependency>
                 <groupId>com.expedia.adaptivealerting</groupId>
-                <artifactId>adaptive-alerting-core</artifactId>
-                <version>${aa.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.expedia.adaptivealerting</groupId>
                 <artifactId>adaptive-alerting-kafka</artifactId>
                 <version>${aa.version}</version>
             </dependency>

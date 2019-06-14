@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.filter;
 
-import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyResult;
 import com.expedia.adaptivealerting.anomdetect.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyResult;
 import com.expedia.adaptivealerting.anomdetect.outlier.forecast.evaluate.ModelEvaluation;
 import com.expedia.adaptivealerting.anomdetect.outlier.forecast.evaluate.RmseEvaluator;
 import com.expedia.adaptivealerting.tools.pipeline.util.ModelEvaluationSubscriber;

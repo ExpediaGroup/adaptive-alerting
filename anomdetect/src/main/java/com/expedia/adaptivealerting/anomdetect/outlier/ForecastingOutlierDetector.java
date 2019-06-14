@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.outlier;
 
 import com.expedia.adaptivealerting.anomdetect.Detector;
+import com.expedia.adaptivealerting.anomdetect.DetectorResult;
 import com.expedia.adaptivealerting.anomdetect.outlier.forecast.interval.IntervalForecast;
 import com.expedia.adaptivealerting.anomdetect.outlier.forecast.interval.IntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.outlier.forecast.interval.IntervalForecasterParams;
@@ -23,6 +24,7 @@ import com.expedia.adaptivealerting.anomdetect.outlier.forecast.point.PointForec
 import com.expedia.adaptivealerting.anomdetect.outlier.forecast.point.PointForecasterParams;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Generated;
 import lombok.Getter;
 import lombok.experimental.Accessors;
@@ -79,7 +81,7 @@ public final class ForecastingOutlierDetector extends AbstractOutlierDetector {
     }
 
     @Override
-    public AnomalyResult detect(MetricData metricData) {
+    public DetectorResult detect(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
 
         val pointForecast = pointForecaster.forecast(metricData);
@@ -106,6 +108,7 @@ public final class ForecastingOutlierDetector extends AbstractOutlierDetector {
      */
     @Data
     @Accessors(chain = true)
+    @EqualsAndHashCode(callSuper = false)
     public static final class Params extends AbstractOutlierDetectorConfig {
         private PointForecasterParams pointForecasterParams;
         private IntervalForecasterParams intervalForecasterParams;

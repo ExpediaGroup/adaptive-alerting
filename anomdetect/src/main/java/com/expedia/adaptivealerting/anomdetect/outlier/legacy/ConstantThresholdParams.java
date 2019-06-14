@@ -15,9 +15,9 @@
  */
 package com.expedia.adaptivealerting.anomdetect.outlier.legacy;
 
-import com.expedia.adaptivealerting.anomdetect.outlier.ConstantThresholdOutlierDetector;
 import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyThresholds;
 import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyType;
+import com.expedia.adaptivealerting.anomdetect.outlier.ConstantThresholdOutlierDetector;
 import lombok.Data;
 import lombok.experimental.Accessors;
 

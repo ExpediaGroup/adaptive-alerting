@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect.outlier.legacy;
 
-import com.expedia.adaptivealerting.anomdetect.outlier.CusumOutlierDetector;
 import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyType;
+import com.expedia.adaptivealerting.anomdetect.outlier.CusumOutlierDetector;
 import lombok.Data;
 import lombok.experimental.Accessors;
 

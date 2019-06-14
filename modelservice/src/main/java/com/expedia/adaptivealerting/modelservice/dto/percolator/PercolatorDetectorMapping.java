@@ -17,7 +17,6 @@ package com.expedia.adaptivealerting.modelservice.dto.percolator;
 
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.User;
-import com.expedia.adaptivealerting.modelservice.dto.percolator.Query;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;

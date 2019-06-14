@@ -16,15 +16,17 @@
 package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.anomdetect.connector.ModelServiceConnector;
-import com.expedia.adaptivealerting.anomdetect.outlier.legacy.LegacyDetectorFactory;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapping;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMatchResponse;
+import com.expedia.adaptivealerting.anomdetect.outlier.legacy.LegacyDetectorFactory;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isTrue;

@@ -54,10 +54,7 @@ public interface DetectorSource {
      */
     List<UUID> findUpdatedDetectors(int timePeriod);
 
-
     List<DetectorMapping> findUpdatedDetectorMappings(int timePeriod);
 
-
     DetectorMatchResponse findMatchingDetectorMappings(List<Map<String, String>> metricTags);
-
 }

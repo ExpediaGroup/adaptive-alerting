@@ -16,8 +16,8 @@
 package com.expedia.adaptivealerting.kafka;
 
 import com.expedia.adaptivealerting.anomdetect.DetectorManager;
-import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyResult;
 import com.expedia.adaptivealerting.anomdetect.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyResult;
 import com.expedia.adaptivealerting.anomdetect.util.AssertUtil;
 import com.expedia.adaptivealerting.anomdetect.util.ErrorUtil;
 import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
@@ -85,7 +85,7 @@ public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
 
         AnomalyResult anomalyResult = null;
         try {
-            anomalyResult = manager.classify(mmd);
+            anomalyResult = (AnomalyResult) manager.detect(mmd);
         } catch (Exception e) {
             log.error("Classification error: mappedMetricData={}, error={}",
                     mmd,

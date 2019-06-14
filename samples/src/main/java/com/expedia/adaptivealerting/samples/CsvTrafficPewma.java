@@ -15,10 +15,10 @@
  */
 package com.expedia.adaptivealerting.samples;
 
+import com.expedia.adaptivealerting.anomdetect.outlier.forecast.evaluate.RmseEvaluator;
 import com.expedia.adaptivealerting.anomdetect.outlier.legacy.LegacyDetectorFactory;
 import com.expedia.adaptivealerting.anomdetect.outlier.legacy.PewmaParams;
 import com.expedia.adaptivealerting.anomdetect.util.MetricFrameLoader;
-import com.expedia.adaptivealerting.anomdetect.outlier.forecast.evaluate.RmseEvaluator;
 import com.expedia.adaptivealerting.tools.pipeline.filter.DetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.source.MetricFrameMetricSource;

@@ -1,13 +1,12 @@
 package com.expedia.adaptivealerting.modelservice.service;
 
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.CreateDetectorMappingRequest;
-import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.MatchingDetectorsResponse;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.SearchMappingsRequest;
+import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorMappingRepository;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import lombok.extern.slf4j.Slf4j;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

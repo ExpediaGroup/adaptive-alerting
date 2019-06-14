@@ -102,7 +102,8 @@ public class CusumOutlierDetectorTest {
             val testRow = testRows.next();
             val observed = testRow.getObserved();
             val metricData = new MetricData(metricDefinition, observed, epochSecond);
-            val level = detector.detect(metricData).getAnomalyLevel();
+            val result = (AnomalyResult) detector.detect(metricData);
+            val level = result.getAnomalyLevel();
 
             assertEquals(AnomalyLevel.valueOf(testRow.getLevel()), level);
 
@@ -149,7 +150,7 @@ public class CusumOutlierDetectorTest {
 
         for (int i = 0; i < adjWarmupPeriod; i++) {
             val metricData = new MetricData(metricDefinition, 1000.0, 1000 * i);
-            val anomalyResult = detector.detect(metricData);
+            val anomalyResult = (AnomalyResult) detector.detect(metricData);
             val anomalyLevel = anomalyResult.getAnomalyLevel();
             assertEquals(AnomalyLevel.MODEL_WARMUP, anomalyLevel);
         }
@@ -159,7 +160,7 @@ public class CusumOutlierDetectorTest {
             val value = testRow.getObserved();
             val timestamp = (adjWarmupPeriod + i) * 1000L;
             val metricData = new MetricData(metricDefinition, value, timestamp);
-            val anomalyResult = detector.detect(metricData);
+            val anomalyResult = (AnomalyResult) detector.detect(metricData);
             val anomalyLevel = anomalyResult.getAnomalyLevel();
             assertEquals(AnomalyLevel.valueOf(testRow.getLevel()), anomalyLevel);
         }

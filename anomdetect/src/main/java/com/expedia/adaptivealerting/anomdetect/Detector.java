@@ -39,5 +39,5 @@ public interface Detector {
      * @param metricData Metric data point.
      * @return Anomaly result.
      */
-    AnomalyResult detect(MetricData metricData);
+    DetectorResult detect(MetricData metricData);
 }
