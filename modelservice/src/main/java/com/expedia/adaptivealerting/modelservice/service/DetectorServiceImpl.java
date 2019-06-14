@@ -52,7 +52,7 @@ public class DetectorServiceImpl implements DetectorService {
     }
 
     @Override
-    public List<Detector> findByUuid(String uuid) {
+    public Detector findByUuid(String uuid) {
         return detectorRepository.findByUuid(uuid);
     }
 

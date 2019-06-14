@@ -117,9 +117,11 @@ public class DetectorRepositoryImplTest {
 
     @Test
     public void testFindByUuid() {
-        List<Detector> actualDetectors = detectorRepository.findByUuid("uuid");
-        assertNotNull(actualDetectors);
-        assertCheck(actualDetectors);
+        Detector actualDetector = detectorRepository.findByUuid("uuid");
+        assertNotNull(actualDetector);
+        Assert.assertEquals("aeb4d849-847a-45c0-8312-dc0fcf22b639", actualDetector.getUuid());
+        Assert.assertEquals("test-user", actualDetector.getCreatedBy());
+        Assert.assertEquals(true, actualDetector.getEnabled());
     }
 
     @Test

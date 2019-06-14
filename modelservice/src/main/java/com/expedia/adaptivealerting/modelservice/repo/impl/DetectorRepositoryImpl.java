@@ -113,11 +113,11 @@ public class DetectorRepositoryImpl implements DetectorRepository {
     }
 
     @Override
-    public List<Detector> findByUuid(String uuid) {
+    public Detector findByUuid(String uuid) {
         val queryBuilder = QueryBuilders.matchQuery("uuid", uuid);
         val searchSourceBuilder = elasticsearchUtil.getSourceBuilder(queryBuilder).size(DEFAULT_ES_RESULTS_SIZE);
         val searchRequest = elasticsearchUtil.getSearchRequest(searchSourceBuilder, DETECTOR_INDEX, DETECTOR_DOC_TYPE);
-        return getDetectorsFromElasticSearch(searchRequest);
+        return getDetectorsFromElasticSearch(searchRequest).get(0);
     }
 
     @Override
@@ -160,6 +160,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
         SearchHit[] hits = response.getHits().getHits();
         List<Detector> detectors = new ArrayList<>();
         for (val hit : hits) {
+
             val detector = (Detector) objectMapperUtil.convertToObject(hit.getSourceAsString(), new TypeReference<Detector>() {
             });
             val newElasticsearchDetector = getElasticSearchDetector(detector);

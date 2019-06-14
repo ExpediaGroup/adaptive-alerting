@@ -41,8 +41,8 @@ public class DetectorControllerTest {
 
     @Test
     public void testFindByUuid() {
-        List<Detector> actualDetectors = controller.findByUuid("uuid");
-        assertNotNull(actualDetectors);
+        Detector actualDetector = controller.findByUuid("uuid");
+        assertNotNull(actualDetector);
     }
 
     @Test

@@ -27,7 +27,7 @@ public interface DetectorService {
 
     void updateDetector(String uuid, Detector elasticsearchDetector);
 
-    List<Detector> findByUuid(String uuid);
+    Detector findByUuid(String uuid);
 
     List<Detector> findByCreatedBy(String user);
 
