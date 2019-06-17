@@ -101,7 +101,7 @@ public final class DetectorManagerTest {
 
     @Test
     public void testDetectorRefresh() {
-        val result = managerUnderTest.detectorMapRefresh();
+        val result = managerUnderTest.detectorMapRefresh(System.currentTimeMillis()+1000*60);
         assertNotNull(result);
         assertEquals(updatedDetectors, result);
     }
@@ -153,7 +153,7 @@ public final class DetectorManagerTest {
 
         when(detectorSource.findDetector(mappedUuid)).thenReturn(detector);
         when(detectorSource.findDetector(unmappedUuid)).thenReturn(null);
-        when(detectorSource.findUpdatedDetectors(detectorRefreshPeriod)).thenReturn(updatedDetectors);
+        when(detectorSource.findUpdatedDetectors(detectorRefreshPeriod * 60)).thenReturn(updatedDetectors);
 
         when(config.getInt("detector-refresh-period")).thenReturn(detectorRefreshPeriod);
         when(badConfig.getInt("detector-refresh-period")).thenReturn(badDetectorRefreshPeriod);

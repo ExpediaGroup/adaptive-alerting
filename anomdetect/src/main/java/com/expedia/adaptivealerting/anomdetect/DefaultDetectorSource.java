@@ -55,7 +55,7 @@ public class DefaultDetectorSource implements DetectorSource {
     }
 
     @Override
-    public List<UUID> findUpdatedDetectors(int timePeriod) {
+    public List<UUID> findUpdatedDetectors(long timePeriod) {
         notNull(timePeriod, "timePeriod can't be null");
 
         return connector

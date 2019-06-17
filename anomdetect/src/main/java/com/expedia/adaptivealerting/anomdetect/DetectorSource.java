@@ -46,13 +46,13 @@ public interface DetectorSource {
     Detector findDetector(UUID uuid);
 
     /**
-     * Finds the list of detector UUIDs updated in last `timePeriod` minutes
+     * Finds the list of detector UUIDs updated in last `timePeriod` seconds
      *
-     * @param timePeriod time period in minutes.
+     * @param timePeriod time period in seconds.
      * @return The detector UUIDs.
      * @throws DetectorException if there's a problem finding the detectors
      */
-    List<UUID> findUpdatedDetectors(int timePeriod);
+    List<UUID> findUpdatedDetectors(long timePeriod);
 
     List<DetectorMapping> findUpdatedDetectorMappings(int timePeriod);
 
