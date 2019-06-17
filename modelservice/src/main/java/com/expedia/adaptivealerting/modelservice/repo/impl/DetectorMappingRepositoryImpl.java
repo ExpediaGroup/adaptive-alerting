@@ -52,7 +52,6 @@ import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.ConstantScoreQueryBuilder;
 import org.elasticsearch.index.query.NestedQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
@@ -112,8 +111,13 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
             }
             PercolateQueryBuilder percolateQuery = new PercolateQueryBuilder(PercolatorDetectorMapping.QUERY_KEYWORD,
                     refList, XContentType.JSON);
-            ConstantScoreQueryBuilder constantScoreQueryBuilder = new ConstantScoreQueryBuilder(percolateQuery);
-            SearchSourceBuilder searchSourceBuilder = elasticsearchUtil.getSourceBuilder(constantScoreQueryBuilder);
+            val termQuery = QueryBuilders.termQuery("aa_enabled", true);
+
+            BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+            boolQueryBuilder.filter(percolateQuery);
+            boolQueryBuilder.filter(termQuery);
+
+            SearchSourceBuilder searchSourceBuilder = elasticsearchUtil.getSourceBuilder(boolQueryBuilder);
             searchSourceBuilder.timeout(new TimeValue(elasticSearchProperties.getConfig().getConnectionTimeout()));
             //FIXME setting default result set size to 500.
             // This is for returning detectors matching for set of metrics
