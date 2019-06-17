@@ -77,7 +77,7 @@ public class DetectorManager {
         scheduler.scheduleWithFixedDelay(() -> {
             try {
                 log.trace("Refreshing detectors");
-                this.detectorMapRefresh(System.currentTimeMillis());
+                this.detectorCacheSync(System.currentTimeMillis());
             } catch (Exception e) {
                 log.error("Error refreshing detectors", e);
             }
@@ -123,7 +123,7 @@ public class DetectorManager {
      * when corresponding mapped-metric comes in.
      * On successful sync update syncUptill time to currentTime
      */
-    List<UUID> detectorMapRefresh(long currentTime) {
+    List<UUID> detectorCacheSync(long currentTime) {
         var updatedDetectors = new ArrayList<UUID>();
 
         long updateDurationInSeconds = (currentTime - syncedUptillTime) / 1000;

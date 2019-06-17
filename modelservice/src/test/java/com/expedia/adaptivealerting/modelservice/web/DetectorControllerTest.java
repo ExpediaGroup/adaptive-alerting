@@ -15,7 +15,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 
@@ -36,7 +36,7 @@ public class DetectorControllerTest {
     public void setUp() {
         this.controller = new DetectorController();
         MockitoAnnotations.initMocks(this);
-        when(detectorService.getLastUpdatedDetectors(anyInt())).thenReturn(detectors);
+        when(detectorService.getLastUpdatedDetectors(anyLong())).thenReturn(detectors);
     }
 
     @Test

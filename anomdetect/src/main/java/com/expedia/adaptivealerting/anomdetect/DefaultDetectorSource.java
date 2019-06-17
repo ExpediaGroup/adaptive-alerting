@@ -67,11 +67,11 @@ public class DefaultDetectorSource implements DetectorSource {
     }
 
     @Override
-    public List<DetectorMapping> findUpdatedDetectorMappings(int timeInSecs) {
-        isTrue(timeInSecs > 0, "timeInSecs must be strictly positive");
+    public List<DetectorMapping> findUpdatedDetectorMappings(long timePeriod) {
+        isTrue(timePeriod > 0, "timeInSecs must be strictly positive");
 
         return connector
-                .findUpdatedDetectorMappings(timeInSecs);
+                .findUpdatedDetectorMappings(timePeriod);
     }
 
 

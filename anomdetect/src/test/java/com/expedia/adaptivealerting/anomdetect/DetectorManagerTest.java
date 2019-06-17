@@ -101,7 +101,7 @@ public final class DetectorManagerTest {
 
     @Test
     public void testDetectorRefresh() {
-        val result = managerUnderTest.detectorMapRefresh(System.currentTimeMillis()+1000*60);
+        val result = managerUnderTest.detectorCacheSync(System.currentTimeMillis()+1000*60);
         assertNotNull(result);
         assertEquals(updatedDetectors, result);
     }
