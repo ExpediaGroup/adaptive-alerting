@@ -57,10 +57,8 @@ public class DefaultDetectorSource implements DetectorSource {
     @Override
     public List<UUID> findUpdatedDetectors(int timePeriod) {
         notNull(timePeriod, "timePeriod can't be null");
-
         return connector
                 .findUpdatedDetectors(timePeriod)
-                .getDetectorResources()
                 .stream()
                 .map(resource -> UUID.fromString(resource.getUuid()))
                 .collect(Collectors.toList());

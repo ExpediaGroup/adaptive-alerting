@@ -55,6 +55,7 @@ import static org.mockito.Mockito.when;
  */
 @Slf4j
 public class ModelServiceConnectorTest {
+
     private static final UUID DETECTOR_UUID = UUID.randomUUID();
     private static final UUID DETECTOR_UUID_CANT_RETRIEVE = UUID.randomUUID();
     private static final UUID DETECTOR_UUID_CANT_DESERIALIZE = UUID.randomUUID();
@@ -95,10 +96,10 @@ public class ModelServiceConnectorTest {
     private Content detectorResourcesContent_noModels;
     private Content detectorResourcesContent;
     private byte[] detectorResourcesBytes_cantDeserialize;
-    private DetectorResources detectorResources;
+    private DetectorResource[] detectorResources;
     private DetectorResource detectorResource;
     private DetectorResource detectorResources_noModel;
-    private DetectorResources detectorResources_noModels;
+    private DetectorResource[] detectorResources_noModels;
 
     @Mock
     private Content findDetectorResourcesContent_cantDeserialize;
@@ -247,7 +248,9 @@ public class ModelServiceConnectorTest {
 
         // Find latest model - happy path
         this.detectorResource = new DetectorResource();
-        this.detectorResources = new DetectorResources(Collections.singletonList(new DetectorResource("3217d4be-9c33-490f-828e-c976b393b000", "kashah", "constant-detector", new Date(), new HashMap<>(), true)));
+        this.detectorResources = new DetectorResource[1];
+        detectorResources[0] = new DetectorResource("3217d4be-9c33-490f-828e-c976b393b000", "kashah", "constant-detector", new Date(), new HashMap<>(), true);
+
         val detectorResourcesBytes = new ObjectMapper().writeValueAsBytes(detectorResources);
         this.detectorResourcesContent = new Content(detectorResourcesBytes, ContentType.APPLICATION_JSON);
 
@@ -256,7 +259,7 @@ public class ModelServiceConnectorTest {
         when(findDetectorResourcesContent_cantDeserialize.asBytes()).thenReturn(findDetectorResourcesBytes_cantDeserialize);
 
         // Find latest model - no models
-        this.detectorResources_noModels = new DetectorResources(Collections.EMPTY_LIST);
+        this.detectorResources_noModels = new DetectorResource[0];
         this.detectorResources_noModel = null;
         val detectorResourcesBytes_noModels = new ObjectMapper().writeValueAsBytes(detectorResources_noModels);
         this.detectorResourcesContent_noModels = new Content(detectorResourcesBytes_noModels, ContentType.APPLICATION_JSON);
@@ -304,9 +307,9 @@ public class ModelServiceConnectorTest {
     }
 
     private void initDependencies_findDetectors_objectMapper() throws IOException {
-        when(objectMapper.readValue(detectorResourcesContent.asBytes(), DetectorResources.class))
+        when(objectMapper.readValue(detectorResourcesContent.asBytes(), DetectorResource[].class))
                 .thenReturn(detectorResources);
-        when(objectMapper.readValue(detectorResourcesBytes_cantDeserialize, DetectorResources.class))
+        when(objectMapper.readValue(detectorResourcesBytes_cantDeserialize, DetectorResource[].class))
                 .thenThrow(new IOException());
     }
 
@@ -330,4 +333,5 @@ public class ModelServiceConnectorTest {
         when(objectMapper.readValue(detectorResourcesContent_noModels.asBytes(), DetectorResource.class))
                 .thenReturn(detectorResources_noModel);
     }
+
 }
