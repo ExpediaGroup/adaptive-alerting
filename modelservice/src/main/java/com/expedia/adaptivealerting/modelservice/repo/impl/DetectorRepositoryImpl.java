@@ -42,6 +42,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -62,7 +63,11 @@ public class DetectorRepositoryImpl implements DetectorRepository {
 
     @Override
     public String createDetector(Detector detector) {
-        val indexRequest = new IndexRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, detector.getUuid());
+        String uuid = UUID.randomUUID().toString();
+        if (detector.getUuid() != null) {
+            uuid = detector.getUuid();
+        }
+        val indexRequest = new IndexRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, uuid);
         String json = objectMapperUtil.convertToString(getElasticSearchDetector(detector));
         return elasticsearchUtil.getIndexResponse(indexRequest, json).getId();
     }
