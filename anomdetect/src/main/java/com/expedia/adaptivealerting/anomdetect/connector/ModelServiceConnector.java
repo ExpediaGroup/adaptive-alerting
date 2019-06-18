@@ -90,12 +90,10 @@ public class ModelServiceConnector {
     public DetectorResource findLatestDetector(UUID detectorUuid) {
         notNull(detectorUuid, "detectorUuid can't be null");
 
-        // http://modelservice/api/models/search/findLatestByDetectorUuid?uuid=%s
-        // http://modelservice/api/models/search/findLatestByDetectorUuid?uuid=85f395a2-e276-7cfd-34bc-cb850ae3bc2e
+        // http://modelservice/api/v2/detectors/findByUuid?uuid=%s
+        // http://modelservice/api/v2/detectors/findByUuid?uuid=85f395a2-e276-7cfd-34bc-cb850ae3bc2e
         val uri = String.format(baseUri + API_PATH_MODEL_BY_DETECTOR_UUID, detectorUuid);
 
-        // This returns a list, but it contains either a single detector or none.
-        // We should have made the backing method return a Model instead of a List<Model>. [WLW]
         Content content;
         try {
             content = httpClient.get(uri);
@@ -123,7 +121,7 @@ public class ModelServiceConnector {
 
     /**
      * @param sinceMinutes the time period in minutes
-     * @return the list of detectorMappings that were modified in last since minutes
+     * @return the list of detectors that were modified in last since minutes
      */
     public List<DetectorResource> findUpdatedDetectors(int sinceMinutes) {
         isTrue(sinceMinutes > 0, "timePeriod must be strictly positive");
