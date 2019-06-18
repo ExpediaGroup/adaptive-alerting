@@ -41,10 +41,10 @@ public class DetectorResource {
     private String createdBy;
 
     private String type;
-
+    
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Date lastUpdateTimestamp;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Map<String, Object> detectorConfig = new HashMap<>();
 
     private Boolean enabled;
