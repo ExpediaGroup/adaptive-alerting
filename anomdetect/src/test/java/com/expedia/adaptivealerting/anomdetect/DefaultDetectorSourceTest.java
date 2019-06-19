@@ -16,7 +16,6 @@
 package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.anomdetect.connector.DetectorResource;
-import com.expedia.adaptivealerting.anomdetect.connector.DetectorResources;
 import com.expedia.adaptivealerting.anomdetect.connector.ModelServiceConnector;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapping;
 import com.expedia.adaptivealerting.anomdetect.exception.DetectorNotFoundException;
@@ -34,6 +33,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -61,8 +61,7 @@ public final class DefaultDetectorSourceTest {
     @Mock
     private LegacyDetectorFactory legacyDetectorFactory;
 
-    private DetectorResources detectorResources;
-    private DetectorResources updatedDetectorResources;
+    private DetectorResource[] updatedDetectorResources;
     private DetectorResource detectorResource_ewma;
     private Detector detector;
     private DetectorMapping detectorMapping;
@@ -123,16 +122,6 @@ public final class DefaultDetectorSourceTest {
     }
 
     private void initTestObjects_findDetectors() {
-        val detectorResource = new DetectorResource(
-                DETECTOR_UUID_EWMA.toString(),
-                "kashah",
-                "ewma-detector",
-                new Date(),
-                new HashMap<>(),
-                true);
-
-        this.detectorResources = new DetectorResources(Collections.singletonList(detectorResource));
-
         val updatedDetectorsResource = new DetectorResource(
                 DETECTOR_UUID_EWMA.toString(),
                 "kashah",
@@ -140,7 +129,9 @@ public final class DefaultDetectorSourceTest {
                 new Date(),
                 new HashMap<>(),
                 true);
-        this.updatedDetectorResources = new DetectorResources(Collections.singletonList(updatedDetectorsResource));
+
+        this.updatedDetectorResources = new DetectorResource[1];
+        updatedDetectorResources[0] = updatedDetectorsResource;
         this.detectorMapping = new DetectorMapping().setDetector(new com.expedia.adaptivealerting.anomdetect.detectormapper.Detector(UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689"))).setEnabled(false);
     }
 
@@ -167,7 +158,7 @@ public final class DefaultDetectorSourceTest {
 
     private void initDependencies() {
         when(connector.findUpdatedDetectors(1))
-                .thenReturn(updatedDetectorResources);
+                .thenReturn(Arrays.asList(updatedDetectorResources));
         when(connector.findLatestDetector(DETECTOR_UUID_EWMA))
                 .thenReturn(detectorResource_ewma);
         when(connector.findLatestDetector(DETECTOR_UUID_MISSING_DETECTOR))

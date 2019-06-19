@@ -42,6 +42,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -62,7 +63,11 @@ public class DetectorRepositoryImpl implements DetectorRepository {
 
     @Override
     public String createDetector(Detector detector) {
-        val indexRequest = new IndexRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, detector.getUuid());
+        String uuid = UUID.randomUUID().toString();
+        if (detector.getUuid() != null) {
+            uuid = detector.getUuid();
+        }
+        val indexRequest = new IndexRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, uuid);
         String json = objectMapperUtil.convertToString(getElasticSearchDetector(detector));
         return elasticsearchUtil.getIndexResponse(indexRequest, json).getId();
     }
@@ -113,16 +118,16 @@ public class DetectorRepositoryImpl implements DetectorRepository {
     }
 
     @Override
-    public List<Detector> findByUuid(String uuid) {
-        val queryBuilder = QueryBuilders.matchQuery("uuid", uuid);
+    public Detector findByUuid(String uuid) {
+        val queryBuilder = QueryBuilders.termQuery("uuid", uuid);
         val searchSourceBuilder = elasticsearchUtil.getSourceBuilder(queryBuilder).size(DEFAULT_ES_RESULTS_SIZE);
         val searchRequest = elasticsearchUtil.getSearchRequest(searchSourceBuilder, DETECTOR_INDEX, DETECTOR_DOC_TYPE);
-        return getDetectorsFromElasticSearch(searchRequest);
+        return getDetectorsFromElasticSearch(searchRequest).get(0);
     }
 
     @Override
     public List<Detector> findByCreatedBy(String user) {
-        val queryBuilder = QueryBuilders.matchQuery("createdBy", user);
+        val queryBuilder = QueryBuilders.termQuery("createdBy", user);
         val searchSourceBuilder = elasticsearchUtil.getSourceBuilder(queryBuilder).size(DEFAULT_ES_RESULTS_SIZE);
         val searchRequest = elasticsearchUtil.getSearchRequest(searchSourceBuilder, DETECTOR_INDEX, DETECTOR_DOC_TYPE);
         return getDetectorsFromElasticSearch(searchRequest);
@@ -160,6 +165,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
         SearchHit[] hits = response.getHits().getHits();
         List<Detector> detectors = new ArrayList<>();
         for (val hit : hits) {
+
             val detector = (Detector) objectMapperUtil.convertToObject(hit.getSourceAsString(), new TypeReference<Detector>() {
             });
             val newElasticsearchDetector = getElasticSearchDetector(detector);

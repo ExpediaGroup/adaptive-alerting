@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.connector;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -40,7 +41,8 @@ public class DetectorResource {
     private String createdBy;
 
     private String type;
-
+    
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Date lastUpdateTimestamp;
 
     private Map<String, Object> detectorConfig = new HashMap<>();

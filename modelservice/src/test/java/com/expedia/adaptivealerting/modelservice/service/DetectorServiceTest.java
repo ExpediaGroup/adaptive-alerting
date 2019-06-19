@@ -73,9 +73,11 @@ public class DetectorServiceTest {
 
     @Test
     public void testFindByUuid() {
-        List<Detector> actualDetectors = detectorService.findByUuid("uuid");
-        assertNotNull(actualDetectors);
-        assertCheck(actualDetectors);
+        Detector actualDetector = detectorService.findByUuid("uuid");
+        assertNotNull(actualDetector);
+        Assert.assertEquals("aeb4d849-847a-45c0-8312-dc0fcf22b639", actualDetector.getUuid());
+        Assert.assertEquals("test-user", actualDetector.getCreatedBy());
+        Assert.assertEquals(true, actualDetector.getEnabled());
     }
 
     @Test
@@ -110,7 +112,7 @@ public class DetectorServiceTest {
 
     private void initDependencies() {
         Mockito.when(detectorRepository.createDetector(any())).thenReturn("1");
-        Mockito.when(detectorRepository.findByUuid(Mockito.anyString())).thenReturn(detectors);
+        Mockito.when(detectorRepository.findByUuid(Mockito.anyString())).thenReturn(detector);
         Mockito.when(detectorRepository.findByCreatedBy(Mockito.anyString())).thenReturn(detectors);
         Mockito.when(detectorRepository.getLastUpdatedDetectors(Mockito.anyString(), Mockito.anyString())).thenReturn(detectors);
     }

@@ -16,6 +16,7 @@ import java.util.List;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 
@@ -30,19 +31,23 @@ public class DetectorControllerTest {
     private DetectorService detectorService;
 
     @Mock
+    private Detector detector;
+
+    @Mock
     private List<Detector> detectors;
 
     @Before
     public void setUp() {
         this.controller = new DetectorController();
         MockitoAnnotations.initMocks(this);
+        when(detectorService.findByUuid(anyString())).thenReturn(detector);
         when(detectorService.getLastUpdatedDetectors(anyLong())).thenReturn(detectors);
     }
 
     @Test
     public void testFindByUuid() {
-        List<Detector> actualDetectors = controller.findByUuid("uuid");
-        assertNotNull(actualDetectors);
+        Detector actualDetector = controller.findByUuid("uuid");
+        assertNotNull(actualDetector);
     }
 
     @Test

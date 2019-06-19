@@ -58,7 +58,7 @@ public class DetectorController {
 
     @GetMapping(path = "/findByUuid", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public List<Detector> findByUuid(@RequestParam String uuid) {
+    public Detector findByUuid(@RequestParam String uuid) {
         return detectorService.findByUuid(uuid);
     }
 
