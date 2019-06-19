@@ -86,7 +86,6 @@ public class DetectorRepositoryImpl implements DetectorRepository {
 
     @Override
     public void updateDetector(String uuid, Detector detector) {
-
         val updateRequest = new UpdateRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, uuid);
         Map<String, Object> jsonMap = new HashMap<>();
 
@@ -104,6 +103,8 @@ public class DetectorRepositoryImpl implements DetectorRepository {
                 if (name.equals("lastUpdateTimestamp")) {
                     Date nowDate = DateUtil.now();
                     value = DateUtil.instantToDate(nowDate.toInstant());
+                } else if (name.equals("uuid")) {
+                    value = uuid;
                 }
                 jsonMap.put(name, value);
             }
