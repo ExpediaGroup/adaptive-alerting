@@ -185,7 +185,7 @@ public class ModelServiceConnector {
      * @param timeInSecs the time period in seconds
      * @return the list of detectormappings that were modified in last since minutes
      */
-    public List<DetectorMapping> findUpdatedDetectorMappings(int timeInSecs) {
+    public List<DetectorMapping> findUpdatedDetectorMappings(long timeInSecs) {
         // converting to seconds
         val uri = String.format(baseUri + API_PATH_DETECTOR_MAPPING_UPDATES, timeInSecs);
         Content content;
