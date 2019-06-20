@@ -86,7 +86,6 @@ public class DetectorRepositoryImpl implements DetectorRepository {
 
     @Override
     public void updateDetector(String uuid, Detector detector) {
-
         val updateRequest = new UpdateRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, uuid);
         Map<String, Object> jsonMap = new HashMap<>();
 
@@ -101,11 +100,13 @@ public class DetectorRepositoryImpl implements DetectorRepository {
                     log.error(String.format("Updating elastic search failed", e));
                     throw new RuntimeException(e);
                 }
-                if (name.equals("lastUpdateTimestamp")) {
+                if ("lastUpdateTimestamp".equals(name)) {
                     Date nowDate = DateUtil.now();
                     value = DateUtil.instantToDate(nowDate.toInstant());
                 }
-                jsonMap.put(name, value);
+                if (value != null) {
+                    jsonMap.put(name, value);
+                }
             }
         }
         updateRequest.doc(jsonMap);
