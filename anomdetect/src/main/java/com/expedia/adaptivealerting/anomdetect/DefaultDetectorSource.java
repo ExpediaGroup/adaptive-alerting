@@ -55,7 +55,7 @@ public class DefaultDetectorSource implements DetectorSource {
     }
 
     @Override
-    public List<UUID> findUpdatedDetectors(int timePeriod) {
+    public List<UUID> findUpdatedDetectors(long timePeriod) {
         notNull(timePeriod, "timePeriod can't be null");
         return connector
                 .findUpdatedDetectors(timePeriod)
@@ -65,11 +65,11 @@ public class DefaultDetectorSource implements DetectorSource {
     }
 
     @Override
-    public List<DetectorMapping> findUpdatedDetectorMappings(int timeInSecs) {
-        isTrue(timeInSecs > 0, "timeInSecs must be strictly positive");
+    public List<DetectorMapping> findUpdatedDetectorMappings(long timePeriod) {
+        isTrue(timePeriod > 0, "timeInSecs must be strictly positive");
 
         return connector
-                .findUpdatedDetectorMappings(timeInSecs);
+                .findUpdatedDetectorMappings(timePeriod);
     }
 
 

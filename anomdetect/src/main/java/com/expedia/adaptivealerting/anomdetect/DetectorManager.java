@@ -36,10 +36,10 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 /**
  * Component that manages a given set of anomaly detectors.
- *
+ * <p>
  * Detector manager maintains an internal cache of (UUID : Detectors).
  * This cache is kept up-to-date by polling modelservice for changes.
- *
+ * <p>
  * An alternative event-based approach to keep cache updated is to compare last-modified timestamp of a detector.
  * This approach however doesn't provide a way to delete an existing detector .
  */
@@ -55,9 +55,12 @@ public class DetectorManager {
 
     private int detectorRefreshTimePeriod;
 
+
     // TODO Consider making this an explicit class so we can mock it and verify interactions
     //  against it. [WLW]
     private final Map<UUID, Detector> cachedDetectors;
+    private long syncedUptillTime = System.currentTimeMillis();
+
 
     public DetectorManager(DetectorSource detectorSource, int detectorRefreshTimePeriod, Map<UUID, Detector> cachedDetectors) {
         this.detectorSource = detectorSource;
@@ -74,11 +77,11 @@ public class DetectorManager {
         scheduler.scheduleWithFixedDelay(() -> {
             try {
                 log.trace("Refreshing detectors");
-                this.detectorMapRefresh();
+                this.detectorCacheSync(System.currentTimeMillis());
             } catch (Exception e) {
                 log.error("Error refreshing detectors", e);
             }
-        }, 1, detectorRefreshTimePeriod, TimeUnit.MINUTES);
+        }, detectorRefreshTimePeriod, detectorRefreshTimePeriod, TimeUnit.MINUTES);
     }
 
     /**
@@ -115,14 +118,21 @@ public class DetectorManager {
     }
 
     /**
-     * Remove detectors from cache that have been modified in last `timePeriod` minutes.
+     * Sync with detector datastore by polling to get all deleted detectors
      * The deleted detectors will be cleaned up and the detectors modified will be reloaded
      * when corresponding mapped-metric comes in.
+     * On successful sync update syncUptill time to currentTime
      */
-    List<UUID> detectorMapRefresh() {
-
+    List<UUID> detectorCacheSync(long currentTime) {
         var updatedDetectors = new ArrayList<UUID>();
-        detectorSource.findUpdatedDetectors(detectorRefreshTimePeriod).forEach(key -> {
+
+        long updateDurationInSeconds = (currentTime - syncedUptillTime) / 1000;
+
+        if (updateDurationInSeconds <= 0) {
+            return updatedDetectors;
+        }
+
+        detectorSource.findUpdatedDetectors(updateDurationInSeconds).forEach(key -> {
             if (cachedDetectors.containsKey(key)) {
                 cachedDetectors.remove(key);
                 updatedDetectors.add(key);
@@ -130,6 +140,7 @@ public class DetectorManager {
         });
 
         log.info("Removed detectors on refresh : {}", updatedDetectors);
+        syncedUptillTime = currentTime;
         return updatedDetectors;
     }
 }

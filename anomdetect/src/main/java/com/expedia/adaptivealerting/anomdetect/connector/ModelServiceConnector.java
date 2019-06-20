@@ -120,19 +120,19 @@ public class ModelServiceConnector {
     }
 
     /**
-     * @param sinceMinutes the time period in minutes
-     * @return the list of detectors that were modified in last since minutes
+     * @param sinceSeconds the time period in seconds
+     * @return the list of detectorMappings that were modified in last since minutes
      */
-    public List<DetectorResource> findUpdatedDetectors(int sinceMinutes) {
-        isTrue(sinceMinutes > 0, "timePeriod must be strictly positive");
+    public  List<DetectorResource>  findUpdatedDetectors(long sinceSeconds) {
+        isTrue(sinceSeconds > 0, "timePeriod must be strictly positive");
 
-        val uri = String.format(baseUri + API_PATH_DETECTOR_UPDATES, sinceMinutes);
+        val uri = String.format(baseUri + API_PATH_DETECTOR_UPDATES, sinceSeconds);
         Content content;
         try {
             content = httpClient.get(uri);
         } catch (IOException e) {
             val message = "IOException while getting last updated detectors" +
-                    ": timePeriod=" + sinceMinutes +
+                    ": timePeriod=" + sinceSeconds +
                     ", httpMethod=GET" +
                     ", uri=" + uri;
             throw new DetectorRetrievalException(message, e);
@@ -142,7 +142,7 @@ public class ModelServiceConnector {
             return Arrays.asList(objectMapper.readValue(content.asBytes(), DetectorResource[].class));
         } catch (IOException e) {
             val message = "IOException while deserializing detectors" +
-                    ": timePeriod=" + sinceMinutes;
+                    ": timePeriod=" + sinceSeconds;
             throw new DetectorDeserializationException(message, e);
         }
     }
@@ -185,7 +185,7 @@ public class ModelServiceConnector {
      * @param timeInSecs the time period in seconds
      * @return the list of detectormappings that were modified in last since minutes
      */
-    public List<DetectorMapping> findUpdatedDetectorMappings(int timeInSecs) {
+    public List<DetectorMapping> findUpdatedDetectorMappings(long timeInSecs) {
         // converting to seconds
         val uri = String.format(baseUri + API_PATH_DETECTOR_MAPPING_UPDATES, timeInSecs);
         Content content;

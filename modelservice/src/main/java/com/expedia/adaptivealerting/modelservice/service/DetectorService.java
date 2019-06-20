@@ -31,7 +31,7 @@ public interface DetectorService {
 
     List<Detector> findByCreatedBy(String user);
 
-    List<Detector> getLastUpdatedDetectors(int interval);
+    List<Detector> getLastUpdatedDetectors(long interval);
 
     void toggleDetector(String uuid, Boolean enabled);
 }
