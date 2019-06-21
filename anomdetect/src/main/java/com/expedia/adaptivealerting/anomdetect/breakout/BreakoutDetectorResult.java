@@ -13,30 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect;
+package com.expedia.adaptivealerting.anomdetect.breakout;
 
-import com.expedia.metrics.MetricData;
+import com.expedia.adaptivealerting.anomdetect.DetectorResult;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
-import java.util.UUID;
+@NoArgsConstructor
+@RequiredArgsConstructor
+@AllArgsConstructor
+public class BreakoutDetectorResult implements DetectorResult {
+    public enum Type {
+        WARMUP,
+        NORMAL,
+        BREAKOUT
+    };
 
-/**
- * Anomaly detector interface. Anomalies can be outliers (point-in-time) or breakouts (distributional shifts in the
- * recent past).
- */
-public interface Detector {
+    @NonNull
+    private Type type;
 
-    /**
-     * Returns the anomaly detector UUID.
-     *
-     * @return Anomaly detector UUID.
-     */
-    UUID getUuid();
-
-    /**
-     * Processes a given metric point.
-     *
-     * @param metricData Metric data point.
-     * @return Anomaly result.
-     */
-    DetectorResult detect(MetricData metricData);
+    private int location = -1;
+    private long timestamp = -1;
+    private double testStatistic = 0.0;
 }

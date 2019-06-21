@@ -17,18 +17,20 @@ package com.expedia.adaptivealerting.anomdetect.breakout;
 
 import com.expedia.adaptivealerting.anomdetect.util.MetricFrameLoader;
 import com.expedia.adaptivealerting.anomdetect.util.TestObjectMother;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.UUID;
 
+@Slf4j
 public final class EdmxBreakoutDetectorTest {
     private EdmxBreakoutDetector detectorUnderTest;
 
     @Before
     public void setUp() {
-        this.detectorUnderTest = new EdmxBreakoutDetector(UUID.randomUUID());
+        this.detectorUnderTest = new EdmxBreakoutDetector(UUID.randomUUID(), 24, 5, 199);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -44,6 +46,7 @@ public final class EdmxBreakoutDetectorTest {
         val is = ClassLoader.getSystemResourceAsStream("datasets/white-noise-with-breakout-at-row-600.csv");
         val metricFrame = MetricFrameLoader.loadCsv(metricDef, is, false);
         val metricDataList = metricFrame.getMetricData();
+
         for (val metricData : metricDataList) {
             detectorUnderTest.detect(metricData);
         }

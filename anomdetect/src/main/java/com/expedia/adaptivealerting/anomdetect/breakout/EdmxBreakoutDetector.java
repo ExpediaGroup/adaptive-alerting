@@ -16,27 +16,51 @@
 package com.expedia.adaptivealerting.anomdetect.breakout;
 
 import com.expedia.adaptivealerting.anomdetect.Detector;
-import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.DetectorResult;
 import com.expedia.metrics.MetricData;
+import com.google.common.collect.EvictingQueue;
 import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.val;
 
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
-@RequiredArgsConstructor
 public final class EdmxBreakoutDetector implements Detector {
 
-    @NonNull
     @Getter
     private UUID uuid;
 
+    private final EvictingQueue<Double> buffer;
+    private int delta;
+    private int numPerms;
+
+    public EdmxBreakoutDetector(UUID uuid, int bufferSize, int delta, int numPerms) {
+        notNull(uuid, "uuid can't be null");
+        this.uuid = uuid;
+        this.buffer = EvictingQueue.create(bufferSize);
+        this.delta = delta;
+        this.numPerms = numPerms;
+    }
+
     @Override
-    public AnomalyResult detect(MetricData metricData) {
+    public DetectorResult detect(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
-//        throw new UnsupportedOperationException("Not yet implemented");
-        return null;
+        buffer.add(metricData.getValue());
+
+        if (buffer.size() < 2 * delta) {
+            return new BreakoutDetectorResult(BreakoutDetectorResult.Type.WARMUP);
+        }
+
+        val list = buffer.stream().collect(Collectors.toList());
+        val breakoutResult = Edmx.edmx(list, delta, numPerms);
+
+        // TODO Calculate type and timestamp
+        return new BreakoutDetectorResult(
+                BreakoutDetectorResult.Type.BREAKOUT,
+                breakoutResult.getLocation(),
+                -1,
+                breakoutResult.getStat());
     }
 }

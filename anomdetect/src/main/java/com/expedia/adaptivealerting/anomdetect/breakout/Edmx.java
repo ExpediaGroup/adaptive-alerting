@@ -19,7 +19,12 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isTrue;
 
 /**
  * Breakout detector (a.k.a. change point detector) based on the E-Divisive with Exact Medians (EDM-X) algorithm as
@@ -29,6 +34,8 @@ import java.util.Arrays;
 @UtilityClass
 @Slf4j
 public class Edmx {
+    private static final BreakoutResult NO_BREAKOUT_RESULT = new BreakoutResult(-1, 0.0);
+    private static final double SIGNIFICANCE_LEVEL = 0.05;
 
     /**
      * Runs EDM-X on the given time series data. This method scales the data to [0, 1] per the Appendix.
@@ -37,27 +44,53 @@ public class Edmx {
      * @param delta Minimum sample size for computing a median. This applies to both the left and the right medians.
      * @return EDM-X breakout result
      */
-    public static BreakoutResult edmx(double[] data, int delta) {
+    public static BreakoutResult edmx(List<Double> data, int delta, int numPerms) {
         val scaledData = unitScale(data);
-        val n = scaledData.length;
+        val result = estimateLocation(scaledData, delta);
+        val significant = isSignificant(scaledData, delta, numPerms, result.getStat());
+        return significant ? result : NO_BREAKOUT_RESULT;
+    }
 
+    /**
+     * Scales the data to the interval [0, 1]. See the appendix in the paper.
+     *
+     * @param data unscaled data
+     * @return data scaled to [0, 1]
+     */
+    private static List<Double> unitScale(List<Double> data) {
+        val summaryStats = data.stream()
+                .mapToDouble(Double::doubleValue)
+                .summaryStatistics();
+        val min = summaryStats.getMin();
+        val max = summaryStats.getMax();
+        val range = max - min;
+        val denom = (range == 0.0 ? 1.0 : range);
+        return data.stream()
+                .map(value -> (value - min) / denom)
+                .collect(Collectors.toList());
+    }
+
+    private static BreakoutResult estimateLocation(List<Double> data, int delta) {
+        isTrue(data.size() >= 2 * delta, "Required: data.size >= 2 * delta");
+
+        val n = data.size();
         double bestStat = Double.MIN_VALUE;
         int bestLoc = -1;
 
         val heapsL = new RunningMedian();
         for (int i = 0; i < delta - 1; i++) {
-            heapsL.add(scaledData[i]);
+            heapsL.add(data.get(i));
         }
         for (int i = delta; i < n - delta + 1; i++) {
-            heapsL.add(scaledData[i - 1]);
+            heapsL.add(data.get(i - 1));
             val mL = heapsL.getMedian();
 
             val heapsR = new RunningMedian();
             for (int j = i; j < i + delta - 1; j++) {
-                heapsR.add(scaledData[j]);
+                heapsR.add(data.get(j));
             }
             for (int j = i + delta; j < n + 1; j++) {
-                heapsR.add(scaledData[j - 1]);
+                heapsR.add(data.get(j - 1));
 
                 val mR = heapsR.getMedian();
                 val diff = mL - mR;
@@ -76,20 +109,29 @@ public class Edmx {
     }
 
     /**
-     * Scales the data to the interval [0, 1]. See the appendix in the paper.
+     * Performs a significance test of a proposed breakout, represented by the breakout's test statistic.
      *
-     * @param data unscaled data
-     * @return data scaled to [0, 1]
+     * @param data     data series
+     * @param delta    minimum segment width
+     * @param numPerms number of permutations to use in the permutation test
+     * @param testStat test statistic used to estimate the p-value via the permutation test
+     * @return boolean indicating whether the test stat is statistically significant
      */
-    private static double[] unitScale(double[] data) {
-        val summaryStats = Arrays.stream(data).summaryStatistics();
-        val min = summaryStats.getMin();
-        val max = summaryStats.getMax();
-        val range = max - min;
-        val denom = (range == 0.0 ? 1.0 : range);
+    private static boolean isSignificant(List<Double> data, int delta, int numPerms, double testStat) {
+        val perm = new ArrayList<>(data);
+        int numPermsGte = 0;
 
-        return Arrays.stream(data)
-                .map(value -> (value - min) / denom)
-                .toArray();
+        for (int i = 0; i < numPerms; i++) {
+            Collections.shuffle(perm);
+            val result = estimateLocation(perm, delta);
+//            log.trace("stat={}, perm={}", result.getStat(), perm);
+            if (result.getStat() >= testStat) {
+                numPermsGte++;
+            }
+        }
+
+        val estPValue = (double) numPermsGte / (double) (numPerms + 1);
+        log.trace("estimated p-value: {}", estPValue);
+        return estPValue <= SIGNIFICANCE_LEVEL;
     }
 }
