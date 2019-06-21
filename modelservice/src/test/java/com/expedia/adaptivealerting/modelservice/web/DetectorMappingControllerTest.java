@@ -63,7 +63,7 @@ public class DetectorMappingControllerTest {
         when(detectorMappingService.findDetectorMapping(id)).thenReturn(detectorMapping);
         DetectorMapping detectorMappingreturned = controllerUnderTest.getDetectorMapping(id);
         assertNotNull("Response can't be null", detectorMappingreturned);
-        assertEquals(UUID.fromString(detectorUuid), detectorMappingreturned.getDetector().getId());
+        assertEquals(UUID.fromString(detectorUuid), detectorMappingreturned.getDetector().getUuid());
         assertEquals(id, detectorMappingreturned.getId());
         assertEquals(userVal, detectorMapping.getUser().getId());
         assertEquals(true, detectorMapping.isEnabled());
@@ -74,7 +74,7 @@ public class DetectorMappingControllerTest {
         when(detectorMappingService.findDetectorMapping(id)).thenReturn(new DetectorMapping());
         DetectorMapping detectorMappingreturned = controllerUnderTest.getDetectorMapping(id);
         assertNotNull("Response can't be null", detectorMappingreturned);
-        assertEquals(detectorUuid, detectorMappingreturned.getDetector().getId());
+        assertEquals(detectorUuid, detectorMappingreturned.getDetector().getUuid());
         assertEquals(id, detectorMappingreturned.getId());
     }
 
@@ -98,7 +98,7 @@ public class DetectorMappingControllerTest {
         List<DetectorMapping> listofdetectorMappingsreturned = controllerUnderTest.findDetectorMapping(timeInSecs);
         assertNotNull("Response can't be null", listofdetectorMappingsreturned);
         assertEquals(1, listofdetectorMappingsreturned.size());
-        assertEquals(UUID.fromString(detectorUuid), listofdetectorMappingsreturned.get(0).getDetector().getId());
+        assertEquals(UUID.fromString(detectorUuid), listofdetectorMappingsreturned.get(0).getDetector().getUuid());
         assertEquals(id, listofdetectorMappingsreturned.get(0).getId());
     }
 
@@ -120,7 +120,7 @@ public class DetectorMappingControllerTest {
         when(detectorMappingService.search(searchMappingsRequest)).thenReturn(detectorMappingslist);
         List<DetectorMapping> detectorMappingsResponse = controllerUnderTest.searchDetectorMapping(searchMappingsRequest);
         assertEquals(id, detectorMappingsResponse.get(0).getId());
-        assertEquals(detectorUuid, detectorMappingsResponse.get(0).getDetector().getId().toString());
+        assertEquals(detectorUuid, detectorMappingsResponse.get(0).getDetector().getUuid().toString());
         assertEquals("test-user", detectorMappingsResponse.get(0).getUser().getId());
     }
 
@@ -134,7 +134,7 @@ public class DetectorMappingControllerTest {
         Assert.assertEquals(1, matchingDetectorsResult.getGroupedDetectorsBySearchIndex().size());
         List<Detector> detectors = matchingDetectorsResult.getGroupedDetectorsBySearchIndex().get(1);
         assertEquals(1, detectors.size());
-        assertEquals(UUID.fromString(detectorUuid), detectors.get(0).getId());
+        assertEquals(UUID.fromString(detectorUuid), detectors.get(0).getUuid());
     }
 
     private DetectorMapping mockDetectorMapping(String id) {

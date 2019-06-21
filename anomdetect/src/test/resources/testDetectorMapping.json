@@ -1,7 +1,7 @@
 [
   {
     "detector": {
-      "id": "2c49ba26-1a7d-43f4-b70c-c6644a2c1689"
+      "uuid": "2c49ba26-1a7d-43f4-b70c-c6644a2c1689"
     },
     "expression": {
       "operator": "AND",

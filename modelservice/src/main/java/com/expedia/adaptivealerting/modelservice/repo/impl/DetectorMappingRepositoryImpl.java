@@ -324,7 +324,7 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
         log.info("detectorEntity:{}", detectorEntity);
         DetectorMapping detectorMapping = new DetectorMapping()
                 .setId(id)
-                .setDetector(new Detector(detectorEntity.getDetector().getId()))
+                .setDetector(new Detector(detectorEntity.getDetector().getUuid()))
                 .setExpression(QueryUtil.buildExpression(detectorEntity.getQuery()))
                 .setEnabled(detectorEntity.isEnabled())
                 .setCreatedTimeInMillis(detectorEntity.getCreatedTimeInMillis())

@@ -54,7 +54,7 @@ public class DetectorMappingServiceTest {
     public void testFindMatchingDetectorMappings() {
         MatchingDetectorsResponse actualElasticsearchDetectorMapping = detectorMappingService.findMatchingDetectorMappings(new ArrayList<>());
         assertNotNull(actualElasticsearchDetectorMapping);
-        assertEquals("aeb4d849-847a-45c0-8312-dc0fcf22b639", actualElasticsearchDetectorMapping.getGroupedDetectorsBySearchIndex().get(0).get(0).getId().toString());
+        assertEquals("aeb4d849-847a-45c0-8312-dc0fcf22b639", actualElasticsearchDetectorMapping.getGroupedDetectorsBySearchIndex().get(0).get(0).getUuid().toString());
         assertEquals(10000, actualElasticsearchDetectorMapping.getLookupTimeInMillis());
     }
 
@@ -118,7 +118,7 @@ public class DetectorMappingServiceTest {
     }
 
     private void assertCheck(DetectorMapping detectorMapping) {
-        Assert.assertEquals("aeb4d849-847a-45c0-8312-dc0fcf22b639", detectorMapping.getDetector().getId().toString());
+        Assert.assertEquals("aeb4d849-847a-45c0-8312-dc0fcf22b639", detectorMapping.getDetector().getUuid().toString());
         Assert.assertEquals("test-user", detectorMapping.getUser().getId());
         Assert.assertEquals(10000, detectorMapping.getCreatedTimeInMillis());
         Assert.assertEquals(true, detectorMapping.isEnabled());

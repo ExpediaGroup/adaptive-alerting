@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detectormapper;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,6 +25,5 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Detector {
-    @JsonProperty("id")
     private UUID uuid;
 }

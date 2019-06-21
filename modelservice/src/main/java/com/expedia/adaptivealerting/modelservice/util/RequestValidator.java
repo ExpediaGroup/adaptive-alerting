@@ -58,6 +58,6 @@ public class RequestValidator {
 
     public static void validateDetector(Detector detector) {
         Assert.notNull(detector, "Detector can't be null");
-        Assert.notNull(detector.getId(), "Detector id can't be null");
+        Assert.notNull(detector.getUuid(), "Detector uuid can't be null");
     }
 }

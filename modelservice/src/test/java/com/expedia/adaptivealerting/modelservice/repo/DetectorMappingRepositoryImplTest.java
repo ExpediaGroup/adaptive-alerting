@@ -140,7 +140,7 @@ public class DetectorMappingRepositoryImplTest {
         assertEquals(1, response.getGroupedDetectorsBySearchIndex().size());
         List<Detector> detectors = response.getGroupedDetectorsBySearchIndex().get(new Integer(searchIndex));
         assertEquals(1, detectors.size());
-        assertEquals(UUID.fromString(detectorUuid), detectors.get(0).getId());
+        assertEquals(UUID.fromString(detectorUuid), detectors.get(0).getUuid());
     }
 
     @Test(expected = RuntimeException.class)
@@ -167,7 +167,7 @@ public class DetectorMappingRepositoryImplTest {
         assertEquals(LastModifiedTimeInMillis, Long.valueOf(detectorMapping.getLastModifiedTimeInMillis()));
         assertEquals(CreatedTimeInMillis, Long.valueOf(detectorMapping.getCreatedTimeInMillis()));
         assertTrue(detectorMapping.isEnabled());
-        assertEquals(UUID.fromString(detectorUuid), detectorMapping.getDetector().getId());
+        assertEquals(UUID.fromString(detectorUuid), detectorMapping.getDetector().getUuid());
 
     }
 
@@ -206,7 +206,7 @@ public class DetectorMappingRepositoryImplTest {
         verify(elasticSearchClient, atLeastOnce()).search(any(SearchRequest.class), eq(RequestOptions.DEFAULT));
         assertNotNull("Response can't be null", tagsList);
         assertEquals(1, tagsList.size());
-        assertEquals(UUID.fromString(detectorUuid), tagsList.get(0).getDetector().getId());
+        assertEquals(UUID.fromString(detectorUuid), tagsList.get(0).getDetector().getUuid());
         assertEquals("test-user", tagsList.get(0).getUser().getId());
         assertEquals(LastModifiedTimeInMillis, Long.valueOf(tagsList.get(0).getLastModifiedTimeInMillis()));
         assertEquals(CreatedTimeInMillis, Long.valueOf(tagsList.get(0).getCreatedTimeInMillis()));
@@ -238,7 +238,7 @@ public class DetectorMappingRepositoryImplTest {
         verify(elasticSearchClient, atLeastOnce()).search(any(SearchRequest.class), eq(RequestOptions.DEFAULT));
         assertNotNull("Response can't be null", tagsList);
         assertEquals(1, tagsList.size());
-        assertEquals(UUID.fromString(detectorUuid), tagsList.get(0).getDetector().getId());
+        assertEquals(UUID.fromString(detectorUuid), tagsList.get(0).getDetector().getUuid());
         assertEquals("test-user", tagsList.get(0).getUser().getId());
         assertEquals(LastModifiedTimeInMillis, Long.valueOf(tagsList.get(0).getLastModifiedTimeInMillis()));
         assertEquals(CreatedTimeInMillis, Long.valueOf(tagsList.get(0).getCreatedTimeInMillis()));
