@@ -21,7 +21,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.streams.processor.TimestampExtractor;
 
 /**
- * Extracts a epochSeconds from a {@link MappedMetricData} consumer record.
+ * Extracts a timestamp from a {@link MappedMetricData} consumer record.
  */
 public final class MappedMetricDataTimestampExtractor implements TimestampExtractor {
 
