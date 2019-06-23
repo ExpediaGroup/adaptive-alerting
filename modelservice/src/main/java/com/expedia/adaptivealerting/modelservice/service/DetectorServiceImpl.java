@@ -67,9 +67,9 @@ public class DetectorServiceImpl implements DetectorService {
     }
 
     @Override
-    public List<Detector> getLastUpdatedDetectors(int interval) {
+    public List<Detector> getLastUpdatedDetectors(long interval) {
         val now = DateUtil.now().toInstant();
-        val fromDate = DateUtil.toUtcDateString((now.minus(interval, ChronoUnit.MINUTES)));
+        val fromDate = DateUtil.toUtcDateString((now.minus(interval, ChronoUnit.SECONDS)));
         val toDate = DateUtil.toUtcDateString(now);
         return detectorRepository.getLastUpdatedDetectors(fromDate, toDate);
     }

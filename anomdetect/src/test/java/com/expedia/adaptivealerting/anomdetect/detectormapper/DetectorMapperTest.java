@@ -203,11 +203,11 @@ public final class DetectorMapperTest {
         List<DetectorMapping> updateDetectorMappings = Arrays.asList(disabledDetectorMapping, modifiedDetectorMapping);
 
 
-        when(detectorSource.findUpdatedDetectorMappings(detectorMappingCacheUpdatePeriod * 60)).thenReturn(updateDetectorMappings);
+        when(detectorSource.findUpdatedDetectorMappings(60)).thenReturn(updateDetectorMappings);
         doAnswer((e) -> null).when(cache).removeDisabledDetectorMappings(anyList());
         doAnswer((e) -> null).when(cache).invalidateMetricsWithOldDetectorMappings(anyList());
 
-        detectorMapper.detectorCacheUpdate();
+        detectorMapper.detectorMappingCacheSync(System.currentTimeMillis()+60000);
 
         verify(cache).removeDisabledDetectorMappings(Collections.singletonList(disabledDetectorMapping));
         verify(cache).invalidateMetricsWithOldDetectorMappings(Collections.singletonList(modifiedDetectorMapping));

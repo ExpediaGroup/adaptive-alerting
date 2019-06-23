@@ -49,6 +49,7 @@ public class DetectorMapper {
     private DetectorSource detectorSource;
     private DetectorMapperCache cache;
     private int detectorCacheUpdateTimePeriod;
+    private long syncedUptillTime = System.currentTimeMillis();
 
     public DetectorMapper(DetectorSource detectorSource, DetectorMapperCache cache, int detectorCacheUpdateTimePeriod) {
         AssertUtil.notNull(detectorSource, "detectorSource can't be null");
@@ -67,11 +68,11 @@ public class DetectorMapper {
         scheduler.scheduleWithFixedDelay(() -> {
             try {
                 log.trace("Updating detector mapping cache");
-                this.detectorCacheUpdate();
+                this.detectorMappingCacheSync(System.currentTimeMillis());
             } catch (Exception e) {
                 log.error("Error updating detectors mapping cache", e);
             }
-        }, 1, detectorCacheUpdateTimePeriod, TimeUnit.MINUTES);
+        }, detectorCacheUpdateTimePeriod, detectorCacheUpdateTimePeriod, TimeUnit.MINUTES);
     }
 
     public List<Detector> getDetectorsFromCache(MetricDefinition metricDefinition) {
@@ -85,7 +86,8 @@ public class DetectorMapper {
         try {
             matchingDetectorMappings = detectorSource.findMatchingDetectorMappings(cacheMissedMetricTags);
         } catch (RuntimeException e) {
-            log.error(e.getMessage());
+            //Disabling temporarily to reduce log
+           // log.error(e.getMessage());
         }
 
         if (matchingDetectorMappings != null) {
@@ -128,22 +130,33 @@ public class DetectorMapper {
     }
 
 
-    void detectorCacheUpdate() {
+    void detectorMappingCacheSync(long currentTime) {
 
-        List<DetectorMapping> detectorMappings = detectorSource.findUpdatedDetectorMappings(detectorCacheUpdateTimePeriod * 60);
+        long updateDurationInSeconds = (currentTime - syncedUptillTime) / 1000;
+
+        if (updateDurationInSeconds <= 0) {
+            return;
+        }
+
+        List<DetectorMapping> detectorMappings = detectorSource.findUpdatedDetectorMappings(updateDurationInSeconds);
 
         List<DetectorMapping> disabledDetectorMappings = detectorMappings.stream()
                 .filter(dt -> !dt.isEnabled())
                 .collect(Collectors.toList());
         if (!disabledDetectorMappings.isEmpty()) {
             cache.removeDisabledDetectorMappings(disabledDetectorMappings);
+            log.info("Removing disabled mapping  : {}", disabledDetectorMappings);
         }
+
         List<DetectorMapping> newDetectorMappings = detectorMappings.stream()
                 .filter(DetectorMapping::isEnabled)
                 .collect(Collectors.toList());
         if (!newDetectorMappings.isEmpty()) {
             cache.invalidateMetricsWithOldDetectorMappings(newDetectorMappings);
+            log.info("Invalidating metrics for modified mappings  : {}", newDetectorMappings);
         }
+
+        syncedUptillTime = currentTime;
     }
 
 }
