@@ -40,7 +40,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
  * Detector manager maintains an internal cache of (UUID : Detectors).
  * This cache is kept up-to-date by polling modelservice for changes.
  *
- * An alternative event-based approach to keep cache updated is to compare last-modified timestamp of a detector.
+ * An alternative event-based approach to keep cache updated is to compare last-modified epochSeconds of a detector.
  * This approach however doesn't provide a way to delete an existing detector .
  */
 @RequiredArgsConstructor

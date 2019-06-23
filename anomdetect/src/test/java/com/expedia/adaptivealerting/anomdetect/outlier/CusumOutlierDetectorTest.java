@@ -15,11 +15,9 @@
  */
 package com.expedia.adaptivealerting.anomdetect.outlier;
 
-import com.expedia.adaptivealerting.anomdetect.util.MathUtil;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.opencsv.bean.CsvToBeanBuilder;
-import junit.framework.TestCase;
 import lombok.val;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -32,6 +30,7 @@ import java.util.UUID;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 public class CusumOutlierDetectorTest {
     private static final double WEAK_SIGMAS = 3.0;
@@ -175,6 +174,6 @@ public class CusumOutlierDetectorTest {
     }
 
     private static void assertApproxEqual(double d1, double d2) {
-        TestCase.assertTrue(MathUtil.isApproximatelyEqual(d1, d2, TOLERANCE));
+        assertTrue(Math.abs(d1 - d2) <= TOLERANCE);
     }
 }

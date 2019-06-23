@@ -30,9 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -40,11 +38,10 @@ import java.util.List;
  */
 @UtilityClass
 public class MetricFrameLoader {
-    private static final DateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private final static ObjectMapper OBJECT_MAPPER = new ObjectMapper().registerModule(new MetricsJavaModule());
 
     public static MetricFrame loadCsv(File metricDefFile, File metricDataFile, boolean hasHeader)
-            throws IOException, ParseException {
+            throws IOException {
 
         val metricDef = OBJECT_MAPPER.readValue(metricDefFile, MetricDefinition.class);
         return loadCsv(metricDef, new FileInputStream(metricDataFile), hasHeader);
@@ -60,7 +57,7 @@ public class MetricFrameLoader {
      * @throws IOException if there's a problem reading the CSV input stream.
      */
     public static MetricFrame loadCsv(MetricDefinition metricDef, InputStream in, boolean hasHeader)
-            throws IOException, ParseException {
+            throws IOException  {
 
         List<String[]> rows;
         try (val br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
@@ -79,10 +76,9 @@ public class MetricFrameLoader {
         return new MetricFrame(metricData);
     }
 
-    private static MetricData toMetricData(MetricDefinition metricDefinition, String[] row)
-            throws ParseException {
-
-        long epochSecond = DATE_TIME_FORMAT.parse(row[0]).toInstant().getEpochSecond();
-        return new MetricData(metricDefinition, Float.parseFloat(row[1]), epochSecond);
+    private static MetricData toMetricData(MetricDefinition metricDefinition, String[] row) {
+        val epochSecond = Instant.parse(row[0]).getEpochSecond();
+        val value = Float.parseFloat(row[1]);
+        return new MetricData(metricDefinition, value, epochSecond);
     }
 }

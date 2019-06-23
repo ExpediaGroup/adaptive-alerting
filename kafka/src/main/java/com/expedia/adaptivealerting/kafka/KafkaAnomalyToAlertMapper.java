@@ -40,7 +40,7 @@ public class KafkaAnomalyToAlertMapper extends AbstractStreamsApp {
     // on top of it.
     // If the tags contain `metric_key` as key, it will be overridden by metric definition key.
     private static final String METRIC_KEY = "metric_key";
-    private static final String TIMESTAMP = "timestamp";
+    private static final String TIMESTAMP = "epochSeconds";
     private static final String ANOMALY_LEVEL = "anomalyLevel";
 
     // Cleaned code coverage

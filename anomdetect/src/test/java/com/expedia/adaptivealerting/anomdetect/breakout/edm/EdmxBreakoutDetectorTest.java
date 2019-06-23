@@ -13,42 +13,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.breakout;
+package com.expedia.adaptivealerting.anomdetect.breakout.edm;
 
 import com.expedia.adaptivealerting.anomdetect.util.MetricFrameLoader;
 import com.expedia.adaptivealerting.anomdetect.util.TestObjectMother;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.UUID;
 
 @Slf4j
 public final class EdmxBreakoutDetectorTest {
-    private EdmxBreakoutDetector detectorUnderTest;
 
-    @Before
-    public void setUp() {
-        this.detectorUnderTest = new EdmxBreakoutDetector(UUID.randomUUID(), 24, 5, 199);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testDetect_nullMetricData() {
-        detectorUnderTest.detect(null);
-    }
-
-    // TODO Support a single detector managing state for multiple metrics
+    // TODO Test warmup
+    // TODO Support a single detector managing state for multiple metrics?
 
     @Test
     public void testDetect_whiteNoiseWithBreakout() throws Exception {
+        val params = new EdmxBreakoutDetector.Params()
+                .setBufferSize(20)
+                .setDelta(6)
+                .setNumPerms(199)
+                .setAlpha(0.01);
+        val detectorUnderTest = new EdmxBreakoutDetector(UUID.randomUUID(), params);
+
         val metricDef = TestObjectMother.metricDefinition();
         val is = ClassLoader.getSystemResourceAsStream("datasets/white-noise-with-breakout-at-row-600.csv");
         val metricFrame = MetricFrameLoader.loadCsv(metricDef, is, false);
         val metricDataList = metricFrame.getMetricData();
 
-        for (val metricData : metricDataList) {
-            detectorUnderTest.detect(metricData);
+        for (int i = 0; i < 700; i++) {
+            val metricData = metricDataList.get(i);
+            val result = (EdmxBreakoutDetectorResult) detectorUnderTest.detect(metricData);
+            if (!result.isWarmup() && result.getTimestamp() != null && result.getSignificant()) {
+                log.trace("row={}: timestamp={}, pValue={}",
+                        i + 1,
+                        result.getTimestamp(),
+                        result.getPValue());
+            }
         }
     }
 }

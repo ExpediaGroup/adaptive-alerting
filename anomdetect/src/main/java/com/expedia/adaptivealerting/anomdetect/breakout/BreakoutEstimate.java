@@ -15,26 +15,13 @@
  */
 package com.expedia.adaptivealerting.anomdetect.breakout;
 
-import com.expedia.adaptivealerting.anomdetect.DetectorResult;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+public interface BreakoutEstimate {
 
-@NoArgsConstructor
-@RequiredArgsConstructor
-@AllArgsConstructor
-public class BreakoutDetectorResult implements DetectorResult {
-    public enum Type {
-        WARMUP,
-        NORMAL,
-        BREAKOUT
-    };
+    int getLocation();
 
-    @NonNull
-    private Type type;
+    double getPValue();
 
-    private int location = -1;
-    private long timestamp = -1;
-    private double testStatistic = 0.0;
+    double getAlpha();
+
+    boolean isSignificant();
 }

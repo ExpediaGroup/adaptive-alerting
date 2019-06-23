@@ -73,7 +73,7 @@ public class MetricUtil {
     }
 
     /**
-     * Convenience method to create a new {@link MetricData} from the given definition and value. Sets the timestamp to
+     * Convenience method to create a new {@link MetricData} from the given definition and value. Sets the epochSeconds to
      * the current epoch second.
      *
      * @param metricDef Metric definition.

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.breakout;
+package com.expedia.adaptivealerting.anomdetect.util.math;
 
 import lombok.extern.slf4j.Slf4j;
 

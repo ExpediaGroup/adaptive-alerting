@@ -101,7 +101,7 @@ public final class TestObjectMother {
     }
 
     /**
-     * Returns a metric data with value 100.0 and timestamp = now.
+     * Returns a metric data with value 100.0 and epochSeconds = now.
      *
      * @return metric data
      */
@@ -110,7 +110,7 @@ public final class TestObjectMother {
     }
 
     /**
-     * Returns a metric data with the given value and timestamp = now.
+     * Returns a metric data with the given value and epochSeconds = now.
      *
      * @param value a value for the metric data
      * @return metric data
@@ -195,7 +195,7 @@ public final class TestObjectMother {
 
         val annotations = new HashMap<String, String>();
         annotations.put("value", "100.0");
-        annotations.put("timestamp", String.valueOf(System.currentTimeMillis() / 1000));
+        annotations.put("epochSeconds", String.valueOf(System.currentTimeMillis() / 1000));
         alert.setAnnotations(annotations);
 
         return alert;
