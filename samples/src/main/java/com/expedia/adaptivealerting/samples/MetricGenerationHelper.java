@@ -22,14 +22,13 @@ import lombok.experimental.UtilityClass;
 import lombok.val;
 
 import java.io.IOException;
-import java.text.ParseException;
 
 @UtilityClass
 public class MetricGenerationHelper {
 
     // TODO: Use this from other Sample classes
     public static MetricFrameMetricSource buildMetricFrameMetricSource(String filename, long periodMs)
-            throws IOException, ParseException {
+            throws IOException {
 
         val is = ClassLoader.getSystemResourceAsStream(filename);
         // TODO Use the FileDataConnector rather than the MetricFrameLoader. [WLW]
