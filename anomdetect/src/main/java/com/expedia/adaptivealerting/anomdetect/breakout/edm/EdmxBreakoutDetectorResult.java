@@ -43,6 +43,16 @@ public class EdmxBreakoutDetectorResult implements DetectorResult {
     private Double energyDistance;
 
     /**
+     * Median for the pre-breakout sample.
+     */
+    private double preBreakoutMedian;
+
+    /**
+     * Median for the post-breakout sample.
+     */
+    private double postBreakoutMedian;
+
+    /**
      * Estimated p-value of the energy distance statistic, based on the permutation scheme described in "Leveraging
      * Cloud Data to Mitigate User Experience from 'Breaking Bad'", by James, et al.
      */

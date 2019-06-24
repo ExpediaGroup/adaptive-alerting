@@ -84,6 +84,8 @@ public final class EdmxBreakoutDetector implements Detector {
                 .setTimestamp(instant)
                 .setSignificant(estimate.isSignificant())
                 .setEnergyDistance(estimate.getEnergyDistance())
+                .setPreBreakoutMedian(estimate.getPreBreakoutMedian())
+                .setPostBreakoutMedian(estimate.getPostBreakoutMedian())
                 .setPValue(estimate.getPValue())
                 .setAlpha(estimate.getAlpha());
     }

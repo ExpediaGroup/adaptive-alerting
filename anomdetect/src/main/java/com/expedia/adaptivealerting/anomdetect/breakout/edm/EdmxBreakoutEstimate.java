@@ -16,13 +16,13 @@
 package com.expedia.adaptivealerting.anomdetect.breakout.edm;
 
 import com.expedia.adaptivealerting.anomdetect.breakout.BreakoutEstimate;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
+@Accessors(chain = true)
 public class EdmxBreakoutEstimate implements BreakoutEstimate {
 
     /**
@@ -34,6 +34,16 @@ public class EdmxBreakoutEstimate implements BreakoutEstimate {
      * Estimated energy distance between the pre- and post-breakout samples. This is a divergence measure.
      */
     private double energyDistance;
+
+    /**
+     * Median for the pre-breakout sample.
+     */
+    private double preBreakoutMedian;
+
+    /**
+     * Median for the post-breakout sample.
+     */
+    private double postBreakoutMedian;
 
     /**
      * Estimated p-value for the energy distance.

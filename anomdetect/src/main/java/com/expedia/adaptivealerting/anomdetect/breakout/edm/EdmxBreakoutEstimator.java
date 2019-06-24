@@ -45,7 +45,15 @@ public class EdmxBreakoutEstimator {
         val energyDistance = breakout.getEnergyDistance();
         val pValue = estimatePValue(scaledData, delta, numPerms, energyDistance);
         val significant = pValue <= alpha;
-        return new EdmxBreakoutEstimate(breakout.getLocation(), energyDistance, pValue, alpha, significant);
+
+        return new EdmxBreakoutEstimate()
+                .setLocation(breakout.location)
+                .setEnergyDistance(breakout.energyDistance)
+                .setPreBreakoutMedian(breakout.preBreakoutMedian)
+                .setPostBreakoutMedian(breakout.postBreakoutMedian)
+                .setPValue(pValue)
+                .setAlpha(alpha)
+                .setSignificant(significant);
     }
 
     private static SimpleEdmxBreakoutEstimate estimateSimpleBreakout(double[] data, int delta) {
@@ -54,6 +62,8 @@ public class EdmxBreakoutEstimator {
         val n = data.length;
         int bestLoc = -1;
         double bestStat = Double.MIN_VALUE;
+        double bestML = 0.0;
+        double bestMR = 0.0;
 
         val heapsL = new RunningMedian();
         for (int i = 0; i < delta - 1; i++) {
@@ -79,11 +89,13 @@ public class EdmxBreakoutEstimator {
                 if (stat > bestStat) {
                     bestLoc = i;
                     bestStat = stat;
+                    bestML = mL;
+                    bestMR = mR;
                 }
             }
         }
 
-        return new SimpleEdmxBreakoutEstimate(bestLoc, bestStat);
+        return new SimpleEdmxBreakoutEstimate(bestLoc, bestStat, bestML, bestMR);
     }
 
     /**
@@ -121,5 +133,16 @@ public class EdmxBreakoutEstimator {
          * Estimated energy distance between the pre- and post-breakout samples. This is a divergence measure.
          */
         private double energyDistance;
+
+
+        /**
+         * Median for the pre-breakout sample.
+         */
+        private double preBreakoutMedian;
+
+        /**
+         * Median for the post-breakout sample.
+         */
+        private double postBreakoutMedian;
     }
 }

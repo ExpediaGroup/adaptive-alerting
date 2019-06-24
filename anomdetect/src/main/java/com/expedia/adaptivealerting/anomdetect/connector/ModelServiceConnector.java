@@ -40,9 +40,9 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isTrue;
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 // FIXME Currently this class uses the URI template in an inconsistent way. In some methods it fills in a detector UUID
-// whereas in others it fills in a metric ID. The only reason it currently works is that no existing client uses both
-// types of method. However if some client used both then the connector would break. We probably want to construct the
-// URI from a scheme/host/port. (Ideal would be hypermedia, but might be overkill for this.) [WLW]
+//  whereas in others it fills in a metric ID. The only reason it currently works is that no existing client uses both
+//  types of method. However if some client used both then the connector would break. We probably want to construct the
+//  URI from a scheme/host/port. (Ideal would be hypermedia, but might be overkill for this.) [WLW]
 
 /**
  * <p>
@@ -59,6 +59,8 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 public class ModelServiceConnector {
     public static final String API_PATH_MODEL_BY_DETECTOR_UUID = "/api/v2/detectors/findByUuid?uuid=%s";
     public static final String API_PATH_DETECTOR_UPDATES = "/api/v2/detectors/getLastUpdatedDetectors?interval=%d";
+
+    // TODO Shouldn't these also include the /api/v2 prefix? [WLW]
     public static final String API_PATH_DETECTOR_MAPPING_UPDATES = "/api/detectorMappings/lastUpdated?timeInSecs=%d";
     public static final String API_PATH_MATCHING_DETECTOR_BY_TAGS = "/api/detectorMappings/findMatchingByTags";
 
@@ -77,9 +79,9 @@ public class ModelServiceConnector {
     }
 
     /**
-     * Finds the latest model for the given detector.
+     * Finds the detector for the given detector UUID.
      *
-     * @param detectorUuid detector UUID
+     * @param uuid detector UUID
      * @return latest model for the given detector
      * @throws DetectorRetrievalException       if there's a problem calling the Model Service
      * @throws DetectorDeserializationException if there's a problem deserializing the Model Service response into a
@@ -87,18 +89,18 @@ public class ModelServiceConnector {
      * @throws DetectorNotFoundException        if the detector doesn't have any models
      * @throws DetectorException                if there's any other problem finding the detector
      */
-    public DetectorResource findLatestDetector(UUID detectorUuid) {
-        notNull(detectorUuid, "detectorUuid can't be null");
+    public DetectorResource findLatestDetector(UUID uuid) {
+        notNull(uuid, "detectorUuid can't be null");
 
         // http://modelservice/api/v2/detectors/findByUuid?uuid=%s
         // http://modelservice/api/v2/detectors/findByUuid?uuid=85f395a2-e276-7cfd-34bc-cb850ae3bc2e
-        val uri = String.format(baseUri + API_PATH_MODEL_BY_DETECTOR_UUID, detectorUuid);
+        val uri = String.format(baseUri + API_PATH_MODEL_BY_DETECTOR_UUID, uuid);
 
         Content content;
         try {
             content = httpClient.get(uri);
         } catch (IOException e) {
-            val message = "IOException while getting models for detector " + detectorUuid +
+            val message = "IOException while getting detector " + uuid +
                     ": httpMethod=GET" +
                     ", uri=" + uri;
             throw new DetectorRetrievalException(message, e);
@@ -108,12 +110,12 @@ public class ModelServiceConnector {
         try {
             detectorResource = objectMapper.readValue(content.asBytes(), DetectorResource.class);
         } catch (IOException e) {
-            val message = "IOException while deserializing models for detector " + detectorUuid;
+            val message = "IOException while deserializing detector " + uuid;
             throw new DetectorDeserializationException(message, e);
         }
 
         if (detectorResource == null) {
-            throw new DetectorNotFoundException("No models for detectorUuid=" + detectorUuid);
+            throw new DetectorNotFoundException("No models for detectorUuid=" + uuid);
         }
 
         return detectorResource;
@@ -123,7 +125,7 @@ public class ModelServiceConnector {
      * @param sinceSeconds the time period in seconds
      * @return the list of detectorMappings that were modified in last since minutes
      */
-    public  List<DetectorResource>  findUpdatedDetectors(long sinceSeconds) {
+    public List<DetectorResource> findUpdatedDetectors(long sinceSeconds) {
         isTrue(sinceSeconds > 0, "timePeriod must be strictly positive");
 
         val uri = String.format(baseUri + API_PATH_DETECTOR_UPDATES, sinceSeconds);

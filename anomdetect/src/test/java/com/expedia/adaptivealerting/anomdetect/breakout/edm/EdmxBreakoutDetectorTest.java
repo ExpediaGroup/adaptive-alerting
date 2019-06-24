@@ -47,10 +47,11 @@ public final class EdmxBreakoutDetectorTest {
             val metricData = metricDataList.get(i);
             val result = (EdmxBreakoutDetectorResult) detectorUnderTest.detect(metricData);
             if (!result.isWarmup() && result.getTimestamp() != null && result.getSignificant()) {
-                log.trace("row={}: timestamp={}, pValue={}",
-                        i + 1,
-                        result.getTimestamp(),
-                        result.getPValue());
+//                log.trace("row={}: timestamp={}, pValue={}",
+//                        i + 1,
+//                        result.getTimestamp(),
+//                        result.getPValue());
+                log.trace("row={}: {}", i + 1, result);
             }
         }
     }
