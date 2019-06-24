@@ -35,7 +35,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 // Non-final because we currently need to mock this in DetectorManagerTest. [WLW]
 
 /**
- * A {@link DetectorSource} backed by the Model Service.
+ * The default {@link DetectorSource}, backed by the Model Service.
  */
 @RequiredArgsConstructor
 @Slf4j
@@ -48,33 +48,31 @@ public class DefaultDetectorSource implements DetectorSource {
     private final LegacyDetectorFactory legacyDetectorFactory;
 
     @Override
+    public DetectorMatchResponse findDetectorMappings(List<Map<String, String>> metricTags) {
+        notNull(metricTags, "metricTags can't be null");
+        return connector.findMatchingDetectorMappings(metricTags);
+    }
+
+    @Override
+    public List<DetectorMapping> findUpdatedDetectorMappings(long timePeriod) {
+        isTrue(timePeriod > 0, "Required: timePeriod > 0");
+        return connector.findUpdatedDetectorMappings(timePeriod);
+    }
+
+    @Override
     public Detector findDetector(UUID uuid) {
         notNull(uuid, "uuid can't be null");
-        val detectorResource = connector.findLatestDetector(uuid);
-        return legacyDetectorFactory.createDetector(uuid, detectorResource);
+        val detectorConfig = connector.findLatestDetector(uuid);
+        return legacyDetectorFactory.createDetector(uuid, detectorConfig);
     }
 
     @Override
     public List<UUID> findUpdatedDetectors(long timePeriod) {
-        notNull(timePeriod, "timePeriod can't be null");
+        isTrue(timePeriod > 0, "Required: timePeriod > 0");
         return connector
                 .findUpdatedDetectors(timePeriod)
                 .stream()
                 .map(resource -> UUID.fromString(resource.getUuid()))
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<DetectorMapping> findUpdatedDetectorMappings(long timePeriod) {
-        isTrue(timePeriod > 0, "timeInSecs must be strictly positive");
-
-        return connector
-                .findUpdatedDetectorMappings(timePeriod);
-    }
-
-
-    @Override
-    public DetectorMatchResponse findMatchingDetectorMappings(List<Map<String, String>> metricTags) {
-        return connector.findMatchingDetectorMappings(metricTags);
     }
 }

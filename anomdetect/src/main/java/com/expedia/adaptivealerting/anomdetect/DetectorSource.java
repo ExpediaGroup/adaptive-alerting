@@ -26,14 +26,38 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Detector source interfaces, supporting two major functions:
+ * Detector source interface, supporting two major functions:
  *
  * <ul>
- * <li>mapping a metric definition to a list of detector metas (required by {@link DetectorMapper}), and</li>
- * <li>mapping a detector UUID to the associated detector (required by {@link DetectorManager}).</li>
+ * <li>looking up a list of detector UUIDs for a given metric (required by {@link DetectorMapper}), and</li>
+ * <li>looking up a detector by UUID (required by {@link DetectorManager}).</li>
  * </ul>
  */
 public interface DetectorSource {
+
+    // TODO findDetectorMappings should take a List<MetricDefinition> as an argument, as
+    //  MetricDefinition is the system's concept for metric identity. The DetectorSoruce
+    //  implementation can itself pull the tags from the MetricDefinition. [WLW]
+
+    // TODO Do the findUpdated* methods handle deleted mappings and detectors? If so (and I
+    //  think they should), then we want to document that too. [WLW]
+
+    /**
+     * Finds all detector UUIDs for the given metrics.
+     *
+     * @param metricTags A list of metrics, each represented by a set of tags
+     * @return A list of detector UUIDs mapped to the given metrics.
+     */
+    DetectorMatchResponse findDetectorMappings(List<Map<String, String>> metricTags);
+
+    /**
+     * Finds the list of detector mappings updated in the last {@code timePeriod} seconds. This allows the Detector
+     * Mapper to keep current with new and updated mappings.
+     *
+     * @param timePeriod Time period in seconds. Must be strictly positive.
+     * @return List of detector mappings.
+     */
+    List<DetectorMapping> findUpdatedDetectorMappings(long timePeriod);
 
     /**
      * Finds the detector for a given detector and, optionally, metric.
@@ -46,15 +70,12 @@ public interface DetectorSource {
     Detector findDetector(UUID uuid);
 
     /**
-     * Finds the list of detector UUIDs updated in last `timePeriod` seconds
+     * Finds the list of detector UUIDs updated in last {@code timePeriod} seconds. This allows the Detector Manager to
+     * keep current with new and updated detectors.
      *
-     * @param timePeriod time period in seconds.
+     * @param timePeriod Time period in seconds. Must be strictly positive.
      * @return The detector UUIDs.
      * @throws DetectorException if there's a problem finding the detectors
      */
     List<UUID> findUpdatedDetectors(long timePeriod);
-
-    List<DetectorMapping> findUpdatedDetectorMappings(long timePeriod);
-
-    DetectorMatchResponse findMatchingDetectorMappings(List<Map<String, String>> metricTags);
 }

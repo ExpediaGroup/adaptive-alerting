@@ -15,21 +15,13 @@
  */
 package com.expedia.adaptivealerting.anomdetect.breakout;
 
-import org.junit.Before;
-import org.junit.Test;
+public interface BreakoutEstimate {
 
-import java.util.UUID;
+    int getLocation();
 
-public final class EdmxBreakoutDetectorTest {
-    private EdmxBreakoutDetector detectorUnderTest;
+    double getPValue();
 
-    @Before
-    public void setUp() {
-        this.detectorUnderTest = new EdmxBreakoutDetector(UUID.randomUUID());
-    }
+    double getAlpha();
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testDetect_nullMetricData() {
-        detectorUnderTest.detect(null);
-    }
+    boolean isSignificant();
 }

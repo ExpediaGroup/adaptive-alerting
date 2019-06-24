@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Response from model-service for request findMatchingDetectorMappings
+ * Response from model-service for request findDetectorMappings
  * same as com.expedia.adaptivealerting.modelservice.model.MatchingDetectorsResponse
  */
 @Data

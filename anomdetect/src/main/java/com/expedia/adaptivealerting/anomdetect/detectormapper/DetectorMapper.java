@@ -84,7 +84,7 @@ public class DetectorMapper {
 
         DetectorMatchResponse matchingDetectorMappings = null;
         try {
-            matchingDetectorMappings = detectorSource.findMatchingDetectorMappings(cacheMissedMetricTags);
+            matchingDetectorMappings = detectorSource.findDetectorMappings(cacheMissedMetricTags);
         } catch (RuntimeException e) {
             //Disabling temporarily to reduce log
            // log.error(e.getMessage());

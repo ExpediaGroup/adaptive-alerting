@@ -13,26 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.util;
+package com.expedia.adaptivealerting.anomdetect.util.math;
 
 import lombok.experimental.UtilityClass;
+import lombok.val;
+
+import java.util.Arrays;
 
 /**
- * Math utilities.
+ * Utility class for common data manipulation operations.
  */
 @UtilityClass
-public class MathUtil {
+public class DataUtil {
 
     /**
-     * Indicates whether the distance between d1 and d2 is less than or equal to the given threshold.
+     * Scales the data to the interval [0, 1].
      *
-     * @param d1        Value 1
-     * @param d2        Value 2
-     * @param threshold Threshold
-     * @return Boolean indicating whether the two value are approximately equal
+     * @param data unscaled data
+     * @return data scaled to [0, 1]
      */
-    public static boolean isApproximatelyEqual(double d1, double d2, double threshold) {
-        return Math.abs(d1 - d2) <= threshold;
-    }
+    public static double[] unitScale(double[] data) {
+        val summaryStats = Arrays.stream(data).summaryStatistics();
+        val min = summaryStats.getMin();
+        val max = summaryStats.getMax();
+        val range = max - min;
+        val denom = (range == 0.0 ? 1.0 : range);
 
+        return Arrays.stream(data)
+                .map(value -> (value - min) / denom)
+                .toArray();
+    }
 }

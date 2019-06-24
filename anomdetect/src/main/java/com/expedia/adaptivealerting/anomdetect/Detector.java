@@ -15,14 +15,13 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyResult;
 import com.expedia.metrics.MetricData;
 
 import java.util.UUID;
 
 /**
- * Anomaly detector interface. An anomaly detector takes a metric data point as an input, and classifies it as
- * anomalous or not as an output. See {@link AnomalyResult} for more details on the classification.
+ * Anomaly detector interface. Anomalies can be outliers (point-in-time) or breakouts (distributional shifts in the
+ * recent past).
  */
 public interface Detector {
 
@@ -34,7 +33,7 @@ public interface Detector {
     UUID getUuid();
 
     /**
-     * Classifies a given metric data point.
+     * Processes a given metric point.
      *
      * @param metricData Metric data point.
      * @return Anomaly result.

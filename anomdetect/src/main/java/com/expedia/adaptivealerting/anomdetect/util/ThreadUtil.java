@@ -22,7 +22,7 @@ import lombok.experimental.UtilityClass;
  * Thread utilities.
  */
 @UtilityClass
-public final class ThreadUtil {
+public class ThreadUtil {
 
     @SneakyThrows
     public static void sleep(long millis) {
