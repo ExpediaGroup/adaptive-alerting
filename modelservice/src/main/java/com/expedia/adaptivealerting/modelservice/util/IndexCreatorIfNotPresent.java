@@ -18,10 +18,9 @@ package com.expedia.adaptivealerting.modelservice.util;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
 import com.google.gson.JsonObject;
-import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
-import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.common.settings.Settings;
@@ -44,43 +43,25 @@ import static com.expedia.adaptivealerting.modelservice.dto.percolator.Percolato
  */
 @Component
 @Slf4j
-@Generated //(exclude from code coverage)
 public class IndexCreatorIfNotPresent implements ApplicationListener<ApplicationReadyEvent> {
 
     @Autowired
-    private ElasticSearchClient elasticSearchClient;
+    private ElasticSearchProperties properties;
 
     @Autowired
-    private ElasticSearchProperties elasticSearchProperties;
+    private ElasticSearchClient client;
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {
-        if (elasticSearchProperties.isCreateIndexIfNotFound()) {
+        if (properties.isCreateIndexIfNotFound()) {
             try {
-                GetIndexRequest getIndexRequest = new GetIndexRequest();
-                getIndexRequest.indices(elasticSearchProperties.getIndexName());
-                boolean isPresent = elasticSearchClient.indices().exists(getIndexRequest, RequestOptions.DEFAULT);
-
+                boolean isPresent = client.indices().exists(getIndexRequest(), RequestOptions.DEFAULT);
                 if (!isPresent) {
-                    CreateIndexRequest createIndexRequest = new CreateIndexRequest(elasticSearchProperties.getIndexName());
-                    createIndexRequest.settings(Settings.builder()
-                            .put("index.number_of_shards", 5)
-                            .put("index.number_of_replicas", 3)
-                    );
-
-                    JsonObject docObject = new JsonObject();
-                    docObject.addProperty("dynamic", "false");
-                    docObject.add("properties", buildMappingsJson());
-                    JsonObject mapObject = new JsonObject();
-                    mapObject.add(elasticSearchProperties.getDocType(), docObject);
-                    createIndexRequest.mapping(elasticSearchProperties.getDocType(), mapObject.toString(),
-                            XContentType.JSON);
-                    CreateIndexResponse response = elasticSearchClient.indices().create(createIndexRequest,
-                            RequestOptions.DEFAULT);
+                    val response = client.indices().create(createIndexRequest(), RequestOptions.DEFAULT);
                     if (!response.isAcknowledged()) {
-                        throw new RuntimeException("Index Creation failed");
+                        throw new RuntimeException("Index creation failed");
                     }
-                    log.info("Successfully created index : " + elasticSearchProperties.getIndexName());
+                    log.info("Successfully created index: {}", properties.getIndexName());
                 }
             } catch (IOException e) {
                 log.error("Index creation failed", e);
@@ -89,23 +70,49 @@ public class IndexCreatorIfNotPresent implements ApplicationListener<Application
         }
     }
 
-    private JsonObject buildMappingsJson() {
-        JsonObject dynamicTypeObject = new JsonObject();
-        dynamicTypeObject.addProperty("type", "nested");
-        dynamicTypeObject.addProperty("dynamic", "true");
-        JsonObject dispatcherTypeObject = new JsonObject();
-        dispatcherTypeObject.addProperty("type", "object");
-        JsonObject queryTypeObject = new JsonObject();
-        queryTypeObject.addProperty("type", "percolator");
-        JsonObject timeTypeObject = new JsonObject();
-        timeTypeObject.addProperty("type", "long");
+    private GetIndexRequest getIndexRequest() {
+        val request = new GetIndexRequest();
+        request.indices(properties.getIndexName());
+        return request;
+    }
 
-        JsonObject propObject = new JsonObject();
-        propObject.add(USER_KEYWORD, dynamicTypeObject);
-        propObject.add(DETECTOR_KEYWORD, dynamicTypeObject);
-        propObject.add(QUERY_KEYWORD, queryTypeObject);
-        propObject.add(LAST_MOD_TIME_KEYWORD, timeTypeObject);
-        propObject.add(CREATE_TIME_KEYWORD, timeTypeObject);
+    private CreateIndexRequest createIndexRequest() {
+        val docObject = new JsonObject();
+        docObject.addProperty("dynamic", "false");
+        docObject.add("properties", buildMappingsJson());
+
+        val mapObject = new JsonObject();
+        mapObject.add(properties.getDocType(), docObject);
+
+        val request = new CreateIndexRequest(properties.getIndexName());
+        request.settings(Settings.builder()
+                .put("index.number_of_shards", 5)
+                .put("index.number_of_replicas", 3)
+        );
+        request.mapping(properties.getDocType(), mapObject.toString(), XContentType.JSON);
+        return request;
+    }
+
+    private JsonObject buildMappingsJson() {
+        val dynamicType = new JsonObject();
+        dynamicType.addProperty("type", "nested");
+        dynamicType.addProperty("dynamic", "true");
+
+        val dispatcherType = new JsonObject();
+        dispatcherType.addProperty("type", "object");
+
+        val queryType = new JsonObject();
+        queryType.addProperty("type", "percolator");
+
+        val timeType = new JsonObject();
+        timeType.addProperty("type", "long");
+
+        val propObject = new JsonObject();
+        propObject.add(USER_KEYWORD, dynamicType);
+        propObject.add(DETECTOR_KEYWORD, dynamicType);
+        propObject.add(QUERY_KEYWORD, queryType);
+        propObject.add(LAST_MOD_TIME_KEYWORD, timeType);
+        propObject.add(CREATE_TIME_KEYWORD, timeType);
         return propObject;
     }
 }

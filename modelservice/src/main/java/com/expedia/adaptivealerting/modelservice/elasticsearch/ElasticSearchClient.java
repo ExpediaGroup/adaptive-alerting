@@ -34,6 +34,10 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+// TODO Not sure how much this class helps. The IndicesClient class returned by the indices() method is
+//  itself final, so any client code calling that will still have to deal with mocking issues. We could
+//  make a similar wrapper for IndicesClient, but that class has a lot of methods. See
+//  https://discuss.elastic.co/t/resthighlevelclient-mocking/123027. [WLW]
 /**
  * This is a wrapper class around {@code RestHighLevelClient}.
  * we can't easily mock methods of class {@code RestHighLevelClient}, which are final.
@@ -46,12 +50,12 @@ public class ElasticSearchClient {
     @Autowired
     private RestHighLevelClient client;
 
-    public IndexResponse index(IndexRequest indexRequest, RequestOptions options) throws IOException {
-        return client.index(indexRequest, options);
-    }
-
     public IndicesClient indices() {
         return client.indices();
+    }
+
+    public IndexResponse index(IndexRequest indexRequest, RequestOptions options) throws IOException {
+        return client.index(indexRequest, options);
     }
 
     public DeleteResponse delete(DeleteRequest deleteRequest, RequestOptions options) throws IOException {
