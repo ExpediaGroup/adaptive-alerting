@@ -1,8 +1,8 @@
 package com.expedia.adaptivealerting.modelservice.service;
 
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.CreateDetectorMappingRequest;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.MatchingDetectorsResponse;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.SearchMappingsRequest;
+import com.expedia.adaptivealerting.modelservice.request.CreateDetectorMappingRequest;
+import com.expedia.adaptivealerting.modelservice.request.MatchingDetectorsResponse;
+import com.expedia.adaptivealerting.modelservice.request.SearchMappingsRequest;
 import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorMappingRepository;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;

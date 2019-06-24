@@ -1,16 +1,16 @@
 package com.expedia.adaptivealerting.modelservice.test;
 
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.MatchingDetectorsResponse;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.User;
-import com.expedia.adaptivealerting.modelservice.dto.percolator.BoolCondition;
-import com.expedia.adaptivealerting.modelservice.dto.percolator.MustCondition;
-import com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping;
-import com.expedia.adaptivealerting.modelservice.dto.percolator.Query;
+import com.expedia.adaptivealerting.modelservice.request.MatchingDetectorsResponse;
+import com.expedia.adaptivealerting.modelservice.request.User;
+import com.expedia.adaptivealerting.modelservice.request.BoolCondition;
+import com.expedia.adaptivealerting.modelservice.request.MustCondition;
+import com.expedia.adaptivealerting.modelservice.request.PercolatorDetectorMapping;
+import com.expedia.adaptivealerting.modelservice.request.Query;
 import com.expedia.adaptivealerting.modelservice.entity.Detector;
 import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
-import com.expedia.adaptivealerting.modelservice.providers.graphite.GraphiteResult;
-import com.expedia.adaptivealerting.modelservice.service.AnomalyRequest;
-import com.expedia.adaptivealerting.modelservice.spi.MetricSourceResult;
+import com.expedia.adaptivealerting.modelservice.plugin.graphite.GraphiteResult;
+import com.expedia.adaptivealerting.modelservice.request.AnomalyRequest;
+import com.expedia.adaptivealerting.modelservice.plugin.MetricSourceResult;
 import com.expedia.adaptivealerting.modelservice.util.DateUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
@@ -79,7 +79,7 @@ public class ObjectMother {
         detectorMapping.setCreatedTimeInMillis(10000);
         detectorMapping.setEnabled(true);
         detectorMapping.setUser(new User("test-user"));
-        detectorMapping.setDetector(new com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639")));
+        detectorMapping.setDetector(new com.expedia.adaptivealerting.modelservice.request.Detector(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639")));
         return detectorMapping;
     }
 
@@ -99,15 +99,15 @@ public class ObjectMother {
         percolatorDetectorMapping.setEnabled(true);
         percolatorDetectorMapping.setLastModifiedTimeInMillis(1554828886);
         percolatorDetectorMapping.setUser(new User("test-user"));
-        percolatorDetectorMapping.setDetector(new com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639")));
+        percolatorDetectorMapping.setDetector(new com.expedia.adaptivealerting.modelservice.request.Detector(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639")));
         percolatorDetectorMapping.setQuery(query);
         return percolatorDetectorMapping;
     }
 
     public MatchingDetectorsResponse getMatchingDetectorsResponse() {
-        Map<Integer, List<com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector>> groupedDetectorsByIndex = new HashMap<>();
-        com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector detector = new com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"));
-        List<com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector> detectors = new ArrayList<>();
+        Map<Integer, List<com.expedia.adaptivealerting.modelservice.request.Detector>> groupedDetectorsByIndex = new HashMap<>();
+        com.expedia.adaptivealerting.modelservice.request.Detector detector = new com.expedia.adaptivealerting.modelservice.request.Detector(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"));
+        List<com.expedia.adaptivealerting.modelservice.request.Detector> detectors = new ArrayList<>();
         detectors.add(detector);
         groupedDetectorsByIndex.put(0, detectors);
         return new MatchingDetectorsResponse(groupedDetectorsByIndex, 10000);

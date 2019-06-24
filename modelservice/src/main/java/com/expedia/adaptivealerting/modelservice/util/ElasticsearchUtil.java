@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.modelservice.util;
 
-import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.elasticsearch.action.index.IndexRequest;
@@ -35,7 +34,7 @@ import java.io.IOException;
 public class ElasticsearchUtil {
 
     @Autowired
-    private ElasticSearchClient elasticSearchClient;
+    private ElasticsearchClient elasticSearchClient;
 
     public IndexResponse getIndexResponse(IndexRequest indexRequest, String json) {
         try {

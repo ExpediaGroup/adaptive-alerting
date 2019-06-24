@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 public class MetricEventHandler {
 
     @Autowired
-    MetricRepository metricRepository;
+    private MetricRepository metricRepository;
 
     @HandleBeforeCreate
     public void handleMetricCreate(Metric object) {

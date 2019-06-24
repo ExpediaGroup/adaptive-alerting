@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.modelservice;
 
 import com.codahale.metrics.MetricRegistry;
-import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
+import com.expedia.adaptivealerting.modelservice.util.ElasticsearchProperties;
 import org.apache.http.HttpHost;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.elasticsearch.client.RestClient;
@@ -82,7 +82,7 @@ public class ModelServiceApp {
     }
 
     @Bean
-    public RestHighLevelClient restClientBuilder(ElasticSearchProperties elasticSearchProperties) {
+    public RestHighLevelClient restClientBuilder(ElasticsearchProperties elasticSearchProperties) {
         RestClientBuilder builder = RestClient
                 .builder(HttpHost.create(elasticSearchProperties.getUrls()))
                 .setRequestConfigCallback(req -> {

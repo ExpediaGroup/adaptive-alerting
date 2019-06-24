@@ -1,6 +1,5 @@
 package com.expedia.adaptivealerting.modelservice.util;
 
-import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -30,7 +29,7 @@ public class ElasticsearchUtilTest {
     private ElasticsearchUtil elasticsearchUtil;
 
     @Mock
-    private ElasticSearchClient elasticSearchClient;
+    private ElasticsearchClient elasticSearchClient;
 
     @Before
     public void setUp() throws Exception {

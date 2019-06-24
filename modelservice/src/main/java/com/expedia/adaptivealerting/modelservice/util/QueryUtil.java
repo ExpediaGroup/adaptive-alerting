@@ -15,13 +15,13 @@
  */
 package com.expedia.adaptivealerting.modelservice.util;
 
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Expression;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Field;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Operand;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Operator;
-import com.expedia.adaptivealerting.modelservice.dto.percolator.BoolCondition;
-import com.expedia.adaptivealerting.modelservice.dto.percolator.MustCondition;
-import com.expedia.adaptivealerting.modelservice.dto.percolator.Query;
+import com.expedia.adaptivealerting.modelservice.request.Expression;
+import com.expedia.adaptivealerting.modelservice.request.Field;
+import com.expedia.adaptivealerting.modelservice.request.Operand;
+import com.expedia.adaptivealerting.modelservice.request.Operator;
+import com.expedia.adaptivealerting.modelservice.request.BoolCondition;
+import com.expedia.adaptivealerting.modelservice.request.MustCondition;
+import com.expedia.adaptivealerting.modelservice.request.Query;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,8 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Slf4j
 @UtilityClass
+@Slf4j
 public class QueryUtil {
 
     public static Expression buildExpression(Query query) {

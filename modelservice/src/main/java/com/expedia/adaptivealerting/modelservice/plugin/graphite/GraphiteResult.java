@@ -13,14 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.service;
+package com.expedia.adaptivealerting.modelservice.plugin.graphite;
 
-import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyResult;
-import com.expedia.adaptivealerting.modelservice.request.AnomalyRequest;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.util.Map;
 
-public interface AnomalyService {
-
-    List<AnomalyResult> getAnomalies(AnomalyRequest request);
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class GraphiteResult {
+    private String[][] datapoints;
+    private String target;
+    private Map<String, Object> tags;
 }

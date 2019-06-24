@@ -15,9 +15,9 @@
  */
 package com.expedia.adaptivealerting.modelservice.web;
 
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.CreateDetectorMappingRequest;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.MatchingDetectorsResponse;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.SearchMappingsRequest;
+import com.expedia.adaptivealerting.modelservice.request.CreateDetectorMappingRequest;
+import com.expedia.adaptivealerting.modelservice.request.MatchingDetectorsResponse;
+import com.expedia.adaptivealerting.modelservice.request.SearchMappingsRequest;
 import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
 import com.expedia.adaptivealerting.modelservice.service.DetectorMappingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +32,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
+
+// TODO Shouldn't this also be /api/v2/... ? [WLW]
 
 @RestController
 @RequestMapping("/api/detectorMappings")

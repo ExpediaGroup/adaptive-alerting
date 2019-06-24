@@ -13,14 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.service;
-
-import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyResult;
-import com.expedia.adaptivealerting.modelservice.request.AnomalyRequest;
+package com.expedia.adaptivealerting.modelservice.plugin;
 
 import java.util.List;
 
-public interface AnomalyService {
+public interface MetricSource {
 
-    List<AnomalyResult> getAnomalies(AnomalyRequest request);
+    List<MetricSourceResult> getMetricData(String metricName);
 }

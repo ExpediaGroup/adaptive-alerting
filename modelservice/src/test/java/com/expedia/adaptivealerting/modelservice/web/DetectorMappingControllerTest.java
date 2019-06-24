@@ -1,9 +1,9 @@
 package com.expedia.adaptivealerting.modelservice.web;
 
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.MatchingDetectorsResponse;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.SearchMappingsRequest;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.User;
+import com.expedia.adaptivealerting.modelservice.request.Detector;
+import com.expedia.adaptivealerting.modelservice.request.MatchingDetectorsResponse;
+import com.expedia.adaptivealerting.modelservice.request.SearchMappingsRequest;
+import com.expedia.adaptivealerting.modelservice.request.User;
 import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
 import com.expedia.adaptivealerting.modelservice.service.DetectorMappingServiceImpl;
 import lombok.val;

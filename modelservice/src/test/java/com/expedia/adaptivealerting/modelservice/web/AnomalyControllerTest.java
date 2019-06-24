@@ -1,7 +1,7 @@
 package com.expedia.adaptivealerting.modelservice.web;
 
 import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyResult;
-import com.expedia.adaptivealerting.modelservice.service.AnomalyRequest;
+import com.expedia.adaptivealerting.modelservice.request.AnomalyRequest;
 import com.expedia.adaptivealerting.modelservice.service.AnomalyService;
 import org.junit.Before;
 import org.junit.Test;

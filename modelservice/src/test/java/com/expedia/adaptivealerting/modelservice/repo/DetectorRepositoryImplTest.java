@@ -1,8 +1,7 @@
 package com.expedia.adaptivealerting.modelservice.repo;
 
-import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
+import com.expedia.adaptivealerting.modelservice.util.ElasticsearchClient;
 import com.expedia.adaptivealerting.modelservice.entity.Detector;
-import com.expedia.adaptivealerting.modelservice.repo.impl.DetectorRepositoryImpl;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import com.expedia.adaptivealerting.modelservice.util.ElasticsearchUtil;
 import com.expedia.adaptivealerting.modelservice.util.ObjectMapperUtil;
@@ -65,7 +64,7 @@ public class DetectorRepositoryImplTest {
     private DetectorRepository detectorRepository = new DetectorRepositoryImpl();
 
     @Mock
-    private ElasticSearchClient elasticSearchClient;
+    private ElasticsearchClient elasticSearchClient;
 
     @Mock
     private ElasticsearchUtil elasticsearchUtil;

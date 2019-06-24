@@ -1,9 +1,10 @@
 package com.expedia.adaptivealerting.modelservice.service;
 
 import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyLevel;
-import com.expedia.adaptivealerting.modelservice.providers.graphite.GraphiteMetricSource;
-import com.expedia.adaptivealerting.modelservice.spi.MetricSource;
-import com.expedia.adaptivealerting.modelservice.spi.MetricSourceResult;
+import com.expedia.adaptivealerting.modelservice.plugin.graphite.GraphiteMetricSource;
+import com.expedia.adaptivealerting.modelservice.plugin.MetricSource;
+import com.expedia.adaptivealerting.modelservice.plugin.MetricSourceResult;
+import com.expedia.adaptivealerting.modelservice.request.AnomalyRequest;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;

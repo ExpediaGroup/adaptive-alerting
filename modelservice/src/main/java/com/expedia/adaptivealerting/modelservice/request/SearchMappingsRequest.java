@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.service;
+package com.expedia.adaptivealerting.modelservice.request;
 
-import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyResult;
-import com.expedia.adaptivealerting.modelservice.request.AnomalyRequest;
+import lombok.Data;
 
-import java.util.List;
+import java.util.UUID;
 
-public interface AnomalyService {
-
-    List<AnomalyResult> getAnomalies(AnomalyRequest request);
+@Data
+public class SearchMappingsRequest {
+    private String userId;
+    private UUID detectorUuid;
 }

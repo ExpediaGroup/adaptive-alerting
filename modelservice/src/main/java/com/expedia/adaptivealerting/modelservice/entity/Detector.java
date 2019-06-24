@@ -29,18 +29,13 @@ import java.util.Map;
 @Data
 @Accessors(chain = true)
 public class Detector {
-
     private String uuid;
-
     private String createdBy;
-
     private String type;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Date lastUpdateTimestamp;
 
     private Map<String, Object> detectorConfig = new HashMap<>();
-
     private Boolean enabled;
-
 }
