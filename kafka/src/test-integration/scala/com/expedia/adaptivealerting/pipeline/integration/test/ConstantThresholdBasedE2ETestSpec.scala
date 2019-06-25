@@ -18,7 +18,7 @@ package com.expedia.adaptivealerting.pipeline.integration.test
 import java.time.Instant
 
 import com.expedia.adaptivealerting.anomdetect.DetectorManager
-import com.expedia.adaptivealerting.anomdetect.connector.{HttpClientWrapper, ModelServiceConnector}
+import com.expedia.adaptivealerting.anomdetect.detectorclient.{HttpClientWrapper, DetectorClient}
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapper
 import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyResult
 import com.expedia.adaptivealerting.kafka.{KafkaAnomalyDetectorManager, KafkaAnomalyDetectorMapper}
@@ -111,7 +111,7 @@ class ConstantThresholdBasedE2ETestSpec extends IntegrationTestSpec {
 
     val httpClient: HttpClientWrapper = new HttpClientWrapper()
     val uriTemplate: String = conf.getString(MODEL_SERVICE_URI_TEMPLATE)
-    val modelServiceConnector: ModelServiceConnector = new ModelServiceConnector(httpClient, uriTemplate)
+    val modelServiceConnector: DetectorClient = new DetectorClient(httpClient, uriTemplate)
     val mapper: DetectorMapper = new DetectorMapper(modelServiceConnector)
 
     new KafkaAnomalyDetectorMapper(conf, mapper)
@@ -122,7 +122,7 @@ class ConstantThresholdBasedE2ETestSpec extends IntegrationTestSpec {
 
     val httpClient: HttpClientWrapper = new HttpClientWrapper()
     val uriTemplate: String = conf.getString(MODEL_SERVICE_URI_TEMPLATE)
-    val modelServiceConnector: ModelServiceConnector = new ModelServiceConnector(httpClient, uriTemplate)
+    val modelServiceConnector: DetectorClient = new DetectorClient(httpClient, uriTemplate)
 
     val manager: DetectorManager = new DetectorManager(conf.getConfig(DETECTORS), modelServiceConnector)
 

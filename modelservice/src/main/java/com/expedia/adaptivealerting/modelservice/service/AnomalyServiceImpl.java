@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.service;
 
 import com.expedia.adaptivealerting.anomdetect.Detector;
-import com.expedia.adaptivealerting.anomdetect.connector.DetectorResource;
+import com.expedia.adaptivealerting.anomdetect.detectorclient.DetectorResource;
 import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyResult;
 import com.expedia.adaptivealerting.anomdetect.outlier.legacy.LegacyDetectorFactory;
 import com.expedia.adaptivealerting.anomdetect.util.MetricUtil;

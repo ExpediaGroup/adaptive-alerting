@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.expedia.adaptivealerting.anomdetect.exception;
+package com.expedia.adaptivealerting.anomdetect.detectorclient;
 
 public class DetectorMappingDeserializationException extends DetectorMappingException {
 

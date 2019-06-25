@@ -13,15 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.connector;
+package com.expedia.adaptivealerting.anomdetect.detectorclient;
 
 import com.expedia.adaptivealerting.anomdetect.detectormapper.Detector;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMatchResponse;
-import com.expedia.adaptivealerting.anomdetect.exception.DetectorDeserializationException;
-import com.expedia.adaptivealerting.anomdetect.exception.DetectorMappingDeserializationException;
-import com.expedia.adaptivealerting.anomdetect.exception.DetectorMappingRetrievalException;
-import com.expedia.adaptivealerting.anomdetect.exception.DetectorNotFoundException;
-import com.expedia.adaptivealerting.anomdetect.exception.DetectorRetrievalException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
@@ -35,27 +30,25 @@ import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.expedia.adaptivealerting.anomdetect.connector.ModelServiceConnector.API_PATH_DETECTOR_MAPPING_UPDATES;
-import static com.expedia.adaptivealerting.anomdetect.connector.ModelServiceConnector.API_PATH_DETECTOR_UPDATES;
-import static com.expedia.adaptivealerting.anomdetect.connector.ModelServiceConnector.API_PATH_MATCHING_DETECTOR_BY_TAGS;
-import static com.expedia.adaptivealerting.anomdetect.connector.ModelServiceConnector.API_PATH_MODEL_BY_DETECTOR_UUID;
+import static com.expedia.adaptivealerting.anomdetect.detectorclient.DetectorClient.API_PATH_DETECTOR_MAPPING_UPDATES;
+import static com.expedia.adaptivealerting.anomdetect.detectorclient.DetectorClient.API_PATH_DETECTOR_UPDATES;
+import static com.expedia.adaptivealerting.anomdetect.detectorclient.DetectorClient.API_PATH_MATCHING_DETECTOR_BY_TAGS;
+import static com.expedia.adaptivealerting.anomdetect.detectorclient.DetectorClient.API_PATH_MODEL_BY_DETECTOR_UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
 /**
- * {@link ModelServiceConnector} unit tests.
+ * {@link DetectorClient} unit tests.
  */
 @Slf4j
-public class ModelServiceConnectorTest {
-
+public class DetectorClientTest {
     private static final UUID DETECTOR_UUID = UUID.randomUUID();
     private static final UUID DETECTOR_UUID_CANT_RETRIEVE = UUID.randomUUID();
     private static final UUID DETECTOR_UUID_CANT_DESERIALIZE = UUID.randomUUID();
@@ -64,7 +57,7 @@ public class ModelServiceConnectorTest {
     // FIXME The ModelServiceConnector uses this inconsistently. See the notes in that class for more information. [WLW]
     private static final String URI_TEMPLATE = "http://example.com";
 
-    private ModelServiceConnector connectorUnderTest;
+    private DetectorClient clientUnderTest;
 
     @Mock
     private HttpClientWrapper httpClient;
@@ -80,6 +73,7 @@ public class ModelServiceConnectorTest {
     // Test objects - find matching Detectors
     @Mock
     private Content detectorMatchResponseContent_cantDeserialize;
+
     private DetectorMatchResponse detectorMatchResponse;
     private Content detectorMatchResponseContent;
     private List<Map<String, String>> tags = new ArrayList<>();
@@ -88,11 +82,13 @@ public class ModelServiceConnectorTest {
 
     @Mock
     private Content detectorMappingContent_cantDeserialize;
+
     private byte[] detectorMappingBytes_cantDeserialize;
 
     // Test objects - find latest model
     @Mock
     private Content detectorResourcesContent_cantDeserialize;
+
     private Content detectorResourcesContent_noModels;
     private Content detectorResourcesContent;
     private byte[] detectorResourcesBytes_cantDeserialize;
@@ -103,6 +99,7 @@ public class ModelServiceConnectorTest {
 
     @Mock
     private Content findDetectorResourcesContent_cantDeserialize;
+
     private byte[] findDetectorResourcesBytes_cantDeserialize;
 
     @Before
@@ -110,85 +107,85 @@ public class ModelServiceConnectorTest {
         MockitoAnnotations.initMocks(this);
         initTestObjects();
         initDependencies();
-        this.connectorUnderTest = new ModelServiceConnector(httpClient, URI_TEMPLATE, objectMapper);
+        this.clientUnderTest = new DetectorClient(httpClient, URI_TEMPLATE, objectMapper);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructor_nullHttpClient() {
-        new ModelServiceConnector(null, URI_TEMPLATE, objectMapper);
+        new DetectorClient(null, URI_TEMPLATE, objectMapper);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructor_nullUriTemplate() {
-        new ModelServiceConnector(httpClient, null, objectMapper);
+        new DetectorClient(httpClient, null, objectMapper);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructor_nullObjectMapper() {
-        new ModelServiceConnector(httpClient, URI_TEMPLATE, null);
+        new DetectorClient(httpClient, URI_TEMPLATE, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testFindUpdatedDetectors_timePeriodInvalid() {
-        connectorUnderTest.findUpdatedDetectors(invalidTimePeriod);
+        clientUnderTest.findUpdatedDetectors(invalidTimePeriod);
     }
 
     @Test(expected = DetectorRetrievalException.class)
     public void testFindUpdatedDetector_cantRetrieve() {
-        connectorUnderTest.findUpdatedDetectors(timePeriod_cantRetrieve);
+        clientUnderTest.findUpdatedDetectors(timePeriod_cantRetrieve);
     }
 
     @Test(expected = DetectorDeserializationException.class)
     public void testFindUpdatedDetector_cantDeserialize() {
-        connectorUnderTest.findUpdatedDetectors(timePeriod_cantDeserialize);
+        clientUnderTest.findUpdatedDetectors(timePeriod_cantDeserialize);
     }
 
     @Test(expected = DetectorMappingRetrievalException.class)
     public void testFindUpdatedDetectorMappings_cantRetrieve() {
-        val result = connectorUnderTest.findUpdatedDetectorMappings(timePeriod_cantRetrieve);
+        val result = clientUnderTest.findUpdatedDetectorMappings(timePeriod_cantRetrieve);
         assertEquals(this.detectorMatchResponse, result);
     }
 
     @Test(expected = DetectorMappingDeserializationException.class)
     public void testFindUpdatedDetectorMappings_cantDeserialize() {
-        connectorUnderTest.findUpdatedDetectorMappings(timePeriod_cantDeserialize);
+        clientUnderTest.findUpdatedDetectorMappings(timePeriod_cantDeserialize);
     }
 
     @Test
     public void testFindMatchingDetectorMappings() {
-        val result = connectorUnderTest.findMatchingDetectorMappings(tags);
+        val result = clientUnderTest.findMatchingDetectorMappings(tags);
         assertEquals(this.detectorMatchResponse, result);
     }
 
     @Test(expected = DetectorMappingRetrievalException.class)
     public void testFindMatchingDetectorMappings_cantRetrieve() {
-        connectorUnderTest.findMatchingDetectorMappings(tags_cantRetrieve);
+        clientUnderTest.findMatchingDetectorMappings(tags_cantRetrieve);
     }
 
     @Test(expected = DetectorMappingDeserializationException.class)
     public void testFindMatchingDetectorMappings_cantDeserialize() {
-        connectorUnderTest.findMatchingDetectorMappings(tags_cantDeserialize);
+        clientUnderTest.findMatchingDetectorMappings(tags_cantDeserialize);
     }
 
     @Test
     public void testFindLatestModel() {
-        val result = connectorUnderTest.findLatestDetector(DETECTOR_UUID);
+        val result = clientUnderTest.findLatestDetector(DETECTOR_UUID);
         assertNotNull(result);
     }
 
     @Test(expected = DetectorRetrievalException.class)
     public void testFindLatestModel_retrievalException() {
-        connectorUnderTest.findLatestDetector(DETECTOR_UUID_CANT_RETRIEVE);
+        clientUnderTest.findLatestDetector(DETECTOR_UUID_CANT_RETRIEVE);
     }
 
     @Test(expected = DetectorDeserializationException.class)
     public void testFindLatestModel_deserializationException() {
-        connectorUnderTest.findLatestDetector(DETECTOR_UUID_CANT_DESERIALIZE);
+        clientUnderTest.findLatestDetector(DETECTOR_UUID_CANT_DESERIALIZE);
     }
 
     @Test(expected = DetectorNotFoundException.class)
     public void testFindLatestModel_notFound() {
-        connectorUnderTest.findLatestDetector(DETECTOR_UUID_NO_MODELS);
+        clientUnderTest.findLatestDetector(DETECTOR_UUID_NO_MODELS);
     }
 
     private void initTestObjects() throws IOException {

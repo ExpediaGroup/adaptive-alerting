@@ -18,8 +18,8 @@ package com.expedia.adaptivealerting.anomdetect;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapper;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapping;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMatchResponse;
-import com.expedia.adaptivealerting.anomdetect.exception.DetectorException;
-import com.expedia.adaptivealerting.anomdetect.exception.DetectorNotFoundException;
+import com.expedia.adaptivealerting.anomdetect.detectorclient.DetectorException;
+import com.expedia.adaptivealerting.anomdetect.detectorclient.DetectorNotFoundException;
 
 import java.util.List;
 import java.util.Map;
