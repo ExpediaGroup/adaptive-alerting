@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.connector;
+package com.expedia.adaptivealerting.anomdetect.detectorclient;
 
 import lombok.Generated;
 import org.apache.http.client.fluent.Content;

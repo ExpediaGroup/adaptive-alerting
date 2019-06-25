@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.outlier.legacy;
 
 import com.expedia.adaptivealerting.anomdetect.Detector;
-import com.expedia.adaptivealerting.anomdetect.connector.DetectorResource;
+import com.expedia.adaptivealerting.anomdetect.detectorclient.DetectorResource;
 import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyThresholds;
 import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyType;
 import com.expedia.adaptivealerting.anomdetect.outlier.ConstantThresholdOutlierDetector;

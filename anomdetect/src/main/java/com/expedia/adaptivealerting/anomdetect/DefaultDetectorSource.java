@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.anomdetect.connector.ModelServiceConnector;
+import com.expedia.adaptivealerting.anomdetect.detectorclient.DetectorClient;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapping;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMatchResponse;
 import com.expedia.adaptivealerting.anomdetect.outlier.legacy.LegacyDetectorFactory;
@@ -42,7 +42,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 public class DefaultDetectorSource implements DetectorSource {
 
     @NonNull
-    private final ModelServiceConnector connector;
+    private final DetectorClient connector;
 
     @NonNull
     private final LegacyDetectorFactory legacyDetectorFactory;

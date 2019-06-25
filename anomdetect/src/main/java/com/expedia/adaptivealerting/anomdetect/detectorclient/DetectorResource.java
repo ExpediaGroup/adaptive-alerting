@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.connector;
+package com.expedia.adaptivealerting.anomdetect.detectorclient;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Detector configuration.
+ * Detector resource.
  */
 @Data
 @NoArgsConstructor
@@ -54,10 +54,7 @@ public class DetectorResource {
     private Date lastUpdateTimestamp;
 
     /**
-     * Detector model parameters.
-     *
-     * TODO Consider renaming this field, as the overall class represents the detector
-     *  configuration. [WLW]
+     * Detector configuration.
      */
     private Map<String, Object> detectorConfig = new HashMap<>();
 

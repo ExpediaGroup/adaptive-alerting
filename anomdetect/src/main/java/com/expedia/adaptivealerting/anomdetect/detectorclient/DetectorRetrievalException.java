@@ -13,24 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.connector;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Generated;
-import lombok.NoArgsConstructor;
+package com.expedia.adaptivealerting.anomdetect.detectorclient;
 
 /**
- * Model type resource.
- *
- * @deprecated We should just use the key directly.
+ * Exception indicating a failed attempt to get a detector from the model service.
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true)
-@Generated // https://reflectoring.io/100-percent-test-coverage/
-public class ModelTypeResource {
-    private String key;
+public class DetectorRetrievalException extends DetectorException {
+
+    public DetectorRetrievalException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

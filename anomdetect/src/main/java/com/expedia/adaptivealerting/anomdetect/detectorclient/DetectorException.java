@@ -13,25 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.connector;
+package com.expedia.adaptivealerting.anomdetect.detectorclient;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Generated;
-import lombok.NoArgsConstructor;
+public class DetectorException extends RuntimeException {
 
-/**
- * Legacy Detector resource.
- */
-@Deprecated
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true)
-@Generated // https://reflectoring.io/100-percent-test-coverage/
-public class LegacyDetectorResource {
-    private String uuid;
-    private ModelTypeResource type;
-    private Boolean enabled;
+    public DetectorException(String message) {
+        super(message);
+    }
+
+    public DetectorException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

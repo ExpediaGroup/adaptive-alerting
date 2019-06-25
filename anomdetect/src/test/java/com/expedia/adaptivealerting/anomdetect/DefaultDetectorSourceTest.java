@@ -15,11 +15,11 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.anomdetect.connector.DetectorResource;
-import com.expedia.adaptivealerting.anomdetect.connector.ModelServiceConnector;
+import com.expedia.adaptivealerting.anomdetect.detectorclient.DetectorResource;
+import com.expedia.adaptivealerting.anomdetect.detectorclient.DetectorClient;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapping;
-import com.expedia.adaptivealerting.anomdetect.exception.DetectorNotFoundException;
-import com.expedia.adaptivealerting.anomdetect.exception.DetectorRetrievalException;
+import com.expedia.adaptivealerting.anomdetect.detectorclient.DetectorNotFoundException;
+import com.expedia.adaptivealerting.anomdetect.detectorclient.DetectorRetrievalException;
 import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyType;
 import com.expedia.adaptivealerting.anomdetect.outlier.ForecastingOutlierDetector;
 import com.expedia.adaptivealerting.anomdetect.outlier.forecast.interval.ExponentialWelfordIntervalForecaster;
@@ -56,7 +56,7 @@ public final class DefaultDetectorSourceTest {
     private DefaultDetectorSource sourceUnderTest;
 
     @Mock
-    private ModelServiceConnector connector;
+    private DetectorClient connector;
 
     @Mock
     private LegacyDetectorFactory legacyDetectorFactory;

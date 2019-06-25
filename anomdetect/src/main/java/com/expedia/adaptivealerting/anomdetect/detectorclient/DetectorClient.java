@@ -13,17 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.connector;
+package com.expedia.adaptivealerting.anomdetect.detectorclient;
 
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapper;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapping;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMatchResponse;
-import com.expedia.adaptivealerting.anomdetect.exception.DetectorDeserializationException;
-import com.expedia.adaptivealerting.anomdetect.exception.DetectorException;
-import com.expedia.adaptivealerting.anomdetect.exception.DetectorMappingDeserializationException;
-import com.expedia.adaptivealerting.anomdetect.exception.DetectorMappingRetrievalException;
-import com.expedia.adaptivealerting.anomdetect.exception.DetectorNotFoundException;
-import com.expedia.adaptivealerting.anomdetect.exception.DetectorRetrievalException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +40,8 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 /**
  * <p>
- * Connector for interacting with the Model Service.
+ * Connector for interacting with the Model Service. This allows the anomaly detection module to load detector
+ * configurations and detector mappings from the Model Service (Elasticsearch) backend.
  * </p>
  * <p>
  * For now this is just part of the
@@ -56,7 +51,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
  * </p>
  */
 @Slf4j
-public class ModelServiceConnector {
+public class DetectorClient {
     public static final String API_PATH_MODEL_BY_DETECTOR_UUID = "/api/v2/detectors/findByUuid?uuid=%s";
     public static final String API_PATH_DETECTOR_UPDATES = "/api/v2/detectors/getLastUpdatedDetectors?interval=%d";
 
@@ -68,7 +63,7 @@ public class ModelServiceConnector {
     private final String baseUri;
     private final ObjectMapper objectMapper;
 
-    public ModelServiceConnector(HttpClientWrapper httpClient, String baseUri, ObjectMapper objectMapper) {
+    public DetectorClient(HttpClientWrapper httpClient, String baseUri, ObjectMapper objectMapper) {
         notNull(httpClient, "httpClient can't be null");
         notNull(baseUri, "baseUri can't be null");
         notNull(objectMapper, "objectMapper can't be null");
@@ -90,7 +85,7 @@ public class ModelServiceConnector {
      * @throws DetectorException                if there's any other problem finding the detector
      */
     public DetectorResource findLatestDetector(UUID uuid) {
-        notNull(uuid, "detectorUuid can't be null");
+        notNull(uuid, "uuid can't be null");
 
         // http://modelservice/api/v2/detectors/findByUuid?uuid=%s
         // http://modelservice/api/v2/detectors/findByUuid?uuid=85f395a2-e276-7cfd-34bc-cb850ae3bc2e
@@ -115,7 +110,7 @@ public class ModelServiceConnector {
         }
 
         if (detectorResource == null) {
-            throw new DetectorNotFoundException("No models for detectorUuid=" + uuid);
+            throw new DetectorNotFoundException("No detector for uuid=" + uuid);
         }
 
         return detectorResource;
@@ -126,7 +121,7 @@ public class ModelServiceConnector {
      * @return the list of detectorMappings that were modified in last since minutes
      */
     public List<DetectorResource> findUpdatedDetectors(long sinceSeconds) {
-        isTrue(sinceSeconds > 0, "timePeriod must be strictly positive");
+        isTrue(sinceSeconds > 0, "sinceSeconds must be strictly positive");
 
         val uri = String.format(baseUri + API_PATH_DETECTOR_UPDATES, sinceSeconds);
         Content content;
@@ -134,7 +129,7 @@ public class ModelServiceConnector {
             content = httpClient.get(uri);
         } catch (IOException e) {
             val message = "IOException while getting last updated detectors" +
-                    ": timePeriod=" + sinceSeconds +
+                    ": sinceSeconds=" + sinceSeconds +
                     ", httpMethod=GET" +
                     ", uri=" + uri;
             throw new DetectorRetrievalException(message, e);
@@ -143,8 +138,7 @@ public class ModelServiceConnector {
         try {
             return Arrays.asList(objectMapper.readValue(content.asBytes(), DetectorResource[].class));
         } catch (IOException e) {
-            val message = "IOException while deserializing detectors" +
-                    ": timePeriod=" + sinceSeconds;
+            val message = "IOException while deserializing detectors: sinceSeconds=" + sinceSeconds;
             throw new DetectorDeserializationException(message, e);
         }
     }
