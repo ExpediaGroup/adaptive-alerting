@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.service;
 
 import com.expedia.adaptivealerting.anomdetect.Detector;
-import com.expedia.adaptivealerting.anomdetect.detectorclient.DetectorResource;
+import com.expedia.adaptivealerting.anomdetect.detectorclient.DetectorDocument;
 import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyResult;
 import com.expedia.adaptivealerting.anomdetect.outlier.legacy.LegacyDetectorFactory;
 import com.expedia.adaptivealerting.anomdetect.util.MetricUtil;
@@ -65,7 +65,7 @@ public class AnomalyServiceImpl implements AnomalyService {
         val paramsMap = request.getDetectorParams();
         Map detectorConfig = new HashMap<>();
         detectorConfig.put("params", paramsMap);
-        val detector = new DetectorResource()
+        val detector = new DetectorDocument()
                 .setType(legacyDetectorType)
                 .setCreatedBy("adaptive-alerting")
                 .setLastUpdateTimestamp(new Date())
