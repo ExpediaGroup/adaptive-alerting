@@ -92,10 +92,10 @@ public class DetectorClientTest {
     private Content detectorResourcesContent_noModels;
     private Content detectorResourcesContent;
     private byte[] detectorResourcesBytes_cantDeserialize;
-    private DetectorResource[] detectorResources;
-    private DetectorResource detectorResource;
-    private DetectorResource detectorResources_noModel;
-    private DetectorResource[] detectorResources_noModels;
+    private DetectorDocument[] detectorDocuments;
+    private DetectorDocument detectorDocument;
+    private DetectorDocument detectorResources_noModel;
+    private DetectorDocument[] detectorResources_noModels;
 
     @Mock
     private Content findDetectorResourcesContent_cantDeserialize;
@@ -169,23 +169,23 @@ public class DetectorClientTest {
 
     @Test
     public void testFindLatestModel() {
-        val result = clientUnderTest.findLatestDetector(DETECTOR_UUID);
+        val result = clientUnderTest.findDetector(DETECTOR_UUID);
         assertNotNull(result);
     }
 
     @Test(expected = DetectorRetrievalException.class)
     public void testFindLatestModel_retrievalException() {
-        clientUnderTest.findLatestDetector(DETECTOR_UUID_CANT_RETRIEVE);
+        clientUnderTest.findDetector(DETECTOR_UUID_CANT_RETRIEVE);
     }
 
     @Test(expected = DetectorDeserializationException.class)
     public void testFindLatestModel_deserializationException() {
-        clientUnderTest.findLatestDetector(DETECTOR_UUID_CANT_DESERIALIZE);
+        clientUnderTest.findDetector(DETECTOR_UUID_CANT_DESERIALIZE);
     }
 
     @Test(expected = DetectorNotFoundException.class)
     public void testFindLatestModel_notFound() {
-        clientUnderTest.findLatestDetector(DETECTOR_UUID_NO_MODELS);
+        clientUnderTest.findDetector(DETECTOR_UUID_NO_MODELS);
     }
 
     private void initTestObjects() throws IOException {
@@ -244,11 +244,17 @@ public class DetectorClientTest {
     private void initTestObjects_findLatestModel() throws IOException {
 
         // Find latest model - happy path
-        this.detectorResource = new DetectorResource();
-        this.detectorResources = new DetectorResource[1];
-        detectorResources[0] = new DetectorResource("3217d4be-9c33-490f-828e-c976b393b000", "kashah", "constant-detector", new Date(), new HashMap<>(), true);
+        this.detectorDocument = new DetectorDocument();
+        this.detectorDocuments = new DetectorDocument[1];
+        detectorDocuments[0] = new DetectorDocument()
+                .setUuid("3217d4be-9c33-490f-828e-c976b393b000")
+                .setEnabled(true)
+                .setType("constant-detector")
+                .setDetectorConfig(new HashMap<>())
+                .setCreatedBy("kashah")
+                .setLastUpdateTimestamp(new Date());
 
-        val detectorResourcesBytes = new ObjectMapper().writeValueAsBytes(detectorResources);
+        val detectorResourcesBytes = new ObjectMapper().writeValueAsBytes(detectorDocuments);
         this.detectorResourcesContent = new Content(detectorResourcesBytes, ContentType.APPLICATION_JSON);
 
         // Find latest model - can't deserialize
@@ -256,7 +262,7 @@ public class DetectorClientTest {
         when(findDetectorResourcesContent_cantDeserialize.asBytes()).thenReturn(findDetectorResourcesBytes_cantDeserialize);
 
         // Find latest model - no models
-        this.detectorResources_noModels = new DetectorResource[0];
+        this.detectorResources_noModels = new DetectorDocument[0];
         this.detectorResources_noModel = null;
         val detectorResourcesBytes_noModels = new ObjectMapper().writeValueAsBytes(detectorResources_noModels);
         this.detectorResourcesContent_noModels = new Content(detectorResourcesBytes_noModels, ContentType.APPLICATION_JSON);
@@ -304,9 +310,9 @@ public class DetectorClientTest {
     }
 
     private void initDependencies_findDetectors_objectMapper() throws IOException {
-        when(objectMapper.readValue(detectorResourcesContent.asBytes(), DetectorResource[].class))
-                .thenReturn(detectorResources);
-        when(objectMapper.readValue(detectorResourcesBytes_cantDeserialize, DetectorResource[].class))
+        when(objectMapper.readValue(detectorResourcesContent.asBytes(), DetectorDocument[].class))
+                .thenReturn(detectorDocuments);
+        when(objectMapper.readValue(detectorResourcesBytes_cantDeserialize, DetectorDocument[].class))
                 .thenThrow(new IOException());
     }
 
@@ -323,11 +329,11 @@ public class DetectorClientTest {
     }
 
     private void initDependencies_findLatestModel_objectMapper() throws IOException {
-        when(objectMapper.readValue(detectorResourcesContent.asBytes(), DetectorResource.class))
-                .thenReturn(detectorResource);
-        when(objectMapper.readValue(findDetectorResourcesBytes_cantDeserialize, DetectorResource.class))
+        when(objectMapper.readValue(detectorResourcesContent.asBytes(), DetectorDocument.class))
+                .thenReturn(detectorDocument);
+        when(objectMapper.readValue(findDetectorResourcesBytes_cantDeserialize, DetectorDocument.class))
                 .thenThrow(new IOException());
-        when(objectMapper.readValue(detectorResourcesContent_noModels.asBytes(), DetectorResource.class))
+        when(objectMapper.readValue(detectorResourcesContent_noModels.asBytes(), DetectorDocument.class))
                 .thenReturn(detectorResources_noModel);
     }
 

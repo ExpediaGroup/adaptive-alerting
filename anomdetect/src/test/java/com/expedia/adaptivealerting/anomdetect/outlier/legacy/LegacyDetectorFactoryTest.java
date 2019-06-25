@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.outlier.legacy;
 
 import com.expedia.adaptivealerting.anomdetect.Detector;
-import com.expedia.adaptivealerting.anomdetect.detectorclient.DetectorResource;
+import com.expedia.adaptivealerting.anomdetect.detectorclient.DetectorDocument;
 import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyThresholds;
 import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyType;
 import com.expedia.adaptivealerting.anomdetect.outlier.ConstantThresholdOutlierDetector;
@@ -126,10 +126,10 @@ public class LegacyDetectorFactoryTest {
         return factoryUnderTest.createDetector(UUID.randomUUID(), legacyDetectorConfig);
     }
 
-    private DetectorResource buildLegacyDetectorConfig(String type, Map<String, Object> detectorParams) {
+    private DetectorDocument buildLegacyDetectorConfig(String type, Map<String, Object> detectorParams) {
         Map<String, Object> params = new HashMap<>();
         params.put("params", detectorParams);
-        return new DetectorResource()
+        return new DetectorDocument()
                 .setType(type)
                 .setCreatedBy("user")
                 .setLastUpdateTimestamp(new Date())

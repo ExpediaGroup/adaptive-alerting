@@ -41,35 +41,43 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 @Slf4j
 public class DefaultDetectorSource implements DetectorSource {
 
+    /**
+     * Client to load detector documents from the Model Service.
+     */
     @NonNull
-    private final DetectorClient connector;
+    private final DetectorClient client;
 
+    // TODO Add DetectorFactory
+
+    /**
+     * Legacy detector factory to create a detector from a detector document.
+     */
     @NonNull
     private final LegacyDetectorFactory legacyDetectorFactory;
 
     @Override
     public DetectorMatchResponse findDetectorMappings(List<Map<String, String>> metricTags) {
         notNull(metricTags, "metricTags can't be null");
-        return connector.findMatchingDetectorMappings(metricTags);
+        return client.findMatchingDetectorMappings(metricTags);
     }
 
     @Override
     public List<DetectorMapping> findUpdatedDetectorMappings(long timePeriod) {
         isTrue(timePeriod > 0, "Required: timePeriod > 0");
-        return connector.findUpdatedDetectorMappings(timePeriod);
+        return client.findUpdatedDetectorMappings(timePeriod);
     }
 
     @Override
     public Detector findDetector(UUID uuid) {
         notNull(uuid, "uuid can't be null");
-        val detectorConfig = connector.findLatestDetector(uuid);
+        val detectorConfig = client.findDetector(uuid);
         return legacyDetectorFactory.createDetector(uuid, detectorConfig);
     }
 
     @Override
     public List<UUID> findUpdatedDetectors(long timePeriod) {
         isTrue(timePeriod > 0, "Required: timePeriod > 0");
-        return connector
+        return client
                 .findUpdatedDetectors(timePeriod)
                 .stream()
                 .map(resource -> UUID.fromString(resource.getUuid()))

@@ -17,9 +17,7 @@ package com.expedia.adaptivealerting.anomdetect.detectorclient;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.util.Date;
@@ -27,19 +25,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Detector resource.
+ * Detector document, which we maintain in the persistent store. This isn't the detector itself, but rather a
+ * specification that allows the {@link com.expedia.adaptivealerting.anomdetect.DetectorFactory} to create a
+ * detector.
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Accessors(chain = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DetectorResource {
-
-    // TODO Decide whether the detector should include its mapping and hyperparams.
-    //  I'm thinking it should. [WLW]
-
+public class DetectorDocument {
     private String uuid;
+    private Boolean enabled;
 
     /**
      * @deprecated Detectors no longer have a single type. For example a ForecastingDetector
@@ -48,15 +43,13 @@ public class DetectorResource {
      */
     private String type;
 
+    /**
+     * Detector configuration. Currently
+     */
+    private Map<String, Object> detectorConfig = new HashMap<>();
+
     private String createdBy;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Date lastUpdateTimestamp;
-
-    /**
-     * Detector configuration.
-     */
-    private Map<String, Object> detectorConfig = new HashMap<>();
-
-    private Boolean enabled;
 }

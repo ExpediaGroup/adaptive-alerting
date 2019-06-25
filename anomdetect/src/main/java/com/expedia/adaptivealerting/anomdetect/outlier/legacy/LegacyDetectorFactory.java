@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.outlier.legacy;
 
 import com.expedia.adaptivealerting.anomdetect.Detector;
-import com.expedia.adaptivealerting.anomdetect.detectorclient.DetectorResource;
+import com.expedia.adaptivealerting.anomdetect.detectorclient.DetectorDocument;
 import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyType;
 import com.expedia.adaptivealerting.anomdetect.outlier.ConstantThresholdOutlierDetector;
 import com.expedia.adaptivealerting.anomdetect.outlier.CusumOutlierDetector;
@@ -53,12 +53,12 @@ public class LegacyDetectorFactory {
 
     // TODO Currently we use a legacy process to find the detector. The legacy process couples point forecast algos
     //  with interval forecast algos. We will decouple these shortly. [WLW]
-    public Detector createDetector(UUID uuid, DetectorResource detectorResource) {
+    public Detector createDetector(UUID uuid, DetectorDocument detectorDocument) {
         notNull(uuid, "uuid can't be null");
-        notNull(detectorResource, "detectorResource can't be null");
+        notNull(detectorDocument, "detectorDocument can't be null");
 
-        val detectorType = detectorResource.getType();
-        val detectorConfig = detectorResource.getDetectorConfig();
+        val detectorType = detectorDocument.getType();
+        val detectorConfig = detectorDocument.getDetectorConfig();
 
         notNull(detectorConfig, "legacyDetectorConfig can't be null");
         val detectorParams = detectorConfig.get("params");

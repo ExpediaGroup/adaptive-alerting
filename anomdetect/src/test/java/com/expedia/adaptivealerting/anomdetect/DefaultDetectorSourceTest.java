@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.anomdetect.detectorclient.DetectorResource;
+import com.expedia.adaptivealerting.anomdetect.detectorclient.DetectorDocument;
 import com.expedia.adaptivealerting.anomdetect.detectorclient.DetectorClient;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapping;
 import com.expedia.adaptivealerting.anomdetect.detectorclient.DetectorNotFoundException;
@@ -61,8 +61,8 @@ public final class DefaultDetectorSourceTest {
     @Mock
     private LegacyDetectorFactory legacyDetectorFactory;
 
-    private DetectorResource[] updatedDetectorResources;
-    private DetectorResource detectorResource_ewma;
+    private DetectorDocument[] updatedDetectorDocuments;
+    private DetectorDocument detectorDocument_ewma;
     private Detector detector;
     private DetectorMapping detectorMapping;
 
@@ -122,16 +122,15 @@ public final class DefaultDetectorSourceTest {
     }
 
     private void initTestObjects_findDetectors() {
-        val updatedDetectorsResource = new DetectorResource(
-                DETECTOR_UUID_EWMA.toString(),
-                "kashah",
-                "ewma-detector",
-                new Date(),
-                new HashMap<>(),
-                true);
-
-        this.updatedDetectorResources = new DetectorResource[1];
-        updatedDetectorResources[0] = updatedDetectorsResource;
+        val detectorResource = new DetectorDocument()
+                .setUuid(DETECTOR_UUID_EWMA.toString())
+                .setEnabled(true)
+                .setType("ewma-detector")
+                .setDetectorConfig(new HashMap<>())
+                .setCreatedBy("kashah")
+                .setLastUpdateTimestamp(new Date());
+        this.updatedDetectorDocuments = new DetectorDocument[1];
+        updatedDetectorDocuments[0] = detectorResource;
         this.detectorMapping = new DetectorMapping().setDetector(new com.expedia.adaptivealerting.anomdetect.detectormapper.Detector(UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689"))).setEnabled(false);
     }
 
@@ -144,10 +143,10 @@ public final class DefaultDetectorSourceTest {
         Map<String, Object> detectorParams = new HashMap<>();
         detectorParams.put("params", ewmaParams);
 
-        this.detectorResource_ewma = new DetectorResource();
-        detectorResource_ewma.setDetectorConfig(new HashMap<>());
-        detectorResource_ewma.setDetectorConfig(detectorParams);
-        detectorResource_ewma.setType("ewma-detector");
+        this.detectorDocument_ewma = new DetectorDocument();
+        detectorDocument_ewma.setDetectorConfig(new HashMap<>());
+        detectorDocument_ewma.setDetectorConfig(detectorParams);
+        detectorDocument_ewma.setType("ewma-detector");
 
         this.detector = new ForecastingOutlierDetector(
                 DETECTOR_UUID_EWMA,
@@ -158,17 +157,17 @@ public final class DefaultDetectorSourceTest {
 
     private void initDependencies() {
         when(connector.findUpdatedDetectors(1))
-                .thenReturn(Arrays.asList(updatedDetectorResources));
-        when(connector.findLatestDetector(DETECTOR_UUID_EWMA))
-                .thenReturn(detectorResource_ewma);
-        when(connector.findLatestDetector(DETECTOR_UUID_MISSING_DETECTOR))
+                .thenReturn(Arrays.asList(updatedDetectorDocuments));
+        when(connector.findDetector(DETECTOR_UUID_EWMA))
+                .thenReturn(detectorDocument_ewma);
+        when(connector.findDetector(DETECTOR_UUID_MISSING_DETECTOR))
                 .thenThrow(new DetectorNotFoundException("No models found"));
-        when(connector.findLatestDetector(DETECTOR_UUID_EXCEPTION))
+        when(connector.findDetector(DETECTOR_UUID_EXCEPTION))
                 .thenThrow(new DetectorRetrievalException("Error finding latest model", new IOException()));
         when(connector.findUpdatedDetectorMappings(1))
                 .thenReturn(Collections.singletonList(this.detectorMapping));
 
-        when(legacyDetectorFactory.createDetector(any(UUID.class), any(DetectorResource.class)))
+        when(legacyDetectorFactory.createDetector(any(UUID.class), any(DetectorDocument.class)))
                 .thenReturn(detector);
     }
 }

@@ -84,7 +84,7 @@ public class DetectorClient {
      * @throws DetectorNotFoundException        if the detector doesn't have any models
      * @throws DetectorException                if there's any other problem finding the detector
      */
-    public DetectorResource findLatestDetector(UUID uuid) {
+    public DetectorDocument findDetector(UUID uuid) {
         notNull(uuid, "uuid can't be null");
 
         // http://modelservice/api/v2/detectors/findByUuid?uuid=%s
@@ -101,26 +101,26 @@ public class DetectorClient {
             throw new DetectorRetrievalException(message, e);
         }
 
-        DetectorResource detectorResource;
+        DetectorDocument detectorDocument;
         try {
-            detectorResource = objectMapper.readValue(content.asBytes(), DetectorResource.class);
+            detectorDocument = objectMapper.readValue(content.asBytes(), DetectorDocument.class);
         } catch (IOException e) {
             val message = "IOException while deserializing detector " + uuid;
             throw new DetectorDeserializationException(message, e);
         }
 
-        if (detectorResource == null) {
+        if (detectorDocument == null) {
             throw new DetectorNotFoundException("No detector for uuid=" + uuid);
         }
 
-        return detectorResource;
+        return detectorDocument;
     }
 
     /**
      * @param sinceSeconds the time period in seconds
      * @return the list of detectorMappings that were modified in last since minutes
      */
-    public List<DetectorResource> findUpdatedDetectors(long sinceSeconds) {
+    public List<DetectorDocument> findUpdatedDetectors(long sinceSeconds) {
         isTrue(sinceSeconds > 0, "sinceSeconds must be strictly positive");
 
         val uri = String.format(baseUri + API_PATH_DETECTOR_UPDATES, sinceSeconds);
@@ -136,7 +136,7 @@ public class DetectorClient {
         }
 
         try {
-            return Arrays.asList(objectMapper.readValue(content.asBytes(), DetectorResource[].class));
+            return Arrays.asList(objectMapper.readValue(content.asBytes(), DetectorDocument[].class));
         } catch (IOException e) {
             val message = "IOException while deserializing detectors: sinceSeconds=" + sinceSeconds;
             throw new DetectorDeserializationException(message, e);
@@ -182,7 +182,6 @@ public class DetectorClient {
      * @return the list of detectormappings that were modified in last since minutes
      */
     public List<DetectorMapping> findUpdatedDetectorMappings(long timeInSecs) {
-        // converting to seconds
         val uri = String.format(baseUri + API_PATH_DETECTOR_MAPPING_UPDATES, timeInSecs);
         Content content;
         try {
@@ -196,9 +195,12 @@ public class DetectorClient {
         }
 
         try {
-            List<DetectorMapping> result = objectMapper.readValue(content.asBytes(), new TypeReference<List<DetectorMapping>>() {
-            });
-            if (result == null) throw new IOException();
+            List<DetectorMapping> result = objectMapper.readValue(
+                    content.asBytes(),
+                    new TypeReference<List<DetectorMapping>>() {});
+            if (result == null) {
+                throw new IOException();
+            }
             return result;
         } catch (IOException e) {
             val message = "IOException while deserializing updated detectors mappings" +
