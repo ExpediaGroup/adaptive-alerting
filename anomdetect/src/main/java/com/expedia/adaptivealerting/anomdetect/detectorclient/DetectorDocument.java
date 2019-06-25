@@ -44,7 +44,7 @@ public class DetectorDocument {
     private String type;
 
     /**
-     * Detector configuration. Currently
+     * Detector configuration.
      */
     private Map<String, Object> detectorConfig = new HashMap<>();
 
