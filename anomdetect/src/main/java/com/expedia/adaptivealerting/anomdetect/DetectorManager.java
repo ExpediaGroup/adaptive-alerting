@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
+import com.expedia.adaptivealerting.anomdetect.detectorsource.DetectorSource;
 import com.typesafe.config.Config;
 import lombok.Getter;
 import lombok.NonNull;
