@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect.outlier.forecast.point;
 
-import com.expedia.adaptivealerting.anomdetect.outlier.legacy.EwmaParams;
-import com.expedia.adaptivealerting.anomdetect.outlier.legacy.PewmaParams;
+import com.expedia.adaptivealerting.anomdetect.detectorsource.legacy.EwmaParams;
+import com.expedia.adaptivealerting.anomdetect.detectorsource.legacy.PewmaParams;
 import com.expedia.adaptivealerting.anomdetect.util.TestObjectMother;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;

@@ -15,9 +15,9 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.outlier.legacy.EwmaParams;
-import com.expedia.adaptivealerting.anomdetect.outlier.legacy.LegacyDetectorFactory;
-import com.expedia.adaptivealerting.anomdetect.outlier.legacy.PewmaParams;
+import com.expedia.adaptivealerting.anomdetect.detectorsource.legacy.EwmaParams;
+import com.expedia.adaptivealerting.anomdetect.detectorsource.legacy.LegacyDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.detectorsource.legacy.PewmaParams;
 import com.expedia.adaptivealerting.tools.pipeline.filter.DetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.source.WhiteNoiseMetricSource;
 import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;

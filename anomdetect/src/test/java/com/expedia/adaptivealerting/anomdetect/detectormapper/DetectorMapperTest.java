@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.detectormapper;
 
 import com.codahale.metrics.MetricRegistry;
-import com.expedia.adaptivealerting.anomdetect.DetectorSource;
+import com.expedia.adaptivealerting.anomdetect.detectorsource.DetectorSource;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.TagCollection;

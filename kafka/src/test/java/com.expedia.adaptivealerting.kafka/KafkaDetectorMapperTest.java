@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.kafka;
 
-import com.expedia.adaptivealerting.anomdetect.JmxReporterFactory;
+import com.expedia.adaptivealerting.anomdetect.util.JmxReporterFactory;
 import com.expedia.adaptivealerting.anomdetect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.Detector;
 import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapper;
