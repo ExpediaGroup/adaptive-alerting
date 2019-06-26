@@ -18,10 +18,9 @@ package com.expedia.adaptivealerting.anomdetect.util;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.jackson.MetricsJavaModule;
-import com.expedia.metrics.metrictank.MetricTankIdFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.CSVReaderBuilder;
-import lombok.extern.slf4j.Slf4j;
+import lombok.experimental.UtilityClass;
 import lombok.val;
 
 import java.io.BufferedReader;
@@ -37,16 +36,14 @@ import java.util.List;
 /**
  * Utility methods for loading metric frames from various sources.
  */
-@Slf4j
-public final class MetricFrameLoader {
-    final static ObjectMapper objectMapper = new ObjectMapper().registerModule(new MetricsJavaModule());
+@UtilityClass
+public class MetricFrameLoader {
+    private final static ObjectMapper OBJECT_MAPPER = new ObjectMapper().registerModule(new MetricsJavaModule());
 
     public static MetricFrame loadCsv(File metricDefFile, File metricDataFile, boolean hasHeader)
             throws IOException {
 
-        val metricDef = objectMapper.readValue(metricDefFile, MetricDefinition.class);
-        log.info("metricDef={}", metricDef);
-        log.info("metricId={}", new MetricTankIdFactory().getId(metricDef));
+        val metricDef = OBJECT_MAPPER.readValue(metricDefFile, MetricDefinition.class);
         return loadCsv(metricDef, new FileInputStream(metricDataFile), hasHeader);
     }
 
@@ -60,7 +57,7 @@ public final class MetricFrameLoader {
      * @throws IOException if there's a problem reading the CSV input stream.
      */
     public static MetricFrame loadCsv(MetricDefinition metricDef, InputStream in, boolean hasHeader)
-            throws IOException {
+            throws IOException  {
 
         List<String[]> rows;
         try (val br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
@@ -80,13 +77,8 @@ public final class MetricFrameLoader {
     }
 
     private static MetricData toMetricData(MetricDefinition metricDefinition, String[] row) {
-        // Some of the CSVs use Instants, some use epoch seconds
-        long epochSeconds;
-        try {
-            epochSeconds = Long.parseLong(row[0]);
-        } catch (NumberFormatException nfe) {
-            epochSeconds = Instant.parse(row[0]).getEpochSecond();
-        }
-        return new MetricData(metricDefinition, Float.parseFloat(row[1]), epochSeconds);
+        val epochSecond = Instant.parse(row[0]).getEpochSecond();
+        val value = Float.parseFloat(row[1]);
+        return new MetricData(metricDefinition, value, epochSecond);
     }
 }

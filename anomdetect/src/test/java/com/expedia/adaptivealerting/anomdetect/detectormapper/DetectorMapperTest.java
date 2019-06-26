@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.detectormapper;
 
 import com.codahale.metrics.MetricRegistry;
-import com.expedia.adaptivealerting.anomdetect.DetectorSource;
+import com.expedia.adaptivealerting.anomdetect.detectorsource.DetectorSource;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.TagCollection;
@@ -146,9 +146,9 @@ public final class DetectorMapperTest {
     }
 
     private void initDependencies() {
-        when(detectorSource.findMatchingDetectorMappings(tags)).thenReturn(detectorMatchResponse);
-        when(detectorSource.findMatchingDetectorMappings(tag_bigList)).thenReturn(detectorMatchResponse_withMoreLookupTime);
-        when(detectorSource.findMatchingDetectorMappings(tags_cantRetrieve)).thenReturn(emptyDetectorMatchResponse);
+        when(detectorSource.findDetectorMappings(tags)).thenReturn(detectorMatchResponse);
+        when(detectorSource.findDetectorMappings(tag_bigList)).thenReturn(detectorMatchResponse_withMoreLookupTime);
+        when(detectorSource.findDetectorMappings(tags_cantRetrieve)).thenReturn(emptyDetectorMatchResponse);
 
         when(config.getInt("detector-mapping-cache-update-period")).thenReturn(detectorMappingCacheUpdatePeriod);
     }
@@ -165,7 +165,7 @@ public final class DetectorMapperTest {
                 new File(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("groupedDetectors.json")).getFile()),
                 DetectorMatchResponse.class);
 
-        when(detectorSource.findMatchingDetectorMappings(listOfMetricTags)).thenReturn(detectorMatchResponse);
+        when(detectorSource.findDetectorMappings(listOfMetricTags)).thenReturn(detectorMatchResponse);
     }
 
     @Test

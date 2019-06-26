@@ -102,7 +102,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
                 }
                 if ("lastUpdateTimestamp".equals(name)) {
                     Date nowDate = DateUtil.now();
-                    value = DateUtil.instantToDate(nowDate.toInstant());
+                    value = DateUtil.toDateString(nowDate.toInstant());
                 }
                 if (value != null) {
                     jsonMap.put(name, value);

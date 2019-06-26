@@ -15,11 +15,11 @@
  */
 package com.expedia.adaptivealerting.kafka.util;
 
-import com.expedia.adaptivealerting.anomdetect.DefaultDetectorSource;
-import com.expedia.adaptivealerting.anomdetect.DetectorSource;
-import com.expedia.adaptivealerting.anomdetect.connector.HttpClientWrapper;
-import com.expedia.adaptivealerting.anomdetect.connector.ModelServiceConnector;
-import com.expedia.adaptivealerting.anomdetect.outlier.legacy.LegacyDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.detectorsource.DefaultDetectorSource;
+import com.expedia.adaptivealerting.anomdetect.detectorsource.DetectorSource;
+import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
+import com.expedia.adaptivealerting.anomdetect.detectorsource.DetectorClient;
+import com.expedia.adaptivealerting.anomdetect.detectorsource.legacy.LegacyDetectorFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import lombok.experimental.UtilityClass;
@@ -36,7 +36,7 @@ public class DetectorUtil {
 
     public static DetectorSource buildDetectorSource(Config config) {
         val uriTemplate = config.getString(CK_MODEL_SERVICE_URI_TEMPLATE);
-        val connector = new ModelServiceConnector(new HttpClientWrapper(), uriTemplate, new ObjectMapper());
+        val connector = new DetectorClient(new HttpClientWrapper(), uriTemplate, new ObjectMapper());
         return new DefaultDetectorSource(connector, new LegacyDetectorFactory());
     }
 }

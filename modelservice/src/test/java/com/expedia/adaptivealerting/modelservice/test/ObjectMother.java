@@ -71,7 +71,7 @@ public class ObjectMother {
                 .setCreatedBy("test-user")
                 .setDetectorConfig(new HashMap<>())
                 .setEnabled(true)
-                .setLastUpdateTimestamp(DateUtil.toUTCDate("2019-04-06 22:00:00"));
+                .setLastUpdateTimestamp(DateUtil.toUtcDate("2019-04-06 22:00:00"));
     }
 
     public DetectorMapping getDetectorMapping() {

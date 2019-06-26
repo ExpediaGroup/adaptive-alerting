@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.outlier.forecast.point.holtwinters;
 
 import com.expedia.adaptivealerting.anomdetect.outlier.forecast.point.HoltWintersForecaster;
-import com.expedia.adaptivealerting.anomdetect.outlier.legacy.HoltWintersParams;
+import com.expedia.adaptivealerting.anomdetect.detectorsource.legacy.HoltWintersParams;
 import lombok.Data;
 import lombok.NonNull;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;

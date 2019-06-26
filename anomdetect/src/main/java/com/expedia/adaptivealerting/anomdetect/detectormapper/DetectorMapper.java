@@ -17,7 +17,7 @@ package com.expedia.adaptivealerting.anomdetect.detectormapper;
 
 
 import com.codahale.metrics.MetricRegistry;
-import com.expedia.adaptivealerting.anomdetect.DetectorSource;
+import com.expedia.adaptivealerting.anomdetect.detectorsource.DetectorSource;
 import com.expedia.adaptivealerting.anomdetect.util.AssertUtil;
 import com.expedia.metrics.MetricDefinition;
 import com.typesafe.config.Config;
@@ -84,7 +84,7 @@ public class DetectorMapper {
 
         DetectorMatchResponse matchingDetectorMappings = null;
         try {
-            matchingDetectorMappings = detectorSource.findMatchingDetectorMappings(cacheMissedMetricTags);
+            matchingDetectorMappings = detectorSource.findDetectorMappings(cacheMissedMetricTags);
         } catch (RuntimeException e) {
             //Disabling temporarily to reduce log
            // log.error(e.getMessage());

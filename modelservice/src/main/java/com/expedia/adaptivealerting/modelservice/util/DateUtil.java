@@ -15,6 +15,9 @@
  */
 package com.expedia.adaptivealerting.modelservice.util;
 
+import lombok.experimental.UtilityClass;
+import lombok.val;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -22,12 +25,15 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.TimeZone;
 
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
+
+@UtilityClass
 public class DateUtil {
+    private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    private static final TimeZone UTC_TIME_ZONE = TimeZone.getTimeZone("UTC");
 
-    public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    public static final TimeZone UTC_TIME_ZONE = TimeZone.getTimeZone("UTC");
-
-    public static Date toUTCDate(String dateStr) {
+    public static Date toUtcDate(String dateStr) {
+        notNull(dateStr, "dateStr can't be null");
         try {
             return buildDateFormat().parse(dateStr);
         } catch (ParseException e) {
@@ -35,22 +41,24 @@ public class DateUtil {
         }
     }
 
+    public static String toDateString(Instant instant) {
+        notNull(instant, "instant can't be null");
+        val date = new Date(instant.getEpochSecond() * 1000);
+        return buildDateFormat().format(date);
+    }
+
+    public static String toUtcDateString(Instant instant) {
+        notNull(instant, "instant can't be null");
+        return buildDateFormat().format(Date.from(instant));
+    }
+
     public static Date now() {
         TimeZone.setDefault(UTC_TIME_ZONE);
         return new Date();
     }
 
-    public static String toUtcDateString(Instant instant) {
-        return buildDateFormat().format(Date.from(instant));
-    }
-
-    public static String instantToDate(Instant instant) {
-        Date date = new Date(instant.getEpochSecond() * 1000);
-        return buildDateFormat().format(date);
-    }
-
     private static DateFormat buildDateFormat() {
-        DateFormat format = new SimpleDateFormat(DATE_FORMAT);
+        val format = new SimpleDateFormat(DATE_FORMAT);
         format.setTimeZone(UTC_TIME_ZONE);
         return format;
     }
