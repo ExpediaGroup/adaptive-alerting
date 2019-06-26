@@ -55,12 +55,14 @@ public class DetectorMappingController {
     @RequestMapping(value = "/disable", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.OK)
     public void disableDeleteDetectorMapping(@RequestParam String id) {
+        Assert.notNull(id, "id can't be null");
         detectorMappingService.disableDetectorMapping(id);
     }
 
     @RequestMapping(method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.OK)
     public void deleteDetectorMapping(@RequestParam String id) {
+        Assert.notNull(id, "id can't be null");
         detectorMappingService.deleteDetectorMapping(id);
     }
 
@@ -79,6 +81,7 @@ public class DetectorMappingController {
 
     @RequestMapping(value = "/findMatchingByTags", method = RequestMethod.POST)
     public MatchingDetectorsResponse searchDetectorMapping(@RequestBody List<Map<String, String>> tagsList) {
+        Assert.notNull(tagsList, "tagsList can't be null");
         return detectorMappingService.findMatchingDetectorMappings(tagsList);
     }
 }

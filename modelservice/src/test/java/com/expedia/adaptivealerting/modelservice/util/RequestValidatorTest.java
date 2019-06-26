@@ -74,7 +74,7 @@ public class RequestValidatorTest {
     @Test
     public void testValidateDetector_successful() {
         Detector detector = new Detector(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"));
-        RequestValidator.validateDetector(detector);
+        RequestValidator.validateMappingDetector(detector);
     }
 
     @Test(expected = RuntimeException.class)

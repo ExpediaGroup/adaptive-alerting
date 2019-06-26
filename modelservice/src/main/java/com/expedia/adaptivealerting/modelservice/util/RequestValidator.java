@@ -15,18 +15,29 @@
  */
 package com.expedia.adaptivealerting.modelservice.util;
 
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector;
+import com.expedia.adaptivealerting.anomdetect.detectorsource.DetectorDocument;
+import com.expedia.adaptivealerting.anomdetect.detectorsource.legacy.LegacyDetectorFactory;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Expression;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Operand;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Operator;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.User;
 import com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping;
+import com.expedia.adaptivealerting.modelservice.entity.Detector;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.experimental.UtilityClass;
+import lombok.val;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 @UtilityClass
 public class RequestValidator {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public static void validateUser(User user) {
         Assert.notNull(user, "subscription user can't null");
@@ -56,8 +67,21 @@ public class RequestValidator {
                         operand.getField().getKey(), PercolatorDetectorMapping.AA_PREFIX));
     }
 
-    public static void validateDetector(Detector detector) {
+    public static void validateMappingDetector(com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector detector) {
         Assert.notNull(detector, "Detector can't be null");
         Assert.notNull(detector.getUuid(), "Detector uuid can't be null");
     }
+
+    public static void validateDetector(Detector detector) {
+        val legacyDetectorType = detector.getType();
+        val detectorConfig = detector.getDetectorConfig();
+        val detectorDocument = new DetectorDocument()
+                .setType(legacyDetectorType)
+                .setCreatedBy("adaptive-alerting")
+                .setLastUpdateTimestamp(new Date())
+                .setDetectorConfig(detectorConfig);
+        val validateDetector = new LegacyDetectorFactory().createDetector(UUID.randomUUID(), detectorDocument);
+    }
 }
+
+

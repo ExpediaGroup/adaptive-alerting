@@ -30,7 +30,7 @@ public class CreateDetectorMappingRequest {
     public void validate() {
         RequestValidator.validateExpression(this.getExpression());
         RequestValidator.validateUser(this.getUser());
-        RequestValidator.validateDetector(this.getDetector());
+        RequestValidator.validateMappingDetector(this.getDetector());
     }
 
     public Set<String> getFields() {

@@ -15,10 +15,12 @@
  */
 package com.expedia.adaptivealerting.modelservice.entity;
 
+import com.expedia.adaptivealerting.modelservice.util.RequestValidator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,8 +34,10 @@ public class Detector {
 
     private String uuid;
 
+    @NotNull
     private String createdBy;
 
+    @NotNull
     private String type;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
@@ -41,6 +45,6 @@ public class Detector {
 
     private Map<String, Object> detectorConfig = new HashMap<>();
 
-    private Boolean enabled;
+    private Boolean enabled = true;
 
 }
