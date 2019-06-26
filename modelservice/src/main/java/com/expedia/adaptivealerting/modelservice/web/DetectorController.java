@@ -83,7 +83,7 @@ public class DetectorController {
 
     @GetMapping(path = "/getLastUpdatedDetectors", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public List<Detector> getLastUpdatedDetectors(@Valid @RequestParam long interval) {
+    public List<Detector> getLastUpdatedDetectors(@RequestParam long interval) {
         return detectorService.getLastUpdatedDetectors(interval);
     }
 
