@@ -31,7 +31,7 @@ public class PercolatorDetectorMapping {
     public static final String USER_KEYWORD = AA_PREFIX + "user";
     public static final String USER_ID_KEYWORD = "id";
     public static final String DETECTOR_KEYWORD = AA_PREFIX + "detector";
-    public static final String DETECTOR_ID_KEYWORD = "id";
+    public static final String DETECTOR_ID_KEYWORD = "uuid";
     public static final String QUERY_KEYWORD = AA_PREFIX + "query";
     public static final String ENABLED = AA_PREFIX + "enabled";
     public static final String LAST_MOD_TIME_KEYWORD = AA_PREFIX + "lastModifiedTime";
