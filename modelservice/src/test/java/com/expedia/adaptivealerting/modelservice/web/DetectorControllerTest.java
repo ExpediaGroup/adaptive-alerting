@@ -2,16 +2,21 @@ package com.expedia.adaptivealerting.modelservice.web;
 
 import com.expedia.adaptivealerting.modelservice.entity.Detector;
 import com.expedia.adaptivealerting.modelservice.service.DetectorService;
+import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
@@ -36,13 +41,22 @@ public class DetectorControllerTest {
     @Mock
     private List<Detector> detectors;
 
+    private Map<String, Object> illegalDetectorParams;
+
     @Before
     public void setUp() {
         this.controller = new DetectorController();
         MockitoAnnotations.initMocks(this);
+        initTestObjects();
         when(detectorService.findByUuid(anyString())).thenReturn(detector);
         when(detectorService.getLastUpdatedDetectors(anyLong())).thenReturn(detectors);
     }
+
+    private void initTestObjects() {
+        val mom = ObjectMother.instance();
+        illegalDetectorParams = mom.getIllegalDetectorParams();
+    }
+
 
     @Test
     public void testFindByUuid() {
@@ -67,6 +81,29 @@ public class DetectorControllerTest {
         List<Detector> actualDetectors = controller.getLastUpdatedDetectors(interval);
         assertNotNull(actualDetectors);
         assertSame(detectors, actualDetectors);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateDetectorNullValues() {
+        Detector detector1 = new Detector();
+        detector1.setCreatedBy("user");
+        controller.createDetector(detector1);
+
+        Detector detector2 = new Detector();
+        detector2.setType("constant-detector");
+        controller.createDetector(detector2);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateDetectorIllegalThresholds() {
+        Detector detector = new Detector();
+        detector.setCreatedBy("user");
+        detector.setType("constant-detector");
+
+        Map<String, Object> detectorConfig = new HashMap<>();
+        detectorConfig.put("params", illegalDetectorParams);
+        detector.setDetectorConfig(detectorConfig);
+        controller.createDetector(detector);
     }
 
 }

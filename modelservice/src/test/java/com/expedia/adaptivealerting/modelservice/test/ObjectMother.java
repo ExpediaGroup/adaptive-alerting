@@ -65,6 +65,13 @@ public class ObjectMother {
         return detectorParams;
     }
 
+    public Map<String, Object> getIllegalDetectorParams() {
+        val thresholds = "{\"thresholds\": {\"lowerStrong\": \"90\", \"lowerWeak\": \"70\"}}";
+        val detectorParams = toObject(thresholds);
+        detectorParams.put("type", "LEFT_TAILED");
+        return detectorParams;
+    }
+
     public Detector getElasticsearchDetector() {
         return new Detector()
                 .setUuid("aeb4d849-847a-45c0-8312-dc0fcf22b639")
