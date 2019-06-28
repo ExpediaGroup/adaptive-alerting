@@ -85,12 +85,10 @@ public class DetectorControllerTest {
     public void testCreateDetectorNullValues() {
         Detector detector1 = new Detector();
         detector1.setCreatedBy("user");
-        RequestValidator.validateDetector(detector1);
         controller.createDetector(detector1);
 
         Detector detector2 = new Detector();
         detector2.setType("constant-detector");
-        RequestValidator.validateDetector(detector2);
         controller.createDetector(detector2);
     }
 
@@ -104,12 +102,10 @@ public class DetectorControllerTest {
         Detector detector1 = new Detector();
         detector1.setCreatedBy("user");
         controller.updateDetector("", detector1);
-        RequestValidator.validateDetector(detector1);
 
         Detector detector2 = new Detector();
         detector2.setType("constant-detector");
         controller.updateDetector("", detector2);
-        RequestValidator.validateDetector(detector2);
     }
 
     @Test(expected = IllegalArgumentException.class)
