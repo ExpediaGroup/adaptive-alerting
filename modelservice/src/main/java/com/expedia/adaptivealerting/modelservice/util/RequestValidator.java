@@ -71,7 +71,6 @@ public class RequestValidator {
     }
 
     public static void validateDetector(Detector detector) {
-        System.out.println("karan");
         val legacyDetectorType = detector.getType();
         val detectorConfig = detector.getDetectorConfig();
         val detectorDocument = new DetectorDocument()

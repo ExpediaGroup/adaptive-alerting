@@ -46,8 +46,4 @@ public class Detector {
     private Map<String, Object> detectorConfig = new HashMap<>();
 
     private Boolean enabled = true;
-
-    public Detector() {
-    }
-
 }
