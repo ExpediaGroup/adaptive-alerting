@@ -27,9 +27,24 @@ public class CreateDetectorMappingRequestTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testInvalidRequest() {
+    public void testNull_user_request() {
         CreateDetectorMappingRequest createDetectorMappingRequest = new CreateDetectorMappingRequest();
         createDetectorMappingRequest.setExpression(getExpression());
+        createDetectorMappingRequest.setDetector(new Detector(UUID.randomUUID()));
+        createDetectorMappingRequest.validate();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testNull_detector_request() {
+        CreateDetectorMappingRequest createDetectorMappingRequest = new CreateDetectorMappingRequest();
+        createDetectorMappingRequest.setExpression(getExpression());
+        createDetectorMappingRequest.validate();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testNull_expression_request() {
+        CreateDetectorMappingRequest createDetectorMappingRequest = new CreateDetectorMappingRequest();
+        createDetectorMappingRequest.setUser(new User("1"));
         createDetectorMappingRequest.setDetector(new Detector(UUID.randomUUID()));
         createDetectorMappingRequest.validate();
     }
