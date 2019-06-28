@@ -14,7 +14,7 @@ import java.util.Date;
 
 @ControllerAdvice
 @RestController
-@Generated // (excluding from code coverage)
+@Generated // (excluded from the code coverage) [KS]
 public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
