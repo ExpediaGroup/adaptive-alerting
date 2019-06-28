@@ -3,6 +3,7 @@ package com.expedia.adaptivealerting.modelservice.web;
 import com.expedia.adaptivealerting.modelservice.entity.Detector;
 import com.expedia.adaptivealerting.modelservice.service.DetectorService;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
+import com.expedia.adaptivealerting.modelservice.util.RequestValidator;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.Before;
@@ -13,9 +14,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
@@ -86,10 +85,12 @@ public class DetectorControllerTest {
     public void testCreateDetectorNullValues() {
         Detector detector1 = new Detector();
         detector1.setCreatedBy("user");
+        RequestValidator.validateDetector(detector1);
         controller.createDetector(detector1);
 
         Detector detector2 = new Detector();
         detector2.setType("constant-detector");
+        RequestValidator.validateDetector(detector2);
         controller.createDetector(detector2);
     }
 
@@ -103,10 +104,12 @@ public class DetectorControllerTest {
         Detector detector1 = new Detector();
         detector1.setCreatedBy("user");
         controller.updateDetector("", detector1);
+        RequestValidator.validateDetector(detector1);
 
         Detector detector2 = new Detector();
         detector2.setType("constant-detector");
         controller.updateDetector("", detector2);
+        RequestValidator.validateDetector(detector2);
     }
 
     @Test(expected = IllegalArgumentException.class)
