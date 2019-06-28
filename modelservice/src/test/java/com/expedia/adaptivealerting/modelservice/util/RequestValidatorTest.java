@@ -7,13 +7,17 @@ import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Field;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Operand;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Operator;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.User;
+import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
+import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 
@@ -22,9 +26,17 @@ public class RequestValidatorTest {
     @Mock
     private User user;
 
+    private com.expedia.adaptivealerting.modelservice.entity.Detector illegalParamsDetector;
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
+        initTestObjects();
+    }
+
+    private void initTestObjects() {
+        val mom = ObjectMother.instance();
+        illegalParamsDetector = mom.getIllegalParamsDetector();
     }
 
     @Test
@@ -111,6 +123,11 @@ public class RequestValidatorTest {
         operandsList.add(testOperand);
         expression.setOperands(operandsList);
         RequestValidator.validateExpression(expression);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testValidateInvalidDetector_illegal_params() {
+        RequestValidator.validateDetector(illegalParamsDetector);
     }
 
 }

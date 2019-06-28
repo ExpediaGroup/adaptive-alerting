@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -41,7 +40,7 @@ public class DetectorControllerTest {
     @Mock
     private List<Detector> detectors;
 
-    private Map<String, Object> illegalDetectorParams;
+    private Detector illegalParamsDetector;
 
     @Before
     public void setUp() {
@@ -54,7 +53,7 @@ public class DetectorControllerTest {
 
     private void initTestObjects() {
         val mom = ObjectMother.instance();
-        illegalDetectorParams = mom.getIllegalDetectorParams();
+        illegalParamsDetector = mom.getIllegalParamsDetector();
     }
 
 
@@ -96,7 +95,7 @@ public class DetectorControllerTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateDetectorIllegalThresholds() {
-        controller.createDetector(getIllegalParamsDetector());
+        controller.createDetector(illegalParamsDetector);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -112,17 +111,6 @@ public class DetectorControllerTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testUpdateDetectorIllegalThresholds() {
-        controller.updateDetector("", getIllegalParamsDetector());
-    }
-
-    private Detector getIllegalParamsDetector() {
-        Detector detector = new Detector();
-        detector.setCreatedBy("user");
-        detector.setType("constant-detector");
-
-        Map<String, Object> detectorConfig = new HashMap<>();
-        detectorConfig.put("params", illegalDetectorParams);
-        detector.setDetectorConfig(detectorConfig);
-        return detector;
+        controller.updateDetector("", illegalParamsDetector);
     }
 }
