@@ -95,6 +95,11 @@ public class DetectorControllerTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
+    public void testCreateDetectorIllegalThresholds() {
+        controller.createDetector(getIllegalParamsDetector());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
     public void testUpdateDetectorNullValues() {
         Detector detector1 = new Detector();
         detector1.setCreatedBy("user");
@@ -104,9 +109,13 @@ public class DetectorControllerTest {
         detector2.setType("constant-detector");
         controller.updateDetector("", detector2);
     }
-
+    
     @Test(expected = IllegalArgumentException.class)
-    public void testCreateAndUpdateDetectorIllegalThresholds() {
+    public void testUpdateDetectorIllegalThresholds() {
+        controller.updateDetector("", getIllegalParamsDetector());
+    }
+
+    private Detector getIllegalParamsDetector() {
         Detector detector = new Detector();
         detector.setCreatedBy("user");
         detector.setType("constant-detector");
@@ -114,9 +123,6 @@ public class DetectorControllerTest {
         Map<String, Object> detectorConfig = new HashMap<>();
         detectorConfig.put("params", illegalDetectorParams);
         detector.setDetectorConfig(detectorConfig);
-
-        controller.createDetector(detector);
-        controller.updateDetector("", detector);
+        return detector;
     }
-
 }
