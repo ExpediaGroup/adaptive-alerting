@@ -109,7 +109,7 @@ public class DetectorControllerTest {
         detector2.setType("constant-detector");
         controller.updateDetector("", detector2);
     }
-    
+
     @Test(expected = IllegalArgumentException.class)
     public void testUpdateDetectorIllegalThresholds() {
         controller.updateDetector("", getIllegalParamsDetector());
