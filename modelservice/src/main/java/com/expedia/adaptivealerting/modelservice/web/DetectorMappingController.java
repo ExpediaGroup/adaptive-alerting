@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.modelservice.web;
 
+import com.expedia.adaptivealerting.anomdetect.util.AssertUtil;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.CreateDetectorMappingRequest;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.MatchingDetectorsResponse;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.SearchMappingsRequest;
@@ -55,33 +56,32 @@ public class DetectorMappingController {
     @RequestMapping(value = "/disable", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.OK)
     public void disableDeleteDetectorMapping(@RequestParam String id) {
-        Assert.notNull(id, "id can't be null");
+        AssertUtil.notNull(id, "id can't be null");
         detectorMappingService.disableDetectorMapping(id);
     }
 
     @RequestMapping(method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.OK)
     public void deleteDetectorMapping(@RequestParam String id) {
-        Assert.notNull(id, "id can't be null");
+        AssertUtil.notNull(id, "id can't be null");
         detectorMappingService.deleteDetectorMapping(id);
     }
 
     @RequestMapping(value = "/search", method = RequestMethod.POST)
     public List<DetectorMapping> searchDetectorMapping(@RequestBody SearchMappingsRequest request) {
-        Assert.isTrue(request.getUserId() != null || request.getDetectorUuid() != null,
+        AssertUtil.isTrue(request.getUserId() != null || request.getDetectorUuid() != null,
                 "userId and detectorId can't both be null");
         return detectorMappingService.search(request);
     }
 
     @RequestMapping(value = "/lastUpdated", method = RequestMethod.GET)
     public List<DetectorMapping> findDetectorMapping(@RequestParam int timeInSecs) {
-        Assert.notNull(timeInSecs, "timeInSecs can't be null");
+        AssertUtil.notNull(timeInSecs, "timeInSecs can't be null");
         return detectorMappingService.findLastUpdated(timeInSecs);
     }
 
     @RequestMapping(value = "/findMatchingByTags", method = RequestMethod.POST)
     public MatchingDetectorsResponse searchDetectorMapping(@RequestBody List<Map<String, String>> tagsList) {
-        Assert.notNull(tagsList, "tagsList can't be null");
         return detectorMappingService.findMatchingDetectorMappings(tagsList);
     }
 }

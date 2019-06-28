@@ -30,8 +30,6 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 @UtilityClass
@@ -73,6 +71,7 @@ public class RequestValidator {
     }
 
     public static void validateDetector(Detector detector) {
+        System.out.println("karan");
         val legacyDetectorType = detector.getType();
         val detectorConfig = detector.getDetectorConfig();
         val detectorDocument = new DetectorDocument()

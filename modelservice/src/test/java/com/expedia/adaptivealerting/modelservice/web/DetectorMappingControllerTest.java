@@ -58,7 +58,7 @@ public class DetectorMappingControllerTest {
     }
 
     @Test
-    public void testgetDetectorMappings_successful() throws IOException {
+    public void testGetDetectorMappings_successful() throws IOException {
         DetectorMapping detectorMapping = mockDetectorMapping(id);
         when(detectorMappingService.findDetectorMapping(id)).thenReturn(detectorMapping);
         DetectorMapping detectorMappingreturned = controllerUnderTest.getDetectorMapping(id);
@@ -70,7 +70,7 @@ public class DetectorMappingControllerTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void testgetDetectorMappings_fail() throws IOException {
+    public void testGetDetectorMappings_fail() throws IOException {
         when(detectorMappingService.findDetectorMapping(id)).thenReturn(new DetectorMapping());
         DetectorMapping detectorMappingreturned = controllerUnderTest.getDetectorMapping(id);
         assertNotNull("Response can't be null", detectorMappingreturned);
@@ -80,18 +80,28 @@ public class DetectorMappingControllerTest {
 
     @Test
     @ResponseStatus(value = HttpStatus.OK)
-    public void testdisableDetectorMappings() throws IOException {
+    public void testDisableDetectorMappings() throws IOException {
         controllerUnderTest.disableDeleteDetectorMapping(id);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testDisableDetectorMappings_notNull() throws IOException {
+        controllerUnderTest.disableDeleteDetectorMapping(null);
     }
 
     @Test
     @ResponseStatus(value = HttpStatus.OK)
-    public void testdeleteDetectorMappings() throws IOException {
+    public void testDeleteDetectorMappings() throws IOException {
         controllerUnderTest.deleteDetectorMapping(id);
     }
 
+    @Test(expected=IllegalArgumentException.class)
+    public void testDeleteDetectorMappings_notNull() throws IOException {
+        controllerUnderTest.deleteDetectorMapping(null);
+    }
+
     @Test
-    public void testgetLastUpdated_successful() throws IOException {
+    public void testGetLastUpdated_successful() throws IOException {
         val timeInSecs = 60;
         List<DetectorMapping> mockeddetectorMappingsList = mockDetectorMappingsList();
         when(detectorMappingService.findLastUpdated(timeInSecs)).thenReturn(mockeddetectorMappingsList);
@@ -103,7 +113,7 @@ public class DetectorMappingControllerTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void testgetLastUpdated_fail() throws IOException {
+    public void testGetLastUpdated_fail() throws IOException {
         val TimeinSecs = 60;
         when(detectorMappingService.findLastUpdated(TimeinSecs)).thenThrow(new IOException());
         List<DetectorMapping> listofdetectorMappingsreturned = controllerUnderTest.findDetectorMapping(TimeinSecs);
@@ -112,7 +122,7 @@ public class DetectorMappingControllerTest {
     }
 
     @Test
-    public void testdetectorMappingsearch() throws Exception {
+    public void testDetectorMappingsearch() throws Exception {
         List<DetectorMapping> detectorMappingslist = mockDetectorMappingsList();
         SearchMappingsRequest searchMappingsRequest = new SearchMappingsRequest();
         searchMappingsRequest.setDetectorUuid(UUID.fromString(detectorUuid));
@@ -125,7 +135,7 @@ public class DetectorMappingControllerTest {
     }
 
     @Test
-    public void testfindMatchingByTags() throws Exception {
+    public void testFindMatchingByTags() throws Exception {
         val lookuptime = 60;
         List<Map<String, String>> tagsList = new ArrayList<>();
         MatchingDetectorsResponse mockmatchingDetectorsResponse = mockMatchingDetectorsResponse(lookuptime, detectorUuid);

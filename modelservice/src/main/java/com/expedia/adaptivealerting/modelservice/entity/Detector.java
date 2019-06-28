@@ -47,4 +47,7 @@ public class Detector {
 
     private Boolean enabled = true;
 
+    public Detector() {
+    }
+
 }
