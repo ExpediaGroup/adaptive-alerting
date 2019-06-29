@@ -25,5 +25,8 @@ import java.util.Map;
 public class AnomalyRequest {
     private String metricTags;
     private String detectorType;
+
+    // TODO This should be the detector config, not the detector params.
+    //  We need to be able to handle hyperparams too. [WLW]
     private Map<String, Object> detectorParams;
 }

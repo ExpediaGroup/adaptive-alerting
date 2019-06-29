@@ -15,11 +15,11 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.filter;
 
-import com.expedia.adaptivealerting.anomdetect.MappedMetricData;
-import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyType;
-import com.expedia.adaptivealerting.anomdetect.outlier.ForecastingOutlierDetector;
-import com.expedia.adaptivealerting.anomdetect.outlier.forecast.interval.ExponentialWelfordIntervalForecaster;
-import com.expedia.adaptivealerting.anomdetect.outlier.forecast.point.EwmaPointForecaster;
+import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
+import com.expedia.adaptivealerting.anomdetect.detect.ForecastingOutlierDetector;
+import com.expedia.adaptivealerting.anomdetect.forecast.algo.ExponentialWelfordIntervalForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.algo.EwmaPointForecaster;
 import com.expedia.adaptivealerting.tools.pipeline.util.AnomalyResultSubscriber;
 import com.expedia.adaptivealerting.tools.util.TestObjectMother;
 import com.expedia.metrics.MetricData;

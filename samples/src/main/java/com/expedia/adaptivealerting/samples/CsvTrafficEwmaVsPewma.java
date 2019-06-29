@@ -15,19 +15,15 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.outlier.forecast.evaluate.RmseEvaluator;
-import com.expedia.adaptivealerting.anomdetect.detectorsource.legacy.EwmaParams;
-import com.expedia.adaptivealerting.anomdetect.detectorsource.legacy.LegacyDetectorFactory;
-import com.expedia.adaptivealerting.anomdetect.detectorsource.legacy.PewmaParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.RmsePointForecastEvaluator;
 import com.expedia.adaptivealerting.anomdetect.util.MetricFrameLoader;
+import com.expedia.adaptivealerting.samples.util.DetectorUtil;
 import com.expedia.adaptivealerting.tools.pipeline.filter.DetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.source.MetricFrameMetricSource;
 import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
 import com.expedia.metrics.MetricDefinition;
 import lombok.val;
-
-import java.util.UUID;
 
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.createChartFrame;
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showChartFrame;
@@ -39,34 +35,31 @@ import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showCha
 public final class CsvTrafficEwmaVsPewma {
 
     public static void main(String[] args) throws Exception {
-
-        // TODO Use the FileDataConnector rather than the MetricFrameLoader. [WLW]
         val is = ClassLoader.getSystemResourceAsStream("samples/cal-inflow.csv");
-        val frame = MetricFrameLoader.loadCsv(new MetricDefinition("csv"), is, true);
-        val source = new MetricFrameMetricSource(frame, "data", 200L);
-        val factory = new LegacyDetectorFactory();
+        val metricFrame = MetricFrameLoader.loadCsv(new MetricDefinition("csv"), is, true);
+        val metricSource = new MetricFrameMetricSource(metricFrame, "data", 200L);
 
-        val ewmaDetector = factory.createEwmaDetector(UUID.randomUUID(), new EwmaParams());
+        val ewmaDetector = DetectorUtil.buildEwmaDetector();
         val ewmaFilter = new DetectorFilter(ewmaDetector);
-        val ewmaEval = new EvaluatorFilter(new RmseEvaluator());
+        val ewmaEval = new EvaluatorFilter(new RmsePointForecastEvaluator());
         val ewmaChart = PipelineFactory.createChartSink("EWMA");
 
-        source.addSubscriber(ewmaFilter);
+        metricSource.addSubscriber(ewmaFilter);
         ewmaFilter.addSubscriber(ewmaEval);
         ewmaFilter.addSubscriber(ewmaChart);
         ewmaEval.addSubscriber(ewmaChart);
 
-        val pewmaDetector = factory.createPewmaDetector(UUID.randomUUID(), new PewmaParams());
+        val pewmaDetector = DetectorUtil.buildPewmaDetector();
         val pewmaFilter = new DetectorFilter(pewmaDetector);
-        val pewmaEval = new EvaluatorFilter(new RmseEvaluator());
+        val pewmaEval = new EvaluatorFilter(new RmsePointForecastEvaluator());
         val pewmaChart = PipelineFactory.createChartSink("PEWMA");
 
-        source.addSubscriber(pewmaFilter);
+        metricSource.addSubscriber(pewmaFilter);
         pewmaFilter.addSubscriber(pewmaEval);
         pewmaFilter.addSubscriber(pewmaChart);
         pewmaEval.addSubscriber(pewmaChart);
 
         showChartFrame(createChartFrame("Cal Inflow", ewmaChart.getChart(), pewmaChart.getChart()));
-        source.start();
+        metricSource.start();
     }
 }

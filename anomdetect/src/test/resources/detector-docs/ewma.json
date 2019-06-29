@@ -1,0 +1,14 @@
+{
+  "uuid": "3e047348-f837-f615-271c-dce6206f50d6",
+  "type": "ewma-detector",
+  "enabled": false,
+  "detectorConfig": {
+    "hyperparams": {},
+    "params": {
+      "weakSigmas": 3,
+      "strongSigmas": 4
+    }
+  },
+  "createdBy": "bibin",
+  "lastUpdateTimestamp": "2019-04-30 11:04:40"
+}

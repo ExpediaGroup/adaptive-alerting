@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.sink;
 
-import com.expedia.adaptivealerting.anomdetect.MappedMetricData;
-import com.expedia.adaptivealerting.anomdetect.outlier.forecast.evaluate.ModelEvaluation;
+import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.forecast.PointForecastEvaluation;
 import com.expedia.adaptivealerting.tools.pipeline.util.AnomalyResultSubscriber;
 import com.expedia.adaptivealerting.tools.pipeline.util.ModelEvaluationSubscriber;
 import com.expedia.adaptivealerting.tools.visualization.ChartSeries;
@@ -30,8 +30,8 @@ import java.text.DecimalFormat;
 import java.time.Instant;
 import java.util.Date;
 
-import static com.expedia.adaptivealerting.anomdetect.outlier.AnomalyLevel.STRONG;
-import static com.expedia.adaptivealerting.anomdetect.outlier.AnomalyLevel.WEAK;
+import static com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel.STRONG;
+import static com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel.WEAK;
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 public final class AnomalyChartSink implements AnomalyResultSubscriber, ModelEvaluationSubscriber {
@@ -84,7 +84,7 @@ public final class AnomalyChartSink implements AnomalyResultSubscriber, ModelEva
     }
 
     @Override
-    public void next(ModelEvaluation evaluation) {
+    public void next(PointForecastEvaluation evaluation) {
         notNull(evaluation, "evaluation can't be null");
 
         val title = new StringBuilder(baseTitle)

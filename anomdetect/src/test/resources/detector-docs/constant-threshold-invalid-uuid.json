@@ -1,0 +1,17 @@
+{
+  "uuid": "invalid-uuid",
+  "type": "constant-detector",
+  "enabled": true,
+  "detectorConfig": {
+    "hyperparams": {},
+    "params": {
+      "type": "RIGHT_TAILED",
+      "thresholds": {
+        "upperStrong": 16666.0,
+        "upperWeak": 2161.0
+      }
+    }
+  },
+  "createdBy": "david",
+  "lastUpdateTimestamp": "2019-06-21 04:12:38"
+}

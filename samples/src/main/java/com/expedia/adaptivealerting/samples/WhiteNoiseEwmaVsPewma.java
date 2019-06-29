@@ -15,41 +15,48 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.detectorsource.legacy.EwmaParams;
-import com.expedia.adaptivealerting.anomdetect.detectorsource.legacy.LegacyDetectorFactory;
-import com.expedia.adaptivealerting.anomdetect.detectorsource.legacy.PewmaParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.RmsePointForecastEvaluator;
+import com.expedia.adaptivealerting.samples.util.DetectorUtil;
 import com.expedia.adaptivealerting.tools.pipeline.filter.DetectorFilter;
+import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.source.WhiteNoiseMetricSource;
 import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
 import lombok.val;
 
-import java.util.UUID;
-
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.createChartFrame;
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showChartFrame;
 
+// Disabled CUSUM and individuals as they don't have natural predictions. [WLW]
+
 /**
- * Sample pipeline based on white noise with EWMA and PEWMA filters.
+ * This is a sample pipeline to calculate RMSE
  */
 public class WhiteNoiseEwmaVsPewma {
 
     public static void main(String[] args) {
         val source = new WhiteNoiseMetricSource("white-noise", 1000L, 0.0, 1.0);
-        val factory = new LegacyDetectorFactory();
 
-        val ewmaDetector = factory.createEwmaDetector(UUID.randomUUID(), new EwmaParams());
-        val ewmaFilter = new DetectorFilter(ewmaDetector);
+        val ewma = DetectorUtil.buildEwmaDetector();
+        val ewmaFilter = new DetectorFilter(ewma);
+        val ewmaEval = new EvaluatorFilter(new RmsePointForecastEvaluator());
         val ewmaChart = PipelineFactory.createChartSink("EWMA");
+
         source.addSubscriber(ewmaFilter);
+        ewmaFilter.addSubscriber(ewmaEval);
         ewmaFilter.addSubscriber(ewmaChart);
+        ewmaEval.addSubscriber(ewmaChart);
 
-        val pewmaDetector = factory.createPewmaDetector(UUID.randomUUID(), new PewmaParams());
-        val pewmaFilter = new DetectorFilter(pewmaDetector);
+        val pewma = DetectorUtil.buildPewmaDetector();
+        val pewmaFilter = new DetectorFilter(pewma);
+        val pewmaEval = new EvaluatorFilter(new RmsePointForecastEvaluator());
         val pewmaChart = PipelineFactory.createChartSink("PEWMA");
-        source.addSubscriber(pewmaFilter);
-        pewmaFilter.addSubscriber(pewmaChart);
 
-        showChartFrame(createChartFrame("White Noise", ewmaChart.getChart(), pewmaChart.getChart()));
+        source.addSubscriber(pewmaFilter);
+        pewmaFilter.addSubscriber(pewmaEval);
+        pewmaFilter.addSubscriber(pewmaChart);
+        pewmaEval.addSubscriber(pewmaChart);
+
+        showChartFrame(createChartFrame("White Noise RMSE", ewmaChart.getChart(), pewmaChart.getChart()));
         source.start();
     }
 }

@@ -17,10 +17,9 @@ package com.expedia.adaptivealerting.pipeline.integration.test
 
 import java.time.Instant
 
-import com.expedia.adaptivealerting.anomdetect.DetectorManager
-import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapper
-import com.expedia.adaptivealerting.anomdetect.detectorsource.DetectorClient
-import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyResult
+import com.expedia.adaptivealerting.anomdetect.detect.{AnomalyResult, DetectorManager}
+import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMapper
+import com.expedia.adaptivealerting.anomdetect.source.DetectorClient
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper
 import com.expedia.adaptivealerting.kafka.{KafkaAnomalyDetectorManager, KafkaAnomalyDetectorMapper}
 import com.expedia.metrics.{MetricData, MetricDefinition}
@@ -86,7 +85,7 @@ class ConstantThresholdBasedE2ETestSpec extends IntegrationTestSpec {
       Then("'constant threshold outlier detector' should read records from its topic and " +
         "write those anomalous records to output topic")
       val consumerPropAnomalyTopic = configToProps(anomalyTopicConsumerConfig.getConfig(STREAM))
-      // No longer using this config. [WLW]
+      // No longer using this detector-docs. [WLW]
 //      consumerPropAnomalyTopic.put("JsonPOJOClass", classOf[AnomalyResult])
       val outputRecords: List[KeyValue[String, AnomalyResult]] =
         IntegrationTestUtils.waitUntilMinKeyValueRecordsReceived[String, AnomalyResult](

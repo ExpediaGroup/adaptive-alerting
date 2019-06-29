@@ -22,7 +22,7 @@ import org.springframework.data.rest.core.config.Projection;
 import java.sql.Timestamp;
 import java.util.Map;
 
-// Projection must be in the same package or a subpackage as entities, or else special config required.
+// Projection must be in the same package or a subpackage as entities, or else special detector-docs required.
 
 /**
  * Projection for finding models by metric.

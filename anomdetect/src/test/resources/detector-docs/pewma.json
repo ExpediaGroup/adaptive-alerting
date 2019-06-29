@@ -1,0 +1,15 @@
+{
+  "uuid": "6ec81aa2-2cdc-415e-b4f3-c1beb223ae60",
+  "type": "pewma-detector",
+  "enabled": true,
+  "detectorConfig": {
+    "hyperparams": {},
+    "params": {
+      "alpha": 0.2,
+      "weakSigmas": 9,
+      "strongSigmas": 11
+    }
+  },
+  "createdBy": null,
+  "lastUpdateTimestamp": "2019-03-14 10:18:35"
+}

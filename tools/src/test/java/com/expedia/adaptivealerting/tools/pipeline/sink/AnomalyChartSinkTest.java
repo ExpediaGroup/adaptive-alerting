@@ -15,11 +15,11 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.sink;
 
-import com.expedia.adaptivealerting.anomdetect.MappedMetricData;
-import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyLevel;
-import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyResult;
-import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyThresholds;
-import com.expedia.adaptivealerting.anomdetect.outlier.forecast.evaluate.ModelEvaluation;
+import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
+import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.AnomalyThresholds;
+import com.expedia.adaptivealerting.anomdetect.forecast.PointForecastEvaluation;
 import com.expedia.adaptivealerting.tools.util.TestObjectMother;
 import com.expedia.adaptivealerting.tools.visualization.ChartSeries;
 import com.expedia.metrics.MetricData;
@@ -49,7 +49,7 @@ public final class AnomalyChartSinkTest {
     private ChartSeries chartSeries;
     private MappedMetricData strongAnomalyNoThresholds;
     private MappedMetricData weakAnomalyWithThresholds;
-    private ModelEvaluation modelEvaluation;
+    private PointForecastEvaluation pointForecastEvaluation;
 
     @Before
     public void setUp() {
@@ -81,12 +81,12 @@ public final class AnomalyChartSinkTest {
 
     @Test
     public void testNext_modelEvaluation() {
-        sinkUnderTest.next(modelEvaluation);
+        sinkUnderTest.next(pointForecastEvaluation);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testNext_nullModelEvaluation() {
-        sinkUnderTest.next((ModelEvaluation) null);
+        sinkUnderTest.next((PointForecastEvaluation) null);
     }
 
     private void initTestObjects() {
@@ -109,7 +109,7 @@ public final class AnomalyChartSinkTest {
         this.weakAnomalyWithThresholds = new MappedMetricData(metricData, UUID.randomUUID());
         this.weakAnomalyWithThresholds.setAnomalyResult(anomalyResult_weak_thresholds);
 
-        this.modelEvaluation = new ModelEvaluation("some-method", 0.0);
+        this.pointForecastEvaluation = new PointForecastEvaluation("some-method", 0.0);
     }
 
     private void initDependencies() {

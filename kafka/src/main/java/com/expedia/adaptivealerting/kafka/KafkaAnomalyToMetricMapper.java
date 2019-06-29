@@ -15,10 +15,10 @@
  */
 package com.expedia.adaptivealerting.kafka;
 
-import com.expedia.adaptivealerting.anomdetect.AnomalyToMetricMapper;
-import com.expedia.adaptivealerting.anomdetect.MappedMetricData;
-import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyLevel;
-import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.AnomalyToMetricMapper;
+import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
+import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
 import com.expedia.adaptivealerting.anomdetect.util.AssertUtil;
 import com.expedia.adaptivealerting.kafka.util.ConfigUtil;
 import com.expedia.metrics.MetricData;

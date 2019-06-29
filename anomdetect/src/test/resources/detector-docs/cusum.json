@@ -1,0 +1,11 @@
+{
+  "uuid": "3ec81aa2-2cdc-415e-b4f3-c1beb223ae60",
+  "type": "cusum-detector",
+  "enabled": true,
+  "detectorConfig": {
+    "hyperparams": {},
+    "params": {}
+  },
+  "createdBy": null,
+  "lastUpdateTimestamp": "2019-03-14 10:18:35"
+}
