@@ -15,8 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.algo;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.PointForecasterParams;
-import com.expedia.adaptivealerting.anomdetect.forecast.SeasonalityType;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -30,12 +28,12 @@ import static java.lang.String.format;
 @Data
 @Accessors(chain = true)
 @Slf4j
-public final class HoltWintersPointForecasterParams implements PointForecasterParams {
+public final class HoltWintersPointForecasterParams {
 
     /**
      * SeasonalityType parameter used to determine which Seasonality method (Multiplicative or Additive) to use.
      */
-    private SeasonalityType seasonalityType = SeasonalityType.MULTIPLICATIVE;
+    private HoltWintersSeasonalityType seasonalityType = HoltWintersSeasonalityType.MULTIPLICATIVE;
 
     /**
      * Frequency parameter representing periodicity of the data.
@@ -103,7 +101,7 @@ public final class HoltWintersPointForecasterParams implements PointForecasterPa
     private final HoltWintersSeasonalEstimatesValidator seasonalEstimatesValidator = new HoltWintersSeasonalEstimatesValidator();
 
     public boolean isMultiplicative() {
-        return seasonalityType.equals(SeasonalityType.MULTIPLICATIVE);
+        return seasonalityType.equals(HoltWintersSeasonalityType.MULTIPLICATIVE);
     }
 
     /**
@@ -116,9 +114,8 @@ public final class HoltWintersPointForecasterParams implements PointForecasterPa
         return (initTrainingMethod == HoltWintersTrainingMethod.SIMPLE) ? (frequency * 2) : 0;
     }
 
-    // TODO Call this from the constructor
     public void validate() {
-        notNull(seasonalityType, "Required: seasonalityType one of " + Arrays.toString(SeasonalityType.values()));
+        notNull(seasonalityType, "Required: seasonalityType one of " + Arrays.toString(HoltWintersSeasonalityType.values()));
         notNull(initTrainingMethod, "Required: initTrainingMethod one of " + Arrays.toString(HoltWintersTrainingMethod.values()));
         isTrue(0 < frequency, "Required: frequency value greater than 0");
         isTrue(0.0 <= alpha && alpha <= 1.0, "Required: alpha in the range [0, 1]");

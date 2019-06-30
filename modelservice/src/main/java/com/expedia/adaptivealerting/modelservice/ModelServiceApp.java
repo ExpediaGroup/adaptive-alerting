@@ -16,7 +16,6 @@
 package com.expedia.adaptivealerting.modelservice;
 
 import com.codahale.metrics.MetricRegistry;
-import com.expedia.adaptivealerting.anomdetect.detect.DetectorBuilder;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
 import org.apache.http.HttpHost;
 import org.apache.tomcat.jdbc.pool.DataSource;
@@ -99,11 +98,6 @@ public class ModelServiceApp {
                 });
         restHighLevelClient = new RestHighLevelClient(builder);
         return restHighLevelClient;
-    }
-
-    @Bean
-    public DetectorBuilder detectorBuilder() {
-        return new DetectorBuilder();
     }
 
     @PreDestroy

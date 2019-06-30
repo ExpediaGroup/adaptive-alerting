@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.algo;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.SeasonalityType;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -30,7 +29,7 @@ public class HoltWintersOnlineComponentsTest {
         double initLevelEstimate = 80000;
         double initBaseEstimate = 2;
         double[] initSeasonalEstimates = {1, 2, 3, 4};
-        final HoltWintersPointForecasterParams params = HoltWintersAustouristsTestHelper.buildAustouristsParams(SeasonalityType.MULTIPLICATIVE, initLevelEstimate, initBaseEstimate, initSeasonalEstimates);
+        final HoltWintersPointForecasterParams params = HoltWintersAustouristsTestHelper.buildAustouristsParams(HoltWintersSeasonalityType.MULTIPLICATIVE, initLevelEstimate, initBaseEstimate, initSeasonalEstimates);
         HoltWintersOnlineComponents subject = new HoltWintersOnlineComponents(params);
 //        assertEquals(params, subject.getHyperparams());
         assertEquals(0, subject.getN());
@@ -49,14 +48,14 @@ public class HoltWintersOnlineComponentsTest {
 
     @Test
     public void testConstructorNoInitSeasonalsMultiplicative() {
-        final HoltWintersPointForecasterParams params = HoltWintersAustouristsTestHelper.buildAustouristsParams(SeasonalityType.MULTIPLICATIVE);
+        final HoltWintersPointForecasterParams params = HoltWintersAustouristsTestHelper.buildAustouristsParams(HoltWintersSeasonalityType.MULTIPLICATIVE);
         HoltWintersOnlineComponents subject = new HoltWintersOnlineComponents(params);
         Assert.assertArrayEquals(HoltWintersAustouristsTestHelper.MULTIPLICATIVE_IDENTITY_SEASONALS, subject.getSeasonal(), TOLERANCE);
     }
 
     @Test
     public void testConstructorNoInitSeasonalsAdditive() {
-        final HoltWintersPointForecasterParams params = HoltWintersAustouristsTestHelper.buildAustouristsParams(SeasonalityType.ADDITIVE);
+        final HoltWintersPointForecasterParams params = HoltWintersAustouristsTestHelper.buildAustouristsParams(HoltWintersSeasonalityType.ADDITIVE);
         HoltWintersOnlineComponents subject = new HoltWintersOnlineComponents(params);
         Assert.assertArrayEquals(HoltWintersAustouristsTestHelper.ADDITIVE_IDENTITY_SEASONALS, subject.getSeasonal(), TOLERANCE);
     }
@@ -66,7 +65,7 @@ public class HoltWintersOnlineComponentsTest {
         double initLevelEstimate = 80000;
         double initBaseEstimate = 2;
         double[] initSeasonalEstimates = {1, 2, 3};
-        final HoltWintersPointForecasterParams params = HoltWintersAustouristsTestHelper.buildAustouristsParams(SeasonalityType.MULTIPLICATIVE, initLevelEstimate, initBaseEstimate, initSeasonalEstimates);
+        final HoltWintersPointForecasterParams params = HoltWintersAustouristsTestHelper.buildAustouristsParams(HoltWintersSeasonalityType.MULTIPLICATIVE, initLevelEstimate, initBaseEstimate, initSeasonalEstimates);
         new HoltWintersOnlineComponents(params);
     }
 }

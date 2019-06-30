@@ -17,7 +17,8 @@ package com.expedia.adaptivealerting.pipeline.integration.test
 
 import java.time.Instant
 
-import com.expedia.adaptivealerting.anomdetect.detect.{AnomalyResult, DetectorManager}
+import com.expedia.adaptivealerting.anomdetect.DetectorManager
+import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult
 import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMapper
 import com.expedia.adaptivealerting.anomdetect.source.DetectorClient
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper
@@ -85,7 +86,7 @@ class ConstantThresholdBasedE2ETestSpec extends IntegrationTestSpec {
       Then("'constant threshold outlier detector' should read records from its topic and " +
         "write those anomalous records to output topic")
       val consumerPropAnomalyTopic = configToProps(anomalyTopicConsumerConfig.getConfig(STREAM))
-      // No longer using this detector-docs. [WLW]
+      // No longer using this detector-documents. [WLW]
 //      consumerPropAnomalyTopic.put("JsonPOJOClass", classOf[AnomalyResult])
       val outputRecords: List[KeyValue[String, AnomalyResult]] =
         IntegrationTestUtils.waitUntilMinKeyValueRecordsReceived[String, AnomalyResult](

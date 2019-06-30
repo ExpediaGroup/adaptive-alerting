@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.algo;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.SeasonalityType;
 import lombok.Data;
 import lombok.NonNull;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
@@ -134,7 +133,7 @@ public class HoltWintersOnlineComponents {
     }
 
     private double seasonalityIdentity() {
-        return params.getSeasonalityType() == SeasonalityType.MULTIPLICATIVE
+        return params.getSeasonalityType() == HoltWintersSeasonalityType.MULTIPLICATIVE
                 ? MULTIPLICATIVE_IDENTITY
                 : ADDITIVE_IDENTITY;
     }

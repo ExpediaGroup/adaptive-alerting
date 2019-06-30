@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.source;
 
-import com.expedia.adaptivealerting.anomdetect.detect.DetectorDocument;
 import com.expedia.adaptivealerting.anomdetect.mapper.Detector;
 import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMatchResponse;
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
@@ -249,12 +248,13 @@ public class DetectorClientTest {
         this.detectorDocument = new DetectorDocument();
         this.detectorDocuments = new DetectorDocument[1];
         detectorDocuments[0] = new DetectorDocument()
+                .setType("constant-detector")
                 .setUuid(UUID.fromString("3217d4be-9c33-490f-828e-c976b393b000"))
                 .setEnabled(true)
-                .setType("constant-detector")
-                .setDetectorConfig(new HashMap<>())
+                .setConfig(new HashMap<>())
                 .setCreatedBy("kashah")
-                .setLastUpdateTimestamp(new Date());
+                .setDateCreated(new Date())
+                .setDateUpdated(new Date());
 
         val detectorResourcesBytes = new ObjectMapper().writeValueAsBytes(detectorDocuments);
         this.detectorResourcesContent = new Content(detectorResourcesBytes, ContentType.APPLICATION_JSON);

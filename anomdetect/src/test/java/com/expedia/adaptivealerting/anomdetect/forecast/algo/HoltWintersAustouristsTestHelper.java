@@ -15,8 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.algo;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.SeasonalityType;
-
 import java.util.List;
 
 import static com.expedia.adaptivealerting.anomdetect.util.CsvToBeanFileReader.readData;
@@ -42,7 +40,7 @@ public class HoltWintersAustouristsTestHelper {
     public static final String AUSTOURISTS_MULT_FILE = "tests/austourists-tests-holtwinters-multiplicative.csv";
     public static List<HoltWintersAustouristsTestRow> AUSTOURISTS_MULT_DATA = readData(AUSTOURISTS_MULT_FILE, HoltWintersAustouristsTestRow.class);
 
-    public static HoltWintersPointForecasterParams buildAustouristsParams(SeasonalityType seasonalityType) {
+    public static HoltWintersPointForecasterParams buildAustouristsParams(HoltWintersSeasonalityType seasonalityType) {
         return new HoltWintersPointForecasterParams()
                 .setFrequency(AUSTOURISTS_FREQUENCY)
                 .setAlpha(AUSTOURISTS_ALPHA)
@@ -52,7 +50,7 @@ public class HoltWintersAustouristsTestHelper {
                 .setWarmUpPeriod(AUSTOURISTS_FREQUENCY);
     }
 
-    public static HoltWintersPointForecasterParams buildAustouristsParams(SeasonalityType seasonalityType, double level, double base, double[] seasonal) {
+    public static HoltWintersPointForecasterParams buildAustouristsParams(HoltWintersSeasonalityType seasonalityType, double level, double base, double[] seasonal) {
         return new HoltWintersPointForecasterParams()
                 .setFrequency(AUSTOURISTS_FREQUENCY)
                 .setAlpha(AUSTOURISTS_ALPHA)

@@ -17,8 +17,8 @@ package com.expedia.adaptivealerting.samples.util;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
-import com.expedia.adaptivealerting.anomdetect.detect.ForecastingOutlierDetector;
-import com.expedia.adaptivealerting.anomdetect.forecast.SeasonalityType;
+import com.expedia.adaptivealerting.anomdetect.detect.algo.ForecastingDetector;
+import com.expedia.adaptivealerting.anomdetect.forecast.algo.HoltWintersSeasonalityType;
 import com.expedia.adaptivealerting.anomdetect.forecast.algo.EwmaPointForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.algo.EwmaPointForecasterParams;
 import com.expedia.adaptivealerting.anomdetect.forecast.algo.HoltWintersPointForecaster;
@@ -43,22 +43,12 @@ public class DetectorUtil {
         return buildEwmaDetector(new EwmaPointForecasterParams());
     }
 
-    public static Detector buildEwmaDetector(double alpha) {
-        return buildEwmaDetector(new EwmaPointForecasterParams().setAlpha(alpha));
-    }
-
     public static Detector buildPewmaDetector() {
         return buildPewmaDetector(new PewmaPointForecasterParams());
     }
 
-    public static Detector buildPewmaDetector(double alpha, double beta) {
-        return buildPewmaDetector(new PewmaPointForecasterParams()
-                .setAlpha(alpha)
-                .setBeta(beta));
-    }
-
     public static Detector buildHoltWintersDetector(
-            SeasonalityType seasonalityType,
+            HoltWintersSeasonalityType seasonalityType,
             double level,
             double base,
             double[] seasonal,
@@ -85,7 +75,7 @@ public class DetectorUtil {
         val welfordParams = new ExponentialWelfordIntervalForecasterParams()
                 .setAlpha(params.getAlpha());
         val welford = new ExponentialWelfordIntervalForecaster(welfordParams);
-        return new ForecastingOutlierDetector(UUID.randomUUID(), ewma, welford, AnomalyType.RIGHT_TAILED);
+        return new ForecastingDetector(UUID.randomUUID(), ewma, welford, AnomalyType.RIGHT_TAILED);
     }
 
     private static Detector buildPewmaDetector(PewmaPointForecasterParams params) {
@@ -93,7 +83,7 @@ public class DetectorUtil {
         val welfordParams = new ExponentialWelfordIntervalForecasterParams()
                 .setAlpha(params.getAlpha());
         val welford = new ExponentialWelfordIntervalForecaster(welfordParams);
-        return new ForecastingOutlierDetector(UUID.randomUUID(), pewma, welford, AnomalyType.RIGHT_TAILED);
+        return new ForecastingDetector(UUID.randomUUID(), pewma, welford, AnomalyType.RIGHT_TAILED);
     }
 
     private static Detector buildHoltWintersDetector(HoltWintersPointForecasterParams params) {
@@ -103,7 +93,7 @@ public class DetectorUtil {
                 .setStrongSigmas(HW_STRONG_SIGMAS)
                 .setWeakSigmas(HW_WEAK_SIGMAS);
         val welford = new ExponentialWelfordIntervalForecaster(welfordParams);
-        return new ForecastingOutlierDetector(
+        return new ForecastingDetector(
                 UUID.randomUUID(),
                 holtWinters,
                 welford,

@@ -15,8 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.algo;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.SeasonalityType;
-
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.Arrays;
@@ -50,7 +48,7 @@ public class HoltWintersSeasonalEstimatesValidator {
      * @param frequency             The amount of observations per cycle.
      * @param seasonalityType       Are the estimates MULTIPLICATIVE or ADDITIVE?
      */
-    public void validate(double[] initSeasonalEstimates, int frequency, SeasonalityType seasonalityType) {
+    public void validate(double[] initSeasonalEstimates, int frequency, HoltWintersSeasonalityType seasonalityType) {
         checkNotNull(initSeasonalEstimates);
         if (initSeasonalEstimates.length <= 0) return;
         checkLength(initSeasonalEstimates, frequency);
@@ -67,11 +65,11 @@ public class HoltWintersSeasonalEstimatesValidator {
                 format("Invalid: initSeasonalEstimates size (%d) must equal frequency (%d)", initSeasonalEstimates.length, frequency));
     }
 
-    private void checkSumOfEstimates(double[] initSeasonalEstimates, int frequency, SeasonalityType seasonalityType) {
+    private void checkSumOfEstimates(double[] initSeasonalEstimates, int frequency, HoltWintersSeasonalityType seasonalityType) {
         BigDecimal seasonalSum = sum(initSeasonalEstimates, frequency);
         BigDecimal maxAbs = maxOfAbsolutes(distancesFromIdentity(initSeasonalEstimates, seasonalityType, frequency), frequency);
         BigDecimal tolerance = onePercent(maxAbs);
-        if (seasonalityType.equals(SeasonalityType.MULTIPLICATIVE)) {
+        if (seasonalityType.equals(HoltWintersSeasonalityType.MULTIPLICATIVE)) {
             isBetween(seasonalSum.doubleValue(), frequency - tolerance.doubleValue(), frequency + tolerance.doubleValue(),
                     additiveErrorMessage(frequency, seasonalSum, tolerance));
         } else {
@@ -84,8 +82,8 @@ public class HoltWintersSeasonalEstimatesValidator {
         return Arrays.stream(values, 0, frequency).mapToObj(BigDecimal::valueOf).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    private static double[] distancesFromIdentity(double[] values, SeasonalityType seasonalityType, int frequency) {
-        return seasonalityType.equals(SeasonalityType.MULTIPLICATIVE) ? eachMinusOne(values, frequency) : values;
+    private static double[] distancesFromIdentity(double[] values, HoltWintersSeasonalityType seasonalityType, int frequency) {
+        return seasonalityType.equals(HoltWintersSeasonalityType.MULTIPLICATIVE) ? eachMinusOne(values, frequency) : values;
     }
 
     private static double[] eachMinusOne(double[] values, int frequency) {

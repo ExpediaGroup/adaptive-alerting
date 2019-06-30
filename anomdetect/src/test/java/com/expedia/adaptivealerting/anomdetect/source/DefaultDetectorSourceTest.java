@@ -15,8 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.source;
 
-import com.expedia.adaptivealerting.anomdetect.detect.DetectorBuilder;
-import com.expedia.adaptivealerting.anomdetect.detect.DetectorDocument;
 import com.expedia.adaptivealerting.anomdetect.mapper.Detector;
 import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMapping;
 import lombok.extern.slf4j.Slf4j;
@@ -48,9 +46,6 @@ public final class DefaultDetectorSourceTest {
     @Mock
     private DetectorClient detectorClient;
 
-    @Mock
-    private DetectorBuilder detectorBuilder;
-
     private DetectorDocument[] updatedDetectorDocuments;
     private DetectorDocument detectorDocument_ewma;
     private DetectorMapping detectorMapping;
@@ -60,7 +55,7 @@ public final class DefaultDetectorSourceTest {
         MockitoAnnotations.initMocks(this);
         initTestObjects();
         initDependencies();
-        this.sourceUnderTest = new DefaultDetectorSource(detectorClient, detectorBuilder);
+        this.sourceUnderTest = new DefaultDetectorSource(detectorClient);
     }
 
     @Test
@@ -113,12 +108,13 @@ public final class DefaultDetectorSourceTest {
 
     private void initTestObjects_findDetectors() {
         val doc = new DetectorDocument()
+                .setType("ewma-detector")
                 .setUuid(DETECTOR_UUID_EWMA)
                 .setEnabled(true)
-                .setType("ewma-detector")
-                .setDetectorConfig(new HashMap<>())
+                .setConfig(new HashMap<>())
                 .setCreatedBy("kashah")
-                .setLastUpdateTimestamp(new Date());
+                .setDateCreated(new Date())
+                .setDateUpdated(new Date());
         this.updatedDetectorDocuments = new DetectorDocument[1];
         updatedDetectorDocuments[0] = doc;
         this.detectorMapping = new DetectorMapping()
@@ -137,9 +133,8 @@ public final class DefaultDetectorSourceTest {
         detectorParams.put("params", ewmaParams);
 
         this.detectorDocument_ewma = new DetectorDocument();
-        detectorDocument_ewma.setDetectorConfig(new HashMap<>());
-        detectorDocument_ewma.setDetectorConfig(detectorParams);
         detectorDocument_ewma.setType("ewma-detector");
+        detectorDocument_ewma.setConfig(detectorParams);
 
 //        this.detector = new ForecastingOutlierDetector(
 //                DETECTOR_UUID_EWMA,

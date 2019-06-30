@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.algo;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.SeasonalityType;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -27,15 +26,15 @@ public class HoltWintersSimpleTrainingModelTest {
 
     @Test
     public void testObserveAndTrain() {
-        checkObserveAndTrain(SeasonalityType.MULTIPLICATIVE, HoltWintersAustouristsTestHelper.MULT_LEVEL, HoltWintersAustouristsTestHelper.MULT_BASE, HoltWintersAustouristsTestHelper.MULT_SEASONAL);
-        checkObserveAndTrain(SeasonalityType.ADDITIVE, HoltWintersAustouristsTestHelper.ADD_LEVEL, HoltWintersAustouristsTestHelper.ADD_BASE, HoltWintersAustouristsTestHelper.ADD_SEASONAL);
+        checkObserveAndTrain(HoltWintersSeasonalityType.MULTIPLICATIVE, HoltWintersAustouristsTestHelper.MULT_LEVEL, HoltWintersAustouristsTestHelper.MULT_BASE, HoltWintersAustouristsTestHelper.MULT_SEASONAL);
+        checkObserveAndTrain(HoltWintersSeasonalityType.ADDITIVE, HoltWintersAustouristsTestHelper.ADD_LEVEL, HoltWintersAustouristsTestHelper.ADD_BASE, HoltWintersAustouristsTestHelper.ADD_SEASONAL);
     }
 
     @Test
     public void testNullParamFails() {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("params can't be null");
-        HoltWintersSimpleTrainingModel subject = new HoltWintersSimpleTrainingModel(HoltWintersAustouristsTestHelper.buildAustouristsParams(SeasonalityType.MULTIPLICATIVE));
+        HoltWintersSimpleTrainingModel subject = new HoltWintersSimpleTrainingModel(HoltWintersAustouristsTestHelper.buildAustouristsParams(HoltWintersSeasonalityType.MULTIPLICATIVE));
         subject.observeAndTrain(0, null, null);
     }
 
@@ -43,7 +42,7 @@ public class HoltWintersSimpleTrainingModelTest {
     public void testNullComponentsFails() {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("components can't be null");
-        HoltWintersPointForecasterParams params = HoltWintersAustouristsTestHelper.buildAustouristsParams(SeasonalityType.MULTIPLICATIVE);
+        HoltWintersPointForecasterParams params = HoltWintersAustouristsTestHelper.buildAustouristsParams(HoltWintersSeasonalityType.MULTIPLICATIVE);
         HoltWintersSimpleTrainingModel subject = new HoltWintersSimpleTrainingModel(params);
         subject.observeAndTrain(0, params, null);
     }
@@ -52,7 +51,7 @@ public class HoltWintersSimpleTrainingModelTest {
     public void testInvalidTrainingMethod() {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage(String.format("Expected training method to be %s but was %s", HoltWintersTrainingMethod.SIMPLE, HoltWintersTrainingMethod.NONE));
-        HoltWintersPointForecasterParams params = HoltWintersAustouristsTestHelper.buildAustouristsParams(SeasonalityType.MULTIPLICATIVE);
+        HoltWintersPointForecasterParams params = HoltWintersAustouristsTestHelper.buildAustouristsParams(HoltWintersSeasonalityType.MULTIPLICATIVE);
         HoltWintersOnlineComponents components = new HoltWintersOnlineComponents(params);
         HoltWintersSimpleTrainingModel subject = new HoltWintersSimpleTrainingModel(params);
         subject.observeAndTrain(0, params, components);
@@ -64,7 +63,7 @@ public class HoltWintersSimpleTrainingModelTest {
         expectedEx.expectMessage(String.format(
                 "Training invoked %d times which is greater than the training window of frequency * 2 (%d * 2 = %d) observations.",
                 (HoltWintersAustouristsTestHelper.AUSTOURISTS_FREQUENCY * 2) + 1, HoltWintersAustouristsTestHelper.AUSTOURISTS_FREQUENCY, HoltWintersAustouristsTestHelper.AUSTOURISTS_FREQUENCY * 2));
-        HoltWintersPointForecasterParams params = HoltWintersAustouristsTestHelper.buildAustouristsParams(SeasonalityType.MULTIPLICATIVE)
+        HoltWintersPointForecasterParams params = HoltWintersAustouristsTestHelper.buildAustouristsParams(HoltWintersSeasonalityType.MULTIPLICATIVE)
                 .setInitTrainingMethod(HoltWintersTrainingMethod.SIMPLE);
         HoltWintersOnlineComponents components = new HoltWintersOnlineComponents(params);
         HoltWintersSimpleTrainingModel subject = new HoltWintersSimpleTrainingModel(params);
@@ -73,7 +72,7 @@ public class HoltWintersSimpleTrainingModelTest {
         }
     }
 
-    private void checkObserveAndTrain(SeasonalityType seasonalityType, double expectedLevel, double expectedBase, double[] expectedSeasonal) {
+    private void checkObserveAndTrain(HoltWintersSeasonalityType seasonalityType, double expectedLevel, double expectedBase, double[] expectedSeasonal) {
         HoltWintersPointForecasterParams params = HoltWintersAustouristsTestHelper.buildAustouristsParams(seasonalityType)
                 .setInitTrainingMethod(HoltWintersTrainingMethod.SIMPLE);
         HoltWintersOnlineComponents components = new HoltWintersOnlineComponents(params);

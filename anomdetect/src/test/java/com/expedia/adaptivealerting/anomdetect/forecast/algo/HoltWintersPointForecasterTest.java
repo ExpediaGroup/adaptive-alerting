@@ -16,7 +16,6 @@
 package com.expedia.adaptivealerting.anomdetect.forecast.algo;
 
 import com.expedia.adaptivealerting.anomdetect.forecast.PointForecast;
-import com.expedia.adaptivealerting.anomdetect.forecast.SeasonalityType;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import lombok.val;
@@ -106,25 +105,25 @@ public final class HoltWintersPointForecasterTest {
 
     @Test
     public void testAdditiveProvidingInitialEstimates() {
-        doAustouristsTest(HoltWintersAustouristsTestHelper.AUSTOURISTS_ADD_DATA, SeasonalityType.ADDITIVE, false);
+        doAustouristsTest(HoltWintersAustouristsTestHelper.AUSTOURISTS_ADD_DATA, HoltWintersSeasonalityType.ADDITIVE, false);
     }
 
     @Test
     public void testMultiplicativeProvidingInitialEstimates() {
-        doAustouristsTest(HoltWintersAustouristsTestHelper.AUSTOURISTS_MULT_DATA, SeasonalityType.MULTIPLICATIVE, false);
+        doAustouristsTest(HoltWintersAustouristsTestHelper.AUSTOURISTS_MULT_DATA, HoltWintersSeasonalityType.MULTIPLICATIVE, false);
     }
 
     @Test
     public void testAdditiveWithTraining() {
-        doAustouristsTest(HoltWintersAustouristsTestHelper.AUSTOURISTS_ADD_DATA, SeasonalityType.ADDITIVE, true);
+        doAustouristsTest(HoltWintersAustouristsTestHelper.AUSTOURISTS_ADD_DATA, HoltWintersSeasonalityType.ADDITIVE, true);
     }
 
     @Test
     public void testMultiplicativeWithTraining() {
-        doAustouristsTest(HoltWintersAustouristsTestHelper.AUSTOURISTS_MULT_DATA, SeasonalityType.MULTIPLICATIVE, true);
+        doAustouristsTest(HoltWintersAustouristsTestHelper.AUSTOURISTS_MULT_DATA, HoltWintersSeasonalityType.MULTIPLICATIVE, true);
     }
 
-    private void doAustouristsTest(List<HoltWintersAustouristsTestRow> testData, SeasonalityType seasonalityType, boolean withTraining) {
+    private void doAustouristsTest(List<HoltWintersAustouristsTestRow> testData, HoltWintersSeasonalityType seasonalityType, boolean withTraining) {
         final ListIterator<HoltWintersAustouristsTestRow> testRows = testData.listIterator();
         HoltWintersAustouristsTestRow firstRow = testRows.next();
         double initLevelEstimate = firstRow.getL();

@@ -1,0 +1,16 @@
+{
+  "uuid": "a6a4d8c4-4102-51fc-a1c7-38aa6f066cca",
+  "type": "individuals-detector",
+  "enabled": true,
+  "detectorConfig": {
+    "hyperparams": {},
+    "params": {
+      "initValue": 10.0,
+      "strongSigmas": 3,
+      "weakSigmas": 4,
+      "initMeanEstimate": 30.0
+    }
+  },
+  "createdBy": "willie",
+  "lastUpdateTimestamp": "2019-06-04 23:33:31"
+}

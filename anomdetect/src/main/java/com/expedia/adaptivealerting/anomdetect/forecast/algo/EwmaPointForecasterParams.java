@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.algo;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.PointForecasterParams;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -23,7 +22,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isBetween;
 
 @Data
 @Accessors(chain = true)
-public final class EwmaPointForecasterParams implements PointForecasterParams {
+public final class EwmaPointForecasterParams {
 
     /**
      * Smoothing param. Somewhat misnamed because higher values lead to less smoothing, but it's called the smoothing
@@ -36,7 +35,6 @@ public final class EwmaPointForecasterParams implements PointForecasterParams {
      */
     public double initMeanEstimate = 0.0;
 
-    @Override
     public void validate() {
         isBetween(alpha, 0.0, 1.0, "Required: 0.0 <= alpha <= 1.0");
     }

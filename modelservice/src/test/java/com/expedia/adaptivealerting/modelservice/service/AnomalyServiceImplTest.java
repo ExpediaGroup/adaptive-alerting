@@ -2,13 +2,10 @@ package com.expedia.adaptivealerting.modelservice.service;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
-import com.expedia.adaptivealerting.anomdetect.detect.DetectorBuilder;
-import com.expedia.adaptivealerting.anomdetect.detect.DetectorDocument;
 import com.expedia.adaptivealerting.modelservice.providers.graphite.GraphiteMetricSource;
 import com.expedia.adaptivealerting.modelservice.spi.MetricSource;
 import com.expedia.adaptivealerting.modelservice.spi.MetricSourceResult;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
-import com.expedia.metrics.MetricData;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.Before;
@@ -26,7 +23,6 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atMost;
 import static org.mockito.Mockito.verify;
@@ -43,9 +39,6 @@ public class AnomalyServiceImplTest {
     @Spy
     @Qualifier("metricSourceServiceListFactoryBean")
     private List<MetricSource> metricSources = new ArrayList<>();
-
-    @Mock
-    private DetectorBuilder detectorBuilder;
 
     @Mock
     private Detector detector;
@@ -84,17 +77,12 @@ public class AnomalyServiceImplTest {
     private void initTestObjects() {
         val mom = ObjectMother.instance();
 
-        anomalyRequest = mom.getAnomalyRequest();
-        metricSourceResult = mom.getMetricData();
-        metricSourceResults.add(metricSourceResult);
-
-        when(detector.detect(any(MetricData.class)))
-                .thenReturn(anomalyResult);
+        this.anomalyRequest = mom.getAnomalyRequest();
+        this.metricSourceResult = mom.getMetricData();
+        this.metricSourceResults.add(metricSourceResult);
     }
 
     private void initDependencies() {
-        when(detectorBuilder.build(any(DetectorDocument.class)))
-                .thenReturn(detector);
         when(graphiteMetricSource.getMetricData(anyString()))
                 .thenReturn(metricSourceResults);
         metricSources.add(graphiteMetricSource);

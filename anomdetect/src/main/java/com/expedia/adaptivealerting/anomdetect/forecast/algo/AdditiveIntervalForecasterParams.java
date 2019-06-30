@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.algo;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.IntervalForecasterParams;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -23,11 +22,10 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isTrue;
 
 @Data
 @Accessors(chain = true)
-public final class AdditiveIntervalForecasterParams implements IntervalForecasterParams {
+public final class AdditiveIntervalForecasterParams {
     private double weakValue;
     private double strongValue;
 
-    @Override
     public void validate() {
         isTrue(weakValue >= 0.0, "Required: weakValue >= 0.0");
         isTrue(strongValue >= weakValue, "Required: strongValue >= weakValue");

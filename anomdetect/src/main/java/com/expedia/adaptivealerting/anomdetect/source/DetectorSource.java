@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.source;
 
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
-import com.expedia.adaptivealerting.anomdetect.detect.DetectorManager;
+import com.expedia.adaptivealerting.anomdetect.DetectorManager;
 import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMapper;
 import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMapping;
 import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMatchResponse;

@@ -15,8 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.algo;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.SeasonalityType;
-
 /**
  * Encapsulates the algorithm for forecasting one-step ahead estimate using Holt-Winters (Triple-Exponential Smoothing) method.
  *
@@ -68,8 +66,8 @@ public class HoltWintersOnlineAlgorithm {
         updateForecast(components, getForecast(params.getSeasonalityType(), newLevel, newBase, nextSeason));
     }
 
-    public double getForecast(SeasonalityType seasonalityType, double level, double base, double season) {
-        return SeasonalityType.MULTIPLICATIVE.equals(seasonalityType)
+    public double getForecast(HoltWintersSeasonalityType seasonalityType, double level, double base, double season) {
+        return HoltWintersSeasonalityType.MULTIPLICATIVE.equals(seasonalityType)
                 ? (level + base) * season
                 : level + base + season;
     }

@@ -70,7 +70,7 @@ public class PewmaPointForecaster implements PointForecaster {
         notNull(params, "params can't be null");
         this.params = params;
 
-        // Init detector-docs
+        // Init detector-documents
         this.adjAlpha = 1.0 - params.getAlpha();
 
         // Init state

@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.samples;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
-import com.expedia.adaptivealerting.anomdetect.detect.ForecastingOutlierDetector;
+import com.expedia.adaptivealerting.anomdetect.detect.algo.ForecastingDetector;
 import com.expedia.adaptivealerting.anomdetect.forecast.RmsePointForecastEvaluator;
 import com.expedia.adaptivealerting.anomdetect.forecast.algo.PewmaPointForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.algo.PewmaPointForecasterParams;
@@ -93,7 +93,7 @@ public class CsvTrafficPewmaVariants {
                 .setStrongSigmas(strongSigmas);
         val welford = new ExponentialWelfordIntervalForecaster(welfordParams);
 
-        val detector = new ForecastingOutlierDetector(UUID.randomUUID(), pewma, welford, AnomalyType.RIGHT_TAILED);
+        val detector = new ForecastingDetector(UUID.randomUUID(), pewma, welford, AnomalyType.RIGHT_TAILED);
         return new DetectorFilter(detector);
     }
 }

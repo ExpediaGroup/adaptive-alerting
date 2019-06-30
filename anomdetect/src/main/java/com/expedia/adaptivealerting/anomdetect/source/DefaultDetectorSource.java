@@ -16,7 +16,6 @@
 package com.expedia.adaptivealerting.anomdetect.source;
 
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
-import com.expedia.adaptivealerting.anomdetect.detect.DetectorBuilder;
 import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMapping;
 import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMatchResponse;
 import lombok.NonNull;
@@ -47,9 +46,6 @@ public class DefaultDetectorSource implements DetectorSource {
     @NonNull
     private final DetectorClient client;
 
-    @NonNull
-    private final DetectorBuilder builder;
-
     @Override
     public DetectorMatchResponse findDetectorMappings(List<Map<String, String>> metricTags) {
         notNull(metricTags, "metricTags can't be null");
@@ -66,7 +62,8 @@ public class DefaultDetectorSource implements DetectorSource {
     public Detector findDetector(UUID uuid) {
         notNull(uuid, "uuid can't be null");
         val document = client.findDetectorDocument(uuid);
-        return builder.build(document);
+        val factory = DetectorRegistry.getDetectorFactory(document);
+        return factory.buildDetector();
     }
 
     @Override

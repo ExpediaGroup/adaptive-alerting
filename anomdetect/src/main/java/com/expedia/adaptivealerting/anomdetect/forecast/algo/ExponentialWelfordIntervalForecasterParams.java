@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.algo;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.IntervalForecasterParams;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -24,14 +23,13 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isTrue;
 
 @Data
 @Accessors(chain = true)
-public final class ExponentialWelfordIntervalForecasterParams implements IntervalForecasterParams {
+public final class ExponentialWelfordIntervalForecasterParams {
     private double alpha = 0.15;
     private double initVarianceEstimate = 0.0;
     private double weakSigmas = 3.0;
     private double strongSigmas = 4.0;
     // TODO Add warmup period
 
-    @Override
     public void validate() {
         isBetween(alpha, 0.0, 1.0, "Required: 0.0 <= alpha <= 1.0");
         isTrue(initVarianceEstimate >= 0.0, "Required: initVarianceEstimate >= 0.0");

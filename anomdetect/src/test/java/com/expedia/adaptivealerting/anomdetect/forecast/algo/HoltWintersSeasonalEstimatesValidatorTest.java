@@ -15,8 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.algo;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.SeasonalityType;
-import com.expedia.adaptivealerting.anomdetect.forecast.algo.HoltWintersSeasonalEstimatesValidator;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -42,17 +40,17 @@ public class HoltWintersSeasonalEstimatesValidatorTest {
 
     @Test
     public void testEmptySeasonalEstimatesIsValid() {
-        subject.validate(new double[]{}, DUMMY_FREQUENCY, SeasonalityType.MULTIPLICATIVE);
+        subject.validate(new double[]{}, DUMMY_FREQUENCY, HoltWintersSeasonalityType.MULTIPLICATIVE);
     }
 
     @Test
     public void testValidMultiplicativeSeasonalEstimatesIsValid() {
-        subject.validate(VALID_MULTIPLICATIVE_SEASONAL_COMPONENT, DUMMY_FREQUENCY, SeasonalityType.MULTIPLICATIVE);
+        subject.validate(VALID_MULTIPLICATIVE_SEASONAL_COMPONENT, DUMMY_FREQUENCY, HoltWintersSeasonalityType.MULTIPLICATIVE);
     }
 
     @Test
     public void testValidAdditiveSeasonalEstimatesIsValid() {
-        subject.validate(VALID_ADDITIVE_SEASONAL_COMPONENT, DUMMY_FREQUENCY, SeasonalityType.ADDITIVE);
+        subject.validate(VALID_ADDITIVE_SEASONAL_COMPONENT, DUMMY_FREQUENCY, HoltWintersSeasonalityType.ADDITIVE);
     }
 
     @Test
@@ -60,21 +58,21 @@ public class HoltWintersSeasonalEstimatesValidatorTest {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage(String.format("Invalid: initSeasonalEstimates size (%d) must equal frequency (%d)",
                 INSUFFICIENT_SEASONAL_ESTIMATES.length, DUMMY_FREQUENCY));
-        subject.validate(INSUFFICIENT_SEASONAL_ESTIMATES, DUMMY_FREQUENCY, SeasonalityType.MULTIPLICATIVE);
+        subject.validate(INSUFFICIENT_SEASONAL_ESTIMATES, DUMMY_FREQUENCY, HoltWintersSeasonalityType.MULTIPLICATIVE);
     }
 
     @Test
     public void testInvalidInitSeasonalEstimateAdditive() {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("Invalid: Sum of initSeasonalEstimates (-1,100) was outside accepted tolerance. Sum should be 0 with a tolerance within 1% of largest seasonal estimate distance from 0 (±1,011), for ADDITIVE seasonality type.");
-        subject.validate(INVALID_ADDITIVE_SEASONAL_COMPONENT, DUMMY_FREQUENCY, SeasonalityType.ADDITIVE);
+        subject.validate(INVALID_ADDITIVE_SEASONAL_COMPONENT, DUMMY_FREQUENCY, HoltWintersSeasonalityType.ADDITIVE);
     }
 
     @Test
     public void testInvalidInitSeasonalEstimateMultiplicative() {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("Invalid: Sum of initSeasonalEstimates (4.0001) was outside accepted tolerance. Sum should equal 'frequency' with a tolerance within 1% of largest seasonal estimate distance from 1 (4 ± 0.000011), for MULTIPLICATIVE seasonality type.");
-        subject.validate(INVALID_MULTIPLICATIVE_SEASONAL_COMPONENT, DUMMY_FREQUENCY, SeasonalityType.MULTIPLICATIVE);
+        subject.validate(INVALID_MULTIPLICATIVE_SEASONAL_COMPONENT, DUMMY_FREQUENCY, HoltWintersSeasonalityType.MULTIPLICATIVE);
     }
 
 }

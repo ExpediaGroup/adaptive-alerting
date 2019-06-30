@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.source;
 
-import com.expedia.adaptivealerting.anomdetect.detect.DetectorDocument;
 import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMapper;
 import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMapping;
 import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMatchResponse;
@@ -102,7 +101,7 @@ public class DetectorClient {
         try {
             document = objectMapper.readValue(content.asBytes(), DetectorDocument.class);
         } catch (IOException e) {
-            val message = "IOException while deserializing detector document " + uuid;
+            val message = "IOException while reading detector document " + uuid;
             throw new DetectorException(message, e);
         }
 
@@ -135,7 +134,7 @@ public class DetectorClient {
         try {
             return Arrays.asList(objectMapper.readValue(content.asBytes(), DetectorDocument[].class));
         } catch (IOException e) {
-            val message = "IOException while deserializing detectors: sinceSeconds=" + sinceSeconds;
+            val message = "IOException while reading detectors: sinceSeconds=" + sinceSeconds;
             throw new DetectorException(message, e);
         }
     }
@@ -165,7 +164,7 @@ public class DetectorClient {
         try {
             return objectMapper.readValue(content.asBytes(), DetectorMatchResponse.class);
         } catch (IOException e) {
-            val message = "IOException while deserializing detectorMatchResponse: tags=" + tagsList;
+            val message = "IOException while reading detectorMatchResponse: tags=" + tagsList;
             throw new DetectorException(message, e);
         }
 
@@ -193,14 +192,13 @@ public class DetectorClient {
         try {
             List<DetectorMapping> result = objectMapper.readValue(
                     content.asBytes(),
-                    new TypeReference<List<DetectorMapping>>() {
-                    });
+                    new TypeReference<List<DetectorMapping>>() {});
             if (result == null) {
-                throw new IOException();
+                throw new IOException("Updated detector mappings are null");
             }
             return result;
         } catch (IOException e) {
-            val message = "IOException while deserializing updated detectors mappings: timeInSecs=" + timeInSecs;
+            val message = "IOException while reading updated detectors mappings: timeInSecs=" + timeInSecs;
             throw new DetectorException(message, e);
         }
     }

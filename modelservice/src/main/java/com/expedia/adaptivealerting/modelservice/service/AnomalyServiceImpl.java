@@ -17,8 +17,8 @@ package com.expedia.adaptivealerting.modelservice.service;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
-import com.expedia.adaptivealerting.anomdetect.detect.DetectorBuilder;
-import com.expedia.adaptivealerting.anomdetect.detect.DetectorDocument;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorRegistry;
 import com.expedia.adaptivealerting.anomdetect.util.MetricUtil;
 import com.expedia.adaptivealerting.modelservice.spi.MetricSource;
 import lombok.extern.slf4j.Slf4j;
@@ -41,9 +41,6 @@ public class AnomalyServiceImpl implements AnomalyService {
     @Autowired
     private List<? extends MetricSource> metricSources;
 
-    @Autowired
-    private DetectorBuilder detectorBuilder;
-
     @Override
     public List<AnomalyResult> getAnomalies(AnomalyRequest request) {
         val metricDef = MetricUtil.metricDefinition();
@@ -62,6 +59,7 @@ public class AnomalyServiceImpl implements AnomalyService {
     }
 
     private Detector getDetector(AnomalyRequest request) {
+        val now = new Date();
 
         // TODO This would be better if we read the config itself from the request, rather than reading the params from
         //  the request. This is because the config includes hyperparams too. [WLW]
@@ -70,9 +68,12 @@ public class AnomalyServiceImpl implements AnomalyService {
 
         val document = new DetectorDocument()
                 .setType(request.getDetectorType())
-                .setDetectorConfig(config)
+                .setUuid(request.getDetectorUuid())
+                .setConfig(config)
                 .setCreatedBy("adaptive-alerting")
-                .setLastUpdateTimestamp(new Date());
-        return detectorBuilder.build(document);
+                .setDateCreated(now)
+                .setDateUpdated(now);
+        val factory = DetectorRegistry.getDetectorFactory(document);
+        return factory.buildDetector();
     }
 }

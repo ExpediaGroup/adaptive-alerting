@@ -17,7 +17,7 @@ package com.expedia.adaptivealerting.samples;
 
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
 import com.expedia.adaptivealerting.anomdetect.forecast.RmsePointForecastEvaluator;
-import com.expedia.adaptivealerting.anomdetect.forecast.SeasonalityType;
+import com.expedia.adaptivealerting.anomdetect.forecast.algo.HoltWintersSeasonalityType;
 import com.expedia.adaptivealerting.samples.util.DetectorUtil;
 import com.expedia.adaptivealerting.tools.pipeline.filter.DetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
@@ -32,8 +32,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.expedia.adaptivealerting.anomdetect.forecast.SeasonalityType.ADDITIVE;
-import static com.expedia.adaptivealerting.anomdetect.forecast.SeasonalityType.MULTIPLICATIVE;
+import static com.expedia.adaptivealerting.anomdetect.forecast.algo.HoltWintersSeasonalityType.ADDITIVE;
+import static com.expedia.adaptivealerting.anomdetect.forecast.algo.HoltWintersSeasonalityType.MULTIPLICATIVE;
 import static com.expedia.adaptivealerting.anomdetect.forecast.algo.HoltWintersTrainingMethod.NONE;
 import static com.expedia.adaptivealerting.anomdetect.forecast.algo.HoltWintersTrainingMethod.SIMPLE;
 import static com.expedia.adaptivealerting.samples.util.MetricUtil.buildMetricFrameMetricSource;
@@ -54,8 +54,8 @@ public class CsvTrafficHoltWintersVariants {
     public static final double BASE = 1.06587325;
     public static final double[] M_SEASONAL = new double[]{1.17725873605224, 0.750111453184012, 0.991779758440832, 1.08085005232291};
     public static final double[] A_SEASONAL = new double[]{4.5249785, -6.3790385, -0.209842500000001, 2.0639025};
-    public static final SeasonalityType M = MULTIPLICATIVE;
-    public static final SeasonalityType A = ADDITIVE;
+    public static final HoltWintersSeasonalityType M = MULTIPLICATIVE;
+    public static final HoltWintersSeasonalityType A = ADDITIVE;
 
     public static void main(String[] args) throws Exception {
         MetricFrameMetricSource source = buildMetricFrameMetricSource("samples/austourists.csv", 200L);
@@ -83,7 +83,7 @@ public class CsvTrafficHoltWintersVariants {
 
     private static AnomalyChartSink buildChartWithInitEstimates(
             MetricFrameMetricSource source,
-            SeasonalityType seasonalityType,
+            HoltWintersSeasonalityType seasonalityType,
             double[] seasonal,
             double alpha,
             double beta,
@@ -98,7 +98,7 @@ public class CsvTrafficHoltWintersVariants {
 
     private static AnomalyChartSink buildChartWithoutInitEstimates(
             MetricFrameMetricSource source,
-            SeasonalityType seasonalityType,
+            HoltWintersSeasonalityType seasonalityType,
             double alpha,
             double beta,
             double gamma,
@@ -111,7 +111,7 @@ public class CsvTrafficHoltWintersVariants {
 
     private static AnomalyChartSink buildChartWithInitTrainings(
             MetricFrameMetricSource source,
-            SeasonalityType seasonalityType,
+            HoltWintersSeasonalityType seasonalityType,
             double alpha,
             double beta,
             double gamma,
@@ -124,7 +124,7 @@ public class CsvTrafficHoltWintersVariants {
 
     private static AnomalyChartSink buildChart(
             MetricFrameMetricSource source,
-            SeasonalityType seasonalityType,
+            HoltWintersSeasonalityType seasonalityType,
             Detector detector,
             double alpha,
             double beta,
