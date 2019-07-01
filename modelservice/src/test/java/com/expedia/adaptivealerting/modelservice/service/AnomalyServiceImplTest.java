@@ -2,6 +2,9 @@ package com.expedia.adaptivealerting.modelservice.service;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorRegistry;
 import com.expedia.adaptivealerting.modelservice.providers.graphite.GraphiteMetricSource;
 import com.expedia.adaptivealerting.modelservice.spi.MetricSource;
 import com.expedia.adaptivealerting.modelservice.spi.MetricSourceResult;
@@ -23,6 +26,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atMost;
 import static org.mockito.Mockito.verify;
@@ -41,9 +45,6 @@ public class AnomalyServiceImplTest {
     private List<MetricSource> metricSources = new ArrayList<>();
 
     @Mock
-    private Detector detector;
-
-    @Mock
     private GraphiteMetricSource graphiteMetricSource;
 
     @Spy
@@ -51,6 +52,15 @@ public class AnomalyServiceImplTest {
 
     @Spy
     private List<MetricSourceResult> metricSourceResults = new ArrayList<>();
+
+    @Mock
+    private DetectorRegistry detectorRegistry;
+
+    @Mock
+    private DetectorFactory detectorFactory;
+
+    @Mock
+    private Detector detector;
 
     private AnomalyRequest anomalyRequest;
 
@@ -80,11 +90,13 @@ public class AnomalyServiceImplTest {
         this.anomalyRequest = mom.getAnomalyRequest();
         this.metricSourceResult = mom.getMetricData();
         this.metricSourceResults.add(metricSourceResult);
+
+        when(detectorFactory.buildDetector()).thenReturn(detector);
     }
 
     private void initDependencies() {
-        when(graphiteMetricSource.getMetricData(anyString()))
-                .thenReturn(metricSourceResults);
+        when(graphiteMetricSource.getMetricData(anyString())).thenReturn(metricSourceResults);
         metricSources.add(graphiteMetricSource);
+        when(detectorRegistry.getDetectorFactory(any(DetectorDocument.class))).thenReturn(detectorFactory);
     }
 }

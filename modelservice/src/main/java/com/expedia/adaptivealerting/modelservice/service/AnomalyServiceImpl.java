@@ -41,10 +41,13 @@ public class AnomalyServiceImpl implements AnomalyService {
     @Autowired
     private List<? extends MetricSource> metricSources;
 
+    @Autowired
+    private DetectorRegistry detectorRegistry;
+
     @Override
     public List<AnomalyResult> getAnomalies(AnomalyRequest request) {
         val metricDef = MetricUtil.metricDefinition();
-        val detector = getDetector(request);
+        val detector = buildDetector(request);
 
         val anomalyResults = new ArrayList<AnomalyResult>();
         metricSources.forEach(metricSource -> {
@@ -58,7 +61,7 @@ public class AnomalyServiceImpl implements AnomalyService {
         return anomalyResults;
     }
 
-    private Detector getDetector(AnomalyRequest request) {
+    private Detector buildDetector(AnomalyRequest request) {
         val now = new Date();
 
         // TODO This would be better if we read the config itself from the request, rather than reading the params from
@@ -73,7 +76,7 @@ public class AnomalyServiceImpl implements AnomalyService {
                 .setCreatedBy("adaptive-alerting")
                 .setDateCreated(now)
                 .setDateUpdated(now);
-        val factory = DetectorRegistry.getDetectorFactory(document);
+        val factory = detectorRegistry.getDetectorFactory(document);
         return factory.buildDetector();
     }
 }

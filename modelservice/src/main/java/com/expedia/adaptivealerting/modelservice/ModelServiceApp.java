@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.modelservice;
 
 import com.codahale.metrics.MetricRegistry;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorRegistry;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
 import org.apache.http.HttpHost;
 import org.apache.tomcat.jdbc.pool.DataSource;
@@ -68,6 +69,11 @@ public class ModelServiceApp {
     @Bean
     public MetricRegistry metricRegistry() {
         return new MetricRegistry();
+    }
+
+    @Bean
+    public DetectorRegistry detectorRegistry() {
+        return new DetectorRegistry();
     }
 
     //Adding a custom data source bean to avoid conflicting dataSource bean error. [KS]
