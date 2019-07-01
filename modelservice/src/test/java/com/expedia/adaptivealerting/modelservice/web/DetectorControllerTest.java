@@ -5,6 +5,7 @@ import com.expedia.adaptivealerting.modelservice.service.DetectorService;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,6 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -83,7 +85,8 @@ public class DetectorControllerTest {
 
     @Test
     public void testCreateDetector() {
-        controller.createDetector(legalParamsDetector);
+        doReturn("1").when(controller).createDetector(legalParamsDetector);
+        Assert.assertEquals(controller.createDetector(legalParamsDetector), "1");
         verify(controller, times(1)).createDetector(legalParamsDetector);
     }
 
