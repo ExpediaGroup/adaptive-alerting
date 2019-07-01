@@ -3,7 +3,6 @@ package com.expedia.adaptivealerting.modelservice.web;
 import com.expedia.adaptivealerting.modelservice.entity.Detector;
 import com.expedia.adaptivealerting.modelservice.service.DetectorService;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
-import com.expedia.adaptivealerting.modelservice.util.RequestValidator;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.Before;

@@ -65,6 +65,20 @@ public class ObjectMother {
         return detectorParams;
     }
 
+    public Detector getDetector() {
+        Detector detector = new Detector();
+        detector.setCreatedBy("user");
+        detector.setType("constant-detector");
+
+        Map<String, Object> detectorConfig = new HashMap<>();
+        val thresholds = "{\"thresholds\": {\"lowerStrong\": \"90\", \"lowerWeak\": \"70\"}}";
+        val detectorParams = toObject(thresholds);
+        detectorParams.put("type", "LEFT_TAILED");
+        detectorConfig.put("params", getDetectorParams());
+        detector.setDetectorConfig(detectorConfig);
+        return detector;
+    }
+
     public Map<String, Object> getIllegalDetectorParams() {
         val thresholds = "{\"thresholds\": {\"lowerStrong\": \"90\", \"lowerWeak\": \"70\"}}";
         val detectorParams = toObject(thresholds);
@@ -78,7 +92,6 @@ public class ObjectMother {
         detector.setType("constant-detector");
 
         Map<String, Object> detectorConfig = new HashMap<>();
-
         val thresholds = "{\"thresholds\": {\"lowerStrong\": \"90\", \"lowerWeak\": \"70\"}}";
         val detectorParams = toObject(thresholds);
         detectorParams.put("type", "LEFT_TAILED");
@@ -168,3 +181,4 @@ public class ObjectMother {
         return tags;
     }
 }
+
