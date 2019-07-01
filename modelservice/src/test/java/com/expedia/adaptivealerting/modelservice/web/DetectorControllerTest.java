@@ -11,14 +11,19 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
@@ -26,6 +31,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class DetectorControllerTest {
 
+    @Spy
     @InjectMocks
     private DetectorController controller;
 
@@ -39,6 +45,8 @@ public class DetectorControllerTest {
     private List<Detector> detectors;
 
     private Detector illegalParamsDetector;
+    private Detector legalParamsDetector;
+
 
     @Before
     public void setUp() {
@@ -52,6 +60,7 @@ public class DetectorControllerTest {
     private void initTestObjects() {
         val mom = ObjectMother.instance();
         illegalParamsDetector = mom.getIllegalParamsDetector();
+        legalParamsDetector = mom.getDetector();
     }
 
 
@@ -70,6 +79,18 @@ public class DetectorControllerTest {
     @Test
     public void testToggleDetector() {
         controller.toggleDetector("uuid", true);
+    }
+
+    @Test
+    public void testCreateDetector() {
+        controller.createDetector(legalParamsDetector);
+        verify(controller, times(1)).createDetector(legalParamsDetector);
+    }
+
+    @Test
+    public void testUpdateDetector() {
+        controller.updateDetector("uuid", legalParamsDetector);
+        verify(controller, times(1)).updateDetector("uuid", legalParamsDetector);
     }
 
     @Test
