@@ -66,6 +66,41 @@ public class ObjectMother {
         return detectorParams;
     }
 
+    public Detector getDetector() {
+        Detector detector = new Detector();
+        detector.setCreatedBy("user");
+        detector.setType("constant-detector");
+
+        Map<String, Object> detectorConfig = new HashMap<>();
+        val thresholds = "{\"thresholds\": {\"lowerStrong\": \"90\", \"lowerWeak\": \"70\"}}";
+        val detectorParams = toObject(thresholds);
+        detectorParams.put("type", "LEFT_TAILED");
+        detectorConfig.put("params", getDetectorParams());
+        detector.setDetectorConfig(detectorConfig);
+        return detector;
+    }
+
+    public Map<String, Object> getIllegalDetectorParams() {
+        val thresholds = "{\"thresholds\": {\"lowerStrong\": \"90\", \"lowerWeak\": \"70\"}}";
+        val detectorParams = toObject(thresholds);
+        detectorParams.put("type", "LEFT_TAILED");
+        return detectorParams;
+    }
+
+    public Detector getIllegalParamsDetector() {
+        Detector detector = new Detector();
+        detector.setCreatedBy("user");
+        detector.setType("constant-detector");
+
+        Map<String, Object> detectorConfig = new HashMap<>();
+        val thresholds = "{\"thresholds\": {\"lowerStrong\": \"90\", \"lowerWeak\": \"70\"}}";
+        val detectorParams = toObject(thresholds);
+        detectorParams.put("type", "LEFT_TAILED");
+        detectorConfig.put("params", getIllegalDetectorParams());
+        detector.setDetectorConfig(detectorConfig);
+        return detector;
+    }
+
     public Detector getElasticsearchDetector() {
         return new Detector()
                 .setUuid("aeb4d849-847a-45c0-8312-dc0fcf22b639")
@@ -147,3 +182,4 @@ public class ObjectMother {
         return tags;
     }
 }
+
