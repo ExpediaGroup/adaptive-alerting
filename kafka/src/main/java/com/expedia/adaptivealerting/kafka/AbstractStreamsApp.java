@@ -40,7 +40,7 @@ public abstract class AbstractStreamsApp {
     private final JmxReporter jmxReporter;
 
     public AbstractStreamsApp(StreamsAppConfig config) {
-        notNull(config, "detector-documents can't be null");
+        notNull(config, "config can't be null");
         this.config = config;
         this.jmxReporter = JmxReporter.forRegistry(new MetricRegistry())
                 .build();
@@ -48,7 +48,7 @@ public abstract class AbstractStreamsApp {
     }
 
     public AbstractStreamsApp(StreamsAppConfig config, JmxReporter reporter) {
-        notNull(config, "detector-documents can't be null");
+        notNull(config, "config can't be null");
         notNull(reporter, "reporter can't be null");
         this.config = config;
         this.jmxReporter = reporter;

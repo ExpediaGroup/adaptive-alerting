@@ -53,7 +53,7 @@ public class MOfNAggregator implements Aggregator {
     }
 
     public MOfNAggregator(Config config) {
-        notNull(config, "detector-documents can't be null");
+        notNull(config, "config can't be null");
         this.config = config;
         this.buffer = new AnomalyLevel[config.getN()];
     }

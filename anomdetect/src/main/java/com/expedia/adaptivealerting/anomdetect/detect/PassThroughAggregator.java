@@ -34,7 +34,7 @@ public class PassThroughAggregator implements Aggregator {
     }
 
     /**
-     * Dummy detector-documents for detector-documents deserialization. We don't actually use it for anything since it has no detector-documents params.
+     * Dummy config for config deserialization. We don't actually use it for anything since it has no config params.
      */
     @Data
     @NoArgsConstructor
