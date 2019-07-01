@@ -16,7 +16,6 @@
 package com.expedia.adaptivealerting.anomdetect.source.factory;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
-import com.expedia.adaptivealerting.anomdetect.detect.DetectorTrainer;
 import com.expedia.adaptivealerting.anomdetect.detect.algo.ForecastingDetector;
 import com.expedia.adaptivealerting.anomdetect.forecast.algo.ExponentialWelfordIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.algo.HoltWintersPointForecaster;
@@ -38,9 +37,9 @@ public class LegacyHoltWintersFactory implements DetectorFactory<ForecastingDete
     @Override
     public ForecastingDetector buildDetector() {
         val uuid = document.getUuid();
-        val type = AnomalyType.valueOf(document.getType());
 
         val config = document.getConfig();
+        val type = AnomalyType.valueOf((String) config.get("type"));
         val paramsMap = config.get("params");
         val legacyParams = objectMapper.convertValue(paramsMap, LegacyHoltWintersParams.class);
         val holtWintersParams = legacyParams.toHoltWintersParams();
@@ -50,10 +49,5 @@ public class LegacyHoltWintersFactory implements DetectorFactory<ForecastingDete
         val welford = new ExponentialWelfordIntervalForecaster(welfordParams);
 
         return new ForecastingDetector(uuid, holtWinters, welford, type);
-    }
-
-    @Override
-    public DetectorTrainer buildTrainer() {
-        throw new UnsupportedOperationException("Not yet implemented");
     }
 }

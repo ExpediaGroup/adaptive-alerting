@@ -3,20 +3,21 @@
   "type": "holtwinters-detector",
   "enabled": true,
   "detectorConfig": {
+    "type": "RIGHT_TAILED",
     "hyperparams": {},
     "params": {
-      "alpha": 0.15,
-      "beta": 0.15,
-      "gamma": 0.15,
       "frequency": 2016,
-      "weakSigmas": 3,
-      "strongSigmas": 4,
+      "alpha": 0.15,
+      "beta": 0.10,
+      "gamma": 0.20,
       "warmUpPeriod": 0,
       "seasonalityType": "MULTIPLICATIVE",
+      "initTrainingMethod": "NONE",
       "initBaseEstimate": null,
       "initLevelEstimate": null,
-      "initTrainingMethod": "NONE",
-      "initSeasonalEstimates": []
+      "initSeasonalEstimates": [],
+      "weakSigmas": 3,
+      "strongSigmas": 4
     }
   },
   "createdBy": "wwheeler",

@@ -22,8 +22,6 @@ import com.expedia.adaptivealerting.anomdetect.source.factory.IndividualsFactory
 import com.expedia.adaptivealerting.anomdetect.source.factory.LegacyEwmaFactory;
 import com.expedia.adaptivealerting.anomdetect.source.factory.LegacyHoltWintersFactory;
 import com.expedia.adaptivealerting.anomdetect.source.factory.LegacyPewmaFactory;
-import com.expedia.adaptivealerting.anomdetect.source.factory.LegacyRcfFactory;
-import lombok.experimental.UtilityClass;
 import lombok.val;
 
 import java.util.HashMap;
@@ -31,13 +29,10 @@ import java.util.Map;
 
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
-// TODO Consider making this a singleton so we can mock it.
-//  Both the DefaultDetectorSource and the Model Service use it.
-@UtilityClass
 public class DetectorRegistry {
-    private static final Map<String, DetectorFactoryBuilder> builders = new HashMap<>();
+    private final Map<String, DetectorFactoryBuilder> builders = new HashMap<>();
 
-    static {
+    public DetectorRegistry() {
         builders.put("constant-detector", document -> new ConstantThresholdFactory(document));
         builders.put("cusum-detector", document -> new CusumFactory(document));
         builders.put("edmx-detector", document -> new EdmxFactory(document));
@@ -47,10 +42,9 @@ public class DetectorRegistry {
         builders.put("ewma-detector", document -> new LegacyEwmaFactory(document));
         builders.put("holtwinters-detector", document -> new LegacyHoltWintersFactory(document));
         builders.put("pewma-detector", document -> new LegacyPewmaFactory(document));
-        builders.put("rcf-detector", document -> new LegacyRcfFactory(document));
     }
 
-    public static DetectorFactory getDetectorFactory(DetectorDocument document) {
+    public DetectorFactory getDetectorFactory(DetectorDocument document) {
         notNull(document, "document can't be null");
         val type = document.getType();
         val builder = builders.get(type);

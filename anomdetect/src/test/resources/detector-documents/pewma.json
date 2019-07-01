@@ -3,11 +3,15 @@
   "type": "pewma-detector",
   "enabled": true,
   "detectorConfig": {
+    "type": "RIGHT_TAILED",
     "hyperparams": {},
     "params": {
       "alpha": 0.2,
-      "weakSigmas": 9,
-      "strongSigmas": 11
+      "beta": 0.18,
+      "initMeanEstimate": 0.44,
+      "warmUpPeriod": 12,
+      "weakSigmas": 4.5,
+      "strongSigmas": 5
     }
   },
   "createdBy": null,

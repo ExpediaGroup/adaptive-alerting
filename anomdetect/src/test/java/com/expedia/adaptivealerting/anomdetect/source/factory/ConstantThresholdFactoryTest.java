@@ -19,7 +19,6 @@ import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
 import com.expedia.adaptivealerting.anomdetect.detect.algo.ConstantThresholdDetector;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -43,9 +42,9 @@ public class ConstantThresholdFactoryTest extends AbstractDetectorFactoryTest {
         val thresholds = params.getThresholds();
 
         assertNotNull(detector);
-        assertEquals("e2e290a0-d1c1-471e-9d72-79d43282cfbd", detector.getUuid().toString());
         assertEquals(ConstantThresholdDetector.class, detector.getClass());
-        Assert.assertEquals(AnomalyType.RIGHT_TAILED, params.getType());
+        assertEquals("e2e290a0-d1c1-471e-9d72-79d43282cfbd", detector.getUuid().toString());
+        assertEquals(AnomalyType.RIGHT_TAILED, params.getType());
         assertEquals(16666.0, thresholds.getUpperStrong(), TOLERANCE);
         assertEquals(2161.0, thresholds.getUpperWeak(), TOLERANCE);
     }

@@ -16,12 +16,11 @@
 package com.expedia.adaptivealerting.anomdetect.source;
 
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
-import com.expedia.adaptivealerting.anomdetect.detect.DetectorTrainer;
 
 public interface DetectorFactory<T extends Detector> {
 
     T buildDetector();
 
-    // TODO Genericize this. [WLW]
-    DetectorTrainer buildTrainer();
+    // TODO Implement and genericize. [WLW]
+//    DetectorTrainer buildTrainer();
 }

@@ -5,10 +5,10 @@
   "detectorConfig": {
     "hyperparams": {},
     "params": {
-      "initValue": 10.0,
       "strongSigmas": 3,
-      "weakSigmas": 4,
-      "initMeanEstimate": 30.0
+      "initValue": 10.0,
+      "initMeanEstimate": 30.0,
+      "warmUpPeriod": 30
     }
   },
   "createdBy": "willie",

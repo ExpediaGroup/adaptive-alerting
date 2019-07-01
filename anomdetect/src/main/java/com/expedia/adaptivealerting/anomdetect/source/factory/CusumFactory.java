@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.source.factory;
 
-import com.expedia.adaptivealerting.anomdetect.detect.DetectorTrainer;
 import com.expedia.adaptivealerting.anomdetect.detect.algo.CusumDetector;
 import com.expedia.adaptivealerting.anomdetect.detect.algo.CusumParams;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
@@ -37,10 +36,5 @@ public class CusumFactory implements DetectorFactory<CusumDetector> {
         val paramsMap = document.getConfig().get("params");
         val params = objectMapper.convertValue(paramsMap, CusumParams.class);
         return new CusumDetector(document.getUuid(), params);
-    }
-
-    @Override
-    public DetectorTrainer buildTrainer() {
-        throw new UnsupportedOperationException("Not yet implemented");
     }
 }

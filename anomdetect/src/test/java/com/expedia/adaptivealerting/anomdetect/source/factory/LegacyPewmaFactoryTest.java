@@ -15,7 +15,36 @@
  */
 package com.expedia.adaptivealerting.anomdetect.source.factory;
 
-public class LegacyPewmaFactoryTest {
+import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
+import com.expedia.adaptivealerting.anomdetect.detect.algo.ForecastingDetector;
+import com.expedia.adaptivealerting.anomdetect.forecast.algo.ExponentialWelfordIntervalForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.algo.PewmaPointForecaster;
+import lombok.val;
+import org.junit.Test;
 
-    // TODO
+import static org.junit.Assert.assertEquals;
+
+public class LegacyPewmaFactoryTest extends AbstractDetectorFactoryTest {
+    private static final double TOLERANCE = 0.001;
+
+    @Test
+    public void testBuildDetector() {
+        val document = readDocument("pewma");
+        val factoryUnderTest = new LegacyPewmaFactory(document);
+        val detector = factoryUnderTest.buildDetector();
+        val pewma = (PewmaPointForecaster) detector.getPointForecaster();
+        val pewmaParams = pewma.getParams();
+        val welford = (ExponentialWelfordIntervalForecaster) detector.getIntervalForecaster();
+        val welfordParams = welford.getParams();
+
+        assertEquals(ForecastingDetector.class, detector.getClass());
+        assertEquals("6ec81aa2-2cdc-415e-b4f3-c1beb223ae60", detector.getUuid().toString());
+        assertEquals(AnomalyType.RIGHT_TAILED, detector.getAnomalyType());
+        assertEquals(0.2, pewmaParams.getAlpha(), TOLERANCE);
+        assertEquals(0.18, pewmaParams.getBeta(), TOLERANCE);
+        assertEquals(0.44, pewmaParams.getInitMeanEstimate(), TOLERANCE);
+        assertEquals(12, pewmaParams.getWarmUpPeriod());
+        assertEquals(4.5, welfordParams.getWeakSigmas(), TOLERANCE);
+        assertEquals(5, welfordParams.getStrongSigmas(), TOLERANCE);
+    }
 }

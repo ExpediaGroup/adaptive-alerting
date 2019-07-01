@@ -15,8 +15,9 @@
  */
 package com.expedia.adaptivealerting.anomdetect.source;
 
-import com.expedia.adaptivealerting.anomdetect.mapper.Detector;
+import com.expedia.adaptivealerting.anomdetect.detect.Detector;
 import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMapping;
+import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMatchResponse;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.Before;
@@ -25,19 +26,22 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @Slf4j
 public final class DefaultDetectorSourceTest {
-    private static final UUID DETECTOR_UUID_EWMA = UUID.randomUUID();
+    private static final UUID DETECTOR_UUID = UUID.randomUUID();
     private static final UUID DETECTOR_UUID_MISSING_DETECTOR = UUID.randomUUID();
     private static final UUID DETECTOR_UUID_EXCEPTION = UUID.randomUUID();
 
@@ -46,25 +50,40 @@ public final class DefaultDetectorSourceTest {
     @Mock
     private DetectorClient detectorClient;
 
+    @Mock
+    private DetectorRegistry detectorRegistry;
+
+    @Mock
+    private DetectorFactory detectorFactory;
+
+    private List<Map<String, String>> metricTags;
+    private DetectorMatchResponse detectorMatchResponse;
     private DetectorDocument[] updatedDetectorDocuments;
-    private DetectorDocument detectorDocument_ewma;
     private DetectorMapping detectorMapping;
+
+    @Mock
+    private DetectorDocument detectorDocument;
+
+    @Mock
+    private Detector detector;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         initTestObjects();
         initDependencies();
-        this.sourceUnderTest = new DefaultDetectorSource(detectorClient);
+        this.sourceUnderTest = new DefaultDetectorSource(detectorClient, detectorRegistry);
     }
 
     @Test
-    public void testFindUpdatedDetectorUuids() {
-        val results = sourceUnderTest.findUpdatedDetectors(1);
-        assertEquals(1, results.size());
+    public void testFindDetectorMappings() {
+        val result = sourceUnderTest.findDetectorMappings(metricTags);
+        assertSame(detectorMatchResponse, result);
+    }
 
-        val result = results.get(0);
-        assertEquals(DETECTOR_UUID_EWMA, result);
+    @Test(expected = IllegalArgumentException.class)
+    public void testFindDetectorMappings_nullTags() {
+        sourceUnderTest.findDetectorMappings(null);
     }
 
     @Test
@@ -78,13 +97,17 @@ public final class DefaultDetectorSourceTest {
         sourceUnderTest.findUpdatedDetectorMappings(-1);
     }
 
-    // TODO EWMA type is a legacy type, and I'm not yet supporting it in the detector source.
-//    @Test
-//    public void testFindDetector_ewma() {
-//        val result = sourceUnderTest.findDetector(DETECTOR_UUID_EWMA);
-//        assertNotNull(result);
-//        assertEquals(DETECTOR_UUID_EWMA, result.getUuid());
-//    }
+    @Test
+    public void testFindUpdatedDetectors() {
+        val results = sourceUnderTest.findUpdatedDetectors(1);
+        assertEquals(1, results.size());
+    }
+
+    @Test
+    public void testFindDetector() {
+        val result = sourceUnderTest.findDetector(DETECTOR_UUID);
+        assertNotNull(result);
+    }
 
     @Test(expected = IllegalArgumentException.class)
     public void testFindDetector_nullMeta() {
@@ -102,57 +125,43 @@ public final class DefaultDetectorSourceTest {
     }
 
     private void initTestObjects() {
-        initTestObjects_findDetectors();
-        initTestObjects_findLatestModel();
+        this.metricTags = new ArrayList<>();
+        this.detectorMatchResponse = new DetectorMatchResponse();
+        initTestObjects_findDetector();
+        initTestObjects_findUpdatedDetectors();
     }
 
-    private void initTestObjects_findDetectors() {
-        val doc = new DetectorDocument()
-                .setType("ewma-detector")
-                .setUuid(DETECTOR_UUID_EWMA)
-                .setEnabled(true)
-                .setConfig(new HashMap<>())
-                .setCreatedBy("kashah")
-                .setDateCreated(new Date())
-                .setDateUpdated(new Date());
-        this.updatedDetectorDocuments = new DetectorDocument[1];
-        updatedDetectorDocuments[0] = doc;
+    private void initTestObjects_findDetector() {
+        when(detectorDocument.getType()).thenReturn("some-detector-type");
+    }
+
+    private void initTestObjects_findUpdatedDetectors() {
         this.detectorMapping = new DetectorMapping()
-                .setDetector(new Detector(
+                .setDetector(new com.expedia.adaptivealerting.anomdetect.mapper.Detector(
                         UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689")))
                 .setEnabled(false);
-    }
 
-    private void initTestObjects_findLatestModel() {
-        val ewmaParams = new HashMap<String, Object>();
-        ewmaParams.put("alpha", 0.2);
-        ewmaParams.put("weakSigmas", 2.0);
-        ewmaParams.put("strongSigmas", 4.0);
-
-        Map<String, Object> detectorParams = new HashMap<>();
-        detectorParams.put("params", ewmaParams);
-
-        this.detectorDocument_ewma = new DetectorDocument();
-        detectorDocument_ewma.setType("ewma-detector");
-        detectorDocument_ewma.setConfig(detectorParams);
-
-//        this.detector = new ForecastingOutlierDetector(
-//                DETECTOR_UUID_EWMA,
-//                new EwmaPointForecaster(),
-//                new ExponentialWelfordIntervalForecaster(),
-//                AnomalyType.TWO_TAILED);
+        this.updatedDetectorDocuments = new DetectorDocument[1];
+        updatedDetectorDocuments[0] = detectorDocument;
     }
 
     private void initDependencies() {
+        when(detectorClient.findMatchingDetectorMappings(any(List.class)))
+                .thenReturn(detectorMatchResponse);
         when(detectorClient.findUpdatedDetectorDocuments(1))
                 .thenReturn(Arrays.asList(updatedDetectorDocuments));
-        when(detectorClient.findDetectorDocument(DETECTOR_UUID_EWMA))
-                .thenReturn(detectorDocument_ewma);
+        when(detectorClient.findDetectorDocument(DETECTOR_UUID))
+                .thenReturn(detectorDocument);
         when(detectorClient.findDetectorDocument(DETECTOR_UUID_MISSING_DETECTOR))
-                .thenThrow(new DetectorException("No models found"));
+                .thenThrow(new DetectorException("No detectors found"));
         when(detectorClient.findDetectorDocument(DETECTOR_UUID_EXCEPTION))
                 .thenThrow(new DetectorException("Error finding latest model", new IOException()));
         when(detectorClient.findUpdatedDetectorMappings(1))
                 .thenReturn(Collections.singletonList(this.detectorMapping));
+
+        when(detectorRegistry.getDetectorFactory(any(DetectorDocument.class)))
+                .thenReturn(detectorFactory);
+
+        when(detectorFactory.buildDetector()).thenReturn(detector);
     }
 }

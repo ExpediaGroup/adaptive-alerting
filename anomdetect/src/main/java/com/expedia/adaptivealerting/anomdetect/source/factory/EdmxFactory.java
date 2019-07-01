@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.source.factory;
 
-import com.expedia.adaptivealerting.anomdetect.detect.DetectorTrainer;
 import com.expedia.adaptivealerting.anomdetect.detect.algo.EdmxDetector;
 import com.expedia.adaptivealerting.anomdetect.detect.algo.EdmxHyperparams;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
@@ -39,10 +38,5 @@ public class EdmxFactory implements DetectorFactory<EdmxDetector> {
         val hyperparamsMap = document.getConfig().get("hyperparams");
         val hyperparams = objectMapper.convertValue(hyperparamsMap, EdmxHyperparams.class);
         return new EdmxDetector(document.getUuid(), hyperparams);
-    }
-
-    @Override
-    public DetectorTrainer buildTrainer() {
-        throw new UnsupportedOperationException("Not yet implemented");
     }
 }

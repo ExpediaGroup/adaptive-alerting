@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.source.factory;
 
-import com.expedia.adaptivealerting.anomdetect.detect.DetectorTrainer;
 import com.expedia.adaptivealerting.anomdetect.detect.algo.ConstantThresholdDetector;
 import com.expedia.adaptivealerting.anomdetect.detect.algo.ConstantThresholdParams;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
@@ -37,10 +36,5 @@ public class ConstantThresholdFactory implements DetectorFactory<ConstantThresho
         val paramsMap = document.getConfig().get("params");
         val params = objectMapper.convertValue(paramsMap, ConstantThresholdParams.class);
         return new ConstantThresholdDetector(document.getUuid(), params);
-    }
-
-    @Override
-    public DetectorTrainer buildTrainer() {
-        throw new UnsupportedOperationException("Not yet implemented");
     }
 }

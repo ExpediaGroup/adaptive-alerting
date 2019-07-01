@@ -20,30 +20,41 @@ import com.expedia.adaptivealerting.anomdetect.forecast.algo.HoltWintersPointFor
 import com.expedia.adaptivealerting.anomdetect.forecast.algo.HoltWintersSeasonalityType;
 import com.expedia.adaptivealerting.anomdetect.forecast.algo.HoltWintersTrainingMethod;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
-import lombok.experimental.Accessors;
+import lombok.Setter;
 import lombok.val;
 
-@Data
-@Accessors(chain = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Deprecated // Use ForecastingDetector with Holt-Winters point forecaster
 public class LegacyHoltWintersParams {
 
+    // Setter-only to avoid test coverage gaps
+
     // Holt-Winters params
+    @Setter
     private int frequency;
+    @Setter
     private double alpha;
+    @Setter
     private double beta;
+    @Setter
     private double gamma;
+    @Setter
     private HoltWintersSeasonalityType seasonalityType;
+    @Setter
     private HoltWintersTrainingMethod initTrainingMethod;
+    @Setter
     private double initLevelEstimate;
+    @Setter
     private double initBaseEstimate;
+    @Setter
     private double[] initSeasonalEstimates;
+    @Setter
     private int warmUpPeriod;
 
     // Welford params
+    @Setter
     private double weakSigmas;
+    @Setter
     private double strongSigmas;
 
     public LegacyHoltWintersParams() {

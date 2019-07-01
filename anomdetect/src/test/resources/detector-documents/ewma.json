@@ -3,14 +3,14 @@
   "type": "ewma-detector",
   "enabled": false,
   "detectorConfig": {
+    "type": "RIGHT_TAILED",
     "hyperparams": {},
     "params": {
       "alpha": 0.20,
       "initMeanEstimate": 1.4,
       "weakSigmas": 3,
       "strongSigmas": 4
-    },
-    "type": "RIGHT_TAILED"
+    }
   },
   "createdBy": "bibin",
   "lastUpdateTimestamp": "2019-04-30 11:04:40"

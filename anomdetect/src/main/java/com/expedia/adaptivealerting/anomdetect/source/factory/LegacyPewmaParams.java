@@ -18,24 +18,29 @@ package com.expedia.adaptivealerting.anomdetect.source.factory;
 import com.expedia.adaptivealerting.anomdetect.forecast.algo.ExponentialWelfordIntervalForecasterParams;
 import com.expedia.adaptivealerting.anomdetect.forecast.algo.PewmaPointForecasterParams;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
-import lombok.experimental.Accessors;
+import lombok.Setter;
 import lombok.val;
 
-@Data
-@Accessors(chain = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Deprecated // Use ForecastingDetector with EWMA point forecaster
 public class LegacyPewmaParams {
 
+    // Setter-only to avoid test coverage gaps
+
     // PEWMA params
+    @Setter
     private double alpha;
+    @Setter
     private double beta;
+    @Setter
     private double initMeanEstimate;
+    @Setter
     private int warmUpPeriod;
 
     // Welford params
+    @Setter
     private double weakSigmas;
+    @Setter
     private double strongSigmas;
 
     public LegacyPewmaParams() {

@@ -21,6 +21,8 @@ import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMatchResponse;
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.http.client.fluent.Content;
@@ -34,11 +36,6 @@ import java.util.UUID;
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isTrue;
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
-// FIXME Currently this class uses the URI template in an inconsistent way. In some methods it fills in a detector UUID
-//  whereas in others it fills in a metric ID. The only reason it currently works is that no existing client uses both
-//  types of method. However if some client used both then the connector would break. We probably want to construct the
-//  URI from a scheme/host/port. (Ideal would be hypermedia, but might be overkill for this.) [WLW]
-
 /**
  * <p>
  * Connector for interacting with the Model Service. This allows the anomaly detection module to load detector documents
@@ -50,28 +47,24 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
  * location.
  * </p>
  */
+@RequiredArgsConstructor
 @Slf4j
 public class DetectorClient {
-    public static final String API_PATH_MODEL_BY_DETECTOR_UUID = "/api/v2/detectors/findByUuid?uuid=%s";
-    public static final String API_PATH_DETECTOR_UPDATES = "/api/v2/detectors/getLastUpdatedDetectors?interval=%d";
+    static final String FIND_DOCUMENT_PATH = "/api/v2/detectors/findByUuid?uuid=%s";
+    static final String FIND_UPDATED_DOCUMENTS_PATH = "/api/v2/detectors/getLastUpdatedDetectors?interval=%d";
 
     // TODO Shouldn't these also include the /api/v2 prefix? [WLW]
-    public static final String API_PATH_DETECTOR_MAPPING_UPDATES = "/api/detectorMappings/lastUpdated?timeInSecs=%d";
-    public static final String API_PATH_MATCHING_DETECTOR_BY_TAGS = "/api/detectorMappings/findMatchingByTags";
+    static final String FIND_MAPPINGS_BY_TAGS_PATH = "/api/detectorMappings/findMatchingByTags";
+    static final String FIND_UPDATED_MAPPINGS_PATH = "/api/detectorMappings/lastUpdated?timeInSecs=%d";
 
+    @NonNull
     private final HttpClientWrapper httpClient;
+
+    @NonNull
     private final String baseUri;
+
+    @NonNull
     private final ObjectMapper objectMapper;
-
-    public DetectorClient(HttpClientWrapper httpClient, String baseUri, ObjectMapper objectMapper) {
-        notNull(httpClient, "httpClient can't be null");
-        notNull(baseUri, "baseUri can't be null");
-        notNull(objectMapper, "objectMapper can't be null");
-
-        this.httpClient = httpClient;
-        this.baseUri = baseUri;
-        this.objectMapper = objectMapper;
-    }
 
     /**
      * Finds the detector document for the given detector UUID.
@@ -85,7 +78,7 @@ public class DetectorClient {
 
         // http://modelservice/api/v2/detectors/findByUuid?uuid=%s
         // http://modelservice/api/v2/detectors/findByUuid?uuid=85f395a2-e276-7cfd-34bc-cb850ae3bc2e
-        val uri = String.format(baseUri + API_PATH_MODEL_BY_DETECTOR_UUID, uuid);
+        val uri = String.format(baseUri + FIND_DOCUMENT_PATH, uuid);
 
         Content content;
         try {
@@ -113,19 +106,19 @@ public class DetectorClient {
     }
 
     /**
-     * @param sinceSeconds the time period in seconds
+     * @param timeInSecs the time period in seconds
      * @return the list of detectorMappings that were modified in last since minutes
      */
-    public List<DetectorDocument> findUpdatedDetectorDocuments(long sinceSeconds) {
-        isTrue(sinceSeconds > 0, "sinceSeconds must be strictly positive");
+    public List<DetectorDocument> findUpdatedDetectorDocuments(long timeInSecs) {
+        isTrue(timeInSecs > 0, "sinceSeconds must be strictly positive");
 
-        val uri = String.format(baseUri + API_PATH_DETECTOR_UPDATES, sinceSeconds);
+        val uri = String.format(baseUri + FIND_UPDATED_DOCUMENTS_PATH, timeInSecs);
         Content content;
         try {
             content = httpClient.get(uri);
         } catch (IOException e) {
             val message = "IOException while getting last updated detectors" +
-                    ": sinceSeconds=" + sinceSeconds +
+                    ": sinceSeconds=" + timeInSecs +
                     ", httpMethod=GET" +
                     ", uri=" + uri;
             throw new DetectorException(message, e);
@@ -134,11 +127,10 @@ public class DetectorClient {
         try {
             return Arrays.asList(objectMapper.readValue(content.asBytes(), DetectorDocument[].class));
         } catch (IOException e) {
-            val message = "IOException while reading detectors: sinceSeconds=" + sinceSeconds;
+            val message = "IOException while reading detectors: sinceSeconds=" + timeInSecs;
             throw new DetectorException(message, e);
         }
     }
-
 
     /**
      * Find matching detectors for a list of metrics, represented by a set of tags
@@ -149,7 +141,7 @@ public class DetectorClient {
     public DetectorMatchResponse findMatchingDetectorMappings(List<Map<String, String>> tagsList) {
         isTrue(tagsList.size() > 0, "tagsList must not be empty");
 
-        val uri = baseUri + API_PATH_MATCHING_DETECTOR_BY_TAGS;
+        val uri = baseUri + FIND_MAPPINGS_BY_TAGS_PATH;
         Content content;
         try {
             String body = objectMapper.writeValueAsString(tagsList);
@@ -167,7 +159,6 @@ public class DetectorClient {
             val message = "IOException while reading detectorMatchResponse: tags=" + tagsList;
             throw new DetectorException(message, e);
         }
-
     }
 
     /**
@@ -177,29 +168,33 @@ public class DetectorClient {
      * @return the list of detectormappings that were modified in last since minutes
      */
     public List<DetectorMapping> findUpdatedDetectorMappings(long timeInSecs) {
-        val uri = String.format(baseUri + API_PATH_DETECTOR_MAPPING_UPDATES, timeInSecs);
         Content content;
+        List<DetectorMapping> result;
+
+        val uri = String.format(baseUri + FIND_UPDATED_MAPPINGS_PATH, timeInSecs);
         try {
             content = httpClient.get(uri);
         } catch (IOException e) {
-            val message = "IOException while getting last updated detectors mappings" +
+            val message = "IOException while getting updated detectors mappings" +
                     ": timeInSecs=" + timeInSecs +
                     ", httpMethod=GET" +
                     ", uri=" + uri;
             throw new DetectorException(message, e);
         }
 
+        val typeRef = new TypeReference<List<DetectorMapping>>() {};
         try {
-            List<DetectorMapping> result = objectMapper.readValue(
-                    content.asBytes(),
-                    new TypeReference<List<DetectorMapping>>() {});
-            if (result == null) {
-                throw new IOException("Updated detector mappings are null");
-            }
-            return result;
+            result = objectMapper.readValue(content.asBytes(), typeRef);
         } catch (IOException e) {
-            val message = "IOException while reading updated detectors mappings: timeInSecs=" + timeInSecs;
+            val message = "IOException while reading updated detectors mappings" +
+                    ": timeInSecs=" + timeInSecs;
             throw new DetectorException(message, e);
         }
+
+        if (result == null) {
+            throw new DetectorException("Updated detector mappings are null");
+        }
+
+        return result;
     }
 }

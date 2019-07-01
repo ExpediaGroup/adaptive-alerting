@@ -16,7 +16,6 @@
 package com.expedia.adaptivealerting.anomdetect.source.factory;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
-import com.expedia.adaptivealerting.anomdetect.detect.DetectorTrainer;
 import com.expedia.adaptivealerting.anomdetect.detect.algo.ForecastingDetector;
 import com.expedia.adaptivealerting.anomdetect.forecast.algo.EwmaPointForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.algo.ExponentialWelfordIntervalForecaster;
@@ -25,10 +24,12 @@ import com.expedia.adaptivealerting.anomdetect.source.DetectorFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 @RequiredArgsConstructor
 @Deprecated // Use ForecastingDetector with EWMA point forecaster
+@Slf4j
 public class LegacyEwmaFactory implements DetectorFactory<ForecastingDetector> {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -40,20 +41,16 @@ public class LegacyEwmaFactory implements DetectorFactory<ForecastingDetector> {
         val uuid = document.getUuid();
 
         val config = document.getConfig();
+        log.info("config={}", config);
+        val type = AnomalyType.valueOf((String) config.get("type"));
         val paramsMap = config.get("params");
         val legacyParams = objectMapper.convertValue(paramsMap, LegacyEwmaParams.class);
         val ewmaParams = legacyParams.toEwmaParams();
         val welfordParams = legacyParams.toWelfordParams();
-        val type = AnomalyType.valueOf((String) config.get("type"));
 
         val ewma = new EwmaPointForecaster(ewmaParams);
         val welford = new ExponentialWelfordIntervalForecaster(welfordParams);
 
         return new ForecastingDetector(uuid, ewma, welford, type);
-    }
-
-    @Override
-    public DetectorTrainer buildTrainer() {
-        throw new UnsupportedOperationException("Not yet implemented");
     }
 }

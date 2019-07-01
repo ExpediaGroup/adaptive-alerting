@@ -15,37 +15,29 @@
  */
 package com.expedia.adaptivealerting.anomdetect.source.factory;
 
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
-import com.expedia.adaptivealerting.anomdetect.detect.algo.CusumDetector;
+import com.expedia.adaptivealerting.anomdetect.detect.algo.IndividualsDetector;
 import lombok.val;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class CusumFactoryTest extends AbstractDetectorFactoryTest {
+public class IndividualsFactoryTest extends AbstractDetectorFactoryTest {
     private static final double TOLERANCE = 0.001;
-
-    @Test(expected = RuntimeException.class)
-    public void testInit_nullDocument() {
-        new CusumFactory(null);
-    }
 
     @Test
     public void testBuildDetector() {
-        val document = readDocument("cusum");
-        val factoryUnderTest = new CusumFactory(document);
+        val document = readDocument("individuals");
+        val factoryUnderTest = new IndividualsFactory(document);
         val detector = factoryUnderTest.buildDetector();
         val params = detector.getParams();
 
         assertNotNull(detector);
-        assertEquals(CusumDetector.class, detector.getClass());
-        assertEquals("3ec81aa2-2cdc-415e-b4f3-c1beb223ae60", detector.getUuid().toString());
-        assertEquals(120.0, params.getTargetValue(), TOLERANCE);
-        assertEquals(0.8, params.getSlackParam(), TOLERANCE);
-        assertEquals(110.0, params.getInitMeanEstimate(), TOLERANCE);
-        assertEquals(AnomalyType.RIGHT_TAILED, params.getType());
-        assertEquals(2.5, params.getWeakSigmas(), TOLERANCE);
-        assertEquals(3.5, params.getStrongSigmas(), TOLERANCE);
+        assertEquals(IndividualsDetector.class, detector.getClass());
+        assertEquals("a6a4d8c4-4102-51fc-a1c7-38aa6f066cca", detector.getUuid().toString());
+        assertEquals(3.0, params.getStrongSigmas(), TOLERANCE);
+        assertEquals(10.0, params.getInitValue(), TOLERANCE);
+        assertEquals(30.0, params.getInitMeanEstimate(), TOLERANCE);
+        assertEquals(30, params.getWarmUpPeriod());
     }
 }

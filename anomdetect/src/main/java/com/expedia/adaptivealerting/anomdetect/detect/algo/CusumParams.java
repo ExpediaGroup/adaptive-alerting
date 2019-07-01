@@ -29,24 +29,9 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 public class CusumParams {
 
     /**
-     * Detector type: left-, right- or two-tailed.
-     */
-    private AnomalyType type;
-
-    /**
      * Target value (i.e., the set point).
      */
     private double targetValue = 0.0;
-
-    /**
-     * Weak threshold sigmas.
-     */
-    private double weakSigmas = 3.0;
-
-    /**
-     * Strong threshold sigmas.
-     */
-    private double strongSigmas = 4.0;
 
     /**
      * Slack param to calculate slack value k where k = slack_param * stdev.
@@ -56,7 +41,26 @@ public class CusumParams {
     /**
      * Initial mean estimate.
      */
+    // FIXME This should be a hyperparam
     private double initMeanEstimate = 0.0;
+
+    /**
+     * Weak threshold sigmas.
+     */
+    // FIXME This should be a hyperparam
+    private double weakSigmas = 3.0;
+
+    /**
+     * Strong threshold sigmas.
+     */
+    // FIXME This should be a hyperparam
+    private double strongSigmas = 4.0;
+
+    /**
+     * Detector type: left-, right- or two-tailed.
+     */
+    // FIXME This should be a detector config
+    private AnomalyType type;
 
     /**
      * Minimum number of data points required before this anomaly detector is available for use.

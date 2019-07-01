@@ -22,9 +22,9 @@ import com.expedia.adaptivealerting.anomdetect.source.factory.IndividualsFactory
 import com.expedia.adaptivealerting.anomdetect.source.factory.LegacyEwmaFactory;
 import com.expedia.adaptivealerting.anomdetect.source.factory.LegacyHoltWintersFactory;
 import com.expedia.adaptivealerting.anomdetect.source.factory.LegacyPewmaFactory;
-import com.expedia.adaptivealerting.anomdetect.source.factory.LegacyRcfFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.val;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -32,7 +32,13 @@ import java.io.IOException;
 import static org.junit.Assert.assertEquals;
 
 public class DetectorRegistryTest {
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private DetectorRegistry registryUnderTest;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Before
+    public void setUp() {
+        this.registryUnderTest = new DetectorRegistry();
+    }
 
     @Test
     public void testGetDetectorFactory_constantThreshold() {
@@ -72,21 +78,15 @@ public class DetectorRegistryTest {
         testGetDetectorFactory("pewma", LegacyPewmaFactory.class);
     }
 
-    @Test
-    @Deprecated // underlying factory is deprecated
-    public void testGetDetectorFactory_legacyRcf() {
-        testGetDetectorFactory("rcf", LegacyRcfFactory.class);
-    }
-
     @Test(expected = RuntimeException.class)
     public void testGetDetectorFactory_illegalType() {
         val document = readDocument("invalid-type");
-        DetectorRegistry.getDetectorFactory(document);
+        registryUnderTest.getDetectorFactory(document);
     }
 
     private void testGetDetectorFactory(String documentName, Class factoryClass) {
         val document = readDocument(documentName);
-        val factory = DetectorRegistry.getDetectorFactory(document);
+        val factory = registryUnderTest.getDetectorFactory(document);
         assertEquals(factoryClass, factory.getClass());
     }
 

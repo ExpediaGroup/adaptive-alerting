@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.source.factory;
 
-import com.expedia.adaptivealerting.anomdetect.detect.DetectorTrainer;
 import com.expedia.adaptivealerting.anomdetect.detect.algo.IndividualsDetector;
 import com.expedia.adaptivealerting.anomdetect.detect.algo.IndividualsParams;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
@@ -37,10 +36,5 @@ public class IndividualsFactory implements DetectorFactory<IndividualsDetector> 
         val paramsMap = document.getConfig().get("params");
         val params = objectMapper.convertValue(paramsMap, IndividualsParams.class);
         return new IndividualsDetector(document.getUuid(), params);
-    }
-
-    @Override
-    public DetectorTrainer buildTrainer() {
-        throw new UnsupportedOperationException("Not yet implemented");
     }
 }

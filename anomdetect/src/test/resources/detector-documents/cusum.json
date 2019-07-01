@@ -4,8 +4,15 @@
   "enabled": true,
   "detectorConfig": {
     "hyperparams": {},
-    "params": {}
+    "params": {
+      "targetValue": 120.0,
+      "slackParam": 0.8,
+      "initMeanEstimate": 110.0,
+      "type": "RIGHT_TAILED",
+      "weakSigmas": 2.5,
+      "strongSigmas": 3.5
+    }
   },
-  "createdBy": null,
+  "createdBy": "wingbat",
   "lastUpdateTimestamp": "2019-03-14 10:18:35"
 }

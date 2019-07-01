@@ -15,6 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect.source.factory;
 
+import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
+import com.expedia.adaptivealerting.anomdetect.detect.algo.ForecastingDetector;
 import com.expedia.adaptivealerting.anomdetect.forecast.algo.EwmaPointForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.algo.ExponentialWelfordIntervalForecaster;
 import lombok.val;
@@ -35,7 +37,9 @@ public class LegacyEwmaFactoryTest extends AbstractDetectorFactoryTest {
         val welford = (ExponentialWelfordIntervalForecaster) detector.getIntervalForecaster();
         val welfordParams = welford.getParams();
 
+        assertEquals(ForecastingDetector.class, detector.getClass());
         assertEquals("3e047348-f837-f615-271c-dce6206f50d6", detector.getUuid().toString());
+        assertEquals(AnomalyType.RIGHT_TAILED, detector.getAnomalyType());
         assertEquals(0.20, ewmaParams.getAlpha(), TOLERANCE);
         assertEquals(1.4, ewmaParams.getInitMeanEstimate(), TOLERANCE);
         assertEquals(3.0, welfordParams.getWeakSigmas(), TOLERANCE);
