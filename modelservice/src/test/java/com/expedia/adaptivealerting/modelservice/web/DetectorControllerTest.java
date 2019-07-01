@@ -87,7 +87,8 @@ public class DetectorControllerTest {
     public void testCreateDetector() {
         doReturn("1").when(controller).createDetector(legalParamsDetector);
         Assert.assertEquals(controller.createDetector(legalParamsDetector), "1");
-        verify(controller, times(1)).createDetector(legalParamsDetector);
+        controller.createDetector(legalParamsDetector);
+        verify(controller, times(2)).createDetector(legalParamsDetector);
     }
 
     @Test
