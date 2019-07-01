@@ -1,48 +1,38 @@
 package com.expedia.adaptivealerting.modelservice.util;
 
+        import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector;
+        import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Expression;
+        import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Field;
+        import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Operand;
+        import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Operator;
+        import com.expedia.adaptivealerting.modelservice.dto.detectormapping.User;
+        import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
+        import lombok.val;
+        import org.junit.Before;
+        import org.junit.Test;
+        import org.mockito.MockitoAnnotations;
 
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Expression;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Field;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Operand;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Operator;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.User;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+        import java.util.ArrayList;
+        import java.util.List;
+        import java.util.UUID;
 
 
 public class RequestValidatorTest {
 
-    @Mock
-    private User user;
+    private com.expedia.adaptivealerting.modelservice.entity.Detector illegalParamsDetector;
+    private com.expedia.adaptivealerting.modelservice.entity.Detector legalParamsDetector;
+
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
+        initTestObjects();
     }
 
-    @Test
-    public void testValidateUser_successful() {
-        User user = new User("test-user");
-        RequestValidator.validateUser(user);
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void testValidateUser_idempty() throws IllegalArgumentException {
-        User user = new User("");
-        RequestValidator.validateUser(user);
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void testValidateUser_idcontainswhitespaces() throws IllegalArgumentException {
-        User user = new User("test user");
-        RequestValidator.validateUser(user);
+    private void initTestObjects() {
+        val mom = ObjectMother.instance();
+        illegalParamsDetector = mom.getIllegalParamsDetector();
+        legalParamsDetector = mom.getDetector();
     }
 
     @Test
@@ -72,10 +62,34 @@ public class RequestValidatorTest {
     }
 
     @Test
-    public void testValidateDetector_successful() {
+    public void testValidateMappingDetector_successful() {
         Detector detector = new Detector(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"));
-        RequestValidator.validateDetector(detector);
+        RequestValidator.validateMappingDetector(detector);
     }
+
+    @Test
+    public void testValidateDetector_successful() {
+        RequestValidator.validateDetector(legalParamsDetector);
+    }
+
+    @Test
+    public void testValidateUser_successful() {
+        User user = new User("test-user");
+        RequestValidator.validateUser(user);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testValidateUser_id_empty() throws IllegalArgumentException {
+        User user = new User("");
+        RequestValidator.validateUser(user);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testValidateUser_idContainsWhitespaces() throws IllegalArgumentException {
+        User user = new User("test user");
+        RequestValidator.validateUser(user);
+    }
+
 
     @Test(expected = RuntimeException.class)
     public void testValidateOperand_keyempty() {
@@ -113,4 +127,9 @@ public class RequestValidatorTest {
         RequestValidator.validateExpression(expression);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testValidateInvalidDetector_illegal_params() {
+        RequestValidator.validateDetector(illegalParamsDetector);
+    }
 }
+

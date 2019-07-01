@@ -17,8 +17,10 @@ package com.expedia.adaptivealerting.modelservice.web;
 
 import com.expedia.adaptivealerting.modelservice.entity.Detector;
 import com.expedia.adaptivealerting.modelservice.service.DetectorService;
+import com.expedia.adaptivealerting.modelservice.util.RequestValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -40,13 +43,15 @@ public class DetectorController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public String createDetector(@RequestBody Detector detector) {
+    public String createDetector(@Valid @RequestBody Detector detector) {
+        RequestValidator.validateDetector(detector);
         return detectorService.createDetector(detector);
     }
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public void updateDetector(@RequestParam String uuid, @RequestBody Detector detector) {
+        RequestValidator.validateDetector(detector);
         detectorService.updateDetector(uuid, detector);
     }
 
@@ -71,6 +76,8 @@ public class DetectorController {
     @PostMapping(path = "/toggleDetector", consumes = "application/json", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public void toggleDetector(@RequestParam String uuid, @RequestParam Boolean enabled) {
+        Assert.notNull(uuid, "uuid can't be null");
+        Assert.notNull(enabled, "enabled can't be null");
         detectorService.toggleDetector(uuid, enabled);
     }
 
