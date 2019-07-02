@@ -49,7 +49,7 @@ public class DetectorRegistry {
         val type = document.getType();
         val builder = builders.get(type);
         if (builder == null) {
-            throw new RuntimeException("Illegal detector type: " + type);
+            throw new DetectorException("Illegal detector type: " + type);
         }
         return builder.build(document);
     }

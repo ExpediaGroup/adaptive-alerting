@@ -78,7 +78,12 @@ public class DetectorRegistryTest {
         testGetDetectorFactory("pewma", LegacyPewmaFactory.class);
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetDetectorFactory_nullDocument() {
+        registryUnderTest.getDetectorFactory(null);
+    }
+
+    @Test(expected = DetectorException.class)
     public void testGetDetectorFactory_illegalType() {
         val document = readDocument("invalid-type");
         registryUnderTest.getDetectorFactory(document);
