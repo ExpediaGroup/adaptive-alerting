@@ -16,9 +16,9 @@
 package com.expedia.adaptivealerting.anomdetect.source.factory;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
-import com.expedia.adaptivealerting.anomdetect.detect.algo.ForecastingDetector;
-import com.expedia.adaptivealerting.anomdetect.forecast.algo.ExponentialWelfordIntervalForecaster;
-import com.expedia.adaptivealerting.anomdetect.forecast.algo.PewmaPointForecaster;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.ForecastingDetector;
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.ExponentialWelfordIntervalForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.PewmaPointForecaster;
 import lombok.val;
 import org.junit.Test;
 

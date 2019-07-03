@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect.source.factory;
 
-import com.expedia.adaptivealerting.anomdetect.detect.algo.ConstantThresholdDetector;
-import com.expedia.adaptivealerting.anomdetect.detect.algo.ConstantThresholdParams;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.ConstantThresholdDetector;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.ConstantThresholdParams;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;

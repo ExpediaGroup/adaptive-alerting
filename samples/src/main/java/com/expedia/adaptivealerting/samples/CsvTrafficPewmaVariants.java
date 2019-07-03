@@ -16,12 +16,12 @@
 package com.expedia.adaptivealerting.samples;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
-import com.expedia.adaptivealerting.anomdetect.detect.algo.ForecastingDetector;
-import com.expedia.adaptivealerting.anomdetect.forecast.RmsePointForecastEvaluator;
-import com.expedia.adaptivealerting.anomdetect.forecast.algo.PewmaPointForecaster;
-import com.expedia.adaptivealerting.anomdetect.forecast.algo.PewmaPointForecasterParams;
-import com.expedia.adaptivealerting.anomdetect.forecast.algo.ExponentialWelfordIntervalForecaster;
-import com.expedia.adaptivealerting.anomdetect.forecast.algo.ExponentialWelfordIntervalForecasterParams;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.ForecastingDetector;
+import com.expedia.adaptivealerting.anomdetect.forecast.eval.algo.RmsePointForecastEvaluator;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.PewmaPointForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.PewmaPointForecasterParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.ExponentialWelfordIntervalForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.ExponentialWelfordIntervalForecasterParams;
 import com.expedia.adaptivealerting.anomdetect.util.MetricFrameLoader;
 import com.expedia.adaptivealerting.tools.pipeline.filter.DetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;

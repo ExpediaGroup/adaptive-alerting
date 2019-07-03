@@ -16,9 +16,9 @@
 package com.expedia.adaptivealerting.anomdetect.source.factory;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
-import com.expedia.adaptivealerting.anomdetect.detect.algo.ForecastingDetector;
-import com.expedia.adaptivealerting.anomdetect.forecast.algo.EwmaPointForecaster;
-import com.expedia.adaptivealerting.anomdetect.forecast.algo.ExponentialWelfordIntervalForecaster;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.ForecastingDetector;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.EwmaPointForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.ExponentialWelfordIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;

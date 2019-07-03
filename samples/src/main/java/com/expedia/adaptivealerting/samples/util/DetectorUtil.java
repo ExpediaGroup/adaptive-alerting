@@ -17,17 +17,17 @@ package com.expedia.adaptivealerting.samples.util;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
-import com.expedia.adaptivealerting.anomdetect.detect.algo.ForecastingDetector;
-import com.expedia.adaptivealerting.anomdetect.forecast.algo.HoltWintersSeasonalityType;
-import com.expedia.adaptivealerting.anomdetect.forecast.algo.EwmaPointForecaster;
-import com.expedia.adaptivealerting.anomdetect.forecast.algo.EwmaPointForecasterParams;
-import com.expedia.adaptivealerting.anomdetect.forecast.algo.HoltWintersPointForecaster;
-import com.expedia.adaptivealerting.anomdetect.forecast.algo.HoltWintersPointForecasterParams;
-import com.expedia.adaptivealerting.anomdetect.forecast.algo.HoltWintersTrainingMethod;
-import com.expedia.adaptivealerting.anomdetect.forecast.algo.PewmaPointForecaster;
-import com.expedia.adaptivealerting.anomdetect.forecast.algo.PewmaPointForecasterParams;
-import com.expedia.adaptivealerting.anomdetect.forecast.algo.ExponentialWelfordIntervalForecaster;
-import com.expedia.adaptivealerting.anomdetect.forecast.algo.ExponentialWelfordIntervalForecasterParams;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.ForecastingDetector;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.HoltWintersSeasonalityType;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.EwmaPointForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.EwmaPointForecasterParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.HoltWintersPointForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.HoltWintersPointForecasterParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.HoltWintersTrainingMethod;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.PewmaPointForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.PewmaPointForecasterParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.ExponentialWelfordIntervalForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.ExponentialWelfordIntervalForecasterParams;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 

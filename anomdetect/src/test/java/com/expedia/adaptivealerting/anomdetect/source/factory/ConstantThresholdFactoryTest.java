@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.source.factory;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
-import com.expedia.adaptivealerting.anomdetect.detect.algo.ConstantThresholdDetector;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.ConstantThresholdDetector;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.Test;

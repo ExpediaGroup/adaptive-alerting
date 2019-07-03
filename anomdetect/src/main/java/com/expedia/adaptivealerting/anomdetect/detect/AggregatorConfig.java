@@ -15,6 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detect;
 
+import com.expedia.adaptivealerting.anomdetect.aggregate.algo.MOfNAggregator;
+import com.expedia.adaptivealerting.anomdetect.aggregate.algo.PassThroughAggregator;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 

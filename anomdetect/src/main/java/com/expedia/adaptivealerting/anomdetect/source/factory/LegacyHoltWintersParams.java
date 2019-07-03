@@ -15,10 +15,10 @@
  */
 package com.expedia.adaptivealerting.anomdetect.source.factory;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.algo.ExponentialWelfordIntervalForecasterParams;
-import com.expedia.adaptivealerting.anomdetect.forecast.algo.HoltWintersPointForecasterParams;
-import com.expedia.adaptivealerting.anomdetect.forecast.algo.HoltWintersSeasonalityType;
-import com.expedia.adaptivealerting.anomdetect.forecast.algo.HoltWintersTrainingMethod;
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.ExponentialWelfordIntervalForecasterParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.HoltWintersPointForecasterParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.HoltWintersSeasonalityType;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.HoltWintersTrainingMethod;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Setter;
 import lombok.val;

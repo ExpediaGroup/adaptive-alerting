@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect.source.factory;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.algo.ExponentialWelfordIntervalForecasterParams;
-import com.expedia.adaptivealerting.anomdetect.forecast.algo.PewmaPointForecasterParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.ExponentialWelfordIntervalForecasterParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.PewmaPointForecasterParams;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Setter;
 import lombok.val;

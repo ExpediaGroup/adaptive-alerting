@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.source.factory;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
-import com.expedia.adaptivealerting.anomdetect.detect.algo.CusumDetector;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.CusumDetector;
 import lombok.val;
 import org.junit.Test;
 

@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.source.factory;
 
-import com.expedia.adaptivealerting.anomdetect.detect.algo.IndividualsDetector;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.IndividualsDetector;
 import lombok.val;
 import org.junit.Test;
 

@@ -17,8 +17,8 @@ package com.expedia.adaptivealerting.tools.pipeline.filter;
 
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
-import com.expedia.adaptivealerting.anomdetect.forecast.PointForecastEvaluation;
-import com.expedia.adaptivealerting.anomdetect.forecast.RmsePointForecastEvaluator;
+import com.expedia.adaptivealerting.anomdetect.forecast.eval.PointForecastEvaluation;
+import com.expedia.adaptivealerting.anomdetect.forecast.eval.algo.RmsePointForecastEvaluator;
 import com.expedia.adaptivealerting.tools.pipeline.util.ModelEvaluationSubscriber;
 import com.expedia.adaptivealerting.tools.util.TestObjectMother;
 import com.expedia.metrics.MetricData;

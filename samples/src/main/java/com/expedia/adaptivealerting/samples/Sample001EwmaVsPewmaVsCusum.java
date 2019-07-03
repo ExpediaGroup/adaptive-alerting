@@ -16,9 +16,9 @@
 package com.expedia.adaptivealerting.samples;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
-import com.expedia.adaptivealerting.anomdetect.detect.algo.CusumDetector;
-import com.expedia.adaptivealerting.anomdetect.detect.algo.CusumParams;
-import com.expedia.adaptivealerting.anomdetect.forecast.RmsePointForecastEvaluator;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.CusumDetector;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.CusumParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.eval.algo.RmsePointForecastEvaluator;
 import com.expedia.adaptivealerting.samples.util.DetectorUtil;
 import com.expedia.adaptivealerting.tools.pipeline.filter.DetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;

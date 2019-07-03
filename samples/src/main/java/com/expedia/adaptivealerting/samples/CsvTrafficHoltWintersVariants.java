@@ -16,8 +16,8 @@
 package com.expedia.adaptivealerting.samples;
 
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
-import com.expedia.adaptivealerting.anomdetect.forecast.RmsePointForecastEvaluator;
-import com.expedia.adaptivealerting.anomdetect.forecast.algo.HoltWintersSeasonalityType;
+import com.expedia.adaptivealerting.anomdetect.forecast.eval.algo.RmsePointForecastEvaluator;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.HoltWintersSeasonalityType;
 import com.expedia.adaptivealerting.samples.util.DetectorUtil;
 import com.expedia.adaptivealerting.tools.pipeline.filter.DetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
@@ -32,10 +32,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.expedia.adaptivealerting.anomdetect.forecast.algo.HoltWintersSeasonalityType.ADDITIVE;
-import static com.expedia.adaptivealerting.anomdetect.forecast.algo.HoltWintersSeasonalityType.MULTIPLICATIVE;
-import static com.expedia.adaptivealerting.anomdetect.forecast.algo.HoltWintersTrainingMethod.NONE;
-import static com.expedia.adaptivealerting.anomdetect.forecast.algo.HoltWintersTrainingMethod.SIMPLE;
+import static com.expedia.adaptivealerting.anomdetect.forecast.point.algo.HoltWintersSeasonalityType.ADDITIVE;
+import static com.expedia.adaptivealerting.anomdetect.forecast.point.algo.HoltWintersSeasonalityType.MULTIPLICATIVE;
+import static com.expedia.adaptivealerting.anomdetect.forecast.point.algo.HoltWintersTrainingMethod.NONE;
+import static com.expedia.adaptivealerting.anomdetect.forecast.point.algo.HoltWintersTrainingMethod.SIMPLE;
 import static com.expedia.adaptivealerting.samples.util.MetricUtil.buildMetricFrameMetricSource;
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.createChartFrame;
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showChartFrame;

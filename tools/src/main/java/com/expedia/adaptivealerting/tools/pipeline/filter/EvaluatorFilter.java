@@ -16,8 +16,8 @@
 package com.expedia.adaptivealerting.tools.pipeline.filter;
 
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
-import com.expedia.adaptivealerting.anomdetect.forecast.PointForecastEvaluator;
-import com.expedia.adaptivealerting.anomdetect.forecast.PointForecastEvaluation;
+import com.expedia.adaptivealerting.anomdetect.forecast.eval.PointForecastEvaluator;
+import com.expedia.adaptivealerting.anomdetect.forecast.eval.PointForecastEvaluation;
 import com.expedia.adaptivealerting.tools.pipeline.util.AnomalyResultSubscriber;
 import com.expedia.adaptivealerting.tools.pipeline.util.ModelEvaluationSubscriber;
 import lombok.val;

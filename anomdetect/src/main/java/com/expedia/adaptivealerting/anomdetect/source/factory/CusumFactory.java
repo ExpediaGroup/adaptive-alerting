@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect.source.factory;
 
-import com.expedia.adaptivealerting.anomdetect.detect.algo.CusumDetector;
-import com.expedia.adaptivealerting.anomdetect.detect.algo.CusumParams;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.CusumDetector;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.CusumParams;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;

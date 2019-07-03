@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect.source.factory;
 
-import com.expedia.adaptivealerting.anomdetect.detect.algo.IndividualsDetector;
-import com.expedia.adaptivealerting.anomdetect.detect.algo.IndividualsParams;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.IndividualsDetector;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.IndividualsParams;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;

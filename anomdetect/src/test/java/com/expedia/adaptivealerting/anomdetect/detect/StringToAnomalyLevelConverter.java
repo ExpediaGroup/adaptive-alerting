@@ -23,8 +23,8 @@ import com.opencsv.bean.AbstractBeanField;
  *
  * <p>
  * E.g.
- * <pre>     @CsvCustomBindByName(converter = StringToAnomalyLevelConverter.class)
- *   private AnomalyLevel expectedLevel;
+ * <pre>@CsvCustomBindByName(converter = StringToAnomalyLevelConverter.class)
+ * private AnomalyLevel expectedLevel;
  * </pre>
  */
 public class StringToAnomalyLevelConverter extends AbstractBeanField {
