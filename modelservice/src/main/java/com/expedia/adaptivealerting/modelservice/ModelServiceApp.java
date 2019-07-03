@@ -18,7 +18,6 @@ package com.expedia.adaptivealerting.modelservice;
 import com.codahale.metrics.MetricRegistry;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
 import org.apache.http.HttpHost;
-import org.apache.tomcat.jdbc.pool.DataSource;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -37,10 +36,7 @@ import java.io.IOException;
 @SpringBootApplication
 @EnableConfigurationProperties
 public class ModelServiceApp {
-
-    @Autowired
-    private DatabaseSettings settings;
-
+    
     @Autowired
     private RestHighLevelClient restHighLevelClient;
 
@@ -68,17 +64,6 @@ public class ModelServiceApp {
     @Bean
     public MetricRegistry metricRegistry() {
         return new MetricRegistry();
-    }
-
-    //Adding a custom data source bean to avoid conflicting dataSource bean error. [KS]
-    @Bean(name = "customDataSource")
-    public DataSource dataSource() {
-        DataSource dataSource = new DataSource();
-        dataSource.setDriverClassName(settings.getDriverClassName());
-        dataSource.setUrl(settings.getUrl());
-        dataSource.setUsername(settings.getUsername());
-        dataSource.setPassword(settings.getPassword());
-        return dataSource;
     }
 
     @Bean
