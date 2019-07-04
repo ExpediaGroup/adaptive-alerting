@@ -18,18 +18,14 @@ package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo;
 import com.opencsv.bean.CsvBindByName;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@RequiredArgsConstructor
 public class CusumDetectorTestRow {
 
     @CsvBindByName
     private int sample;
 
-    @NonNull
     @CsvBindByName
     private double observed;
 
@@ -42,7 +38,11 @@ public class CusumDetectorTestRow {
     @CsvBindByName(column = "stdev")
     private double stdDev;
 
-    @NonNull
     @CsvBindByName
     private String level;
+
+    public CusumDetectorTestRow(double observed, String level) {
+        this.observed = observed;
+        this.level = level;
+    }
 }

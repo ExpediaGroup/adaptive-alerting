@@ -50,7 +50,7 @@ import static org.mockito.Mockito.when;
  * https://kafka.apache.org/20/documentation/streams/developer-guide/testing.html
  */
 @Slf4j
-public final class KafkaDetectorMapperTest {
+public final class KafkaAnomalyDetectorMapperTest {
     private static final String KAFKA_KEY = "some-kafka-key";
     private static final String INPUT_TOPIC = "metrics";
     private static final String OUTPUT_TOPIC = "mapped-metrics";

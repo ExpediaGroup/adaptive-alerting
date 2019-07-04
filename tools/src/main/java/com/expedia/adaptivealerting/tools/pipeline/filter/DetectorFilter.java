@@ -17,7 +17,7 @@ package com.expedia.adaptivealerting.tools.pipeline.filter;
 
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 import com.expedia.adaptivealerting.tools.pipeline.util.AnomalyResultSubscriber;
 import com.expedia.adaptivealerting.tools.pipeline.util.MetricDataSubscriber;
 import com.expedia.metrics.MetricData;
@@ -46,7 +46,7 @@ public final class DetectorFilter implements MetricDataSubscriber {
     public void next(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
         val anomaly = new MappedMetricData(metricData, detector.getUuid());
-        val anomalyResult = (AnomalyResult) detector.detect(metricData);
+        val anomalyResult = (OutlierDetectorResult) detector.detect(metricData);
         anomaly.setAnomalyResult(anomalyResult);
         publish(anomaly);
     }

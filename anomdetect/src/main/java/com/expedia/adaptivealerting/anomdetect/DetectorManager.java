@@ -59,13 +59,15 @@ public class DetectorManager {
 
     private int detectorRefreshTimePeriod;
 
-
     // TODO Consider making this an explicit class so we can mock it and verify interactions
     //  against it. [WLW]
     private final Map<UUID, Detector> cachedDetectors;
-    private long syncedUptillTime = System.currentTimeMillis();
+    private long synchedTilTime = System.currentTimeMillis();
 
-
+    // TODO Seems odd to include this constructor, whose purpose seems to be to support unit
+    //  testing. At least I don't think it should be public. And it should take a Config
+    //  since the other one does, and this is conceptually just the base constructor with
+    //  the cache exposed.[WLW]
     public DetectorManager(DetectorSource detectorSource, int detectorRefreshTimePeriod, Map<UUID, Detector> cachedDetectors) {
         this.detectorSource = detectorSource;
         this.detectorRefreshTimePeriod = detectorRefreshTimePeriod;
@@ -130,7 +132,7 @@ public class DetectorManager {
     List<UUID> detectorCacheSync(long currentTime) {
         var updatedDetectors = new ArrayList<UUID>();
 
-        long updateDurationInSeconds = (currentTime - syncedUptillTime) / 1000;
+        long updateDurationInSeconds = (currentTime - synchedTilTime) / 1000;
 
         if (updateDurationInSeconds <= 0) {
             return updatedDetectors;
@@ -144,7 +146,7 @@ public class DetectorManager {
         });
 
         log.info("Removed detectors on refresh : {}", updatedDetectors);
-        syncedUptillTime = currentTime;
+        synchedTilTime = currentTime;
         return updatedDetectors;
     }
 }

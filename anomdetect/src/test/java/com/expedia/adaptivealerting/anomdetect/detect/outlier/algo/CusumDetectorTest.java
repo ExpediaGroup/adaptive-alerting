@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
@@ -104,7 +104,7 @@ public class CusumDetectorTest {
             val testRow = testRows.next();
             val observed = testRow.getObserved();
             val metricData = new MetricData(metricDefinition, observed, epochSecond);
-            val result = (AnomalyResult) detector.detect(metricData);
+            val result = (OutlierDetectorResult) detector.detect(metricData);
             val level = result.getAnomalyLevel();
 
             assertEquals(AnomalyLevel.valueOf(testRow.getLevel()), level);
@@ -152,7 +152,7 @@ public class CusumDetectorTest {
 
         for (int i = 0; i < adjWarmupPeriod; i++) {
             val metricData = new MetricData(metricDefinition, 1000.0, 1000 * i);
-            val anomalyResult = (AnomalyResult) detector.detect(metricData);
+            val anomalyResult = (OutlierDetectorResult) detector.detect(metricData);
             val anomalyLevel = anomalyResult.getAnomalyLevel();
             assertEquals(AnomalyLevel.MODEL_WARMUP, anomalyLevel);
         }
@@ -162,7 +162,7 @@ public class CusumDetectorTest {
             val value = testRow.getObserved();
             val timestamp = (adjWarmupPeriod + i) * 1000L;
             val metricData = new MetricData(metricDefinition, value, timestamp);
-            val anomalyResult = (AnomalyResult) detector.detect(metricData);
+            val anomalyResult = (OutlierDetectorResult) detector.detect(metricData);
             val anomalyLevel = anomalyResult.getAnomalyLevel();
             assertEquals(AnomalyLevel.valueOf(testRow.getLevel()), anomalyLevel);
         }

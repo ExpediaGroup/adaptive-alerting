@@ -17,7 +17,7 @@ package com.expedia.adaptivealerting.kafka.util;
 
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.TagCollection;
@@ -39,7 +39,7 @@ public class TestHelper {
         MetricData data = new MetricData(def, 2.0f, Instant.now().getEpochSecond());
         UUID detectorUUID = UUID.randomUUID();
         MappedMetricData mappedData = new MappedMetricData(data, detectorUUID);
-        mappedData.setAnomalyResult(new AnomalyResult(AnomalyLevel.NORMAL));
+        mappedData.setAnomalyResult(new OutlierDetectorResult(AnomalyLevel.NORMAL));
         return mappedData;
     }
 

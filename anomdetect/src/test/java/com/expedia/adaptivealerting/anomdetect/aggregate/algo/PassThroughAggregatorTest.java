@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.aggregate.algo;
 
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,18 +24,18 @@ import static org.junit.Assert.assertSame;
 
 public final class PassThroughAggregatorTest {
     private PassThroughAggregator aggregatorUnderTest;
-    private AnomalyResult anomalyResult;
+    private OutlierDetectorResult outlierDetectorResult;
 
     @Before
     public void setUp() {
         this.aggregatorUnderTest = new PassThroughAggregator();
-        this.anomalyResult = new AnomalyResult();
+        this.outlierDetectorResult = new OutlierDetectorResult();
     }
 
     @Test
     public void testAggregate() {
-        val aggregatedResult = aggregatorUnderTest.aggregate(anomalyResult);
-        assertSame(anomalyResult, aggregatedResult);
+        val aggregatedResult = aggregatorUnderTest.aggregate(outlierDetectorResult);
+        assertSame(outlierDetectorResult, aggregatedResult);
     }
 
     @Test(expected = IllegalArgumentException.class)

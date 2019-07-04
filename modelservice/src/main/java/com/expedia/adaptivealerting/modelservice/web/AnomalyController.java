@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.modelservice.web;
 
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 import com.expedia.adaptivealerting.modelservice.service.AnomalyRequest;
 import com.expedia.adaptivealerting.modelservice.service.AnomalyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ public class AnomalyController {
     private AnomalyService anomalyService;
 
     @PostMapping(path = "/anomalies", consumes = "application/json", produces = "application/json")
-    public List<AnomalyResult> getAnomalies(@RequestBody AnomalyRequest request) {
+    public List<OutlierDetectorResult> getAnomalies(@RequestBody AnomalyRequest request) {
         return anomalyService.getAnomalies(request);
     }
 }

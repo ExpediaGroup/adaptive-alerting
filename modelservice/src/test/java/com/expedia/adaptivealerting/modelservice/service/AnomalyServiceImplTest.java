@@ -1,6 +1,6 @@
 package com.expedia.adaptivealerting.modelservice.service;
 
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorFactory;
@@ -65,7 +65,7 @@ public class AnomalyServiceImplTest {
     private AnomalyRequest anomalyRequest;
 
     @Mock
-    private AnomalyResult anomalyResult;
+    private OutlierDetectorResult outlierDetectorResult;
 
     @Before
     public void setUp() {

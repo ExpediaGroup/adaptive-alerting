@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.util.AssertUtil;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
@@ -77,15 +78,15 @@ public class AnomalyToMetricMapper {
         }
 
         val detectorUuid = anomaly.getDetectorUuid();
-        val anomalyResult = anomaly.getAnomalyResult();
-        val anomalyLevel = anomalyResult.getAnomalyLevel();
+        val outlierResult = (OutlierDetectorResult) anomaly.getAnomalyResult();
+        val outlierLevel = outlierResult.getAnomalyLevel();
 
         AssertUtil.notNull(detectorUuid, "detectorUuid can't be null");
-        AssertUtil.notNull(anomalyLevel, "anomalyLevel can't be null");
+        AssertUtil.notNull(outlierLevel, "anomalyLevel can't be null");
 
         val newKVTags = new HashMap<>(kvTags);
         newKVTags.put(AA_DETECTOR_UUID, detectorUuid.toString());
-        newKVTags.put(AA_ANOMALY_LEVEL, anomalyLevel.toString());
+        newKVTags.put(AA_ANOMALY_LEVEL, outlierLevel.toString());
 
         val newKey = metricDef.getKey();
         val newTags = new TagCollection(newKVTags, Collections.EMPTY_SET);

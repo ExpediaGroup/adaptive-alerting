@@ -15,12 +15,12 @@
  */
 package com.expedia.adaptivealerting.anomdetect.aggregate;
 
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 
 /**
  * Interface for anomaly aggregation strategies,
  */
 public interface Aggregator {
 
-    AnomalyResult aggregate(AnomalyResult result);
+    OutlierDetectorResult aggregate(OutlierDetectorResult result);
 }

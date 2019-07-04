@@ -44,9 +44,11 @@ public final class MappedMetricData {
     @NonNull
     private UUID detectorUuid;
 
-    private AnomalyResult anomalyResult;
+    // Calling this anomalyResult because this is the original name for this property,
+    // and various downstream processes assume this name.
+    private DetectorResult anomalyResult;
 
-    public MappedMetricData(MappedMetricData orig, AnomalyResult anomalyResult) {
+    public MappedMetricData(MappedMetricData orig, DetectorResult anomalyResult) {
         notNull(orig, "orig can't be null");
         notNull(anomalyResult, "anomalyResult can't be null");
 

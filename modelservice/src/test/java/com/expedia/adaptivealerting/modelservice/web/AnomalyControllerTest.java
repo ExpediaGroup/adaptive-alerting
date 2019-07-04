@@ -1,6 +1,6 @@
 package com.expedia.adaptivealerting.modelservice.web;
 
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 import com.expedia.adaptivealerting.modelservice.service.AnomalyRequest;
 import com.expedia.adaptivealerting.modelservice.service.AnomalyService;
 import org.junit.Before;
@@ -29,7 +29,7 @@ public class AnomalyControllerTest {
     @Mock
     private AnomalyRequest request;
     @Mock
-    private List<AnomalyResult> results;
+    private List<OutlierDetectorResult> results;
 
     @Before
     public void setUp() {
@@ -40,7 +40,7 @@ public class AnomalyControllerTest {
 
     @Test
     public void testGetAnomalies() {
-        List<AnomalyResult> actualResults = controller.getAnomalies(request);
+        List<OutlierDetectorResult> actualResults = controller.getAnomalies(request);
         assertNotNull(actualResults);
         assertSame(results, actualResults);
     }

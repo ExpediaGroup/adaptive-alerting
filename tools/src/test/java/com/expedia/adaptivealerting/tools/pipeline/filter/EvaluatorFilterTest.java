@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.tools.pipeline.filter;
 
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.forecast.eval.PointForecastEvaluation;
 import com.expedia.adaptivealerting.anomdetect.forecast.eval.algo.RmsePointForecastEvaluator;
 import com.expedia.adaptivealerting.tools.pipeline.util.ModelEvaluationSubscriber;
@@ -31,7 +31,7 @@ import java.util.UUID;
 
 import static org.junit.Assert.assertTrue;
 
-public final class PointForecastEvaluatorFilterTest {
+public final class EvaluatorFilterTest {
     private EvaluatorFilter filterUnderTest;
     private MappedMetricData classified;
 
@@ -43,7 +43,7 @@ public final class PointForecastEvaluatorFilterTest {
         val metricDef = TestObjectMother.metricDefinition();
         val metricData = new MetricData(metricDef, 10.0, Instant.now().getEpochSecond());
 
-        val anomalyResult = new AnomalyResult();
+        val anomalyResult = new OutlierDetectorResult();
 
         this.classified = new MappedMetricData(metricData, UUID.randomUUID());
         classified.setAnomalyResult(anomalyResult);

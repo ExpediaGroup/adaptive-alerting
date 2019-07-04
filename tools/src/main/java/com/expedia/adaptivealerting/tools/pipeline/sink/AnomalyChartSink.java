@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.tools.pipeline.sink;
 
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.forecast.eval.PointForecastEvaluation;
 import com.expedia.adaptivealerting.tools.pipeline.util.AnomalyResultSubscriber;
 import com.expedia.adaptivealerting.tools.pipeline.util.ModelEvaluationSubscriber;
@@ -59,14 +60,14 @@ public final class AnomalyChartSink implements AnomalyResultSubscriber, ModelEva
         val metricData = anomaly.getMetricData();
         val epochSecond = metricData.getTimestamp();
         val observed = metricData.getValue();
-        val anomalyResult = anomaly.getAnomalyResult();
-        val level = anomalyResult.getAnomalyLevel();
-        val thresholds = anomalyResult.getThresholds();
+        val outlierResult = (OutlierDetectorResult) anomaly.getAnomalyResult();
+        val outlierLevel = outlierResult.getAnomalyLevel();
+        val thresholds = outlierResult.getThresholds();
 
         val second = toSecond(epochSecond);
         chartSeries.getObserved().add(second, observed);
 
-        addValue(chartSeries.getPredicted(), second, anomalyResult.getPredicted());
+        addValue(chartSeries.getPredicted(), second, outlierResult.getPredicted());
 
         // FIXME Hacky check
         if (thresholds != null) {
@@ -76,9 +77,9 @@ public final class AnomalyChartSink implements AnomalyResultSubscriber, ModelEva
             addValue(chartSeries.getStrongThresholdLower(), second, thresholds.getLowerStrong());
         }
 
-        if (level == STRONG) {
+        if (outlierLevel == STRONG) {
             chartSeries.getStrongOutlier().add(second, observed);
-        } else if (level == WEAK) {
+        } else if (outlierLevel == WEAK) {
             chartSeries.getWeakOutlier().add(second, observed);
         }
     }

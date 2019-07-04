@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo;
 
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
 import com.expedia.metrics.MetricData;
 import lombok.Getter;
@@ -50,6 +50,6 @@ public final class ConstantThresholdDetector extends AbstractOutlierDetector {
         notNull(metricData, "metricData can't be null");
         val thresholds = params.getThresholds();
         val level = classifier.classify(thresholds, metricData.getValue());
-        return new AnomalyResult(level).setThresholds(thresholds);
+        return new OutlierDetectorResult(level).setThresholds(thresholds);
     }
 }

@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.util.MetricUtil;
 import com.expedia.metrics.MetricDefinition;
@@ -46,10 +46,11 @@ public class AnomalyToMetricMapperTest {
         val actualTags = actualMetricDef.getTags();
         val actualKvTags = actualTags.getKv();
         val detectorUuid = anomalyWithStringMetricKey.getDetectorUuid().toString();
-        val anomalyLevel = anomalyWithStringMetricKey.getAnomalyResult().getAnomalyLevel().toString();
+        val outlierResult = (OutlierDetectorResult) anomalyWithStringMetricKey.getAnomalyResult();
+        val outlierLevel = outlierResult.getAnomalyLevel();
 
         assertEquals(detectorUuid, actualKvTags.get(AnomalyToMetricMapper.AA_DETECTOR_UUID));
-        assertEquals(anomalyLevel, actualKvTags.get(AnomalyToMetricMapper.AA_ANOMALY_LEVEL));
+        assertEquals(outlierLevel.toString(), actualKvTags.get(AnomalyToMetricMapper.AA_ANOMALY_LEVEL));
     }
 
     @Test
@@ -73,7 +74,7 @@ public class AnomalyToMetricMapperTest {
         val metricDef = new MetricDefinition("someKey");
         val metricData = MetricUtil.metricData(metricDef);
         val mmd = new MappedMetricData(metricData, UUID.randomUUID());
-        mmd.setAnomalyResult(new AnomalyResult(AnomalyLevel.STRONG));
+        mmd.setAnomalyResult(new OutlierDetectorResult(AnomalyLevel.STRONG));
         this.anomalyWithStringMetricKey = mmd;
     }
 
@@ -84,7 +85,7 @@ public class AnomalyToMetricMapperTest {
         val metricDef = MetricUtil.metricDefinition(kvTags, null);
         val metricData = MetricUtil.metricData(metricDef);
         val mmd = new MappedMetricData(metricData, UUID.randomUUID());
-        mmd.setAnomalyResult(new AnomalyResult());
+        mmd.setAnomalyResult(new OutlierDetectorResult());
 
         assertNull(mapperUnderTest.toMetricData(mmd));
     }

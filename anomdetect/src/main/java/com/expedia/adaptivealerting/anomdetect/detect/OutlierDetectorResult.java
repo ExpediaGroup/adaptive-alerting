@@ -22,6 +22,8 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 
+// TODO Rename this to OutlierResult. [WLW]
+
 /**
  * Anomaly result.
  */
@@ -30,7 +32,7 @@ import lombok.experimental.Accessors;
 @RequiredArgsConstructor
 @Accessors(chain = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AnomalyResult implements DetectorResult {
+public class OutlierDetectorResult implements DetectorResult {
 
     @NonNull
     private AnomalyLevel anomalyLevel;

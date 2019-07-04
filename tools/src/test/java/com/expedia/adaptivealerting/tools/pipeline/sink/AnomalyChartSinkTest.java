@@ -17,7 +17,7 @@ package com.expedia.adaptivealerting.tools.pipeline.sink;
 
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyThresholds;
 import com.expedia.adaptivealerting.anomdetect.forecast.eval.PointForecastEvaluation;
 import com.expedia.adaptivealerting.tools.util.TestObjectMother;
@@ -95,10 +95,10 @@ public final class AnomalyChartSinkTest {
         val metricDef = TestObjectMother.metricDefinition();
         val metricData = new MetricData(metricDef, 15.0, Instant.now().getEpochSecond());
 
-        val anomalyResult_strong_noThresholds = new AnomalyResult();
+        val anomalyResult_strong_noThresholds = new OutlierDetectorResult();
         anomalyResult_strong_noThresholds.setAnomalyLevel(AnomalyLevel.STRONG);
 
-        val anomalyResult_weak_thresholds = new AnomalyResult();
+        val anomalyResult_weak_thresholds = new OutlierDetectorResult();
         anomalyResult_weak_thresholds.setAnomalyLevel(AnomalyLevel.WEAK);
         val thresholds = new AnomalyThresholds(100.0, 90.0, 20.0, 10.0);
         anomalyResult_weak_thresholds.setThresholds(thresholds);

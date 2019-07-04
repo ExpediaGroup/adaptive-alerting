@@ -15,8 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.anomdetect.DetectorManager;
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
@@ -45,7 +44,6 @@ import static org.mockito.Mockito.when;
  * {@link DetectorManager} unit test.
  */
 public final class DetectorManagerTest {
-    private static final String DETECTOR_TYPE = "ewma-detector";
     private final int detectorRefreshPeriod = 1;
     private final int badDetectorRefreshPeriod = 0;
 
@@ -76,7 +74,7 @@ public final class DetectorManagerTest {
     private Detector detector;
 
     @Mock
-    private AnomalyResult anomalyResult;
+    private OutlierDetectorResult outlierDetectorResult;
 
     @Mock
     private Config config;
@@ -114,7 +112,7 @@ public final class DetectorManagerTest {
     public void testClassify() {
         val result = managerUnderTest.detect(goodMappedMetricData);
         assertNotNull(result);
-        assertSame(anomalyResult, result);
+        assertSame(outlierDetectorResult, result);
     }
 
     @Test
@@ -151,7 +149,7 @@ public final class DetectorManagerTest {
     }
 
     private void initDependencies() {
-        when(detector.detect(goodMetricData)).thenReturn(anomalyResult);
+        when(detector.detect(goodMetricData)).thenReturn(outlierDetectorResult);
 
         when(cachedDetectors.containsKey(updatedDetectors.get(0))).thenReturn(true);
 

@@ -16,9 +16,9 @@
 package com.expedia.adaptivealerting.kafka;
 
 import com.expedia.adaptivealerting.anomdetect.AnomalyToMetricMapper;
-import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.util.AssertUtil;
 import com.expedia.adaptivealerting.kafka.util.ConfigUtil;
 import com.expedia.metrics.MetricData;
@@ -41,7 +41,7 @@ import java.util.Collections;
 
 /**
  * Maps anomalies to metrics. Note that the input topic actually contains {@link MappedMetricData} rather than
- * {@link AnomalyResult}.
+ * {@link OutlierDetectorResult}.
  */
 @Slf4j
 public class KafkaAnomalyToMetricMapper implements Runnable {
@@ -79,14 +79,14 @@ public class KafkaAnomalyToMetricMapper implements Runnable {
     // Extracted for unit testing
     static KafkaAnomalyToMetricMapper buildMapper(Config config) {
         val anomalyConsumerConfig = config.getConfig(ANOMALY_CONSUMER);
-        val anomalyConsumerTopic = anomalyConsumerConfig.getString(TOPIC);
         val anomalyConsumerProps = ConfigUtil.toConsumerConfig(anomalyConsumerConfig);
         val anomalyConsumer = new KafkaConsumer<String, MappedMetricData>(anomalyConsumerProps);
+        val anomalyConsumerTopic = anomalyConsumerConfig.getString(TOPIC);
 
         val metricProducerConfig = config.getConfig(METRIC_PRODUCER);
-        val metricProducerTopic = metricProducerConfig.getString(TOPIC);
         val metricProducerProps = ConfigUtil.toProducerConfig(metricProducerConfig);
         val metricProducer = new KafkaProducer<String, MetricData>(metricProducerProps);
+        val metricProducerTopic = metricProducerConfig.getString(TOPIC);
 
         return new KafkaAnomalyToMetricMapper(
                 anomalyConsumer,
@@ -116,7 +116,7 @@ public class KafkaAnomalyToMetricMapper implements Runnable {
         // See Kafka: The Definitive Guide, pp. 86 ff.
         while (continueProcessing) {
             try {
-                pollAnomalyTopic();
+                processAnomalies();
             } catch (WakeupException e) {
                 log.info("Stopping KafkaAnomalyToMetricMapper");
                 anomalyConsumer.close();
@@ -129,7 +129,7 @@ public class KafkaAnomalyToMetricMapper implements Runnable {
         }
     }
 
-    private void pollAnomalyTopic() {
+    private void processAnomalies() {
         val anomalyRecords = anomalyConsumer.poll(POLL_PERIOD);
         val numConsumed = anomalyRecords.count();
 
@@ -140,7 +140,10 @@ public class KafkaAnomalyToMetricMapper implements Runnable {
         for (val anomalyRecord : anomalyRecords) {
             val anomalyMMD = anomalyRecord.value();
             val anomalyResult = anomalyMMD.getAnomalyResult();
-            val anomalyLevel = anomalyResult.getAnomalyLevel();
+
+            // FIXME Handle BreakoutDetectorResult in addition to OutlierDetectorResult.
+            val anomalyLevel = ((OutlierDetectorResult) anomalyResult).getAnomalyLevel();
+
             if (anomalyLevel == AnomalyLevel.WEAK || anomalyLevel == AnomalyLevel.STRONG) {
                 val metricDataRecord = toMetricDataRecord(anomalyRecord);
                 if (metricDataRecord != null) {
@@ -158,6 +161,8 @@ public class KafkaAnomalyToMetricMapper implements Runnable {
             return;
         }
 
+        // FIXME Hm, doesn't this mean that we calculate a delay iff there are more
+        //  records remaining? Is that the right way to do this? [WLW]
         val anomaly0 = anomalyRecords.iterator().next().value();
         val timestamp = anomaly0.getMetricData().getTimestamp() * 1000L;
         val timeDelay = System.currentTimeMillis() - timestamp;
@@ -168,6 +173,8 @@ public class KafkaAnomalyToMetricMapper implements Runnable {
     private ProducerRecord<String, MetricData> toMetricDataRecord(
             ConsumerRecord<String, MappedMetricData> anomalyRecord) {
 
+        // FIXME Typically we don't do explicit param checks in private methods, as we
+        //  fully control how this method is invoked. [WLW]
         AssertUtil.notNull(anomalyRecord, "anomalyRecord can't be null");
 
         val mmd = anomalyRecord.value();

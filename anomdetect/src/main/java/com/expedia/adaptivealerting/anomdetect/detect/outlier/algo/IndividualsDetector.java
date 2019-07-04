@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyThresholds;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
 import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
@@ -172,7 +172,7 @@ public final class IndividualsDetector implements Detector {
         }
         this.prevValue = observed;
 
-        final AnomalyResult result = new AnomalyResult(level);
+        final OutlierDetectorResult result = new OutlierDetectorResult(level);
         result.setPredicted(this.mean);
         result.setThresholds(thresholds);
         return result;
