@@ -15,9 +15,9 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.filter;
 
-import com.expedia.adaptivealerting.anomdetect.MappedMetricData;
-import com.expedia.adaptivealerting.anomdetect.outlier.forecast.evaluate.Evaluator;
-import com.expedia.adaptivealerting.anomdetect.outlier.forecast.evaluate.ModelEvaluation;
+import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.forecast.eval.PointForecastEvaluator;
+import com.expedia.adaptivealerting.anomdetect.forecast.eval.PointForecastEvaluation;
 import com.expedia.adaptivealerting.tools.pipeline.util.AnomalyResultSubscriber;
 import com.expedia.adaptivealerting.tools.pipeline.util.ModelEvaluationSubscriber;
 import lombok.val;
@@ -31,10 +31,10 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
  * Stream filter that applies model evaluator to metrics and publishes the score.
  */
 public final class EvaluatorFilter implements AnomalyResultSubscriber {
-    private final Evaluator evaluator;
+    private final PointForecastEvaluator evaluator;
     private final List<ModelEvaluationSubscriber> subscribers = new LinkedList<>();
 
-    public EvaluatorFilter(Evaluator evaluator) {
+    public EvaluatorFilter(PointForecastEvaluator evaluator) {
         notNull(evaluator, "evaluator can't be null");
         this.evaluator = evaluator;
     }
@@ -63,7 +63,7 @@ public final class EvaluatorFilter implements AnomalyResultSubscriber {
         return (anomalyResult.getPredicted() == null ? 0.0 : anomalyResult.getPredicted());
     }
 
-    private void publish(ModelEvaluation modelEvaluation) {
-        subscribers.stream().forEach(subscriber -> subscriber.next(modelEvaluation));
+    private void publish(PointForecastEvaluation pointForecastEvaluation) {
+        subscribers.stream().forEach(subscriber -> subscriber.next(pointForecastEvaluation));
     }
 }

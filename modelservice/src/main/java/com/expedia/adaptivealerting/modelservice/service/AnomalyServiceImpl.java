@@ -15,10 +15,10 @@
  */
 package com.expedia.adaptivealerting.modelservice.service;
 
-import com.expedia.adaptivealerting.anomdetect.Detector;
-import com.expedia.adaptivealerting.anomdetect.detectorsource.DetectorDocument;
-import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyResult;
-import com.expedia.adaptivealerting.anomdetect.detectorsource.legacy.LegacyDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.Detector;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorRegistry;
 import com.expedia.adaptivealerting.anomdetect.util.MetricUtil;
 import com.expedia.adaptivealerting.modelservice.spi.MetricSource;
 import lombok.extern.slf4j.Slf4j;
@@ -30,8 +30,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * Service to fetch anomalies for a given metric and detector.
@@ -43,10 +41,13 @@ public class AnomalyServiceImpl implements AnomalyService {
     @Autowired
     private List<? extends MetricSource> metricSources;
 
+    @Autowired
+    private DetectorRegistry detectorRegistry;
+
     @Override
     public List<AnomalyResult> getAnomalies(AnomalyRequest request) {
         val metricDef = MetricUtil.metricDefinition();
-        val detector = getDetector(request);
+        val detector = buildDetector(request);
 
         val anomalyResults = new ArrayList<AnomalyResult>();
         metricSources.forEach(metricSource -> {
@@ -60,16 +61,22 @@ public class AnomalyServiceImpl implements AnomalyService {
         return anomalyResults;
     }
 
-    private Detector getDetector(AnomalyRequest request) {
-        val legacyDetectorType = request.getDetectorType();
-        val paramsMap = request.getDetectorParams();
-        Map detectorConfig = new HashMap<>();
-        detectorConfig.put("params", paramsMap);
-        val detector = new DetectorDocument()
-                .setType(legacyDetectorType)
+    private Detector buildDetector(AnomalyRequest request) {
+        val now = new Date();
+
+        // TODO This would be better if we read the config itself from the request, rather than reading the params from
+        //  the request. This is because the config includes hyperparams too. [WLW]
+        val config = new HashMap<String, Object>();
+        config.put("params", request.getDetectorParams());
+
+        val document = new DetectorDocument()
+                .setType(request.getDetectorType())
+                .setUuid(request.getDetectorUuid())
+                .setConfig(config)
                 .setCreatedBy("adaptive-alerting")
-                .setLastUpdateTimestamp(new Date())
-                .setDetectorConfig(detectorConfig);
-        return new LegacyDetectorFactory().createDetector(UUID.randomUUID(), detector);
+                .setDateCreated(now)
+                .setDateUpdated(now);
+        val factory = detectorRegistry.getDetectorFactory(document);
+        return factory.buildDetector();
     }
 }

@@ -52,13 +52,14 @@ public class ObjectMother {
 
     public AnomalyRequest getAnomalyRequest() {
         return new AnomalyRequest()
-                .setDetectorParams(getDetectorParams())
-                // FIXME This is a legacy detector type
                 .setDetectorType("constant-detector")
+                .setDetectorUuid(UUID.randomUUID())
+                .setDetectorParams(getDetectorParams())
                 .setMetricTags("what=bookings");
     }
 
     public Map<String, Object> getDetectorParams() {
+        // FIXME Use serialization rather than hand-crafted JSON. [WLW]
         val thresholds = "{\"thresholds\": {\"lowerStrong\": \"70\", \"lowerWeak\": \"90\"}}";
         val detectorParams = toObject(thresholds);
         detectorParams.put("type", "LEFT_TAILED");

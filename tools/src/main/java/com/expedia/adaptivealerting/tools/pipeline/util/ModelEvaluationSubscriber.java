@@ -15,12 +15,12 @@
  */
 package com.expedia.adaptivealerting.tools.pipeline.util;
 
-import com.expedia.adaptivealerting.anomdetect.outlier.forecast.evaluate.ModelEvaluation;
+import com.expedia.adaptivealerting.anomdetect.forecast.eval.PointForecastEvaluation;
 
 /**
  * Interface for processors that subscribe to a model evaluation channel.
  */
 public interface ModelEvaluationSubscriber {
 
-    void next(ModelEvaluation modelEvaluation);
+    void next(PointForecastEvaluation pointForecastEvaluation);
 }

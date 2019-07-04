@@ -19,11 +19,16 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.util.Map;
+import java.util.UUID;
 
 @Data
 @Accessors(chain = true)
 public class AnomalyRequest {
     private String metricTags;
     private String detectorType;
+    private UUID detectorUuid;
+
+    // TODO This should be the detector config, not the detector params.
+    //  We need to be able to handle hyperparams too. [WLW]
     private Map<String, Object> detectorParams;
 }

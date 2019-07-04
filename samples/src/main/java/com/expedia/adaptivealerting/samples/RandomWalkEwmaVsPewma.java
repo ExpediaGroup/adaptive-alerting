@@ -15,17 +15,13 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.outlier.forecast.evaluate.RmseEvaluator;
-import com.expedia.adaptivealerting.anomdetect.detectorsource.legacy.EwmaParams;
-import com.expedia.adaptivealerting.anomdetect.detectorsource.legacy.LegacyDetectorFactory;
-import com.expedia.adaptivealerting.anomdetect.detectorsource.legacy.PewmaParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.eval.algo.RmsePointForecastEvaluator;
+import com.expedia.adaptivealerting.samples.util.DetectorUtil;
 import com.expedia.adaptivealerting.tools.pipeline.filter.DetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.source.RandomWalkMetricSource;
 import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
 import lombok.val;
-
-import java.util.UUID;
 
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.createChartFrame;
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showChartFrame;
@@ -37,21 +33,22 @@ public class RandomWalkEwmaVsPewma {
 
     public static void main(String[] args) {
         val source = new RandomWalkMetricSource();
-        val factory = new LegacyDetectorFactory();
 
-        val ewmaDetector = factory.createEwmaDetector(UUID.randomUUID(), new EwmaParams());
+        val ewmaDetector = DetectorUtil.buildEwmaDetector();
         val ewmaFilter = new DetectorFilter(ewmaDetector);
-        val ewmaEval = new EvaluatorFilter(new RmseEvaluator());
+        val ewmaEval = new EvaluatorFilter(new RmsePointForecastEvaluator());
         val ewmaChart = PipelineFactory.createChartSink("EWMA");
+
         source.addSubscriber(ewmaFilter);
         ewmaFilter.addSubscriber(ewmaEval);
         ewmaFilter.addSubscriber(ewmaChart);
         ewmaEval.addSubscriber(ewmaChart);
 
-        val pewmaDetector = factory.createPewmaDetector(UUID.randomUUID(), new PewmaParams());
+        val pewmaDetector = DetectorUtil.buildPewmaDetector();
         val pewmaFilter = new DetectorFilter(pewmaDetector);
-        val pewmaEval = new EvaluatorFilter(new RmseEvaluator());
+        val pewmaEval = new EvaluatorFilter(new RmsePointForecastEvaluator());
         val pewmaChart = PipelineFactory.createChartSink("PEWMA");
+
         source.addSubscriber(pewmaFilter);
         pewmaFilter.addSubscriber(pewmaEval);
         pewmaFilter.addSubscriber(pewmaChart);

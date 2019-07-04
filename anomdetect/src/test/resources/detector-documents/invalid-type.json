@@ -1,0 +1,11 @@
+{
+  "uuid": "c8d4d8c4-8068-46bf-a1c7-43ea6f066eeb",
+  "type": "invalid-detector",
+  "enabled": true,
+  "detectorConfig": {
+    "hyperparams": {},
+    "params": {}
+  },
+  "createdBy": null,
+  "lastUpdateTimestamp": "2019-06-04 23:33:31"
+}

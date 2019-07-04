@@ -15,9 +15,9 @@
  */
 package com.expedia.adaptivealerting.kafka.processor;
 
-import com.expedia.adaptivealerting.anomdetect.detectormapper.Detector;
-import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapper;
-import com.expedia.adaptivealerting.anomdetect.detectormapper.MapperResult;
+import com.expedia.adaptivealerting.anomdetect.mapper.Detector;
+import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMapper;
+import com.expedia.adaptivealerting.anomdetect.mapper.MapperResult;
 import com.expedia.metrics.MetricData;
 import lombok.Data;
 import lombok.NonNull;

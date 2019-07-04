@@ -1,5 +1,6 @@
 package com.expedia.adaptivealerting.modelservice.web;
 
+import com.expedia.adaptivealerting.anomdetect.source.DetectorException;
 import com.expedia.adaptivealerting.modelservice.entity.Detector;
 import com.expedia.adaptivealerting.modelservice.service.DetectorService;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
@@ -19,10 +20,8 @@ import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -105,15 +104,15 @@ public class DetectorControllerTest {
         assertSame(detectors, actualDetectors);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = DetectorException.class)
     public void testCreateDetectorNullValues() {
         Detector detector1 = new Detector();
         detector1.setCreatedBy("user");
         controller.createDetector(detector1);
 
-        Detector detector2 = new Detector();
-        detector2.setType("constant-detector");
-        controller.createDetector(detector2);
+//        Detector detector2 = new Detector();
+//        detector2.setType("constant-detector");
+//        controller.createDetector(detector2);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -121,15 +120,15 @@ public class DetectorControllerTest {
         controller.createDetector(illegalParamsDetector);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = DetectorException.class)
     public void testUpdateDetectorNullValues() {
         Detector detector1 = new Detector();
         detector1.setCreatedBy("user");
         controller.updateDetector("", detector1);
 
-        Detector detector2 = new Detector();
-        detector2.setType("constant-detector");
-        controller.updateDetector("", detector2);
+//        Detector detector2 = new Detector();
+//        detector2.setType("constant-detector");
+//        controller.updateDetector("", detector2);
     }
 
     @Test(expected = IllegalArgumentException.class)

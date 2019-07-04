@@ -15,8 +15,9 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyLevel;
-import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
+import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.util.MetricUtil;
 import com.expedia.metrics.MetricDefinition;
 import lombok.val;
@@ -25,8 +26,6 @@ import org.junit.Test;
 
 import java.util.UUID;
 
-import static com.expedia.adaptivealerting.anomdetect.AnomalyToMetricMapper.AA_ANOMALY_LEVEL;
-import static com.expedia.adaptivealerting.anomdetect.AnomalyToMetricMapper.AA_DETECTOR_UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -49,8 +48,8 @@ public class AnomalyToMetricMapperTest {
         val detectorUuid = anomalyWithStringMetricKey.getDetectorUuid().toString();
         val anomalyLevel = anomalyWithStringMetricKey.getAnomalyResult().getAnomalyLevel().toString();
 
-        assertEquals(detectorUuid, actualKvTags.get(AA_DETECTOR_UUID));
-        assertEquals(anomalyLevel, actualKvTags.get(AA_ANOMALY_LEVEL));
+        assertEquals(detectorUuid, actualKvTags.get(AnomalyToMetricMapper.AA_DETECTOR_UUID));
+        assertEquals(anomalyLevel, actualKvTags.get(AnomalyToMetricMapper.AA_ANOMALY_LEVEL));
     }
 
     @Test
@@ -61,13 +60,13 @@ public class AnomalyToMetricMapperTest {
     @Test
     public void testToMetricData_aaDetectorUuidToNull() {
         val detectorUuid = UUID.randomUUID();
-        testToMetricData_reservedTagToNull(AA_DETECTOR_UUID, detectorUuid.toString());
+        testToMetricData_reservedTagToNull(AnomalyToMetricMapper.AA_DETECTOR_UUID, detectorUuid.toString());
     }
 
     @Test
     public void testToMetricData_aaAnomalyLevelToNull() {
         val anomalyLevel = AnomalyLevel.STRONG;
-        testToMetricData_reservedTagToNull(AA_ANOMALY_LEVEL, anomalyLevel.toString());
+        testToMetricData_reservedTagToNull(AnomalyToMetricMapper.AA_ANOMALY_LEVEL, anomalyLevel.toString());
     }
 
     private void initTestObjects() {

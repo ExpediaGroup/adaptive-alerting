@@ -15,10 +15,9 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.outlier.forecast.evaluate.RmseEvaluator;
-import com.expedia.adaptivealerting.anomdetect.detectorsource.legacy.EwmaParams;
-import com.expedia.adaptivealerting.anomdetect.detectorsource.legacy.LegacyDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.forecast.eval.algo.RmsePointForecastEvaluator;
 import com.expedia.adaptivealerting.anomdetect.util.MetricFrameLoader;
+import com.expedia.adaptivealerting.samples.util.DetectorUtil;
 import com.expedia.adaptivealerting.tools.pipeline.filter.DetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.source.MetricFrameMetricSource;
@@ -26,32 +25,27 @@ import com.expedia.adaptivealerting.tools.pipeline.util.PipelineFactory;
 import com.expedia.metrics.MetricDefinition;
 import lombok.val;
 
-import java.util.UUID;
-
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.createChartFrame;
 import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showChartFrame;
 
 public final class CsvTrafficEwma {
 
     public static void main(String[] args) throws Exception {
-
-        // TODO Use the FileDataConnector rather than the MetricFrameLoader. [WLW]
         val is = ClassLoader.getSystemResourceAsStream("samples/cal-inflow.csv");
-        val frame = MetricFrameLoader.loadCsv(new MetricDefinition("csv"), is, true);
-        val source = new MetricFrameMetricSource(frame, "data", 200L);
-        val factory = new LegacyDetectorFactory();
+        val metricFrame = MetricFrameLoader.loadCsv(new MetricDefinition("csv"), is, true);
+        val metricSource = new MetricFrameMetricSource(metricFrame, "data", 200L);
 
-        val detector = factory.createEwmaDetector(UUID.randomUUID(), new EwmaParams());
+        val detector = DetectorUtil.buildEwmaDetector();
         val detectorFilter = new DetectorFilter(detector);
-        val evaluator = new EvaluatorFilter(new RmseEvaluator());
+        val evaluator = new EvaluatorFilter(new RmsePointForecastEvaluator());
         val chartWrapper = PipelineFactory.createChartSink("EWMA");
 
-        source.addSubscriber(detectorFilter);
+        metricSource.addSubscriber(detectorFilter);
         detectorFilter.addSubscriber(evaluator);
         detectorFilter.addSubscriber(chartWrapper);
         evaluator.addSubscriber(chartWrapper);
 
         showChartFrame(createChartFrame("Cal Inflow", chartWrapper.getChart()));
-        source.start();
+        metricSource.start();
     }
 }

@@ -15,15 +15,14 @@
  */
 package com.expedia.adaptivealerting.modelservice.util;
 
-import com.expedia.adaptivealerting.anomdetect.detectorsource.DetectorDocument;
-import com.expedia.adaptivealerting.anomdetect.detectorsource.legacy.LegacyDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorRegistry;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Expression;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Operand;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Operator;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.User;
 import com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping;
 import com.expedia.adaptivealerting.modelservice.entity.Detector;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 import org.springframework.util.Assert;
@@ -35,13 +34,11 @@ import java.util.UUID;
 @UtilityClass
 public class RequestValidator {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
     public static void validateUser(User user) {
         Assert.notNull(user, "subscription user can't null");
         Assert.isTrue(!StringUtils.isEmpty(user.getId()), "subscription userId can't empty");
-        Assert.isTrue(!StringUtils.containsWhitespace(user.getId()), "subscription userId can't " +
-                "contain whitespaces");
+        Assert.isTrue(!StringUtils.containsWhitespace(user.getId()),
+                "subscription userId can't contain whitespaces");
     }
 
     public static void validateExpression(Expression expression) {
@@ -49,9 +46,7 @@ public class RequestValidator {
         //Only AND operator is supported now
         Assert.isTrue(Operator.AND.equals(expression.getOperator()), "Only AND operator is supported now");
         Assert.notEmpty(expression.getOperands(), "Operands can't be empty");
-        expression.getOperands().forEach(operand -> {
-            validateOperand(operand);
-        });
+        expression.getOperands().forEach(operand -> validateOperand(operand));
     }
 
     private static void validateOperand(Operand operand) {
@@ -71,15 +66,16 @@ public class RequestValidator {
     }
 
     public static void validateDetector(Detector detector) {
-        val legacyDetectorType = detector.getType();
-        val detectorConfig = detector.getDetectorConfig();
-        val detectorDocument = new DetectorDocument()
-                .setType(legacyDetectorType)
+        val type = detector.getType();
+        val config = detector.getDetectorConfig();
+        val document = new DetectorDocument()
+                .setType(type)
+                .setUuid(UUID.randomUUID())
                 .setCreatedBy("adaptive-alerting")
-                .setLastUpdateTimestamp(new Date())
-                .setDetectorConfig(detectorConfig);
-        val validateDetector = new LegacyDetectorFactory().createDetector(UUID.randomUUID(), detectorDocument);
+                .setDateUpdated(new Date())
+                .setConfig(config);
+        new DetectorRegistry()
+                .getDetectorFactory(document)
+                .buildDetector();
     }
 }
-
-

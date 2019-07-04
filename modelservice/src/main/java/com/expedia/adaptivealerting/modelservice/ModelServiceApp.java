@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.modelservice;
 
 import com.codahale.metrics.MetricRegistry;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorRegistry;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
@@ -64,6 +65,11 @@ public class ModelServiceApp {
     @Bean
     public MetricRegistry metricRegistry() {
         return new MetricRegistry();
+    }
+
+    @Bean
+    public DetectorRegistry detectorRegistry() {
+        return new DetectorRegistry();
     }
 
     @Bean

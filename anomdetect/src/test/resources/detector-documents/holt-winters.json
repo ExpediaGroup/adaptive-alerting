@@ -1,0 +1,25 @@
+{
+  "uuid": "a63c2128-113a-8fd7-942d-f8ae228b61b0",
+  "type": "holtwinters-detector",
+  "enabled": true,
+  "detectorConfig": {
+    "type": "RIGHT_TAILED",
+    "hyperparams": {},
+    "params": {
+      "frequency": 2016,
+      "alpha": 0.15,
+      "beta": 0.10,
+      "gamma": 0.20,
+      "warmUpPeriod": 0,
+      "seasonalityType": "MULTIPLICATIVE",
+      "initTrainingMethod": "NONE",
+      "initBaseEstimate": null,
+      "initLevelEstimate": null,
+      "initSeasonalEstimates": [],
+      "weakSigmas": 3,
+      "strongSigmas": 4
+    }
+  },
+  "createdBy": "wwheeler",
+  "lastUpdateTimestamp": "2019-03-19 07:43:54"
+}

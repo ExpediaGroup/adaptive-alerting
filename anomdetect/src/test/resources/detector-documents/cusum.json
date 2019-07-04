@@ -1,0 +1,18 @@
+{
+  "uuid": "3ec81aa2-2cdc-415e-b4f3-c1beb223ae60",
+  "type": "cusum-detector",
+  "enabled": true,
+  "detectorConfig": {
+    "hyperparams": {},
+    "params": {
+      "targetValue": 120.0,
+      "slackParam": 0.8,
+      "initMeanEstimate": 110.0,
+      "type": "RIGHT_TAILED",
+      "weakSigmas": 2.5,
+      "strongSigmas": 3.5
+    }
+  },
+  "createdBy": "wingbat",
+  "lastUpdateTimestamp": "2019-03-14 10:18:35"
+}

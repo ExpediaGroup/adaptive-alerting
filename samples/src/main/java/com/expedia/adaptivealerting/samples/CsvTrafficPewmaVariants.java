@@ -15,9 +15,13 @@
  */
 package com.expedia.adaptivealerting.samples;
 
-import com.expedia.adaptivealerting.anomdetect.outlier.forecast.evaluate.RmseEvaluator;
-import com.expedia.adaptivealerting.anomdetect.detectorsource.legacy.LegacyDetectorFactory;
-import com.expedia.adaptivealerting.anomdetect.detectorsource.legacy.PewmaParams;
+import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.ForecastingDetector;
+import com.expedia.adaptivealerting.anomdetect.forecast.eval.algo.RmsePointForecastEvaluator;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.PewmaPointForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.PewmaPointForecasterParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.ExponentialWelfordIntervalForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.ExponentialWelfordIntervalForecasterParams;
 import com.expedia.adaptivealerting.anomdetect.util.MetricFrameLoader;
 import com.expedia.adaptivealerting.tools.pipeline.filter.DetectorFilter;
 import com.expedia.adaptivealerting.tools.pipeline.filter.EvaluatorFilter;
@@ -34,52 +38,25 @@ import static com.expedia.adaptivealerting.tools.visualization.ChartUtil.showCha
 public class CsvTrafficPewmaVariants {
 
     public static void main(String[] args) throws Exception {
-
-        // TODO Use the FileDataConnector rather than the MetricFrameLoader. [WLW]
         val is = ClassLoader.getSystemResourceAsStream("samples/cal-inflow.csv");
-        val frame = MetricFrameLoader.loadCsv(new MetricDefinition("csv"), is, true);
-        val source = new MetricFrameMetricSource(frame, "data", 200L);
+        val metricFrame = MetricFrameLoader.loadCsv(new MetricDefinition("csv"), is, true);
+        val metricSource = new MetricFrameMetricSource(metricFrame, "data", 200L);
 
-        val factory = new LegacyDetectorFactory();
+        val detectorFilter1 = buildDetectorFilter(0.15, 1.0, 0.0, 2.0, 3.0);
+        val detectorFilter2 = buildDetectorFilter(0.25, 1.0, 0.0, 2.0, 3.0);
+        val detectorFilter3 = buildDetectorFilter(0.35, 1.0, 0.0, 2.0, 3.0);
 
-        val params1 = new PewmaParams()
-                .setAlpha(0.15)
-                .setBeta(1.0)
-                .setWeakSigmas(2.0)
-                .setStrongSigmas(3.0)
-                .setInitMeanEstimate(0.0);
-        val detector1 = factory.createPewmaDetector(UUID.randomUUID(), params1);
-        val detectorFilter1 = new DetectorFilter(detector1);
-
-        val params2 = new PewmaParams()
-                .setAlpha(0.25)
-                .setBeta(1.0)
-                .setWeakSigmas(2.0)
-                .setStrongSigmas(3.0)
-                .setInitMeanEstimate(0.0);
-        val detector2 = factory.createPewmaDetector(UUID.randomUUID(), params2);
-        val detectorFilter2 = new DetectorFilter(detector2);
-
-        val params3 = new PewmaParams()
-                .setAlpha(0.35)
-                .setBeta(1.0)
-                .setWeakSigmas(2.0)
-                .setStrongSigmas(3.0)
-                .setInitMeanEstimate(0.0);
-        val detector3 = factory.createPewmaDetector(UUID.randomUUID(), params3);
-        val detectorFilter3 = new DetectorFilter(detector3);
-
-        val eval1 = new EvaluatorFilter(new RmseEvaluator());
-        val eval2 = new EvaluatorFilter(new RmseEvaluator());
-        val eval3 = new EvaluatorFilter(new RmseEvaluator());
+        val eval1 = new EvaluatorFilter(new RmsePointForecastEvaluator());
+        val eval2 = new EvaluatorFilter(new RmsePointForecastEvaluator());
+        val eval3 = new EvaluatorFilter(new RmsePointForecastEvaluator());
 
         val chart1 = PipelineFactory.createChartSink("PEWMA: alpha=0.15");
         val chart2 = PipelineFactory.createChartSink("PEWMA: alpha=0.25");
         val chart3 = PipelineFactory.createChartSink("PEWMA: alpha=0.35");
 
-        source.addSubscriber(detectorFilter1);
-        source.addSubscriber(detectorFilter2);
-        source.addSubscriber(detectorFilter3);
+        metricSource.addSubscriber(detectorFilter1);
+        metricSource.addSubscriber(detectorFilter2);
+        metricSource.addSubscriber(detectorFilter3);
 
         detectorFilter1.addSubscriber(eval1);
         detectorFilter2.addSubscriber(eval2);
@@ -94,6 +71,29 @@ public class CsvTrafficPewmaVariants {
         eval3.addSubscriber(chart3);
 
         showChartFrame(createChartFrame("Cal Inflow", chart1.getChart(), chart2.getChart(), chart3.getChart()));
-        source.start();
+        metricSource.start();
+    }
+
+    private static DetectorFilter buildDetectorFilter(
+            double alpha,
+            double beta,
+            double initMeanEstimate,
+            double weakSigmas,
+            double strongSigmas) {
+
+        val pewmaParams = new PewmaPointForecasterParams()
+                .setAlpha(alpha)
+                .setBeta(beta)
+                .setInitMeanEstimate(initMeanEstimate);
+        val pewma = new PewmaPointForecaster(pewmaParams);
+
+        val welfordParams = new ExponentialWelfordIntervalForecasterParams()
+                .setAlpha(alpha)
+                .setWeakSigmas(weakSigmas)
+                .setStrongSigmas(strongSigmas);
+        val welford = new ExponentialWelfordIntervalForecaster(welfordParams);
+
+        val detector = new ForecastingDetector(UUID.randomUUID(), pewma, welford, AnomalyType.RIGHT_TAILED);
+        return new DetectorFilter(detector);
     }
 }

@@ -18,9 +18,9 @@ package com.expedia.adaptivealerting.pipeline.integration.test
 import java.time.Instant
 
 import com.expedia.adaptivealerting.anomdetect.DetectorManager
-import com.expedia.adaptivealerting.anomdetect.detectormapper.DetectorMapper
-import com.expedia.adaptivealerting.anomdetect.detectorsource.DetectorClient
-import com.expedia.adaptivealerting.anomdetect.outlier.AnomalyResult
+import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult
+import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMapper
+import com.expedia.adaptivealerting.anomdetect.source.DetectorClient
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper
 import com.expedia.adaptivealerting.kafka.{KafkaAnomalyDetectorManager, KafkaAnomalyDetectorMapper}
 import com.expedia.metrics.{MetricData, MetricDefinition}
