@@ -19,7 +19,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.HibernateException;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -41,7 +40,7 @@ public class ObjectMapperUtil {
         try {
             return objectMapper.readValue(data, c);
         } catch (IOException e) {
-            throw new HibernateException("unable to read object from result set", e);
+            throw new RuntimeException("Unable to read object from result set", e);
         }
     }
 }
