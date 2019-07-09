@@ -15,9 +15,9 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
 import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
+import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
 import com.typesafe.config.Config;
 import lombok.Getter;
@@ -64,11 +64,18 @@ public class DetectorManager {
     private final Map<UUID, Detector> cachedDetectors;
     private long synchedTilTime = System.currentTimeMillis();
 
-    // TODO Seems odd to include this constructor, whose purpose seems to be to support unit
-    //  testing. At least I don't think it should be public. And it should take a Config
-    //  since the other one does, and this is conceptually just the base constructor with
-    //  the cache exposed.[WLW]
+    /**
+     * Creates a new detector manager from the given parameters.
+     *
+     * @param detectorSource            detector source
+     * @param detectorRefreshTimePeriod detector refresh period in minutes
+     * @param cachedDetectors           map containing cached detectors
+     */
     public DetectorManager(DetectorSource detectorSource, int detectorRefreshTimePeriod, Map<UUID, Detector> cachedDetectors) {
+        // TODO Seems odd to include this constructor, whose purpose seems to be to support unit
+        //  testing. At least I don't think it should be public. And it should take a Config
+        //  since the other one does, and this is conceptually just the base constructor with
+        //  the cache exposed.[WLW]
         this.detectorSource = detectorSource;
         this.detectorRefreshTimePeriod = detectorRefreshTimePeriod;
         this.cachedDetectors = cachedDetectors;

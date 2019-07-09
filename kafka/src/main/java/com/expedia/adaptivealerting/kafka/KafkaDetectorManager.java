@@ -81,7 +81,8 @@ public class KafkaDetectorManager implements Runnable {
         manager.run();
     }
 
-    private static KafkaDetectorManager buildManager(Config config) {
+    // Extracted for unit testing
+    static KafkaDetectorManager buildManager(Config config) {
         val detectorSource = DetectorUtil.buildDetectorSource(config);
         val detectorManager = new DetectorManager(detectorSource, config);
 
