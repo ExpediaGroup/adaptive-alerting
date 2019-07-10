@@ -46,7 +46,10 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
  */
 @Slf4j
 public class KafkaDetectorManager implements Runnable {
-    private static final String APP_ID = "detector-manager";
+
+    // TODO Rename this to detector-manager. But have to coordinate that with Terraform scripts. [WLW]
+    private static final String APP_ID = "ad-manager";
+
     private static final String METRIC_CONSUMER = "metric-consumer";
     private static final String ANOMALY_PRODUCER = "anomaly-producer";
     private static final String TOPIC = "topic";
