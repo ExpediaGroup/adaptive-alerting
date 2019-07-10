@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.opencsv.bean.CsvToBeanBuilder;
@@ -79,7 +79,7 @@ public class IndividualsDetectorTest {
             val observed = testRow.getObserved();
 
             val metricData = new MetricData(metricDef, observed, epochSecond);
-            val result = (AnomalyResult) detector.detect(metricData);
+            val result = (OutlierDetectorResult) detector.detect(metricData);
             val level = result.getAnomalyLevel();
 
             if (noOfDataPoints < WARMUP_PERIOD) {

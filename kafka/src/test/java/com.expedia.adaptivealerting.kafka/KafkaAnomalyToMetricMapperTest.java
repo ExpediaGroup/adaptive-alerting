@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.kafka;
 
-import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
+import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.kafka.util.TestObjectMother;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.jackson.MetricsJavaModule;
@@ -79,8 +79,7 @@ public final class KafkaAnomalyToMetricMapperTest {
                 anomalyConsumer,
                 metricProducer,
                 ANOMALY_TOPIC,
-                METRIC_TOPIC
-        );
+                METRIC_TOPIC);
 
         this.objectMapper = new ObjectMapper()
                 .registerModule(new MetricsJavaModule())
@@ -105,10 +104,6 @@ public final class KafkaAnomalyToMetricMapperTest {
 
     @Test
     public void testRun() throws Exception {
-
-        // TODO This mapped metric data represents an anomaly. It's a little confusing because there's a class called
-        // AnomalyResult, which seems more like an anomaly. Want to revisit whether we need to put the whole MMD on the
-        // anomalies topic, or whether putting an AnomalyResult is sufficient. [WLW]
         val anomaly = TestObjectMother.mappedMetricDataWithAnomalyResult();
         val anomalyJson = objectMapper.writeValueAsString(anomaly);
 

@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
 import com.expedia.adaptivealerting.anomdetect.util.AssertUtil;
 import com.expedia.metrics.MetricData;
@@ -160,7 +160,7 @@ public final class CusumDetector extends AbstractOutlierDetector {
             }
         }
 
-        return new AnomalyResult(level);
+        return new OutlierDetectorResult(level);
     }
 
     private void resetSums() {

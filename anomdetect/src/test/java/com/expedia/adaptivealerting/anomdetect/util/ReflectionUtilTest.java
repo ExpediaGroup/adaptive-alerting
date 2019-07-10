@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.util;
 
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyThresholds;
 import lombok.val;
 import org.junit.Test;
@@ -26,8 +26,8 @@ public class ReflectionUtilTest {
 
     @Test
     public void testNewInstance() {
-        val result = ReflectionUtil.newInstance(AnomalyResult.class);
-        assertEquals(AnomalyResult.class, result.getClass());
+        val result = ReflectionUtil.newInstance(OutlierDetectorResult.class);
+        assertEquals(OutlierDetectorResult.class, result.getClass());
     }
 
     @Test(expected = RuntimeException.class)

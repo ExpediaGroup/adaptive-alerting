@@ -17,7 +17,7 @@ package com.expedia.adaptivealerting.kafka;
 
 import com.expedia.adaptivealerting.anomdetect.DetectorManager;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.util.AssertUtil;
 import com.expedia.adaptivealerting.anomdetect.util.ErrorUtil;
 import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
@@ -74,30 +74,30 @@ public final class KafkaAnomalyDetectorManager extends AbstractStreamsApp {
         final KStream<String, MappedMetricData> stream = builder.stream(inputTopic);
         stream
                 .filter((key, mmd) -> mmd != null)
-                .mapValues(this::toAnomalyMmd)
+                .mapValues(this::toAnomalyMMD)
                 .filter((key, mmd) -> mmd != null)
                 .to(outputTopic);
         return builder.build();
     }
 
-    private MappedMetricData toAnomalyMmd(MappedMetricData mmd) {
+    private MappedMetricData toAnomalyMMD(MappedMetricData mmd) {
         AssertUtil.notNull(mmd, "mappedMetricData can't be null");
 
-        AnomalyResult anomalyResult = null;
+        OutlierDetectorResult outlierDetectorResult = null;
         try {
-            anomalyResult = (AnomalyResult) manager.detect(mmd);
+            outlierDetectorResult = (OutlierDetectorResult) manager.detect(mmd);
         } catch (Exception e) {
             log.error("Classification error: mappedMetricData={}, error={}",
                     mmd,
                     ErrorUtil.singleLineExceptionTrace(e));
         }
 
-        if (anomalyResult == null) {
+        if (outlierDetectorResult == null) {
             log.info("anomalyResult=null");
             return null;
         }
 
-        val newMmd = new MappedMetricData(mmd, anomalyResult);
+        val newMmd = new MappedMetricData(mmd, outlierDetectorResult);
         log.info("produced={}", newMmd);
         return newMmd;
     }

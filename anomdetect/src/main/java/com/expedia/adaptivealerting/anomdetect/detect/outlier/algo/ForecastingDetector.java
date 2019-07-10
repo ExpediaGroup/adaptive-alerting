@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo;
 
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyThresholds;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
@@ -94,7 +94,7 @@ public final class ForecastingDetector extends AbstractOutlierDetector {
         val observed = metricData.getValue();
         val level = classifier.classify(thresholds, observed);
 
-        return new AnomalyResult(level)
+        return new OutlierDetectorResult(level)
                 .setPredicted(pointForecast.getValue())
                 .setThresholds(thresholds);
     }

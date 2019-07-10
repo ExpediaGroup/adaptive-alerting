@@ -15,8 +15,9 @@
  */
 package com.expedia.adaptivealerting.kafka;
 
-import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
+import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 import com.expedia.adaptivealerting.kafka.serde.AlertJsonSerde;
 import com.expedia.alertmanager.model.Alert;
 import lombok.Generated;
@@ -30,6 +31,8 @@ import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Produced;
 
 import java.util.HashMap;
+
+// TODO Expand this to support breakouts? [WLW]
 
 @Slf4j
 public class KafkaAnomalyToAlertMapper extends AbstractStreamsApp {
@@ -71,23 +74,28 @@ public class KafkaAnomalyToAlertMapper extends AbstractStreamsApp {
 
         val builder = new StreamsBuilder();
         final KStream<String, MappedMetricData> stream = builder.stream(inboundTopic);
-        stream.filter((key, mappedMetricData) -> AnomalyLevel.STRONG.equals(mappedMetricData.getAnomalyResult().getAnomalyLevel()) ||
-                AnomalyLevel.WEAK.equals(mappedMetricData.getAnomalyResult().getAnomalyLevel()))
+        stream
+                .filter((key, mappedMetricData) -> {
+                    val outlierResult = (OutlierDetectorResult) mappedMetricData.getAnomalyResult();
+                    val outlierLevel = outlierResult.getAnomalyLevel();
+                    return AnomalyLevel.STRONG.equals(outlierLevel) || AnomalyLevel.WEAK.equals(outlierLevel);
+                })
                 .map((key, mappedMetricData) -> {
                     val metricData = mappedMetricData.getMetricData();
                     val metricDef = metricData.getMetricDefinition();
                     val tags = metricDef.getTags().getKv();
-                    Double value = metricData.getValue();
-                    Long timestamp = metricData.getTimestamp();
-                    val anomalyLevel = mappedMetricData.getAnomalyResult().getAnomalyLevel();
+                    val outlierResult = (OutlierDetectorResult) mappedMetricData.getAnomalyResult();
+                    val outlierLevel = outlierResult.getAnomalyLevel();
+                    val value = metricData.getValue();
+                    val timestamp = metricData.getTimestamp();
 
                     val labels = new HashMap<String, String>(tags);
                     labels.put(METRIC_KEY, metricDef.getKey());
-                    labels.put(ANOMALY_LEVEL, anomalyLevel.toString());
+                    labels.put(ANOMALY_LEVEL, outlierLevel.toString());
 
                     val annotations = new HashMap<String, String>();
-                    annotations.put(VALUE, value.toString());
-                    annotations.put(TIMESTAMP, timestamp.toString());
+                    annotations.put(VALUE, String.valueOf(value));
+                    annotations.put(TIMESTAMP, String.valueOf(timestamp));
 
                     val alert = new Alert();
                     alert.setName(metricDef.getKey());

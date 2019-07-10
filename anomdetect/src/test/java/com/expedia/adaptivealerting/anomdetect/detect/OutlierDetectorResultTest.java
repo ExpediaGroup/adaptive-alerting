@@ -21,15 +21,15 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public final class AnomalyResultTest {
+public final class OutlierDetectorResultTest {
     private static final double TOLERANCE = 0.001;
 
     @Test
     public void coverageOnly() {
-        val anomalyResult = new AnomalyResult();
+        val anomalyResult = new OutlierDetectorResult();
         anomalyResult.setAnomalyLevel(AnomalyLevel.NORMAL);
 
-        val anomalyResult2 = new AnomalyResult(AnomalyLevel.STRONG);
+        val anomalyResult2 = new OutlierDetectorResult(AnomalyLevel.STRONG);
         anomalyResult2.setPredicted(10.0);
         anomalyResult2.setThresholds(new AnomalyThresholds(100.0, null, null, null));
 

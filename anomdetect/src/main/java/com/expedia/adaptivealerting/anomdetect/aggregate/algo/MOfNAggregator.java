@@ -18,7 +18,7 @@ package com.expedia.adaptivealerting.anomdetect.aggregate.algo;
 import com.expedia.adaptivealerting.anomdetect.aggregate.Aggregator;
 import com.expedia.adaptivealerting.anomdetect.detect.AggregatorConfig;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
@@ -63,7 +63,7 @@ public class MOfNAggregator implements Aggregator {
     }
 
     @Override
-    public AnomalyResult aggregate(AnomalyResult result) {
+    public OutlierDetectorResult aggregate(OutlierDetectorResult result) {
         notNull(result, "result can't be null");
 
         buffer[bufferIndex++] = result.getAnomalyLevel();
@@ -71,7 +71,7 @@ public class MOfNAggregator implements Aggregator {
             bufferIndex = 0;
         }
 
-        val aggregatedResult = new AnomalyResult()
+        val aggregatedResult = new OutlierDetectorResult()
                 .setAnomalyLevel(result.getAnomalyLevel())
                 .setPredicted(result.getPredicted())
                 .setThresholds(result.getThresholds());

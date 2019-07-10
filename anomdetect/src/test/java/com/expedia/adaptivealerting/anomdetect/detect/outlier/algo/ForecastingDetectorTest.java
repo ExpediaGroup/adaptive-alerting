@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo;
 
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecast;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecaster;
@@ -72,7 +72,7 @@ public class ForecastingDetectorTest {
     public void testClassify() {
         val metricDef = TestObjectMother.metricDefinition();
         val metricData = new MetricData(metricDef, 100.0, Instant.now().getEpochSecond());
-        val result = (AnomalyResult) detectorUnderTest.detect(metricData);
+        val result = (OutlierDetectorResult) detectorUnderTest.detect(metricData);
         assertNotNull(result);
     }
 

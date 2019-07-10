@@ -15,8 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detect.breakout.algo;
 
-import com.expedia.adaptivealerting.anomdetect.detect.breakout.algo.EdmxDetector;
-import com.expedia.adaptivealerting.anomdetect.detect.breakout.algo.EdmxDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.EdmxHyperparams;
 import com.expedia.adaptivealerting.anomdetect.util.MetricFrameLoader;
 import com.expedia.adaptivealerting.anomdetect.util.TestObjectMother;

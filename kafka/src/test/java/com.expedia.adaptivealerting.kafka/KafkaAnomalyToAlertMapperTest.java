@@ -17,7 +17,7 @@ package com.expedia.adaptivealerting.kafka;
 
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.util.ObjectMapperUtil;
 import com.expedia.adaptivealerting.kafka.serde.AlertJsonSerde;
 import com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde;
@@ -56,7 +56,7 @@ public class KafkaAnomalyToAlertMapperTest {
     //Test Objects
     private Alert alert;
     private MappedMetricData mappedMetricData;
-    private AnomalyResult anomalyResult;
+    private OutlierDetectorResult outlierDetectorResult;
     private MetricData metricData;
 
     //Test machinery
@@ -97,9 +97,9 @@ public class KafkaAnomalyToAlertMapperTest {
     private void initTestObjects() {
         this.alert = TestObjectMother.alert();
         this.metricData = TestObjectMother.metricData();
-        this.anomalyResult = new AnomalyResult(AnomalyLevel.STRONG);
+        this.outlierDetectorResult = new OutlierDetectorResult(AnomalyLevel.STRONG);
         this.mappedMetricData = TestObjectMother.mappedMetricData(metricData);
-        mappedMetricData.setAnomalyResult(anomalyResult);
+        mappedMetricData.setAnomalyResult(outlierDetectorResult);
         log.trace("alert={}", ObjectMapperUtil.writeValueAsString(new ObjectMapper(), alert));
     }
 

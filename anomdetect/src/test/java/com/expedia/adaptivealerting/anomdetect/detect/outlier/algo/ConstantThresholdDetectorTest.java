@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyThresholds;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
@@ -114,7 +114,7 @@ public class ConstantThresholdDetectorTest {
 
     private void verifyResult(AnomalyLevel level, Detector detector, long epochSecond, double value) {
         val metricData = new MetricData(metricDefinition, value, epochSecond);
-        val result = (AnomalyResult)  detector.detect(metricData);
+        val result = (OutlierDetectorResult)  detector.detect(metricData);
         assertNull(result.getPredicted());
         assertNotNull(result.getThresholds());
         assertEquals(level, result.getAnomalyLevel());

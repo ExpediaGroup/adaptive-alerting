@@ -16,190 +16,161 @@
 package com.expedia.adaptivealerting.kafka;
 
 import com.expedia.adaptivealerting.anomdetect.DetectorManager;
+import com.expedia.adaptivealerting.anomdetect.detect.BreakoutDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
-import com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
+import com.expedia.adaptivealerting.anomdetect.detect.algo.EdmxBreakoutDetectorResult;
 import com.expedia.adaptivealerting.kafka.util.TestObjectMother;
-import com.typesafe.config.Config;
+import com.expedia.metrics.jackson.MetricsJavaModule;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.github.charithe.kafka.EphemeralKafkaBroker;
+import com.github.charithe.kafka.KafkaJunitRule;
+import com.typesafe.config.ConfigFactory;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.serialization.Deserializer;
-import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.streams.TopologyTestDriver;
-import org.apache.kafka.streams.test.ConsumerRecordFactory;
-import org.junit.After;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 
-/**
- * Unit test for {@link KafkaAnomalyDetectorManager}. See
- * https://kafka.apache.org/20/documentation/streams/developer-guide/testing.html
- */
 @Slf4j
-public final class KafkaDetectorManagerTest {
-    private static final String KAFKA_KEY = "some-kafka-key";
-    private static final String INPUT_TOPIC = "mapped-metrics";
-    private static final String OUTPUT_TOPIC = "anomalies";
-    private static final String INVALID_INPUT_VALUE = "invalid-input-value";
+public class KafkaDetectorManagerTest {
+
+    // Metric consumer
+    private static final String METRIC_TOPIC = "mapped-metrics";
+    private static final String STRING_DESER = "org.apache.kafka.common.serialization.StringDeserializer";
+    private static final String METRIC_DESER = "com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde$Deser";
+    private static final String METRIC_SER = "com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde$Ser";
+
+    // Anomaly producer
+    private static final String OUTLIER_TOPIC = "outliers";
+    private static final String BREAKOUT_TOPIC = "breakouts";
+    private static final String STRING_SER = "org.apache.kafka.common.serialization.StringSerializer";
+    private static final String ANOMALY_SER = "com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde$Ser";
+    private static final String ANOMALY_DESER = "com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde$Deser";
+
+    private static final int NUM_OUTLIER_METRICS = 10;
+    private static final int NUM_BREAKOUT_METRICS = 5;
+    private static final long THREAD_JOIN_MILLIS = 5000L;
+
+    @ClassRule
+    public static KafkaJunitRule kafka = new KafkaJunitRule(EphemeralKafkaBroker.create()).waitForStartup();
+
+    private KafkaDetectorManager managerUnderTest;
+    private ObjectMapper objectMapper;
 
     @Mock
-    private DetectorManager manager;
+    private DetectorManager detectorManager;
 
-    @Mock
-    private StreamsAppConfig saConfig;
-
-    @Mock
-    private Config tsConfig;
-
-    // Test machinery
-    private TopologyTestDriver logAndFailDriver;
-    private TopologyTestDriver logAndContinueDriver;
-    private ConsumerRecordFactory<String, String> stringFactory;
-    private ConsumerRecordFactory<String, MappedMetricData> metricFactory;
-    private StringDeserializer stringDeser;
-    private Deserializer<MappedMetricData> anomalyDeser;
-
-    // Test objects
-    private MappedMetricData metric_normalAnomaly;
-    private MappedMetricData metric_weakAnomaly;
-    private MappedMetricData metric_strongAnomaly;
-    private MappedMetricData metric_modelWarmup;
-    private MappedMetricData metric_unknownAnomaly;
-    private MappedMetricData metric_invalid;
+    private MappedMetricData outlierMMD;
+    private MappedMetricData breakoutMMD;
+    private OutlierDetectorResult outlierDetectorResult;
+    private BreakoutDetectorResult breakoutDetectorResult;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        initConfig();
         initTestObjects();
         initDependencies();
-        initTestMachinery();
-    }
 
-    @After
-    public void tearDown() {
-        logAndFailDriver.close();
-        logAndContinueDriver.close();
-    }
+        val metricConsumer = buildMetricConsumer();
+        val anomalyProducer = buildAnomalyProducer();
 
-    @Test
-    public void testPublishesNormalAnomalies() {
-        publishesAnomaly(metric_normalAnomaly, AnomalyLevel.NORMAL);
-    }
+        this.managerUnderTest = new KafkaDetectorManager(
+                detectorManager,
+                metricConsumer,
+                anomalyProducer,
+                METRIC_TOPIC,
+                OUTLIER_TOPIC,
+                BREAKOUT_TOPIC);
 
-    @Test
-    public void testPublishesWeakAnomalies() {
-        publishesAnomaly(metric_weakAnomaly, AnomalyLevel.WEAK);
-    }
-
-    @Test
-    public void testPublishesStrongAnomalies() {
-        publishesAnomaly(metric_strongAnomaly, AnomalyLevel.STRONG);
+        this.objectMapper = new ObjectMapper()
+                .registerModule(new MetricsJavaModule())
+                .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     @Test
-    public void testPublishesWarmupAnomalies() {
-        publishesAnomaly(metric_modelWarmup, AnomalyLevel.MODEL_WARMUP);
+    public void testBuildManager() {
+        val config = ConfigFactory.load("detector-manager.conf");
+        val manager = KafkaDetectorManager.buildManager(config);
+        assertNotNull(manager);
+        assertEquals(METRIC_TOPIC, manager.getMetricTopic());
+        assertEquals(OUTLIER_TOPIC, manager.getOutlierTopic());
+        assertEquals(BREAKOUT_TOPIC, manager.getBreakoutTopic());
     }
 
     @Test
-    public void testPublishesUnknownAnomalies() {
-        publishesAnomaly(metric_unknownAnomaly, AnomalyLevel.UNKNOWN);
+    public void testRun() throws Exception {
+        val outlierMmdJson = objectMapper.writeValueAsString(outlierMMD);
+        val breakoutMmdJson = objectMapper.writeValueAsString(breakoutMMD);
+
+        for (int i = 0; i < NUM_OUTLIER_METRICS; i++) {
+            log.info("Writing mapped metric data: {}", outlierMmdJson);
+            kafka.helper().produceStrings(METRIC_TOPIC, outlierMmdJson);
+        }
+
+        for (int i = 0; i < NUM_BREAKOUT_METRICS; i++) {
+            log.info("Writing mapped metric data: {}", breakoutMmdJson);
+            kafka.helper().produceStrings(METRIC_TOPIC, breakoutMmdJson);
+        }
+
+        val managerThread = new Thread(managerUnderTest);
+        managerThread.start();
+        managerThread.join(THREAD_JOIN_MILLIS);
+        managerUnderTest.getMetricConsumer().wakeup();
+
+        // FIXME This hangs if there aren't enough messages to consume. Add a timeout?
+        val outliers = kafka.helper().consumeStrings(OUTLIER_TOPIC, NUM_OUTLIER_METRICS).get();
+        assertEquals(NUM_OUTLIER_METRICS, outliers.size());
+
+        val breakouts = kafka.helper().consumeStrings(BREAKOUT_TOPIC, NUM_BREAKOUT_METRICS).get();
+        assertEquals(NUM_BREAKOUT_METRICS, breakouts.size());
+
+        for (val outlier : outliers) {
+            log.info("outlierDetectorResult={}", outlier);
+        }
     }
 
     @Test
-    public void testDoesNotPublishInvalidAnomaly() {
-        doesNotPublishAnomaly(metric_invalid);
-    }
-
-    /**
-     * Addresses bug https://github.com/ExpediaDotCom/adaptive-alerting/issues/245
-     * See also https://stackoverflow.com/questions/51136942/how-to-handle-serializationexception-after-deserialization
-     */
-    @Test
-    public void nullOnDeserExceptionWithLogAndFailDriver() {
-        nullOnDeserException(logAndFailDriver);
-    }
-
-    /**
-     * Addresses bug https://github.com/ExpediaDotCom/adaptive-alerting/issues/245
-     * See also https://stackoverflow.com/questions/51136942/how-to-handle-serializationexception-after-deserialization
-     */
-    @Test
-    public void nullOnDeserExceptionWithLogAndContinueDriver() {
-        nullOnDeserException(logAndContinueDriver);
-    }
-
-    private void initConfig() {
-        when(saConfig.getTypesafeConfig()).thenReturn(tsConfig);
-        when(saConfig.getInputTopic()).thenReturn(INPUT_TOPIC);
-        when(saConfig.getOutputTopic()).thenReturn(OUTPUT_TOPIC);
+    public void testRun_unmappedAnomalies() throws Exception {
+        // TODO
     }
 
     private void initTestObjects() {
-        this.metric_normalAnomaly = TestObjectMother.mappedMetricData();
-        this.metric_weakAnomaly = TestObjectMother.mappedMetricData();
-        this.metric_strongAnomaly = TestObjectMother.mappedMetricData();
-        this.metric_modelWarmup = TestObjectMother.mappedMetricData();
-        this.metric_unknownAnomaly = TestObjectMother.mappedMetricData();
-        this.metric_invalid = TestObjectMother.mappedMetricData();
+        this.outlierMMD = TestObjectMother.mappedMetricData();
+        this.breakoutMMD = TestObjectMother.mappedMetricData();
+        this.outlierDetectorResult = new OutlierDetectorResult();
+        this.breakoutDetectorResult = new EdmxBreakoutDetectorResult();
     }
 
     private void initDependencies() {
-        when(manager.detect(metric_normalAnomaly)).thenReturn(new AnomalyResult(AnomalyLevel.NORMAL));
-        when(manager.detect(metric_weakAnomaly)).thenReturn(new AnomalyResult(AnomalyLevel.WEAK));
-        when(manager.detect(metric_strongAnomaly)).thenReturn(new AnomalyResult(AnomalyLevel.STRONG));
-        when(manager.detect(metric_modelWarmup)).thenReturn(new AnomalyResult(AnomalyLevel.MODEL_WARMUP));
-        when(manager.detect(metric_unknownAnomaly)).thenReturn(new AnomalyResult(AnomalyLevel.UNKNOWN));
-        when(manager.detect(metric_invalid)).thenThrow(new RuntimeException("Classification error"));
+        when(detectorManager.detect(outlierMMD)).thenReturn(outlierDetectorResult);
+        when(detectorManager.detect(breakoutMMD)).thenReturn(breakoutDetectorResult);
     }
 
-    private void initTestMachinery() {
-
-        // Topology test drivers
-        val topology = new KafkaAnomalyDetectorManager(saConfig, manager).buildTopology();
-        this.logAndFailDriver = TestObjectMother.topologyTestDriver(topology, MappedMetricDataJsonSerde.class, false);
-        this.logAndContinueDriver = TestObjectMother.topologyTestDriver(topology, MappedMetricDataJsonSerde.class, true);
-
-        // MetricData sources
-        this.stringFactory = TestObjectMother.stringFactory();
-        this.metricFactory = TestObjectMother.mappedMetricDataFactory();
-
-        // MappedMetricData consumers
-        this.stringDeser = new StringDeserializer();
-        this.anomalyDeser = new MappedMetricDataJsonSerde.Deser();
+    private KafkaConsumer<String, MappedMetricData> buildMetricConsumer() {
+        val config = kafka.helper().consumerConfig();
+        config.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, STRING_DESER);
+        config.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, METRIC_DESER);
+        return new KafkaConsumer<>(config);
     }
 
-    private void publishesAnomaly(MappedMetricData metric, AnomalyLevel anomalyLevel) {
-        val anomalyRecord = getAnomalyRecord(metric);
-        val anomaly = anomalyRecord.value();
-        assertNotNull(anomaly);
-        assertEquals(anomalyLevel, anomaly.getAnomalyResult().getAnomalyLevel());
-    }
-
-    @SuppressWarnings("unused")
-    private void doesNotPublishAnomaly(MappedMetricData metric) {
-        assertNull(getAnomalyRecord(metric));
-    }
-
-    private ProducerRecord<String, MappedMetricData> getAnomalyRecord(MappedMetricData metric) {
-        val metricRecord = metricFactory.create(INPUT_TOPIC, KAFKA_KEY, metric);
-        logAndFailDriver.pipeInput(metricRecord);
-        return logAndFailDriver.readOutput(OUTPUT_TOPIC, stringDeser, anomalyDeser);
-    }
-
-    private void nullOnDeserException(TopologyTestDriver driver) {
-        driver.pipeInput(stringFactory.create(INPUT_TOPIC, KAFKA_KEY, INVALID_INPUT_VALUE));
-        val record = driver.readOutput(OUTPUT_TOPIC, stringDeser, anomalyDeser);
-        assertNull(record);
+    private KafkaProducer<String, MappedMetricData> buildAnomalyProducer() {
+        val config = kafka.helper().producerConfig();
+        config.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, STRING_SER);
+        config.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ANOMALY_SER);
+        return new KafkaProducer<>(config);
     }
 }

@@ -15,10 +15,9 @@
  */
 package com.expedia.adaptivealerting.anomdetect.aggregate.algo;
 
-import com.expedia.adaptivealerting.anomdetect.aggregate.algo.MOfNAggregator;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyThresholds;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,26 +25,26 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 public final class MOfNAggregatorTest {
-    private AnomalyResult normalResult;
-    private AnomalyResult weakResult;
-    private AnomalyResult strongResult;
-    private AnomalyResult warmupResult;
+    private OutlierDetectorResult normalResult;
+    private OutlierDetectorResult weakResult;
+    private OutlierDetectorResult strongResult;
+    private OutlierDetectorResult warmupResult;
 
     @Before
     public void setUp() {
-        this.normalResult = new AnomalyResult()
+        this.normalResult = new OutlierDetectorResult()
                 .setAnomalyLevel(AnomalyLevel.NORMAL)
                 .setPredicted(42.2)
                 .setThresholds(new AnomalyThresholds(100.0, 90.0, 20.0, 10.0));
-        this.weakResult = new AnomalyResult()
+        this.weakResult = new OutlierDetectorResult()
                 .setAnomalyLevel(AnomalyLevel.WEAK)
                 .setPredicted(95.1)
                 .setThresholds(new AnomalyThresholds(102.0, 92.0, 22.0, 12.0));
-        this.strongResult = new AnomalyResult()
+        this.strongResult = new OutlierDetectorResult()
                 .setAnomalyLevel(AnomalyLevel.STRONG)
                 .setPredicted(105.8)
                 .setThresholds(new AnomalyThresholds(101.0, 91.0, 21.0, 11.0));
-        this.warmupResult = new AnomalyResult()
+        this.warmupResult = new OutlierDetectorResult()
                 .setAnomalyLevel(AnomalyLevel.MODEL_WARMUP)
                 .setPredicted(37.2)
                 .setThresholds(new AnomalyThresholds(103.0, 93.0, 23.0, 13.0));
@@ -81,7 +80,7 @@ public final class MOfNAggregatorTest {
         val aggregator = new MOfNAggregator();
 
         val inputResult = weakResult;
-        AnomalyResult outputResult;
+        OutlierDetectorResult outputResult;
 
         outputResult = aggregator.aggregate(inputResult);
         assertEquals(inputResult.getAnomalyLevel(), outputResult.getAnomalyLevel());
@@ -97,8 +96,8 @@ public final class MOfNAggregatorTest {
     public void testAggregate_mNonConsecutiveWeaks() {
         val aggregator = new MOfNAggregator();
 
-        AnomalyResult inputResult;
-        AnomalyResult outputResult;
+        OutlierDetectorResult inputResult;
+        OutlierDetectorResult outputResult;
 
         inputResult = weakResult;
         outputResult = aggregator.aggregate(inputResult);
@@ -125,8 +124,8 @@ public final class MOfNAggregatorTest {
     public void testAggregate_mConsecutiveMixedAnomalies() {
         val aggregator = new MOfNAggregator();
 
-        AnomalyResult inputResult;
-        AnomalyResult outputResult;
+        OutlierDetectorResult inputResult;
+        OutlierDetectorResult outputResult;
 
         inputResult = weakResult;
         outputResult = aggregator.aggregate(inputResult);
@@ -145,8 +144,8 @@ public final class MOfNAggregatorTest {
     public void testAggregate_nWarmupsThenMixedLevels() {
         val aggregator = new MOfNAggregator();
 
-        AnomalyResult inputResult = warmupResult;
-        AnomalyResult outputResult;
+        OutlierDetectorResult inputResult = warmupResult;
+        OutlierDetectorResult outputResult;
 
         outputResult = aggregator.aggregate(inputResult);
         assertEquals(inputResult.getAnomalyLevel(), outputResult.getAnomalyLevel());

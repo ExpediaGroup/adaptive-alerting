@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.aggregate.algo;
 
-import com.expedia.adaptivealerting.anomdetect.aggregate.algo.MOfNAggregator;
 import org.junit.Test;
 
 public class MOfNAggregatorConfigTest {

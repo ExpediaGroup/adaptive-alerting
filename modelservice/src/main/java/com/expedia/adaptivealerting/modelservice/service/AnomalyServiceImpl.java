@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.modelservice.service;
 
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorRegistry;
@@ -45,16 +45,16 @@ public class AnomalyServiceImpl implements AnomalyService {
     private DetectorRegistry detectorRegistry;
 
     @Override
-    public List<AnomalyResult> getAnomalies(AnomalyRequest request) {
+    public List<OutlierDetectorResult> getAnomalies(AnomalyRequest request) {
         val metricDef = MetricUtil.metricDefinition();
         val detector = buildDetector(request);
 
-        val anomalyResults = new ArrayList<AnomalyResult>();
+        val anomalyResults = new ArrayList<OutlierDetectorResult>();
         metricSources.forEach(metricSource -> {
             val results = metricSource.getMetricData(request.getMetricTags());
             for (val result : results) {
                 val metricData = MetricUtil.metricData(metricDef, result.getDataPoint(), result.getEpochSecond());
-                val anomalyResult = (AnomalyResult) detector.detect(metricData);
+                val anomalyResult = (OutlierDetectorResult) detector.detect(metricData);
                 anomalyResults.add(anomalyResult);
             }
         });

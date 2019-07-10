@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.tools.pipeline.filter;
 
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.forecast.eval.PointForecastEvaluator;
 import com.expedia.adaptivealerting.anomdetect.forecast.eval.PointForecastEvaluation;
 import com.expedia.adaptivealerting.tools.pipeline.util.AnomalyResultSubscriber;
@@ -59,8 +60,8 @@ public final class EvaluatorFilter implements AnomalyResultSubscriber {
 
     private Double getPredicted(MappedMetricData anomaly) {
         // getPredicted() can return null during warm up; convert null to 0
-        val anomalyResult = anomaly.getAnomalyResult();
-        return (anomalyResult.getPredicted() == null ? 0.0 : anomalyResult.getPredicted());
+        val outlierResult = (OutlierDetectorResult) anomaly.getAnomalyResult();
+        return (outlierResult.getPredicted() == null ? 0.0 : outlierResult.getPredicted());
     }
 
     private void publish(PointForecastEvaluation pointForecastEvaluation) {

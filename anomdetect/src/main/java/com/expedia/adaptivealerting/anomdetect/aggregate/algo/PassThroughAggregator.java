@@ -17,7 +17,7 @@ package com.expedia.adaptivealerting.anomdetect.aggregate.algo;
 
 import com.expedia.adaptivealerting.anomdetect.aggregate.Aggregator;
 import com.expedia.adaptivealerting.anomdetect.detect.AggregatorConfig;
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,12 +26,12 @@ import lombok.Setter;
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 /**
- * "Aggregator" that simply returns the passed {@link AnomalyResult}.
+ * "Aggregator" that simply returns the passed {@link OutlierDetectorResult}.
  */
 public class PassThroughAggregator implements Aggregator {
 
     @Override
-    public AnomalyResult aggregate(AnomalyResult result) {
+    public OutlierDetectorResult aggregate(OutlierDetectorResult result) {
         notNull(result, "result can't be null");
         return result;
     }

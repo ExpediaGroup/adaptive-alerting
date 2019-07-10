@@ -18,7 +18,7 @@ package com.expedia.adaptivealerting.pipeline.integration.test
 import java.time.Instant
 
 import com.expedia.adaptivealerting.anomdetect.DetectorManager
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult
 import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMapper
 import com.expedia.adaptivealerting.anomdetect.source.DetectorClient
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper
@@ -88,8 +88,8 @@ class ConstantThresholdBasedE2ETestSpec extends IntegrationTestSpec {
       val consumerPropAnomalyTopic = configToProps(anomalyTopicConsumerConfig.getConfig(STREAM))
       // No longer using this config. [WLW]
 //      consumerPropAnomalyTopic.put("JsonPOJOClass", classOf[AnomalyResult])
-      val outputRecords: List[KeyValue[String, AnomalyResult]] =
-        IntegrationTestUtils.waitUntilMinKeyValueRecordsReceived[String, AnomalyResult](
+      val outputRecords: List[KeyValue[String, OutlierDetectorResult]] =
+        IntegrationTestUtils.waitUntilMinKeyValueRecordsReceived[String, OutlierDetectorResult](
           consumerPropAnomalyTopic,
           OUTPUT_TOPIC, 1, 35000).asScala.toList // get metricPoints from Kafka's output topic
       outputRecords.size shouldEqual 1

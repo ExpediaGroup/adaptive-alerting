@@ -15,11 +15,11 @@
  */
 package com.expedia.adaptivealerting.modelservice.service;
 
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyResult;
+import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
 
 import java.util.List;
 
 public interface AnomalyService {
 
-    List<AnomalyResult> getAnomalies(AnomalyRequest request);
+    List<OutlierDetectorResult> getAnomalies(AnomalyRequest request);
 }
