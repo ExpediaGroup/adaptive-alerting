@@ -67,7 +67,6 @@ module "ad-manager" {
   env_vars = "${var.ad-manager["environment_overrides"]}"
 
   # App
-  kafka_endpoint = "${local.kafka_endpoint}"
   metric_consumer_bootstrap_servers = "${var.ad-manager["metric_consumer_bootstrap_servers"]}"
   metric_consumer_group_id = "${var.ad-manager["metric_consumer_group_id"]}"
   metric_consumer_topic = "${var.ad-manager["metric_consumer_topic"]}"
