@@ -22,7 +22,7 @@ import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult
 import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMapper
 import com.expedia.adaptivealerting.anomdetect.source.DetectorClient
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper
-import com.expedia.adaptivealerting.kafka.{KafkaAnomalyDetectorManager, KafkaAnomalyDetectorMapper}
+import com.expedia.adaptivealerting.kafka.{KafkaDetectorManager, KafkaAnomalyDetectorMapper}
 import com.expedia.metrics.{MetricData, MetricDefinition}
 import com.typesafe.config.Config
 import org.apache.kafka.clients.admin.AdminClient
@@ -127,7 +127,7 @@ class ConstantThresholdBasedE2ETestSpec extends IntegrationTestSpec {
 
     val manager: DetectorManager = new DetectorManager(conf.getConfig(DETECTORS), modelServiceConnector)
 
-    new KafkaAnomalyDetectorManager(conf, manager)
+    new KafkaDetectorManager(conf, manager)
   }
 
   private def generateAnomalousMetrics(): List[MetricData] = {
