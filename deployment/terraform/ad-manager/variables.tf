@@ -27,7 +27,17 @@ variable "graphite_prefix" {
 variable "env_vars" {}
 
 # App
-variable "kafka_endpoint" {}
+variable "metric_consumer_bootstrap_servers" {}
+variable "metric_consumer_group_id" {}
+variable "metric_consumer_topic" {}
+variable "metric_consumer_key_deserializer" {}
+variable "metric_consumer_value_deserializer" {}
+variable "anomaly_producer_bootstrap_servers" {}
+variable "anomaly_producer_client_id" {}
+variable "anomaly_producer_outlier_topic" {}
+variable "anomaly_producer_breakout_topic" {}
+variable "anomaly_producer_key_serializer" {}
+variable "anomaly_producer_value_serializer" {}
 variable "modelservice_base_uri" {}
 variable "detector_refresh_period" {
   default = 5

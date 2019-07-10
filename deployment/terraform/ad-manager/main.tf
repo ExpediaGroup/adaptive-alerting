@@ -10,7 +10,17 @@ locals {
 data "template_file" "config_data" {
   template = "${file("${local.config_file_path}")}"
   vars {
-    kafka_endpoint = "${var.kafka_endpoint}"
+    metric_consumer_bootstrap_servers = "${var.metric_consumer_bootstrap_servers}"
+    metric_consumer_group_id = "${var.metric_consumer_group_id}"
+    metric_consumer_topic = "${var.metric_consumer_topic}"
+    metric_consumer_key_deserializer = "${var.metric_consumer_key_deserializer}"
+    metric_consumer_value_deserializer = "${var.metric_consumer_value_deserializer}"
+    anomaly_producer_bootstrap_servers = "${var.anomaly_producer_bootstrap_servers}"
+    anomaly_producer_client_id = "${var.anomaly_producer_client_id}"
+    anomaly_producer_outlier_topic = "${var.anomaly_producer_outlier_topic}"
+    anomaly_producer_breakout_topic = "${var.anomaly_producer_breakout_topic}"
+    anomaly_producer_key_serializer = "${var.anomaly_producer_key_serializer}"
+    anomaly_producer_value_serializer = "${var.anomaly_producer_value_serializer}"
     modelservice_base_uri = "${var.modelservice_base_uri}"
     detector_refresh_period = "${var.detector_refresh_period}"
   }
