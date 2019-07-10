@@ -16,7 +16,7 @@
 
 APP_NAME="adaptive-alerting-ad-manager"
 DOTTED_APP_NAME="ad.manager"
-MAIN_CLASS="com.expedia.adaptivealerting.kafka.KafkaAnomalyDetectorManager"
+MAIN_CLASS="com.expedia.adaptivealerting.kafka.KafkaDetectorManager"
 
 cd `cd -P -- "$(dirname -- "$0")" && pwd -P`
 

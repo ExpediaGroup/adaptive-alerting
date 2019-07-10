@@ -1,15 +1,21 @@
 ad-manager {
-  streams {
-    application.id = "ad-manager"
-    bootstrap.servers = "${kafka_endpoint}"
-    default.value.serde = "com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde"
-    default.timestamp.extractor = "com.expedia.adaptivealerting.kafka.processor.MappedMetricDataTimestampExtractor"
-    retries = 10
-    retry.backoff.ms = 5000
+  metric-consumer {
+    bootstrap.servers = "${metric_consumer_bootstrap_servers}"
+    group.id = "${metric_consumer_group_id}"
+    topic = "${metric_consumer_topic}"
+    key.deserializer = "${metric_consumer_key_deserializer}"
+    value.deserializer = "${metric_consumer_value_deserializer}"
   }
-  health.status.path = "/app/isHealthy"
-  inbound-topic = "mapped-metrics"
-  outbound-topic = "anomalies"
-  detector-refresh-period = "${detector_refresh_period}"
+  anomaly-producer {
+    bootstrap.servers = "${anomaly_producer_bootstrap_servers}"
+    client.id = "${anomaly_producer_client_id}"
+    outlier-topic = "${anomaly_producer_outlier_topic}"
+    breakout-topic = "${anomaly_producer_breakout_topic}"
+    key.serializer = "${anomaly_producer_key_serializer}"
+    value.serializer = "${anomaly_producer_value_serializer}"
+  }
   model-service-base-uri = "${modelservice_base_uri}"
+
+  # Detector refresh period in minutes
+  detector-refresh-period = ${detector_refresh_period}
 }

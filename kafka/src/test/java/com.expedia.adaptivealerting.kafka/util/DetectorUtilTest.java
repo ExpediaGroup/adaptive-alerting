@@ -28,7 +28,7 @@ public final class DetectorUtilTest {
 
     @Test
     public void testBuildDetectorSource() {
-        val config = ConfigFactory.load("manager.conf");
+        val config = ConfigFactory.load("detector-manager.conf");
         val source = DetectorUtil.buildDetectorSource(config);
         assertNotNull(source);
     }
