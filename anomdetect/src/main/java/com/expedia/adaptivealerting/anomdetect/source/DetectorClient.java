@@ -86,7 +86,8 @@ public class DetectorClient {
         } catch (IOException e) {
             val message = "IOException while getting detector document " + uuid +
                     ": httpMethod=GET" +
-                    ", uri=" + uri;
+                    ", uri=" + uri +
+                    ", message=" + e.getMessage();
             throw new DetectorException(message, e);
         }
 

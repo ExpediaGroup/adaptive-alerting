@@ -16,12 +16,14 @@
 package com.expedia.adaptivealerting.anomdetect.source.factory;
 
 import com.expedia.adaptivealerting.anomdetect.detect.breakout.algo.EdmxDetector;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+@Slf4j
 public class EdmxFactoryTest extends AbstractDetectorFactoryTest {
     private static final double TOLERANCE = 0.01;
 
