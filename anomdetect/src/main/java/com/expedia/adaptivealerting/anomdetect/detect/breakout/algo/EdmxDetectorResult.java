@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detect.breakout.algo;
 
-import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
+import com.expedia.adaptivealerting.anomdetect.detect.BreakoutDetectorResult;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -25,7 +25,7 @@ import java.time.Instant;
 @Data
 @Accessors(chain = true)
 @NoArgsConstructor
-public class EdmxDetectorResult implements DetectorResult {
+public class EdmxDetectorResult implements BreakoutDetectorResult {
 
     /**
      * Indicates whether the detector is warming up.
