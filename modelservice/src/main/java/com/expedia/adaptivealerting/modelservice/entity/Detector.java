@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.modelservice.entity;
 
-import com.expedia.adaptivealerting.modelservice.util.RequestValidator;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -30,6 +30,7 @@ import java.util.Map;
  */
 @Data
 @Accessors(chain = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Detector {
 
     private String uuid;
@@ -39,6 +40,8 @@ public class Detector {
 
     @NotNull
     private String type;
+
+    private Date dateCreated;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Date lastUpdateTimestamp;
