@@ -134,7 +134,6 @@ public class EdmxEstimator {
          */
         private double energyDistance;
 
-
         /**
          * Median for the pre-breakout sample.
          */

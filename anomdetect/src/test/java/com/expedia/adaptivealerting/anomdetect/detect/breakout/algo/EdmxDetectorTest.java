@@ -18,11 +18,17 @@ package com.expedia.adaptivealerting.anomdetect.detect.breakout.algo;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.EdmxHyperparams;
 import com.expedia.adaptivealerting.anomdetect.util.MetricFrameLoader;
 import com.expedia.adaptivealerting.anomdetect.util.TestObjectMother;
+import com.expedia.metrics.MetricData;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.Test;
 
+import java.util.Random;
 import java.util.UUID;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 @Slf4j
 public final class EdmxDetectorTest {
@@ -54,6 +60,39 @@ public final class EdmxDetectorTest {
 //                        result.getPValue());
                 log.trace("row={}: {}", i + 1, result);
             }
+        }
+    }
+
+    @Test
+    public void testDetect_warmupPeriod() {
+        val bufferSize = 16;
+        val random = new Random();
+
+        val hyperparams = new EdmxHyperparams()
+                .setBufferSize(bufferSize)
+                .setDelta(6)
+                .setNumPerms(199)
+                .setAlpha(0.01);
+        val detectorUnderTest = new EdmxDetector(UUID.randomUUID(), hyperparams);
+
+        val metricDef = TestObjectMother.metricDefinition();
+
+        // Here we're in warmup because we haven't yet filled the buffer
+        for (int i = 0; i < (bufferSize - 1); i++) {
+            val metricData = new MetricData(metricDef, 100.0 * random.nextDouble(), i);
+            val result = (EdmxDetectorResult) detectorUnderTest.detect(metricData);
+            log.info("row={}: {}", i, result);
+            assertNotNull(result);
+            assertTrue(result.isWarmup());
+        }
+
+        // Now we're done warming up.
+        for (int i = bufferSize - 1; i < 2 * bufferSize; i++) {
+            val metricData = new MetricData(metricDef, 100.0 * random.nextDouble(), i);
+            val result = (EdmxDetectorResult) detectorUnderTest.detect(metricData);
+            log.info("row={}: {}", (bufferSize - 1), result);
+            assertNotNull(result);
+            assertFalse(result.isWarmup());
         }
     }
 }

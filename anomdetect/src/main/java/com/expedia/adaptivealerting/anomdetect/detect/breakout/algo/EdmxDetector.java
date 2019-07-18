@@ -46,6 +46,7 @@ public final class EdmxDetector implements BreakoutDetector {
         notNull(hyperparams, "hyperparams can't be null");
         hyperparams.validate();
 
+        log.info("Creating EdmxDetector: uuid={}, hyperparams={}", uuid, hyperparams);
         this.uuid = uuid;
         this.hyperparams = hyperparams;
         this.buffer = EvictingQueue.create(hyperparams.getBufferSize());
