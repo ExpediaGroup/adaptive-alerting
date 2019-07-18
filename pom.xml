@@ -48,8 +48,6 @@
         <module>anomdetect</module>
         <module>kafka</module>
         <module>modelservice</module>
-        <module>samples</module>
-        <module>tools</module>
 
         <!-- For multi-module JaCoCo -->
         <!-- See https://github.com/jacoco/jacoco/wiki/MavenMultiModule -->
