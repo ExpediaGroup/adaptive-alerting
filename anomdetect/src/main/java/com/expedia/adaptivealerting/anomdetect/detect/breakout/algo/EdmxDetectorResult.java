@@ -33,7 +33,8 @@ public class EdmxDetectorResult implements BreakoutDetectorResult {
     private boolean warmup;
 
     /**
-     * Estimated breakout timestamp.
+     * Estimated breakout timestamp. This is the timestamp for the breakout itself, not the timestamp for when we found
+     * the breakout.
      */
     private Instant timestamp;
 

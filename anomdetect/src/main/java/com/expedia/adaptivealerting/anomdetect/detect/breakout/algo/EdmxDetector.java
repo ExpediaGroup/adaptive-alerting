@@ -77,7 +77,6 @@ public final class EdmxDetector implements BreakoutDetector {
             return new EdmxDetectorResult().setWarmup(false);
         }
 
-        // FIXME This is generating wrong timestamps
         val epochSeconds = mdList.get(location).getTimestamp();
         val instant = Instant.ofEpochSecond(epochSeconds);
 
