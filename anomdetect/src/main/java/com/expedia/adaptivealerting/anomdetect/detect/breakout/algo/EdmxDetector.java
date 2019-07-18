@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detect.breakout.algo;
 
-import com.expedia.adaptivealerting.anomdetect.detect.breakout.BreakoutDetector;
 import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
+import com.expedia.adaptivealerting.anomdetect.detect.breakout.BreakoutDetector;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.EdmxHyperparams;
 import com.expedia.metrics.MetricData;
 import com.google.common.collect.EvictingQueue;
@@ -58,9 +58,12 @@ public final class EdmxDetector implements BreakoutDetector {
         buffer.add(metricData);
 
         val warmup = buffer.remainingCapacity() > 0;
+        val result = new EdmxDetectorResult().setWarmup(warmup);
 
         if (warmup) {
-            return new EdmxDetectorResult().setWarmup(true);
+            log.info("EdmxDetector warming up: uuid={}, size={}, toGo={}",
+                    uuid, buffer.size(), buffer.remainingCapacity());
+            return result;
         }
 
         val mdValues = buffer.stream().mapToDouble(md -> md.getValue()).toArray();
@@ -74,14 +77,13 @@ public final class EdmxDetector implements BreakoutDetector {
         val location = estimate.getLocation();
 
         if (location == -1) {
-            return new EdmxDetectorResult().setWarmup(false);
+            return result;
         }
 
         val epochSeconds = mdList.get(location).getTimestamp();
         val instant = Instant.ofEpochSecond(epochSeconds);
 
-        return new EdmxDetectorResult()
-                .setWarmup(false)
+        return result
                 .setTimestamp(instant)
                 .setSignificant(estimate.isSignificant())
                 .setEnergyDistance(estimate.getEnergyDistance())
@@ -90,5 +92,4 @@ public final class EdmxDetector implements BreakoutDetector {
                 .setPValue(estimate.getPValue())
                 .setAlpha(estimate.getAlpha());
     }
-
 }
