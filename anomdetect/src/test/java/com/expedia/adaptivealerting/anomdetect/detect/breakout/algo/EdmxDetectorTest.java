@@ -87,10 +87,11 @@ public final class EdmxDetectorTest {
         }
 
         // Now we're done warming up.
+        // FIXME This is generating wrong timestamps
         for (int i = bufferSize - 1; i < 2 * bufferSize; i++) {
             val metricData = new MetricData(metricDef, 100.0 * random.nextDouble(), i);
             val result = (EdmxDetectorResult) detectorUnderTest.detect(metricData);
-            log.info("row={}: {}", (bufferSize - 1), result);
+            log.info("row={}: {}", i, result);
             assertNotNull(result);
             assertFalse(result.isWarmup());
         }
