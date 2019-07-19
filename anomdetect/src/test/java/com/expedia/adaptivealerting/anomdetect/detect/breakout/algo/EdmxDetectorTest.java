@@ -24,16 +24,19 @@ import org.junit.Test;
 
 import java.util.UUID;
 
+import static org.junit.Assert.assertEquals;
+
 @Slf4j
 public final class EdmxDetectorTest {
 
-    // TODO Test warmup
     // TODO Support a single detector managing state for multiple metrics?
 
     @Test
     public void testDetect_whiteNoiseWithBreakout() throws Exception {
+        val bufferSize = 20;
+
         val hyperparams = new EdmxHyperparams()
-                .setBufferSize(20)
+                .setBufferSize(bufferSize)
                 .setDelta(6)
                 .setNumPerms(199)
                 .setAlpha(0.01);
@@ -47,13 +50,8 @@ public final class EdmxDetectorTest {
         for (int i = 0; i < 700; i++) {
             val metricData = metricDataList.get(i);
             val result = (EdmxDetectorResult) detectorUnderTest.detect(metricData);
-            if (!result.isWarmup() && result.getTimestamp() != null && result.getSignificant()) {
-//                log.trace("row={}: timestamp={}, pValue={}",
-//                        i + 1,
-//                        result.getTimestamp(),
-//                        result.getPValue());
-                log.trace("row={}: {}", i + 1, result);
-            }
+            log.trace("row={}: {}", i + 1, result);
+            assertEquals(i < bufferSize - 1, result.isWarmup());
         }
     }
 }

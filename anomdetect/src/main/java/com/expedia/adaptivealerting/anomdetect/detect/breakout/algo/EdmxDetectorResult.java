@@ -33,7 +33,8 @@ public class EdmxDetectorResult implements BreakoutDetectorResult {
     private boolean warmup;
 
     /**
-     * Estimated breakout timestamp.
+     * Estimated breakout timestamp. This is the timestamp for the breakout itself, not the timestamp for when we found
+     * the breakout.
      */
     private Instant timestamp;
 
@@ -45,12 +46,12 @@ public class EdmxDetectorResult implements BreakoutDetectorResult {
     /**
      * Median for the pre-breakout sample.
      */
-    private double preBreakoutMedian;
+    private Double preBreakoutMedian;
 
     /**
      * Median for the post-breakout sample.
      */
-    private double postBreakoutMedian;
+    private Double postBreakoutMedian;
 
     /**
      * Estimated p-value of the energy distance statistic, based on the permutation scheme described in "Leveraging
