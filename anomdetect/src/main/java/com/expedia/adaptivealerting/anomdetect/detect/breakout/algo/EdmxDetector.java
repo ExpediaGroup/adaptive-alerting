@@ -61,8 +61,8 @@ public final class EdmxDetector implements BreakoutDetector {
         val result = new EdmxDetectorResult().setWarmup(warmup);
 
         if (warmup) {
-            log.info("EdmxDetector warming up: uuid={}, size={}, toGo={}",
-                    uuid, buffer.size(), buffer.remainingCapacity());
+            log.info("EdmxDetector warming up: uuid={}, size={}, toGo={}, metricData={}",
+                    uuid, buffer.size(), buffer.remainingCapacity(), metricData);
             return result;
         }
 
