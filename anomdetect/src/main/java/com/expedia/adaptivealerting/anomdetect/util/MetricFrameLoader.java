@@ -38,7 +38,6 @@ import java.util.List;
 /**
  * Utility methods for loading metric frames from various sources.
  */
-//Unreleased Resource: Streams
 @UtilityClass
 @Slf4j
 public class MetricFrameLoader {
