@@ -96,9 +96,9 @@ public class SwaggerConfiguration {
     }
 
     @Bean
-    UiConfiguration uiConfig() {
+    public UiConfiguration uiConfig() {
         // To turn off Swagger UI validation
-        return new UiConfiguration(null);
+        return new UiConfiguration("");
     }
 
     @Autowired

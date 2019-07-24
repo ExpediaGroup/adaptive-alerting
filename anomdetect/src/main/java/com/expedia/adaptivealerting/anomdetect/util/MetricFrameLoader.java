@@ -21,11 +21,13 @@ import com.expedia.metrics.jackson.MetricsJavaModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.CSVReaderBuilder;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -36,7 +38,9 @@ import java.util.List;
 /**
  * Utility methods for loading metric frames from various sources.
  */
+//Unreleased Resource: Streams
 @UtilityClass
+@Slf4j
 public class MetricFrameLoader {
     private final static ObjectMapper OBJECT_MAPPER = new ObjectMapper().registerModule(new MetricsJavaModule());
 
@@ -44,7 +48,14 @@ public class MetricFrameLoader {
             throws IOException {
 
         val metricDef = OBJECT_MAPPER.readValue(metricDefFile, MetricDefinition.class);
-        return loadCsv(metricDef, new FileInputStream(metricDataFile), hasHeader);
+        FileInputStream fileInputStream  = new FileInputStream(metricDataFile);
+        try {
+            return loadCsv(metricDef, fileInputStream, hasHeader);
+        } finally {
+            if (fileInputStream != null) {
+                safeClose(fileInputStream);
+            }
+        }
     }
 
     /**
@@ -57,7 +68,7 @@ public class MetricFrameLoader {
      * @throws IOException if there's a problem reading the CSV input stream.
      */
     public static MetricFrame loadCsv(MetricDefinition metricDef, InputStream in, boolean hasHeader)
-            throws IOException  {
+            throws IOException {
 
         List<String[]> rows;
         try (val br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
@@ -80,5 +91,15 @@ public class MetricFrameLoader {
         val epochSecond = Instant.parse(row[0]).getEpochSecond();
         val value = Float.parseFloat(row[1]);
         return new MetricData(metricDefinition, value, epochSecond);
+    }
+
+    private static void safeClose(FileInputStream fis) {
+        if (fis != null) {
+            try {
+                fis.close();
+            } catch (IOException e) {
+                log.error("Error while closing file stream:{}", e);
+            }
+        }
     }
 }

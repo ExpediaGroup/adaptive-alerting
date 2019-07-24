@@ -61,8 +61,13 @@ public class TypesafeConfigLoader {
 
     public Config loadOverridesConfig() {
         String overridesPath = System.getenv(EV_OVERRIDES_CONFIG_PATH);
+
         if (overridesPath == null) {
             overridesPath = "/config/" + appKey + ".conf";
+        }
+
+        if (!overridesPath.startsWith("/config")) {
+            throw new IllegalArgumentException();
         }
 
         val overridesFile = new File(overridesPath);
