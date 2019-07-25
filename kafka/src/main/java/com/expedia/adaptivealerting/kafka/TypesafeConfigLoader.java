@@ -66,6 +66,7 @@ public class TypesafeConfigLoader {
             overridesPath = "/config/" + appKey + ".conf";
         }
 
+        //SAST SCAN. Path Manipulation. Specify the legitimate paths. [KS]
         if (!overridesPath.startsWith("/config")) {
             throw new IllegalArgumentException();
         }

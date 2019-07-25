@@ -95,6 +95,7 @@ public class SwaggerConfiguration {
                 .build();
     }
 
+    //SAST SCAN. Null Dereference. Return empty string instead of returning NULL. [KS]
     @Bean
     public UiConfiguration uiConfig() {
         // To turn off Swagger UI validation

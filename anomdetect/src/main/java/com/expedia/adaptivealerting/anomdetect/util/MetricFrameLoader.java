@@ -47,6 +47,8 @@ public class MetricFrameLoader {
             throws IOException {
 
         val metricDef = OBJECT_MAPPER.readValue(metricDefFile, MetricDefinition.class);
+
+        //SAST SCAN. Unreleased Resource. Close the file input stream. [KS]
         FileInputStream fileInputStream  = new FileInputStream(metricDataFile);
         try {
             return loadCsv(metricDef, fileInputStream, hasHeader);

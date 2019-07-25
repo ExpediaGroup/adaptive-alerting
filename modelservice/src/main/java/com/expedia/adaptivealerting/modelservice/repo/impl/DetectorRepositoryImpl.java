@@ -91,6 +91,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
         Map<String, Object> jsonMap = new HashMap<>();
 
         for (Field field : detector.getClass().getDeclaredFields()) {
+            //SAST SCAN. Access Specifier Manipulation. Using reflection utils to make the field accessible.
             ReflectionUtils.makeAccessible(field);
             String name = field.getName();
             if (!name.isEmpty()) {
