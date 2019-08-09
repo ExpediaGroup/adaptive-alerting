@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo;
+package com.expedia.adaptivealerting.anomdetect.detect.outlier;
 
 import com.expedia.adaptivealerting.anomdetect.aggregate.Aggregator;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
@@ -24,7 +24,7 @@ import java.util.UUID;
 
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
-abstract class AbstractOutlierDetector implements Detector {
+public abstract class AbstractOutlierDetector implements Detector {
 
     @Getter
     private UUID uuid;

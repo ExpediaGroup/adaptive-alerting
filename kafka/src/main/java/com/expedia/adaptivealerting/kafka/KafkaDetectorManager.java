@@ -16,10 +16,10 @@
 package com.expedia.adaptivealerting.kafka;
 
 import com.expedia.adaptivealerting.anomdetect.DetectorManager;
-import com.expedia.adaptivealerting.anomdetect.detect.BreakoutDetectorResult;
+import com.expedia.adaptivealerting.anomdetect.detect.breakout.BreakoutDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
-import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
 import com.expedia.adaptivealerting.kafka.util.ConfigUtil;
 import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
 import com.typesafe.config.Config;

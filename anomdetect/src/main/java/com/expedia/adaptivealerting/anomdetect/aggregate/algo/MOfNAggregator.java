@@ -16,9 +16,9 @@
 package com.expedia.adaptivealerting.anomdetect.aggregate.algo;
 
 import com.expedia.adaptivealerting.anomdetect.aggregate.Aggregator;
-import com.expedia.adaptivealerting.anomdetect.detect.AggregatorConfig;
+import com.expedia.adaptivealerting.anomdetect.aggregate.AggregatorConfig;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
-import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;

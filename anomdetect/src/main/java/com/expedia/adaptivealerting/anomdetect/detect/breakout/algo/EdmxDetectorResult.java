@@ -15,7 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detect.breakout.algo;
 
-import com.expedia.adaptivealerting.anomdetect.detect.BreakoutDetectorResult;
+import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
+import com.expedia.adaptivealerting.anomdetect.detect.breakout.BreakoutDetectorResult;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -31,6 +32,11 @@ public class EdmxDetectorResult implements BreakoutDetectorResult {
      * Indicates whether the detector is warming up.
      */
     private boolean warmup;
+
+    /**
+     * Indicates the strength of the anomaly.
+     */
+    private AnomalyLevel anomalyLevel;
 
     /**
      * Estimated breakout timestamp. This is the timestamp for the breakout itself, not the timestamp for when we found

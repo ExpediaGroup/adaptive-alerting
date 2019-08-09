@@ -13,17 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.detect;
+package com.expedia.adaptivealerting.anomdetect.detect.breakout;
 
-import com.expedia.adaptivealerting.anomdetect.aggregate.algo.MOfNAggregator;
-import com.expedia.adaptivealerting.anomdetect.aggregate.algo.PassThroughAggregator;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
-@JsonSubTypes({
-        @JsonSubTypes.Type(value = MOfNAggregator.Config.class, name = "mOfN"),
-        @JsonSubTypes.Type(value = PassThroughAggregator.Config.class, name = "passThrough"),
-})
-public interface AggregatorConfig {
+//@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "@type")
+public interface BreakoutDetectorResult extends DetectorResult {
 }
