@@ -37,11 +37,14 @@ public enum AnomalyLevel {
 
     /**
      * No classification because the model is warming up.
+     *
+     * @deprecated Warmup isn't a level. Use DetectorResult.isWarmup instead.
      */
+    @Deprecated
     MODEL_WARMUP,
 
     /**
-     * Unknown outlier. Should be used when we are not sure about the anomaly level. e.g. during the warm up period.
+     * Unknown anomaly level. Used when we are not sure about the anomaly level. e.g. during the warm up period.
      */
     UNKNOWN
 }

@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.aggregate;
 
-import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
 
 /**
  * Interface for anomaly aggregation strategies,

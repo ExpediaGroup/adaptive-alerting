@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
-import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.util.MetricUtil;
 import com.expedia.metrics.MetricDefinition;

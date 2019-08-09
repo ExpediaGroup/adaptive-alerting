@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.util;
 
-import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyThresholds;
 import lombok.val;
 import org.junit.Test;

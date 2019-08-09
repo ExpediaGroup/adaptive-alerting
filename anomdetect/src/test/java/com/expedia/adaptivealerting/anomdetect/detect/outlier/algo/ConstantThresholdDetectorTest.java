@@ -16,12 +16,10 @@
 package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
-import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyThresholds;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
-import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.ConstantThresholdDetector;
-import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.ConstantThresholdParams;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import lombok.val;

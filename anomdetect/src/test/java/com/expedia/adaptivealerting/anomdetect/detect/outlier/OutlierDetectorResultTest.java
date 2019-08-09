@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.detect;
+package com.expedia.adaptivealerting.anomdetect.detect.outlier;
 
+import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
+import com.expedia.adaptivealerting.anomdetect.detect.AnomalyThresholds;
 import lombok.val;
 import org.junit.Test;
 

@@ -16,10 +16,10 @@
 package com.expedia.adaptivealerting.kafka;
 
 import com.expedia.adaptivealerting.anomdetect.DetectorManager;
-import com.expedia.adaptivealerting.anomdetect.detect.BreakoutDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
-import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
-import com.expedia.adaptivealerting.anomdetect.detect.algo.EdmxBreakoutDetectorResult;
+import com.expedia.adaptivealerting.anomdetect.detect.breakout.BreakoutDetectorResult;
+import com.expedia.adaptivealerting.anomdetect.detect.breakout.algo.EdmxDetectorResult;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
 import com.expedia.adaptivealerting.kafka.util.TestObjectMother;
 import com.expedia.metrics.jackson.MetricsJavaModule;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -152,7 +152,7 @@ public class KafkaDetectorManagerTest {
         this.outlierMMD = TestObjectMother.mappedMetricData();
         this.breakoutMMD = TestObjectMother.mappedMetricData();
         this.outlierDetectorResult = new OutlierDetectorResult();
-        this.breakoutDetectorResult = new EdmxBreakoutDetectorResult();
+        this.breakoutDetectorResult = new EdmxDetectorResult();
     }
 
     private void initDependencies() {

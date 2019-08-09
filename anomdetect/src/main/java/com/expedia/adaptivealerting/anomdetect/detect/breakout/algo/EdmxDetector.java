@@ -17,7 +17,6 @@ package com.expedia.adaptivealerting.anomdetect.detect.breakout.algo;
 
 import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.breakout.BreakoutDetector;
-import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.EdmxHyperparams;
 import com.expedia.metrics.MetricData;
 import com.google.common.collect.EvictingQueue;
 import lombok.Getter;

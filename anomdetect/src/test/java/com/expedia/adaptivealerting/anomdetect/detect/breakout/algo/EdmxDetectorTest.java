@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detect.breakout.algo;
 
-import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.EdmxHyperparams;
 import com.expedia.adaptivealerting.anomdetect.util.MetricFrameLoader;
 import com.expedia.adaptivealerting.anomdetect.util.TestObjectMother;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +29,11 @@ import static org.junit.Assert.assertEquals;
 public final class EdmxDetectorTest {
 
     // TODO Support a single detector managing state for multiple metrics?
+
+    @Test
+    public void testDetect_noBreakout() {
+        // TODO
+    }
 
     @Test
     public void testDetect_whiteNoiseWithBreakout() throws Exception {

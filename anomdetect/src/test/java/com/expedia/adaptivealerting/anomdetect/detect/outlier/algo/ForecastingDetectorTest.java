@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo;
 
-import com.expedia.adaptivealerting.anomdetect.detect.OutlierDetectorResult;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecast;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecaster;
