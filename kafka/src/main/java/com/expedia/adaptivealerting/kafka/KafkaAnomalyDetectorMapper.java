@@ -15,11 +15,11 @@
  */
 package com.expedia.adaptivealerting.kafka;
 
-import com.expedia.adaptivealerting.anomdetect.util.JmxReporterFactory;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMapper;
 import com.expedia.adaptivealerting.anomdetect.mapper.MapperResult;
 import com.expedia.adaptivealerting.anomdetect.util.AssertUtil;
+import com.expedia.adaptivealerting.anomdetect.util.JmxReporterFactory;
 import com.expedia.adaptivealerting.kafka.processor.MetricDataTransformerSupplier;
 import com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde;
 import com.expedia.adaptivealerting.kafka.serde.MetricDataJsonSerde;
@@ -73,8 +73,9 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
     /**
      * Creates a new Kafka Streams adapter for the {@link DetectorMapper}.
      *
-     * @param config Streams app configuration.
-     * @param mapper Anomaly detector mapper.
+     * @param config             Streams app configuration.
+     * @param mapper             Anomaly detector mapper.
+     * @param jmxReporterFactory JMX reporter factory.
      */
     public KafkaAnomalyDetectorMapper(StreamsAppConfig config, DetectorMapper mapper, JmxReporterFactory jmxReporterFactory) {
         super(config, jmxReporterFactory.getJmxReporter());

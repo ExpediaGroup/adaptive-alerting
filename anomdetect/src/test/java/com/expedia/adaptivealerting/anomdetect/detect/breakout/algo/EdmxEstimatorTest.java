@@ -25,7 +25,6 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Random;
 
-import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 
 @Slf4j
@@ -34,9 +33,14 @@ public class EdmxEstimatorTest {
     private static final long RANDOM_SEED = 314159;
 
     /**
-     * Significance level for breakout alpha tests.
+     * Significance level for strong breakout significance tests.
      */
-    private static final double ALPHA = 0.05;
+    private static final double STRONG_ALPHA = 0.05;
+
+    /**
+     * Significance level for weak breakout significance tests.
+     */
+    private static final double WEAK_ALPHA = 0.10;
 
     private Random random;
 
@@ -50,7 +54,7 @@ public class EdmxEstimatorTest {
     public void testEdmx_range0() {
         val data = new double[100];
         Arrays.fill(data, 1.0);
-        val estBreakout = EdmxEstimator.estimate(data, 24, 0, ALPHA);
+        val estBreakout = EdmxEstimator.estimate(data, 24, 0);
 
         // TODO Might want to make this series throw an exception since the R package fails on division by 0.
         assertEquals(-1, estBreakout.getLocation());
@@ -65,17 +69,16 @@ public class EdmxEstimatorTest {
 
         // When there's no permutation test, the algo returns the location with the highest energyDistance.
         // Or one of them, I guess, when there are multiple such locations (haven't checked).
-        val result1 = EdmxEstimator.estimate(data, 5, 0, ALPHA);
+        val result1 = EdmxEstimator.estimate(data, 5, 0);
         log.trace("result1={}", result1);
         assertEquals(49, result1.getLocation());
         assertEquals(24.99, result1.getEnergyDistance(), TOLERANCE);
 
         // With permutations
-        val result2 = EdmxEstimator.estimate(data, 5, 20, ALPHA);
+        val result2 = EdmxEstimator.estimate(data, 5, 20);
         log.trace("result2={}", result2);
         assertEquals(49, result2.getLocation());
         assertEquals(24.99, result2.getEnergyDistance(), TOLERANCE);
-        assertFalse(result2.isSignificant());
     }
 
     @Test
@@ -104,7 +107,7 @@ public class EdmxEstimatorTest {
         }
 
         // No permutations, small breakout
-        val result = EdmxEstimator.estimate(data, 2, 0, ALPHA);
+        val result = EdmxEstimator.estimate(data, 2, 0);
         assertEquals(8, result.getLocation());
         assertEquals(0.455, result.getEnergyDistance(), TOLERANCE);
     }
@@ -117,7 +120,7 @@ public class EdmxEstimatorTest {
         }
 
         // No permutations, large breakout
-        val result = EdmxEstimator.estimate(data, 2, 0, ALPHA);
+        val result = EdmxEstimator.estimate(data, 2, 0);
         assertEquals(7, result.getLocation());
         assertEquals(1.986, result.getEnergyDistance(), TOLERANCE);
     }
@@ -130,7 +133,7 @@ public class EdmxEstimatorTest {
         }
 
         // No permutations, small breakout
-        val result = EdmxEstimator.estimate(data, 10, 0, ALPHA);
+        val result = EdmxEstimator.estimate(data, 10, 0);
         assertEquals(75, result.getLocation());
         assertEquals(2.569, result.getEnergyDistance(), TOLERANCE);
     }
@@ -139,12 +142,12 @@ public class EdmxEstimatorTest {
         val data = Arrays.copyOfRange(fullData, start, end);
 
         // No permutations
-        val resultNoPerms = EdmxEstimator.estimate(data, delta, 0, ALPHA);
+        val resultNoPerms = EdmxEstimator.estimate(data, delta, 0);
         assertEquals(loc, resultNoPerms.getLocation());
         assertEquals(stat, resultNoPerms.getEnergyDistance(), TOLERANCE);
 
         // With permutations
-        val resultPerms = EdmxEstimator.estimate(data, delta, 20, ALPHA);
+        val resultPerms = EdmxEstimator.estimate(data, delta, 20);
         assertEquals(loc, resultPerms.getLocation());
         assertEquals(stat, resultPerms.getEnergyDistance(), TOLERANCE);
         // FIXME Sometimes this fails. The permutation test is not deterministic.

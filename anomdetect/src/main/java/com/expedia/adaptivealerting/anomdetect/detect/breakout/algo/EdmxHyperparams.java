@@ -43,14 +43,21 @@ public class EdmxHyperparams {
     private int numPerms = 99;
 
     /**
-     * Significance level threshold.
+     * Significance level for the strong breakout significance test.
      */
-    private double alpha = 0.05;
+    private double strongAlpha = 0.01;
+
+    /**
+     * Significance level for the weak breakout significance test.
+     */
+    private double weakAlpha = 0.05;
 
     public void validate() {
-        isTrue(delta > 0, "Required; delta > 0");
+        isTrue(delta > 0, "Required: delta > 0");
         isTrue(bufferSize >= 2 * delta, "Required: bufferSize >= 2 * delta");
         isTrue(numPerms >= 0, "Required: numPerms >= 0");
-        isBetween(alpha, 0.0, 1.0, "Required: 0.0 <= alpha <= 1.0");
+        isBetween(strongAlpha, 0.0, 1.0, "Required: 0.0 <= alpha <= 1.0");
+        isBetween(weakAlpha, 0.0, 1.0, "Required: 0.0 <= weakAlpha <= 1.0");
+        isTrue(weakAlpha > strongAlpha, "Required: weakAlpha > strongAlpha");
     }
 }

@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detect.breakout.algo;
 
+import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
 import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.breakout.BreakoutDetector;
 import com.expedia.metrics.MetricData;
@@ -69,8 +70,7 @@ public final class EdmxDetector implements BreakoutDetector {
         val estimate = EdmxEstimator.estimate(
                 mdValues,
                 hyperparams.getDelta(),
-                hyperparams.getNumPerms(),
-                hyperparams.getAlpha());
+                hyperparams.getNumPerms());
 
         val mdList = buffer.stream().collect(Collectors.toList());
         val location = estimate.getLocation();
@@ -81,14 +81,22 @@ public final class EdmxDetector implements BreakoutDetector {
 
         val epochSeconds = mdList.get(location).getTimestamp();
         val instant = Instant.ofEpochSecond(epochSeconds);
+        val anomalyLevel = calculateAnomalyLevel(estimate);
 
         return result
                 .setTimestamp(instant)
-                .setSignificant(estimate.isSignificant())
-                .setEnergyDistance(estimate.getEnergyDistance())
-                .setPreBreakoutMedian(estimate.getPreBreakoutMedian())
-                .setPostBreakoutMedian(estimate.getPostBreakoutMedian())
-                .setPValue(estimate.getPValue())
-                .setAlpha(estimate.getAlpha());
+                .setEdmxEstimate(estimate)
+                .setAnomalyLevel(anomalyLevel);
+    }
+
+    private AnomalyLevel calculateAnomalyLevel(EdmxEstimate estimate) {
+        val pValue = estimate.getPValue();
+        if (pValue <= hyperparams.getStrongAlpha()) {
+            return AnomalyLevel.STRONG;
+        } else if (pValue <= hyperparams.getWeakAlpha()) {
+            return AnomalyLevel.WEAK;
+        } else {
+            return AnomalyLevel.NORMAL;
+        }
     }
 }

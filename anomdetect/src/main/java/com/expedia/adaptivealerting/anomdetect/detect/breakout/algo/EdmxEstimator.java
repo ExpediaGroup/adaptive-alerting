@@ -36,24 +36,20 @@ public class EdmxEstimator {
      * @param data     Time series data
      * @param delta    Minimum sample size for computing a median. This applies to both the left and the right medians.
      * @param numPerms Number of permutations to create for the permutation test
-     * @param alpha    Significance level for the alpha test
      * @return EDM-X breakout result
      */
-    public static EdmxEstimate estimate(double[] data, int delta, int numPerms, double alpha) {
+    public static EdmxEstimate estimate(double[] data, int delta, int numPerms) {
         val scaledData = DataUtil.unitScale(data);
         val breakout = estimateSimpleBreakout(scaledData, delta);
         val energyDistance = breakout.getEnergyDistance();
         val pValue = estimatePValue(scaledData, delta, numPerms, energyDistance);
-        val significant = pValue <= alpha;
 
         return new EdmxEstimate()
                 .setLocation(breakout.location)
                 .setEnergyDistance(breakout.energyDistance)
                 .setPreBreakoutMedian(breakout.preBreakoutMedian)
                 .setPostBreakoutMedian(breakout.postBreakoutMedian)
-                .setPValue(pValue)
-                .setAlpha(alpha)
-                .setSignificant(significant);
+                .setPValue(pValue);
     }
 
     private static SimpleEdmxBreakoutEstimate estimateSimpleBreakout(double[] data, int delta) {
