@@ -51,11 +51,6 @@
             <groupId>com.expedia.adaptivealerting</groupId>
             <artifactId>adaptive-alerting-modelservice</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.expedia.adaptivealerting</groupId>
-            <artifactId>adaptive-alerting-tools</artifactId>
-        </dependency>
-        <!-- Omitting adaptive-alerting-samples -->
     </dependencies>
 
     <build>
