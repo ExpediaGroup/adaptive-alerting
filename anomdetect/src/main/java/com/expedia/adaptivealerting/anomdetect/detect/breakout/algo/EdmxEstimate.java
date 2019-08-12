@@ -48,15 +48,4 @@ public class EdmxEstimate {
      * Estimated p-value for the energy distance.
      */
     private double pValue;
-
-    /**
-     * Significance level to apply for the significance test. The breakout is significant if the p-value is less than or
-     * equal to the alpha.
-     */
-    private double alpha;
-
-    /**
-     * Convenience field to indicate whether the breakout is statistically significant.
-     */
-    private boolean significant;
 }

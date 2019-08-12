@@ -40,7 +40,8 @@ public class EdmxFactoryTest extends AbstractDetectorFactoryTest {
         assertEquals(24, hyperparams.getBufferSize());
         assertEquals(6, hyperparams.getDelta());
         assertEquals(199, hyperparams.getNumPerms());
-        assertEquals(0.01, hyperparams.getAlpha(), TOLERANCE);
+        assertEquals(0.01, hyperparams.getStrongAlpha(), TOLERANCE);
+        assertEquals(0.05, hyperparams.getWeakAlpha(), TOLERANCE);
     }
 
     @Test(expected = RuntimeException.class)

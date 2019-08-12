@@ -34,44 +34,18 @@ public class EdmxDetectorResult implements BreakoutDetectorResult {
     private boolean warmup;
 
     /**
-     * Indicates the strength of the anomaly.
-     */
-    private AnomalyLevel anomalyLevel;
-
-    /**
      * Estimated breakout timestamp. This is the timestamp for the breakout itself, not the timestamp for when we found
      * the breakout.
      */
     private Instant timestamp;
 
     /**
-     * Estimated energy distance between the pre- and post-breakout partitions.
+     * Breakout estimate.
      */
-    private Double energyDistance;
+    private EdmxEstimate edmxEstimate;
 
     /**
-     * Median for the pre-breakout sample.
+     * Indicates the strength of the anomaly.
      */
-    private Double preBreakoutMedian;
-
-    /**
-     * Median for the post-breakout sample.
-     */
-    private Double postBreakoutMedian;
-
-    /**
-     * Estimated p-value of the energy distance statistic, based on the permutation scheme described in "Leveraging
-     * Cloud Data to Mitigate User Experience from 'Breaking Bad'", by James, et al.
-     */
-    private Double pValue;
-
-    /**
-     * Significance level used for the significance test.
-     */
-    private Double alpha;
-
-    /**
-     * Indicates whether the estimate is statistically significant.
-     */
-    private Boolean significant;
+    private AnomalyLevel anomalyLevel;
 }

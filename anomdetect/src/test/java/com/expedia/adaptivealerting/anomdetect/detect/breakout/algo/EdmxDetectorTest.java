@@ -43,7 +43,8 @@ public final class EdmxDetectorTest {
                 .setBufferSize(bufferSize)
                 .setDelta(6)
                 .setNumPerms(199)
-                .setAlpha(0.01);
+                .setStrongAlpha(0.01)
+                .setWeakAlpha(0.05);
         val detectorUnderTest = new EdmxDetector(UUID.randomUUID(), hyperparams);
 
         val metricDef = TestObjectMother.metricDefinition();
