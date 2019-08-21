@@ -63,6 +63,8 @@ public class DetectorMapperCache {
 
     /**
      * Instantiates a new Detector mapper cache.
+     *
+     * @param metricRegistry Metric registry.
      */
     public DetectorMapperCache(MetricRegistry metricRegistry) {
         this.cache = CacheBuilder.newBuilder()
