@@ -87,8 +87,9 @@ public class MetricUtil {
     /**
      * Convenience method to create a new {@link MetricData} from the given definition, value and epoch second.
      *
-     * @param metricDef Metric definition.
-     * @param value     Value.
+     * @param metricDef   Metric definition.
+     * @param value       Value.
+     * @param epochSecond Epoch second.
      * @return Metric data.
      */
     public static MetricData metricData(MetricDefinition metricDef, double value, long epochSecond) {
