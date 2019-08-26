@@ -13,14 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.dto.detectormapping;
+package com.expedia.adaptivealerting.metricprofiler.source;
 
-import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
-import java.util.List;
+import javax.validation.constraints.NotNull;
+import java.util.Map;
 
-@Data
-public class Expression {
-    private Operator operator;
-    private List<Operand> operands;
+@RequiredArgsConstructor
+public class DefaultProfilingSource implements ProfilingSource {
+
+    @NotNull
+    private final ProfilingClient client;
+
+    @Override
+    public Boolean profilingExists(Map<String, String> tags) {
+        return client.findProfilingDocument(tags);
+    }
+
 }

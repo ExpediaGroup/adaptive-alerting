@@ -13,12 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.dto.detectormapping;
+package com.expedia.adaptivealerting.modelservice.service;
 
-import lombok.Data;
+import com.expedia.adaptivealerting.modelservice.dto.metricprofiling.CreateMetricProfilingRequest;
 
-@Data
-public class Operand {
-    private Field field;
-    private Expression expression;
+import java.util.List;
+import java.util.Map;
+
+public interface MetricProfilingService {
+
+    String createMetricProfile(CreateMetricProfilingRequest metricProfilingRequest);
+
+    void updateMetricProfile(String id, Boolean isStationary);
+
+    Boolean profilingExists(Map<String, String> tags);
+
 }

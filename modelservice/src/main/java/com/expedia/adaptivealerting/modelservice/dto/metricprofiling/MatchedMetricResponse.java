@@ -13,14 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.dto.detectormapping;
+package com.expedia.adaptivealerting.modelservice.dto.metricprofiling;
 
-import com.expedia.adaptivealerting.modelservice.dto.common.Expression;
+import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector;
 import lombok.Data;
 
+import java.util.List;
+import java.util.Map;
+
 @Data
-public class UpdateDetectorMappingRequest {
-    private String id;
-    private Expression expression;
-    private Detector detector;
+public class MatchedMetricResponse {
+    private Map<Integer, List<Detector>> groupedDetectorsBySearchIndex;
+    private long lookupTimeInMillis;
 }

@@ -109,10 +109,6 @@ public class DetectorControllerTest {
         Detector detector1 = new Detector();
         detector1.setCreatedBy("user");
         controller.createDetector(detector1);
-
-//        Detector detector2 = new Detector();
-//        detector2.setType("constant-detector");
-//        controller.createDetector(detector2);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -125,10 +121,6 @@ public class DetectorControllerTest {
         Detector detector1 = new Detector();
         detector1.setCreatedBy("user");
         controller.updateDetector("", detector1);
-
-//        Detector detector2 = new Detector();
-//        detector2.setType("constant-detector");
-//        controller.updateDetector("", detector2);
     }
 
     @Test(expected = IllegalArgumentException.class)

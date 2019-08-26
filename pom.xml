@@ -47,12 +47,14 @@
     <modules>
         <module>anomdetect</module>
         <module>kafka</module>
+        <module>metricprofiler</module>
         <module>modelservice</module>
         <module>metrics</module>
 
         <!-- For multi-module JaCoCo -->
         <!-- See https://github.com/jacoco/jacoco/wiki/MavenMultiModule -->
         <module>reporting</module>
+        <module>metricprofiler</module>
     </modules>
     <scm>
         <connection>scm:git:git://github.com/ExpediaDotCom/adaptive-alerting.git</connection>
@@ -174,6 +176,11 @@
             <dependency>
                 <groupId>com.expedia.adaptivealerting</groupId>
                 <artifactId>adaptive-alerting-metrics</artifactId>
+                <version>${aa.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.expedia.adaptivealerting</groupId>
+                <artifactId>adaptive-alerting-metricprofiler</artifactId>
                 <version>${aa.version}</version>
             </dependency>
             <dependency>

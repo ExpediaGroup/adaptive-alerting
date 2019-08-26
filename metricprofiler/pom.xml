@@ -15,11 +15,6 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
-<!-- For multi-module JaCoCo. See: -->
-<!-- https://github.com/jacoco/jacoco/wiki/MavenMultiModule -->
-<!-- https://github.com/jacoco/jacoco/tree/master/jacoco-maven-plugin.test/it/it-report-aggregate -->
-<!-- http://janejieblog.blogspot.com/2017/12/code-coverage-jacoco-with-maven-multi.html -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -32,32 +27,31 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>adaptive-alerting-reporting</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>adaptive-alerting-metricprofiler</artifactId>
+    <packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
-    <description>Adaptive Alerting reporting module.</description>
+    <description>Metric profiler for Adaptive Alerting.</description>
+
+    <properties>
+        <maven.scalatest.plugin.version>2.0.0</maven.scalatest.plugin.version>
+        <maven.scala.plugin.version>3.4.2</maven.scala.plugin.version>
+        <maven.build.helper.plugin.version>3.0.0</maven.build.helper.plugin.version>
+        <maven.assembly.plugin.version>3.1.0</maven.assembly.plugin.version>
+        <jacoco-percentage>0.5</jacoco-percentage>
+        <jacoco-branch-percentage>0.18</jacoco-branch-percentage>
+    </properties>
 
     <dependencies>
+
+        <!-- Compile -->
         <dependency>
             <groupId>com.expedia.adaptivealerting</groupId>
             <artifactId>adaptive-alerting-anomdetect</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.expedia.adaptivealerting</groupId>
-            <artifactId>adaptive-alerting-kafka</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.expedia.adaptivealerting</groupId>
-            <artifactId>adaptive-alerting-metrics</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.expedia.adaptivealerting</groupId>
-            <artifactId>adaptive-alerting-metricprofiler</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.expedia.adaptivealerting</groupId>
-            <artifactId>adaptive-alerting-modelservice</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
     </dependencies>
 
@@ -66,16 +60,8 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>report-aggregate</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>report-aggregate</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
+
         </plugins>
     </build>
 </project>
