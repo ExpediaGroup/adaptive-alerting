@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.dto.metricprofiling;
 
 import com.expedia.adaptivealerting.modelservice.dto.common.Expression;
+import com.expedia.adaptivealerting.modelservice.util.RequestValidator;
 import lombok.Data;
 
 import java.util.Set;
@@ -25,6 +26,11 @@ import java.util.stream.Collectors;
 public class CreateMetricProfilingRequest {
     private Expression expression;
     private Boolean isStationary;
+
+    public void validate() {
+        RequestValidator.validateExpression(this.getExpression());
+        RequestValidator.validateBoolean(this.isStationary);
+    }
 
     public Set<String> getFields() {
         return this.expression.getOperands().stream()

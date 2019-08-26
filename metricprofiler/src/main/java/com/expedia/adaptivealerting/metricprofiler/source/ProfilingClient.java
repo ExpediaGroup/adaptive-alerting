@@ -41,11 +41,6 @@ public class ProfilingClient {
 
     private static final String FIND_DOCUMENT_PATH = "/api/metricProfiling/findMatchingByTags";
 
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
-
     public Boolean findProfilingDocument(Map<String, String> tags) {
         isTrue(tags.size() > 0, "tags must not be empty");
 

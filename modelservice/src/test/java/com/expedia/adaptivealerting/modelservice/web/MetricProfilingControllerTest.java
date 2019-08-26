@@ -1,7 +1,9 @@
 package com.expedia.adaptivealerting.modelservice.web;
 
+import com.expedia.adaptivealerting.modelservice.dto.common.Expression;
 import com.expedia.adaptivealerting.modelservice.dto.metricprofiling.CreateMetricProfilingRequest;
 import com.expedia.adaptivealerting.modelservice.service.MetricProfilingService;
+import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,9 +15,8 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertNotNull;
@@ -28,17 +29,24 @@ public class MetricProfilingControllerTest {
 
     @Spy
     @InjectMocks
-    private MetricProfilingController controller;
+    private MetricProfilingController controllerUnderTest;
 
     @Mock
     private MetricProfilingService profilingService;
 
+    private Expression expression;
+
     @Before
     public void setUp() {
-        this.controller = new MetricProfilingController();
+        this.controllerUnderTest = new MetricProfilingController();
         MockitoAnnotations.initMocks(this);
+        initTestObjects();
         initDependencies();
+    }
 
+    private void initTestObjects() {
+        ObjectMother mom = ObjectMother.instance();
+        this.expression = mom.getExpression();
     }
 
     private void initDependencies() {
@@ -48,20 +56,28 @@ public class MetricProfilingControllerTest {
 
     @Test
     public void testCreateMetricProfile() {
-        val response = controller.createMetricProfile(new CreateMetricProfilingRequest());
+        val createMetricProfilingRequest = new CreateMetricProfilingRequest();
+        createMetricProfilingRequest.setExpression(expression);
+        createMetricProfilingRequest.setIsStationary(true);
+        val response = controllerUnderTest.createMetricProfile(createMetricProfilingRequest);
         assertNotNull(response);
     }
 
     @Test
     public void testUpdateMetricProfile() {
-        controller.updateMetricProfile("id", true);
-        verify(controller, times(1)).updateMetricProfile("id", true);
+        controllerUnderTest.updateMetricProfile("id", true);
+        verify(controllerUnderTest, times(1)).updateMetricProfile("id", true);
     }
 
     @Test
     public void testSearchMetricProfiles() {
-        val profileExists = controller.profilingExists(new HashMap<>());
+        val profileExists = controllerUnderTest.profilingExists(new HashMap<>());
         assertNotNull(profileExists);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateMetricProfile_notNull() throws IOException {
+        controllerUnderTest.createMetricProfile(new CreateMetricProfilingRequest());
     }
 
 }

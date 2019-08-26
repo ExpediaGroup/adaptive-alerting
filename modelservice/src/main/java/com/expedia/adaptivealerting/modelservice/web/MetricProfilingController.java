@@ -40,6 +40,7 @@ public class MetricProfilingController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public String createMetricProfile(@RequestBody CreateMetricProfilingRequest request) {
+        request.validate();
         return metricProfilingService.createMetricProfile(request);
     }
 

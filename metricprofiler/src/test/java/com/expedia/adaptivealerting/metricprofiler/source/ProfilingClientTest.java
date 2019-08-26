@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,6 +56,18 @@ public class ProfilingClientTest {
     public void testFindProfilingDocument_illegal_arguments() {
         val result = clientUnderTest.findProfilingDocument(metricTags);
         assertEquals(true, result);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testFindProfilingDocument_mapper_io_exception() throws IOException {
+        when(objectMapper.writeValueAsString(metricTags)).thenThrow(new IOException());
+        clientUnderTest.findProfilingDocument(metricTags);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testFindProfilingDocument_http_io_exception() throws IOException {
+        when(httpClient.post(anyString(), anyString())).thenThrow(new IOException());
+        clientUnderTest.findProfilingDocument(metricTags);
     }
 
     private void initTestObjects() {

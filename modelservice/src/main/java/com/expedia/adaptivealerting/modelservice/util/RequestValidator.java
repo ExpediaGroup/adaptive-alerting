@@ -49,6 +49,10 @@ public class RequestValidator {
         expression.getOperands().forEach(operand -> validateOperand(operand));
     }
 
+    public static void validateBoolean(Boolean condition){
+        Assert.notNull(condition, "Condition can't be null");
+    }
+
     private static void validateOperand(Operand operand) {
         //Nested conditions are not supported now
         Assert.isNull(operand.getExpression(), "Nested expressions are not supported");
