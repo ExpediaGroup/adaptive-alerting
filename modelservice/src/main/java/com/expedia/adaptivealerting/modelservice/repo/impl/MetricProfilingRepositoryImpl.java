@@ -27,7 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.common.bytes.BytesReference;
@@ -37,7 +36,6 @@ import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.percolator.PercolateQueryBuilder;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -107,19 +105,15 @@ public class MetricProfilingRepositoryImpl implements MetricProfilingRepository 
             PercolateQueryBuilder percolateQuery = new PercolateQueryBuilder(PercolatorMetricProfiling.QUERY_KEYWORD,
                     refList, XContentType.JSON);
 
-            BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+            val boolQueryBuilder = new BoolQueryBuilder();
             boolQueryBuilder.filter(percolateQuery);
-
-            SearchSourceBuilder searchSourceBuilder = elasticsearchUtil.getSourceBuilder(boolQueryBuilder);
+            val searchSourceBuilder = elasticsearchUtil.getSourceBuilder(boolQueryBuilder);
             searchSourceBuilder.timeout(new TimeValue(elasticSearchProperties.getConfig().getConnectionTimeout()));
             searchSourceBuilder.size(500);
 
-            final SearchRequest searchRequest =
-                    new SearchRequest()
-                            .source(searchSourceBuilder)
-                            .indices(METRIC_PROFILING_INDEX);
+            val searchRequest = new SearchRequest().source(searchSourceBuilder).indices(METRIC_PROFILING_INDEX);
+            val searchResponse = elasticSearchClient.search(searchRequest, RequestOptions.DEFAULT);
 
-            SearchResponse searchResponse = elasticSearchClient.search(searchRequest, RequestOptions.DEFAULT);
             return searchResponse.getHits().getHits().length > 0;
         } catch (IOException e) {
             log.error("Error ES lookup", e);

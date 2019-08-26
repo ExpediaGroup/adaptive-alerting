@@ -47,7 +47,7 @@ public class ProfilingClient {
         val uri = baseUri + FIND_DOCUMENT_PATH;
         Content content;
         try {
-            String body = objectMapper.writeValueAsString(tags);
+            val body = objectMapper.writeValueAsString(tags);
             content = httpClient.post(uri, body);
         } catch (IOException e) {
             val message = "IOException while finding matching metrics for" +
