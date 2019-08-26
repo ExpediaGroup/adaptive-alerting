@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.modelservice.util;
 
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
+import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsRequest;
@@ -69,6 +70,13 @@ public class ElasticsearchUtil {
         return searchRequest.source(searchSourceBuilder).indices(indexName).types(docType);
     }
 
+    /**
+     * Skipping unit tests for below two functions. [KS]
+     * when(elasticSearchClient.indices()).thenReturn(mock(IndicesClient.class));
+     * IndicesClient is final class and we can't mock it.
+     * One of the solutions can be to wrap the client and hide it behind an interface which is then mockable
+     **/
+    @Generated
     public Set<String> removeFieldsHavingExistingMapping(Set<String> fields, String indexName) {
         GetMappingsRequest request = new GetMappingsRequest();
         request.indices(indexName);
@@ -90,7 +98,8 @@ public class ElasticsearchUtil {
         }
     }
 
-    public void updateIndexMappings(Set<String> newFieldMappings, String indexName) {
+    @Generated
+    public void updateIndexMappings(Set<String> newFieldMappings, String indexName, String docType) {
         PutMappingRequest request = new PutMappingRequest(indexName);
 
         Map<String, Object> type = new HashMap<>();
@@ -104,7 +113,7 @@ public class ElasticsearchUtil {
         Map<String, Object> jsonMap = new HashMap<>();
         jsonMap.put("properties", properties);
         request.source(jsonMap);
-        request.type(elasticSearchProperties.getDocType());
+        request.type(docType);
 
         try {
             elasticSearchClient.indices().putMapping(request, RequestOptions.DEFAULT);

@@ -29,6 +29,12 @@ public class ProfilingClientTest {
     @Mock
     private ObjectMapper objectMapper;
 
+    @Mock
+    private ObjectMapper objectMapper_exception;
+
+    @Mock
+    private HttpClientWrapper httpClient_exception;
+
     private Map<String, String> metricTags;
 
     @Mock
@@ -60,13 +66,12 @@ public class ProfilingClientTest {
 
     @Test(expected = RuntimeException.class)
     public void testFindProfilingDocument_mapper_io_exception() throws IOException {
-        when(objectMapper.writeValueAsString(metricTags)).thenThrow(new IOException());
         clientUnderTest.findProfilingDocument(metricTags);
     }
 
     @Test(expected = RuntimeException.class)
-    public void testFindProfilingDocument_http_io_exception() throws IOException {
-        when(httpClient.post(anyString(), anyString())).thenThrow(new IOException());
+    @SneakyThrows
+    public void testFindProfilingDocument_http_io_exception() {
         clientUnderTest.findProfilingDocument(metricTags);
     }
 
@@ -77,7 +82,9 @@ public class ProfilingClientTest {
     @SneakyThrows
     private void initDependencies() {
         when(objectMapper.writeValueAsString(metricTags)).thenReturn(tagsBody);
+        when(objectMapper_exception.writeValueAsString(metricTags)).thenThrow(new IOException());
         when(httpClient.post(anyString(), anyString())).thenReturn(docContent);
+        when(httpClient_exception.post(anyString(), anyString())).thenThrow(new IOException());
         when(docContent.asBytes()).thenReturn(docBytes);
         when(objectMapper.readValue(docBytes, Boolean.class)).thenReturn(true);
     }

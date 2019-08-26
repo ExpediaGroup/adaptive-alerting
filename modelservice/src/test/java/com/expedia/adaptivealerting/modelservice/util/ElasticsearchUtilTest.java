@@ -4,10 +4,15 @@ import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClie
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsRequest;
+import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.client.IndicesClient;
 import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestClientBuilder;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.Before;
@@ -15,6 +20,9 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -31,6 +39,8 @@ public class ElasticsearchUtilTest {
 
     @Mock
     private ElasticSearchClient elasticSearchClient;
+
+    private IndicesClient indicesClient;
 
     @Before
     public void setUp() throws Exception {
@@ -65,5 +75,4 @@ public class ElasticsearchUtilTest {
         assertNotNull(actualSearchRequest);
         assertEquals(SearchRequest.class, actualSearchRequest.getClass());
     }
-
 }
