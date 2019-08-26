@@ -54,7 +54,6 @@
         <!-- For multi-module JaCoCo -->
         <!-- See https://github.com/jacoco/jacoco/wiki/MavenMultiModule -->
         <module>reporting</module>
-        <module>metricprofiler</module>
     </modules>
     <scm>
         <connection>scm:git:git://github.com/ExpediaDotCom/adaptive-alerting.git</connection>
