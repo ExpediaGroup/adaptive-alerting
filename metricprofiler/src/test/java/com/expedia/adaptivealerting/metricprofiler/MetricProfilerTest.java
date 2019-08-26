@@ -42,7 +42,7 @@ public class MetricProfilerTest {
 
     @Test
     public void testProfiling() {
-        val result = metricProfiler.detect(goodMetricData);
+        val result = metricProfiler.hasProfilingInfo(goodMetricData);
         assertNotNull(result);
         assertEquals(true, result);
     }
