@@ -22,7 +22,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import lombok.var;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -64,18 +63,17 @@ public class MetricProfiler {
      * Finds whether profiling exists or not for a given metric.
      *
      * @param metricData Metric data.
-     * @return Boolean
+     * @return Boolean Profiling information.
      */
     public Boolean hasProfilingInfo(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
+
         val hash = idFactory.getId(metricData.getMetricDefinition());
-        var profilingExists = cachedMetrics.get(hash);
+        Boolean profilingExists = cachedMetrics.get(hash);
         if (profilingExists == null) {
             val tags = metricData.getMetricDefinition().getTags().getKv();
             profilingExists = profilingSource.profilingExists(tags);
             cachedMetrics.put(hash, profilingExists);
-        } else {
-            log.trace("Fetched profiling info from cache");
         }
         return profilingExists;
     }

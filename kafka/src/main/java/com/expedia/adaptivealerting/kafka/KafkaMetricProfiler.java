@@ -21,6 +21,7 @@ import com.expedia.adaptivealerting.metricprofiler.MetricProfiler;
 import com.expedia.adaptivealerting.metricprofiler.source.DefaultProfilingSource;
 import com.expedia.adaptivealerting.metricprofiler.source.ProfilingClient;
 import com.expedia.metrics.MetricData;
+import com.expedia.metrics.metrictank.MetricTankIdFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import lombok.Getter;
@@ -43,6 +44,7 @@ public final class KafkaMetricProfiler extends AbstractStreamsApp {
 
     private Serde<String> outputKeySerde = new Serdes.StringSerde();
     private Serde<MetricData> outputValueSerde = new MetricDataJsonSerde();
+    private final MetricTankIdFactory idFactory = new MetricTankIdFactory();
 
     @Getter
     private final MetricProfiler metricProfiler;
@@ -78,8 +80,10 @@ public final class KafkaMetricProfiler extends AbstractStreamsApp {
         stream
                 .filter((key, metricData) ->
                         metricProfiler.hasProfilingInfo(metricData))
-                .map((key, metricData) ->
-                        KeyValue.pair(metricData.getMetricDefinition().toString(), metricData))
+                .map((key, metricData) -> {
+                    val hash = idFactory.getId(metricData.getMetricDefinition());
+                    return KeyValue.pair(hash, metricData);
+                })
                 .to(outboundTopic, Produced.with(outputKeySerde, outputValueSerde));
         return builder.build();
     }

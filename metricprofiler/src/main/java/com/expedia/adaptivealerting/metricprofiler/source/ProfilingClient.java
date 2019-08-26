@@ -39,7 +39,7 @@ public class ProfilingClient {
     @NonNull
     private final String baseUri;
 
-    private static final String FIND_DOCUMENT_PATH = "/api/metricProfiling/findMatchingByTags";
+    public static final String FIND_DOCUMENT_PATH = "/api/metricProfiling/findMatchingByTags";
 
     public Boolean findProfilingDocument(Map<String, String> tags) {
         isTrue(tags.size() > 0, "tags must not be empty");
