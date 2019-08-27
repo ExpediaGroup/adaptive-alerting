@@ -88,7 +88,7 @@ public final class KafkaMetricProfiler extends AbstractStreamsApp {
         return builder.build();
     }
 
-    private static MetricProfiler buildMetricProfiler(Config config) {
+    static MetricProfiler buildMetricProfiler(Config config) {
         val uriTemplate = config.getString(CK_MODEL_SERVICE_URI_TEMPLATE);
         val client = new ProfilingClient(new HttpClientWrapper(), new ObjectMapper(), uriTemplate);
         val profilingSource = new DefaultProfilingSource(client);

@@ -23,6 +23,7 @@ import com.expedia.metrics.metrictank.MetricTankIdFactory;
 import com.github.charithe.kafka.EphemeralKafkaBroker;
 import com.github.charithe.kafka.KafkaJunitRule;
 import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.kafka.common.serialization.Deserializer;
@@ -37,6 +38,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -92,7 +94,14 @@ public class KafkaMetricProfilerTest {
         val expectedKey = idFactory.getId((metricData.getMetricDefinition()));
         OutputVerifier.compareKeyValue(outputRecord, expectedKey, metricData);
     }
-    
+
+    @Test
+    public void testBuildMetricProfiler() {
+        val config = ConfigFactory.load("metric-profiler.conf");
+        val metricProfiler = KafkaMetricProfiler.buildMetricProfiler(config);
+        assertNotNull(metricProfiler);
+    }
+
     private void initTestObjects() {
         this.metricData = TestObjectMother.metricData();
     }
