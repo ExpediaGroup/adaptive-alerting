@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -39,9 +40,7 @@ public class ElasticsearchUtilTest {
 
     @Mock
     private ElasticSearchClient elasticSearchClient;
-
-    private IndicesClient indicesClient;
-
+    
     @Before
     public void setUp() throws Exception {
         this.elasticsearchUtil = new ElasticsearchUtil();
