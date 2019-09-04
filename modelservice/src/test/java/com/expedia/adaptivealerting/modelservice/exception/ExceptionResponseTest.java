@@ -11,9 +11,10 @@ public class ExceptionResponseTest {
 
     @Test
     public void testEquals() {
-        ExceptionResponse e1 = new ExceptionResponse(new Date(), "message", "details");
-        ExceptionResponse e2 = new ExceptionResponse(new Date(), "message", "details");
-        ExceptionResponse e3 = new ExceptionResponse(new Date(), "message1", "details1");
+        Date date = new Date();
+        ExceptionResponse e1 = new ExceptionResponse(date, "message", "details");
+        ExceptionResponse e2 = new ExceptionResponse(date, "message", "details");
+        ExceptionResponse e3 = new ExceptionResponse(date, "message1", "details1");
 
         assertEquals(e1, e2);
         assertEquals(e2, e1);
