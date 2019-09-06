@@ -19,6 +19,7 @@ import com.expedia.adaptivealerting.kafka.serde.MetricDataJsonSerde;
 import com.expedia.adaptivealerting.kafka.util.TestObjectMother;
 import com.expedia.adaptivealerting.metricprofiler.MetricProfiler;
 import com.expedia.metrics.MetricData;
+import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.metrictank.MetricTankIdFactory;
 import com.github.charithe.kafka.EphemeralKafkaBroker;
 import com.github.charithe.kafka.KafkaJunitRule;
@@ -118,7 +119,7 @@ public class KafkaMetricProfilerTest {
         when(saConfig.getTypesafeConfig()).thenReturn(tsConfig);
         when(saConfig.getInputTopic()).thenReturn(INPUT_TOPIC);
         when(saConfig.getOutputTopic()).thenReturn(OUTPUT_TOPIC);
-        when(metricProfiler.hasProfilingInfo(any(MetricData.class))).thenReturn(true);
+        when(metricProfiler.hasProfilingInfo(any(MetricDefinition.class))).thenReturn(true);
     }
 
 }

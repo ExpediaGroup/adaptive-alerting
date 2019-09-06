@@ -1,7 +1,6 @@
 package com.expedia.adaptivealerting.metricprofiler;
 
-import com.expedia.adaptivealerting.metricprofiler.source.ProfilingSource;
-import com.expedia.metrics.MetricData;
+import com.expedia.adaptivealerting.metricprofiler.source.ProfileSource;
 import com.expedia.metrics.MetricDefinition;
 import lombok.val;
 import org.junit.Before;
@@ -11,7 +10,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import java.time.Instant;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -24,12 +22,11 @@ public class MetricProfilerTest {
     private MetricProfiler metricProfiler;
 
     @Mock
-    private ProfilingSource source;
+    private ProfileSource source;
 
     @Mock
     private Map<String, Boolean> cachedMetrics;
 
-    private MetricData goodMetricData;
     private MetricDefinition goodDefinition;
 
     @Before
@@ -42,17 +39,16 @@ public class MetricProfilerTest {
 
     @Test
     public void testProfiling() {
-        val result = metricProfiler.hasProfilingInfo(goodMetricData);
+        val result = metricProfiler.hasProfilingInfo(goodDefinition);
         assertNotNull(result);
         assertEquals(true, result);
     }
 
     private void initTestObjects() {
         this.goodDefinition = new MetricDefinition("good-definition");
-        this.goodMetricData = new MetricData(goodDefinition, 100.0, Instant.now().getEpochSecond());
     }
 
     private void initDependencies() {
-        when(source.profilingExists(Mockito.any(Map.class))).thenReturn(true);
+        when(source.profileExists(Mockito.any(MetricDefinition.class))).thenReturn(true);
     }
 }

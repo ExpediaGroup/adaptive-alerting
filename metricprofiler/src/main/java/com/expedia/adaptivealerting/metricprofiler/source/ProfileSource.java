@@ -15,20 +15,10 @@
  */
 package com.expedia.adaptivealerting.metricprofiler.source;
 
-import lombok.RequiredArgsConstructor;
+import com.expedia.metrics.MetricDefinition;
 
-import javax.validation.constraints.NotNull;
 import java.util.Map;
 
-@RequiredArgsConstructor
-public class DefaultProfilingSource implements ProfilingSource {
-
-    @NotNull
-    private final ProfilingClient client;
-
-    @Override
-    public Boolean profilingExists(Map<String, String> tags) {
-        return client.findProfilingDocument(tags);
-    }
-
+public interface ProfileSource {
+    Boolean profileExists(MetricDefinition metricDefinition);
 }

@@ -25,11 +25,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class MetricProfilingControllerTest {
+public class MetricProfileControllerTest {
 
     @Spy
     @InjectMocks
-    private MetricProfilingController controllerUnderTest;
+    private MetricProfileController controllerUnderTest;
 
     @Mock
     private MetricProfilingService profilingService;
@@ -38,7 +38,7 @@ public class MetricProfilingControllerTest {
 
     @Before
     public void setUp() {
-        this.controllerUnderTest = new MetricProfilingController();
+        this.controllerUnderTest = new MetricProfileController();
         MockitoAnnotations.initMocks(this);
         initTestObjects();
         initDependencies();

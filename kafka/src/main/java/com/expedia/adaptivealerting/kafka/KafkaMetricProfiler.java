@@ -18,8 +18,8 @@ package com.expedia.adaptivealerting.kafka;
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.expedia.adaptivealerting.kafka.serde.MetricDataJsonSerde;
 import com.expedia.adaptivealerting.metricprofiler.MetricProfiler;
-import com.expedia.adaptivealerting.metricprofiler.source.DefaultProfilingSource;
-import com.expedia.adaptivealerting.metricprofiler.source.ProfilingClient;
+import com.expedia.adaptivealerting.metricprofiler.source.DefaultProfileSource;
+import com.expedia.adaptivealerting.metricprofiler.source.MetricProfilerClient;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.metrictank.MetricTankIdFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -79,7 +79,7 @@ public final class KafkaMetricProfiler extends AbstractStreamsApp {
         final KStream<String, MetricData> stream = builder.stream(inboundTopic);
         stream
                 .filter((key, metricData) ->
-                        metricProfiler.hasProfilingInfo(metricData))
+                        metricProfiler.hasProfilingInfo(metricData.getMetricDefinition()))
                 .map((key, metricData) -> {
                     val hash = idFactory.getId(metricData.getMetricDefinition());
                     return KeyValue.pair(hash, metricData);
@@ -90,8 +90,8 @@ public final class KafkaMetricProfiler extends AbstractStreamsApp {
 
     static MetricProfiler buildMetricProfiler(Config config) {
         val uriTemplate = config.getString(CK_MODEL_SERVICE_URI_TEMPLATE);
-        val client = new ProfilingClient(new HttpClientWrapper(), new ObjectMapper(), uriTemplate);
-        val profilingSource = new DefaultProfilingSource(client);
+        val client = new MetricProfilerClient(new HttpClientWrapper(), new ObjectMapper(), uriTemplate);
+        val profilingSource = new DefaultProfileSource(client);
         return new MetricProfiler(profilingSource);
     }
 }

@@ -1,6 +1,8 @@
 package com.expedia.adaptivealerting.metricprofiler.source;
 
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
+import com.expedia.metrics.MetricDefinition;
+import com.expedia.metrics.TagCollection;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -14,15 +16,15 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.expedia.adaptivealerting.metricprofiler.source.ProfilingClient.FIND_DOCUMENT_PATH;
+import static com.expedia.adaptivealerting.metricprofiler.source.MetricProfilerClient.FIND_DOCUMENT_PATH;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-public class ProfilingClientTest {
+public class MetricProfilerClientTest {
     private static final String BASE_URI = "http://example.com";
     private static final String FIND_DOC_URI = uri(FIND_DOCUMENT_PATH);
 
-    private ProfilingClient clientUnderTest;
+    private MetricProfilerClient clientUnderTest;
 
     @Mock
     private HttpClientWrapper httpClient;
@@ -30,9 +32,14 @@ public class ProfilingClientTest {
     @Mock
     private ObjectMapper objectMapper;
 
+    private MetricDefinition goodDefinition;
+    private MetricDefinition metricDefinition_cantRead;
+    private MetricDefinition metricDefinition_invalidContent;
+
     private Map<String, String> metricTags;
     private Map<String, String> metricTags_cantRead;
     private Map<String, String> metricTags_invalidContent;
+
 
     @Mock
     private Content docContent;
@@ -49,34 +56,40 @@ public class ProfilingClientTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        this.clientUnderTest = new ProfilingClient(httpClient, objectMapper, BASE_URI);
+        this.clientUnderTest = new MetricProfilerClient(httpClient, objectMapper, BASE_URI);
         initTestObjects();
         initDependencies();
     }
 
     @Test
     public void testFindProfilingDocument() {
-        metricTags.put("app", "test-app");
-        val result = clientUnderTest.findProfilingDocument(metricTags);
+        metricTags.put("key", "value");
+        Map<String, String> metaMap = new HashMap<>();
+        metaMap.put("key", "value");
+        TagCollection tags = new TagCollection(metricTags);
+        TagCollection meta = new TagCollection(metaMap);
+
+        goodDefinition = new MetricDefinition("good-definition", tags, meta);
+        val result = clientUnderTest.profileExists(goodDefinition);
         assertEquals(true, result);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testFindProfilingDocument_illegal_arguments() {
-        val result = clientUnderTest.findProfilingDocument(metricTags);
+        val result = clientUnderTest.profileExists(goodDefinition);
         assertEquals(true, result);
     }
 
     @Test(expected = RuntimeException.class)
     public void testFindProfilingDocument_http_io_exception() {
-        metricTags_cantRead.put("app", "test-app");
-        clientUnderTest.findProfilingDocument(metricTags_cantRead);
+        metricDefinition_cantRead = new MetricDefinition("bad-definition");
+        clientUnderTest.profileExists(metricDefinition_cantRead);
     }
 
     @Test(expected = RuntimeException.class)
     public void testFindProfilingDocument_http_io_exception_1() {
-        metricTags_invalidContent.put("app", "test-app");
-        clientUnderTest.findProfilingDocument(metricTags_invalidContent);
+        metricDefinition_invalidContent = new MetricDefinition("bad-definition");
+        clientUnderTest.profileExists(metricDefinition_invalidContent);
     }
 
     private void initTestObjects() {

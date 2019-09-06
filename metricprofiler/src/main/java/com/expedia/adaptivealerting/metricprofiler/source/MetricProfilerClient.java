@@ -15,20 +15,23 @@
  */
 package com.expedia.adaptivealerting.metricprofiler.source;
 
+import com.expedia.adaptivealerting.anomdetect.util.AssertUtil;
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
+import com.expedia.metrics.MetricDefinition;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.http.client.fluent.Content;
 
 import java.io.IOException;
-import java.util.Map;
 
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isTrue;
 
 @RequiredArgsConstructor
-public class ProfilingClient {
+@Slf4j
+public class MetricProfilerClient {
 
     @NonNull
     private final HttpClientWrapper httpClient;
@@ -39,9 +42,12 @@ public class ProfilingClient {
     @NonNull
     private final String baseUri;
 
-    public static final String FIND_DOCUMENT_PATH = "/api/metricProfiling/findMatchingByTags";
+    public static final String FIND_DOCUMENT_PATH = "/api/metricProfiling/search/findByTags";
 
-    public Boolean findProfilingDocument(Map<String, String> tags) {
+    public Boolean profileExists(MetricDefinition metricDefinition) {
+        AssertUtil.notNull(metricDefinition, "metricDefinition can't be null");
+        val tags = metricDefinition.getTags().getKv();
+
         isTrue(tags.size() > 0, "tags must not be empty");
 
         val uri = baseUri + FIND_DOCUMENT_PATH;
@@ -60,7 +66,7 @@ public class ProfilingClient {
             objectMapper.readValue(content.asBytes(), Boolean.class);
             return true;
         } catch (IOException e) {
-            val message = "IOException while finding profiling document: tags=" + tags;
+            val message = "IOException while finding finding matching profile: tags=" + tags;
             throw new RuntimeException(message, e);
         }
     }
