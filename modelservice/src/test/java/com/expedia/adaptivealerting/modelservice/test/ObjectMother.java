@@ -1,5 +1,9 @@
 package com.expedia.adaptivealerting.modelservice.test;
 
+import com.expedia.adaptivealerting.modelservice.dto.common.Expression;
+import com.expedia.adaptivealerting.modelservice.dto.common.Field;
+import com.expedia.adaptivealerting.modelservice.dto.common.Operand;
+import com.expedia.adaptivealerting.modelservice.dto.common.Operator;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.MatchingDetectorsResponse;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.User;
 import com.expedia.adaptivealerting.modelservice.dto.percolator.BoolCondition;
@@ -159,6 +163,17 @@ public class ObjectMother {
 
     public String getTestString() {
         return "{\"test1\":1,\"test2\":2,\"test3\":3}";
+    }
+
+    public Expression getExpression() {
+        Expression expression = new Expression();
+        expression.setOperator(Operator.AND);
+        List<Operand> operandsList = new ArrayList<>();
+        Operand testOperand = new Operand();
+        testOperand.setField(new Field("name", "sample-app"));
+        operandsList.add(testOperand);
+        expression.setOperands(operandsList);
+        return expression;
     }
 
     @SneakyThrows

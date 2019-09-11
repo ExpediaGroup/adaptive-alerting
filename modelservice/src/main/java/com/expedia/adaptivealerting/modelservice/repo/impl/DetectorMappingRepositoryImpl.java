@@ -132,8 +132,8 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
     @Override
     public String createDetectorMapping(CreateDetectorMappingRequest createRequest) {
         Set<String> fields = createRequest.getFields();
-        Set<String> newFieldMappings = removeFieldsHavingExistingMapping(fields);
-        updateIndexMappings(newFieldMappings);
+        Set<String> newFieldMappings = elasticsearchUtil.removeFieldsHavingExistingMapping(fields, elasticSearchProperties.getIndexName());
+        elasticsearchUtil.updateIndexMappings(newFieldMappings, elasticSearchProperties.getIndexName(), elasticSearchProperties.getDocType());
         final PercolatorDetectorMapping percolatorDetectorMapping = new PercolatorDetectorMapping()
                 .setUser(createRequest.getUser())
                 .setDetector(createRequest.getDetector())
@@ -145,50 +145,6 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
         val indexRequest = new IndexRequest(elasticSearchProperties.getIndexName(), elasticSearchProperties.getDocType());
         String json = objectMapperUtil.convertToString(percolatorDetectorMapping);
         return elasticsearchUtil.getIndexResponse(indexRequest, json).getId();
-    }
-
-    private void updateIndexMappings(Set<String> newFieldMappings) {
-        PutMappingRequest request = new PutMappingRequest(elasticSearchProperties.getIndexName());
-        Map<String, Object> jsonMap = new HashMap<>();
-        Map<String, Object> type = new HashMap<>();
-        type.put("type", "keyword");
-
-        Map<String, Object> properties = new HashMap<>();
-        newFieldMappings.forEach(field -> {
-            properties.put(field, type);
-        });
-
-        jsonMap.put("properties", properties);
-        request.source(jsonMap);
-        request.type(elasticSearchProperties.getDocType());
-
-        try {
-            elasticSearchClient.indices().putMapping(request, RequestOptions.DEFAULT);
-        } catch (IOException e) {
-            log.error("Error updating mappings", e);
-            throw new RuntimeException(e);
-        }
-    }
-
-    private Set<String> removeFieldsHavingExistingMapping(Set<String> fields) {
-        GetMappingsRequest request = new GetMappingsRequest();
-        request.indices(elasticSearchProperties.getIndexName());
-
-        try {
-            GetMappingsResponse mappingsResponse = elasticSearchClient.indices().getMapping(request, RequestOptions.DEFAULT);
-            Map<String, String> mapProperties = ((Map<String, String>) mappingsResponse.getMappings()
-                    .get(elasticSearchProperties.getIndexName())
-                    .get(elasticSearchProperties.getDocType())
-                    .sourceAsMap().get("properties"));
-
-            Set<String> mappedFields = mapProperties.entrySet().stream()
-                    .map(en -> en.getKey()).collect(Collectors.toSet());
-            fields.removeAll(mappedFields);
-            return fields;
-        } catch (IOException e) {
-            log.error("Error finding mappings", e);
-            throw new RuntimeException(e);
-        }
     }
 
     private void updateDetectorMapping(String index, PercolatorDetectorMapping percolatorDetectorMapping) {
@@ -320,7 +276,8 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
     }
 
     private DetectorMapping getDetectorMapping(String json, String id, Optional<Map<String, DocumentField>> documentFieldMap) {
-        PercolatorDetectorMapping detectorEntity = (PercolatorDetectorMapping) objectMapperUtil.convertToObject(json, new TypeReference<PercolatorDetectorMapping>(){});
+        PercolatorDetectorMapping detectorEntity = (PercolatorDetectorMapping) objectMapperUtil.convertToObject(json, new TypeReference<PercolatorDetectorMapping>() {
+        });
         log.info("detectorEntity:{}", detectorEntity);
         DetectorMapping detectorMapping = new DetectorMapping()
                 .setId(id)

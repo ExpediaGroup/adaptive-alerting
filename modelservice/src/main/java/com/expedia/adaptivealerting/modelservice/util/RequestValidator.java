@@ -17,12 +17,12 @@ package com.expedia.adaptivealerting.modelservice.util;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorRegistry;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Expression;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Operand;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Operator;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.User;
 import com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping;
 import com.expedia.adaptivealerting.modelservice.entity.Detector;
+import com.expedia.adaptivealerting.modelservice.dto.common.Expression;
+import com.expedia.adaptivealerting.modelservice.dto.common.Operator;
+import com.expedia.adaptivealerting.modelservice.dto.common.Operand;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 import org.springframework.util.Assert;
@@ -47,6 +47,10 @@ public class RequestValidator {
         Assert.isTrue(Operator.AND.equals(expression.getOperator()), "Only AND operator is supported now");
         Assert.notEmpty(expression.getOperands(), "Operands can't be empty");
         expression.getOperands().forEach(operand -> validateOperand(operand));
+    }
+
+    public static void validateBoolean(Boolean condition){
+        Assert.notNull(condition, "Condition can't be null");
     }
 
     private static void validateOperand(Operand operand) {

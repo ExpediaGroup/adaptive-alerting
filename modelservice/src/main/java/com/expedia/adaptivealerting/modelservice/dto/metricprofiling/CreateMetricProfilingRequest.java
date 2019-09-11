@@ -13,14 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.dto.detectormapping;
+package com.expedia.adaptivealerting.modelservice.dto.metricprofiling;
 
 import com.expedia.adaptivealerting.modelservice.dto.common.Expression;
+import com.expedia.adaptivealerting.modelservice.util.RequestValidator;
 import lombok.Data;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @Data
-public class UpdateDetectorMappingRequest {
-    private String id;
+public class CreateMetricProfilingRequest {
     private Expression expression;
-    private Detector detector;
+    private Boolean isStationary;
+
+    public void validate() {
+        RequestValidator.validateExpression(this.getExpression());
+        RequestValidator.validateBoolean(this.isStationary);
+    }
+
+    public Set<String> getFields() {
+        return this.expression.getOperands().stream()
+                .map(operand -> operand.getField().getKey()).collect(Collectors.toSet());
+    }
 }
+

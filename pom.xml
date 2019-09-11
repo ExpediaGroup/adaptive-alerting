@@ -47,6 +47,7 @@
     <modules>
         <module>anomdetect</module>
         <module>kafka</module>
+        <module>metricprofiler</module>
         <module>modelservice</module>
         <module>metrics</module>
 
@@ -174,6 +175,11 @@
             <dependency>
                 <groupId>com.expedia.adaptivealerting</groupId>
                 <artifactId>adaptive-alerting-metrics</artifactId>
+                <version>${aa.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.expedia.adaptivealerting</groupId>
+                <artifactId>adaptive-alerting-metricprofiler</artifactId>
                 <version>${aa.version}</version>
             </dependency>
             <dependency>
