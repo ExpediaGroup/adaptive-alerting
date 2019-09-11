@@ -20,3 +20,4 @@ release: docker_build
 	./docker/scripts/build-ad-manager.sh --release
 	./docker/scripts/build-a2m-mapper.sh --release
 	./docker/scripts/build-a2a-mapper.sh --release
+	./docker/scripts/build-metric-profiler.sh --release
