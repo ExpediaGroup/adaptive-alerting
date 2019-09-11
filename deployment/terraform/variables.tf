@@ -31,6 +31,10 @@ variable "a2m-mapper" {
   type = "map"
 }
 
+variable "metric-profiler" {
+  type = "map"
+}
+
 variable "notifier" {
   type = "map"
 }
