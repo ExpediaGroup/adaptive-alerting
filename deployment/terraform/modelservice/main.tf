@@ -15,6 +15,8 @@ data "template_file" "config_data" {
     detector_mapper_es_urls = "${var.detector_mapper_es_urls}"
     detector_mapper_index_name = "${var.detector_mapper_index_name}"
     detector_mapper_doctype = "${var.detector_mapper_doctype}"
+    detector_index_name = "${var.detector_index_name}"
+    detector_doctype = "${var.detector_doctype}"
     detector_mapper_es_config_connection_timeout = "${var.detector_mapper_es_config_connection_timeout}"
     detector_mapper_es_config_connection_retry_timeout = "${var.detector_mapper_es_config_connection_retry_timeout}"
     detector_mapper_es_config_max_total_connection = "${var.detector_mapper_es_config_max_total_connection}"

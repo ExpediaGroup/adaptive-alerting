@@ -37,6 +37,12 @@ public class PercolatorDetectorMapping {
     public static final String LAST_MOD_TIME_KEYWORD = AA_PREFIX + "lastModifiedTime";
     public static final String CREATE_TIME_KEYWORD = AA_PREFIX + "createdTime";
 
+    public static final String DETECTOR_MOD_TIME = "lastUpdateTimestamp";
+    public static final String DETECTOR_CREATED_TIME = "dateCreated";
+    public static final String DETECTOR_TYPE = "type";
+    public static final String DETECTOR_CREATED_BY = "createdBy";
+    public static final String DETECTOR_CONFIG = "detectorConfig";
+
     @JsonProperty(USER_KEYWORD)
     private User user;
     @JsonProperty(DETECTOR_KEYWORD)

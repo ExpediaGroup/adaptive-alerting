@@ -39,6 +39,8 @@ public class ElasticSearchProperties {
     private boolean createIndexIfNotFound;
     private String docType;
     private String urls;
+    private String detectorIndexName;
+    private String detectorDocType;
 
     @Data
     @Accessors(chain = true)
