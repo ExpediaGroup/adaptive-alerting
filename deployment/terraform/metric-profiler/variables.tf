@@ -29,3 +29,4 @@ variable "env_vars" {}
 # App
 variable "kafka_endpoint" {}
 variable "modelservice_base_uri" {}
+variable "inbound_topic" {}
