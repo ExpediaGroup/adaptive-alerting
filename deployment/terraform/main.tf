@@ -191,6 +191,7 @@ module "metric-profiler" {
   # App
   kafka_endpoint = "${local.kafka_endpoint}"
   modelservice_base_uri = "${var.metric-profiler["modelservice_base_uri"]}"
+  inbound_topic = "${var.metric-profiler["inbound_topic"]}"
 }
 
 module "notifier" {

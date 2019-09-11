@@ -8,7 +8,7 @@ metric-profiler {
     retry.backoff.ms = 5000
   }
   health.status.path = "/app/isHealthy"
-  inbound-topic = "metrics"
+  inbound-topic = "${inbound_topic}"
   outbound-topic = "profile-metrics"
   model-service-base-uri = "${modelservice_base_uri}"
 }
