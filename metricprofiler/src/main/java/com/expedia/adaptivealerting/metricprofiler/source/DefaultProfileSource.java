@@ -47,7 +47,6 @@ public class DefaultProfileSource implements ProfileSource {
     public Boolean profileExists(MetricDefinition metricDefinition) {
         AssertUtil.notNull(metricDefinition, "metricDefinition can't be null");
         val tags = metricDefinition.getTags().getKv();
-
         val mutableTags = new HashMap<>();
         mutableTags.putAll(tags);
         mutableTags.remove("box");
