@@ -46,6 +46,7 @@ public class DefaultProfileSource implements ProfileSource {
     public Boolean profileExists(MetricDefinition metricDefinition) {
         AssertUtil.notNull(metricDefinition, "metricDefinition can't be null");
         val tags = metricDefinition.getTags().getKv();
+        tags.remove("box");
 
         isTrue(tags.size() > 0, "tags must not be empty");
 
