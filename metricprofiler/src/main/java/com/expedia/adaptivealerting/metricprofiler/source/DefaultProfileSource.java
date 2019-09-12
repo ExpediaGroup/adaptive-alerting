@@ -25,6 +25,7 @@ import lombok.val;
 import org.apache.http.client.fluent.Content;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isTrue;
 
@@ -47,16 +48,20 @@ public class DefaultProfileSource implements ProfileSource {
         AssertUtil.notNull(metricDefinition, "metricDefinition can't be null");
         val tags = metricDefinition.getTags().getKv();
 
-        isTrue(tags.size() > 0, "tags must not be empty");
+        val mutableTags = new HashMap<>();
+        mutableTags.putAll(tags);
+        mutableTags.remove("box");
+
+        isTrue(mutableTags.size() > 0, "tags must not be empty");
 
         val uri = baseUri + FIND_DOCUMENT_PATH;
         Content content;
         try {
-            val body = objectMapper.writeValueAsString(tags);
+            val body = objectMapper.writeValueAsString(mutableTags);
             content = httpClient.post(uri, body);
         } catch (IOException e) {
             val message = "IOException while finding matching metrics for" +
-                    ": tags=" + tags +
+                    ": tags=" + mutableTags +
                     ", httpMethod=POST" +
                     ", uri=" + uri;
             throw new RuntimeException(message, e);
@@ -65,7 +70,7 @@ public class DefaultProfileSource implements ProfileSource {
             objectMapper.readValue(content.asBytes(), Boolean.class);
             return true;
         } catch (IOException e) {
-            val message = "IOException while finding finding matching profile: tags=" + tags;
+            val message = "IOException while finding finding matching profile: tags=" + mutableTags;
             throw new RuntimeException(message, e);
         }
     }
