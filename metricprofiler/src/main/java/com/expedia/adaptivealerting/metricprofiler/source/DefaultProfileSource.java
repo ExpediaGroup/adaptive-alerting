@@ -26,6 +26,7 @@ import org.apache.http.client.fluent.Content;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isTrue;
 
@@ -47,10 +48,7 @@ public class DefaultProfileSource implements ProfileSource {
     public Boolean profileExists(MetricDefinition metricDefinition) {
         AssertUtil.notNull(metricDefinition, "metricDefinition can't be null");
         val tags = metricDefinition.getTags().getKv();
-        val mutableTags = new HashMap<>();
-        mutableTags.putAll(tags);
-        mutableTags.remove("box");
-
+        val mutableTags = getMutableTagsMap(tags);
         isTrue(mutableTags.size() > 0, "tags must not be empty");
 
         val uri = baseUri + FIND_DOCUMENT_PATH;
@@ -72,5 +70,14 @@ public class DefaultProfileSource implements ProfileSource {
             val message = "IOException while finding finding matching profile: tags=" + mutableTags;
             throw new RuntimeException(message, e);
         }
+    }
+
+    //FIXME - This is a temporary fix to remove IP value which comes as part of tags format.
+    // We don't want to keep IP while querying since profile doesn't change for same type of metrics. [KS]
+    private Map<String, String> getMutableTagsMap(Map<String, String> tags) {
+        val mutableTags = new HashMap<String, String>();
+        mutableTags.putAll(tags);
+        mutableTags.remove("box");
+        return mutableTags;
     }
 }
