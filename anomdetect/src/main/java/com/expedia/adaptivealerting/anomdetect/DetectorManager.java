@@ -25,7 +25,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import lombok.var;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -120,7 +119,7 @@ public class DetectorManager {
         notNull(mappedMetricData, "mappedMetricData can't be null");
 
         val detectorUuid = mappedMetricData.getDetectorUuid();
-        var detector = cachedDetectors.get(detectorUuid);
+        Detector detector = cachedDetectors.get(detectorUuid);
         if (detector == null) {
             detector = detectorSource.findDetector(detectorUuid);
             cachedDetectors.put(detectorUuid, detector);
@@ -137,7 +136,7 @@ public class DetectorManager {
      * On successful sync update syncUptill time to currentTime
      */
     List<UUID> detectorCacheSync(long currentTime) {
-        var updatedDetectors = new ArrayList<UUID>();
+        List<UUID> updatedDetectors = new ArrayList<>();
 
         long updateDurationInSeconds = (currentTime - synchedTilTime) / 1000;
 
