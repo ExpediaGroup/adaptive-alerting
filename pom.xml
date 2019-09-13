@@ -655,7 +655,6 @@
                 <configuration>
                     <source>${project.jdk.version}</source>
                     <target>${project.jdk.version}</target>
-                    <verbose>true</verbose>
                 </configuration>
             </plugin>
             <plugin>
