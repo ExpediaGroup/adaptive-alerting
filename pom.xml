@@ -715,7 +715,7 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>${maven.javadoc.plugin.version}</version>
                 <configuration>
-                    <source>8</source>
+                    <source>1.8</source>
                 </configuration>
                 <executions>
                     <execution>
