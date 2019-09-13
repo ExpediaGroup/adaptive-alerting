@@ -13,16 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.serde;
+package com.expedia.adaptivealerting.kafka.alert;
 
-import com.expedia.alertmanager.model.Alert;
+import com.expedia.adaptivealerting.kafka.serde.AbstractJsonDeserializer;
+import com.expedia.adaptivealerting.kafka.serde.AbstractJsonSerializer;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serializer;
 
 import java.util.Map;
 
-// TODO Move this to alert-manager. [WLW]
+/**
+ * @deprecated Remove alerting from AA.
+ */
 public final class AlertJsonSerde implements Serde<Alert> {
 
     @Override

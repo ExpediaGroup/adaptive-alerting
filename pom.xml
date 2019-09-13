@@ -77,7 +77,6 @@
 
         <!-- Dependencies -->
         <aa.version>1.0.0-SNAPSHOT</aa.version>
-        <alert-manager.version>1.0.0-SNAPSHOT</alert-manager.version>
         <apache.commons.version>3.7</apache.commons.version>
         <apache.commons.math.version>3.6.1</apache.commons.math.version>
         <apache.httpcomponents.version>4.5.6</apache.httpcomponents.version>
@@ -191,11 +190,6 @@
                 <groupId>com.expedia.adaptivealerting</groupId>
                 <artifactId>adaptive-alerting-tools</artifactId>
                 <version>${aa.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.expedia.alertmanager</groupId>
-                <artifactId>alert-manager-api</artifactId>
-                <version>${alert-manager.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>

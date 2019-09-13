@@ -15,14 +15,14 @@
  */
 package com.expedia.adaptivealerting.kafka;
 
-import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
+import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.util.ObjectMapperUtil;
-import com.expedia.adaptivealerting.kafka.serde.AlertJsonSerde;
+import com.expedia.adaptivealerting.kafka.alert.Alert;
+import com.expedia.adaptivealerting.kafka.alert.AlertJsonSerde;
 import com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde;
 import com.expedia.adaptivealerting.kafka.util.TestObjectMother;
-import com.expedia.alertmanager.model.Alert;
 import com.expedia.metrics.MetricData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;

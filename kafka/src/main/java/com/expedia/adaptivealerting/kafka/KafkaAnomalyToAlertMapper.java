@@ -18,8 +18,8 @@ package com.expedia.adaptivealerting.kafka;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
-import com.expedia.adaptivealerting.kafka.serde.AlertJsonSerde;
-import com.expedia.alertmanager.model.Alert;
+import com.expedia.adaptivealerting.kafka.alert.Alert;
+import com.expedia.adaptivealerting.kafka.alert.AlertJsonSerde;
 import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -34,6 +34,9 @@ import java.util.HashMap;
 
 // TODO Expand this to support breakouts? [WLW]
 
+/**
+ * @deprecated Remove alerting from AA.
+ */
 @Slf4j
 public class KafkaAnomalyToAlertMapper extends AbstractStreamsApp {
     private static final String APP_ID = "a2a-mapper";
