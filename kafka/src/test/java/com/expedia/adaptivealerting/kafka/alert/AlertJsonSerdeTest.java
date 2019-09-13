@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.kafka.serde;
+package com.expedia.adaptivealerting.kafka.alert;
 
 import com.expedia.adaptivealerting.kafka.util.TestObjectMother;
-import com.expedia.alertmanager.model.Alert;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.val;
 import org.junit.Before;
@@ -25,6 +24,9 @@ import org.junit.Test;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * @deprecated Remove alerts from AA
+ */
 // TODO Use abstract base class for serde tests [WLW]
 public final class AlertJsonSerdeTest {
     private AlertJsonSerde serdeUnderTest;
