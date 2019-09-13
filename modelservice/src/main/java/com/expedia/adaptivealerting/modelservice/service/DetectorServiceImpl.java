@@ -23,6 +23,7 @@ import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
@@ -68,9 +69,11 @@ public class DetectorServiceImpl implements DetectorService {
 
     @Override
     public List<Detector> getLastUpdatedDetectors(long interval) {
-        val now = DateUtil.now().toInstant();
-        val fromDate = DateUtil.toUtcDateString((now.minus(interval, ChronoUnit.SECONDS)));
-        val toDate = DateUtil.toUtcDateString(now);
+        // Replaced Lombok val with explicit types here because the Maven compiler plugin was breaking under
+        // OpenJDK 12. Not sure what the issue was but this fixed it. [WLW]
+        Instant now = DateUtil.now().toInstant();
+        String fromDate = DateUtil.toUtcDateString((now.minus(interval, ChronoUnit.SECONDS)));
+        String toDate = DateUtil.toUtcDateString(now);
         return detectorRepository.getLastUpdatedDetectors(fromDate, toDate);
     }
 }
