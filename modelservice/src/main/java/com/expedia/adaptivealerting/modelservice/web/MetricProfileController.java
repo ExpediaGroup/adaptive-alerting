@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/metricProfiling/search")
+@RequestMapping("/api/metricProfiling")
 public class MetricProfileController {
 
     @Autowired
@@ -50,7 +50,7 @@ public class MetricProfileController {
     }
 
     @PostMapping
-    @RequestMapping(value = "/findByTags")
+    @RequestMapping(value = "/search/findByTags")
     public Boolean profilingExists(@RequestBody Map<String, String> tags) {
         return metricProfilingService.profilingExists(tags);
     }

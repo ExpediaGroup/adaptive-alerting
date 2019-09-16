@@ -67,7 +67,7 @@ public class MetricProfilingRepositoryImpl implements MetricProfilingRepository 
     @Override
     public String createMetricProfile(CreateMetricProfilingRequest createRequest) {
         val fields = createRequest.getFields();
-        val newFieldMappings = elasticsearchUtil.removeFieldsHavingExistingMapping(fields, METRIC_PROFILING_INDEX);
+        val newFieldMappings = elasticsearchUtil.removeFieldsHavingExistingMapping(fields, METRIC_PROFILING_INDEX, METRIC_PROFILING_DOC_TYPE);
         elasticsearchUtil.updateIndexMappings(newFieldMappings, METRIC_PROFILING_INDEX, METRIC_PROFILING_DOC_TYPE);
 
         val percolatorMetricProfiling = new PercolatorMetricProfiling()

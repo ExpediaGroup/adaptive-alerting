@@ -77,7 +77,7 @@ public class ElasticsearchUtil {
      * One of the solutions can be to wrap the client and hide it behind an interface which is then mockable
      **/
     @Generated
-    public Set<String> removeFieldsHavingExistingMapping(Set<String> fields, String indexName) {
+    public Set<String> removeFieldsHavingExistingMapping(Set<String> fields, String indexName, String docType) {
         GetMappingsRequest request = new GetMappingsRequest();
         request.indices(indexName);
 
@@ -85,7 +85,7 @@ public class ElasticsearchUtil {
             GetMappingsResponse mappingsResponse = elasticSearchClient.indices().getMapping(request, RequestOptions.DEFAULT);
             Map<String, String> mapProperties = ((Map<String, String>) mappingsResponse.getMappings()
                     .get(indexName)
-                    .get(elasticSearchProperties.getDocType())
+                    .get(docType)
                     .sourceAsMap().get("properties"));
 
             Set<String> mappedFields = mapProperties.entrySet().stream()

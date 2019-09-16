@@ -83,7 +83,8 @@ public class SwaggerConfiguration {
         return or(
                 // regex("/additional_endpoints/.*?"),
                 regex("/api/detectorMappings.*?"),
-                regex("/api/v2/detectors.*?")
+                regex("/api/v2/detectors.*?"),
+                regex("/api/metricProfiling.*?")
         );
     }
 

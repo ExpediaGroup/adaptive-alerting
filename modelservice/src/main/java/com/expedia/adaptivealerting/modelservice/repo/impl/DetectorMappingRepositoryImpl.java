@@ -132,7 +132,7 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
     @Override
     public String createDetectorMapping(CreateDetectorMappingRequest createRequest) {
         Set<String> fields = createRequest.getFields();
-        Set<String> newFieldMappings = elasticsearchUtil.removeFieldsHavingExistingMapping(fields, elasticSearchProperties.getIndexName());
+        Set<String> newFieldMappings = elasticsearchUtil.removeFieldsHavingExistingMapping(fields, elasticSearchProperties.getIndexName(), elasticSearchProperties.getDocType());
         elasticsearchUtil.updateIndexMappings(newFieldMappings, elasticSearchProperties.getIndexName(), elasticSearchProperties.getDocType());
         final PercolatorDetectorMapping percolatorDetectorMapping = new PercolatorDetectorMapping()
                 .setUser(createRequest.getUser())
