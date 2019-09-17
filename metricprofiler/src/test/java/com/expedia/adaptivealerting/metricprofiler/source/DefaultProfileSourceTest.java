@@ -66,6 +66,8 @@ public class DefaultProfileSourceTest {
         metricTags.put("key", "value");
         Map<String, String> metaMap = new HashMap<>();
         metaMap.put("key", "value");
+        metaMap.put("box", "ip-address");
+
         TagCollection tags = new TagCollection(metricTags);
         TagCollection meta = new TagCollection(metaMap);
 
