@@ -1,0 +1,146 @@
+#
+#  Copyright 2018-2019 Expedia Group, Inc.
+#
+#       Licensed under the Apache License, Version 2.0 (the "License");
+#       you may not use this file except in compliance with the License.
+#      You may obtain a copy of the License at
+#
+#           http://www.apache.org/licenses/LICENSE-2.0
+#
+#       Unless required by applicable law or agreed to in writing, software
+#       distributed under the License is distributed on an "AS IS" BASIS,
+#       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#       See the License for the specific language governing permissions and
+#       limitations under the License.
+#
+version: "2.4"
+services:
+
+  # AA Components
+  modelservice:
+    image: expediadotcom/adaptive-alerting-modelservice:69c4f3d4e56ea6540fb94d3fcfb141c00bcea3d7
+    environment:
+      AA_GRAPHITE_ENABLED: "true"
+      JAVA_XMS: 128m
+    volumes:
+      - ./configs/modelservice:/config
+    ports:
+      - "8008:8008"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      metrics:
+        condition: service_healthy
+    healthcheck:
+      test: "curl -fs http://localhost:8008/api/detectorMappings/lastUpdated?timeInSecs=60 >/dev/null || false"
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  a2m-mapper:
+    image: expediadotcom/adaptive-alerting-a2m-mapper:69c4f3d4e56ea6540fb94d3fcfb141c00bcea3d7
+    environment:
+      AA_GRAPHITE_ENABLED: "true"
+      JAVA_XMS: 128m
+    volumes:
+      - ./configs/a2m-mapper:/config
+    depends_on:
+      kafkasvc:
+        condition: service_healthy
+      metrics:
+        condition: service_healthy
+
+  ad-mapper:
+    image: expediadotcom/adaptive-alerting-ad-mapper:69c4f3d4e56ea6540fb94d3fcfb141c00bcea3d7
+    environment:
+      AA_GRAPHITE_ENABLED: "true"
+      JAVA_XMS: 128m
+    volumes:
+      - ./configs/ad-mapper:/config
+    depends_on:
+      modelservice:
+        condition: service_healthy
+      kafkasvc:
+        condition: service_healthy
+
+  ad-manager:
+    image: expediadotcom/adaptive-alerting-ad-manager:69c4f3d4e56ea6540fb94d3fcfb141c00bcea3d7
+    environment:
+      AA_GRAPHITE_ENABLED: "true"
+      JAVA_XMS: 128m
+    volumes:
+      - ./configs/ad-manager:/config
+    depends_on:
+      modelservice:
+        condition: service_healthy
+      kafkasvc:
+        condition: service_healthy
+      metrics:
+        condition: service_healthy
+
+  # Dependencies
+  elasticsearch:
+    image: elasticsearch:6.5.0
+    environment:
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+      xpack.security.enabled: "false"
+    ports:
+      - "9200:9200"
+    restart: always
+    volumes:
+      - "./scripts/populate-es.sh:/usr/local/bin/populate-es.sh"
+      - "./scripts/start-es.sh:/usr/local/bin/start-es.sh"
+    command:
+      - start-es.sh
+    healthcheck:
+      test: "curl -fs http://localhost:9200/_cat/indices?v >/dev/null || false"
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    healthcheck:
+      test: "nc -w 2 localhost 2181 || false"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    ports:
+      - "2181:2181"
+
+  kafkasvc:
+    image: wurstmeister/kafka:2.11-1.1.1
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafkasvc:9092,OUTSIDE://localhost:19092
+      KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://:19092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CREATE_TOPICS: "aa-metrics:1:1,mapped-metrics:1:1,anomalies:1:1,alerts:1:1,breakouts:1:1,tagged-anomalies:1:1"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    healthcheck:
+      test: "nc -w 2 localhost 9092 || false"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    ports:
+      - "9092:9092"
+      - "19092:19092"
+
+  metrics:
+    image: "graphiteapp/graphite-statsd"
+    healthcheck:
+      test: "nc -w 2 localhost 2003 || false"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    ports:
+      - "8125:8125/udp"
+      - "2003-2004:2003-2004"
+      - "2023-2024:2023-2024"
+      - "8126:8126"
+      - "80:80"
