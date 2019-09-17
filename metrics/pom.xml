@@ -33,6 +33,11 @@
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Metrics processing.</description>
 
+    <properties>
+        <jackson.version>2.9.8</jackson.version>
+        <json.version>20180813</json.version>
+    </properties>
+
     <dependencies>
 
         <!-- Compile -->
@@ -45,8 +50,17 @@
             <artifactId>metrics-java-jackson</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.expedia.adaptivealerting</groupId>
+            <artifactId>adaptive-alerting-kafka</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>fluent-hc</artifactId>
+            <version>${apache.httpcomponents.version}</version>
         </dependency>
         <dependency>
             <groupId>com.opencsv</groupId>
@@ -56,12 +70,20 @@
             <groupId>com.typesafe</groupId>
             <artifactId>config</artifactId>
         </dependency>
-
-        <!--Test-->
         <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest</artifactId>
-            <scope>test</scope>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>${json.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+            <version>${kafka.streams.version}</version>
         </dependency>
     </dependencies>
 
