@@ -39,8 +39,10 @@ server:
 # Elasticsearch
 datasource-es:
   createIndexIfNotFound: true
-  indexName: ${ES_INDEX_NAME}
-  doctype: ${ES_DOCTYPE}
+  indexName: ${ES_MAPPING_INDEX_NAME}
+  doctype: ${ES_MAPPING_DOCTYPE}
+  detectorIndexName: ${ES_DETECTOR_INDEX_NAME}
+  detectorDoctype: ${ES_DETECTOR_DOCTYPE}
   urls: ${ES_URL}
   config:
     connectionTimeout: 40000

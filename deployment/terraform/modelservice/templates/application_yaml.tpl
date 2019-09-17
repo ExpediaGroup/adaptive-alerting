@@ -22,6 +22,8 @@ datasource-es:
   createIndexIfNotFound: true
   indexName: ${detector_mapper_index_name}
   doctype: ${detector_mapper_doctype}
+  detectorIndexName: ${detector_index_name}
+  detectorDocType: ${detector_doctype}
   urls: ${detector_mapper_es_urls}
   config: 
     connectionTimeout: ${detector_mapper_es_config_connection_timeout}
