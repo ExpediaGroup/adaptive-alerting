@@ -53,11 +53,11 @@ data "template_file" "deployment_yaml" {
 
 resource "kubernetes_config_map" "a2m-mapper-config" {
   metadata {
-    name = "${local.configmap1_name}"
+    name = "${local.configmap_name}"
     namespace = "${var.namespace}"
   }
   data {
-    "aa-metric-functions.conf" = "${data.template_file.config_data.rendered}"
+    "a2m-mapper.conf" = "${data.template_file.config_data.rendered}"
   }
   count = "${local.count}"
 }

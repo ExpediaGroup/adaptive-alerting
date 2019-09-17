@@ -35,7 +35,13 @@ spec:
             memory: ${memory_request}Mi
         env:
         - name: "AA_OVERRIDES_CONFIG_PATH"
-          value: "/config/aa-metrics-functions.conf"
+          value: "/config/a2m-mapper.conf"
+        - name: "AA_GRAPHITE_HOST"	
+          value: "${graphite_host}"	
+        - name: "AA_GRAPHITE_PORT"	
+          value: "${graphite_port}"	
+        - name: "AA_GRAPHITE_ENABLED"	
+          value: "${graphite_enabled}"
         - name: "JAVA_XMS"
           value: "${jvm_memory_limit}m"
         - name: "JAVA_XMX"
