@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo;
 
+import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecast;
@@ -23,6 +24,7 @@ import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecast;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecaster;
 import com.expedia.adaptivealerting.anomdetect.util.TestObjectMother;
 import com.expedia.metrics.MetricData;
+import com.expedia.metrics.MetricDefinition;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
@@ -69,15 +71,27 @@ public class ForecastingDetectorTest {
     }
 
     @Test
-    public void testClassify() {
+    public void testDetect() {
         val metricDef = TestObjectMother.metricDefinition();
         val metricData = new MetricData(metricDef, 100.0, Instant.now().getEpochSecond());
         val result = (OutlierDetectorResult) detectorUnderTest.detect(metricData);
         assertNotNull(result);
     }
 
+    @Test
+    public void testDetect_nullForecast() {
+        val metricDef = new MetricDefinition("some-key");
+        val metricData = new MetricData(metricDef, 100.0, Instant.now().getEpochSecond());
+
+        when(pointForecaster.forecast(metricData)).thenReturn(null);
+
+        val result = (OutlierDetectorResult) detectorUnderTest.detect(metricData);
+        assertNotNull(result);
+        assertEquals(AnomalyLevel.UNKNOWN, result.getAnomalyLevel());
+    }
+
     @Test(expected = IllegalArgumentException.class)
-    public void testClassify_nullMetricData() {
+    public void testDetect_nullMetricData() {
         detectorUnderTest.detect(null);
     }
 
