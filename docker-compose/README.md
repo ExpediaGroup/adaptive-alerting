@@ -1,6 +1,6 @@
 # Testing the Adaptive Alerting pipeline with Docker Compose
 
-The Docker Compose setup allows you run the Adaptive Alerting components and test sample metrics against the project. By default the images are downloaded from Docker Hub, but they can be subsituted with your own builds or different versions from Docker Hub for testing purposes.
+The Docker Compose setup allows you run the Adaptive Alerting components and test sample metrics against the project. By default the images are downloaded from Docker Hub, but they can be substituted with your own builds or different versions from Docker Hub for testing purposes.
 
 #### 1. Build and run using Docker Compose
 ```

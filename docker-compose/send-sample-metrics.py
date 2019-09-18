@@ -15,30 +15,27 @@
 import msgpack
 from kafka import KafkaProducer
 from kafka import KafkaConsumer
+from kafka.errors import KafkaError
 import json
 import time
 from sys import stdout
 import random
+import threading
 
 kafka_boostrap_servers=['localhost:19092']
 
-def send_sample_metrics_handler():
+def produce_to_kafka(topic):
     num_samples = 250    # Minimum of 80 events need to be in Kafka topic to see output
-    print("Sending", num_samples, "random sample messages to Kafka...")
-
-    producer = KafkaProducer(bootstrap_servers=kafka_boostrap_servers)
-    for i in range(0, num_samples):
-        send_msgpack_to_kafka(producer, topic='aa-metrics') # Send to kafka using msgpack format
-        # send_json_to_kafka()              # Send to kafka using JSON format
-    producer.flush()
-
-    print("Checking for anomalies from Kafka...\n")
-    weak_anomaly_values, strong_anomaly_values = consume_from_kafka('anomalies')
-    print("\n-- Found", len(weak_anomaly_values), "WEAK Anomalies")
-    print("-- Weak Anomalous values:", weak_anomaly_values)
-    print("\n-- Found", len(strong_anomaly_values), "STRONG Anomalies")
-    print("-- Strong Anomalous values:", strong_anomaly_values)
-    
+    try:
+        time.sleep(1)   # Wait to make sure we establish a connection to anomalies kafka first
+        producer = KafkaProducer(bootstrap_servers=kafka_boostrap_servers)
+        print("Sending", num_samples, "random sample messages to Kafka...")
+        for i in range(0, num_samples):
+            send_msgpack_to_kafka(producer, topic='aa-metrics') # Send to kafka using msgpack format
+            # send_json_to_kafka()              # Send to kafka using JSON format
+        producer.flush()
+    except KafkaError as e:
+        print("Error connecting to", topic, "Kafka. Make sure your Docker Compose environment is up and running. EXCEPTION:",e)
 
 # Default Msgpack Serde - Use if ad-mapper.conf is set to "com.expedia.adaptivealerting.kafka.serde.MetricDataMessagePackSerde"
 def send_msgpack_to_kafka(producer, topic):
@@ -53,8 +50,11 @@ def send_msgpack_to_kafka(producer, topic):
         "Tags": ["what=samplemetric", "m_application=sample-web", "region=primary", "env=prod"]
     }
     packed_metric_data = msgpack.packb(metric_data, use_bin_type=True)
-    producer.send(topic, key=b'prod.primary.sample-web.sample-metric', value=packed_metric_data)
-
+    try:
+        producer.send(topic, key=b'prod.primary.sample-web.sample-metric', value=packed_metric_data)
+    except KafkaError as e:
+        print("Error connecting to kafka producer...",e)
+    
 
 # JSON Serde - Use if ad-mapper.conf is set to "com.expedia.adaptivealerting.kafka.serde.MetricDataJsonSerde"
 def send_json_to_kafka(producer, topic):
@@ -79,36 +79,50 @@ def send_json_to_kafka(producer, topic):
                     "timestamp": int(time.time())
                 }
     metric_data = json.dumps(metric_data).encode()
-    producer.send(topic, key=b'prod.primary.sample-web.sample-metric', value=metric_data)
-
+    try:
+        producer.send(topic, key=b'prod.primary.sample-web.sample-metric', value=metric_data)
+    except KafkaError as e:
+        print("Error connecting to kafka producer...",e)
 
 def consume_from_kafka(topic):
     output_count = 0
     anomaly_count = 0
-    strong_values = []
-    weak_values = []
-    consumer = KafkaConsumer(topic,
-                            bootstrap_servers=kafka_boostrap_servers, 
-                            auto_offset_reset='earliest', 
-                            enable_auto_commit=False, 
-                            consumer_timeout_ms=5000)
-    
-    for message in consumer:
-        output_count+=1
-        anomaly = json.loads(message.value)
-        anomalyLevel = anomaly.get('anomalyResult',{}).get('anomalyLevel')
-        if anomalyLevel == 'WEAK':
-            anomaly_count+=1
-            weak_values.append(anomaly.get('metricData').get('value'))
-        elif anomalyLevel == 'STRONG':
-            anomaly_count+=1
-            strong_values.append(anomaly.get('metricData').get('value'))
-        
-        print('- Total Anomalies Found: ' + str(anomaly_count) + ' out of ' + str(output_count), end='\r')
-        stdout.flush()
+    anomaly_values = {"WEAK": [], "STRONG": []}
 
-    return weak_values, strong_values
+    try:
+        consumer = KafkaConsumer(topic,
+                                bootstrap_servers=kafka_boostrap_servers, 
+                                auto_offset_reset='latest', 
+                                enable_auto_commit=False, 
+                                consumer_timeout_ms=5000)
+        
+        print("Checking for anomalies from Kafka...\n")
+        for message in consumer:
+            output_count+=1
+            anomaly = json.loads(message.value)
+            anomaly_level = anomaly.get('anomalyResult',{}).get('anomalyLevel')
+            if anomaly_level == 'WEAK' or anomaly_level == 'STRONG':
+                anomaly_count+=1
+                anomaly_values[anomaly_level].append(anomaly.get('metricData').get('value'))
+            
+            print('- Total Anomalies Found: ' + str(anomaly_count) + ' out of ' + str(output_count), end='\r')
+            stdout.flush()
+    except KafkaError as e:
+        print("Error connecting to", topic, "Kafka. Make sure your Docker environment is up and running. EXCEPTION:",e)
+        return False
+
+    if anomaly_count == 0:
+        print("No Anomalies were found. Make sure your Docker Compose environment is up and running.")
+    else:
+        print("\n\n-- Found", len(anomaly_values['WEAK']), "WEAK Anomalies")
+        print("-- Weak Anomalous values:", anomaly_values['WEAK'])
+        print("\n-- Found", len(anomaly_values['STRONG']), "STRONG Anomalies")
+        print("-- Strong Anomalous values:", anomaly_values['STRONG'])
+
+    return anomaly_values
 
 
 if __name__ == '__main__':
-    send_sample_metrics_handler()
+    t = threading.Thread(target=consume_from_kafka, args=['anomalies'])
+    t.start()
+    produce_to_kafka('aa-metrics')
