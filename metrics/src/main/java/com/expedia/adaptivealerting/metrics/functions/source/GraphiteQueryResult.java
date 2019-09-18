@@ -52,12 +52,25 @@ public class GraphiteQueryResult {
     public void getGraphiteQueryResultFromJson(String jsonGraphiteOutput) {
         JSONTokener graphiteQuery = new JSONTokener(jsonGraphiteOutput);
         JSONArray graphiteResultJsonArray = new JSONArray(graphiteQuery);
-        JSONObject graphiteResultJsonObject = graphiteResultJsonArray.getJSONObject(0);
-        String[] datapointString = graphiteResultJsonObject.getJSONArray(GRAPHITE_RESULT_DATAPOINTS_KEY).get(0).toString().split(",");
-        this.Datapoint = new Datapoint(Double.parseDouble(datapointString[0].substring(1)), Long.parseLong(datapointString[1].substring(0, datapointString[1].length() - 1 )));
-        this.Target = graphiteResultJsonObject.getString(GRAPHITE_RESULT_TARGET_KEY);
-        setTagsFromString(graphiteResultJsonObject.get(GRAPHITE_RESULT_TAGS_KEY).toString());
-    }
+        if (graphiteResultJsonArray.length() > 0) {
+            JSONObject graphiteResultJsonObject = graphiteResultJsonArray.getJSONObject(0);
+
+            if (graphiteResultJsonObject.getJSONArray(GRAPHITE_RESULT_DATAPOINTS_KEY).length() > 0) {
+                String[] datapointString = graphiteResultJsonObject.getJSONArray(GRAPHITE_RESULT_DATAPOINTS_KEY).get(0).toString().split(",");
+                if (datapointString.length > 1) {
+                    this.Datapoint = new Datapoint(Double.parseDouble(datapointString[0].substring(1)), Long.parseLong(datapointString[1].substring(0, datapointString[1].length() - 1)));
+                }
+            }
+
+            if (graphiteResultJsonObject.getString(GRAPHITE_RESULT_TARGET_KEY) != null) {
+                this.Target = graphiteResultJsonObject.getString(GRAPHITE_RESULT_TARGET_KEY);
+            }
+
+            if (graphiteResultJsonObject.get(GRAPHITE_RESULT_TAGS_KEY) != null) {
+                setTagsFromString(graphiteResultJsonObject.get(GRAPHITE_RESULT_TAGS_KEY).toString());
+            }
+        }
+}
 
     private void setTagsFromString(String tags) {
         JSONObject tagsJSONObject = new JSONObject(tags);
