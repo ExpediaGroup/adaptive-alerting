@@ -17,7 +17,16 @@ package com.expedia.adaptivealerting.anomdetect.forecast.point;
 
 import com.expedia.metrics.MetricData;
 
+/**
+ * Interface for point forecasting algorithms.
+ */
 public interface PointForecaster {
 
+    /**
+     * Return a point forecast, or {@literal null} if the forecaster has no forecast.
+     *
+     * @param metricData Metric data
+     * @return A point forecast, or {@literal null}
+     */
     PointForecast forecast(MetricData metricData);
 }
