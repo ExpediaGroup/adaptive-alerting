@@ -29,10 +29,10 @@ import lombok.extern.slf4j.Slf4j;
 public class MetricFunctionsReader {
 
     public static List<MetricFunctionsSpec> readFromInputFile(String InputFilename) {
-        List<MetricFunctionsSpec> metricFunctionSpecList = new ArrayList<MetricFunctionsSpec>();
+        List<MetricFunctionsSpec> metricFunctionSpecList = new ArrayList<>();
         InputStream inputStream = MetricFunctionsReader.class.getResourceAsStream(InputFilename);
-        InputStreamReader streamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
         try {
+            InputStreamReader streamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
             BufferedReader bufferedReader = new BufferedReader(streamReader);
             String metricFunctionSpecString;
             while ((metricFunctionSpecString = bufferedReader.readLine()) != null) {

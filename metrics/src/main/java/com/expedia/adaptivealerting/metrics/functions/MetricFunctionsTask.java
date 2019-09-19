@@ -16,10 +16,7 @@
 package com.expedia.adaptivealerting.metrics.functions;
 
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
-import com.expedia.adaptivealerting.metrics.functions.kafka.KafkaMetricFunctionsToAAMetrics;
-import com.expedia.adaptivealerting.metrics.functions.util.ConstructSourceURI;
-import org.apache.http.client.fluent.Content;
-import com.expedia.adaptivealerting.metrics.functions.source.GraphiteQueryResult;
+import com.expedia.adaptivealerting.metrics.functions.service.MetricQueryService;
 import com.expedia.adaptivealerting.metrics.functions.source.MetricFunctionsSpec;
 import com.expedia.metrics.MetricData;
 import com.typesafe.config.Config;
@@ -44,22 +41,11 @@ public class MetricFunctionsTask implements Runnable {
 
     @SuppressWarnings("unchecked")
     public void run() {
-        HttpClientWrapper metricFunctionHttpClient = new HttpClientWrapper();
-        /* For now source supported is graphite alone */
-        GraphiteQueryResult graphiteQueryResult = new GraphiteQueryResult();
+        HttpClientWrapper httpClientWrapper = new HttpClientWrapper();
+        MetricQueryService metricQueryService = new MetricQueryService(httpClientWrapper);
         try {
-            ConstructSourceURI constructSourceURI = new ConstructSourceURI();
-            String URI = constructSourceURI.getGraphiteURI(metricSourceSinkConfig, metricFunctionsSpec);
-            Content graphiteResult = metricFunctionHttpClient.get(URI);
-            graphiteQueryResult.getGraphiteQueryResultFromJson(graphiteResult.asString());
-        }
-        catch(Exception e) {
-                log.error("Exception during reading from metric source", e);
-
-        }
-
-        try {
-            MetricData metricData = KafkaMetricFunctionsToAAMetrics.streamAggregateRecord(graphiteQueryResult, metricFunctionsSpec);
+            MetricData metricData = metricQueryService.getMetricQueryResult(metricSourceSinkConfig,
+                    metricFunctionsSpec);
             ProducerRecord aggregateProducerRecord = new ProducerRecord(
                     metricSourceSinkConfig.getString(OUTPUT_TOPIC_KEY_STRING),
                     metricData.getMetricDefinition().getKey(), metricData);

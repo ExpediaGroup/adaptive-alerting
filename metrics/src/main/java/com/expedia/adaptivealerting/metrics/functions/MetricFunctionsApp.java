@@ -43,7 +43,7 @@ public class MetricFunctionsApp {
         val metricSourceSinkConfig = config.getConfig(METRIC_SOURCE_SINK);
         val aggregatorProducerConfig = config.getConfig(AGGREGATOR_PRODUCER);
         val aggregatorProducerProps = ConfigUtil.toProducerConfig(aggregatorProducerConfig);
-        Producer<String, MetricData> aggregatorProducer = new KafkaProducer<String, MetricData>(aggregatorProducerProps);
+        Producer<String, MetricData> aggregatorProducer = new KafkaProducer<>(aggregatorProducerProps);
         val input_file = INPUT_FILE_PATH + INPUT_FUNCTIONS_FILENAME;
         List<MetricFunctionsSpec> metricFunctionSpecs = MetricFunctionsReader.readFromInputFile(input_file);
         ScheduledExecutorService execService

@@ -1,4 +1,4 @@
-package com.expedia.adaptivealerting.metrics.functions.source;
+package com.expedia.adaptivealerting.metrics.functions.source.graphite;
 
 import lombok.val;
 import org.junit.Test;

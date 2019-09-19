@@ -13,31 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.metrics.functions.util;
+package com.expedia.adaptivealerting.metrics.functions.source.graphite;
 
 import com.expedia.adaptivealerting.metrics.functions.source.MetricFunctionsSpec;
 import com.typesafe.config.Config;
 
 public class ConstructSourceURI {
-    private final String GRAPHITE_HOST_KEY = "graphite-host";
-    private final String GRAPHITE_RENDER_API_DEFINITION = "/render?target=";
-    private final String GRAPHITE_FROM_TIME_PARAM_STRING = "from=-";
-    private final String GRAPHITE_TO_TIME_PARAM_STRING = "until=now";
-    private final String GRAPHITE_FORMAT_PARAM_STRING = "format=json";
-    private final String GRAPHITE_TIME_UNIT = "s";
-    private final String URI_CONSTRUCT_AMPERSAND = "&";
+    private final String GRAPHITE_URI_KEY = "urlTemplate";
+    private final String GRAPHITE_FROM_TIME_PARAM_STRING = "&from=-";
+    private final String GRAPHITE_TIME_UNIT_STRING = "s";
 
     public String getGraphiteURI(Config metricSourceSinkConfig, MetricFunctionsSpec metricFunctionsSpec) {
-        String URI = metricSourceSinkConfig.getString(GRAPHITE_HOST_KEY)
-                + GRAPHITE_RENDER_API_DEFINITION
+        String URI = metricSourceSinkConfig.getString(GRAPHITE_URI_KEY)
                 + metricFunctionsSpec.getFunction()
-                + URI_CONSTRUCT_AMPERSAND
                 + GRAPHITE_FROM_TIME_PARAM_STRING
-                + metricFunctionsSpec.getIntervalInSecs() + GRAPHITE_TIME_UNIT
-                + URI_CONSTRUCT_AMPERSAND
-                + GRAPHITE_TO_TIME_PARAM_STRING
-                + URI_CONSTRUCT_AMPERSAND
-                + GRAPHITE_FORMAT_PARAM_STRING;
+                + metricFunctionsSpec.getIntervalInSecs() + GRAPHITE_TIME_UNIT_STRING;
         return URI;
     }
 

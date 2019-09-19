@@ -1,4 +1,4 @@
-package com.expedia.adaptivealerting.metrics.functions.util;
+package com.expedia.adaptivealerting.metrics.functions.source.graphite;
 
 import com.expedia.adaptivealerting.kafka.TypesafeConfigLoader;
 import com.expedia.adaptivealerting.metrics.functions.source.MetricFunctionsReader;
@@ -13,7 +13,7 @@ public class ConstructSourceURITest {
     @Test
     public void testgetGraphiteURI() {
         val functionsInputFileName = "/config/functions-test.txt";
-        val uri = "samplegraphitehosturi/render?target=sumSeries(a.b.c)&from=-30s&until=now&format=json";
+        val uri = "samplegraphitehosturi/render?until=now&format=json&target=sumSeries(a.b.c)&from=-30s";
         MetricFunctionsSpec metricFunctionsSpec = MetricFunctionsReader.readFromInputFile(functionsInputFileName).get(0);
         Config config = new TypesafeConfigLoader("aa-metric-functions-test").loadMergedConfig();
         val metricSourceSinkConfigTest = config.getConfig("metric-source-sink");

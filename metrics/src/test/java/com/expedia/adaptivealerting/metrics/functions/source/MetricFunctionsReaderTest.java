@@ -27,4 +27,10 @@ public class MetricFunctionsReaderTest {
         assertEquals(tag2.getKey(), "env");
         assertEquals(tag2.getValue(), "test");
     }
+
+    @Test
+    public void testreadFromInputFileException() throws Exception {
+        val invalidFileName = "/config/no-such-file-test.txt";
+        List<MetricFunctionsSpec> metricFunctionsSpecList = MetricFunctionsReader.readFromInputFile(invalidFileName);
+    }
 }
