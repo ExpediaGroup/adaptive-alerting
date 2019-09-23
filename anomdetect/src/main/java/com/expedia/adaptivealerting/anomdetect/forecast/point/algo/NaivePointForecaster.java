@@ -22,9 +22,12 @@ import lombok.val;
 
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
+// TODO Support drift method. See https://otexts.com/fpp2/simple-methods.html#simple-methods.
+
 /**
  * Implements the naive forecaster described in https://otexts.com/fpp2/simple-methods.html. Naive forecasts are
- * optimal for random walk series, but they can be effective for other series as well.
+ * optimal for random walk series, but they can be effective for other series as well. Accordingly, this algorithm is
+ * also known as random walk forecasting.
  */
 public class NaivePointForecaster implements PointForecaster {
     private MetricData lastMetricData;

@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo;
 
+import com.expedia.adaptivealerting.anomdetect.AlgoParams;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
@@ -26,7 +27,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 @Data
 @Accessors(chain = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CusumParams {
+public class CusumParams implements AlgoParams {
 
     /**
      * Target value (i.e., the set point).
@@ -67,6 +68,7 @@ public class CusumParams {
      */
     private int warmUpPeriod = 25;
 
+    @Override
     public void validate() {
         notNull(type, "type can't be null");
         isTrue(weakSigmas > 0.0, "Required: weakSigmas > 0.0");

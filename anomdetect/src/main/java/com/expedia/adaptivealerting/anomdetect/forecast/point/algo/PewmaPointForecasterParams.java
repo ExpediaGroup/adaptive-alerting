@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.point.algo;
 
+import com.expedia.adaptivealerting.anomdetect.AlgoParams;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -23,7 +24,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isTrue;
 
 @Data
 @Accessors(chain = true)
-public class PewmaPointForecasterParams {
+public class PewmaPointForecasterParams implements AlgoParams {
 
     // TODO Describe why we chose these defaults as appropriate.
     //  For example if the paper recommends them, we should say that.
@@ -50,6 +51,7 @@ public class PewmaPointForecasterParams {
      */
     private int warmUpPeriod = 30;
 
+    @Override
     public void validate() {
         isBetween(alpha, 0.0, 1.0, "Required: 0.0 <= alpha <= 1.0");
         isBetween(beta, 0.0, 1.0, "Required: 0.0 <= beta <= 1.0");

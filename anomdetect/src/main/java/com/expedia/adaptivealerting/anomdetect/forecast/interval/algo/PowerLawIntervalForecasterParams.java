@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.interval.algo;
 
+import com.expedia.adaptivealerting.anomdetect.AlgoParams;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -22,12 +23,13 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isTrue;
 
 @Data
 @Accessors(chain = true)
-public final class PowerLawIntervalForecasterParams {
+public final class PowerLawIntervalForecasterParams implements AlgoParams {
     private double alpha;
     private double beta;
     private double weakMultiplier;
     private double strongMultiplier;
 
+    @Override
     public void validate() {
         isTrue(alpha > 0.0, "Required: alpha >= 0.0");
         isTrue(beta > 0.0, "Required: beta >= 0.0");
