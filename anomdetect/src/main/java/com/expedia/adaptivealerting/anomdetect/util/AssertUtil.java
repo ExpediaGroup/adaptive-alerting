@@ -41,6 +41,10 @@ public class AssertUtil {
         isTrue(v1 == v2, message);
     }
 
+    public static void isStrictlyPositive(int value, String message) {
+        isTrue(value > 0, message);
+    }
+
     public static void isBetween(double value, double lowerBd, double upperBd, String message) {
         isTrue(lowerBd <= value && value <= upperBd, message);
     }

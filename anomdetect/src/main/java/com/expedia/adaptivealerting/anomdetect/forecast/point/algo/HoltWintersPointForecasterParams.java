@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.point.algo;
 
+import com.expedia.adaptivealerting.anomdetect.AlgoParams;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +29,7 @@ import static java.lang.String.format;
 @Data
 @Accessors(chain = true)
 @Slf4j
-public final class HoltWintersPointForecasterParams {
+public final class HoltWintersPointForecasterParams implements AlgoParams {
 
     /**
      * SeasonalityType parameter used to determine which Seasonality method (Multiplicative or Additive) to use.
@@ -114,6 +115,7 @@ public final class HoltWintersPointForecasterParams {
         return (initTrainingMethod == HoltWintersTrainingMethod.SIMPLE) ? (frequency * 2) : 0;
     }
 
+    @Override
     public void validate() {
         notNull(seasonalityType, "Required: seasonalityType one of " + Arrays.toString(HoltWintersSeasonalityType.values()));
         notNull(initTrainingMethod, "Required: initTrainingMethod one of " + Arrays.toString(HoltWintersTrainingMethod.values()));

@@ -16,7 +16,6 @@
 package com.expedia.adaptivealerting.anomdetect.forecast.point.algo;
 
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecast;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecaster;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import lombok.val;
@@ -30,7 +29,7 @@ import static org.junit.Assert.assertNull;
 public class NaivePointForecasterTest {
     private static final double TOLERANCE = 0.001;
 
-    private PointForecaster forecasterUnderTest = new NaivePointForecaster();
+    private NaivePointForecaster forecasterUnderTest = new NaivePointForecaster();
     private Random random = new Random();
     private MetricDefinition metricDef = new MetricDefinition("some-key");
 
@@ -48,5 +47,10 @@ public class NaivePointForecasterTest {
             forecast = forecasterUnderTest.forecast(metricData);
             assertEquals(forecast.getValue(), prevValue, TOLERANCE);
         }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testForecast_nullMetricData() {
+        forecasterUnderTest.forecast(null);
     }
 }

@@ -25,46 +25,45 @@ import lombok.val;
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 /**
- * Point forecaster based on the Exponential Weighted Moving Average (EWMA) method, aka Simple Exponential Smoothing
- * (SES).
+ * Point forecaster based on the seasonal naive method described in
+ * https://otexts.com/fpp2/simple-methods.html#simple-methods.
  */
-public class EwmaPointForecaster implements PointForecaster {
+public class SeasonalNaivePointForecaster implements PointForecaster {
 
     @Getter
     @Generated // https://reflectoring.io/100-percent-test-coverage/
-    private EwmaPointForecasterParams params;
+    private SeasonalNaivePointForecasterParams params;
 
-    @Getter
-    @Generated // https://reflectoring.io/100-percent-test-coverage/
-    private double mean;
+    // TODO Currently we use a very simple ring buffer, and ignore timestamps completely. So missing and duplicate
+    //  values mess things up, though this gets flushed out over time as long as the issue isn't systematic. At any
+    //  rate, we need to come up with a more robust approach that accounts for timestamps.
+    private Double[] buffer;
+    private int currIndex;
 
-    public EwmaPointForecaster() {
-        this(new EwmaPointForecasterParams());
-    }
-
-    public EwmaPointForecaster(EwmaPointForecasterParams params) {
+    /**
+     * Creates a new forecaster from the given configuration parameters.
+     *
+     * @param params Configuration parameters.
+     */
+    public SeasonalNaivePointForecaster(SeasonalNaivePointForecasterParams params) {
         notNull(params, "params can't be null");
         params.validate();
         this.params = params;
-        this.mean = params.getInitMeanEstimate();
+        initState();
     }
 
     @Override
     public PointForecast forecast(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
-        val observed = metricData.getValue();
-        updateMeanEstimate(observed);
-
-        // TODO Handle warmup
-        return new PointForecast(mean, false);
+        val currForecastValue = buffer[currIndex];
+        buffer[currIndex] = metricData.getValue();
+        this.currIndex = (currIndex + 1) % buffer.length;
+        return currForecastValue == null ? null : new PointForecast(currForecastValue, false);
     }
 
-    private void updateMeanEstimate(double observed) {
-        // https://en.wikipedia.org/wiki/Moving_average#Exponentially_weighted_moving_variance_and_standard_deviation
-        // http://people.ds.cam.ac.uk/fanf2/hermes/doc/antiforgery/stats.pdf
-        val residual = observed - this.mean;
-        val incr = params.getAlpha() * residual;
-        this.mean += incr;
+    private void initState() {
+        val n = this.params.getCycleLength();
+        this.buffer = new Double[n];
+        this.currIndex = 0;
     }
-
 }

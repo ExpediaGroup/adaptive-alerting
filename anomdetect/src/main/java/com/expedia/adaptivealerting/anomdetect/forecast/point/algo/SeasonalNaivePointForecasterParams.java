@@ -13,33 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.forecast.interval.algo;
+package com.expedia.adaptivealerting.anomdetect.forecast.point.algo;
 
 import com.expedia.adaptivealerting.anomdetect.AlgoParams;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isTrue;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isStrictlyPositive;
 
+/**
+ * Configuration parameters for the {@link SeasonalNaivePointForecaster}.
+ */
 @Data
 @Accessors(chain = true)
-public final class MultiplicativeIntervalForecasterParams implements AlgoParams {
+public class SeasonalNaivePointForecasterParams implements AlgoParams {
 
     /**
-     * Multiplier against the level, used to generate the weak interval:
-     * [pointForecast - weakMultiplier * level, pointForecast + weakMultiplier * level].
+     * Number of observations per cycle.
      */
-    private double weakMultiplier;
-
-    /**
-     * Multiplier against the level, used to generate the strong interval:
-     * [pointForecast - strongMultiplier * level, pointForecast + strongMultiplier * level].
-     */
-    private double strongMultiplier;
+    private int cycleLength;
 
     @Override
     public void validate() {
-        isTrue(weakMultiplier >= 0.0, "Required: weakMultiplier >= 0.0");
-        isTrue(strongMultiplier >= weakMultiplier, "Required: strongMultiplier >= weakMultiplier");
+        isStrictlyPositive(cycleLength, "Required: cycleLength > 0");
     }
 }
