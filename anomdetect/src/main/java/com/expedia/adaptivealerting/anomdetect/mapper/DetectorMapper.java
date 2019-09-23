@@ -123,7 +123,7 @@ public class DetectorMapper {
 
     //TODO - make batch size configureable
     public int optimalBatchSize() {
-        if (lastElasticLookUpLatency.longValue() == -1L || lastElasticLookUpLatency.longValue() > 100L) {
+        if (lastElasticLookUpLatency.longValue() == -1L || lastElasticLookUpLatency.longValue() > 10L) {
             return 80;
         }
         return 0;
