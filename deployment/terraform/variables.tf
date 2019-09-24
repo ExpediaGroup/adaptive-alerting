@@ -35,6 +35,3 @@ variable "metric-profiler" {
   type = "map"
 }
 
-variable "notifier" {
-  type = "map"
-}
