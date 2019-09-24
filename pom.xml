@@ -101,6 +101,7 @@
         <pegdown.version>1.6.0</pegdown.version>
         <scalatest.version>3.0.5</scalatest.version>
         <scala.version>2.12</scala.version>
+        <json.version>20180813</json.version>
         <!-- At least 2.12.4 is needed for compiling with JDK 9+ (and Kafka 1.1.1)
              https://docs.scala-lang.org/overviews/jdk-compatibility/overview.html -->
         <scala.library.version>2.12.7</scala.library.version>

@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.metrics.functions.source.graphite;
 
-import lombok.Getter;
+import lombok.Data;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -23,6 +23,7 @@ import org.json.JSONTokener;
 import java.util.HashMap;
 import java.util.Iterator;
 
+@Data
 public class GraphiteQueryResult {
 
     /* graphite query result json format:
@@ -34,13 +35,10 @@ public class GraphiteQueryResult {
     private final String GRAPHITE_RESULT_TARGET_KEY = "target";
     private final String GRAPHITE_RESULT_TAGS_KEY = "tags";
 
-    @Getter
     private Datapoint datapoint;
 
-    @Getter
     private String target;
 
-    @Getter
     private HashMap<String, String> tags;
 
     public GraphiteQueryResult() {

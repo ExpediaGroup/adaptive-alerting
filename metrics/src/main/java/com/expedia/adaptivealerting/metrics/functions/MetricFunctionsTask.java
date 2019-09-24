@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.metrics.functions;
 
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
-import com.expedia.adaptivealerting.metrics.functions.service.MetricQueryService;
+import com.expedia.adaptivealerting.metrics.functions.service.graphite.GraphiteQueryService;
 import com.expedia.adaptivealerting.metrics.functions.source.MetricFunctionsSpec;
 import com.expedia.metrics.MetricData;
 import com.typesafe.config.Config;
@@ -42,9 +42,9 @@ public class MetricFunctionsTask implements Runnable {
     @SuppressWarnings("unchecked")
     public void run() {
         HttpClientWrapper httpClientWrapper = new HttpClientWrapper();
-        MetricQueryService metricQueryService = new MetricQueryService(httpClientWrapper);
+        GraphiteQueryService graphiteQueryService = new GraphiteQueryService(httpClientWrapper);
         try {
-            MetricData metricData = metricQueryService.getMetricQueryResult(metricSourceSinkConfig,
+            MetricData metricData = graphiteQueryService.queryMetricSource(metricSourceSinkConfig,
                     metricFunctionsSpec);
             ProducerRecord aggregateProducerRecord = new ProducerRecord(
                     metricSourceSinkConfig.getString(OUTPUT_TOPIC_KEY_STRING),

@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 public class ConstructSourceURITest {
 
     @Test
-    public void testgetGraphiteURI() {
+    public void testGetGraphiteURI() {
         val functionsInputFileName = "/config/functions-test.txt";
         val uri = "samplegraphitehosturi/render?until=now&format=json&target=sumSeries(a.b.c)&from=-30s";
         MetricFunctionsSpec metricFunctionsSpec = MetricFunctionsReader.readFromInputFile(functionsInputFileName).get(0);

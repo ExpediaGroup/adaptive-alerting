@@ -1,4 +1,4 @@
-package com.expedia.adaptivealerting.metrics.functions.service;
+package com.expedia.adaptivealerting.metrics.functions.service.graphite;
 
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.expedia.adaptivealerting.metrics.functions.source.MetricFunctionsSpec;
@@ -11,39 +11,26 @@ import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.fluent.Content;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 @Slf4j
-public class MetricQueryService {
+public class GraphiteQueryService {
     private HttpClientWrapper metricFunctionHttpClient;
     private final String EMPTY_RESULT_FROM_SOURCE = "{}";
-    private final String METRICDATA_KEY_FOR_EMPTRY_DATA = "aggregator.producer.";
+    private final String METRICDATA_KEY_FOR_EMPTY_DATA = "aggregator.producer.";
     private final double METRICDATA_DEFAULT_VALUE = 0.0;
     private final String METRIC_SOURCE_KEY = "metric-source";
-    /* For now source supported is graphite alone , non-graphite is just
-    *  a place holder for the common method
-    */
-    private final List<String> METRIC_SOURCE = Arrays.asList("graphite", "non-graphite");
+    /* For now source supported is graphite alone */
     private final String GRAPHITE_SOURCE_KEY = "graphite";
     private final static String GRAPHITE_KEY_TAG = "name";
 
-    public MetricQueryService(HttpClientWrapper httpClientWrapper) {
+    public GraphiteQueryService(HttpClientWrapper httpClientWrapper) {
         metricFunctionHttpClient = httpClientWrapper;
     }
 
-    /* common method for generic metric source */
-    public MetricData getMetricQueryResult(Config metricSourceSinkConfig, MetricFunctionsSpec metricFunctionsSpec) {
-        if (METRIC_SOURCE.contains(metricSourceSinkConfig.getString(METRIC_SOURCE_KEY))) {
-            return queryMetricSource(metricSourceSinkConfig, metricFunctionsSpec);
-        }
-        else {
-            return defaultMetricData(metricFunctionsSpec);
-        }
-    }
 
-    private MetricData queryMetricSource(Config metricSourceSinkConfig, MetricFunctionsSpec metricFunctionsSpec){
+    public MetricData queryMetricSource(Config metricSourceSinkConfig, MetricFunctionsSpec metricFunctionsSpec){
         /* For now source supported is graphite alone */
         if (metricSourceSinkConfig.getString(METRIC_SOURCE_KEY).equals(GRAPHITE_SOURCE_KEY)) {
            return graphiteMetricData(metricSourceSinkConfig, metricFunctionsSpec);
@@ -89,7 +76,7 @@ public class MetricQueryService {
     private MetricData defaultMetricData(MetricFunctionsSpec metricFunctionsSpec) {
         TagCollection tags = TagCollection.EMPTY;
         TagCollection meta = TagCollection.EMPTY;
-        MetricDefinition metricDefinition = new MetricDefinition((METRICDATA_KEY_FOR_EMPTRY_DATA +
+        MetricDefinition metricDefinition = new MetricDefinition((METRICDATA_KEY_FOR_EMPTY_DATA +
                 metricFunctionsSpec.getFunction()),
                 tags, meta);
         return new MetricData(metricDefinition, METRICDATA_DEFAULT_VALUE,

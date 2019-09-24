@@ -41,8 +41,7 @@ public class MetricFunctionsReader {
             }
         }
         catch(Exception e) {
-            log.error("Exception while reading input functions'" +
-                    "definition", e);
+            log.error("Exception while reading input functions' definition", e);
         }
         return metricFunctionSpecList;
     }

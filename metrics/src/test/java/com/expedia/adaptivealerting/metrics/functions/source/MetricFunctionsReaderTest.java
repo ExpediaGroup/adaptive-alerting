@@ -1,5 +1,6 @@
 package com.expedia.adaptivealerting.metrics.functions.source;
 
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 import java.util.Iterator;
@@ -9,10 +10,11 @@ import java.util.Map;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
+@Slf4j
 public class MetricFunctionsReaderTest {
 
     @Test
-    public void testreadFromInputFile(){
+    public void testReadFromInputFile(){
         val functionInputFileName = "/config/functions-test.txt";
         List<MetricFunctionsSpec> metricFunctionsSpecList = MetricFunctionsReader.readFromInputFile(functionInputFileName);
         assertEquals(1, metricFunctionsSpecList.size());
@@ -29,8 +31,11 @@ public class MetricFunctionsReaderTest {
     }
 
     @Test
-    public void testreadFromInputFileException() throws Exception {
+    public void testReadFromInputFileException() throws Exception {
         val invalidFileName = "/config/no-such-file-test.txt";
         List<MetricFunctionsSpec> metricFunctionsSpecList = MetricFunctionsReader.readFromInputFile(invalidFileName);
+        if (metricFunctionsSpecList.isEmpty()) {
+            log.error("Exception reading input file, exiting");
+        }
     }
 }

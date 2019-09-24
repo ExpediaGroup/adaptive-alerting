@@ -17,18 +17,16 @@ package com.expedia.adaptivealerting.metrics.functions.source;
 
 import java.util.HashMap;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Getter;
+import lombok.Data;
 
+@Data
 @JsonIgnoreProperties
 public class MetricFunctionsSpec {
 
-    @Getter
     private String function;
 
-    @Getter
     private int intervalInSecs;
 
-    @Getter
     private HashMap<String, String> tags;
 
 }

@@ -16,12 +16,12 @@
 package com.expedia.adaptivealerting.metrics.functions;
 
 import com.expedia.adaptivealerting.kafka.TypesafeConfigLoader;
-import com.expedia.adaptivealerting.kafka.util.ConfigUtil;
+import com.expedia.adaptivealerting.kafka.KafkaMetricFunctions;
 import com.expedia.adaptivealerting.metrics.functions.source.MetricFunctionsReader;
 import com.expedia.adaptivealerting.metrics.functions.source.MetricFunctionsSpec;
 import com.expedia.metrics.MetricData;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 
 import java.util.List;
@@ -29,11 +29,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class MetricFunctionsApp {
 
-    private static final String METRIC_SOURCE_SINK = "metric-source-sink";
     private static final String APP_ID = "aa-metric-functions";
-    private static final String AGGREGATOR_PRODUCER = "aggregator-producer";
+    private static final String METRIC_SOURCE_SINK = "metric-source-sink";
     private static final String INPUT_FUNCTIONS_FILENAME ="functions.txt";
     private final static String INPUT_FILE_PATH = "/config/";
     private static final int corePoolSize = 5;
@@ -41,15 +41,18 @@ public class MetricFunctionsApp {
     public static void main(String[] args) {
         val config = new TypesafeConfigLoader(APP_ID).loadMergedConfig();
         val metricSourceSinkConfig = config.getConfig(METRIC_SOURCE_SINK);
-        val aggregatorProducerConfig = config.getConfig(AGGREGATOR_PRODUCER);
-        val aggregatorProducerProps = ConfigUtil.toProducerConfig(aggregatorProducerConfig);
-        Producer<String, MetricData> aggregatorProducer = new KafkaProducer<>(aggregatorProducerProps);
+        KafkaMetricFunctions kafkaMetricFunctions = new KafkaMetricFunctions();
+        Producer<String, MetricData> aggregatorProducer = kafkaMetricFunctions.getMetricFunctionsSink(config);
         val input_file = INPUT_FILE_PATH + INPUT_FUNCTIONS_FILENAME;
         List<MetricFunctionsSpec> metricFunctionSpecs = MetricFunctionsReader.readFromInputFile(input_file);
+        if (metricFunctionSpecs.isEmpty()) {
+            log.error("Error with input functions file, exiting..." );
+        }
         ScheduledExecutorService execService
                 = Executors.newScheduledThreadPool(corePoolSize);
         for (MetricFunctionsSpec metricFunctionSpec: metricFunctionSpecs) {
-            MetricFunctionsTask metricFunctionsTask = new MetricFunctionsTask(metricFunctionSpec, aggregatorProducer,
+            MetricFunctionsTask metricFunctionsTask = new MetricFunctionsTask(metricFunctionSpec,
+                    aggregatorProducer,
                     metricSourceSinkConfig);
             execService.scheduleAtFixedRate(metricFunctionsTask,
                     0, metricFunctionSpec.getIntervalInSecs(), TimeUnit.SECONDS);

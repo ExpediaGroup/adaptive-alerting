@@ -1,4 +1,4 @@
-package com.expedia.adaptivealerting.metrics.functions.service;
+package com.expedia.adaptivealerting.metrics.functions.service.graphite;
 
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.expedia.adaptivealerting.kafka.TypesafeConfigLoader;
@@ -12,6 +12,8 @@ import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.http.entity.ContentType;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -28,7 +30,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @Slf4j
-public class MetricQueryServiceTest {
+public class GraphiteQueryServiceTest {
 
     @Mock
     private HttpClientWrapper httpClientWrapper;
@@ -43,7 +45,7 @@ public class MetricQueryServiceTest {
 
     private Config mockMetricSourceSinkConfig;
 
-    private MetricQueryService metricQueryService;
+    private GraphiteQueryService graphiteQueryService;
 
     private double METRIC_DEFAULT_VALUE = 0.0;
     private static final String METRIC_SOURCE_SINK = "metric-source-sink";
@@ -60,22 +62,28 @@ public class MetricQueryServiceTest {
         metricSourceSinkConfig = config.getConfig(METRIC_SOURCE_SINK);
         val functionsInputFile = "/config/functions-test.txt";
         metricFunctionsSpec = MetricFunctionsReader.readFromInputFile(functionsInputFile).get(0);
-        val sampleJsonGraphite = "[{" + "\"datapoints\": [[12.0, 1568255056]], " +
-                "\"target\": \"sumSeries(a.b.c)\", " +
-                "\"tags\":" + "{" + "\"aggregatedBy\": \"sum\", \"name\": \"sumSeries(a.b.c)\"" + "}}]";
+        val testDatapoint = "[12.0,1568255056]";
+        JSONArray sampleJsonGraphite = new JSONArray();
+        JSONObject sampleJsonGraphiteResult = new JSONObject();
+        JSONArray testDatapoints = new JSONArray();
+        JSONObject testTags = new JSONObject();
+        testTags.put("aggregatedBy", "sum");
+        testTags.put("name", "sumSeries(a.b.c)");
+        testDatapoints.put(0, testDatapoint);
+        sampleJsonGraphiteResult.put("datapoints", testDatapoints);
+        sampleJsonGraphiteResult.put("target", "sumSeries(a.b.c)");
+        sampleJsonGraphiteResult.put("tags", testTags);
+        sampleJsonGraphite.put(0, sampleJsonGraphiteResult);
         val uri = "samplegraphitehosturi/render?until=now&format=json&target=sumSeries(a.b.c)&from=-30s";
-        Content mockGraphiteResult = new Content(sampleJsonGraphite.getBytes(), ContentType.APPLICATION_JSON);
+        Content mockGraphiteResult = new Content(sampleJsonGraphite.toString().getBytes(), ContentType.APPLICATION_JSON);
 
         when(httpClientWrapper.get(uri)).thenReturn(mockGraphiteResult);
-        metricQueryService = new MetricQueryService(httpClientWrapper);
-        initValidMetricDataSetup();
+        graphiteQueryService = new GraphiteQueryService(httpClientWrapper);
+        initValidMetricDataSetup(sampleJsonGraphite.toString());
         initDefaultMetricDataSetup();
     }
 
-    public void initValidMetricDataSetup() {
-        val sampleJsonGraphite = "[{" + "\"datapoints\": [[12.0, 1568255056]], " +
-                "\"target\": \"sumSeries(a.b.c)\", " +
-                "\"tags\":" + "{" + "\"aggregatedBy\": \"sum\", \"name\": \"sumSeries(a.b.c)\"" + "}}]";
+    public void initValidMetricDataSetup(String sampleJsonGraphite) {
         GraphiteQueryResult graphiteQueryResult = new GraphiteQueryResult();
         graphiteQueryResult.getGraphiteQueryResultFromJson(sampleJsonGraphite);
         String graphiteKey = graphiteQueryResult.getTags().get("name");
@@ -110,8 +118,8 @@ public class MetricQueryServiceTest {
     }
 
     @Test
-    public void testgetMetricQueryResultTrue() {
-        MetricData metricDataResult = metricQueryService.getMetricQueryResult(metricSourceSinkConfig,
+    public void testGetMetricQueryResultTrue() {
+        MetricData metricDataResult = graphiteQueryService.queryMetricSource(metricSourceSinkConfig,
                 metricFunctionsSpec);
         assertEquals(validMetricData.getValue(), metricDataResult.getValue(), 0.1);
         assertEquals(validMetricData.getTimestamp(), metricDataResult.getTimestamp());
@@ -126,10 +134,10 @@ public class MetricQueryServiceTest {
     }
 
     @Test
-    public void testgetMetricQueryResultFalse() {
+    public void testGetMetricQueryResultFalse() {
         val config = new TypesafeConfigLoader(NON_GRAPHITE_APP_ID).loadMergedConfig();
         mockMetricSourceSinkConfig = config.getConfig(METRIC_SOURCE_SINK);
-        MetricData metricDataResult = metricQueryService.getMetricQueryResult(mockMetricSourceSinkConfig,
+        MetricData metricDataResult = graphiteQueryService.queryMetricSource(mockMetricSourceSinkConfig,
                 metricFunctionsSpec);
         assertEquals(defaultMetricData.getValue(), metricDataResult.getValue(), 0.1);
         assertEquals(defaultMetricData.getTimestamp(), metricDataResult.getTimestamp());
@@ -142,20 +150,20 @@ public class MetricQueryServiceTest {
     }
 
     @Test
-    public void testgetMetricQueryResultSourceFalse() throws Exception {
+    public void testGetMetricQueryResultSourceFalse() throws Exception {
         val config = new TypesafeConfigLoader(OTHER_SOURCE_APP_ID).loadMergedConfig();
         mockMetricSourceSinkConfig = config.getConfig(METRIC_SOURCE_SINK);
-        metricQueryService.getMetricQueryResult(mockMetricSourceSinkConfig,
+        graphiteQueryService.queryMetricSource(mockMetricSourceSinkConfig,
                 metricFunctionsSpec);
     }
 
     @Test
-    public void testgetMetricQueryResultException() throws Exception{
+    public void testGetMetricQueryResultException() throws Exception{
         HttpClientWrapper httpClientWrapper = new HttpClientWrapper();
-        metricQueryService = new MetricQueryService(httpClientWrapper);
+        graphiteQueryService = new GraphiteQueryService(httpClientWrapper);
         val config = new TypesafeConfigLoader(APP_ID).loadMergedConfig();
         val metricSourceSinkConfig = config.getConfig(METRIC_SOURCE_SINK);
-        MetricData metricDataResult = metricQueryService.getMetricQueryResult(metricSourceSinkConfig,
+        MetricData metricDataResult = graphiteQueryService.queryMetricSource(metricSourceSinkConfig,
                 metricFunctionsSpec);
         assertEquals(defaultMetricData.getValue(), metricDataResult.getValue(), 0.1);
         assertEquals(defaultMetricData.getMetricDefinition().getKey(),
