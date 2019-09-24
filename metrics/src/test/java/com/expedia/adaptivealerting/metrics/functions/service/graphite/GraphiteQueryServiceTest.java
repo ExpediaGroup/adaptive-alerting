@@ -134,30 +134,6 @@ public class GraphiteQueryServiceTest {
     }
 
     @Test
-    public void testGetMetricQueryResultFalse() {
-        val config = new TypesafeConfigLoader(NON_GRAPHITE_APP_ID).loadMergedConfig();
-        mockMetricSourceSinkConfig = config.getConfig(METRIC_SOURCE_SINK);
-        MetricData metricDataResult = graphiteQueryService.queryMetricSource(mockMetricSourceSinkConfig,
-                metricFunctionsSpec);
-        assertEquals(defaultMetricData.getValue(), metricDataResult.getValue(), 0.1);
-        assertEquals(defaultMetricData.getTimestamp(), metricDataResult.getTimestamp());
-        assertEquals(defaultMetricData.getMetricDefinition().getKey(),
-                metricDataResult.getMetricDefinition().getKey());
-        assertEquals(TagCollection.EMPTY,
-                metricDataResult.getMetricDefinition().getTags());
-        assertEquals(TagCollection.EMPTY,
-                metricDataResult.getMetricDefinition().getMeta());
-    }
-
-    @Test
-    public void testGetMetricQueryResultSourceFalse() throws Exception {
-        val config = new TypesafeConfigLoader(OTHER_SOURCE_APP_ID).loadMergedConfig();
-        mockMetricSourceSinkConfig = config.getConfig(METRIC_SOURCE_SINK);
-        graphiteQueryService.queryMetricSource(mockMetricSourceSinkConfig,
-                metricFunctionsSpec);
-    }
-
-    @Test
     public void testGetMetricQueryResultException() throws Exception{
         HttpClientWrapper httpClientWrapper = new HttpClientWrapper();
         graphiteQueryService = new GraphiteQueryService(httpClientWrapper);
