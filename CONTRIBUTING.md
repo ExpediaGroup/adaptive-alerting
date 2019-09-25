@@ -9,8 +9,13 @@ This document offers some guidelines for you to consider when submitting a contr
 
 ## Tests
 
-**Unit tests.** Please include unit tests for your code. Our tests are a work in progress, including code coverage, but this is a current
-focus area and we ask that you help us out.
+**Unit tests.** Please include unit tests for your code. Our tests are a work in progress, including code coverage, but this
+is a current focus area and we ask that you help us out.
+
+## Build
+
+**Dependencies.** Use the top-level POM for dependency management. Child POMs should just inherit versions from that. That
+way we can manage versions from a single place across the project.
 
 ## Code style
 
