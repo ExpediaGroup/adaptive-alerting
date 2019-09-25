@@ -14,8 +14,11 @@ is a current focus area and we ask that you help us out.
 
 ## Build
 
-**Dependencies.** Use the top-level POM for dependency management. Child POMs should just inherit versions from that. That
-way we can manage versions from a single place across the project.
+**Adding dependencies.** Be conservative in adding dependencies. If there's already a dependency that we're using to cover
+some specific need, avoid adding a new dependency that does more or less the same thing.
+
+**Dependency management.** Use the top-level POM for dependency management. Child POMs should just inherit versions from
+that. That way we can manage versions from a single place across the project.
 
 ## Code style
 
