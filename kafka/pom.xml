@@ -66,6 +66,10 @@
             <artifactId>adaptive-alerting-anomdetect</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.expedia.adaptivealerting</groupId>
+            <artifactId>adaptive-alerting-metrics</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.expedia.alertmanager</groupId>
             <artifactId>alert-manager-api</artifactId>
         </dependency>

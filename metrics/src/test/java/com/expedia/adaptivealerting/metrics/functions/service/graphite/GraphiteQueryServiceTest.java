@@ -1,7 +1,7 @@
 package com.expedia.adaptivealerting.metrics.functions.service.graphite;
 
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
-import com.expedia.adaptivealerting.kafka.TypesafeConfigLoader;
+import com.expedia.adaptivealerting.metrics.functions.TypesafeConfigLoader;
 import com.expedia.adaptivealerting.metrics.functions.source.MetricFunctionsReader;
 import com.expedia.adaptivealerting.metrics.functions.source.MetricFunctionsSpec;
 import com.expedia.adaptivealerting.metrics.functions.source.graphite.GraphiteQueryResult;

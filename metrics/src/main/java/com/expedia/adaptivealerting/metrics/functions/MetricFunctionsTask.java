@@ -17,25 +17,23 @@ package com.expedia.adaptivealerting.metrics.functions;
 
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.expedia.adaptivealerting.metrics.functions.service.graphite.GraphiteQueryService;
+import com.expedia.adaptivealerting.metrics.functions.sink.MetricFunctionsPublish;
 import com.expedia.adaptivealerting.metrics.functions.source.MetricFunctionsSpec;
 import com.expedia.metrics.MetricData;
 import com.typesafe.config.Config;
-import org.apache.kafka.clients.producer.Producer;
-import org.apache.kafka.clients.producer.ProducerRecord;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class MetricFunctionsTask implements Runnable {
     private MetricFunctionsSpec metricFunctionsSpec;
-    private Producer<String, MetricData> aggregateProducer;
+    private MetricFunctionsPublish metricFunctionsPublish;
     private Config metricSourceSinkConfig;
-    private final String OUTPUT_TOPIC_KEY_STRING = "output_topic";
 
 
-    public MetricFunctionsTask (MetricFunctionsSpec metricFunctionsSpec, Producer<String, MetricData> aggregateProducer,
+    public MetricFunctionsTask (MetricFunctionsSpec metricFunctionsSpec, MetricFunctionsPublish metricFunctionsPublish,
                                 Config metricSourceSinkConfig) {
         this.metricFunctionsSpec = metricFunctionsSpec;
-        this.aggregateProducer = aggregateProducer;
+        this.metricFunctionsPublish = metricFunctionsPublish;
         this.metricSourceSinkConfig = metricSourceSinkConfig;
     }
 
@@ -46,14 +44,10 @@ public class MetricFunctionsTask implements Runnable {
         try {
             MetricData metricData = graphiteQueryService.queryMetricSource(metricSourceSinkConfig,
                     metricFunctionsSpec);
-            ProducerRecord aggregateProducerRecord = new ProducerRecord(
-                    metricSourceSinkConfig.getString(OUTPUT_TOPIC_KEY_STRING),
-                    metricData.getMetricDefinition().getKey(), metricData);
-            aggregateProducer.send(aggregateProducerRecord);
-            log.info("Record sent for function: {}", metricData.getMetricDefinition().getKey());
+            metricFunctionsPublish.publishMetrics(metricData);
         }
         catch (Exception e) {
-            log.error("Exception while sending to kafka", e);
+            log.error("Exception while processing metrics function", e);
 
         }
     }

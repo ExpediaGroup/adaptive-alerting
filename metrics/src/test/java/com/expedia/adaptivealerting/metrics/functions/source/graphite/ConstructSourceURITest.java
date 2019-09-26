@@ -1,6 +1,6 @@
 package com.expedia.adaptivealerting.metrics.functions.source.graphite;
 
-import com.expedia.adaptivealerting.kafka.TypesafeConfigLoader;
+import com.expedia.adaptivealerting.metrics.functions.TypesafeConfigLoader;
 import com.expedia.adaptivealerting.metrics.functions.source.MetricFunctionsReader;
 import com.expedia.adaptivealerting.metrics.functions.source.MetricFunctionsSpec;
 import com.typesafe.config.Config;

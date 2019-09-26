@@ -16,17 +16,14 @@
 package com.expedia.adaptivealerting.metrics.functions.source.graphite;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
-@JsonSerialize
+@AllArgsConstructor
 @Data
 public class Datapoint {
     private double value;
 
     private long timestamp;
-
-    public Datapoint(double value, long timestamp){
-        this.value = value;
-        this.timestamp = timestamp;
-    }
+    
 }

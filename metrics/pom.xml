@@ -46,7 +46,7 @@
         </dependency>
         <dependency>
             <groupId>com.expedia.adaptivealerting</groupId>
-            <artifactId>adaptive-alerting-kafka</artifactId>
+            <artifactId>adaptive-alerting-anomdetect</artifactId>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
