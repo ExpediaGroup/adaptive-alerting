@@ -13,12 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.dto.detectormapping;
+package com.expedia.adaptivealerting.modelservice.dto.common;
 
-import lombok.Data;
-
-@Data
-public class Operand {
-    private Field field;
-    private Expression expression;
+public enum Operator {
+    AND, OR
 }

@@ -24,6 +24,10 @@ import lombok.val;
 
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
+/**
+ * Point forecaster based on the Exponential Weighted Moving Average (EWMA) method, aka Simple Exponential Smoothing
+ * (SES).
+ */
 public class EwmaPointForecaster implements PointForecaster {
 
     @Getter

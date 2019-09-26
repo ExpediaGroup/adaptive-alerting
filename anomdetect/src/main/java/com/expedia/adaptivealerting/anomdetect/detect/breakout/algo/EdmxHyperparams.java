@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detect.breakout.algo;
 
+import com.expedia.adaptivealerting.anomdetect.AlgoParams;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -25,7 +26,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isTrue;
 @Data
 @Accessors(chain = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class EdmxHyperparams {
+public class EdmxHyperparams implements AlgoParams {
 
     /**
      * Minimum window size.
@@ -52,6 +53,7 @@ public class EdmxHyperparams {
      */
     private double weakAlpha = 0.05;
 
+    @Override
     public void validate() {
         isTrue(delta > 0, "Required: delta > 0");
         isTrue(bufferSize >= 2 * delta, "Required: bufferSize >= 2 * delta");

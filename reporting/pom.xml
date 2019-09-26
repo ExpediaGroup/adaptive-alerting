@@ -53,6 +53,10 @@
         </dependency>
         <dependency>
             <groupId>com.expedia.adaptivealerting</groupId>
+            <artifactId>adaptive-alerting-metricprofiler</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.expedia.adaptivealerting</groupId>
             <artifactId>adaptive-alerting-modelservice</artifactId>
         </dependency>
     </dependencies>

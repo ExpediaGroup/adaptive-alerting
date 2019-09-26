@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo;
 
+import com.expedia.adaptivealerting.anomdetect.AlgoParams;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -24,7 +25,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isTrue;
 @Data
 @Accessors(chain = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public final class IndividualsParams {
+public final class IndividualsParams implements AlgoParams {
 
     /**
      * Initial value estimate.
@@ -46,6 +47,7 @@ public final class IndividualsParams {
      */
     private double initMeanEstimate = 0.0;
 
+    @Override
     public void validate() {
         isTrue(warmUpPeriod >= 0, "Required: warmUpPeriod >= 0");
         isTrue(strongSigmas > 0.0, "Required: strongSigmas > 0.0");

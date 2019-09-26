@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo;
 
+import com.expedia.adaptivealerting.anomdetect.AlgoParams;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyThresholds;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -26,7 +27,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 @Data
 @Accessors(chain = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ConstantThresholdParams {
+public class ConstantThresholdParams implements AlgoParams {
 
     /**
      * Detector type: left-, right- or two-tailed.
@@ -38,6 +39,7 @@ public class ConstantThresholdParams {
      */
     private AnomalyThresholds thresholds;
 
+    @Override
     public void validate() {
         notNull(type, "type can't be null");
         notNull(thresholds, "thresholds can't be null");

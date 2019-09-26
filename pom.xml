@@ -47,6 +47,7 @@
     <modules>
         <module>anomdetect</module>
         <module>kafka</module>
+        <module>metricprofiler</module>
         <module>modelservice</module>
         <module>metrics</module>
 
@@ -76,7 +77,6 @@
 
         <!-- Dependencies -->
         <aa.version>1.0.0-SNAPSHOT</aa.version>
-        <alert-manager.version>1.0.0-SNAPSHOT</alert-manager.version>
         <apache.commons.version>3.7</apache.commons.version>
         <apache.commons.math.version>3.6.1</apache.commons.math.version>
         <apache.httpcomponents.version>4.5.6</apache.httpcomponents.version>
@@ -127,14 +127,15 @@
         <jacoco-branch-percentage>0.8</jacoco-branch-percentage>
 
         <maven.compiler.plugin.version>3.8.0</maven.compiler.plugin.version>
+        <maven.deploy.plugin.version>2.8.2</maven.deploy.plugin.version>
         <maven.exec.plugin.version>1.6.0</maven.exec.plugin.version>
         <maven.failsafe.plugin.version>2.22.1</maven.failsafe.plugin.version>
         <maven.gpg.plugin.version>1.6</maven.gpg.plugin.version>
         <maven.jar.plugin.version>3.1.0</maven.jar.plugin.version>
-        <maven.surefire.plugin.version>2.22.1</maven.surefire.plugin.version>
-        <maven.resources.plugin.version>3.1.0</maven.resources.plugin.version>
         <maven.javadoc.plugin.version>3.0.1</maven.javadoc.plugin.version>
+        <maven.resources.plugin.version>3.1.0</maven.resources.plugin.version>
         <maven.source.plugin.version>3.0.1</maven.source.plugin.version>
+        <maven.surefire.plugin.version>2.22.1</maven.surefire.plugin.version>
         <nexus.staging.maven.plugin.version>1.6.8</nexus.staging.maven.plugin.version>
     </properties>
 
@@ -179,6 +180,11 @@
             </dependency>
             <dependency>
                 <groupId>com.expedia.adaptivealerting</groupId>
+                <artifactId>adaptive-alerting-metricprofiler</artifactId>
+                <version>${aa.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.expedia.adaptivealerting</groupId>
                 <artifactId>adaptive-alerting-modelservice</artifactId>
                 <version>${aa.version}</version>
             </dependency>
@@ -186,11 +192,6 @@
                 <groupId>com.expedia.adaptivealerting</groupId>
                 <artifactId>adaptive-alerting-tools</artifactId>
                 <version>${aa.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.expedia.alertmanager</groupId>
-                <artifactId>alert-manager-api</artifactId>
-                <version>${alert-manager.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
@@ -653,12 +654,28 @@
                 </configuration>
             </plugin>
             <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>${maven.resources.plugin.version}</version>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>${maven.deploy.plugin.version}</version>
             </plugin>
             <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven.surefire.plugin.version}</version>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>${maven.gpg.plugin.version}</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${maven.resources.plugin.version}</version>
             </plugin>
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -681,32 +698,6 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>${maven.exec.plugin.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- Plugins required for pushing jars to public maven repository -->
-            <plugin>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>${maven.source.plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>${maven.javadoc.plugin.version}</version>
                 <configuration>
@@ -722,17 +713,29 @@
                 </executions>
             </plugin>
             <plugin>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>${maven.gpg.plugin.version}</version>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven.source.plugin.version}</version>
                 <executions>
                     <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
+                        <id>attach-sources</id>
                         <goals>
-                            <goal>sign</goal>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>${maven.exec.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>java</goal>
                         </goals>
                     </execution>
                 </executions>

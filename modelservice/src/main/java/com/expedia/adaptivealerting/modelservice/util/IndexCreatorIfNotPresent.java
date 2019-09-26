@@ -34,6 +34,7 @@ import java.io.IOException;
 
 import static com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping.CREATE_TIME_KEYWORD;
 import static com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping.DETECTOR_KEYWORD;
+import static com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping.ENABLED;
 import static com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping.LAST_MOD_TIME_KEYWORD;
 import static com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping.QUERY_KEYWORD;
 import static com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping.USER_KEYWORD;
@@ -107,12 +108,16 @@ public class IndexCreatorIfNotPresent implements ApplicationListener<Application
         val timeType = new JsonObject();
         timeType.addProperty("type", "long");
 
+        val boolType = new JsonObject();
+        boolType.addProperty("type", "boolean");
+
         val propObject = new JsonObject();
         propObject.add(USER_KEYWORD, dynamicType);
         propObject.add(DETECTOR_KEYWORD, dynamicType);
         propObject.add(QUERY_KEYWORD, queryType);
         propObject.add(LAST_MOD_TIME_KEYWORD, timeType);
         propObject.add(CREATE_TIME_KEYWORD, timeType);
+        propObject.add(ENABLED, boolType);
         return propObject;
     }
 }

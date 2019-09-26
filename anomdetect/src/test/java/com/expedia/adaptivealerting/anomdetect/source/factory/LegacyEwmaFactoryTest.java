@@ -24,6 +24,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
+@Deprecated // Use ForecastingDetectorFactory
 public class LegacyEwmaFactoryTest extends AbstractDetectorFactoryTest {
     private static final double TOLERANCE = 0.001;
 

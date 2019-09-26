@@ -115,6 +115,8 @@ module "modelservice" {
   detector_mapper_es_urls = "${var.modelservice["detector_mapper_es_urls"]}"
   detector_mapper_index_name = "${var.modelservice["detector_mapper_index_name"]}"
   detector_mapper_doctype = "${var.modelservice["detector_mapper_doctype"]}"
+  detector_index_name = "${var.modelservice["detector_index_name"]}"
+  detector_doctype = "${var.modelservice["detector_doctype"]}"
   detector_mapper_es_config_connection_timeout = "${var.modelservice["detector_mapper_es_config_connection_timeout"]}"
   detector_mapper_es_config_connection_retry_timeout = "${var.modelservice["detector_mapper_es_config_connection_retry_timeout"]}"
   detector_mapper_es_config_max_total_connection = "${var.modelservice["detector_mapper_es_config_max_total_connection"]}"
@@ -159,6 +161,39 @@ module "a2m-mapper" {
   metric_producer_topic = "${var.a2m-mapper["metric_producer_topic"]}"
   metric_producer_key_serializer = "${var.a2m-mapper["metric_producer_key_serializer"]}"
   metric_producer_value_serializer = "${var.a2m-mapper["metric_producer_value_serializer"]}"
+}
+
+module "metric-profiler" {
+  source = "metric-profiler"
+
+  # Docker
+  image = "${var.metric-profiler["image"]}"
+  image_pull_policy = "${var.metric-profiler["image_pull_policy"]}"
+
+  # Kubernetes
+  namespace = "${var.app_namespace}"
+  enabled = "${var.metric-profiler["enabled"]}"
+  replicas = "${var.metric-profiler["instances"]}"
+  cpu_limit = "${var.metric-profiler["cpu_limit"]}"
+  cpu_request = "${var.metric-profiler["cpu_request"]}"
+  memory_limit = "${var.metric-profiler["memory_limit"]}"
+  memory_request = "${var.metric-profiler["memory_request"]}"
+  node_selector_label = "${var.node_selector_label}"
+  kubectl_executable_name = "${var.kubectl_executable_name}"
+  kubectl_context_name = "${var.kubectl_context_name}"
+
+  # Environment
+  jvm_memory_limit = "${var.metric-profiler["jvm_memory_limit"]}"
+  graphite_hostname = "${var.graphite_hostname}"
+  graphite_port = "${var.graphite_port}"
+  graphite_enabled = "${var.graphite_enabled}"
+  graphite_prefix = "${var.graphite_prefix}"
+  env_vars = "${var.metric-profiler["environment_overrides"]}"
+
+  # App
+  kafka_endpoint = "${local.kafka_endpoint}"
+  modelservice_base_uri = "${var.metric-profiler["modelservice_base_uri"]}"
+  inbound_topic = "${var.metric-profiler["inbound_topic"]}"
 }
 
 module "notifier" {

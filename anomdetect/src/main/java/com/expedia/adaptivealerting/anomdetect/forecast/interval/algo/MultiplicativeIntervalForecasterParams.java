@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.interval.algo;
 
+import com.expedia.adaptivealerting.anomdetect.AlgoParams;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -22,7 +23,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isTrue;
 
 @Data
 @Accessors(chain = true)
-public final class MultiplicativeIntervalForecasterParams {
+public final class MultiplicativeIntervalForecasterParams implements AlgoParams {
 
     /**
      * Multiplier against the level, used to generate the weak interval:
@@ -36,6 +37,7 @@ public final class MultiplicativeIntervalForecasterParams {
      */
     private double strongMultiplier;
 
+    @Override
     public void validate() {
         isTrue(weakMultiplier >= 0.0, "Required: weakMultiplier >= 0.0");
         isTrue(strongMultiplier >= weakMultiplier, "Required: strongMultiplier >= weakMultiplier");

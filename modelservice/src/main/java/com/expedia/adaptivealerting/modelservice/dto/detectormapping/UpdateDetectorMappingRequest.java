@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.modelservice.dto.detectormapping;
 
+import com.expedia.adaptivealerting.modelservice.dto.common.Expression;
 import lombok.Data;
 
 @Data

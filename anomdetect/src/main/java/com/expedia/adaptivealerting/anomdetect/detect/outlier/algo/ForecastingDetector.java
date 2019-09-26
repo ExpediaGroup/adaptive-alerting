@@ -15,12 +15,13 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo;
 
-import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
+import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyThresholds;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
 import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.AbstractOutlierDetector;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecast;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecaster;
@@ -66,7 +67,6 @@ public final class ForecastingDetector extends AbstractOutlierDetector {
 
     private final AnomalyClassifier classifier;
 
-    //
     public ForecastingDetector(
             UUID uuid,
             PointForecaster pointForecaster,
@@ -90,6 +90,13 @@ public final class ForecastingDetector extends AbstractOutlierDetector {
         notNull(metricData, "metricData can't be null");
 
         val pointForecast = pointForecaster.forecast(metricData);
+
+        if (pointForecast == null) {
+            // Naive forecasters have a warmup period, but we don't currently have a way for the forecaster to
+            // communicate that up to the detector. So for now we will just treat this as an "unknown" level.
+            return new OutlierDetectorResult(AnomalyLevel.UNKNOWN);
+        }
+
         val intervalForecast = intervalForecaster.forecast(metricData, pointForecast.getValue());
         val thresholds = toAnomalyThresholds(intervalForecast);
         val observed = metricData.getValue();
