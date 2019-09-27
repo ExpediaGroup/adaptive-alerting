@@ -1,9 +1,9 @@
 import os
 import papermill as pm
 
-def train_aquila(datasetName, intervalMinutes, numWeeks):
-    input = "aquila.ipynb"
-    output = "out/aquila-" + datasetName + ".ipynb"
+def train_stl(datasetName, intervalMinutes, numWeeks):
+    input = "stl.ipynb"
+    output = "out/stl-" + datasetName + ".ipynb"
     pm.execute_notebook(input, output, parameters = dict(
         datasetName = datasetName,
         intervalMinutes = intervalMinutes,
@@ -11,7 +11,7 @@ def train_aquila(datasetName, intervalMinutes, numWeeks):
     ))
 
 def train_all(name, intervalMinutes, numWeeks):
-    train_aquila(name, intervalMinutes, numWeeks)
+    train_stl(name, intervalMinutes, numWeeks)
 
 dir = "./out"
 if not os.path.exists(dir):
