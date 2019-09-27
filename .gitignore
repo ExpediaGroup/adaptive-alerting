@@ -39,3 +39,5 @@ target/
 
 /kafka/docker/tmp
 /modelservice/application.yml
+.Rhistory
+.ipynb_checkpoints
