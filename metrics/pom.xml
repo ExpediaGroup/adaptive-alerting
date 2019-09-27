@@ -45,8 +45,17 @@
             <artifactId>metrics-java-jackson</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.expedia.adaptivealerting</groupId>
+            <artifactId>adaptive-alerting-anomdetect</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>fluent-hc</artifactId>
+            <version>${apache.httpcomponents.version}</version>
         </dependency>
         <dependency>
             <groupId>com.opencsv</groupId>
@@ -56,12 +65,20 @@
             <groupId>com.typesafe</groupId>
             <artifactId>config</artifactId>
         </dependency>
-
-        <!--Test-->
         <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest</artifactId>
-            <scope>test</scope>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>${json.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+            <version>${kafka.streams.version}</version>
         </dependency>
     </dependencies>
 
@@ -70,6 +87,16 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
+                    <configuration>
+                        <excludes>
+                            <!-- TODO remove exclude once test cases are added -->
+                            <exclude>**/*com/expedia/adaptivealerting/metrics/functions/MetricFunctionsApp.class</exclude>
+                            <exclude>**/*com/expedia/adaptivealerting/metrics/functions/MetricFunctionsTask.class</exclude>
+                            <!-- TODO jacoco not respecting lombok generated methods -->
+                            <exclude>**/*com/expedia/adaptivealerting/metrics/functions/source/graphite/Datapoint.class</exclude>
+                            <exclude>**/*com/expedia/adaptivealerting/metrics/functions/source/graphite/GraphiteQueryResult.class</exclude>
+                        </excludes>
+                    </configuration>
             </plugin>
         </plugins>
     </build>

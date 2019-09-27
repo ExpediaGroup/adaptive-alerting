@@ -1,0 +1,1 @@
+{"function": "sumSeries(a.b.c)", "intervalInSecs": 30, "tags":{"app_name": "sample_app1", "env": "test"}}
