@@ -37,9 +37,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import sun.jvm.hotspot.runtime.ObjectMonitor;
-
-import java.time.Instant;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -108,7 +105,7 @@ public class KafkaMetricProfilerTest {
         log.trace("outputRecord={}", outputRecord);
         OutputVerifier.compareKeyValue(outputRecord, "some-kafka-key", notProfileMetricData);
     }
-    
+
     @Test
     public void testBuildMetricProfiler() {
         val config = ConfigFactory.load("metric-profiler.conf");
