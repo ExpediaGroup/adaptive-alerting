@@ -15,6 +15,9 @@
  */
 package com.expedia.adaptivealerting.kafka;
 
+import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.mapper.MapperResult;
+import com.expedia.adaptivealerting.anomdetect.util.AssertUtil;
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.expedia.adaptivealerting.kafka.processor.MetricDataTransformerSupplier;
 import com.expedia.adaptivealerting.kafka.processor.MetricProfilerTransformerSupplier;
@@ -39,17 +42,18 @@ import org.apache.kafka.streams.state.KeyValueStore;
 import org.apache.kafka.streams.state.StoreBuilder;
 import org.apache.kafka.streams.state.Stores;
 
+import java.util.stream.Collectors;
+
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 @Slf4j
 public final class KafkaMetricProfiler extends AbstractStreamsApp {
     private static final String CK_METRIC_PROFILER = "metric-profiler";
-    private static final String stateStoreName = "ms-request-buffer";
+    private static final String stateStoreName = "profiler-request-buffer";
     private static final String CK_MODEL_SERVICE_URI_TEMPLATE = "model-service-base-uri";
 
     private Serde<String> outputKeySerde = new Serdes.StringSerde();
     private Serde<MetricData> outputValueSerde = new MetricDataJsonSerde();
-    private final MetricTankIdFactory idFactory = new MetricTankIdFactory();
 
     @Getter
     private final MetricProfiler metricProfiler;

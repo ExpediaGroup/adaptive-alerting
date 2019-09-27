@@ -86,17 +86,15 @@ public class KafkaMetricProfilerTest {
     public void tearDown() {
         logAndFailDriver.close();
     }
-/*
+
     @Test
     public void testTransform() {
         logAndFailDriver.pipeInput(metricDataFactory.create(INPUT_TOPIC, KAFKA_KEY, metricData));
         val outputRecord = logAndFailDriver.readOutput(OUTPUT_TOPIC, stringDeserializer, metricDataDeserializer);
         log.trace("outputRecord={}", outputRecord);
-        val expectedKey = idFactory.getId((metricData.getMetricDefinition()));
-        log.info("expectedKey:{}", outputRecord);
-        OutputVerifier.compareKeyValue(outputRecord, expectedKey, metricData);
+        OutputVerifier.compareKeyValue(outputRecord, "some-kafka-key", metricData);
     }
-*/
+
     @Test
     public void testBuildMetricProfiler() {
         val config = ConfigFactory.load("metric-profiler.conf");
