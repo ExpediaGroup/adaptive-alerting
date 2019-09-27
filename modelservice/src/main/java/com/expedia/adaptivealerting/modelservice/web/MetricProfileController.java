@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.web;
 
 import com.expedia.adaptivealerting.modelservice.dto.metricprofiling.CreateMetricProfilingRequest;
+import com.expedia.adaptivealerting.modelservice.dto.metricprofiling.MatchedMetricResponse;
 import com.expedia.adaptivealerting.modelservice.service.MetricProfilingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -51,7 +52,7 @@ public class MetricProfileController {
 
     @PostMapping
     @RequestMapping(value = "/search/findByTags")
-    public Boolean profilingExists(@RequestBody Map<String, String> tags) {
+    public MatchedMetricResponse profilingExists(@RequestBody Map<String, String> tags) {
         return metricProfilingService.profilingExists(tags);
     }
 

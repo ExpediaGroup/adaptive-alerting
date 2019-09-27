@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.service;
 
 import com.expedia.adaptivealerting.modelservice.dto.metricprofiling.CreateMetricProfilingRequest;
+import com.expedia.adaptivealerting.modelservice.dto.metricprofiling.MatchedMetricResponse;
 import com.expedia.adaptivealerting.modelservice.repo.MetricProfilingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,7 +41,7 @@ public class MetricProfilingServiceImpl implements MetricProfilingService {
     }
 
     @Override
-    public Boolean profilingExists(Map<String, String> tags) {
+    public MatchedMetricResponse profilingExists(Map<String, String> tags) {
         return metricProfilingRepository.profilingExists(tags);
     }
 

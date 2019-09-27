@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.metricprofiler.source;
+package com.expedia.adaptivealerting.metricprofiler;
 
-import com.expedia.adaptivealerting.metricprofiler.MatchedMetricResponse;
-import com.expedia.metrics.MetricDefinition;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-import java.util.Map;
 
-public interface ProfileSource {
-    MatchedMetricResponse profileExists(MetricDefinition metricDefinition);
+@Data
+@AllArgsConstructor
+public class MatchedMetricResponse {
+    private String id;
+    private long lookupTimeInMillis;
 }

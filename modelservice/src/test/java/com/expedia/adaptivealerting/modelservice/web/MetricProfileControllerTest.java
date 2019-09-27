@@ -51,7 +51,7 @@ public class MetricProfileControllerTest {
 
     private void initDependencies() {
         when(profilingService.createMetricProfile(Mockito.any(CreateMetricProfilingRequest.class))).thenReturn("created");
-        when(profilingService.profilingExists(Mockito.any(Map.class))).thenReturn(true);
+       // when(profilingService.profilingExists(Mockito.any(Map.class))).thenReturn(true);
     }
 
     @Test

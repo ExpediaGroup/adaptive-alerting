@@ -16,6 +16,8 @@
 package com.expedia.adaptivealerting.kafka;
 
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
+import com.expedia.adaptivealerting.kafka.processor.MetricDataTransformerSupplier;
+import com.expedia.adaptivealerting.kafka.processor.MetricProfilerTransformerSupplier;
 import com.expedia.adaptivealerting.kafka.serde.MetricDataJsonSerde;
 import com.expedia.adaptivealerting.metricprofiler.MetricProfiler;
 import com.expedia.adaptivealerting.metricprofiler.source.DefaultProfileSource;
@@ -33,12 +35,16 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Produced;
+import org.apache.kafka.streams.state.KeyValueStore;
+import org.apache.kafka.streams.state.StoreBuilder;
+import org.apache.kafka.streams.state.Stores;
 
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 @Slf4j
 public final class KafkaMetricProfiler extends AbstractStreamsApp {
     private static final String CK_METRIC_PROFILER = "metric-profiler";
+    private static final String stateStoreName = "ms-request-buffer";
     private static final String CK_MODEL_SERVICE_URI_TEMPLATE = "model-service-base-uri";
 
     private Serde<String> outputKeySerde = new Serdes.StringSerde();
@@ -75,14 +81,19 @@ public final class KafkaMetricProfiler extends AbstractStreamsApp {
         log.info("Initializing: inboundTopic={}, outboundTopic={}", inboundTopic, outboundTopic);
 
         val builder = new StreamsBuilder();
+        // create store
+        StoreBuilder<KeyValueStore<String, MetricData>> keyValueStoreBuilder =
+                Stores.keyValueStoreBuilder(Stores.inMemoryKeyValueStore(stateStoreName),
+                        Serdes.String(),
+                        new MetricDataJsonSerde())
+                        .withLoggingDisabled();
+        // register store
+        builder.addStateStore(keyValueStoreBuilder);
+
         final KStream<String, MetricData> stream = builder.stream(inboundTopic);
         stream
-                .filter((key, metricData) ->
-                        metricProfiler.hasProfilingInfo(metricData.getMetricDefinition()))
-                .map((key, metricData) -> {
-                    val hash = idFactory.getId(metricData.getMetricDefinition());
-                    return KeyValue.pair(hash, metricData);
-                })
+                .filter((key, md) -> md != null)
+                .transform(new MetricProfilerTransformerSupplier(metricProfiler, stateStoreName), stateStoreName)
                 .to(outboundTopic, Produced.with(outputKeySerde, outputValueSerde));
         return builder.build();
     }

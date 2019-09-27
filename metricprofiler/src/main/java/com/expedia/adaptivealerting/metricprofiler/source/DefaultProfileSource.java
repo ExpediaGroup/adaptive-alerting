@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.metricprofiler.source;
 
 import com.expedia.adaptivealerting.anomdetect.util.AssertUtil;
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
+import com.expedia.adaptivealerting.metricprofiler.MatchedMetricResponse;
 import com.expedia.metrics.MetricDefinition;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
@@ -45,7 +46,7 @@ public class DefaultProfileSource implements ProfileSource {
     public static final String FIND_DOCUMENT_PATH = "/api/metricProfiling/search/findByTags";
 
     @Override
-    public Boolean profileExists(MetricDefinition metricDefinition) {
+    public MatchedMetricResponse profileExists(MetricDefinition metricDefinition) {
         AssertUtil.notNull(metricDefinition, "metricDefinition can't be null");
         val tags = metricDefinition.getTags().getKv();
         val mutableTags = getMutableTagsMap(tags);
@@ -64,8 +65,7 @@ public class DefaultProfileSource implements ProfileSource {
             throw new RuntimeException(message, e);
         }
         try {
-            objectMapper.readValue(content.asBytes(), Boolean.class);
-            return true;
+            return objectMapper.readValue(content.asBytes(), MatchedMetricResponse.class);
         } catch (IOException e) {
             val message = "IOException while finding finding matching profile: tags=" + mutableTags;
             throw new RuntimeException(message, e);

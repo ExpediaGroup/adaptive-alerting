@@ -25,7 +25,10 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
@@ -44,12 +47,14 @@ public class MetricProfiler {
 
     private final Map<String, Boolean> cachedMetrics;
     private final MetricTankIdFactory idFactory = new MetricTankIdFactory();
+    private AtomicLong lastElasticLookUpLatency = new AtomicLong(-1);
+
 
     /**
      * Creates a new metric profiler manager from the given parameters.
      *
      * @param profileSource profile source
-     * @param cachedMetrics   map containing cached metric
+     * @param cachedMetrics map containing cached metric
      */
     public MetricProfiler(ProfileSource profileSource, Map<String, Boolean> cachedMetrics) {
         this.profileSource = profileSource;
@@ -72,9 +77,23 @@ public class MetricProfiler {
         val hash = idFactory.getId(metricDefinition);
         Boolean profileExists = cachedMetrics.get(hash);
         if (profileExists == null) {
-            profileExists = profileSource.profileExists(metricDefinition);
-            cachedMetrics.put(hash, profileExists);
+            val matchedMetricResponse = profileSource.profileExists(metricDefinition);
+            if (matchedMetricResponse != null) {
+                profileExists = matchedMetricResponse.getId() != null;
+                lastElasticLookUpLatency.set(matchedMetricResponse.getLookupTimeInMillis());
+                cachedMetrics.put(hash, profileExists);
+            } else {
+                lastElasticLookUpLatency.set(-2L);
+            }
         }
         return profileExists;
     }
+
+    public int optimalBatchSize() {
+        if (lastElasticLookUpLatency.longValue() == -1L || lastElasticLookUpLatency.longValue() > 100L) {
+            return 80;
+        }
+        return 0;
+    }
+
 }

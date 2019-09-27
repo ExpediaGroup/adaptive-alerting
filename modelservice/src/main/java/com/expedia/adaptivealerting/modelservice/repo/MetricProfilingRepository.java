@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.repo;
 
 import com.expedia.adaptivealerting.modelservice.dto.metricprofiling.CreateMetricProfilingRequest;
+import com.expedia.adaptivealerting.modelservice.dto.metricprofiling.MatchedMetricResponse;
 
 import java.util.List;
 import java.util.Map;
@@ -26,5 +27,5 @@ public interface MetricProfilingRepository {
 
     void updateMetricProfile(String id, Boolean isStationary);
 
-    Boolean profilingExists(Map<String, String> tags);
+    MatchedMetricResponse profilingExists(Map<String, String> tags);
 }

@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.repo.impl;
 
 import com.expedia.adaptivealerting.modelservice.dto.metricprofiling.CreateMetricProfilingRequest;
+import com.expedia.adaptivealerting.modelservice.dto.metricprofiling.MatchedMetricResponse;
 import com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorMetricProfiling;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
@@ -23,6 +24,7 @@ import com.expedia.adaptivealerting.modelservice.repo.MetricProfilingRepository;
 import com.expedia.adaptivealerting.modelservice.util.ElasticsearchUtil;
 import com.expedia.adaptivealerting.modelservice.util.ObjectMapperUtil;
 import com.expedia.adaptivealerting.modelservice.util.QueryUtil;
+import com.fasterxml.jackson.databind.deser.DataFormatReaders;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.elasticsearch.action.index.IndexRequest;
@@ -49,8 +51,8 @@ import java.util.Map;
 @Service
 public class MetricProfilingRepositoryImpl implements MetricProfilingRepository {
 
-    private static final String METRIC_PROFILING_INDEX = "profile-metrics";
-    private static final String METRIC_PROFILING_DOC_TYPE = "_doc";
+    private static final String METRIC_PROFILING_INDEX = "metric_profiling";
+    private static final String METRIC_PROFILING_DOC_TYPE = "details";
 
     @Autowired
     private ElasticSearchProperties elasticSearchProperties;
@@ -95,7 +97,7 @@ public class MetricProfilingRepositoryImpl implements MetricProfilingRepository 
     }
 
     @Override
-    public Boolean profilingExists(Map<String, String> tags) {
+    public MatchedMetricResponse profilingExists(Map<String, String> tags) {
         try {
             List<BytesReference> refList = new ArrayList<>();
             XContentBuilder xContent = XContentFactory.jsonBuilder();
@@ -113,8 +115,17 @@ public class MetricProfilingRepositoryImpl implements MetricProfilingRepository 
 
             val searchRequest = new SearchRequest().source(searchSourceBuilder).indices(METRIC_PROFILING_INDEX);
             val searchResponse = elasticSearchClient.search(searchRequest, RequestOptions.DEFAULT);
+            val lookupTimeInMillis = searchResponse.getTook().getMillis();
+            val hits = searchResponse.getHits().getHits();
 
-            return searchResponse.getHits().getHits().length > 0;
+            MatchedMetricResponse response = new MatchedMetricResponse();
+
+            for (val hit : hits) {
+                response.setId(hit.getId());
+            }
+
+            response.setLookupTimeInMillis(lookupTimeInMillis);
+            return response;
         } catch (IOException e) {
             log.error("Error ES lookup", e);
             throw new RuntimeException(e);
