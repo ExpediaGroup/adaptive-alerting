@@ -2,6 +2,7 @@ package com.expedia.adaptivealerting.modelservice.web;
 
 import com.expedia.adaptivealerting.modelservice.dto.common.Expression;
 import com.expedia.adaptivealerting.modelservice.dto.metricprofiling.CreateMetricProfilingRequest;
+import com.expedia.adaptivealerting.modelservice.dto.metricprofiling.MatchedMetricResponse;
 import com.expedia.adaptivealerting.modelservice.service.MetricProfilingService;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import lombok.val;
@@ -36,6 +37,9 @@ public class MetricProfileControllerTest {
 
     private Expression expression;
 
+    private MatchedMetricResponse metricResponse;
+
+
     @Before
     public void setUp() {
         this.controllerUnderTest = new MetricProfileController();
@@ -47,11 +51,12 @@ public class MetricProfileControllerTest {
     private void initTestObjects() {
         ObjectMother mom = ObjectMother.instance();
         this.expression = mom.getExpression();
+        this.metricResponse = new MatchedMetricResponse("1", 100L);
     }
 
     private void initDependencies() {
         when(profilingService.createMetricProfile(Mockito.any(CreateMetricProfilingRequest.class))).thenReturn("created");
-       // when(profilingService.profilingExists(Mockito.any(Map.class))).thenReturn(true);
+        when(profilingService.profilingExists(Mockito.any(Map.class))).thenReturn(metricResponse);
     }
 
     @Test

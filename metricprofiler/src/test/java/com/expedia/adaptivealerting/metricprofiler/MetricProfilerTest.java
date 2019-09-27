@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -29,6 +30,8 @@ public class MetricProfilerTest {
 
     private MetricDefinition goodDefinition;
 
+    private MatchedMetricResponse metricResponse;
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -46,9 +49,10 @@ public class MetricProfilerTest {
 
     private void initTestObjects() {
         this.goodDefinition = new MetricDefinition("good-definition");
+        this.metricResponse = new MatchedMetricResponse("1", 100L);
     }
 
     private void initDependencies() {
-        when(source.profileExists(Mockito.any(MetricDefinition.class))).thenReturn(true);
+        when(source.profileExists(Mockito.any(MetricDefinition.class))).thenReturn(metricResponse);
     }
 }

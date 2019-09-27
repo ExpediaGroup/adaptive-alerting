@@ -2,6 +2,7 @@ package com.expedia.adaptivealerting.modelservice.repo;
 
 import com.expedia.adaptivealerting.modelservice.dto.common.Expression;
 import com.expedia.adaptivealerting.modelservice.dto.metricprofiling.CreateMetricProfilingRequest;
+import com.expedia.adaptivealerting.modelservice.dto.metricprofiling.MatchedMetricResponse;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
 import com.expedia.adaptivealerting.modelservice.repo.impl.MetricProfilingRepositoryImpl;
@@ -19,6 +20,7 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.common.bytes.BytesArray;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.document.DocumentField;
+import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -83,7 +85,6 @@ public class MetricProfilingRepositoryTest {
         indexResponse = mockIndexResponse();
         searchResponse = mockSearchResponse("1");
         this.expression = mom.getExpression();
-
     }
 
     @SneakyThrows
@@ -118,9 +119,9 @@ public class MetricProfilingRepositoryTest {
 
     @Test
     public void testFindMatchingMetricProfiles() {
-      //  boolean profilingExists = repository.profilingExists(new HashMap<>());
-     //   assertNotNull(profilingExists);
-     //   assertEquals(true, profilingExists);
+        MatchedMetricResponse metricResponse = repository.profilingExists(new HashMap<>());
+        assertNotNull(metricResponse);
+        assertEquals("1", metricResponse.getId());
     }
 
     @Test(expected = RuntimeException.class)
@@ -144,13 +145,14 @@ public class MetricProfilingRepositoryTest {
     private SearchResponse mockSearchResponse(String searchIndex) {
         SearchResponse searchResponse = mock(SearchResponse.class);
         Map<String, DocumentField> fields = new HashMap<>();
-        SearchHit searchHit = new SearchHit(101, "xxx", null, fields);
+        SearchHit searchHit = new SearchHit(101, "1", null, fields);
         BytesReference source = new BytesArray("{}");
         searchHit.sourceRef(source);
         SearchHit[] bunchOfSearchHits = new SearchHit[1];
         bunchOfSearchHits[0] = searchHit;
         SearchHits searchHits = new SearchHits(bunchOfSearchHits, 1, 1);
         when(searchResponse.getHits()).thenReturn(searchHits);
+        when(searchResponse.getTook()).thenReturn(new TimeValue(10000));
         return searchResponse;
     }
 }

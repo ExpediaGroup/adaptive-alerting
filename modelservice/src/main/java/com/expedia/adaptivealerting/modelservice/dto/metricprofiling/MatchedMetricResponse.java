@@ -15,10 +15,14 @@
  */
 package com.expedia.adaptivealerting.modelservice.dto.metricprofiling;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class MatchedMetricResponse {
     private String id;
     private long lookupTimeInMillis;

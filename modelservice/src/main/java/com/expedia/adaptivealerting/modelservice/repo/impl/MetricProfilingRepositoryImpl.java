@@ -119,7 +119,6 @@ public class MetricProfilingRepositoryImpl implements MetricProfilingRepository 
             val hits = searchResponse.getHits().getHits();
 
             MatchedMetricResponse response = new MatchedMetricResponse();
-
             for (val hit : hits) {
                 response.setId(hit.getId());
             }

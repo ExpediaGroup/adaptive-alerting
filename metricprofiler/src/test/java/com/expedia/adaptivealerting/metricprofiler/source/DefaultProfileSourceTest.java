@@ -1,6 +1,7 @@
 package com.expedia.adaptivealerting.metricprofiler.source;
 
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
+import com.expedia.adaptivealerting.metricprofiler.MatchedMetricResponse;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.TagCollection;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,6 +41,7 @@ public class DefaultProfileSourceTest {
     private Map<String, String> metricTags_cantRead;
     private Map<String, String> metricTags_invalidContent;
 
+    private MatchedMetricResponse metricResponse;
 
     @Mock
     private Content docContent;
@@ -73,7 +75,7 @@ public class DefaultProfileSourceTest {
 
         goodDefinition = new MetricDefinition("good-definition", tags, meta);
         val result = classUnderTest.profileExists(goodDefinition);
-        assertEquals(true, result);
+        assertEquals("1", result.getId());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -98,6 +100,7 @@ public class DefaultProfileSourceTest {
         this.metricTags = new HashMap<>();
         this.metricTags_cantRead = new HashMap<>();
         this.metricTags_invalidContent = new HashMap<>();
+        this.metricResponse = new MatchedMetricResponse("1", 1000L);
     }
 
     @SneakyThrows
@@ -105,7 +108,7 @@ public class DefaultProfileSourceTest {
         when(objectMapper.writeValueAsString(metricTags)).thenReturn(tagsBody);
         when(httpClient.post(FIND_DOC_URI, tagsBody)).thenReturn(docContent);
         when(docContent.asBytes()).thenReturn(docBytes);
-        when(objectMapper.readValue(docBytes, Boolean.class)).thenReturn(true);
+        when(objectMapper.readValue(docBytes, MatchedMetricResponse.class)).thenReturn(metricResponse);
 
         when(objectMapper.writeValueAsString(metricTags_cantRead)).thenReturn(tagsBody_cantRead);
         when(httpClient.post(FIND_DOC_URI, tagsBody_cantRead)).thenThrow(new IOException());
@@ -113,7 +116,7 @@ public class DefaultProfileSourceTest {
         when(objectMapper.writeValueAsString(metricTags_invalidContent)).thenReturn(tagsBody_invalidContent);
         when(httpClient.post(FIND_DOC_URI, tagsBody_invalidContent)).thenReturn(invalidDocContent);
         when(invalidDocContent.asBytes()).thenReturn(invalidDocBytes);
-        when(objectMapper.readValue(invalidDocBytes, Boolean.class)).thenThrow(new IOException());
+        when(objectMapper.readValue(invalidDocBytes, MatchedMetricResponse.class)).thenThrow(new IOException());
     }
 
     private static String uri(String path) {
