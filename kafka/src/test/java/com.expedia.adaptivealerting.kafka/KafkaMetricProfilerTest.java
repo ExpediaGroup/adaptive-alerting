@@ -20,7 +20,6 @@ import com.expedia.adaptivealerting.kafka.util.TestObjectMother;
 import com.expedia.adaptivealerting.metricprofiler.MetricProfiler;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
-import com.expedia.metrics.metrictank.MetricTankIdFactory;
 import com.github.charithe.kafka.EphemeralKafkaBroker;
 import com.github.charithe.kafka.KafkaJunitRule;
 import com.typesafe.config.Config;
@@ -38,9 +37,12 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import sun.jvm.hotspot.runtime.ObjectMonitor;
+
+import java.time.Instant;
 
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 
 @Slf4j
@@ -54,10 +56,15 @@ public class KafkaMetricProfilerTest {
     @ClassRule
     public static KafkaJunitRule kafka = new KafkaJunitRule(EphemeralKafkaBroker.create()).waitForStartup();
 
-    private MetricData metricData;
     private ConsumerRecordFactory<String, MetricData> metricDataFactory;
     private StringDeserializer stringDeserializer;
     private Deserializer<MetricData> metricDataDeserializer;
+
+    private MetricData profileMetricData;
+    private MetricDefinition profileMetricDefinition;
+
+    private MetricData notProfileMetricData;
+    private MetricDefinition notprofileMetricDefinition;
 
     @Mock
     private MetricProfiler metricProfiler;
@@ -70,8 +77,6 @@ public class KafkaMetricProfilerTest {
 
     //Test machinery
     private TopologyTestDriver logAndFailDriver;
-
-    private MetricTankIdFactory idFactory = new MetricTankIdFactory();
 
 
     @Before
@@ -88,13 +93,22 @@ public class KafkaMetricProfilerTest {
     }
 
     @Test
-    public void testTransform() {
-        logAndFailDriver.pipeInput(metricDataFactory.create(INPUT_TOPIC, KAFKA_KEY, metricData));
+    public void testTransform_profile_metrics() {
+        when(metricProfiler.hasProfilingInfo(profileMetricDefinition)).thenReturn(true);
+        logAndFailDriver.pipeInput(metricDataFactory.create(INPUT_TOPIC, KAFKA_KEY, profileMetricData));
         val outputRecord = logAndFailDriver.readOutput(OUTPUT_TOPIC, stringDeserializer, metricDataDeserializer);
-        log.trace("outputRecord={}", outputRecord);
-        OutputVerifier.compareKeyValue(outputRecord, "some-kafka-key", metricData);
+        assertNull(outputRecord);
     }
 
+    @Test
+    public void testTransform_unprofile_metrics() {
+        when(metricProfiler.hasProfilingInfo(notprofileMetricDefinition)).thenReturn(null);
+        logAndFailDriver.pipeInput(metricDataFactory.create(INPUT_TOPIC, KAFKA_KEY, notProfileMetricData));
+        val outputRecord = logAndFailDriver.readOutput(OUTPUT_TOPIC, stringDeserializer, metricDataDeserializer);
+        log.trace("outputRecord={}", outputRecord);
+        OutputVerifier.compareKeyValue(outputRecord, "some-kafka-key", notProfileMetricData);
+    }
+    
     @Test
     public void testBuildMetricProfiler() {
         val config = ConfigFactory.load("metric-profiler.conf");
@@ -103,7 +117,10 @@ public class KafkaMetricProfilerTest {
     }
 
     private void initTestObjects() {
-        this.metricData = TestObjectMother.metricData();
+        this.profileMetricDefinition = new MetricDefinition("good-definition", TestObjectMother.metricTags(), TestObjectMother.metricMeta());
+        this.profileMetricData = TestObjectMother.metricData(profileMetricDefinition, 100.0);
+        this.notprofileMetricDefinition = new MetricDefinition("bad-definition", TestObjectMother.metricTags(), TestObjectMother.metricMeta());
+        this.notProfileMetricData = TestObjectMother.metricData(notprofileMetricDefinition, 100.0);
     }
 
     private void initTestMachinery() {
@@ -118,7 +135,5 @@ public class KafkaMetricProfilerTest {
         when(saConfig.getTypesafeConfig()).thenReturn(tsConfig);
         when(saConfig.getInputTopic()).thenReturn(INPUT_TOPIC);
         when(saConfig.getOutputTopic()).thenReturn(OUTPUT_TOPIC);
-        when(metricProfiler.hasProfilingInfo(any(MetricDefinition.class))).thenReturn(true);
     }
-
 }
