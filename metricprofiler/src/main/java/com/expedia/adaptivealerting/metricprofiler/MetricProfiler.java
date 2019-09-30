@@ -89,11 +89,20 @@ public class MetricProfiler {
         return profileExists;
     }
 
+    public Boolean getProfilingInfoFromCache(MetricDefinition metricDefinition){
+        return cachedMetrics.get(idFactory.getId(metricDefinition));
+    }
+
+    /**
+     * Finds the optimal batch size by looking at the elastic search latency
+     *
+     * @return Optimal batch size
+     */
     public int optimalBatchSize() {
         if (lastElasticLookUpLatency.longValue() == -1L || lastElasticLookUpLatency.longValue() > 100L) {
             return 80;
         }
-        return 0;
+        return 100;
     }
 
 }

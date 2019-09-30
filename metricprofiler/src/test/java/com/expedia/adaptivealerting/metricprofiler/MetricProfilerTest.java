@@ -10,7 +10,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -45,6 +44,13 @@ public class MetricProfilerTest {
         val result = metricProfiler.hasProfilingInfo(goodDefinition);
         assertNotNull(result);
         assertEquals(true, result);
+    }
+
+    @Test
+    public void testOptimalBatchSize() {
+        val result = metricProfiler.optimalBatchSize();
+        assertNotNull(result);
+        assertEquals(80, result);
     }
 
     private void initTestObjects() {

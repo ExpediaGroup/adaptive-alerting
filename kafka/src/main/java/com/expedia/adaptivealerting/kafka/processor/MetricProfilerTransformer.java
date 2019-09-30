@@ -59,7 +59,7 @@ public class MetricProfilerTransformer implements Transformer<String, MetricData
                 Map<String, MetricData> metricsToBeProfiled = getMapAndFlushStore();
                 metricsToBeProfiled.forEach((originalKey, metricData) -> {
                     Boolean profilingInfo = metricProfiler.hasProfilingInfo(metricData.getMetricDefinition());
-                    if (profilingInfo == null) {
+                    if (!profilingInfo) {
                         context.forward(originalKey, metricData);
                     }
                 });
@@ -73,8 +73,10 @@ public class MetricProfilerTransformer implements Transformer<String, MetricData
 
     @Override
     public KeyValue<String, MetricData> transform(String key, MetricData metricData) {
-        Boolean profilingInfo = metricProfiler.hasProfilingInfo(metricData.getMetricDefinition());
+        Boolean profilingInfo = metricProfiler.getProfilingInfoFromCache(metricData.getMetricDefinition());
         if (profilingInfo == null) {
+            this.metricDataKeyValueStore.put(key, metricData);
+        } else if (!profilingInfo) {
             return new KeyValue<>(key, metricData);
         }
         return null;
