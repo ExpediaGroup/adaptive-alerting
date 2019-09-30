@@ -1,18 +1,3 @@
-/*
- * Copyright 2018-2019 Expedia Group, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.expedia.adaptivealerting.kafka;
 
 import com.expedia.adaptivealerting.kafka.serde.MetricDataJsonSerde;
@@ -29,9 +14,10 @@ import lombok.val;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.streams.TopologyTestDriver;
+import org.apache.kafka.streams.state.KeyValueStore;
 import org.apache.kafka.streams.test.ConsumerRecordFactory;
 import org.apache.kafka.streams.test.OutputVerifier;
-import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -49,6 +35,7 @@ public class KafkaMetricProfilerTest {
     private static final String KAFKA_KEY = "some-kafka-key";
     private static final String INPUT_TOPIC = "metrics";
     private static final String OUTPUT_TOPIC = "profile-metrics";
+    private static final String stateStoreName = "profiler-request-buffer";
 
     @ClassRule
     public static KafkaJunitRule kafka = new KafkaJunitRule(EphemeralKafkaBroker.create()).waitForStartup();
@@ -57,11 +44,13 @@ public class KafkaMetricProfilerTest {
     private StringDeserializer stringDeserializer;
     private Deserializer<MetricData> metricDataDeserializer;
 
-    private MetricData profileMetricData;
-    private MetricDefinition profileMetricDefinition;
+    private MetricData profiledMetricData;
+    private MetricDefinition profiledMetricDefinition;
 
-    private MetricData notProfileMetricData;
-    private MetricDefinition notprofileMetricDefinition;
+    private MetricData unProfiledMetricData;
+    private MetricDefinition unProfiledMetricDefinition;
+
+    private KeyValueStore<String, MetricData> kvStore;
 
     @Mock
     private MetricProfiler metricProfiler;
@@ -74,7 +63,7 @@ public class KafkaMetricProfilerTest {
 
     //Test machinery
     private TopologyTestDriver logAndFailDriver;
-
+    private TopologyTestDriver logAndContinueDriver;
 
     @Before
     public void setUp() {
@@ -84,26 +73,24 @@ public class KafkaMetricProfilerTest {
         initTestObjects();
     }
 
-    @After
-    public void tearDown() {
+    @Test
+    public void shouldReturnNullForProfiledMetrics() {
+        initLogAndFail();
+        when(metricProfiler.getProfilingInfoFromCache(profiledMetricDefinition)).thenReturn(true);
+        logAndFailDriver.pipeInput(metricDataFactory.create(INPUT_TOPIC, KAFKA_KEY, profiledMetricData));
+        val outputRecord = logAndFailDriver.readOutput(OUTPUT_TOPIC, stringDeserializer, metricDataDeserializer);
+        assertNull(outputRecord);
         logAndFailDriver.close();
     }
 
     @Test
-    public void testTransform_profile_metrics() {
-        when(metricProfiler.hasProfilingInfo(profileMetricDefinition)).thenReturn(true);
-        logAndFailDriver.pipeInput(metricDataFactory.create(INPUT_TOPIC, KAFKA_KEY, profileMetricData));
+    public void shouldReturnOutputForNonProfiledMetrics() {
+        initLogAndFail();
+        when(metricProfiler.getProfilingInfoFromCache(unProfiledMetricDefinition)).thenReturn(false);
+        logAndFailDriver.pipeInput(metricDataFactory.create(INPUT_TOPIC, KAFKA_KEY, unProfiledMetricData));
         val outputRecord = logAndFailDriver.readOutput(OUTPUT_TOPIC, stringDeserializer, metricDataDeserializer);
-        assertNull(outputRecord);
-    }
-
-    @Test
-    public void testTransform_unprofile_metrics() {
-        when(metricProfiler.hasProfilingInfo(notprofileMetricDefinition)).thenReturn(null);
-        logAndFailDriver.pipeInput(metricDataFactory.create(INPUT_TOPIC, KAFKA_KEY, notProfileMetricData));
-        val outputRecord = logAndFailDriver.readOutput(OUTPUT_TOPIC, stringDeserializer, metricDataDeserializer);
-        log.trace("outputRecord={}", outputRecord);
-        OutputVerifier.compareKeyValue(outputRecord, "some-kafka-key", notProfileMetricData);
+        OutputVerifier.compareKeyValue(outputRecord, "some-kafka-key", unProfiledMetricData);
+        logAndFailDriver.close();
     }
 
     @Test
@@ -114,15 +101,14 @@ public class KafkaMetricProfilerTest {
     }
 
     private void initTestObjects() {
-        this.profileMetricDefinition = new MetricDefinition("good-definition", TestObjectMother.metricTags(), TestObjectMother.metricMeta());
-        this.profileMetricData = TestObjectMother.metricData(profileMetricDefinition, 100.0);
-        this.notprofileMetricDefinition = new MetricDefinition("bad-definition", TestObjectMother.metricTags(), TestObjectMother.metricMeta());
-        this.notProfileMetricData = TestObjectMother.metricData(notprofileMetricDefinition, 100.0);
+        this.profiledMetricDefinition = new MetricDefinition("good-definition", TestObjectMother.metricTags(), TestObjectMother.metricMeta());
+        this.profiledMetricData = TestObjectMother.metricData(profiledMetricDefinition, 100.0);
+        this.unProfiledMetricDefinition = new MetricDefinition("bad-definition", TestObjectMother.metricTags(), TestObjectMother.metricMeta());
+        this.unProfiledMetricData = TestObjectMother.metricData(unProfiledMetricDefinition, 100.0);
     }
 
     private void initTestMachinery() {
-        val topology = new KafkaMetricProfiler(saConfig, metricProfiler).buildTopology();
-        this.logAndFailDriver = TestObjectMother.topologyTestDriver(topology, MetricDataJsonSerde.class, false);
+
         this.metricDataFactory = TestObjectMother.metricDataFactory();
         this.stringDeserializer = new StringDeserializer();
         this.metricDataDeserializer = new MetricDataJsonSerde.Deser();
@@ -132,5 +118,15 @@ public class KafkaMetricProfilerTest {
         when(saConfig.getTypesafeConfig()).thenReturn(tsConfig);
         when(saConfig.getInputTopic()).thenReturn(INPUT_TOPIC);
         when(saConfig.getOutputTopic()).thenReturn(OUTPUT_TOPIC);
+    }
+
+    private void initLogAndFail() {
+        val topology = new KafkaMetricProfiler(saConfig, metricProfiler).buildTopology();
+        this.logAndFailDriver = TestObjectMother.topologyTestDriver(topology, MetricDataJsonSerde.class, false);
+    }
+
+    private void initLogAndContinue() {
+        val topology = new KafkaMetricProfiler(saConfig, metricProfiler).buildTopology();
+        this.logAndContinueDriver = TestObjectMother.topologyTestDriver(topology, MetricDataJsonSerde.class, false);
     }
 }

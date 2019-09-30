@@ -102,7 +102,7 @@ public class MetricProfiler {
         if (lastElasticLookUpLatency.longValue() == -1L || lastElasticLookUpLatency.longValue() > 100L) {
             return 80;
         }
-        return 100;
+        return 0;
     }
 
 }
