@@ -5,7 +5,8 @@ locals {
   count = "${var.enabled?1:0}"
   checksum = "${sha1("${data.template_file.config_data.rendered}")}"
   configmap1_name = "aa-metric-functions-config-${local.checksum}"
-  configmap2_name = "aa-metric-functions-definition-${local.checksum}"
+  configmap2_name = "functions.txt-${local.checksum}"
+
 }
 
  data "template_file" "config_data" {
@@ -15,10 +16,6 @@ locals {
         output_topic = "${var.aggregator_producer_topic}"
         metric_source_graphite_host = "${var.metric_source_graphite_host}"
   }
-}
-
- data "template_file" "functions_data" {
-  template = "${file("${local.function_file_path}")}"
 }
 
  data "template_file" "deployment_yaml" {
@@ -61,13 +58,10 @@ locals {
   count = "${local.count}"
 }
 
- resource "kubernetes_config_map" "aa-metric-functions-definiton" {
-  metadata {
-    name = "${local.configmap2_name}"
-    namespace = "${var.namespace}"
-  }
-  data {
-    "functions.txt" = "${data.template_file.functions_data.rendered}"
+ # Creating input file as config map via kubectl.
+resource "null_resource" "kubectl_create_configmap" {
+  provisioner "local-exec" {
+    command = "${var.kubectl_executable_name} create configmap ${local.configmap2_name} --from-file=${var.metric_functions_input_file}"
   }
   count = "${local.count}"
 }
