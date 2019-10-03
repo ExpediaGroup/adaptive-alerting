@@ -15,13 +15,13 @@
  */
 package com.expedia.adaptivealerting.anomdetect.source;
 
-import com.expedia.adaptivealerting.anomdetect.source.factory.ConstantThresholdFactory;
-import com.expedia.adaptivealerting.anomdetect.source.factory.CusumFactory;
-import com.expedia.adaptivealerting.anomdetect.source.factory.EdmxFactory;
-import com.expedia.adaptivealerting.anomdetect.source.factory.IndividualsFactory;
-import com.expedia.adaptivealerting.anomdetect.source.factory.LegacyEwmaFactory;
-import com.expedia.adaptivealerting.anomdetect.source.factory.LegacyHoltWintersFactory;
-import com.expedia.adaptivealerting.anomdetect.source.factory.LegacyPewmaFactory;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.constant.ConstantThresholdDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.cusum.CusumDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.detect.breakout.algo.edmx.EdmxDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.individuals.IndividualsDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.forecasting.LegacyEwmaDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.forecasting.LegacyHoltWintersDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.forecasting.LegacyPewmaDetectorFactory;
 import lombok.val;
 
 import java.util.HashMap;
@@ -33,15 +33,15 @@ public class DetectorRegistry {
     private final Map<String, DetectorFactoryBuilder> builders = new HashMap<>();
 
     public DetectorRegistry() {
-        builders.put("constant-detector", document -> new ConstantThresholdFactory(document));
-        builders.put("cusum-detector", document -> new CusumFactory(document));
-        builders.put("edmx-detector", document -> new EdmxFactory(document));
-        builders.put("individuals-detector", document -> new IndividualsFactory(document));
+        builders.put("constant-detector", document -> new ConstantThresholdDetectorFactory(document));
+        builders.put("cusum-detector", document -> new CusumDetectorFactory(document));
+        builders.put("edmx-detector", document -> new EdmxDetectorFactory(document));
+        builders.put("individuals-detector", document -> new IndividualsDetectorFactory(document));
 
         // Legacy
-        builders.put("ewma-detector", document -> new LegacyEwmaFactory(document));
-        builders.put("holtwinters-detector", document -> new LegacyHoltWintersFactory(document));
-        builders.put("pewma-detector", document -> new LegacyPewmaFactory(document));
+        builders.put("ewma-detector", document -> new LegacyEwmaDetectorFactory(document));
+        builders.put("holtwinters-detector", document -> new LegacyHoltWintersDetectorFactory(document));
+        builders.put("pewma-detector", document -> new LegacyPewmaDetectorFactory(document));
     }
 
     public DetectorFactory getDetectorFactory(DetectorDocument document) {

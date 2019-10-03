@@ -18,7 +18,6 @@ package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyThresholds;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
-import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.AnomalyClassifier;
 import lombok.val;
 import org.junit.Assert;
 import org.junit.Before;

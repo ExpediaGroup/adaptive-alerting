@@ -15,13 +15,13 @@
  */
 package com.expedia.adaptivealerting.anomdetect.source;
 
-import com.expedia.adaptivealerting.anomdetect.source.factory.ConstantThresholdFactory;
-import com.expedia.adaptivealerting.anomdetect.source.factory.CusumFactory;
-import com.expedia.adaptivealerting.anomdetect.source.factory.EdmxFactory;
-import com.expedia.adaptivealerting.anomdetect.source.factory.IndividualsFactory;
-import com.expedia.adaptivealerting.anomdetect.source.factory.LegacyEwmaFactory;
-import com.expedia.adaptivealerting.anomdetect.source.factory.LegacyHoltWintersFactory;
-import com.expedia.adaptivealerting.anomdetect.source.factory.LegacyPewmaFactory;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.constant.ConstantThresholdDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.cusum.CusumDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.detect.breakout.algo.edmx.EdmxDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.individuals.IndividualsDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.forecasting.LegacyEwmaDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.forecasting.LegacyHoltWintersDetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.forecasting.LegacyPewmaDetectorFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.val;
 import org.junit.Before;
@@ -42,40 +42,40 @@ public class DetectorRegistryTest {
 
     @Test
     public void testGetDetectorFactory_constantThreshold() {
-        testGetDetectorFactory("constant-threshold", ConstantThresholdFactory.class);
+        testGetDetectorFactory("constant-threshold", ConstantThresholdDetectorFactory.class);
     }
 
     @Test
     public void testGetDetectorFactory_cusum() {
-        testGetDetectorFactory("cusum", CusumFactory.class);
+        testGetDetectorFactory("cusum", CusumDetectorFactory.class);
     }
 
     @Test
     public void testGetDetectorFactory_edmx() {
-        testGetDetectorFactory("edmx", EdmxFactory.class);
+        testGetDetectorFactory("edmx", EdmxDetectorFactory.class);
     }
 
     @Test
     public void testGetDetectorFactory_individuals() {
-        testGetDetectorFactory("individuals", IndividualsFactory.class);
+        testGetDetectorFactory("individuals", IndividualsDetectorFactory.class);
     }
 
     @Test
     @Deprecated // underlying factory is deprecated
     public void testGetDetectorFactory_legacyEwma() {
-        testGetDetectorFactory("ewma", LegacyEwmaFactory.class);
+        testGetDetectorFactory("ewma", LegacyEwmaDetectorFactory.class);
     }
 
     @Test
     @Deprecated // underlying factory is deprecated
     public void testGetDetectorFactory_legacyHoltWinters() {
-        testGetDetectorFactory("holt-winters", LegacyHoltWintersFactory.class);
+        testGetDetectorFactory("holt-winters", LegacyHoltWintersDetectorFactory.class);
     }
 
     @Test
     @Deprecated // underlying factory is deprecated
     public void testGetDetectorFactory_legacyPewma() {
-        testGetDetectorFactory("pewma", LegacyPewmaFactory.class);
+        testGetDetectorFactory("pewma", LegacyPewmaDetectorFactory.class);
     }
 
     @Test(expected = IllegalArgumentException.class)
