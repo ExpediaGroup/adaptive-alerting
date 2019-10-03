@@ -18,7 +18,7 @@ package com.expedia.adaptivealerting.kafka;
 import com.expedia.adaptivealerting.anomdetect.DetectorManager;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.detect.breakout.BreakoutDetectorResult;
-import com.expedia.adaptivealerting.anomdetect.detect.breakout.algo.EdmxDetectorResult;
+import com.expedia.adaptivealerting.anomdetect.detect.breakout.algo.edmx.EdmxDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
 import com.expedia.adaptivealerting.kafka.util.TestObjectMother;
 import com.expedia.metrics.jackson.MetricsJavaModule;

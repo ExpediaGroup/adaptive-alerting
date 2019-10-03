@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detect;
 
-import com.expedia.adaptivealerting.anomdetect.detect.breakout.algo.EdmxDetectorResult;
+import com.expedia.adaptivealerting.anomdetect.detect.breakout.algo.edmx.EdmxDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
