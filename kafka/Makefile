@@ -22,4 +22,4 @@ release: docker_build
 	./docker/scripts/build-a2m-mapper.sh --release
 	./docker/scripts/build-a2a-mapper.sh --release
 	./docker/scripts/build-metric-profiler.sh --release
-        ./docker/scripts/build-aa-metric-functions.sh --release
+	./docker/scripts/build-aa-metric-functions.sh --release
