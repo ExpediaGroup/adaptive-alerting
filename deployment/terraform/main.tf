@@ -196,6 +196,40 @@ module "metric-profiler" {
   inbound_topic = "${var.metric-profiler["inbound_topic"]}"
 }
 
+module "aa-metric-functions" {
+  source = "aa-metric-functions"
+
+  # Docker
+  image = "${var.aa-metric-functions["image"]}"
+  image_pull_policy = "${var.aa-metric-functions["image_pull_policy"]}"
+
+  # Kubernetes
+  namespace = "${var.app_namespace}"
+  enabled = "${var.aa-metric-functions["enabled"]}"
+  replicas = "${var.aa-metric-functions["instances"]}"
+  cpu_limit = "${var.aa-metric-functions["cpu_limit"]}"
+  cpu_request = "${var.aa-metric-functions["cpu_request"]}"
+  memory_limit = "${var.aa-metric-functions["memory_limit"]}"
+  memory_request = "${var.aa-metric-functions["memory_request"]}"
+  node_selector_label = "${var.node_selector_label}"
+  kubectl_executable_name = "${var.kubectl_executable_name}"
+  kubectl_context_name = "${var.kubectl_context_name}"
+
+  # Environment
+  jvm_memory_limit = "${var.aa-metric-functions["jvm_memory_limit"]}"
+  graphite_hostname = "${var.graphite_hostname}"
+  graphite_port = "${var.graphite_port}"
+  graphite_enabled = "${var.graphite_enabled}"
+  graphite_prefix = "${var.graphite_prefix}"
+  env_vars = "${var.aa-metric-functions["environment_overrides"]}"
+
+  # App
+  kafka_endpoint = "${local.kafka_endpoint}"
+  metric_source_graphite_host = "${var.aa-metric-functions["metric_source_graphite_host"]}"
+  aggregator_producer_topic = "${var.aa-metric-functions["aggregator_producer_topic"]}"
+  metric_functions_input_file = "${var.aa-metric-functions["metric_functions_input_file"]}"
+}
+
 module "notifier" {
   source = "notifier"
 

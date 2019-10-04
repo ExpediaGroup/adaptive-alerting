@@ -35,6 +35,10 @@ variable "metric-profiler" {
   type = "map"
 }
 
+variable "aa-metric-functions" {
+  type = "map"
+}
+
 variable "notifier" {
   type = "map"
 }
