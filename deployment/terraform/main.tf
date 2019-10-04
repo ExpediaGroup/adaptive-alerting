@@ -200,7 +200,7 @@ module "aa-metric-functions" {
   source = "aa-metric-functions"
 
   # Docker
-  image = "${var.metric-functions["image"]}"
+  image = "${var.aa-metric-functions["image"]}"
   image_pull_policy = "${var.aa-metric-functions["image_pull_policy"]}"
 
   # Kubernetes
