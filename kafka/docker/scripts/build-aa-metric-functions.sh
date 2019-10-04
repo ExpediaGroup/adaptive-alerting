@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-APP_NAME="adaptive-alerting-metrics-functions"
-DOTTED_APP_NAME="metric.functions"
+APP_NAME="adaptive-alerting-metric-functions"
+DOTTED_APP_NAME="aa.metric.functions"
 MAIN_CLASS="com.expedia.adaptivealerting.kafka.KafkaMetricFunctions"
 
 cd `cd -P -- "$(dirname -- "$0")" && pwd -P`
