@@ -220,7 +220,6 @@ module "aa-metric-functions" {
   graphite_hostname = "${var.graphite_hostname}"
   graphite_port = "${var.graphite_port}"
   graphite_enabled = "${var.graphite_enabled}"
-  graphite_prefix = "${var.graphite_prefix}"
   env_vars = "${var.aa-metric-functions["environment_overrides"]}"
 
   # App
