@@ -225,8 +225,9 @@ module "aa-metric-functions" {
 
   # App
   kafka_endpoint = "${local.kafka_endpoint}"
-  modelservice_base_uri = "${var.aa-metric-functions["modelservice_base_uri"]}"
-  inbound_topic = "${var.aa-metric-functions["inbound_topic"]}"
+  metric_source_graphite_host = "${var.aa-metric-functions["metric_source_graphite_host"]}"
+  aggregator_producer_topic = "${var.aa-metric-functions["aggregator_producer_topic"]}"
+  metric_functions_input_file = "${var.aa-metric-functions["metric_functions_input_file"]}"
 }
 
 module "notifier" {
