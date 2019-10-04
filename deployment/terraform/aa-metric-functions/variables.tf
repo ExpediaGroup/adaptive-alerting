@@ -1,4 +1,4 @@
-Docker
+# Docker
 variable "image" {}
 variable "image_pull_policy" {
   default = "IfNotPresent"
