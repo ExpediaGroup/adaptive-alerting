@@ -43,6 +43,7 @@ locals {
     graphite_enabled = "${var.graphite_enabled}"
     graphite_host = "${var.graphite_hostname}"
     graphite_port = "${var.graphite_port}"
+    graphite_prefix = "${var.graphite_prefix}"
     env_vars = "${indent(9,"${var.env_vars}")}"
   }
 }
