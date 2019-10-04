@@ -13,7 +13,7 @@ locals {
   template = "${file("${local.config_file_path}")}"
   vars {
         kafka_endpoint = "${var.kafka_endpoint}"
-        output_topic = "${var.aggregator_producer_topic}"
+        aggregator_producer_topic = "${var.aggregator_producer_topic}"
         metric_source_graphite_host = "${var.metric_source_graphite_host}"
   }
 }
