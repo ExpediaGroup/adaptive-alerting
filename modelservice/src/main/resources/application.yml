@@ -1,0 +1,59 @@
+spring:
+  main:
+    web-environment: true
+    show-banner: false
+  datasource:
+    url: "jdbc:mysql://localhost:3306/aa_model_service?autoReconnect=true"
+    username: ${USERNAME:root}
+    password: ${PASSWORD:password}
+    maximum-pool-size: 8
+    minimum-idle: 0
+    driver-class-name: "com.mysql.cj.jdbc.Driver"
+  jpa:
+    openInView: true
+    database: "MYSQL"
+    show-sql: false
+    generate-ddl: false
+    hibernate:
+      naming_strategy: "org.hibernate.cfg.ImprovedNamingStrategy"
+  data:
+    rest:
+      base-path: "/api"
+endpoints:
+  health:
+    sensitive: false
+management:
+  context-path: "/admin"
+  metrics:
+    export:
+      jmx:
+        domain: spring
+    enable:
+      jvm: false
+      tomcat: false
+      system: false
+      process: false
+server:
+  port: 8008
+
+# Elasticsearch
+datasource-es:
+  createIndexIfNotFound: true
+  indexName: ${ES_INDEX_NAME:detector_mappings}
+  doctype: ${ES_DOCTYPE:details}
+  urls: ${ES_URL:http://localhost:9200}
+  config:
+    connectionTimeout: 40000
+    connectionRetryTimeout: 40000
+    maxTotalConnection: 200
+
+# Graphite metric source
+graphite:
+  urlTemplate: "https://graphiteUrl/render?from=-7d&format=json&maxDataPoints=2016&target=seriesByTag('{tags}')"
+
+# Swagger documentation
+swagger:
+  service:
+    version: "1.0.0"
+    title: "Model service detector mappings"
+    description: "API documentation for model service detector mappings"
