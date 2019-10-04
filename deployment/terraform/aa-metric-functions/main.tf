@@ -13,7 +13,7 @@ locals {
   template = "${file("${local.config_file_path}")}"
   vars {
         kafka_endpoint = "${var.kafka_endpoint}"
-        output_topic = "${var.aggregator_producer_topic}"
+        aggregator_producer_topic = "${var.aggregator_producer_topic}"
         metric_source_graphite_host = "${var.metric_source_graphite_host}"
   }
 }
@@ -43,6 +43,7 @@ locals {
     graphite_enabled = "${var.graphite_enabled}"
     graphite_host = "${var.graphite_hostname}"
     graphite_port = "${var.graphite_port}"
+    graphite_prefix = "${var.graphite_prefix}"
     env_vars = "${indent(9,"${var.env_vars}")}"
   }
 }
