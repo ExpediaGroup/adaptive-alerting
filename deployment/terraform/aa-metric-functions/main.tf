@@ -62,7 +62,7 @@ locals {
  # Creating input file as config map via kubectl.
 resource "null_resource" "kubectl_create_configmap" {
   provisioner "local-exec" {
-    command = "${var.kubectl_executable_name} create configmap ${local.configmap2_name} --from-file=${var.metric_functions_input_file}"
+    command = "${var.kubectl_executable_name} create configmap ${local.configmap2_name} --namespace=${var.namespace} --from-file=${var.metric_functions_input_file}"
   }
   count = "${local.count}"
 }
