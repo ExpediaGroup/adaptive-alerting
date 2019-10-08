@@ -5,7 +5,7 @@ locals {
   count = "${var.enabled?1:0}"
   checksum = "${sha1("${data.template_file.config_data.rendered}")}"
   configmap1_name = "aa-metric-functions-config-${local.checksum}"
-  configmap2_name = "functions.txt-${local.checksum}"
+  configmap2_name = "functions.txt"
 
 }
 
