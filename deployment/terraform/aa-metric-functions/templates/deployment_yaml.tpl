@@ -23,9 +23,11 @@ spec:
         image: ${image}
         imagePullPolicy: ${image_pull_policy}
         volumeMounts:
-        - mountPath: /config
+        - mountPath: /config/aa-metric-functions.conf
+          subPath: aa-metric-functions.conf
           name: config-volume
-        - mountPath: /config
+        - mountPath: /config/functions.txt
+          subPath: functions.txt
           name: functions-volume
         resources:
           limits:
