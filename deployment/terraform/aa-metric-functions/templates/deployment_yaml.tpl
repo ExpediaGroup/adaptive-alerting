@@ -1,6 +1,6 @@
 # ------------------- Deployment ------------------- #
 
- kind: Deployment
+kind: Deployment
 apiVersion: apps/v1beta2
 metadata:
   labels:
