@@ -50,8 +50,6 @@ public class GraphiteQueryServiceTest {
     private double METRIC_DEFAULT_VALUE = 0.0;
     private static final String METRIC_SOURCE_SINK = "metric-source-sink";
     private static final String APP_ID = "aa-metric-functions-test";
-    private static final String NON_GRAPHITE_APP_ID = "aa-metric-functions-non-graphite-test";
-    private static final String OTHER_SOURCE_APP_ID = "aa-metric-functions-other-test";
 
 
 
@@ -60,8 +58,9 @@ public class GraphiteQueryServiceTest {
         MockitoAnnotations.initMocks(this);
         val config = new TypesafeConfigLoader(APP_ID).loadMergedConfig();
         metricSourceSinkConfig = config.getConfig(METRIC_SOURCE_SINK);
-        val functionsInputFile = "/config/functions-test.txt";
-        metricFunctionsSpec = MetricFunctionsReader.readFromInputFile(functionsInputFile).get(0);
+        val functionsInputFile = "config/functions-test.txt";
+        metricFunctionsSpec = MetricFunctionsReader.readFromInputFile(
+                ClassLoader.getSystemResource(functionsInputFile).getPath()).get(0);
         val testDatapoint = "[12.0,1568255056]";
         JSONArray sampleJsonGraphite = new JSONArray();
         JSONObject sampleJsonGraphiteResult = new JSONObject();

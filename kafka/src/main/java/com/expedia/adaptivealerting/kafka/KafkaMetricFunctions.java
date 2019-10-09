@@ -58,6 +58,7 @@ public class KafkaMetricFunctions implements MetricFunctionsPublish {
     public static void main(String[] args) {
         val config = new TypesafeConfigLoader(APP_ID).loadMergedConfig();
         val metricSourceConfig = config.getConfig(METRIC_SOURCE_SINK);
+        // This is absolute path of the file at run time environment
         val input_file = INPUT_FILE_PATH + INPUT_FUNCTIONS_FILENAME;
         List<MetricFunctionsSpec> metricFunctionSpecs = MetricFunctionsReader.readFromInputFile(input_file);
         if (metricFunctionSpecs.isEmpty()) {
