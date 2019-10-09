@@ -33,7 +33,7 @@ public class MetricFunctionsReaderTest {
 
     @Test
     public void testReadFromInputFileException() throws Exception {
-        val invalidFileName = "/config/no-such-file-test.txt";
+        val invalidFileName = "config/no-such-file-test.txt";
         List<MetricFunctionsSpec> metricFunctionsSpecList = MetricFunctionsReader.readFromInputFile(invalidFileName);
         if (metricFunctionsSpecList.isEmpty()) {
             log.error("Exception reading input file, exiting");

@@ -17,7 +17,6 @@ package com.expedia.adaptivealerting.metrics.functions.source;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.BufferedReader;
@@ -32,9 +31,8 @@ public class MetricFunctionsReader {
 
     public static List<MetricFunctionsSpec> readFromInputFile(String InputFilename) {
         List<MetricFunctionsSpec> metricFunctionSpecList = new ArrayList<>();
-        String inputFile = new File(InputFilename).toString();
         try {
-            InputStream inputStream = new FileInputStream(inputFile);
+            InputStream inputStream = new FileInputStream(InputFilename);
             InputStreamReader streamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
             BufferedReader bufferedReader = new BufferedReader(streamReader);
             String metricFunctionSpecString;
