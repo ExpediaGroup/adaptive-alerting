@@ -43,8 +43,6 @@ public class GraphiteQueryServiceTest {
 
     private Config metricSourceSinkConfig;
 
-    private Config mockMetricSourceSinkConfig;
-
     private GraphiteQueryService graphiteQueryService;
 
     private double METRIC_DEFAULT_VALUE = 0.0;
@@ -148,4 +146,27 @@ public class GraphiteQueryServiceTest {
         assertEquals(TagCollection.EMPTY,
                 metricDataResult.getMetricDefinition().getMeta());
     }
+
+     @Test
+     public void testGetMetricQueryResultEmpty() {
+        val uri = "samplegraphitehosturi/render?until=now&format=json&target=sumSeries(a.b.c)&from=-30s";
+        val sampleJsonGraphite = "[]";
+        Content mockGraphiteResult = new Content(sampleJsonGraphite.getBytes(), ContentType.APPLICATION_JSON);
+        try {
+        when(httpClientWrapper.get(uri)).thenReturn(mockGraphiteResult);
+        }
+        catch (Exception e) {
+            log.error("{}", e);
+        }
+        MetricData metricDataResult = graphiteQueryService.queryMetricSource(metricSourceSinkConfig,
+        metricFunctionsSpec);
+        assertEquals(defaultMetricData.getValue(), metricDataResult.getValue(), 0.1);
+        assertEquals(defaultMetricData.getMetricDefinition().getKey(),
+                metricDataResult.getMetricDefinition().getKey());
+        assertEquals(TagCollection.EMPTY,
+                metricDataResult.getMetricDefinition().getTags());
+        assertEquals(TagCollection.EMPTY,
+                metricDataResult.getMetricDefinition().getMeta());
+        }
+
 }

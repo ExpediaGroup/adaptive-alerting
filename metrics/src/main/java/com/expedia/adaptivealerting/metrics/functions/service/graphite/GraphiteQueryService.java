@@ -23,6 +23,7 @@ public class GraphiteQueryService {
     private final String METRIC_SOURCE_KEY = "metric-source";
     /* For now source supported is graphite alone */
     private final String GRAPHITE_SOURCE_KEY = "graphite";
+    private final String GRAPHITE_EMPTY_RESULT = "[]";
     private final static String GRAPHITE_KEY_TAG = "name";
 
     public GraphiteQueryService(HttpClientWrapper httpClientWrapper) {
@@ -45,6 +46,9 @@ public class GraphiteQueryService {
             ConstructSourceURI constructSourceURI = new ConstructSourceURI();
             String URI = constructSourceURI.getGraphiteURI(metricSourceSinkConfig, metricFunctionsSpec);
             Content graphiteResult = metricFunctionHttpClient.get(URI);
+            if (graphiteResult.asString().equals(GRAPHITE_EMPTY_RESULT)) {
+                return EMPTY_RESULT_FROM_SOURCE;
+                }
             return graphiteResult.asString();
         }
         catch(Exception e) {
