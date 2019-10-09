@@ -1,4 +1,4 @@
-aa-metric-fucntions {
+aa-metric-functions {
   aggregator-producer {
     bootstrap.servers = "${kafka_endpoint}"
     client.id = "aa-aggregator-producer"
