@@ -15,8 +15,9 @@ public class MetricFunctionsReaderTest {
 
     @Test
     public void testReadFromInputFile(){
-        val functionInputFileName = "/config/functions-test.txt";
-        List<MetricFunctionsSpec> metricFunctionsSpecList = MetricFunctionsReader.readFromInputFile(functionInputFileName);
+        val functionInputFileName = "config/functions-test.txt";
+        List<MetricFunctionsSpec> metricFunctionsSpecList = MetricFunctionsReader.readFromInputFile
+                (ClassLoader.getSystemResource(functionInputFileName).getPath());
         assertEquals(1, metricFunctionsSpecList.size());
         MetricFunctionsSpec metricFunctionsSpec = metricFunctionsSpecList.get(0);
         assertEquals("sumSeries(a.b.c)", metricFunctionsSpec.getFunction());

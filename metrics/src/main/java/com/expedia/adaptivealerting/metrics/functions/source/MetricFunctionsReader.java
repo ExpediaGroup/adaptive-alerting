@@ -17,11 +17,13 @@ package com.expedia.adaptivealerting.metrics.functions.source;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,8 +32,9 @@ public class MetricFunctionsReader {
 
     public static List<MetricFunctionsSpec> readFromInputFile(String InputFilename) {
         List<MetricFunctionsSpec> metricFunctionSpecList = new ArrayList<>();
-        InputStream inputStream = MetricFunctionsReader.class.getResourceAsStream(InputFilename);
+        String inputFile = new File(InputFilename).toString();
         try {
+            InputStream inputStream = new FileInputStream(inputFile);
             InputStreamReader streamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
             BufferedReader bufferedReader = new BufferedReader(streamReader);
             String metricFunctionSpecString;
