@@ -3,7 +3,6 @@ package com.expedia.adaptivealerting.metrics.functions.source.graphite;
 import lombok.val;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -11,6 +10,8 @@ import java.util.Iterator;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 public class GraphiteQueryResultTest {
 
@@ -103,5 +104,45 @@ public class GraphiteQueryResultTest {
       assertEquals(1568255056, graphiteQueryResult.getDatapoint().getTimestamp());
       assertEquals("sumSeries(a.b.c)", graphiteQueryResult.getTarget());
       assertEquals(graphiteQueryResult.getTags().size(), 0);
+   }
+
+   @Test
+   public void testGetGraphiteQueryResultFromJsonNullDatapoint(){
+      HashMap testTags = new HashMap();
+      testTags.put("aggregatedBy", "sum");
+      testTags.put("name", "sumSeries(a.b.c)");
+      setupJsonGraphite("[null,1568255056]","sumSeries(a.b.c)",
+              testTags);
+      GraphiteQueryResult graphiteQueryResult = new GraphiteQueryResult();
+      assertTrue(graphiteQueryResult.validateNullDatapoint(sampleJsonGraphiteString));
+   }
+
+   @Test
+   public void testGetGraphiteQueryResultFromJsonNonNullDatapoint(){
+      HashMap testTags = new HashMap();
+      testTags.put("aggregatedBy", "sum");
+      testTags.put("name", "sumSeries(a.b.c)");
+      setupJsonGraphite("[12.0,1568255056]","sumSeries(a.b.c)",
+              testTags);
+      GraphiteQueryResult graphiteQueryResult = new GraphiteQueryResult();
+      assertFalse(graphiteQueryResult.validateNullDatapoint(sampleJsonGraphiteString));
+   }
+
+   @Test
+   public void testJsonDatapointGraphiteResultJsonArrayZeroLength(){
+      val sampleJsonGraphite = "[]";
+      GraphiteQueryResult graphiteQueryResult = new GraphiteQueryResult();
+      assertFalse(graphiteQueryResult.validateNullDatapoint(sampleJsonGraphite));
+   }
+
+   @Test
+   public void testJsonDatapointArrayZeroLength(){
+      HashMap testTags = new HashMap();
+      testTags.put("aggregatedBy", "sum");
+      testTags.put("name", "sumSeries(a.b.c)");
+      setupJsonGraphite("[]","sumSeries(a.b.c)",
+              testTags);
+      GraphiteQueryResult graphiteQueryResult = new GraphiteQueryResult();
+      assertFalse(graphiteQueryResult.validateNullDatapoint(sampleJsonGraphiteString));
    }
 }

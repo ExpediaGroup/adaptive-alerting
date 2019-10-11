@@ -69,6 +69,26 @@ public class GraphiteQueryResult {
             }
         }
 }
+    public boolean validateNullDatapoint(String jsonGraphiteOutput) {
+        /* null datapoint cannot be set to default 0.0 at getGraphiteQueryResultFromJson as
+        *  this could change time series evaluation
+        */
+        JSONTokener graphiteQuery = new JSONTokener(jsonGraphiteOutput);
+        JSONArray graphiteResultJsonArray = new JSONArray(graphiteQuery);
+        if (graphiteResultJsonArray.length() > 0) {
+            JSONObject graphiteResultJsonObject = graphiteResultJsonArray.getJSONObject(0);
+
+            if (graphiteResultJsonObject.getJSONArray(GRAPHITE_RESULT_DATAPOINTS_KEY).length() > 0) {
+                String[] datapointString = graphiteResultJsonObject.getJSONArray(GRAPHITE_RESULT_DATAPOINTS_KEY).get(0).toString().split(",");
+                if (datapointString.length > 1) {
+                    if (datapointString[0].substring(1).equals("null")) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
     private void setTagsFromString(String tags) {
         JSONObject tagsJSONObject = new JSONObject(tags);
