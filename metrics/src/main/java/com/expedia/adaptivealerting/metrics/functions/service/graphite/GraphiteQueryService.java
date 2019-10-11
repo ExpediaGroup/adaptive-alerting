@@ -60,7 +60,7 @@ public class GraphiteQueryService {
     private MetricData graphiteMetricData(Config metricSourceSinkConfig, MetricFunctionsSpec metricFunctionsSpec) {
         String metricQueryResult = queryGraphiteSource(metricSourceSinkConfig, metricFunctionsSpec);
         GraphiteQueryResult graphiteQueryResult = new GraphiteQueryResult();
-        if (!(metricQueryResult.equals(EMPTY_RESULT_FROM_SOURCE) ||
+        if (!(EMPTY_RESULT_FROM_SOURCE.equals(metricQueryResult) ||
                 graphiteQueryResult.validateNullDatapoint(metricQueryResult))) {
             graphiteQueryResult.getGraphiteQueryResultFromJson(metricQueryResult);
             String graphiteKey = graphiteQueryResult.getTags().get(GRAPHITE_KEY_TAG);

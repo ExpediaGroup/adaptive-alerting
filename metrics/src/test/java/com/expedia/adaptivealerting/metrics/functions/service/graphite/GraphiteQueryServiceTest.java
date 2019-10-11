@@ -9,7 +9,6 @@ import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.TagCollection;
 import com.typesafe.config.Config;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.http.entity.ContentType;
 import org.json.JSONArray;
@@ -29,7 +28,6 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@Slf4j
 public class GraphiteQueryServiceTest {
 
     @Mock
@@ -148,16 +146,11 @@ public class GraphiteQueryServiceTest {
     }
 
      @Test
-     public void testGetMetricQueryResultEmpty() {
+     public void testGetMetricQueryResultEmpty() throws Exception {
         val uri = "samplegraphitehosturi/render?until=now&format=json&target=sumSeries(a.b.c)&from=-30s";
         val sampleJsonGraphite = "[]";
         Content mockGraphiteResult = new Content(sampleJsonGraphite.getBytes(), ContentType.APPLICATION_JSON);
-        try {
         when(httpClientWrapper.get(uri)).thenReturn(mockGraphiteResult);
-        }
-        catch (Exception e) {
-            log.error("{}", e);
-        }
         MetricData metricDataResult = graphiteQueryService.queryMetricSource(metricSourceSinkConfig,
         metricFunctionsSpec);
         assertEquals(defaultMetricData.getValue(), metricDataResult.getValue(), 0.1);
@@ -170,7 +163,7 @@ public class GraphiteQueryServiceTest {
         }
 
     @Test
-    public void testGetMetricQueryResultNullDatapoint() {
+    public void testGetMetricQueryResultNullDatapoint() throws Exception {
         val uri = "samplegraphitehosturi/render?until=now&format=json&target=sumSeries(a.b.c)&from=-30s";
         val testDatapoint = "[null,1568255056]";
         JSONArray sampleJsonGraphite = new JSONArray();
@@ -185,12 +178,7 @@ public class GraphiteQueryServiceTest {
         sampleJsonGraphiteResult.put("tags", testTags);
         sampleJsonGraphite.put(0, sampleJsonGraphiteResult);
         Content mockGraphiteResult = new Content(sampleJsonGraphite.toString().getBytes(), ContentType.APPLICATION_JSON);
-        try {
-            when(httpClientWrapper.get(uri)).thenReturn(mockGraphiteResult);
-        }
-        catch (Exception e) {
-            log.error("{}", e);
-        }
+        when(httpClientWrapper.get(uri)).thenReturn(mockGraphiteResult);
         MetricData metricDataResult = graphiteQueryService.queryMetricSource(metricSourceSinkConfig,
                 metricFunctionsSpec);
         assertEquals(defaultMetricData.getValue(), metricDataResult.getValue(), 0.1);

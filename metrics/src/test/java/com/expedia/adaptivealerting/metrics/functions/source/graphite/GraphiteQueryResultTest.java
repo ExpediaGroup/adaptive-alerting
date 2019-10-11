@@ -1,5 +1,6 @@
 package com.expedia.adaptivealerting.metrics.functions.source.graphite;
 
+import lombok.val;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -122,6 +123,24 @@ public class GraphiteQueryResultTest {
       testTags.put("aggregatedBy", "sum");
       testTags.put("name", "sumSeries(a.b.c)");
       setupJsonGraphite("[12.0,1568255056]","sumSeries(a.b.c)",
+              testTags);
+      GraphiteQueryResult graphiteQueryResult = new GraphiteQueryResult();
+      assertFalse(graphiteQueryResult.validateNullDatapoint(sampleJsonGraphiteString));
+   }
+
+   @Test
+   public void testJsonDatapointGraphiteResultJsonArrayZeroLength(){
+      val sampleJsonGraphite = "[]";
+      GraphiteQueryResult graphiteQueryResult = new GraphiteQueryResult();
+      assertFalse(graphiteQueryResult.validateNullDatapoint(sampleJsonGraphite));
+   }
+
+   @Test
+   public void testJsonDatapointArrayZeroLength(){
+      HashMap testTags = new HashMap();
+      testTags.put("aggregatedBy", "sum");
+      testTags.put("name", "sumSeries(a.b.c)");
+      setupJsonGraphite("[]","sumSeries(a.b.c)",
               testTags);
       GraphiteQueryResult graphiteQueryResult = new GraphiteQueryResult();
       assertFalse(graphiteQueryResult.validateNullDatapoint(sampleJsonGraphiteString));
