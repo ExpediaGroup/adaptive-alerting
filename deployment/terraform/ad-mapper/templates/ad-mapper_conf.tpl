@@ -1,9 +1,10 @@
 ad-mapper {
   streams {
-    application.id = "ad-mapper"
+    application.id = "ad-mapper-2"
     bootstrap.servers = "${kafka_endpoint}"
     default.value.serde = "com.expedia.adaptivealerting.kafka.serde.MetricDataMessagePackSerde"
     default.timestamp.extractor = "com.expedia.adaptivealerting.kafka.processor.MetricDataTimestampExtractor"
+    auto.offset.reset = "latest"
     retries = 10
     retry.backoff.ms = 5000
   }
