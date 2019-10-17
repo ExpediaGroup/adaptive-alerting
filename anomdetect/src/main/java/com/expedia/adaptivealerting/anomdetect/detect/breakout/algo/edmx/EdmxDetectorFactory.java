@@ -35,7 +35,7 @@ public class EdmxDetectorFactory implements DetectorFactory<EdmxDetector> {
     public EdmxDetector buildDetector() {
         // The EDM-X detector fits a new model with each metric point.
         // That's why we're using hyperparameters instead of parameters here.
-        val hyperparamsMap = document.getConfig().get("hyperparams");
+        val hyperparamsMap = document.getDetectorConfig().get("hyperparams");
         val hyperparams = objectMapper.convertValue(hyperparamsMap, EdmxHyperparams.class);
         return new EdmxDetector(document.getUuid(), hyperparams);
     }

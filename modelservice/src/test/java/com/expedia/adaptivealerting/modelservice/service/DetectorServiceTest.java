@@ -1,6 +1,6 @@
 package com.expedia.adaptivealerting.modelservice.service;
 
-import com.expedia.adaptivealerting.modelservice.entity.Detector;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +16,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -37,9 +38,9 @@ public class DetectorServiceTest {
     @Mock
     private DetectorRepository detectorRepository;
 
-    private Detector detector;
+    private DetectorDocument detector;
 
-    private List<Detector> detectors = new ArrayList<>();
+    private List<DetectorDocument> detectors = new ArrayList<>();
 
     @Before
     public void setUp() {
@@ -66,30 +67,30 @@ public class DetectorServiceTest {
     @Test
     public void testUpdateDetector() {
         DetectorService detectorService = mock(DetectorService.class);
-        doNothing().when(detectorService).updateDetector(anyString(), any(Detector.class));
+        doNothing().when(detectorService).updateDetector(anyString(), any(DetectorDocument.class));
         detectorService.updateDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", detector);
         verify(detectorService, times(1)).updateDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", detector);
     }
 
     @Test
     public void testFindByUuid() {
-        Detector actualDetector = detectorService.findByUuid("uuid");
+        DetectorDocument actualDetector = detectorService.findByUuid("uuid");
         assertNotNull(actualDetector);
-        Assert.assertEquals("aeb4d849-847a-45c0-8312-dc0fcf22b639", actualDetector.getUuid());
+        Assert.assertEquals(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"), actualDetector.getUuid());
         Assert.assertEquals("test-user", actualDetector.getCreatedBy());
-        Assert.assertEquals(true, actualDetector.getEnabled());
+        Assert.assertEquals(true, actualDetector.isEnabled());
     }
 
     @Test
     public void testFindByCreatedBy() {
-        List<Detector> actualDetectors = detectorService.findByCreatedBy("test-user");
+        List<DetectorDocument> actualDetectors = detectorService.findByCreatedBy("test-user");
         assertNotNull(actualDetectors);
         assertCheck(actualDetectors);
     }
 
     @Test
     public void testGetLastUpdatedDetectors() {
-        List<Detector> actualDetectors = detectorService.getLastUpdatedDetectors(10);
+        List<DetectorDocument> actualDetectors = detectorService.getLastUpdatedDetectors(10);
         assertNotNull(actualDetectors);
         assertCheck(actualDetectors);
     }
@@ -117,10 +118,10 @@ public class DetectorServiceTest {
         Mockito.when(detectorRepository.getLastUpdatedDetectors(Mockito.anyString(), Mockito.anyString())).thenReturn(detectors);
     }
 
-    private void assertCheck(List<Detector> actualDetectors) {
+    private void assertCheck(List<DetectorDocument> actualDetectors) {
         Assert.assertEquals(1, actualDetectors.size());
-        Assert.assertEquals("aeb4d849-847a-45c0-8312-dc0fcf22b639", actualDetectors.get(0).getUuid());
+        Assert.assertEquals(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"), actualDetectors.get(0).getUuid());
         Assert.assertEquals("test-user", actualDetectors.get(0).getCreatedBy());
-        Assert.assertEquals(true, actualDetectors.get(0).getEnabled());
+        Assert.assertEquals(true, actualDetectors.get(0).isEnabled());
     }
 }

@@ -1,5 +1,6 @@
 package com.expedia.adaptivealerting.modelservice.test;
 
+import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.modelservice.dto.common.Expression;
 import com.expedia.adaptivealerting.modelservice.dto.common.Field;
 import com.expedia.adaptivealerting.modelservice.dto.common.Operand;
@@ -10,7 +11,6 @@ import com.expedia.adaptivealerting.modelservice.dto.percolator.BoolCondition;
 import com.expedia.adaptivealerting.modelservice.dto.percolator.MustCondition;
 import com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping;
 import com.expedia.adaptivealerting.modelservice.dto.percolator.Query;
-import com.expedia.adaptivealerting.modelservice.entity.Detector;
 import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
 import com.expedia.adaptivealerting.modelservice.providers.graphite.GraphiteResult;
 import com.expedia.adaptivealerting.modelservice.service.AnomalyRequest;
@@ -70,8 +70,8 @@ public class ObjectMother {
         return detectorParams;
     }
 
-    public Detector getDetector() {
-        Detector detector = new Detector();
+    public DetectorDocument getDetector() {
+        DetectorDocument detector = new DetectorDocument();
         detector.setCreatedBy("user");
         detector.setType("constant-detector");
 
@@ -91,8 +91,8 @@ public class ObjectMother {
         return detectorParams;
     }
 
-    public Detector getIllegalParamsDetector() {
-        Detector detector = new Detector();
+    public DetectorDocument getIllegalParamsDetector() {
+        DetectorDocument detector = new DetectorDocument();
         detector.setCreatedBy("user");
         detector.setType("constant-detector");
 
@@ -105,9 +105,9 @@ public class ObjectMother {
         return detector;
     }
 
-    public Detector getElasticsearchDetector() {
-        return new Detector()
-                .setUuid("aeb4d849-847a-45c0-8312-dc0fcf22b639")
+    public DetectorDocument getElasticsearchDetector() {
+        return new DetectorDocument()
+                .setUuid(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"))
                 .setCreatedBy("test-user")
                 .setDetectorConfig(new HashMap<>())
                 .setEnabled(true)

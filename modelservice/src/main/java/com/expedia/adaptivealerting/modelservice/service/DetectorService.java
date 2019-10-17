@@ -15,23 +15,23 @@
  */
 package com.expedia.adaptivealerting.modelservice.service;
 
-import com.expedia.adaptivealerting.modelservice.entity.Detector;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 
 import java.util.List;
 
 public interface DetectorService {
 
-    String createDetector(Detector elasticsearchDetector);
+    String createDetector(DetectorDocument document);
 
     void deleteDetector(String uuid);
 
-    void updateDetector(String uuid, Detector elasticsearchDetector);
+    void updateDetector(String uuid, DetectorDocument document);
 
-    Detector findByUuid(String uuid);
+    DetectorDocument findByUuid(String uuid);
 
-    List<Detector> findByCreatedBy(String user);
+    List<DetectorDocument> findByCreatedBy(String user);
 
-    List<Detector> getLastUpdatedDetectors(long interval);
+    List<DetectorDocument> getLastUpdatedDetectors(long interval);
 
     void toggleDetector(String uuid, Boolean enabled);
 }

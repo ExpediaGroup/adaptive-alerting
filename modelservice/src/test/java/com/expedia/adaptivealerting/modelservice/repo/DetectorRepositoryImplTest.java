@@ -1,7 +1,7 @@
 package com.expedia.adaptivealerting.modelservice.repo;
 
+import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
-import com.expedia.adaptivealerting.modelservice.entity.Detector;
 import com.expedia.adaptivealerting.modelservice.repo.impl.DetectorRepositoryImpl;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import com.expedia.adaptivealerting.modelservice.util.ElasticsearchUtil;
@@ -37,7 +37,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
@@ -46,6 +45,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -74,7 +74,7 @@ public class DetectorRepositoryImplTest {
     @Mock
     private ObjectMapperUtil objectMapperUtil;
 
-    private Detector detector;
+    private DetectorDocument detector;
 
     private IndexResponse indexResponse;
 
@@ -84,7 +84,7 @@ public class DetectorRepositoryImplTest {
 
     private GetResponse getResponse;
 
-    private List<Detector> detectors = new ArrayList<>();
+    private List<DetectorDocument> detectors = new ArrayList<>();
 
     @Before
     public void setUp() {
@@ -95,7 +95,7 @@ public class DetectorRepositoryImplTest {
 
     @Test
     public void testCreateDetector() {
-        String actualCreationId = detectorRepository.createDetector(new Detector());
+        String actualCreationId = detectorRepository.createDetector(new DetectorDocument());
         assertNotNull(actualCreationId);
         assertEquals("1", actualCreationId);
     }
@@ -111,23 +111,23 @@ public class DetectorRepositoryImplTest {
     @Test
     public void testUpdateDetector() {
         DetectorRepository detectorRepository = mock(DetectorRepository.class);
-        doNothing().when(detectorRepository).updateDetector(anyString(), any(Detector.class));
-        detectorRepository.updateDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", new Detector());
-        verify(detectorRepository, times(1)).updateDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", new Detector());
+        doNothing().when(detectorRepository).updateDetector(anyString(), any(DetectorDocument.class));
+        detectorRepository.updateDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", new DetectorDocument());
+        verify(detectorRepository, times(1)).updateDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", new DetectorDocument());
     }
 
     @Test
     public void testFindByUuid() {
-        Detector actualDetector = detectorRepository.findByUuid("uuid");
+        DetectorDocument actualDetector = detectorRepository.findByUuid("uuid");
         assertNotNull(actualDetector);
-        Assert.assertEquals("aeb4d849-847a-45c0-8312-dc0fcf22b639", actualDetector.getUuid());
+        Assert.assertEquals(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"), actualDetector.getUuid());
         Assert.assertEquals("test-user", actualDetector.getCreatedBy());
-        Assert.assertEquals(true, actualDetector.getEnabled());
+        Assert.assertEquals(true, actualDetector.isEnabled());
     }
 
     @Test
     public void testFindByCreatedBy() {
-        List<Detector> actualDetectors = detectorRepository.findByCreatedBy("kashah");
+        List<DetectorDocument> actualDetectors = detectorRepository.findByCreatedBy("kashah");
         assertNotNull(actualDetectors);
         assertCheck(actualDetectors);
     }
@@ -142,7 +142,7 @@ public class DetectorRepositoryImplTest {
 
     @Test
     public void testGetLastUpdatedDetectors() {
-        List<Detector> actualDetectors = detectorRepository.getLastUpdatedDetectors("", "");
+        List<DetectorDocument> actualDetectors = detectorRepository.getLastUpdatedDetectors("", "");
         assertNotNull(actualDetectors);
         assertCheck(actualDetectors);
     }
@@ -236,10 +236,10 @@ public class DetectorRepositoryImplTest {
         return getResponse;
     }
 
-    private void assertCheck(List<Detector> actualDetectors) {
+    private void assertCheck(List<DetectorDocument> actualDetectors) {
         Assert.assertEquals(1, actualDetectors.size());
-        Assert.assertEquals("aeb4d849-847a-45c0-8312-dc0fcf22b639", actualDetectors.get(0).getUuid());
+        Assert.assertEquals(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"), actualDetectors.get(0).getUuid());
         Assert.assertEquals("test-user", actualDetectors.get(0).getCreatedBy());
-        Assert.assertEquals(true, actualDetectors.get(0).getEnabled());
+        Assert.assertEquals(true, actualDetectors.get(0).isEnabled());
     }
 }

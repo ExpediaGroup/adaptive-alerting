@@ -39,7 +39,7 @@ public class LegacyEwmaDetectorFactory implements DetectorFactory<ForecastingDet
     public ForecastingDetector buildDetector() {
         val uuid = document.getUuid();
 
-        val config = document.getConfig();
+        val config = document.getDetectorConfig();
         log.info("config={}", config);
         val type = AnomalyType.valueOf((String) config.get("type"));
         val paramsMap = config.get("params");

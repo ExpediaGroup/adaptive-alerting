@@ -31,7 +31,7 @@ public class ConstantThresholdDetectorFactory implements DetectorFactory<Constan
 
     @Override
     public ConstantThresholdDetector buildDetector() {
-        val paramsMap = document.getConfig().get("params");
+        val paramsMap = document.getDetectorConfig().get("params");
         val params = objectMapper.convertValue(paramsMap, ConstantThresholdDetectorParams.class);
         return new ConstantThresholdDetector(document.getUuid(), params);
     }

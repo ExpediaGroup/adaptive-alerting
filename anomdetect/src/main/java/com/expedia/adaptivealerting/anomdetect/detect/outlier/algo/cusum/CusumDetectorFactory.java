@@ -31,7 +31,7 @@ public class CusumDetectorFactory implements DetectorFactory<CusumDetector> {
 
     @Override
     public CusumDetector buildDetector() {
-        val paramsMap = document.getConfig().get("params");
+        val paramsMap = document.getDetectorConfig().get("params");
         val params = objectMapper.convertValue(paramsMap, CusumDetectorParams.class);
         return new CusumDetector(document.getUuid(), params);
     }

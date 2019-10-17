@@ -15,25 +15,23 @@
  */
 package com.expedia.adaptivealerting.modelservice.repo;
 
-import com.expedia.adaptivealerting.modelservice.entity.Detector;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 
 import java.util.List;
 
 public interface DetectorRepository {
 
-    String createDetector(Detector detector);
+    String createDetector(DetectorDocument document);
 
     void deleteDetector(String uuid);
 
-    void updateDetector(String uuid, Detector detector);
+    void updateDetector(String uuid, DetectorDocument document);
 
-    Detector findByUuid(String uuid);
+    DetectorDocument findByUuid(String uuid);
 
-    List<Detector> findByCreatedBy(String user);
+    List<DetectorDocument> findByCreatedBy(String user);
 
     void toggleDetector(String uuid, Boolean enabled);
 
-    List<Detector> getLastUpdatedDetectors(String fromDate, String toDate);
-
-
+    List<DetectorDocument> getLastUpdatedDetectors(String fromDate, String toDate);
 }

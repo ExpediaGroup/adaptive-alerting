@@ -15,11 +15,10 @@
  */
 package com.expedia.adaptivealerting.modelservice.service;
 
-import com.expedia.adaptivealerting.modelservice.entity.Detector;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
 import com.expedia.adaptivealerting.modelservice.util.DateUtil;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,8 +37,8 @@ public class DetectorServiceImpl implements DetectorService {
     private DetectorRepository detectorRepository;
 
     @Override
-    public String createDetector(Detector detector) {
-        return detectorRepository.createDetector(detector);
+    public String createDetector(DetectorDocument document) {
+        return detectorRepository.createDetector(document);
     }
 
     @Override
@@ -48,17 +47,17 @@ public class DetectorServiceImpl implements DetectorService {
     }
 
     @Override
-    public void updateDetector(String uuid, Detector detector) {
-        detectorRepository.updateDetector(uuid, detector);
+    public void updateDetector(String uuid, DetectorDocument document) {
+        detectorRepository.updateDetector(uuid, document);
     }
 
     @Override
-    public Detector findByUuid(String uuid) {
+    public DetectorDocument findByUuid(String uuid) {
         return detectorRepository.findByUuid(uuid);
     }
 
     @Override
-    public List<Detector> findByCreatedBy(String user) {
+    public List<DetectorDocument> findByCreatedBy(String user) {
         return detectorRepository.findByCreatedBy(user);
     }
 
@@ -68,7 +67,7 @@ public class DetectorServiceImpl implements DetectorService {
     }
 
     @Override
-    public List<Detector> getLastUpdatedDetectors(long interval) {
+    public List<DetectorDocument> getLastUpdatedDetectors(long interval) {
         // Replaced Lombok val with explicit types here because the Maven compiler plugin was breaking under
         // OpenJDK 12. Not sure what the issue was but this fixed it. [WLW]
         Instant now = DateUtil.now().toInstant();
