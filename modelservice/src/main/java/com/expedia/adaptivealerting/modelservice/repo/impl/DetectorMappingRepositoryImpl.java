@@ -32,6 +32,7 @@ import com.expedia.adaptivealerting.modelservice.util.ElasticsearchUtil;
 import com.expedia.adaptivealerting.modelservice.util.ObjectMapperUtil;
 import com.expedia.adaptivealerting.modelservice.util.QueryUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.lucene.search.join.ScoreMode;
@@ -143,7 +144,7 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
                 .setCreatedTimeInMillis(System.currentTimeMillis());
 
         val indexRequest = new IndexRequest(elasticSearchProperties.getIndexName(), elasticSearchProperties.getDocType());
-        String json = objectMapperUtil.convertToString(percolatorDetectorMapping);
+        val json = objectMapperUtil.convertToString(percolatorDetectorMapping);
         return elasticsearchUtil.getIndexResponse(indexRequest, json).getId();
     }
 

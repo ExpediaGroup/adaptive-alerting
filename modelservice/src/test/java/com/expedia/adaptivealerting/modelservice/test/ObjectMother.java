@@ -153,18 +153,6 @@ public class ObjectMother {
         return new MatchingDetectorsResponse(groupedDetectorsByIndex, 10000);
     }
 
-    public Map getTestObject() {
-        Map object = new LinkedHashMap<>();
-        object.put("test1", 1);
-        object.put("test2", 2);
-        object.put("test3", 3);
-        return object;
-    }
-
-    public String getTestString() {
-        return "{\"test1\":1,\"test2\":2,\"test3\":3}";
-    }
-
     public Expression getExpression() {
         Expression expression = new Expression();
         expression.setOperator(Operator.AND);
