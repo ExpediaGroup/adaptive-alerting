@@ -17,7 +17,7 @@
     },
     "enabled": true,
     "user": {
-      "id": "shouldBeIngnoredWhileDeserialisation"
+      "id": "shouldBeIgnoredWhileDeserialisation"
     }
   }
 ]
