@@ -16,7 +16,6 @@
 package com.expedia.adaptivealerting.modelservice.repo.impl;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
-import com.expedia.adaptivealerting.anomdetect.util.AssertUtil;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
 import com.expedia.adaptivealerting.modelservice.util.DateUtil;
@@ -182,7 +181,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
                 .setUuid(detector.getUuid())
                 .setCreatedBy(detector.getCreatedBy())
                 .setType(detector.getType())
-                .setDetectorConfig(detector.getDetectorConfig())
+                .setConfig(detector.getConfig())
                 .setEnabled(detector.isEnabled())
                 .setLastUpdateTimestamp(detector.getLastUpdateTimestamp());
     }

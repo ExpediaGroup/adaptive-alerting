@@ -37,7 +37,7 @@ public class LegacyPewmaDetectorFactory implements DetectorFactory<ForecastingDe
     public ForecastingDetector buildDetector() {
         val uuid = document.getUuid();
 
-        val config = document.getDetectorConfig();
+        val config = document.getConfig();
         val type = AnomalyType.valueOf((String) config.get("type"));
         val paramsMap = config.get("params");
         val legacyParams = objectMapper.convertValue(paramsMap, LegacyPewmaDetectorParams.class);

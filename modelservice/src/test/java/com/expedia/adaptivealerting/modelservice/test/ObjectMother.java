@@ -22,7 +22,6 @@ import lombok.val;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -80,7 +79,7 @@ public class ObjectMother {
         val detectorParams = toObject(thresholds);
         detectorParams.put("type", "LEFT_TAILED");
         detectorConfig.put("params", getDetectorParams());
-        detector.setDetectorConfig(detectorConfig);
+        detector.setConfig(detectorConfig);
         return detector;
     }
 
@@ -101,7 +100,7 @@ public class ObjectMother {
         val detectorParams = toObject(thresholds);
         detectorParams.put("type", "LEFT_TAILED");
         detectorConfig.put("params", getIllegalDetectorParams());
-        detector.setDetectorConfig(detectorConfig);
+        detector.setConfig(detectorConfig);
         return detector;
     }
 
@@ -109,7 +108,7 @@ public class ObjectMother {
         return new DetectorDocument()
                 .setUuid(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"))
                 .setCreatedBy("test-user")
-                .setDetectorConfig(new HashMap<>())
+                .setConfig(new HashMap<>())
                 .setEnabled(true)
                 .setLastUpdateTimestamp(DateUtil.toUtcDate("2019-04-06 22:00:00"));
     }

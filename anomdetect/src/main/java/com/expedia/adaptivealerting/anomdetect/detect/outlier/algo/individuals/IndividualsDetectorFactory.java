@@ -31,7 +31,7 @@ public class IndividualsDetectorFactory implements DetectorFactory<IndividualsDe
 
     @Override
     public IndividualsDetector buildDetector() {
-        val paramsMap = document.getDetectorConfig().get("params");
+        val paramsMap = document.getConfig().get("params");
         val params = objectMapper.convertValue(paramsMap, IndividualsDetectorParams.class);
         return new IndividualsDetector(document.getUuid(), params);
     }

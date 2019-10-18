@@ -72,7 +72,7 @@ public class AnomalyServiceImpl implements AnomalyService {
         val document = new DetectorDocument()
                 .setType(request.getDetectorType())
                 .setUuid(request.getDetectorUuid())
-                .setDetectorConfig(config)
+                .setConfig(config)
                 .setCreatedBy("adaptive-alerting")
                 .setDateCreated(now)
                 .setLastUpdateTimestamp(now);

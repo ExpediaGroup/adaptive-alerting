@@ -15,8 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detect.breakout.algo.edmx;
 
-import com.expedia.adaptivealerting.anomdetect.detect.breakout.algo.edmx.EdmxDetector;
-import com.expedia.adaptivealerting.anomdetect.detect.breakout.algo.edmx.EdmxHyperparams;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,7 +33,7 @@ public class EdmxDetectorFactory implements DetectorFactory<EdmxDetector> {
     public EdmxDetector buildDetector() {
         // The EDM-X detector fits a new model with each metric point.
         // That's why we're using hyperparameters instead of parameters here.
-        val hyperparamsMap = document.getDetectorConfig().get("hyperparams");
+        val hyperparamsMap = document.getConfig().get("hyperparams");
         val hyperparams = objectMapper.convertValue(hyperparamsMap, EdmxHyperparams.class);
         return new EdmxDetector(document.getUuid(), hyperparams);
     }

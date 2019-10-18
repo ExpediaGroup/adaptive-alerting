@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.anomdetect.source;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -36,7 +37,10 @@ public class DetectorDocument {
     private UUID uuid;
     private String type;
     private boolean enabled;
-    private Map<String, Object> detectorConfig;
+
+    @JsonProperty("detectorConfig")
+    private Map<String, Object> config;
+    
     private Meta meta;
 
     @Data
