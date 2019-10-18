@@ -1,5 +1,6 @@
 package com.expedia.adaptivealerting.modelservice.util;
 
+import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.User;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
@@ -16,10 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-
 public class RequestValidatorTest {
-    private com.expedia.adaptivealerting.modelservice.entity.Detector illegalParamsDetector;
-    private com.expedia.adaptivealerting.modelservice.entity.Detector legalParamsDetector;
+    private DetectorDocument illegalParamsDetector;
+    private DetectorDocument legalParamsDetector;
 
     @Before
     public void setUp() {
@@ -29,8 +29,9 @@ public class RequestValidatorTest {
 
     private void initTestObjects() {
         val mom = ObjectMother.instance();
-        illegalParamsDetector = mom.getIllegalParamsDetector();
         legalParamsDetector = mom.getDetector();
+        legalParamsDetector.setUuid(UUID.randomUUID());
+        illegalParamsDetector = mom.getIllegalParamsDetector();
     }
 
     @Test
@@ -129,4 +130,3 @@ public class RequestValidatorTest {
         RequestValidator.validateDetector(illegalParamsDetector);
     }
 }
-

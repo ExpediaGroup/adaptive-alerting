@@ -75,7 +75,7 @@ public class AnomalyServiceImpl implements AnomalyService {
                 .setConfig(config)
                 .setCreatedBy("adaptive-alerting")
                 .setDateCreated(now)
-                .setDateUpdated(now);
+                .setLastUpdateTimestamp(now);
         val factory = detectorRegistry.getDetectorFactory(document);
         return factory.buildDetector();
     }

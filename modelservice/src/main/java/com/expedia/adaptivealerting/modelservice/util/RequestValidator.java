@@ -19,7 +19,6 @@ import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorRegistry;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.User;
 import com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping;
-import com.expedia.adaptivealerting.modelservice.entity.Detector;
 import com.expedia.adaptivealerting.modelservice.dto.common.Expression;
 import com.expedia.adaptivealerting.modelservice.dto.common.Operator;
 import com.expedia.adaptivealerting.modelservice.dto.common.Operand;
@@ -69,15 +68,7 @@ public class RequestValidator {
         Assert.notNull(detector.getUuid(), "Detector uuid can't be null");
     }
 
-    public static void validateDetector(Detector detector) {
-        val type = detector.getType();
-        val config = detector.getDetectorConfig();
-        val document = new DetectorDocument()
-                .setType(type)
-                .setUuid(UUID.randomUUID())
-                .setCreatedBy("adaptive-alerting")
-                .setDateUpdated(new Date())
-                .setConfig(config);
+    public static void validateDetector(DetectorDocument document) {
         new DetectorRegistry()
                 .getDetectorFactory(document)
                 .buildDetector();

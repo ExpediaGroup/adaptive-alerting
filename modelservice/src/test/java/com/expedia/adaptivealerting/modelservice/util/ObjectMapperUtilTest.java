@@ -1,80 +1,51 @@
 package com.expedia.adaptivealerting.modelservice.util;
 
-import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
-import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
 
 public class ObjectMapperUtilTest {
+    private static final TypeReference<Map> MAP_TYPE_REFERENCE = new TypeReference<Map>() {};
 
-    @InjectMocks
     private ObjectMapperUtil utilUnderTest;
 
-    @Mock
-    private ObjectMapper mapper;
-
-    private String expectedString;
-    private Map expectedObject;
-
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         this.utilUnderTest = new ObjectMapperUtil();
-        MockitoAnnotations.initMocks(this);
-        initTestObjects();
-        initDependencies();
     }
 
     @Test
-    public void testConvertToString() {
-        String actualString = utilUnderTest.convertToString(new Object());
-        assertEquals(expectedString, actualString);
+    public void testConvertToString() throws JsonProcessingException {
+        val someObj = Collections.singletonMap("foo", "bar");
+        val expected = new ObjectMapper().writeValueAsString(someObj);
+        val actual = utilUnderTest.convertToString(someObj);
+        assertEquals(expected, actual);
     }
 
-
     @Test(expected = RuntimeException.class)
-    public void testConvertToString_fail() throws JsonProcessingException {
-        when(mapper.writeValueAsString(any())).thenThrow(new RuntimeException());
-        String actualString = utilUnderTest.convertToString(new Object());
+    public void testConvertToString_invalidObject() {
+        utilUnderTest.convertToString(new Object());
     }
 
     @Test
-    public void testConvertToObject() {
-        Object actualObject = utilUnderTest.convertToObject("", new TypeReference<Map>() {
-        });
-        assertEquals(expectedObject, actualObject);
+    public void testConvertToObject() throws JsonProcessingException {
+        val someJson = "{ \"foo\" : \"bar\" }";
+        val expected = new ObjectMapper().readValue(someJson, MAP_TYPE_REFERENCE);
+        val actual = utilUnderTest.convertToObject(someJson, MAP_TYPE_REFERENCE);
+        assertEquals(expected, actual);
     }
 
     @Test(expected = RuntimeException.class)
-    public void testConvertToObject_fail() throws IOException {
-        when(mapper.readValue(anyString(), any(TypeReference.class))).thenThrow(new RuntimeException());
-        Object actualObject = utilUnderTest.convertToObject("", new TypeReference<Map>() {
-        });
-    }
-
-    private void initTestObjects() {
-        val mom = ObjectMother.instance();
-        expectedObject = mom.getTestObject();
-        expectedString = mom.getTestString();
-    }
-
-    @SneakyThrows
-    private void initDependencies() {
-        when(mapper.writeValueAsString(any())).thenReturn(expectedString);
-        when(mapper.readValue(anyString(), any(TypeReference.class))).thenReturn(expectedObject);
+    public void testConvertToObject_invalidJson() {
+        utilUnderTest.convertToObject("", MAP_TYPE_REFERENCE);
     }
 }

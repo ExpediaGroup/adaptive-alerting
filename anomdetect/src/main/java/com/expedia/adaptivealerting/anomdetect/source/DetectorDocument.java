@@ -25,6 +25,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
+// TODO Add javax.validation (e.g. @NotNull) [WLW]
+
 /**
  * Detector document, which we maintain in the persistent store.
  */
@@ -32,18 +34,34 @@ import java.util.UUID;
 @Accessors(chain = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DetectorDocument {
-    private String type;
     private UUID uuid;
+    private String type;
     private boolean enabled;
-    private String createdBy;
-    private Date dateCreated;
-
-    // TODO Rename property to dateUpdated. [WLW]
-    // TODO Use ISO 8601. Also we want the time zone. [WLW]
-    @JsonProperty("lastUpdateTimestamp")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date dateUpdated;
 
     @JsonProperty("detectorConfig")
     private Map<String, Object> config;
+    
+    private Meta meta;
+
+    @Data
+    public static class Meta {
+        private Date dateCreated;
+        private Date dateUpdated;
+        private String createdBy;
+        private String updatedBy;
+    }
+
+    // ================================================================================
+    // Deprecated
+    // ================================================================================
+
+    @Deprecated // Use Meta instead
+    private Date dateCreated;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @Deprecated // Use Meta instead
+    private Date lastUpdateTimestamp;
+
+    @Deprecated // Use Meta instead
+    private String createdBy;
 }

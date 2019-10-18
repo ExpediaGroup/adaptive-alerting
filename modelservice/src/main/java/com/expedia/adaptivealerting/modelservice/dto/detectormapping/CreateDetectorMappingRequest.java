@@ -18,12 +18,14 @@ package com.expedia.adaptivealerting.modelservice.dto.detectormapping;
 import com.expedia.adaptivealerting.modelservice.util.RequestValidator;
 import com.expedia.adaptivealerting.modelservice.dto.common.Expression;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data
+@AllArgsConstructor
 public class CreateDetectorMappingRequest {
     private Expression expression;
     private Detector detector;

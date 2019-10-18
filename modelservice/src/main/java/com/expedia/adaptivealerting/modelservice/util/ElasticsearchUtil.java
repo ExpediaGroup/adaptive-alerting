@@ -49,7 +49,7 @@ public class ElasticsearchUtil {
     @Autowired
     private ElasticSearchProperties elasticSearchProperties;
 
-    public IndexResponse getIndexResponse(IndexRequest indexRequest, String json) {
+    public IndexResponse index(IndexRequest indexRequest, String json) {
         try {
             indexRequest.source(json, XContentType.JSON);
             return elasticSearchClient.index(indexRequest, RequestOptions.DEFAULT);

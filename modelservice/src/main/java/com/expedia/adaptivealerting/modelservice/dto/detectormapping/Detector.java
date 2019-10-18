@@ -21,6 +21,8 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
+// TODO Rename this. The anomdetect module already has a Detector class and it's confusing to have two.
+//  (There was a third actually, but I got rid of it.) [WLW]
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

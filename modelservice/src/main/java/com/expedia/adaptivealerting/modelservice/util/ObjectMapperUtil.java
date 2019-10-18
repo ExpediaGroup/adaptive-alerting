@@ -32,7 +32,7 @@ public class ObjectMapperUtil {
         try {
             return objectMapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Could not convert to Json", e);
+            throw new RuntimeException("JSON serialization to String failed", e);
         }
     }
 
@@ -40,7 +40,7 @@ public class ObjectMapperUtil {
         try {
             return objectMapper.readValue(data, c);
         } catch (IOException e) {
-            throw new RuntimeException("Unable to read object from result set", e);
+            throw new RuntimeException("JSON deserialization failed", e);
         }
     }
 }

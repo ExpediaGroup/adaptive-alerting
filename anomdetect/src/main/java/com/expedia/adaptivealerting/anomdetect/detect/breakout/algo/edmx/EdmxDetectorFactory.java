@@ -15,8 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detect.breakout.algo.edmx;
 
-import com.expedia.adaptivealerting.anomdetect.detect.breakout.algo.edmx.EdmxDetector;
-import com.expedia.adaptivealerting.anomdetect.detect.breakout.algo.edmx.EdmxHyperparams;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;

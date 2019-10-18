@@ -77,7 +77,7 @@ public class MetricProfilingRepositoryImpl implements MetricProfilingRepository 
 
         val indexRequest = new IndexRequest(METRIC_PROFILING_INDEX, METRIC_PROFILING_DOC_TYPE);
         val json = objectMapperUtil.convertToString(percolatorMetricProfiling);
-        return elasticsearchUtil.getIndexResponse(indexRequest, json).getId();
+        return elasticsearchUtil.index(indexRequest, json).getId();
     }
 
     @Override

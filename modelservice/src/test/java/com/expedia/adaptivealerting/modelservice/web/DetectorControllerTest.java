@@ -1,7 +1,7 @@
 package com.expedia.adaptivealerting.modelservice.web;
 
+import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorException;
-import com.expedia.adaptivealerting.modelservice.entity.Detector;
 import com.expedia.adaptivealerting.modelservice.service.DetectorService;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import lombok.extern.slf4j.Slf4j;
@@ -17,11 +17,11 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -40,46 +40,50 @@ public class DetectorControllerTest {
     private DetectorService detectorService;
 
     @Mock
-    private Detector detector;
+    private DetectorDocument detector;
 
     @Mock
-    private List<Detector> detectors;
+    private List<DetectorDocument> detectors;
 
-    private Detector illegalParamsDetector;
-    private Detector legalParamsDetector;
-
+    private UUID someUuid;
+    private DetectorDocument illegalParamsDetector;
+    private DetectorDocument legalParamsDetector;
 
     @Before
     public void setUp() {
         this.controller = new DetectorController();
         MockitoAnnotations.initMocks(this);
         initTestObjects();
-        when(detectorService.findByUuid(anyString())).thenReturn(detector);
+        when(detectorService.findByUuid(someUuid.toString())).thenReturn(detector);
         when(detectorService.getLastUpdatedDetectors(anyLong())).thenReturn(detectors);
     }
 
     private void initTestObjects() {
-        val mom = ObjectMother.instance();
-        illegalParamsDetector = mom.getIllegalParamsDetector();
-        legalParamsDetector = mom.getDetector();
-    }
+        this.someUuid = UUID.randomUUID();
 
+        val mom = ObjectMother.instance();
+        legalParamsDetector = mom.getDetector();
+        legalParamsDetector.setUuid(someUuid);
+
+        illegalParamsDetector = mom.getIllegalParamsDetector();
+        illegalParamsDetector.setUuid(someUuid);
+    }
 
     @Test
     public void testFindByUuid() {
-        Detector actualDetector = controller.findByUuid("uuid");
+        DetectorDocument actualDetector = controller.findByUuid(someUuid.toString());
         assertNotNull(actualDetector);
     }
 
     @Test
     public void testFindByCreatedBy() {
-        List<Detector> actualDetectors = controller.findByCreatedBy("kashah");
+        List<DetectorDocument> actualDetectors = controller.findByCreatedBy("kashah");
         assertNotNull(actualDetectors);
     }
 
     @Test
     public void testToggleDetector() {
-        controller.toggleDetector("uuid", true);
+        controller.toggleDetector(someUuid.toString(), true);
     }
 
     @Test
@@ -92,21 +96,21 @@ public class DetectorControllerTest {
 
     @Test
     public void testUpdateDetector() {
-        controller.updateDetector("uuid", legalParamsDetector);
-        verify(controller, times(1)).updateDetector("uuid", legalParamsDetector);
+        controller.updateDetector(someUuid.toString(), legalParamsDetector);
+        verify(controller, times(1)).updateDetector(someUuid.toString(), legalParamsDetector);
     }
 
     @Test
     public void testGetLastUpdatedDetectors() {
         int interval = 5;
-        List<Detector> actualDetectors = controller.getLastUpdatedDetectors(interval);
+        List<DetectorDocument> actualDetectors = controller.getLastUpdatedDetectors(interval);
         assertNotNull(actualDetectors);
         assertSame(detectors, actualDetectors);
     }
 
     @Test(expected = DetectorException.class)
     public void testCreateDetectorNullValues() {
-        Detector detector1 = new Detector();
+        DetectorDocument detector1 = new DetectorDocument();
         detector1.setCreatedBy("user");
         controller.createDetector(detector1);
     }
@@ -118,7 +122,7 @@ public class DetectorControllerTest {
 
     @Test(expected = DetectorException.class)
     public void testUpdateDetectorNullValues() {
-        Detector detector1 = new Detector();
+        DetectorDocument detector1 = new DetectorDocument();
         detector1.setCreatedBy("user");
         controller.updateDetector("", detector1);
     }

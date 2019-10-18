@@ -1,5 +1,6 @@
 package com.expedia.adaptivealerting.modelservice.test;
 
+import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.modelservice.dto.common.Expression;
 import com.expedia.adaptivealerting.modelservice.dto.common.Field;
 import com.expedia.adaptivealerting.modelservice.dto.common.Operand;
@@ -10,7 +11,6 @@ import com.expedia.adaptivealerting.modelservice.dto.percolator.BoolCondition;
 import com.expedia.adaptivealerting.modelservice.dto.percolator.MustCondition;
 import com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping;
 import com.expedia.adaptivealerting.modelservice.dto.percolator.Query;
-import com.expedia.adaptivealerting.modelservice.entity.Detector;
 import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
 import com.expedia.adaptivealerting.modelservice.providers.graphite.GraphiteResult;
 import com.expedia.adaptivealerting.modelservice.service.AnomalyRequest;
@@ -22,7 +22,6 @@ import lombok.val;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -70,8 +69,8 @@ public class ObjectMother {
         return detectorParams;
     }
 
-    public Detector getDetector() {
-        Detector detector = new Detector();
+    public DetectorDocument getDetector() {
+        DetectorDocument detector = new DetectorDocument();
         detector.setCreatedBy("user");
         detector.setType("constant-detector");
 
@@ -80,7 +79,7 @@ public class ObjectMother {
         val detectorParams = toObject(thresholds);
         detectorParams.put("type", "LEFT_TAILED");
         detectorConfig.put("params", getDetectorParams());
-        detector.setDetectorConfig(detectorConfig);
+        detector.setConfig(detectorConfig);
         return detector;
     }
 
@@ -91,8 +90,8 @@ public class ObjectMother {
         return detectorParams;
     }
 
-    public Detector getIllegalParamsDetector() {
-        Detector detector = new Detector();
+    public DetectorDocument getIllegalParamsDetector() {
+        DetectorDocument detector = new DetectorDocument();
         detector.setCreatedBy("user");
         detector.setType("constant-detector");
 
@@ -101,15 +100,15 @@ public class ObjectMother {
         val detectorParams = toObject(thresholds);
         detectorParams.put("type", "LEFT_TAILED");
         detectorConfig.put("params", getIllegalDetectorParams());
-        detector.setDetectorConfig(detectorConfig);
+        detector.setConfig(detectorConfig);
         return detector;
     }
 
-    public Detector getElasticsearchDetector() {
-        return new Detector()
-                .setUuid("aeb4d849-847a-45c0-8312-dc0fcf22b639")
+    public DetectorDocument getElasticsearchDetector() {
+        return new DetectorDocument()
+                .setUuid(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"))
                 .setCreatedBy("test-user")
-                .setDetectorConfig(new HashMap<>())
+                .setConfig(new HashMap<>())
                 .setEnabled(true)
                 .setLastUpdateTimestamp(DateUtil.toUtcDate("2019-04-06 22:00:00"));
     }
@@ -151,18 +150,6 @@ public class ObjectMother {
         detectors.add(detector);
         groupedDetectorsByIndex.put(0, detectors);
         return new MatchingDetectorsResponse(groupedDetectorsByIndex, 10000);
-    }
-
-    public Map getTestObject() {
-        Map object = new LinkedHashMap<>();
-        object.put("test1", 1);
-        object.put("test2", 2);
-        object.put("test3", 3);
-        return object;
-    }
-
-    public String getTestString() {
-        return "{\"test1\":1,\"test2\":2,\"test3\":3}";
     }
 
     public Expression getExpression() {
