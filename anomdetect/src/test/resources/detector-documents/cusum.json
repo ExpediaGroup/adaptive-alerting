@@ -2,6 +2,12 @@
   "uuid": "3ec81aa2-2cdc-415e-b4f3-c1beb223ae60",
   "type": "cusum-detector",
   "enabled": true,
+  "meta": {
+    "dateCreated": "2019-10-16T17:08:40Z",
+    "dateUpdated": "2019-10-16T17:08:40Z",
+    "createdBy": "willie",
+    "updatedBy": "willie"
+  },
   "detectorConfig": {
     "hyperparams": {},
     "params": {
@@ -12,7 +18,5 @@
       "weakSigmas": 2.5,
       "strongSigmas": 3.5
     }
-  },
-  "createdBy": "wingbat",
-  "lastUpdateTimestamp": "2019-03-14 10:18:35"
+  }
 }

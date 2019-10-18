@@ -2,6 +2,12 @@
   "uuid": "a63c2128-113a-8fd7-942d-f8ae228b61b0",
   "type": "holtwinters-detector",
   "enabled": true,
+  "meta": {
+    "dateCreated": "2019-10-16T17:08:40Z",
+    "dateUpdated": "2019-10-16T17:08:40Z",
+    "createdBy": "willie",
+    "updatedBy": "willie"
+  },
   "detectorConfig": {
     "type": "RIGHT_TAILED",
     "hyperparams": {},
@@ -19,7 +25,5 @@
       "weakSigmas": 3,
       "strongSigmas": 4
     }
-  },
-  "createdBy": "wwheeler",
-  "lastUpdateTimestamp": "2019-03-19 07:43:54"
+  }
 }
