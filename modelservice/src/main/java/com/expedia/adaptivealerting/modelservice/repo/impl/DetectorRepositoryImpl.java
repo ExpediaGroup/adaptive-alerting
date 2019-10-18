@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.repo.impl;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
+import com.expedia.adaptivealerting.anomdetect.util.AssertUtil;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
 import com.expedia.adaptivealerting.modelservice.util.DateUtil;
@@ -45,6 +46,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isNull;
+
 @Slf4j
 @Service
 public class DetectorRepositoryImpl implements DetectorRepository {
@@ -63,10 +66,9 @@ public class DetectorRepositoryImpl implements DetectorRepository {
 
     @Override
     public String createDetector(DetectorDocument document) {
-        UUID uuid = UUID.randomUUID();
-        if (document.getUuid() != null) {
-            uuid = document.getUuid();
-        }
+        isNull(document.getUuid(), "Required: document.uuid == null");
+        val uuid = UUID.randomUUID();
+        document.setUuid(uuid);
         val indexRequest = new IndexRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, uuid.toString());
         String json = objectMapperUtil.convertToString(getElasticSearchDetector(document));
         return elasticsearchUtil.index(indexRequest, json).getId();

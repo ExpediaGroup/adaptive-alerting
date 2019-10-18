@@ -33,6 +33,10 @@ public class AssertUtil {
         isTrue(!b, message);
     }
 
+    public static void isNull(Object o, String message) {
+        isTrue(o == null, message);
+    }
+
     public static void notNull(Object o, String message) {
         isTrue(o != null, message);
     }

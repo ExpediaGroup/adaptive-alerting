@@ -23,6 +23,7 @@ import com.expedia.adaptivealerting.modelservice.util.ElasticsearchUtil;
 import com.expedia.adaptivealerting.modelservice.util.ObjectMapperUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.DocWriteResponse.Result;
 import org.elasticsearch.action.delete.DeleteRequest;
@@ -78,7 +79,7 @@ import static org.mockito.Mockito.when;
 public class DetectorRepositoryImplTest {
 
     @InjectMocks
-    private DetectorRepository detectorRepository = new DetectorRepositoryImpl();
+    private DetectorRepository repoUnderTest = new DetectorRepositoryImpl();
 
     @Mock
     private ElasticSearchClient elasticSearchClient;
@@ -90,15 +91,10 @@ public class DetectorRepositoryImplTest {
     private ObjectMapperUtil objectMapperUtil;
 
     private DetectorDocument detector;
-
     private IndexResponse indexResponse;
-
     private SearchResponse searchResponse;
-
     private DeleteResponse deleteResponse;
-
     private GetResponse getResponse;
-
     private List<DetectorDocument> detectors = new ArrayList<>();
 
     @Before
@@ -110,14 +106,21 @@ public class DetectorRepositoryImplTest {
 
     @Test
     public void testCreateDetector() {
-        String actualCreationId = detectorRepository.createDetector(new DetectorDocument());
+        val actualCreationId = repoUnderTest.createDetector(new DetectorDocument());
         assertNotNull(actualCreationId);
         assertEquals("1", actualCreationId);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateDetector_uuidAlreadySet() {
+        val document = new DetectorDocument();
+        document.setUuid(UUID.randomUUID());
+        repoUnderTest.createDetector(document);
+    }
+
     @Test
     public void testDeleteDetector() {
-        DetectorRepository detectorRepository = mock(DetectorRepository.class);
+        val detectorRepository = mock(DetectorRepository.class);
         doNothing().when(detectorRepository).deleteDetector(anyString());
         detectorRepository.deleteDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639");
         verify(detectorRepository, times(1)).deleteDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639");
@@ -133,7 +136,7 @@ public class DetectorRepositoryImplTest {
 
     @Test
     public void testFindByUuid() {
-        DetectorDocument actualDetector = detectorRepository.findByUuid("uuid");
+        DetectorDocument actualDetector = repoUnderTest.findByUuid("uuid");
         assertNotNull(actualDetector);
         Assert.assertEquals(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"), actualDetector.getUuid());
         Assert.assertEquals("test-user", actualDetector.getCreatedBy());
@@ -142,7 +145,7 @@ public class DetectorRepositoryImplTest {
 
     @Test
     public void testFindByCreatedBy() {
-        List<DetectorDocument> actualDetectors = detectorRepository.findByCreatedBy("kashah");
+        List<DetectorDocument> actualDetectors = repoUnderTest.findByCreatedBy("kashah");
         assertNotNull(actualDetectors);
         assertCheck(actualDetectors);
     }
@@ -157,7 +160,7 @@ public class DetectorRepositoryImplTest {
 
     @Test
     public void testGetLastUpdatedDetectors() {
-        List<DetectorDocument> actualDetectors = detectorRepository.getLastUpdatedDetectors("", "");
+        List<DetectorDocument> actualDetectors = repoUnderTest.getLastUpdatedDetectors("", "");
         assertNotNull(actualDetectors);
         assertCheck(actualDetectors);
     }
@@ -165,19 +168,19 @@ public class DetectorRepositoryImplTest {
     @Test(expected = RuntimeException.class)
     public void searchDetectorFail() throws IOException {
         Mockito.when(elasticSearchClient.search(any(SearchRequest.class), any(RequestOptions.class))).thenThrow(new IOException());
-        detectorRepository.findByUuid("aeb4d849-847a-45c0-8312-dc0fcf22b639");
+        repoUnderTest.findByUuid("aeb4d849-847a-45c0-8312-dc0fcf22b639");
     }
 
     @Test(expected = RuntimeException.class)
     public void updateDetectorFail() throws IOException {
         Mockito.when(elasticSearchClient.update(any(UpdateRequest.class), any(RequestOptions.class))).thenThrow(new IOException());
-        detectorRepository.toggleDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
+        repoUnderTest.toggleDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
     }
 
     @Test(expected = RuntimeException.class)
     public void deleteDetectorFail() throws IOException {
         Mockito.when(elasticSearchClient.delete(any(DeleteRequest.class), any(RequestOptions.class))).thenThrow(new IOException());
-        detectorRepository.deleteDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639");
+        repoUnderTest.deleteDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639");
     }
 
     private void initTestObjects() {
