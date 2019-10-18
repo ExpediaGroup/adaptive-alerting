@@ -18,7 +18,7 @@ package com.expedia.adaptivealerting.modelservice.service;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
-import com.expedia.adaptivealerting.anomdetect.source.DetectorRegistry;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorFactory;
 import com.expedia.adaptivealerting.anomdetect.util.MetricUtil;
 import com.expedia.adaptivealerting.modelservice.spi.MetricSource;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +42,7 @@ public class AnomalyServiceImpl implements AnomalyService {
     private List<? extends MetricSource> metricSources;
 
     @Autowired
-    private DetectorRegistry detectorRegistry;
+    private DetectorFactory detectorFactory;
 
     @Override
     public List<OutlierDetectorResult> getAnomalies(AnomalyRequest request) {
@@ -76,7 +76,6 @@ public class AnomalyServiceImpl implements AnomalyService {
                 .setCreatedBy("adaptive-alerting")
                 .setDateCreated(now)
                 .setLastUpdateTimestamp(now);
-        val factory = detectorRegistry.getDetectorFactory(document);
-        return factory.buildDetector();
+        return detectorFactory.buildDetector(document);
     }
 }

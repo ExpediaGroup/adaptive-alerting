@@ -16,8 +16,10 @@
 package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.forecasting;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.ewma.EwmaPointForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.expwelford.ExponentialWelfordIntervalForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.holtwinters.HoltWintersPointForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.holtwinters.HoltWintersSeasonalityType;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.holtwinters.HoltWintersTrainingMethod;
 import com.expedia.adaptivealerting.anomdetect.detect.AbstractDetectorFactoryTest;
 import lombok.val;
 import org.junit.Test;
@@ -25,24 +27,32 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 @Deprecated // Use ForecastingDetectorFactory
-public class LegacyEwmaDetectorFactoryTest extends AbstractDetectorFactoryTest {
+public class LegacyHoltWintersDetectorFactoryProviderTest extends AbstractDetectorFactoryTest {
     private static final double TOLERANCE = 0.001;
 
     @Test
     public void testBuildDetector() {
-        val document = readDocument("ewma");
-        val factoryUnderTest = new LegacyEwmaDetectorFactory(document);
-        val detector = factoryUnderTest.buildDetector();
-        val ewma = (EwmaPointForecaster) detector.getPointForecaster();
-        val ewmaParams = ewma.getParams();
+        val factoryUnderTest = new LegacyHoltWintersDetectorFactoryProvider();
+        val document = readDocument("holt-winters");
+        val detector = factoryUnderTest.buildDetector(document);
+        val hw = (HoltWintersPointForecaster) detector.getPointForecaster();
+        val hwParams = hw.getParams();
         val welford = (ExponentialWelfordIntervalForecaster) detector.getIntervalForecaster();
         val welfordParams = welford.getParams();
 
         assertEquals(ForecastingDetector.class, detector.getClass());
-        assertEquals("3e047348-f837-f615-271c-dce6206f50d6", detector.getUuid().toString());
+        assertEquals("a63c2128-113a-8fd7-942d-f8ae228b61b0", detector.getUuid().toString());
         assertEquals(AnomalyType.RIGHT_TAILED, detector.getAnomalyType());
-        assertEquals(0.20, ewmaParams.getAlpha(), TOLERANCE);
-        assertEquals(1.4, ewmaParams.getInitMeanEstimate(), TOLERANCE);
+        assertEquals(2016, hwParams.getFrequency());
+        assertEquals(0.15, hwParams.getAlpha(), TOLERANCE);
+        assertEquals(0.10, hwParams.getBeta(), TOLERANCE);
+        assertEquals(0.20, hwParams.getGamma(), TOLERANCE);
+        assertEquals(0, hwParams.getWarmUpPeriod());
+        assertEquals(HoltWintersSeasonalityType.MULTIPLICATIVE, hwParams.getSeasonalityType());
+        assertEquals(HoltWintersTrainingMethod.NONE, hwParams.getInitTrainingMethod());
+        assertEquals(0.0, hwParams.getInitBaseEstimate(), TOLERANCE);
+        assertEquals(0.0, hwParams.getInitLevelEstimate(), TOLERANCE);
+        assertEquals(0, hwParams.getInitSeasonalEstimates().length);
         assertEquals(3.0, welfordParams.getWeakSigmas(), TOLERANCE);
         assertEquals(4.0, welfordParams.getStrongSigmas(), TOLERANCE);
     }

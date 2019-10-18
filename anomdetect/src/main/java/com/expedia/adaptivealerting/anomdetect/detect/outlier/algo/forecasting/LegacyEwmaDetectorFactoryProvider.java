@@ -19,24 +19,20 @@ import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.ewma.EwmaPointForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.expwelford.ExponentialWelfordIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
-import com.expedia.adaptivealerting.anomdetect.source.DetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorFactoryProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
-@RequiredArgsConstructor
 @Deprecated // Use ForecastingDetector with EWMA point forecaster
 @Slf4j
-public class LegacyEwmaDetectorFactory implements DetectorFactory<ForecastingDetector> {
+public class LegacyEwmaDetectorFactoryProvider implements DetectorFactoryProvider<ForecastingDetector> {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @NonNull
-    private DetectorDocument document;
-
     @Override
-    public ForecastingDetector buildDetector() {
+    public ForecastingDetector buildDetector(DetectorDocument document) {
         val uuid = document.getUuid();
 
         val config = document.getConfig();

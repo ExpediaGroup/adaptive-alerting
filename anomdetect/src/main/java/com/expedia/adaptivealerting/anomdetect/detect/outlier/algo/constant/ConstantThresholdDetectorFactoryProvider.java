@@ -13,26 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.individuals;
+package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.constant;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
-import com.expedia.adaptivealerting.anomdetect.source.DetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorFactoryProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.val;
 
-@RequiredArgsConstructor
-public class IndividualsDetectorFactory implements DetectorFactory<IndividualsDetector> {
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
+
+public class ConstantThresholdDetectorFactoryProvider implements DetectorFactoryProvider<ConstantThresholdDetector> {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @NonNull
-    private DetectorDocument document;
-
     @Override
-    public IndividualsDetector buildDetector() {
+    public ConstantThresholdDetector buildDetector(DetectorDocument document) {
+        notNull(document, "document can't be null");
         val paramsMap = document.getConfig().get("params");
-        val params = objectMapper.convertValue(paramsMap, IndividualsDetectorParams.class);
-        return new IndividualsDetector(document.getUuid(), params);
+        val params = objectMapper.convertValue(paramsMap, ConstantThresholdDetectorParams.class);
+        return new ConstantThresholdDetector(document.getUuid(), params);
     }
 }

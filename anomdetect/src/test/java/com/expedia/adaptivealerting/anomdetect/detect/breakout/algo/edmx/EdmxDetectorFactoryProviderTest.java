@@ -24,14 +24,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 @Slf4j
-public class EdmxDetectorFactoryTest extends AbstractDetectorFactoryTest {
+public class EdmxDetectorFactoryProviderTest extends AbstractDetectorFactoryTest {
     private static final double TOLERANCE = 0.01;
 
     @Test
     public void testBuildDetector() {
+        val factoryUnderTest = new EdmxDetectorFactoryProvider();
         val document = readDocument("edmx");
-        val factoryUnderTest = new EdmxDetectorFactory(document);
-        val detector = factoryUnderTest.buildDetector();
+        val detector = factoryUnderTest.buildDetector(document);
         val hyperparams = detector.getHyperparams();
 
         assertNotNull(detector);
@@ -51,8 +51,8 @@ public class EdmxDetectorFactoryTest extends AbstractDetectorFactoryTest {
 
     @Test(expected = RuntimeException.class)
     public void testBuild_invalidHyperparams() {
+        val factoryUnderTest = new EdmxDetectorFactoryProvider();
         val document = readDocument("edmx-invalid-hyperparams");
-        val factoryUnderTest = new EdmxDetectorFactory(document);
-        factoryUnderTest.buildDetector();
+        factoryUnderTest.buildDetector(document);
     }
 }

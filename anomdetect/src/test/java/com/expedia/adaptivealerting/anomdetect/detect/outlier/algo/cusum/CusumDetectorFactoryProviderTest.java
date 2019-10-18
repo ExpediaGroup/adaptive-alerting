@@ -23,19 +23,14 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class CusumDetectorFactoryTest extends AbstractDetectorFactoryTest {
+public class CusumDetectorFactoryProviderTest extends AbstractDetectorFactoryTest {
     private static final double TOLERANCE = 0.001;
-
-    @Test(expected = RuntimeException.class)
-    public void testInit_nullDocument() {
-        new CusumDetectorFactory(null);
-    }
 
     @Test
     public void testBuildDetector() {
+        val factoryUnderTest = new CusumDetectorFactoryProvider();
         val document = readDocument("cusum");
-        val factoryUnderTest = new CusumDetectorFactory(document);
-        val detector = factoryUnderTest.buildDetector();
+        val detector = factoryUnderTest.buildDetector(document);
         val params = detector.getParams();
 
         assertNotNull(detector);

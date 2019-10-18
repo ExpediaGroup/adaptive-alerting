@@ -16,19 +16,15 @@
 package com.expedia.adaptivealerting.modelservice.util;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
-import com.expedia.adaptivealerting.anomdetect.source.DetectorRegistry;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorFactory;
 import com.expedia.adaptivealerting.modelservice.dto.detectormapping.User;
 import com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping;
 import com.expedia.adaptivealerting.modelservice.dto.common.Expression;
 import com.expedia.adaptivealerting.modelservice.dto.common.Operator;
 import com.expedia.adaptivealerting.modelservice.dto.common.Operand;
 import lombok.experimental.UtilityClass;
-import lombok.val;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
-
-import java.util.Date;
-import java.util.UUID;
 
 @UtilityClass
 public class RequestValidator {
@@ -69,8 +65,6 @@ public class RequestValidator {
     }
 
     public static void validateDetector(DetectorDocument document) {
-        new DetectorRegistry()
-                .getDetectorFactory(document)
-                .buildDetector();
+        new DetectorFactory().buildDetector(document);
     }
 }
