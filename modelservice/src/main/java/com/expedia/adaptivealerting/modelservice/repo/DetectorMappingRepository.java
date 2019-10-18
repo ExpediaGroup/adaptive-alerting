@@ -25,17 +25,23 @@ import java.util.Map;
 
 public interface DetectorMappingRepository {
 
+    /**
+     * Creates a new detector mapping in the persistent store. This maps a set of metrics to a detector.
+     *
+     * @param request Mapping request
+     * @return Mapping ID
+     */
+    String createDetectorMapping(CreateDetectorMappingRequest request);
+
     MatchingDetectorsResponse findMatchingDetectorMappings(List<Map<String, String>> tagsList);
-
-    String createDetectorMapping(CreateDetectorMappingRequest createDetectorMappingRequest);
-
-    void deleteDetectorMapping(String id);
 
     DetectorMapping findDetectorMapping(String id);
 
-    List<DetectorMapping> search(SearchMappingsRequest searchMappingsRequest);
-
     List<DetectorMapping> findLastUpdated(int timeInSeconds);
 
+    List<DetectorMapping> search(SearchMappingsRequest request);
+
     void disableDetectorMapping(String id);
+
+    void deleteDetectorMapping(String id);
 }

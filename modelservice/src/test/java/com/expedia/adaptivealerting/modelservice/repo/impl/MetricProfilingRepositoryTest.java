@@ -1,10 +1,25 @@
-package com.expedia.adaptivealerting.modelservice.repo;
+/*
+ * Copyright 2018-2019 Expedia Group, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.expedia.adaptivealerting.modelservice.repo.impl;
 
 import com.expedia.adaptivealerting.modelservice.dto.common.Expression;
 import com.expedia.adaptivealerting.modelservice.dto.metricprofiling.CreateMetricProfilingRequest;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
-import com.expedia.adaptivealerting.modelservice.repo.impl.MetricProfilingRepositoryImpl;
+import com.expedia.adaptivealerting.modelservice.repo.MetricProfilingRepository;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import com.expedia.adaptivealerting.modelservice.util.ElasticsearchUtil;
 import com.expedia.adaptivealerting.modelservice.util.ObjectMapperUtil;
@@ -89,7 +104,7 @@ public class MetricProfilingRepositoryTest {
     @SneakyThrows
     private void initDependencies() {
         Mockito.when(elasticsearchUtil.getSourceBuilder(any(QueryBuilder.class))).thenReturn(new SearchSourceBuilder());
-        Mockito.when(elasticsearchUtil.getIndexResponse(any(IndexRequest.class), anyString())).thenReturn(indexResponse);
+        Mockito.when(elasticsearchUtil.index(any(IndexRequest.class), anyString())).thenReturn(indexResponse);
 
         Mockito.when(objectMapperUtil.convertToString(any())).thenReturn(new String());
         Mockito.when(elasticSearchClient.search(any(SearchRequest.class), any(RequestOptions.class))).thenReturn(searchResponse);
