@@ -22,14 +22,14 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class IndividualsDetectorFactoryTest extends AbstractDetectorFactoryTest {
+public class IndividualsDetectorFactoryProviderTest extends AbstractDetectorFactoryTest {
     private static final double TOLERANCE = 0.001;
 
     @Test
     public void testBuildDetector() {
+        val factoryUnderTest = new IndividualsDetectorFactoryProvider();
         val document = readDocument("individuals");
-        val factoryUnderTest = new IndividualsDetectorFactory(document);
-        val detector = factoryUnderTest.buildDetector();
+        val detector = factoryUnderTest.buildDetector(document);
         val params = detector.getParams();
 
         assertNotNull(detector);

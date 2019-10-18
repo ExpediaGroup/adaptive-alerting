@@ -3,10 +3,10 @@
   "type": "edmx-detector",
   "enabled": true,
   "meta": {
-    "createdBy": "dasutherland",
     "dateCreated": "2019-10-16T17:08:40Z",
     "dateUpdated": "2019-10-16T17:08:40Z",
-    "updatedBy": "dasutherland"
+    "createdBy": "willie",
+    "updatedBy": "willie"
   },
   "detectorConfig": {
     "hyperparams": {

@@ -25,19 +25,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 @Slf4j
-public class ConstantThresholdDetectorFactoryTest extends AbstractDetectorFactoryTest {
+public class ConstantThresholdDetectorFactoryProviderTest extends AbstractDetectorFactoryTest {
     private static final double TOLERANCE = 0.001;
-
-    @Test(expected = RuntimeException.class)
-    public void testInit_nullDocument() {
-        new ConstantThresholdDetectorFactory(null);
-    }
 
     @Test
     public void testBuildDetector() {
+        val factoryUnderTest = new ConstantThresholdDetectorFactoryProvider();
         val document = readDocument("constant-threshold");
-        val factoryUnderTest = new ConstantThresholdDetectorFactory(document);
-        val detector = factoryUnderTest.buildDetector();
+        val detector = factoryUnderTest.buildDetector(document);
         val params = detector.getParams();
         val thresholds = params.getThresholds();
 
@@ -56,8 +51,8 @@ public class ConstantThresholdDetectorFactoryTest extends AbstractDetectorFactor
 
     @Test(expected = RuntimeException.class)
     public void testBuildDetector_invalidParams() {
+        val factory = new ConstantThresholdDetectorFactoryProvider();
         val document = readDocument("constant-threshold-invalid-params");
-        val factory = new ConstantThresholdDetectorFactory(document);
-        factory.buildDetector();
+        factory.buildDetector(document);
     }
 }

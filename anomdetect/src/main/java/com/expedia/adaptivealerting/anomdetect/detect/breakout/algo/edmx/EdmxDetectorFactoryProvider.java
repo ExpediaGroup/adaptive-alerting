@@ -16,21 +16,18 @@
 package com.expedia.adaptivealerting.anomdetect.detect.breakout.algo.edmx;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
-import com.expedia.adaptivealerting.anomdetect.source.DetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorFactoryProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.val;
 
-@RequiredArgsConstructor
-public class EdmxDetectorFactory implements DetectorFactory<EdmxDetector> {
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
+
+public class EdmxDetectorFactoryProvider implements DetectorFactoryProvider<EdmxDetector> {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @NonNull
-    private DetectorDocument document;
-
     @Override
-    public EdmxDetector buildDetector() {
+    public EdmxDetector buildDetector(DetectorDocument document) {
+        notNull(document, "document can't be null");
         // The EDM-X detector fits a new model with each metric point.
         // That's why we're using hyperparameters instead of parameters here.
         val hyperparamsMap = document.getConfig().get("hyperparams");

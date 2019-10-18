@@ -19,22 +19,18 @@ import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.expwelford.ExponentialWelfordIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.holtwinters.HoltWintersPointForecaster;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
-import com.expedia.adaptivealerting.anomdetect.source.DetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorFactoryProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
-@RequiredArgsConstructor
 @Deprecated // Use ForecastingDetector with Holt-Winters point forecaster
-public class LegacyHoltWintersDetectorFactory implements DetectorFactory<ForecastingDetector> {
+public class LegacyHoltWintersDetectorFactoryProvider implements DetectorFactoryProvider<ForecastingDetector> {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @NonNull
-    private DetectorDocument document;
-
     @Override
-    public ForecastingDetector buildDetector() {
+    public ForecastingDetector buildDetector(DetectorDocument document) {
         val uuid = document.getUuid();
 
         val config = document.getConfig();

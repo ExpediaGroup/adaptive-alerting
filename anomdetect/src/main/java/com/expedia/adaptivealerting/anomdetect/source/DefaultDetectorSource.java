@@ -47,7 +47,7 @@ public class DefaultDetectorSource implements DetectorSource {
     private final DetectorClient client;
 
     @NonNull
-    private final DetectorRegistry registry;
+    private final DetectorFactory registry;
 
     @Override
     public DetectorMatchResponse findDetectorMappings(List<Map<String, String>> metricTags) {
@@ -65,8 +65,7 @@ public class DefaultDetectorSource implements DetectorSource {
     public Detector findDetector(UUID uuid) {
         notNull(uuid, "uuid can't be null");
         val document = client.findDetectorDocument(uuid);
-        val factory = registry.getDetectorFactory(document);
-        return factory.buildDetector();
+        return registry.buildDetector(document);
     }
 
     @Override

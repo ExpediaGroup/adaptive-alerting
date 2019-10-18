@@ -16,21 +16,18 @@
 package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.cusum;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
-import com.expedia.adaptivealerting.anomdetect.source.DetectorFactory;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorFactoryProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.val;
 
-@RequiredArgsConstructor
-public class CusumDetectorFactory implements DetectorFactory<CusumDetector> {
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
+
+public class CusumDetectorFactoryProvider implements DetectorFactoryProvider<CusumDetector> {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @NonNull
-    private DetectorDocument document;
-
     @Override
-    public CusumDetector buildDetector() {
+    public CusumDetector buildDetector(DetectorDocument document) {
+        notNull(document, "document can't be null");
         val paramsMap = document.getConfig().get("params");
         val params = objectMapper.convertValue(paramsMap, CusumDetectorParams.class);
         return new CusumDetector(document.getUuid(), params);

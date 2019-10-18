@@ -51,9 +51,6 @@ public final class DefaultDetectorSourceTest {
     private DetectorClient detectorClient;
 
     @Mock
-    private DetectorRegistry detectorRegistry;
-
-    @Mock
     private DetectorFactory detectorFactory;
 
     private List<Map<String, String>> metricTags;
@@ -72,7 +69,7 @@ public final class DefaultDetectorSourceTest {
         MockitoAnnotations.initMocks(this);
         initTestObjects();
         initDependencies();
-        this.sourceUnderTest = new DefaultDetectorSource(detectorClient, detectorRegistry);
+        this.sourceUnderTest = new DefaultDetectorSource(detectorClient, detectorFactory);
     }
 
     @Test
@@ -159,9 +156,6 @@ public final class DefaultDetectorSourceTest {
         when(detectorClient.findUpdatedDetectorMappings(1))
                 .thenReturn(Collections.singletonList(this.detectorMapping));
 
-        when(detectorRegistry.getDetectorFactory(any(DetectorDocument.class)))
-                .thenReturn(detectorFactory);
-
-        when(detectorFactory.buildDetector()).thenReturn(detector);
+        when(detectorFactory.buildDetector(any(DetectorDocument.class))).thenReturn(detector);
     }
 }

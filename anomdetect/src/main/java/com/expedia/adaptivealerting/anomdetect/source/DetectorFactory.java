@@ -16,11 +16,45 @@
 package com.expedia.adaptivealerting.anomdetect.source;
 
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.constant.ConstantThresholdDetectorFactoryProvider;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.cusum.CusumDetectorFactoryProvider;
+import com.expedia.adaptivealerting.anomdetect.detect.breakout.algo.edmx.EdmxDetectorFactoryProvider;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.individuals.IndividualsDetectorFactoryProvider;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.forecasting.LegacyEwmaDetectorFactoryProvider;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.forecasting.LegacyHoltWintersDetectorFactoryProvider;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.forecasting.LegacyPewmaDetectorFactoryProvider;
+import lombok.val;
 
-public interface DetectorFactory<T extends Detector> {
+import java.util.HashMap;
+import java.util.Map;
 
-    T buildDetector();
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
-    // TODO Implement and genericize. [WLW]
-//    DetectorTrainer buildTrainer();
+/**
+ * Builds a detector from a detector document.
+ */
+public class DetectorFactory {
+    private final Map<String, DetectorFactoryProvider> providers = new HashMap<>();
+
+    public DetectorFactory() {
+        providers.put("constant-detector", new ConstantThresholdDetectorFactoryProvider());
+        providers.put("cusum-detector", new CusumDetectorFactoryProvider());
+        providers.put("edmx-detector", new EdmxDetectorFactoryProvider());
+        providers.put("individuals-detector", new IndividualsDetectorFactoryProvider());
+
+        // Legacy
+        providers.put("ewma-detector", new LegacyEwmaDetectorFactoryProvider());
+        providers.put("holtwinters-detector", new LegacyHoltWintersDetectorFactoryProvider());
+        providers.put("pewma-detector", new LegacyPewmaDetectorFactoryProvider());
+    }
+
+    public Detector buildDetector(DetectorDocument document) {
+        notNull(document, "document can't be null");
+        val type = document.getType();
+        val factory = providers.get(type);
+        if (factory == null) {
+            throw new DetectorException("Illegal detector type: " + type);
+        }
+        return factory.buildDetector(document);
+    }
 }

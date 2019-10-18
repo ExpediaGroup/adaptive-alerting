@@ -1,10 +1,9 @@
 package com.expedia.adaptivealerting.modelservice.service;
 
-import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorFactory;
-import com.expedia.adaptivealerting.anomdetect.source.DetectorRegistry;
 import com.expedia.adaptivealerting.modelservice.providers.graphite.GraphiteMetricSource;
 import com.expedia.adaptivealerting.modelservice.spi.MetricSource;
 import com.expedia.adaptivealerting.modelservice.spi.MetricSourceResult;
@@ -54,9 +53,6 @@ public class AnomalyServiceImplTest {
     private List<MetricSourceResult> metricSourceResults = new ArrayList<>();
 
     @Mock
-    private DetectorRegistry detectorRegistry;
-
-    @Mock
     private DetectorFactory detectorFactory;
 
     @Mock
@@ -86,17 +82,14 @@ public class AnomalyServiceImplTest {
 
     private void initTestObjects() {
         val mom = ObjectMother.instance();
-
         this.anomalyRequest = mom.getAnomalyRequest();
         this.metricSourceResult = mom.getMetricData();
         this.metricSourceResults.add(metricSourceResult);
-
-        when(detectorFactory.buildDetector()).thenReturn(detector);
     }
 
     private void initDependencies() {
         when(graphiteMetricSource.getMetricData(anyString())).thenReturn(metricSourceResults);
         metricSources.add(graphiteMetricSource);
-        when(detectorRegistry.getDetectorFactory(any(DetectorDocument.class))).thenReturn(detectorFactory);
+        when(detectorFactory.buildDetector(any(DetectorDocument.class))).thenReturn(detector);
     }
 }

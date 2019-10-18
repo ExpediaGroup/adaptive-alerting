@@ -30,9 +30,9 @@ public class LegacyPewmaFactoryTest extends AbstractDetectorFactoryTest {
 
     @Test
     public void testBuildDetector() {
+        val factoryUnderTest = new LegacyPewmaDetectorFactoryProvider();
         val document = readDocument("pewma");
-        val factoryUnderTest = new LegacyPewmaDetectorFactory(document);
-        val detector = factoryUnderTest.buildDetector();
+        val detector = factoryUnderTest.buildDetector(document);
         val pewma = (PewmaPointForecaster) detector.getPointForecaster();
         val pewmaParams = pewma.getParams();
         val welford = (ExponentialWelfordIntervalForecaster) detector.getIntervalForecaster();
