@@ -2,6 +2,12 @@
   "uuid": "6ec81aa2-2cdc-415e-b4f3-c1beb223ae60",
   "type": "pewma-detector",
   "enabled": true,
+  "meta": {
+    "dateCreated": "2019-10-16T17:08:40Z",
+    "dateUpdated": "2019-10-16T17:08:40Z",
+    "createdBy": "willie",
+    "updatedBy": "willie"
+  },
   "detectorConfig": {
     "type": "RIGHT_TAILED",
     "hyperparams": {},
@@ -13,7 +19,5 @@
       "weakSigmas": 4.5,
       "strongSigmas": 5
     }
-  },
-  "createdBy": null,
-  "lastUpdateTimestamp": "2019-03-14 10:18:35"
+  }
 }

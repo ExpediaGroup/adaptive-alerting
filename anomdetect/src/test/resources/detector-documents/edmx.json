@@ -2,15 +2,18 @@
   "uuid": "9d934a88-f89b-4793-956a-bede72c3081f",
   "type": "edmx-detector",
   "enabled": true,
+  "meta": {
+    "dateCreated": "2019-10-16T17:08:40Z",
+    "dateUpdated": "2019-10-16T17:08:40Z",
+    "createdBy": "willie",
+    "updatedBy": "willie"
+  },
   "detectorConfig": {
     "hyperparams": {
+      "alpha": 0.01,
       "bufferSize": 24,
       "delta": 6,
-      "numPerms": 199,
-      "alpha": 0.01
+      "numPerms": 199
     }
-  },
-  "createdBy": "willie",
-  "dateCreated": "2019-07-10T19:07:03Z",
-  "lastUpdateTimestamp": "2019-06-26 14:25:00"
+  }
 }

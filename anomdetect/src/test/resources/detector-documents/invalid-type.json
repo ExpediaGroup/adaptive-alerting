@@ -2,10 +2,14 @@
   "uuid": "c8d4d8c4-8068-46bf-a1c7-43ea6f066eeb",
   "type": "invalid-detector",
   "enabled": true,
+  "meta": {
+    "dateCreated": "2019-10-16T17:08:40Z",
+    "dateUpdated": "2019-10-16T17:08:40Z",
+    "createdBy": "willie",
+    "updatedBy": "willie"
+  },
   "detectorConfig": {
     "hyperparams": {},
     "params": {}
-  },
-  "createdBy": null,
-  "lastUpdateTimestamp": "2019-06-04 23:33:31"
+  }
 }
