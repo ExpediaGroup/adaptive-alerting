@@ -44,21 +44,7 @@ public class DetectorController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public String createDetector(@Valid @RequestBody DetectorDocument document) {
-        RequestValidator.validateDetector(document);
         return detectorRepo.createDetector(document);
-    }
-
-    @PutMapping
-    @ResponseStatus(HttpStatus.OK)
-    public void updateDetector(@RequestParam String uuid, @RequestBody DetectorDocument document) {
-        RequestValidator.validateDetector(document);
-        detectorRepo.updateDetector(uuid, document);
-    }
-
-    @DeleteMapping
-    @ResponseStatus(HttpStatus.OK)
-    public void deleteDetector(@RequestParam String uuid) {
-        detectorRepo.deleteDetector(uuid);
     }
 
     @GetMapping(path = "/findByUuid", produces = "application/json")
@@ -85,5 +71,17 @@ public class DetectorController {
     @ResponseStatus(HttpStatus.OK)
     public List<DetectorDocument> getLastUpdatedDetectors(@RequestParam long interval) {
         return detectorRepo.getLastUpdatedDetectors(interval);
+    }
+
+    @PutMapping
+    @ResponseStatus(HttpStatus.OK)
+    public void updateDetector(@RequestParam String uuid, @RequestBody DetectorDocument document) {
+        detectorRepo.updateDetector(uuid, document);
+    }
+
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteDetector(@RequestParam String uuid) {
+        detectorRepo.deleteDetector(uuid);
     }
 }

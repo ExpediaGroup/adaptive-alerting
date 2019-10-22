@@ -21,6 +21,7 @@ import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
 import com.expedia.adaptivealerting.modelservice.util.DateUtil;
 import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticsearchUtil;
 import com.expedia.adaptivealerting.modelservice.util.ObjectMapperUtil;
+import com.expedia.adaptivealerting.modelservice.util.RequestValidator;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -48,6 +49,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isNull;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 @Slf4j
 @Service
@@ -67,11 +69,19 @@ public class DetectorRepositoryImpl implements DetectorRepository {
 
     @Override
     public String createDetector(DetectorDocument document) {
+        notNull(document, "document can't be null");
         isNull(document.getUuid(), "Required: document.uuid == null");
+
         val uuid = UUID.randomUUID();
         document.setUuid(uuid);
+
+        // Do this after setting the UUID since validation checks for the UUID.
+        RequestValidator.validateDetector(document);
+
         val indexRequest = new IndexRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, uuid.toString());
-        String json = objectMapperUtil.convertToString(getElasticSearchDetector(document));
+        val json = objectMapperUtil.convertToString(getElasticSearchDetector(document));
+
+        // FIXME We should not be returning an implementation-specific ID here. (This is an Elasticsearch document ID.)
         return elasticsearchUtil.index(indexRequest, json).getId();
     }
 
@@ -88,6 +98,9 @@ public class DetectorRepositoryImpl implements DetectorRepository {
 
     @Override
     public void updateDetector(String uuid, DetectorDocument document) {
+        notNull(document, "document can't be null");
+        RequestValidator.validateDetector(document);
+
         val updateRequest = new UpdateRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, uuid);
         Map<String, Object> jsonMap = new HashMap<>();
 

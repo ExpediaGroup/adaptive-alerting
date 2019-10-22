@@ -70,8 +70,13 @@ public class ObjectMother {
         return detectorParams;
     }
 
-    public DetectorDocument getDetector() {
-        DetectorDocument detector = new DetectorDocument();
+    /**
+     * Returns a detector document with the UUID set to {@literal null}.
+     *
+     * @return Detector document with the UUID set to {@literal null}.
+     */
+    public DetectorDocument getDetectorDocument() {
+        val detector = new DetectorDocument();
         detector.setCreatedBy("user");
         detector.setType("constant-detector");
 

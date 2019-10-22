@@ -21,11 +21,13 @@ import com.expedia.adaptivealerting.modelservice.entity.User;
 import com.expedia.adaptivealerting.modelservice.util.RequestValidator;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class CreateDetectorMappingRequest {
     private Expression expression;

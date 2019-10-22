@@ -46,7 +46,6 @@ public class DetectorControllerTest {
     private List<DetectorDocument> detectors;
 
     private UUID someUuid;
-    private DetectorDocument illegalParamsDetector;
     private DetectorDocument legalParamsDetector;
 
     @Before
@@ -62,22 +61,19 @@ public class DetectorControllerTest {
         this.someUuid = UUID.randomUUID();
 
         val mom = ObjectMother.instance();
-        legalParamsDetector = mom.getDetector();
+        legalParamsDetector = mom.getDetectorDocument();
         legalParamsDetector.setUuid(someUuid);
-
-        illegalParamsDetector = mom.getIllegalParamsDetector();
-        illegalParamsDetector.setUuid(someUuid);
     }
 
     @Test
     public void testFindByUuid() {
-        DetectorDocument actualDetector = controller.findByUuid(someUuid.toString());
+        val actualDetector = controller.findByUuid(someUuid.toString());
         assertNotNull(actualDetector);
     }
 
     @Test
     public void testFindByCreatedBy() {
-        List<DetectorDocument> actualDetectors = controller.findByCreatedBy("kashah");
+        val actualDetectors = controller.findByCreatedBy("kashah");
         assertNotNull(actualDetectors);
     }
 
@@ -103,32 +99,8 @@ public class DetectorControllerTest {
     @Test
     public void testGetLastUpdatedDetectors() {
         int interval = 5;
-        List<DetectorDocument> actualDetectors = controller.getLastUpdatedDetectors(interval);
+        val actualDetectors = controller.getLastUpdatedDetectors(interval);
         assertNotNull(actualDetectors);
         assertSame(detectors, actualDetectors);
-    }
-
-    @Test(expected = DetectorException.class)
-    public void testCreateDetectorNullValues() {
-        DetectorDocument detector1 = new DetectorDocument();
-        detector1.setCreatedBy("user");
-        controller.createDetector(detector1);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testCreateDetectorIllegalThresholds() {
-        controller.createDetector(illegalParamsDetector);
-    }
-
-    @Test(expected = DetectorException.class)
-    public void testUpdateDetectorNullValues() {
-        DetectorDocument detector1 = new DetectorDocument();
-        detector1.setCreatedBy("user");
-        controller.updateDetector("", detector1);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testUpdateDetectorIllegalThresholds() {
-        controller.updateDetector("", illegalParamsDetector);
     }
 }

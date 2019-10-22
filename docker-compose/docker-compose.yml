@@ -18,7 +18,7 @@ services:
 
   # AA Components
   modelservice:
-    image: expediadotcom/adaptive-alerting-modelservice:69c4f3d4e56ea6540fb94d3fcfb141c00bcea3d7
+    image: adaptive-alerting-modelservice
     environment:
       AA_GRAPHITE_ENABLED: "true"
       JAVA_XMS: 128m
@@ -38,7 +38,7 @@ services:
       retries: 5
 
   a2m-mapper:
-    image: expediadotcom/adaptive-alerting-a2m-mapper:69c4f3d4e56ea6540fb94d3fcfb141c00bcea3d7
+    image: adaptive-alerting-a2m-mapper
     environment:
       AA_GRAPHITE_ENABLED: "true"
       JAVA_XMS: 128m
@@ -51,7 +51,7 @@ services:
         condition: service_healthy
 
   ad-mapper:
-    image: expediadotcom/adaptive-alerting-ad-mapper:69c4f3d4e56ea6540fb94d3fcfb141c00bcea3d7
+    image: adaptive-alerting-ad-mapper
     environment:
       AA_GRAPHITE_ENABLED: "true"
       JAVA_XMS: 128m
@@ -64,7 +64,7 @@ services:
         condition: service_healthy
 
   ad-manager:
-    image: expediadotcom/adaptive-alerting-ad-manager:69c4f3d4e56ea6540fb94d3fcfb141c00bcea3d7
+    image: adaptive-alerting-ad-manager
     environment:
       AA_GRAPHITE_ENABLED: "true"
       JAVA_XMS: 128m

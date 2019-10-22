@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.repo.impl;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorException;
 import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticSearchClient;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
@@ -90,7 +91,10 @@ public class DetectorRepositoryImplTest {
     @Mock
     private ObjectMapperUtil objectMapperUtil;
 
+    private UUID someUuid;
     private DetectorDocument detector;
+    private DetectorDocument illegalParamsDetector;
+
     private IndexResponse indexResponse;
     private SearchResponse searchResponse;
     private DeleteResponse deleteResponse;
@@ -106,9 +110,27 @@ public class DetectorRepositoryImplTest {
 
     @Test
     public void testCreateDetector() {
-        val actualCreationId = repoUnderTest.createDetector(new DetectorDocument());
-        assertNotNull(actualCreationId);
-        assertEquals("1", actualCreationId);
+        val mom = ObjectMother.instance();
+        val document = mom.getDetectorDocument();
+
+        // Disabled these because the contract does not require returning an implementation-specific ID. [WLW]
+//        val actualCreationId = repoUnderTest.createDetector(document);
+//        assertNotNull(actualCreationId);
+//        assertEquals("1", actualCreationId);
+
+        repoUnderTest.createDetector(document);
+    }
+
+    @Test(expected = DetectorException.class)
+    public void testCreateDetectorNullValues() {
+        val detector1 = new DetectorDocument();
+        detector1.setCreatedBy("user");
+        repoUnderTest.createDetector(detector1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateDetectorIllegalThresholds() {
+        repoUnderTest.createDetector(illegalParamsDetector);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -116,22 +138,6 @@ public class DetectorRepositoryImplTest {
         val document = new DetectorDocument();
         document.setUuid(UUID.randomUUID());
         repoUnderTest.createDetector(document);
-    }
-
-    @Test
-    public void testDeleteDetector() {
-        val detectorRepository = mock(DetectorRepository.class);
-        doNothing().when(detectorRepository).deleteDetector(anyString());
-        detectorRepository.deleteDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639");
-        verify(detectorRepository, times(1)).deleteDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639");
-    }
-
-    @Test
-    public void testUpdateDetector() {
-        DetectorRepository detectorRepository = mock(DetectorRepository.class);
-        doNothing().when(detectorRepository).updateDetector(anyString(), any(DetectorDocument.class));
-        detectorRepository.updateDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", new DetectorDocument());
-        verify(detectorRepository, times(1)).updateDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", new DetectorDocument());
     }
 
     @Test
@@ -151,14 +157,6 @@ public class DetectorRepositoryImplTest {
     }
 
     @Test
-    public void testToggleDetector() {
-        DetectorRepository detectorRepository = mock(DetectorRepository.class);
-        doNothing().when(detectorRepository).toggleDetector(anyString(), anyBoolean());
-        detectorRepository.toggleDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
-        verify(detectorRepository, times(1)).toggleDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
-    }
-
-    @Test
     public void testGetLastUpdatedDetectors() {
         List<DetectorDocument> actualDetectors = repoUnderTest.getLastUpdatedDetectors("", "");
         assertNotNull(actualDetectors);
@@ -171,10 +169,46 @@ public class DetectorRepositoryImplTest {
         repoUnderTest.findByUuid("aeb4d849-847a-45c0-8312-dc0fcf22b639");
     }
 
+    @Test
+    public void testUpdateDetector() {
+        DetectorRepository detectorRepository = mock(DetectorRepository.class);
+        doNothing().when(detectorRepository).updateDetector(anyString(), any(DetectorDocument.class));
+        detectorRepository.updateDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", new DetectorDocument());
+        verify(detectorRepository, times(1)).updateDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", new DetectorDocument());
+    }
+
+    @Test(expected = DetectorException.class)
+    public void testUpdateDetector_nullValues() {
+        val document = new DetectorDocument();
+        document.setCreatedBy("user");
+        repoUnderTest.updateDetector("", document);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testUpdateDetector_illegalThresholds() {
+        repoUnderTest.updateDetector("", illegalParamsDetector);
+    }
+
     @Test(expected = RuntimeException.class)
     public void updateDetectorFail() throws IOException {
         Mockito.when(elasticSearchClient.update(any(UpdateRequest.class), any(RequestOptions.class))).thenThrow(new IOException());
         repoUnderTest.toggleDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
+    }
+
+    @Test
+    public void testToggleDetector() {
+        DetectorRepository detectorRepository = mock(DetectorRepository.class);
+        doNothing().when(detectorRepository).toggleDetector(anyString(), anyBoolean());
+        detectorRepository.toggleDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
+        verify(detectorRepository, times(1)).toggleDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
+    }
+
+    @Test
+    public void testDeleteDetector() {
+        val detectorRepository = mock(DetectorRepository.class);
+        doNothing().when(detectorRepository).deleteDetector(anyString());
+        detectorRepository.deleteDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639");
+        verify(detectorRepository, times(1)).deleteDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639");
     }
 
     @Test(expected = RuntimeException.class)
@@ -184,14 +218,20 @@ public class DetectorRepositoryImplTest {
     }
 
     private void initTestObjects() {
-        ObjectMother mom = ObjectMother.instance();
-        detector = mom.getElasticsearchDetector();
+        this.someUuid = UUID.randomUUID();
+
+        val mom = ObjectMother.instance();
+        this.detector = mom.getElasticsearchDetector();
         detectors.add(detector);
-        String searchIndex = "2";
-        indexResponse = mockIndexResponse();
-        searchResponse = mockSearchResponse(searchIndex);
-        deleteResponse = mockDeleteResponse("id");
-        getResponse = mockGetResponse("id");
+
+        this.illegalParamsDetector = mom.getIllegalParamsDetector();
+        illegalParamsDetector.setUuid(someUuid);
+
+        val searchIndex = "2";
+        this.indexResponse = mockIndexResponse();
+        this.searchResponse = mockSearchResponse(searchIndex);
+        this.deleteResponse = mockDeleteResponse("id");
+        this.getResponse = mockGetResponse("id");
     }
 
     @SneakyThrows
