@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.modelservice.web;
 
-import com.expedia.adaptivealerting.modelservice.dto.metricprofiling.CreateMetricProfilingRequest;
-import com.expedia.adaptivealerting.modelservice.service.MetricProfilingService;
+import com.expedia.adaptivealerting.modelservice.repo.MetricProfileRepository;
+import com.expedia.adaptivealerting.modelservice.repo.request.CreateMetricProfilingRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,25 +34,25 @@ import java.util.Map;
 public class MetricProfileController {
 
     @Autowired
-    private MetricProfilingService metricProfilingService;
+    private MetricProfileRepository metricProfilingRepo;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public String createMetricProfile(@RequestBody CreateMetricProfilingRequest request) {
         request.validate();
-        return metricProfilingService.createMetricProfile(request);
+        return metricProfilingRepo.createMetricProfile(request);
     }
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public void updateMetricProfile(@RequestParam String id, @RequestParam Boolean isStationary) {
-        metricProfilingService.updateMetricProfile(id, isStationary);
+        metricProfilingRepo.updateMetricProfile(id, isStationary);
     }
 
     @PostMapping
     @RequestMapping(value = "/search/findByTags")
     public Boolean profilingExists(@RequestBody Map<String, String> tags) {
-        return metricProfilingService.profilingExists(tags);
+        return metricProfilingRepo.profilingExists(tags);
     }
 
 }

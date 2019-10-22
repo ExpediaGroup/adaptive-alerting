@@ -1,20 +1,21 @@
 package com.expedia.adaptivealerting.modelservice.test;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
-import com.expedia.adaptivealerting.modelservice.dto.common.Expression;
-import com.expedia.adaptivealerting.modelservice.dto.common.Field;
-import com.expedia.adaptivealerting.modelservice.dto.common.Operand;
-import com.expedia.adaptivealerting.modelservice.dto.common.Operator;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.MatchingDetectorsResponse;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.User;
-import com.expedia.adaptivealerting.modelservice.dto.percolator.BoolCondition;
-import com.expedia.adaptivealerting.modelservice.dto.percolator.MustCondition;
-import com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping;
-import com.expedia.adaptivealerting.modelservice.dto.percolator.Query;
+import com.expedia.adaptivealerting.modelservice.entity.Expression;
+import com.expedia.adaptivealerting.modelservice.entity.Field;
+import com.expedia.adaptivealerting.modelservice.entity.Operand;
+import com.expedia.adaptivealerting.modelservice.entity.Operator;
+import com.expedia.adaptivealerting.modelservice.entity.User;
+import com.expedia.adaptivealerting.modelservice.entity.Detector;
+import com.expedia.adaptivealerting.modelservice.repo.impl.percolator.BoolCondition;
+import com.expedia.adaptivealerting.modelservice.repo.impl.percolator.MustCondition;
+import com.expedia.adaptivealerting.modelservice.repo.impl.percolator.PercolatorDetectorMapping;
+import com.expedia.adaptivealerting.modelservice.repo.impl.percolator.Query;
 import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
-import com.expedia.adaptivealerting.modelservice.providers.graphite.GraphiteResult;
-import com.expedia.adaptivealerting.modelservice.service.AnomalyRequest;
-import com.expedia.adaptivealerting.modelservice.spi.MetricSourceResult;
+import com.expedia.adaptivealerting.modelservice.metricsource.graphite.GraphiteResult;
+import com.expedia.adaptivealerting.modelservice.repo.response.MatchingDetectorsResponse;
+import com.expedia.adaptivealerting.modelservice.repo.request.AnomalyRequest;
+import com.expedia.adaptivealerting.modelservice.metricsource.MetricSourceResult;
 import com.expedia.adaptivealerting.modelservice.util.DateUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
@@ -118,7 +119,7 @@ public class ObjectMother {
         detectorMapping.setCreatedTimeInMillis(10000);
         detectorMapping.setEnabled(true);
         detectorMapping.setUser(new User("test-user"));
-        detectorMapping.setDetector(new com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639")));
+        detectorMapping.setDetector(new Detector(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639")));
         return detectorMapping;
     }
 
@@ -138,15 +139,15 @@ public class ObjectMother {
         percolatorDetectorMapping.setEnabled(true);
         percolatorDetectorMapping.setLastModifiedTimeInMillis(1554828886);
         percolatorDetectorMapping.setUser(new User("test-user"));
-        percolatorDetectorMapping.setDetector(new com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639")));
+        percolatorDetectorMapping.setDetector(new Detector(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639")));
         percolatorDetectorMapping.setQuery(query);
         return percolatorDetectorMapping;
     }
 
     public MatchingDetectorsResponse getMatchingDetectorsResponse() {
-        Map<Integer, List<com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector>> groupedDetectorsByIndex = new HashMap<>();
-        com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector detector = new com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"));
-        List<com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector> detectors = new ArrayList<>();
+        Map<Integer, List<Detector>> groupedDetectorsByIndex = new HashMap<>();
+        Detector detector = new Detector(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"));
+        List<Detector> detectors = new ArrayList<>();
         detectors.add(detector);
         groupedDetectorsByIndex.put(0, detectors);
         return new MatchingDetectorsResponse(groupedDetectorsByIndex, 10000);

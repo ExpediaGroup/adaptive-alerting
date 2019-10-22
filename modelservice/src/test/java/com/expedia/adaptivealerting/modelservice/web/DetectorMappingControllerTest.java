@@ -1,11 +1,26 @@
+/*
+ * Copyright 2018-2019 Expedia Group, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.expedia.adaptivealerting.modelservice.web;
 
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.MatchingDetectorsResponse;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.SearchMappingsRequest;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.User;
+import com.expedia.adaptivealerting.modelservice.entity.Detector;
+import com.expedia.adaptivealerting.modelservice.entity.User;
 import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
-import com.expedia.adaptivealerting.modelservice.service.DetectorMappingServiceImpl;
+import com.expedia.adaptivealerting.modelservice.repo.DetectorMappingRepository;
+import com.expedia.adaptivealerting.modelservice.repo.request.SearchMappingsRequest;
+import com.expedia.adaptivealerting.modelservice.repo.response.MatchingDetectorsResponse;
 import lombok.val;
 import org.junit.Assert;
 import org.junit.Before;
@@ -37,7 +52,7 @@ import static org.mockito.Mockito.when;
 public class DetectorMappingControllerTest {
 
     @Mock
-    private DetectorMappingServiceImpl detectorMappingService;
+    private DetectorMappingRepository detectorMappingRepo;
 
     private String id = "adsvade8^szx";
     private String detectorUuid = "aeb4d849-847a-45c0-8312-dc0fcf22b639";
@@ -52,15 +67,10 @@ public class DetectorMappingControllerTest {
         MockitoAnnotations.initMocks(this);
     }
 
-    @Before
-    public void beforeTest() {
-        detectorMappingService = new DetectorMappingServiceImpl();
-    }
-
     @Test
     public void testGetDetectorMappings_successful() throws IOException {
         DetectorMapping detectorMapping = mockDetectorMapping(id);
-        when(detectorMappingService.findDetectorMapping(id)).thenReturn(detectorMapping);
+        when(detectorMappingRepo.findDetectorMapping(id)).thenReturn(detectorMapping);
         DetectorMapping detectorMappingreturned = controllerUnderTest.getDetectorMapping(id);
         assertNotNull("Response can't be null", detectorMappingreturned);
         assertEquals(UUID.fromString(detectorUuid), detectorMappingreturned.getDetector().getUuid());
@@ -71,7 +81,7 @@ public class DetectorMappingControllerTest {
 
     @Test(expected = RuntimeException.class)
     public void testGetDetectorMappings_fail() throws IOException {
-        when(detectorMappingService.findDetectorMapping(id)).thenReturn(new DetectorMapping());
+        when(detectorMappingRepo.findDetectorMapping(id)).thenReturn(new DetectorMapping());
         DetectorMapping detectorMappingreturned = controllerUnderTest.getDetectorMapping(id);
         assertNotNull("Response can't be null", detectorMappingreturned);
         assertEquals(detectorUuid, detectorMappingreturned.getDetector().getUuid());
@@ -104,7 +114,7 @@ public class DetectorMappingControllerTest {
     public void testGetLastUpdated_successful() throws IOException {
         val timeInSecs = 60;
         List<DetectorMapping> mockeddetectorMappingsList = mockDetectorMappingsList();
-        when(detectorMappingService.findLastUpdated(timeInSecs)).thenReturn(mockeddetectorMappingsList);
+        when(detectorMappingRepo.findLastUpdated(timeInSecs)).thenReturn(mockeddetectorMappingsList);
         List<DetectorMapping> listofdetectorMappingsreturned = controllerUnderTest.findDetectorMapping(timeInSecs);
         assertNotNull("Response can't be null", listofdetectorMappingsreturned);
         assertEquals(1, listofdetectorMappingsreturned.size());
@@ -115,7 +125,7 @@ public class DetectorMappingControllerTest {
     @Test(expected = RuntimeException.class)
     public void testGetLastUpdated_fail() throws IOException {
         val TimeinSecs = 60;
-        when(detectorMappingService.findLastUpdated(TimeinSecs)).thenThrow(new IOException());
+        when(detectorMappingRepo.findLastUpdated(TimeinSecs)).thenThrow(new IOException());
         List<DetectorMapping> listofdetectorMappingsreturned = controllerUnderTest.findDetectorMapping(TimeinSecs);
         assertNotNull("Response can't be null", listofdetectorMappingsreturned);
         assertEquals(0, listofdetectorMappingsreturned.size());
@@ -127,7 +137,7 @@ public class DetectorMappingControllerTest {
         SearchMappingsRequest searchMappingsRequest = new SearchMappingsRequest();
         searchMappingsRequest.setDetectorUuid(UUID.fromString(detectorUuid));
         searchMappingsRequest.setUserId(userVal);
-        when(detectorMappingService.search(searchMappingsRequest)).thenReturn(detectorMappingslist);
+        when(detectorMappingRepo.search(searchMappingsRequest)).thenReturn(detectorMappingslist);
         List<DetectorMapping> detectorMappingsResponse = controllerUnderTest.searchDetectorMapping(searchMappingsRequest);
         assertEquals(id, detectorMappingsResponse.get(0).getId());
         assertEquals(detectorUuid, detectorMappingsResponse.get(0).getDetector().getUuid().toString());
@@ -139,7 +149,7 @@ public class DetectorMappingControllerTest {
         val lookuptime = 60;
         List<Map<String, String>> tagsList = new ArrayList<>();
         MatchingDetectorsResponse mockmatchingDetectorsResponse = mockMatchingDetectorsResponse(lookuptime, detectorUuid);
-        when(detectorMappingService.findMatchingDetectorMappings(tagsList)).thenReturn(mockmatchingDetectorsResponse);
+        when(detectorMappingRepo.findMatchingDetectorMappings(tagsList)).thenReturn(mockmatchingDetectorsResponse);
         MatchingDetectorsResponse matchingDetectorsResult = controllerUnderTest.searchDetectorMapping(tagsList);
         Assert.assertEquals(1, matchingDetectorsResult.getGroupedDetectorsBySearchIndex().size());
         List<Detector> detectors = matchingDetectorsResult.getGroupedDetectorsBySearchIndex().get(1);

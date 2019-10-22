@@ -1,8 +1,8 @@
 package com.expedia.adaptivealerting.modelservice.web;
 
-import com.expedia.adaptivealerting.modelservice.dto.common.Expression;
-import com.expedia.adaptivealerting.modelservice.dto.metricprofiling.CreateMetricProfilingRequest;
-import com.expedia.adaptivealerting.modelservice.service.MetricProfilingService;
+import com.expedia.adaptivealerting.modelservice.entity.Expression;
+import com.expedia.adaptivealerting.modelservice.repo.MetricProfileRepository;
+import com.expedia.adaptivealerting.modelservice.repo.request.CreateMetricProfilingRequest;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import lombok.val;
 import org.junit.Before;
@@ -32,7 +32,7 @@ public class MetricProfileControllerTest {
     private MetricProfileController controllerUnderTest;
 
     @Mock
-    private MetricProfilingService profilingService;
+    private MetricProfileRepository metricProfileRepo;
 
     private Expression expression;
 
@@ -50,8 +50,8 @@ public class MetricProfileControllerTest {
     }
 
     private void initDependencies() {
-        when(profilingService.createMetricProfile(Mockito.any(CreateMetricProfilingRequest.class))).thenReturn("created");
-        when(profilingService.profilingExists(Mockito.any(Map.class))).thenReturn(true);
+        when(metricProfileRepo.createMetricProfile(Mockito.any(CreateMetricProfilingRequest.class))).thenReturn("created");
+        when(metricProfileRepo.profilingExists(Mockito.any(Map.class))).thenReturn(true);
     }
 
     @Test

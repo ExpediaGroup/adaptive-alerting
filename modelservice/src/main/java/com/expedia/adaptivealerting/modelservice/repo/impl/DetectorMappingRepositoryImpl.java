@@ -18,17 +18,16 @@ package com.expedia.adaptivealerting.modelservice.repo.impl;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.CreateDetectorMappingRequest;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.DetectorMatchResponse;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.MatchingDetectorsResponse;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.SearchMappingsRequest;
-import com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping;
-import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
-import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
+import com.expedia.adaptivealerting.modelservice.entity.Detector;
+import com.expedia.adaptivealerting.modelservice.repo.impl.percolator.PercolatorDetectorMapping;
+import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticSearchClient;
+import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticSearchProperties;
 import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorMappingRepository;
-import com.expedia.adaptivealerting.modelservice.util.ElasticsearchUtil;
+import com.expedia.adaptivealerting.modelservice.repo.request.CreateDetectorMappingRequest;
+import com.expedia.adaptivealerting.modelservice.repo.request.SearchMappingsRequest;
+import com.expedia.adaptivealerting.modelservice.repo.response.MatchingDetectorsResponse;
+import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticsearchUtil;
 import com.expedia.adaptivealerting.modelservice.util.ObjectMapperUtil;
 import com.expedia.adaptivealerting.modelservice.util.QueryUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -69,7 +68,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping.LAST_MOD_TIME_KEYWORD;
+import static com.expedia.adaptivealerting.modelservice.repo.impl.percolator.PercolatorDetectorMapping.LAST_MOD_TIME_KEYWORD;
 
 @Service
 @Slf4j

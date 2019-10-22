@@ -1,8 +1,8 @@
 package com.expedia.adaptivealerting.modelservice.web;
 
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
-import com.expedia.adaptivealerting.modelservice.service.AnomalyRequest;
-import com.expedia.adaptivealerting.modelservice.service.AnomalyService;
+import com.expedia.adaptivealerting.modelservice.repo.request.AnomalyRequest;
+import com.expedia.adaptivealerting.modelservice.repo.AnomalyRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -23,7 +23,7 @@ public class AnomalyControllerTest {
 
     // Dependencies
     @Mock
-    private AnomalyService anomalyService;
+    private AnomalyRepository anomalyRepository;
 
     // Test objects
     @Mock
@@ -35,7 +35,7 @@ public class AnomalyControllerTest {
     public void setUp() {
         this.controller = new AnomalyController();
         MockitoAnnotations.initMocks(this);
-        when(anomalyService.getAnomalies(request)).thenReturn(results);
+        when(anomalyRepository.getAnomalies(request)).thenReturn(results);
     }
 
     @Test

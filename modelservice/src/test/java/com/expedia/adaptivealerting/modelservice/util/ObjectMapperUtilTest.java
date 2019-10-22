@@ -7,7 +7,6 @@ import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Map;
 

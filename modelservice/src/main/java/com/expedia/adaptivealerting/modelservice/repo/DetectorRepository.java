@@ -33,5 +33,7 @@ public interface DetectorRepository {
 
     void toggleDetector(String uuid, Boolean enabled);
 
+    List<DetectorDocument> getLastUpdatedDetectors(long interval);
+
     List<DetectorDocument> getLastUpdatedDetectors(String fromDate, String toDate);
 }
