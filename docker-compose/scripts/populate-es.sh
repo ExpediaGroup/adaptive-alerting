@@ -15,7 +15,7 @@
 #       limitations under the License.
 
 now=$(date -u +"%Y-%m-%d %H:%M:%S")
-uuid=$(python -c 'import sys,uuid; sys.stdout.write(str(uuid.uuid4()))')
+#uuid=$(python -c 'import sys,uuid; sys.stdout.write(str(uuid.uuid4()))')
 
 echo "--- Waiting for the Model Service API to become available before inserting sample detector and mapping..."
 
@@ -32,7 +32,6 @@ until detectoruuid=$(curl -s -X POST \
     http://modelservice:8008/api/v2/detectors \
     -H 'Content-Type: application/json' \
     -d '{
-            "uuid": "'$uuid'",
             "createdBy": "sampleuser",
             "type": "constant-detector",
             "lastUpdateTimestamp": "'"$now"'",

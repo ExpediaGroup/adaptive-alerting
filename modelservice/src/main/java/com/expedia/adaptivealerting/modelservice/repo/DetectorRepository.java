@@ -21,6 +21,14 @@ import java.util.List;
 
 public interface DetectorRepository {
 
+    /**
+     * Saves a detector document to the detector store. The detector UUID must be {@literal null}, as this method
+     * assigns a UUID.
+     *
+     * @param document Detector document
+     * @return Undefined. Currently returns the Elasticsearch document ID, but that's wrong since we don't want to
+     * expose the underlying implementation. [WLW]
+     */
     String createDetector(DetectorDocument document);
 
     void deleteDetector(String uuid);
