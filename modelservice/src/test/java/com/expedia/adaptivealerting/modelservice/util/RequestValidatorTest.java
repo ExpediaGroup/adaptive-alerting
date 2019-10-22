@@ -1,13 +1,13 @@
 package com.expedia.adaptivealerting.modelservice.util;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.User;
+import com.expedia.adaptivealerting.modelservice.entity.Expression;
+import com.expedia.adaptivealerting.modelservice.entity.Field;
+import com.expedia.adaptivealerting.modelservice.entity.Operand;
+import com.expedia.adaptivealerting.modelservice.entity.Operator;
+import com.expedia.adaptivealerting.modelservice.entity.Detector;
+import com.expedia.adaptivealerting.modelservice.entity.User;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
-import com.expedia.adaptivealerting.modelservice.dto.common.Expression;
-import com.expedia.adaptivealerting.modelservice.dto.common.Operator;
-import com.expedia.adaptivealerting.modelservice.dto.common.Operand;
-import com.expedia.adaptivealerting.modelservice.dto.common.Field;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;

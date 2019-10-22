@@ -16,10 +16,10 @@
 package com.expedia.adaptivealerting.modelservice.repo.impl;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
-import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
+import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticSearchClient;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
 import com.expedia.adaptivealerting.modelservice.util.DateUtil;
-import com.expedia.adaptivealerting.modelservice.util.ElasticsearchUtil;
+import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticsearchUtil;
 import com.expedia.adaptivealerting.modelservice.util.ObjectMapperUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +38,8 @@ import org.springframework.util.ReflectionUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -145,6 +147,16 @@ public class DetectorRepositoryImpl implements DetectorRepository {
             log.error(String.format("Updating elastic search failed", e));
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public List<DetectorDocument> getLastUpdatedDetectors(long interval) {
+        // Replaced Lombok val with explicit types here because the Maven compiler plugin was breaking under
+        // OpenJDK 12. Not sure what the issue was but this fixed it. [WLW]
+        Instant now = DateUtil.now().toInstant();
+        String fromDate = DateUtil.toUtcDateString((now.minus(interval, ChronoUnit.SECONDS)));
+        String toDate = DateUtil.toUtcDateString(now);
+        return getLastUpdatedDetectors(fromDate, toDate);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.expedia.adaptivealerting.modelservice.util;
 
-import com.expedia.adaptivealerting.modelservice.providers.graphite.GraphiteProperties;
+import com.expedia.adaptivealerting.modelservice.metricsource.graphite.GraphiteProperties;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

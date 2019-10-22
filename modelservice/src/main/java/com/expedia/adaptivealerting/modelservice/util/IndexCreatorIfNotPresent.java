@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.modelservice.util;
 
-import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
-import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
+import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticSearchClient;
+import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticSearchProperties;
 import com.google.gson.JsonObject;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -32,12 +32,12 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-import static com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping.CREATE_TIME_KEYWORD;
-import static com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping.DETECTOR_KEYWORD;
-import static com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping.ENABLED;
-import static com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping.LAST_MOD_TIME_KEYWORD;
-import static com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping.QUERY_KEYWORD;
-import static com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping.USER_KEYWORD;
+import static com.expedia.adaptivealerting.modelservice.repo.impl.percolator.PercolatorDetectorMapping.CREATE_TIME_KEYWORD;
+import static com.expedia.adaptivealerting.modelservice.repo.impl.percolator.PercolatorDetectorMapping.DETECTOR_KEYWORD;
+import static com.expedia.adaptivealerting.modelservice.repo.impl.percolator.PercolatorDetectorMapping.ENABLED;
+import static com.expedia.adaptivealerting.modelservice.repo.impl.percolator.PercolatorDetectorMapping.LAST_MOD_TIME_KEYWORD;
+import static com.expedia.adaptivealerting.modelservice.repo.impl.percolator.PercolatorDetectorMapping.QUERY_KEYWORD;
+import static com.expedia.adaptivealerting.modelservice.repo.impl.percolator.PercolatorDetectorMapping.USER_KEYWORD;
 
 /**
  * Util class to create index with mappings if not found.

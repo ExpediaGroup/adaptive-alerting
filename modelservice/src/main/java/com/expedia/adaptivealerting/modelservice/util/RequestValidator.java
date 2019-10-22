@@ -17,11 +17,12 @@ package com.expedia.adaptivealerting.modelservice.util;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorFactory;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.User;
-import com.expedia.adaptivealerting.modelservice.dto.percolator.PercolatorDetectorMapping;
-import com.expedia.adaptivealerting.modelservice.dto.common.Expression;
-import com.expedia.adaptivealerting.modelservice.dto.common.Operator;
-import com.expedia.adaptivealerting.modelservice.dto.common.Operand;
+import com.expedia.adaptivealerting.modelservice.entity.Expression;
+import com.expedia.adaptivealerting.modelservice.entity.Operand;
+import com.expedia.adaptivealerting.modelservice.entity.Operator;
+import com.expedia.adaptivealerting.modelservice.entity.User;
+import com.expedia.adaptivealerting.modelservice.entity.Detector;
+import com.expedia.adaptivealerting.modelservice.repo.impl.percolator.PercolatorDetectorMapping;
 import lombok.experimental.UtilityClass;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -59,7 +60,7 @@ public class RequestValidator {
                         operand.getField().getKey(), PercolatorDetectorMapping.AA_PREFIX));
     }
 
-    public static void validateMappingDetector(com.expedia.adaptivealerting.modelservice.dto.detectormapping.Detector detector) {
+    public static void validateMappingDetector(Detector detector) {
         Assert.notNull(detector, "Detector can't be null");
         Assert.notNull(detector.getUuid(), "Detector uuid can't be null");
     }

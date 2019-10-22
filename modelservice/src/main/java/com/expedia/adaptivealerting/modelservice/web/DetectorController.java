@@ -16,9 +16,8 @@
 package com.expedia.adaptivealerting.modelservice.web;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
-import com.expedia.adaptivealerting.modelservice.service.DetectorService;
+import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
 import com.expedia.adaptivealerting.modelservice.util.RequestValidator;
-import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.Assert;
@@ -40,38 +39,38 @@ import java.util.List;
 public class DetectorController {
 
     @Autowired
-    private DetectorService detectorService;
+    private DetectorRepository detectorRepo;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public String createDetector(@Valid @RequestBody DetectorDocument document) {
         RequestValidator.validateDetector(document);
-        return detectorService.createDetector(document);
+        return detectorRepo.createDetector(document);
     }
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public void updateDetector(@RequestParam String uuid, @RequestBody DetectorDocument document) {
         RequestValidator.validateDetector(document);
-        detectorService.updateDetector(uuid, document);
+        detectorRepo.updateDetector(uuid, document);
     }
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.OK)
     public void deleteDetector(@RequestParam String uuid) {
-        detectorService.deleteDetector(uuid);
+        detectorRepo.deleteDetector(uuid);
     }
 
     @GetMapping(path = "/findByUuid", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public DetectorDocument findByUuid(@RequestParam String uuid) {
-        return detectorService.findByUuid(uuid);
+        return detectorRepo.findByUuid(uuid);
     }
 
     @GetMapping(path = "/findByCreatedBy", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public List<DetectorDocument> findByCreatedBy(@RequestParam String user) {
-        return detectorService.findByCreatedBy(user);
+        return detectorRepo.findByCreatedBy(user);
     }
 
     @PostMapping(path = "/toggleDetector", consumes = "application/json", produces = "application/json")
@@ -79,12 +78,12 @@ public class DetectorController {
     public void toggleDetector(@RequestParam String uuid, @RequestParam Boolean enabled) {
         Assert.notNull(uuid, "uuid can't be null");
         Assert.notNull(enabled, "enabled can't be null");
-        detectorService.toggleDetector(uuid, enabled);
+        detectorRepo.toggleDetector(uuid, enabled);
     }
 
     @GetMapping(path = "/getLastUpdatedDetectors", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public List<DetectorDocument> getLastUpdatedDetectors(@RequestParam long interval) {
-        return detectorService.getLastUpdatedDetectors(interval);
+        return detectorRepo.getLastUpdatedDetectors(interval);
     }
 }

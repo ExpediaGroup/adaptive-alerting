@@ -2,7 +2,7 @@ package com.expedia.adaptivealerting.modelservice.web;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorException;
-import com.expedia.adaptivealerting.modelservice.service.DetectorService;
+import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -37,7 +37,7 @@ public class DetectorControllerTest {
     private DetectorController controller;
 
     @Mock
-    private DetectorService detectorService;
+    private DetectorRepository detectorRepo;
 
     @Mock
     private DetectorDocument detector;
@@ -54,8 +54,8 @@ public class DetectorControllerTest {
         this.controller = new DetectorController();
         MockitoAnnotations.initMocks(this);
         initTestObjects();
-        when(detectorService.findByUuid(someUuid.toString())).thenReturn(detector);
-        when(detectorService.getLastUpdatedDetectors(anyLong())).thenReturn(detectors);
+        when(detectorRepo.findByUuid(someUuid.toString())).thenReturn(detector);
+        when(detectorRepo.getLastUpdatedDetectors(anyLong())).thenReturn(detectors);
     }
 
     private void initTestObjects() {

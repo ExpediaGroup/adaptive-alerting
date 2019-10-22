@@ -15,10 +15,10 @@
  */
 package com.expedia.adaptivealerting.modelservice.repo;
 
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.CreateDetectorMappingRequest;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.MatchingDetectorsResponse;
-import com.expedia.adaptivealerting.modelservice.dto.detectormapping.SearchMappingsRequest;
 import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
+import com.expedia.adaptivealerting.modelservice.repo.request.CreateDetectorMappingRequest;
+import com.expedia.adaptivealerting.modelservice.repo.request.SearchMappingsRequest;
+import com.expedia.adaptivealerting.modelservice.repo.response.MatchingDetectorsResponse;
 
 import java.util.List;
 import java.util.Map;

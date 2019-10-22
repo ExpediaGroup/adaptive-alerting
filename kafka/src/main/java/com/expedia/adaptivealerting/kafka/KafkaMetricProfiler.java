@@ -59,6 +59,7 @@ public final class KafkaMetricProfiler extends AbstractStreamsApp {
      * Creates a new Kafka Streams adapter to send metrics to be profiled to profiling Kafka topic.
      *
      * @param config Streams app configuration.
+     * @param metricProfiler Metric profiler
      */
     public KafkaMetricProfiler(StreamsAppConfig config, MetricProfiler metricProfiler) {
         super(config);
