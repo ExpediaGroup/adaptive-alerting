@@ -20,6 +20,7 @@ import java.util.UUID;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
@@ -30,7 +31,6 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class DetectorControllerTest {
 
-    @Spy
     @InjectMocks
     private DetectorController controllerUnderTest;
 
@@ -51,16 +51,14 @@ public class DetectorControllerTest {
         this.controllerUnderTest = new DetectorController();
         MockitoAnnotations.initMocks(this);
         initTestObjects();
-        when(detectorRepo.findByUuid(someUuid.toString())).thenReturn(detector);
-        when(detectorRepo.getLastUpdatedDetectors(anyLong())).thenReturn(detectors);
+        initDependencies();
     }
 
-    private void initTestObjects() {
-        this.someUuid = UUID.randomUUID();
-
-        val mom = ObjectMother.instance();
-        legalParamsDetector = mom.getDetectorDocument();
-        legalParamsDetector.setUuid(someUuid);
+    @Test
+    public void testCreateDetector() {
+        val uuidStr = controllerUnderTest.createDetector(legalParamsDetector);
+        val uuid = UUID.fromString(uuidStr);
+        assertNotNull(uuid);
     }
 
     @Test
@@ -76,30 +74,20 @@ public class DetectorControllerTest {
     }
 
     @Test
-    public void testToggleDetector() {
-        controllerUnderTest.toggleDetector(someUuid.toString(), true);
-    }
-
-    @Test
-    public void testCreateDetector() {
-        doReturn("1").when(controllerUnderTest).createDetector(legalParamsDetector);
-        Assert.assertEquals(controllerUnderTest.createDetector(legalParamsDetector), "1");
-        controllerUnderTest.createDetector(legalParamsDetector);
-        verify(controllerUnderTest, times(2)).createDetector(legalParamsDetector);
+    public void testGetLastUpdatedDetectors() {
+        val actualDetectors = controllerUnderTest.getLastUpdatedDetectors(5);
+        assertNotNull(actualDetectors);
+        assertSame(detectors, actualDetectors);
     }
 
     @Test
     public void testUpdateDetector() {
         controllerUnderTest.updateDetector(someUuid.toString(), legalParamsDetector);
-        verify(controllerUnderTest, times(1)).updateDetector(someUuid.toString(), legalParamsDetector);
     }
 
     @Test
-    public void testGetLastUpdatedDetectors() {
-        int interval = 5;
-        val actualDetectors = controllerUnderTest.getLastUpdatedDetectors(interval);
-        assertNotNull(actualDetectors);
-        assertSame(detectors, actualDetectors);
+    public void testToggleDetector() {
+        controllerUnderTest.toggleDetector(someUuid.toString(), true);
     }
 
     @Test
@@ -107,5 +95,19 @@ public class DetectorControllerTest {
         val someUuidStr = someUuid.toString();
         controllerUnderTest.deleteDetector(someUuidStr);
         verify(detectorRepo, times(1)).deleteDetector(someUuidStr);
+    }
+
+    private void initTestObjects() {
+        this.someUuid = UUID.randomUUID();
+
+        val mom = ObjectMother.instance();
+        this.legalParamsDetector = mom.getDetectorDocument();
+        legalParamsDetector.setUuid(someUuid);
+    }
+
+    private void initDependencies() {
+        when(detectorRepo.createDetector(any(DetectorDocument.class))).thenReturn(someUuid);
+        when(detectorRepo.findByUuid(someUuid.toString())).thenReturn(detector);
+        when(detectorRepo.getLastUpdatedDetectors(anyLong())).thenReturn(detectors);
     }
 }

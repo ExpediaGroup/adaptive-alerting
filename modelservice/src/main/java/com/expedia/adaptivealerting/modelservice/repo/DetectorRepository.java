@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.modelservice.repo;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface DetectorRepository {
 
@@ -26,10 +27,9 @@ public interface DetectorRepository {
      * assigns a UUID.
      *
      * @param document Detector document
-     * @return Undefined. Currently returns the Elasticsearch document ID, but that's wrong since we don't want to
-     * expose the underlying implementation. [WLW]
+     * @return Detector UUID assigned by this call
      */
-    String createDetector(DetectorDocument document);
+    UUID createDetector(DetectorDocument document);
 
     void deleteDetector(String uuid);
 

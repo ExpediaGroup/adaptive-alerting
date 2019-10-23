@@ -68,7 +68,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
     private ElasticsearchUtil elasticsearchUtil;
 
     @Override
-    public String createDetector(DetectorDocument document) {
+    public UUID createDetector(DetectorDocument document) {
         notNull(document, "document can't be null");
         isNull(document.getUuid(), "Required: document.uuid == null");
 
@@ -82,7 +82,9 @@ public class DetectorRepositoryImpl implements DetectorRepository {
         val json = objectMapperUtil.convertToString(getElasticSearchDetector(document));
 
         // FIXME We should not be returning an implementation-specific ID here. (This is an Elasticsearch document ID.)
-        return elasticsearchUtil.index(indexRequest, json).getId();
+//        return elasticsearchUtil.index(indexRequest, json).getId();
+        elasticsearchUtil.index(indexRequest, json);
+        return uuid;
     }
 
     @Override
