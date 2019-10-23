@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.modelservice.web;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
 import com.expedia.adaptivealerting.modelservice.util.RequestValidator;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.Assert;
@@ -44,7 +45,8 @@ public class DetectorController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public String createDetector(@Valid @RequestBody DetectorDocument document) {
-        return detectorRepo.createDetector(document);
+        val uuid = detectorRepo.createDetector(document);
+        return uuid.toString();
     }
 
     @GetMapping(path = "/findByUuid", produces = "application/json")
