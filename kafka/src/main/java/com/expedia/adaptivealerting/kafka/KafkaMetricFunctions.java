@@ -27,7 +27,7 @@ public class KafkaMetricFunctions implements MetricFunctionsPublish {
     private final String OUTPUT_TOPIC_KEY_STRING = "output-topic";
     private static final String INPUT_FUNCTIONS_FILENAME ="functions.txt";
     private final static String INPUT_FILE_PATH = "/config/";
-    private static final int corePoolSize = 5;
+    private static final int corePoolSize = 15;
 
     private Producer<String, MetricData> aggregatorProducer;
 
