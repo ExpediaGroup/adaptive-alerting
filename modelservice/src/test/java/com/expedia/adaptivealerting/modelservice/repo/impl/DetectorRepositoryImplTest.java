@@ -232,6 +232,13 @@ public class DetectorRepositoryImplTest {
         verify(detectorRepository, times(1)).toggleDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
     }
 
+
+    @Test(expected = RuntimeException.class)
+    public void trustDetectorFail() throws IOException {
+        Mockito.when(elasticSearchClient.update(any(UpdateRequest.class), any(RequestOptions.class))).thenThrow(new IOException());
+        repoUnderTest.trustDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
+    }
+
     @Test
     public void testTrustDetector() {
         DetectorRepository detectorRepository = mock(DetectorRepository.class);
