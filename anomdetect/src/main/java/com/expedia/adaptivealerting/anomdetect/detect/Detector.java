@@ -33,6 +33,13 @@ public interface Detector {
     UUID getUuid();
 
     /**
+     * Returns the anomaly detector trust value.
+     *
+     * @return Anomaly detector Trust Level.
+     */
+    boolean isTrusted();
+
+    /**
      * Processes a given metric point.
      *
      * @param metricData Metric data point.

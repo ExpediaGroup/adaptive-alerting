@@ -74,6 +74,22 @@ public class DetectorRepositoryImpl implements DetectorRepository {
 
         val uuid = UUID.randomUUID();
         document.setUuid(uuid);
+        Date nowDate = DateUtil.now();
+
+        // Force setting last update time to current time. Although deprecated, this field is still used to determine what changed for cache loading.
+        // In the future this can change to the field within Meta
+        document.setLastUpdateTimestamp(nowDate);
+
+        // Set meta fields if none are provided
+        if (document.getMeta() == null) {
+            DetectorDocument.Meta metaBlock = new DetectorDocument.Meta();
+            metaBlock.setDateCreated(nowDate);
+            metaBlock.setCreatedBy(document.getCreatedBy());
+            document.setMeta(metaBlock);
+        } else {
+            DetectorDocument.Meta metaBlock = document.getMeta();
+            metaBlock.setDateCreated(nowDate);
+        }
 
         // Do this after setting the UUID since validation checks for the UUID.
         RequestValidator.validateDetector(document);
@@ -155,7 +171,39 @@ public class DetectorRepositoryImpl implements DetectorRepository {
     @Override
     public void toggleDetector(String uuid, Boolean enabled) {
         val updateRequest = new UpdateRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, uuid);
-        updateRequest.doc("enabled", enabled);
+
+        Date nowDate = DateUtil.now();
+        String nowValue = DateUtil.toDateString(nowDate.toInstant());
+
+        Map<String, Object> jsonMap = new HashMap<>();
+        Map<String, Object> metaMap = new HashMap<>();
+        metaMap.put("dateUpdated", nowDate);
+        jsonMap.put("lastUpdateTimestamp", nowValue);
+        jsonMap.put("enabled", enabled);
+        jsonMap.put("meta", metaMap);
+        updateRequest.doc(jsonMap);
+        try {
+            elasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            log.error(String.format("Updating elastic search failed", e));
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void trustDetector(String uuid, Boolean trusted) {
+        val updateRequest = new UpdateRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, uuid);
+
+        Date nowDate = DateUtil.now();
+        String nowValue = DateUtil.toDateString(nowDate.toInstant());
+
+        Map<String, Object> jsonMap = new HashMap<>();
+        Map<String, Object> metaMap = new HashMap<>();
+        metaMap.put("dateUpdated", nowDate);
+        jsonMap.put("lastUpdateTimestamp", nowValue);
+        jsonMap.put("trusted", trusted);
+        jsonMap.put("meta", metaMap);
+        updateRequest.doc(jsonMap);
         try {
             elasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
@@ -209,7 +257,9 @@ public class DetectorRepositoryImpl implements DetectorRepository {
                 .setCreatedBy(detector.getCreatedBy())
                 .setType(detector.getType())
                 .setConfig(detector.getConfig())
+                .setMeta(detector.getMeta())
                 .setEnabled(detector.isEnabled())
+                .setTrusted(detector.isTrusted())
                 .setLastUpdateTimestamp(detector.getLastUpdateTimestamp());
     }
 

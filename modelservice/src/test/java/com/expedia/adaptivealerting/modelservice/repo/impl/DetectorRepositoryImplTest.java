@@ -141,12 +141,21 @@ public class DetectorRepositoryImplTest {
     }
 
     @Test
+    public void testCreateDetector_emptyMeta() {
+        val mom = ObjectMother.instance();
+        val document = mom.getDetectorDocument();
+        document.setMeta(null);
+        UUID actualUuid = repoUnderTest.createDetector(document);
+    }
+
+    @Test
     public void testFindByUuid() {
         DetectorDocument actualDetector = repoUnderTest.findByUuid("uuid");
         assertNotNull(actualDetector);
         Assert.assertEquals(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"), actualDetector.getUuid());
         Assert.assertEquals("test-user", actualDetector.getCreatedBy());
         Assert.assertEquals(true, actualDetector.isEnabled());
+        Assert.assertEquals(true, actualDetector.isTrusted());
     }
 
     @Test
@@ -204,6 +213,14 @@ public class DetectorRepositoryImplTest {
     }
 
     @Test
+    public void testTrustDetector() {
+        DetectorRepository detectorRepository = mock(DetectorRepository.class);
+        doNothing().when(detectorRepository).trustDetector(anyString(), anyBoolean());
+        detectorRepository.trustDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
+        verify(detectorRepository, times(1)).trustDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
+    }
+
+    @Test
     public void testDeleteDetector() {
         val detectorRepository = mock(DetectorRepository.class);
         doNothing().when(detectorRepository).deleteDetector(anyString());
@@ -253,7 +270,7 @@ public class DetectorRepositoryImplTest {
         SearchResponse searchResponse = mock(SearchResponse.class);
         Map<String, DocumentField> fields = new HashMap<>();
         SearchHit searchHit = new SearchHit(101, "xxx", null, fields);
-        BytesReference source = new BytesArray("{\"uuid\":\"13456565\",\"createdBy\":\"user\",\"lastUpdateTimestamp\":\"2019-05-20 12:00:00\",\"enabled\":true,\"detectorConfig\":{\"hyperparams\":{\"alpha\":0.5,\"beta\":0.6},\"trainingMetaData\":{\"alpha\":0.5},\"params\":{\"upperWeak\":123}}}}");
+        BytesReference source = new BytesArray("{\"uuid\":\"13456565\",\"createdBy\":\"user\",\"lastUpdateTimestamp\":\"2019-05-20 12:00:00\",\"enabled\":true,\"trusted\":true,\"detectorConfig\":{\"hyperparams\":{\"alpha\":0.5,\"beta\":0.6},\"trainingMetaData\":{\"alpha\":0.5},\"params\":{\"upperWeak\":123}}}}");
         searchHit.sourceRef(source);
         SearchHit[] bunchOfSearchHits = new SearchHit[1];
         bunchOfSearchHits[0] = searchHit;
@@ -288,7 +305,7 @@ public class DetectorRepositoryImplTest {
     private GetResponse mockGetResponse(String id) {
         GetResponse getResponse = mock(GetResponse.class);
         Map<String, DocumentField> fields = new HashMap<>();
-        String source = "{\"uuid\":\"aeb4d849-847a-45c0-8312-dc0fcf22b639\",\"createdBy\":\"test-user\",\"lastUpdateTimestamp\":\"2019-05-20 12:00:00\",\"enabled\":true,\"detectorConfig\":{\"hyperparams\":{\"alpha\":0.5,\"beta\":0.6},\"trainingMetaData\":{\"alpha\":0.5},\"params\":{\"upperWeak\":123}}}}";
+        String source = "{\"uuid\":\"aeb4d849-847a-45c0-8312-dc0fcf22b639\",\"createdBy\":\"test-user\",\"lastUpdateTimestamp\":\"2019-05-20 12:00:00\",\"enabled\":true,\"trusted\":true,\"detectorConfig\":{\"hyperparams\":{\"alpha\":0.5,\"beta\":0.6},\"trainingMetaData\":{\"alpha\":0.5},\"params\":{\"upperWeak\":123}}}}";
         when(getResponse.getSourceAsString()).thenReturn(source);
         when(getResponse.getId()).thenReturn(id);
         return getResponse;
@@ -299,5 +316,6 @@ public class DetectorRepositoryImplTest {
         Assert.assertEquals(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"), actualDetectors.get(0).getUuid());
         Assert.assertEquals("test-user", actualDetectors.get(0).getCreatedBy());
         Assert.assertEquals(true, actualDetectors.get(0).isEnabled());
+        Assert.assertEquals(true, actualDetectors.get(0).isTrusted());
     }
 }

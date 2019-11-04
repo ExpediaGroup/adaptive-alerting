@@ -2,6 +2,7 @@
   "uuid": "9d934a88-f89b-4793-956a-bede72c3081f",
   "type": "edmx-detector",
   "enabled": true,
+  "trusted": true,
   "meta": {
     "dateCreated": "2019-10-16T17:08:40Z",
     "dateUpdated": "2019-10-16T17:08:40Z",

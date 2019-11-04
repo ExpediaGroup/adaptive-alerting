@@ -2,6 +2,7 @@
   "uuid": "invalid-uuid",
   "type": "edmx-detector",
   "enabled": true,
+  "trusted": true,
   "meta": {
     "dateCreated": "2019-10-16T17:08:40Z",
     "dateUpdated": "2019-10-16T17:08:40Z",

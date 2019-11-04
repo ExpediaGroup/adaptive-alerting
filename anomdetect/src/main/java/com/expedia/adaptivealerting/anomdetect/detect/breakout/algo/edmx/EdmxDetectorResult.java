@@ -33,6 +33,12 @@ public class EdmxDetectorResult implements BreakoutDetectorResult {
      */
     private boolean warmup;
 
+
+    /**
+     * Indicates whether the detector is trusted and verified.
+     */
+    private boolean trusted;
+
     /**
      * Estimated breakout timestamp. This is the timestamp for the breakout itself, not the timestamp for when we found
      * the breakout.

@@ -61,6 +61,7 @@ public class CusumDetectorTest {
     @Test
     public void testClassify_leftTailed() {
         val anomalyType = AnomalyType.LEFT_TAILED;
+        val trusted = true;
 
         val params = new CusumDetectorParams()
                 .setType(anomalyType)
@@ -77,7 +78,7 @@ public class CusumDetectorTest {
                 new CusumDetectorTestRow(990.0, AnomalyLevel.STRONG.name()),
         };
 
-        testClassify(params, anomalyType, testRows);
+        testClassify(params, anomalyType, testRows, trusted);
     }
 
     @Test
@@ -86,6 +87,7 @@ public class CusumDetectorTest {
         val testRow0 = testRows.next();
 
         val anomalyType = AnomalyType.RIGHT_TAILED;
+        val trusted = true;
 
         val params = new CusumDetectorParams()
                 .setType(anomalyType)
@@ -96,7 +98,7 @@ public class CusumDetectorTest {
                 .setInitMeanEstimate(testRow0.getObserved())
                 .setWarmUpPeriod(WARMUP_PERIOD);
 
-        val detector = new CusumDetector(detectorUuid, params);
+        val detector = new CusumDetector(detectorUuid, params, trusted);
 
         int numDataPoints = 1;
 
@@ -122,6 +124,7 @@ public class CusumDetectorTest {
     @Test
     public void testClassify_twoTailed() {
         val anomalyType = AnomalyType.TWO_TAILED;
+        val trusted = true;
 
         val params = new CusumDetectorParams()
                 .setType(anomalyType)
@@ -139,11 +142,11 @@ public class CusumDetectorTest {
                 new CusumDetectorTestRow(960.0, AnomalyLevel.WEAK.name()),
         };
 
-        testClassify(params, anomalyType, testRows);
+        testClassify(params, anomalyType, testRows, trusted);
     }
 
-    private void testClassify(CusumDetectorParams params, AnomalyType anomalyType, CusumDetectorTestRow[] testRows) {
-        val detector = new CusumDetector(detectorUuid, params);
+    private void testClassify(CusumDetectorParams params, AnomalyType anomalyType, CusumDetectorTestRow[] testRows, boolean trusted) {
+        val detector = new CusumDetector(detectorUuid, params, trusted);
         assertEquals(detectorUuid, detector.getUuid());
         assertSame(params, detector.getParams());
 
@@ -165,6 +168,7 @@ public class CusumDetectorTest {
             val anomalyResult = (OutlierDetectorResult) detector.detect(metricData);
             val anomalyLevel = anomalyResult.getAnomalyLevel();
             assertEquals(AnomalyLevel.valueOf(testRow.getLevel()), anomalyLevel);
+            assertEquals(anomalyResult.isTrusted(), trusted);
         }
     }
 

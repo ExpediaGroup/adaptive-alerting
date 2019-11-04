@@ -48,7 +48,8 @@ public final class EdmxDetectorTest {
                 .setNumPerms(199)
                 .setStrongAlpha(0.01)
                 .setWeakAlpha(0.05);
-        val detectorUnderTest = new EdmxDetector(UUID.randomUUID(), hyperparams);
+        val trusted = true;
+        val detectorUnderTest = new EdmxDetector(UUID.randomUUID(), hyperparams, trusted);
 
         val metricDef = TestObjectMother.metricDefinition();
         val is = ClassLoader.getSystemResourceAsStream("datasets/white-noise-with-breakout-at-row-600.csv");

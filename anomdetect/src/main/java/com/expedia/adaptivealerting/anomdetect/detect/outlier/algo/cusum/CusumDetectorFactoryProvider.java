@@ -30,6 +30,7 @@ public class CusumDetectorFactoryProvider implements DetectorFactoryProvider<Cus
         notNull(document, "document can't be null");
         val paramsMap = document.getConfig().get("params");
         val params = objectMapper.convertValue(paramsMap, CusumDetectorParams.class);
-        return new CusumDetector(document.getUuid(), params);
+        val trusted = document.isTrusted();
+        return new CusumDetector(document.getUuid(), params, trusted);
     }
 }

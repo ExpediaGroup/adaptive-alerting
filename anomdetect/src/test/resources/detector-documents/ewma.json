@@ -2,6 +2,7 @@
   "uuid": "3e047348-f837-f615-271c-dce6206f50d6",
   "type": "ewma-detector",
   "enabled": false,
+  "trusted": true,
   "meta": {
     "dateCreated": "2019-10-16T17:08:40Z",
     "dateUpdated": "2019-10-16T17:08:40Z",

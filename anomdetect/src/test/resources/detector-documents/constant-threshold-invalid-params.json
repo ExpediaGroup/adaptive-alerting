@@ -2,6 +2,7 @@
   "uuid": "e2e290a0-d1c1-471e-9d72-79d43282cfbd",
   "type": "constant-detector",
   "enabled": true,
+  "trusted": true,
   "meta": {
     "dateCreated": "2019-10-16T17:08:40Z",
     "dateUpdated": "2019-10-16T17:08:40Z",

@@ -66,13 +66,18 @@ public final class ForecastingDetector extends AbstractOutlierDetector {
     @Generated // https://reflectoring.io/100-percent-test-coverage/
     private AnomalyType anomalyType;
 
+    @Getter
+    @Generated // https://reflectoring.io/100-percent-test-coverage/
+    private boolean trusted;
+
     private final AnomalyClassifier classifier;
 
     public ForecastingDetector(
             UUID uuid,
             PointForecaster pointForecaster,
             IntervalForecaster intervalForecaster,
-            AnomalyType anomalyType) {
+            AnomalyType anomalyType,
+            boolean trusted) {
 
         super(uuid);
 
@@ -84,6 +89,7 @@ public final class ForecastingDetector extends AbstractOutlierDetector {
         this.intervalForecaster = intervalForecaster;
         this.anomalyType = anomalyType;
         this.classifier = new AnomalyClassifier(anomalyType);
+        this.trusted = trusted;
     }
 
     @Override
@@ -102,10 +108,12 @@ public final class ForecastingDetector extends AbstractOutlierDetector {
         val thresholds = toAnomalyThresholds(intervalForecast);
         val observed = metricData.getValue();
         val level = classifier.classify(thresholds, observed);
+        val trusted = isTrusted();
 
         return new OutlierDetectorResult(level)
                 .setPredicted(pointForecast.getValue())
-                .setThresholds(thresholds);
+                .setThresholds(thresholds)
+                .setTrusted(trusted);
     }
 
     private AnomalyThresholds toAnomalyThresholds(IntervalForecast intervalForecast) {

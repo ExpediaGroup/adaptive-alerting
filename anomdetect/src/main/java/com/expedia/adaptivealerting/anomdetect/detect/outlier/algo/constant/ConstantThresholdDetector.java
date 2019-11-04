@@ -39,11 +39,15 @@ public final class ConstantThresholdDetector extends AbstractOutlierDetector {
 
     private final AnomalyClassifier classifier;
 
-    public ConstantThresholdDetector(UUID uuid, ConstantThresholdDetectorParams params) {
+    @Getter
+    private final boolean trusted;
+
+    public ConstantThresholdDetector(UUID uuid, ConstantThresholdDetectorParams params, boolean trusted) {
         super(uuid);
         notNull(params, "params can't be null");
         params.validate();
         this.params = params;
+        this.trusted = trusted;
         this.classifier = new AnomalyClassifier(params.getType());
     }
 
@@ -51,7 +55,12 @@ public final class ConstantThresholdDetector extends AbstractOutlierDetector {
     public DetectorResult detect(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
         val thresholds = params.getThresholds();
+        val trusted = isTrusted();
         val level = classifier.classify(thresholds, metricData.getValue());
-        return new OutlierDetectorResult(level).setThresholds(thresholds);
+        OutlierDetectorResult outlierResult = new OutlierDetectorResult()
+                .setAnomalyLevel(level)
+                .setThresholds(thresholds)
+                .setTrusted(trusted);
+        return outlierResult;
     }
 }

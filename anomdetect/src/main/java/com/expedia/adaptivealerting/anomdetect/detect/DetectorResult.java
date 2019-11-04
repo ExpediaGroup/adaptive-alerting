@@ -37,5 +37,7 @@ public interface DetectorResult {
      */
     boolean isWarmup();
 
+    boolean isTrusted();
+
     AnomalyLevel getAnomalyLevel();
 }

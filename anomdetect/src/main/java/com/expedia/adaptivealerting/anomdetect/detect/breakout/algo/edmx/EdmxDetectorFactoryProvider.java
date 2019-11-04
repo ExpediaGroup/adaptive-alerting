@@ -32,6 +32,7 @@ public class EdmxDetectorFactoryProvider implements DetectorFactoryProvider<Edmx
         // That's why we're using hyperparameters instead of parameters here.
         val hyperparamsMap = document.getConfig().get("hyperparams");
         val hyperparams = objectMapper.convertValue(hyperparamsMap, EdmxHyperparams.class);
-        return new EdmxDetector(document.getUuid(), hyperparams);
+        val trusted = document.isTrusted();
+        return new EdmxDetector(document.getUuid(), hyperparams, trusted);
     }
 }

@@ -52,6 +52,7 @@ public class ForecastingDetectorTest {
 
     private UUID detectorUuid;
     private AnomalyType anomalyType;
+    private boolean trusted;
 
     @Before
     public void setUp() {
@@ -59,8 +60,9 @@ public class ForecastingDetectorTest {
         initDependencies();
         this.detectorUuid = UUID.randomUUID();
         this.anomalyType = AnomalyType.TWO_TAILED;
+        this.trusted = true;
         this.detectorUnderTest =
-                new ForecastingDetector(detectorUuid, pointForecaster, intervalForecaster, anomalyType);
+                new ForecastingDetector(detectorUuid, pointForecaster, intervalForecaster, anomalyType, trusted);
     }
 
     @Test
@@ -69,6 +71,7 @@ public class ForecastingDetectorTest {
         assertEquals(pointForecaster, detectorUnderTest.getPointForecaster());
         assertEquals(intervalForecaster, detectorUnderTest.getIntervalForecaster());
         assertEquals(anomalyType, detectorUnderTest.getAnomalyType());
+        assertEquals(trusted, detectorUnderTest.isTrusted());
     }
 
     @Test

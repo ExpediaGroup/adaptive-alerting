@@ -57,6 +57,9 @@ public final class IndividualsDetector implements Detector {
     private UUID uuid;
 
     @Getter
+    private boolean trusted;
+
+    @Getter
     private IndividualsDetectorParams params;
 
     /**
@@ -107,11 +110,12 @@ public final class IndividualsDetector implements Detector {
      */
     private double mean;
 
-    public IndividualsDetector(UUID uuid, IndividualsDetectorParams params) {
+    public IndividualsDetector(UUID uuid, IndividualsDetectorParams params, boolean trusted) {
         notNull(uuid, "uuid can't be null");
         notNull(params, "params can't be null");
         params.validate();
         this.uuid = uuid;
+        this.trusted = trusted;
         this.params = params;
         this.prevValue = params.getInitValue();
         this.target = params.getInitValue();
@@ -123,6 +127,7 @@ public final class IndividualsDetector implements Detector {
         notNull(metricData, "metricData can't be null");
 
         val params = getParams();
+        val trusted = isTrusted();
 
         val observed = metricData.getValue();
         val stdDev = sqrt(this.variance);
@@ -175,6 +180,7 @@ public final class IndividualsDetector implements Detector {
         final OutlierDetectorResult result = new OutlierDetectorResult(level);
         result.setPredicted(this.mean);
         result.setThresholds(thresholds);
+        result.setTrusted(trusted);
         return result;
     }
 
