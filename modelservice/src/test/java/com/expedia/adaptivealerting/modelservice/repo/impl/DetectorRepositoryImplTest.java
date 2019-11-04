@@ -149,6 +149,26 @@ public class DetectorRepositoryImplTest {
     }
 
     @Test
+    public void testCreateDetector_populatedMeta() {
+        val mom = ObjectMother.instance();
+        val document = mom.getDetectorDocument();
+        DetectorDocument.Meta metaBlock = new DetectorDocument.Meta();
+        metaBlock.setCreatedBy("user");
+        document.setMeta(metaBlock);
+        repoUnderTest.createDetector(document);
+    }
+
+    @Test
+    public void testCreateDetector_populatedMeta_noUser() {
+        val mom = ObjectMother.instance();
+        val document = mom.getDetectorDocument();
+        DetectorDocument.Meta metaBlock = new DetectorDocument.Meta();
+        metaBlock.setCreatedBy(null);
+        document.setMeta(metaBlock);
+        repoUnderTest.createDetector(document);
+    }
+
+    @Test
     public void testFindByUuid() {
         DetectorDocument actualDetector = repoUnderTest.findByUuid("uuid");
         assertNotNull(actualDetector);

@@ -89,6 +89,9 @@ public class DetectorRepositoryImpl implements DetectorRepository {
         } else {
             DetectorDocument.Meta metaBlock = document.getMeta();
             metaBlock.setDateCreated(nowDate);
+            if (metaBlock.getCreatedBy() == null) {
+                metaBlock.setCreatedBy(document.getCreatedBy());
+            }
         }
 
         // Do this after setting the UUID since validation checks for the UUID.
