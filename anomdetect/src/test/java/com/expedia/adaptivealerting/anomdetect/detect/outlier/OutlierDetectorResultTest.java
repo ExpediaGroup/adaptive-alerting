@@ -38,5 +38,26 @@ public final class OutlierDetectorResultTest {
         assertEquals(AnomalyLevel.STRONG, anomalyResult2.getAnomalyLevel());
         assertEquals(10.0, anomalyResult2.getPredicted(), TOLERANCE);
         assertNotNull(anomalyResult2.getThresholds());
+
+        // Test constructor for anomalyLevel, trusted
+        val anomalyResult3 = new OutlierDetectorResult(AnomalyLevel.STRONG, true);
+        anomalyResult3.setPredicted(10.0);
+        anomalyResult3.setThresholds(new AnomalyThresholds(100.0, null, null, null));
+
+        assertEquals(AnomalyLevel.STRONG, anomalyResult3.getAnomalyLevel());
+        assertEquals(true, anomalyResult3.isTrusted());
+        assertEquals(10.0, anomalyResult3.getPredicted(), TOLERANCE);
+        assertNotNull(anomalyResult3.getThresholds());
+
+        // Test constructor for warmup, anomalyLevel, trusted
+        val anomalyResult4 = new OutlierDetectorResult(true, AnomalyLevel.STRONG, true);
+        anomalyResult4.setPredicted(10.0);
+        anomalyResult4.setThresholds(new AnomalyThresholds(100.0, null, null, null));
+
+        assertEquals(AnomalyLevel.STRONG, anomalyResult4.getAnomalyLevel());
+        assertEquals(true, anomalyResult4.isTrusted());
+        assertEquals(true, anomalyResult4.isWarmup());
+        assertEquals(10.0, anomalyResult4.getPredicted(), TOLERANCE);
+        assertNotNull(anomalyResult4.getThresholds());
     }
 }

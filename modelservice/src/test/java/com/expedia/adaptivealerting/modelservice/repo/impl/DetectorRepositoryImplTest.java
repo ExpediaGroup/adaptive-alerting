@@ -145,7 +145,7 @@ public class DetectorRepositoryImplTest {
         val mom = ObjectMother.instance();
         val document = mom.getDetectorDocument();
         document.setMeta(null);
-        UUID actualUuid = repoUnderTest.createDetector(document);
+        repoUnderTest.createDetector(document);
     }
 
     @Test

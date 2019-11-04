@@ -91,6 +91,11 @@ public class DetectorControllerTest {
     }
 
     @Test
+    public void testTrustDetector() {
+        controllerUnderTest.trustDetector(someUuid.toString(), true);
+    }
+
+    @Test
     public void testDeleteDetector() {
         val someUuidStr = someUuid.toString();
         controllerUnderTest.deleteDetector(someUuidStr);
