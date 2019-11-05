@@ -149,6 +149,13 @@ public class DetectorRepositoryImplTest {
         Assert.assertEquals(true, actualDetector.isEnabled());
     }
 
+    @Test(expected = RuntimeException.class)
+    public void testFindByUuidWhenNoResult() {
+        SearchHits searchHits = new SearchHits(new SearchHit[0], 0, 0);
+        when(searchResponse.getHits()).thenReturn(searchHits);
+        repoUnderTest.findByUuid("uuid");
+    }
+
     @Test
     public void testFindByCreatedBy() {
         List<DetectorDocument> actualDetectors = repoUnderTest.findByCreatedBy("kashah");

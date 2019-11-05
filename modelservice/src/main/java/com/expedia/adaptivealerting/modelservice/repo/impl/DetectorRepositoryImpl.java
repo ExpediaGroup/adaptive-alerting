@@ -141,7 +141,11 @@ public class DetectorRepositoryImpl implements DetectorRepository {
         val queryBuilder = QueryBuilders.termQuery("uuid", uuid);
         val searchSourceBuilder = elasticsearchUtil.getSourceBuilder(queryBuilder).size(DEFAULT_ES_RESULTS_SIZE);
         val searchRequest = elasticsearchUtil.getSearchRequest(searchSourceBuilder, DETECTOR_INDEX, DETECTOR_DOC_TYPE);
-        return getDetectorsFromElasticSearch(searchRequest).get(0);
+        List<DetectorDocument> detectorsFromElasticSearch = getDetectorsFromElasticSearch(searchRequest);
+        if (detectorsFromElasticSearch.isEmpty()) {
+            throw new RuntimeException("No detector document found for uuid "+ uuid);
+        }
+        return detectorsFromElasticSearch.get(0);
     }
 
     @Override
