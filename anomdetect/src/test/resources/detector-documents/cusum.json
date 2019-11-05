@@ -2,6 +2,7 @@
   "uuid": "3ec81aa2-2cdc-415e-b4f3-c1beb223ae60",
   "type": "cusum-detector",
   "enabled": true,
+  "trusted": true,
   "meta": {
     "dateCreated": "2019-10-16T17:08:40Z",
     "dateUpdated": "2019-10-16T17:08:40Z",

@@ -37,6 +37,7 @@ public class DetectorDocument {
     private UUID uuid;
     private String type;
     private boolean enabled;
+    private boolean trusted;
 
     @JsonProperty("detectorConfig")
     private Map<String, Object> config;

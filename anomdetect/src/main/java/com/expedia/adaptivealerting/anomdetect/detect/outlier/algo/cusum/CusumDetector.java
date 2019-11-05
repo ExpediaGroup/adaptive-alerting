@@ -48,6 +48,9 @@ public final class CusumDetector extends AbstractOutlierDetector {
     @Getter
     private CusumDetectorParams params;
 
+    @Getter
+    private boolean trusted;
+
     /**
      * Total number of data points seen so far.
      */
@@ -75,11 +78,12 @@ public final class CusumDetector extends AbstractOutlierDetector {
      */
     private double prevValue = 0.0;
 
-    public CusumDetector(UUID uuid, CusumDetectorParams params) {
+    public CusumDetector(UUID uuid, CusumDetectorParams params, boolean trusted) {
         super(uuid);
         AssertUtil.notNull(params, "params can't be null");
         params.validate();
         this.params = params;
+        this.trusted = trusted;
         this.prevValue = params.getInitMeanEstimate();
     }
 
@@ -88,6 +92,7 @@ public final class CusumDetector extends AbstractOutlierDetector {
         AssertUtil.notNull(metricData, "metricData can't be null");
 
         val params = getParams();
+        val trusted = isTrusted();
         val observed = metricData.getValue();
 
         this.movingRange += Math.abs(this.prevValue - observed);
@@ -161,7 +166,7 @@ public final class CusumDetector extends AbstractOutlierDetector {
             }
         }
 
-        return new OutlierDetectorResult(level);
+        return new OutlierDetectorResult(level, trusted);
     }
 
     private void resetSums() {

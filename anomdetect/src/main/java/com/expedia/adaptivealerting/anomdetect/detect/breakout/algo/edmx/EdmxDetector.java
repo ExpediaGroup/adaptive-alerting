@@ -37,11 +37,14 @@ public final class EdmxDetector implements BreakoutDetector {
     private UUID uuid;
 
     @Getter
+    private boolean trusted;
+
+    @Getter
     private EdmxHyperparams hyperparams;
 
     private final EvictingQueue<MetricData> buffer;
 
-    public EdmxDetector(UUID uuid, EdmxHyperparams hyperparams) {
+    public EdmxDetector(UUID uuid, EdmxHyperparams hyperparams, boolean trusted) {
         notNull(uuid, "uuid can't be null");
         notNull(hyperparams, "hyperparams can't be null");
         hyperparams.validate();
@@ -50,6 +53,7 @@ public final class EdmxDetector implements BreakoutDetector {
         this.uuid = uuid;
         this.hyperparams = hyperparams;
         this.buffer = EvictingQueue.create(hyperparams.getBufferSize());
+        this.trusted = trusted;
     }
 
     @Override
@@ -59,6 +63,7 @@ public final class EdmxDetector implements BreakoutDetector {
 
         val warmup = buffer.remainingCapacity() > 0;
         val result = new EdmxDetectorResult().setWarmup(warmup);
+        val trusted = isTrusted();
 
         if (warmup) {
             log.info("EdmxDetector warming up: uuid={}, size={}, toGo={}, metricData={}",
@@ -86,7 +91,8 @@ public final class EdmxDetector implements BreakoutDetector {
         return result
                 .setTimestamp(instant)
                 .setEdmxEstimate(estimate)
-                .setAnomalyLevel(anomalyLevel);
+                .setAnomalyLevel(anomalyLevel)
+                .setTrusted(trusted);
     }
 
     private AnomalyLevel calculateAnomalyLevel(EdmxEstimate estimate) {

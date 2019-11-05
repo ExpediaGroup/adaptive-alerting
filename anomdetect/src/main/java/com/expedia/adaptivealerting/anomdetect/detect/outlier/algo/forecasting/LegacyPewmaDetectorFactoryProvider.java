@@ -43,6 +43,8 @@ public class LegacyPewmaDetectorFactoryProvider implements DetectorFactoryProvid
         val pewma = new PewmaPointForecaster(pewmaParams);
         val welford = new ExponentialWelfordIntervalForecaster(welfordParams);
 
-        return new ForecastingDetector(uuid, pewma, welford, type);
+        val trusted = document.isTrusted();
+
+        return new ForecastingDetector(uuid, pewma, welford, type, trusted);
     }
 }

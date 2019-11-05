@@ -14,9 +14,6 @@
 #       See the License for the specific language governing permissions and
 #       limitations under the License.
 
-now=$(date -u +"%Y-%m-%d %H:%M:%S")
-#uuid=$(python -c 'import sys,uuid; sys.stdout.write(str(uuid.uuid4()))')
-
 echo "--- Waiting for the Model Service API to become available before inserting sample detector and mapping..."
 
 # Do not post sample detector to API until elasticsearch indexes pre-created by the modelservice
@@ -34,7 +31,6 @@ until detectoruuid=$(curl -s -X POST \
     -d '{
             "createdBy": "sampleuser",
             "type": "constant-detector",
-            "lastUpdateTimestamp": "'"$now"'",
             "detectorConfig": {
                 "hyperparams": {
                     "strategy": "percentile",
@@ -50,7 +46,8 @@ until detectoruuid=$(curl -s -X POST \
                     }
                 }
             },
-            "enabled": true
+            "enabled": true,
+            "trusted": true
             }')
 do
     sleep 1

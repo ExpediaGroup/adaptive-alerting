@@ -35,6 +35,7 @@ import lombok.experimental.Accessors;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OutlierDetectorResult implements DetectorResult {
     private boolean warmup;
+    private boolean trusted;
     private AnomalyLevel anomalyLevel;
 
     /**
@@ -53,6 +54,17 @@ public class OutlierDetectorResult implements DetectorResult {
 
     public OutlierDetectorResult(boolean warmup, AnomalyLevel anomalyLevel) {
         this.warmup = warmup;
+        this.anomalyLevel = anomalyLevel;
+    }
+
+    public OutlierDetectorResult(AnomalyLevel anomalyLevel, boolean trusted) {
+        this.trusted = trusted;
+        this.anomalyLevel = anomalyLevel;
+    }
+
+    public OutlierDetectorResult(boolean warmup, AnomalyLevel anomalyLevel, boolean trusted) {
+        this.warmup = warmup;
+        this.trusted = trusted;
         this.anomalyLevel = anomalyLevel;
     }
 }

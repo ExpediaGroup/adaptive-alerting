@@ -30,6 +30,7 @@ public class ConstantThresholdDetectorFactoryProvider implements DetectorFactory
         notNull(document, "document can't be null");
         val paramsMap = document.getConfig().get("params");
         val params = objectMapper.convertValue(paramsMap, ConstantThresholdDetectorParams.class);
-        return new ConstantThresholdDetector(document.getUuid(), params);
+        val trusted = document.isTrusted();
+        return new ConstantThresholdDetector(document.getUuid(), params, trusted);
     }
 }

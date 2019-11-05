@@ -74,7 +74,8 @@ public class MOfNAggregator implements Aggregator {
         val aggregatedResult = new OutlierDetectorResult()
                 .setAnomalyLevel(result.getAnomalyLevel())
                 .setPredicted(result.getPredicted())
-                .setThresholds(result.getThresholds());
+                .setThresholds(result.getThresholds())
+                .setTrusted(result.isTrusted());
 
         if (numAnomalies() >= config.getM()) {
             aggregatedResult.setAnomalyLevel(AnomalyLevel.STRONG);

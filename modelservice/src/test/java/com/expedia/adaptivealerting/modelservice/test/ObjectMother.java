@@ -116,6 +116,7 @@ public class ObjectMother {
                 .setCreatedBy("test-user")
                 .setConfig(new HashMap<>())
                 .setEnabled(true)
+                .setTrusted(true)
                 .setLastUpdateTimestamp(DateUtil.toUtcDate("2019-04-06 22:00:00"));
     }
 

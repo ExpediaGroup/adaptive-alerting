@@ -43,6 +43,8 @@ public class LegacyHoltWintersDetectorFactoryProvider implements DetectorFactory
         val holtWinters = new HoltWintersPointForecaster(holtWintersParams);
         val welford = new ExponentialWelfordIntervalForecaster(welfordParams);
 
-        return new ForecastingDetector(uuid, holtWinters, welford, type);
+        val trusted = document.isTrusted();
+
+        return new ForecastingDetector(uuid, holtWinters, welford, type, trusted);
     }
 }

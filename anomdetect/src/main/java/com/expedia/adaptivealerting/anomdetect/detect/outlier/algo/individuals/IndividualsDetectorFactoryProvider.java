@@ -30,6 +30,7 @@ public class IndividualsDetectorFactoryProvider implements DetectorFactoryProvid
         notNull(document, "document can't be null");
         val paramsMap = document.getConfig().get("params");
         val params = objectMapper.convertValue(paramsMap, IndividualsDetectorParams.class);
-        return new IndividualsDetector(document.getUuid(), params);
+        val trusted = document.isTrusted();
+        return new IndividualsDetector(document.getUuid(), params, trusted);
     }
 }

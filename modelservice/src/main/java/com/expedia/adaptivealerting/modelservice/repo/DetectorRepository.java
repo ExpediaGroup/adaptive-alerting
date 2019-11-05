@@ -41,6 +41,8 @@ public interface DetectorRepository {
 
     void toggleDetector(String uuid, Boolean enabled);
 
+    void trustDetector(String uuid, Boolean trusted);
+
     List<DetectorDocument> getLastUpdatedDetectors(long interval);
 
     List<DetectorDocument> getLastUpdatedDetectors(String fromDate, String toDate);

@@ -69,6 +69,14 @@ public class DetectorController {
         detectorRepo.toggleDetector(uuid, enabled);
     }
 
+    @PostMapping(path = "/trustDetector", consumes = "application/json", produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
+    public void trustDetector(@RequestParam String uuid, @RequestParam Boolean trusted) {
+        Assert.notNull(uuid, "uuid can't be null");
+        Assert.notNull(trusted, "trusted can't be null");
+        detectorRepo.trustDetector(uuid, trusted);
+    }
+
     @GetMapping(path = "/getLastUpdatedDetectors", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public List<DetectorDocument> getLastUpdatedDetectors(@RequestParam long interval) {

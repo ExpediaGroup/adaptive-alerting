@@ -35,19 +35,23 @@ public final class MOfNAggregatorTest {
         this.normalResult = new OutlierDetectorResult()
                 .setAnomalyLevel(AnomalyLevel.NORMAL)
                 .setPredicted(42.2)
-                .setThresholds(new AnomalyThresholds(100.0, 90.0, 20.0, 10.0));
+                .setThresholds(new AnomalyThresholds(100.0, 90.0, 20.0, 10.0))
+                .setTrusted(true);
         this.weakResult = new OutlierDetectorResult()
                 .setAnomalyLevel(AnomalyLevel.WEAK)
                 .setPredicted(95.1)
-                .setThresholds(new AnomalyThresholds(102.0, 92.0, 22.0, 12.0));
+                .setThresholds(new AnomalyThresholds(102.0, 92.0, 22.0, 12.0))
+                .setTrusted(true);
         this.strongResult = new OutlierDetectorResult()
                 .setAnomalyLevel(AnomalyLevel.STRONG)
                 .setPredicted(105.8)
-                .setThresholds(new AnomalyThresholds(101.0, 91.0, 21.0, 11.0));
+                .setThresholds(new AnomalyThresholds(101.0, 91.0, 21.0, 11.0))
+                .setTrusted(true);
         this.warmupResult = new OutlierDetectorResult()
                 .setAnomalyLevel(AnomalyLevel.MODEL_WARMUP)
                 .setPredicted(37.2)
-                .setThresholds(new AnomalyThresholds(103.0, 93.0, 23.0, 13.0));
+                .setThresholds(new AnomalyThresholds(103.0, 93.0, 23.0, 13.0))
+                .setTrusted(true);
     }
 
     @Test
@@ -64,6 +68,7 @@ public final class MOfNAggregatorTest {
         assertEquals(AnomalyLevel.NORMAL, aggregatedResult.getAnomalyLevel());
         assertEquals(normalResult.getPredicted(), aggregatedResult.getPredicted());
         assertEquals(normalResult.getThresholds(), aggregatedResult.getThresholds());
+        assertEquals(normalResult.isTrusted(), aggregatedResult.isTrusted());
     }
 
     @Test
@@ -73,6 +78,7 @@ public final class MOfNAggregatorTest {
         assertEquals(AnomalyLevel.WEAK, aggregatedResult.getAnomalyLevel());
         assertEquals(weakResult.getPredicted(), aggregatedResult.getPredicted());
         assertEquals(weakResult.getThresholds(), aggregatedResult.getThresholds());
+        assertEquals(normalResult.isTrusted(), aggregatedResult.isTrusted());
     }
 
     @Test

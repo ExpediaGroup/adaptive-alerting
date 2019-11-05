@@ -2,6 +2,7 @@
   "uuid": "a63c2128-113a-8fd7-942d-f8ae228b61b0",
   "type": "holtwinters-detector",
   "enabled": true,
+  "trusted": true,
   "meta": {
     "dateCreated": "2019-10-16T17:08:40Z",
     "dateUpdated": "2019-10-16T17:08:40Z",

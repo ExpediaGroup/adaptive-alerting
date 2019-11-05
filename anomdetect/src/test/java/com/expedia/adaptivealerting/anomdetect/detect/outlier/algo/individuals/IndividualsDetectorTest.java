@@ -44,6 +44,7 @@ public class IndividualsDetectorTest {
     private MetricDefinition metricDef;
     private long epochSecond;
     private static List<IndividualsDetectorTestRow> data;
+    private boolean trusted;
 
 
     @BeforeClass
@@ -56,6 +57,7 @@ public class IndividualsDetectorTest {
         this.detectorUuid = UUID.randomUUID();
         this.metricDef = new MetricDefinition("some-key");
         this.epochSecond = Instant.now().getEpochSecond();
+        this.trusted = true;
     }
 
     @Test
@@ -67,9 +69,10 @@ public class IndividualsDetectorTest {
         val params = new IndividualsDetectorParams()
                 .setInitValue(observed0)
                 .setWarmUpPeriod(WARMUP_PERIOD);
-        val detector = new IndividualsDetector(detectorUuid, params);
+        val detector = new IndividualsDetector(detectorUuid, params, trusted);
 
         assertEquals(detectorUuid, detector.getUuid());
+        assertEquals(trusted, detector.isTrusted());
         assertSame(params, detector.getParams());
 
         int noOfDataPoints = 1;

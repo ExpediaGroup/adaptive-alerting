@@ -31,8 +31,10 @@ public class IndividualsDetectorFactoryProviderTest extends AbstractDetectorFact
         val document = readDocument("individuals");
         val detector = factoryUnderTest.buildDetector(document);
         val params = detector.getParams();
+        val trusted = detector.isTrusted();
 
         assertNotNull(detector);
+        assertEquals(true, trusted);
         assertEquals(IndividualsDetector.class, detector.getClass());
         assertEquals("a6a4d8c4-4102-51fc-a1c7-38aa6f066cca", detector.getUuid().toString());
         assertEquals(3.0, params.getStrongSigmas(), TOLERANCE);
