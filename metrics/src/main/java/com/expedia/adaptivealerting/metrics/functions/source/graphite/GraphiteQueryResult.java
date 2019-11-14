@@ -68,7 +68,8 @@ public class GraphiteQueryResult {
                 setTagsFromString(graphiteResultJsonObject.get(GRAPHITE_RESULT_TAGS_KEY).toString());
             }
         }
-}
+    }
+
     public boolean validateNullDatapoint(String jsonGraphiteOutput) {
         /* null datapoint cannot be set to default 0.0 at getGraphiteQueryResultFromJson as
         *  this could change time series evaluation

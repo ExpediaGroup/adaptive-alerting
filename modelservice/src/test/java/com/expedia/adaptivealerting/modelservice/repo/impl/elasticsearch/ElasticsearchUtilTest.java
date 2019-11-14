@@ -15,8 +15,6 @@
  */
 package com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch;
 
-import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticSearchClient;
-import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticsearchUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;

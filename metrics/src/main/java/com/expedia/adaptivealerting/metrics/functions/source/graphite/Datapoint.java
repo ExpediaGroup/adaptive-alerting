@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.metrics.functions.source.graphite;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

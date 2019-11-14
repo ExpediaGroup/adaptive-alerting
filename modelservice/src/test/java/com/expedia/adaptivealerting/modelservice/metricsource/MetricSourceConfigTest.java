@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.modelservice.metricsource;
 
-import com.expedia.adaptivealerting.modelservice.metricsource.MetricSourceConfig;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.Before;
