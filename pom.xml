@@ -71,6 +71,7 @@
         </repository>
     </distributionManagement>
     <properties>
+        <main.basedir>${project.basedir}</main.basedir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- This controls the bytecode level and sets the minimum JDK version, not the maximum -->
         <project.jdk.version>1.8</project.jdk.version>
@@ -137,6 +138,12 @@
         <maven.source.plugin.version>3.0.1</maven.source.plugin.version>
         <maven.surefire.plugin.version>2.22.1</maven.surefire.plugin.version>
         <nexus.staging.maven.plugin.version>1.6.8</nexus.staging.maven.plugin.version>
+        <maven.checkstyle.plugin.version>3.0.0</maven.checkstyle.plugin.version>
+
+        <checkstyle.basedir>${main.basedir}/build/rules</checkstyle.basedir>
+        <checkstyle.config.location>${main.basedir}/build/rules/checkstyle_rules.xml</checkstyle.config.location>
+        <checkstyle.header.file>${main.basedir}/build/rules/license_header</checkstyle.header.file>
+        <checkstyle.version>8.10.1</checkstyle.version>
     </properties>
 
     <dependencyManagement>
@@ -750,6 +757,30 @@
                     <nexusUrl>https://oss.sonatype.org/</nexusUrl>
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${maven.checkstyle.plugin.version}</version>
+                <configuration>
+                    <configLocation>${checkstyle.config.location}</configLocation>
+                    <headerLocation>${checkstyle.header.file}</headerLocation>
+                    <propertyExpansion>samedir=${checkstyle.basedir}</propertyExpansion>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>${checkstyle.version}</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

@@ -33,6 +33,10 @@
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Metrics processing.</description>
 
+    <properties>
+        <main.basedir>${project.parent.basedir}</main.basedir>
+    </properties>
+
     <dependencies>
 
         <!-- Compile -->

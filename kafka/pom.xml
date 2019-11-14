@@ -34,6 +34,7 @@
     <description>Kafka interface for Adaptive Alerting.</description>
 
     <properties>
+        <main.basedir>${project.parent.basedir}</main.basedir>
         <maven.scalatest.plugin.version>2.0.0</maven.scalatest.plugin.version>
         <maven.scala.plugin.version>3.4.2</maven.scala.plugin.version>
         <maven.build.helper.plugin.version>3.0.0</maven.build.helper.plugin.version>
