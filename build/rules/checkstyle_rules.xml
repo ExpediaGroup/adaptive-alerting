@@ -3,7 +3,7 @@
         "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
         "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
 <module name="Checker">
-    <property name="fileExtensions" value="java, properties, xml, vm, g, g4, dtd"/>
+    <property name="fileExtensions" value="java"/>
     <!-- Headers -->
     <module name="Header">
         <property name="headerFile" value="${checkstyle.header.file}"/>
