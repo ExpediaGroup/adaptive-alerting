@@ -167,7 +167,6 @@ public class DetectorRepositoryImpl implements DetectorRepository {
         val json = objectMapperUtil.convertToString(jsonMap);   // Convert hashmap to JSON for elasticsearch
         updateRequest.doc(json, XContentType.JSON);
         try {
-            log.info("Trying ES client update with updateRequest");
             elasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
             log.error(String.format("Updating elastic search failed", e));
