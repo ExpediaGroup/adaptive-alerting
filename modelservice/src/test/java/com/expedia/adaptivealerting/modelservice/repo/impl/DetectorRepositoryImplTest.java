@@ -225,6 +225,47 @@ public class DetectorRepositoryImplTest {
     }
 
     @Test
+    public void testUpdateDetector_emptyMeta() {
+        val mom = ObjectMother.instance();
+        val document = mom.getDetectorDocument();
+
+        document.setMeta(null);
+
+        UUID someUuid = UUID.randomUUID();
+        document.setUuid(someUuid);
+
+        repoUnderTest.updateDetector(someUuid.toString(), document);
+    }
+
+    @Test
+    public void testUpdateDetector_populatedMeta() {
+        val mom = ObjectMother.instance();
+        val document = mom.getDetectorDocument();
+
+        DetectorDocument.Meta metaBlock = new DetectorDocument.Meta();
+        metaBlock.setCreatedBy("user");
+        document.setMeta(metaBlock);
+
+        UUID someUuid = UUID.randomUUID();
+        document.setUuid(someUuid);
+        repoUnderTest.updateDetector(someUuid.toString(), document);
+    }
+
+    @Test
+    public void testUpdateDetector_populatedMeta_noUser() {
+        val mom = ObjectMother.instance();
+        val document = mom.getDetectorDocument();
+
+        DetectorDocument.Meta metaBlock = new DetectorDocument.Meta();
+        metaBlock.setCreatedBy(null);
+        document.setMeta(metaBlock);
+
+        UUID someUuid = UUID.randomUUID();
+        document.setUuid(someUuid);
+        repoUnderTest.updateDetector(someUuid.toString(), document);
+    }
+
+    @Test
     public void testToggleDetector() {
         DetectorRepository detectorRepository = mock(DetectorRepository.class);
         doNothing().when(detectorRepository).toggleDetector(anyString(), anyBoolean());
