@@ -22,6 +22,7 @@ import com.expedia.adaptivealerting.modelservice.util.DateUtil;
 import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticsearchUtil;
 import com.expedia.adaptivealerting.modelservice.util.ObjectMapperUtil;
 import com.expedia.adaptivealerting.modelservice.util.RequestValidator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -31,6 +32,7 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -131,6 +133,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
             String name = field.getName();
             if (!name.isEmpty()) {
                 Object value;
+                Date nowDate = DateUtil.now();
                 try {
                     value = field.get(document);
                 } catch (IllegalAccessException e) {
@@ -138,15 +141,31 @@ public class DetectorRepositoryImpl implements DetectorRepository {
                     throw new RuntimeException(e);
                 }
                 if ("lastUpdateTimestamp".equals(name)) {
-                    Date nowDate = DateUtil.now();
                     value = DateUtil.toDateString(nowDate.toInstant());
+                }
+                if ("meta".equals(name)) {
+                    // Set meta fields if none are provided
+                    if (document.getMeta() == null) {
+                        DetectorDocument.Meta metaBlock = new DetectorDocument.Meta();
+                        metaBlock.setDateUpdated(nowDate);
+                        document.setMeta(metaBlock);
+                    } else {
+                        DetectorDocument.Meta metaBlock = document.getMeta();
+                        metaBlock.setDateUpdated(nowDate);
+                        metaBlock.setUpdatedBy(document.getMeta().getUpdatedBy());
+                    }
+                }
+                // Remap the JSON property name for any DetectorDocument properties with a defined JsonProperty name
+                if (field.isAnnotationPresent(JsonProperty.class)) {
+                    name = field.getAnnotation(JsonProperty.class).value();
                 }
                 if (value != null) {
                     jsonMap.put(name, value);
                 }
             }
         }
-        updateRequest.doc(jsonMap);
+        val json = objectMapperUtil.convertToString(jsonMap);   // Convert hashmap to JSON for elasticsearch
+        updateRequest.doc(json, XContentType.JSON);
         try {
             elasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
