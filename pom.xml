@@ -765,7 +765,6 @@
                 <configuration>
                     <configLocation>${checkstyle.config.location}</configLocation>
                     <headerLocation>${checkstyle.header.file}</headerLocation>
-                    <propertyExpansion>samedir=${checkstyle.basedir}</propertyExpansion>
                 </configuration>
                 <dependencies>
                     <dependency>
