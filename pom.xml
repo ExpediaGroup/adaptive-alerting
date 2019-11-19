@@ -71,7 +71,6 @@
         </repository>
     </distributionManagement>
     <properties>
-        <main.basedir>${project.basedir}</main.basedir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- This controls the bytecode level and sets the minimum JDK version, not the maximum -->
         <project.jdk.version>1.8</project.jdk.version>
