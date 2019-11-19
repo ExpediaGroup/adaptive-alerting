@@ -138,12 +138,11 @@
         <maven.source.plugin.version>3.0.1</maven.source.plugin.version>
         <maven.surefire.plugin.version>2.22.1</maven.surefire.plugin.version>
         <nexus.staging.maven.plugin.version>1.6.8</nexus.staging.maven.plugin.version>
-        <maven.checkstyle.plugin.version>3.0.0</maven.checkstyle.plugin.version>
+        <maven.checkstyle.plugin.version>3.1.0</maven.checkstyle.plugin.version>
 
         <checkstyle.basedir>${main.basedir}/build/rules</checkstyle.basedir>
         <checkstyle.config.location>${main.basedir}/build/rules/checkstyle_rules.xml</checkstyle.config.location>
         <checkstyle.header.file>${main.basedir}/build/rules/license_header</checkstyle.header.file>
-        <checkstyle.version>8.10.1</checkstyle.version>
     </properties>
 
     <dependencyManagement>
@@ -766,13 +765,6 @@
                     <configLocation>${checkstyle.config.location}</configLocation>
                     <headerLocation>${checkstyle.header.file}</headerLocation>
                 </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.puppycrawl.tools</groupId>
-                        <artifactId>checkstyle</artifactId>
-                        <version>${checkstyle.version}</version>
-                    </dependency>
-                </dependencies>
                 <executions>
                     <execution>
                         <goals>
