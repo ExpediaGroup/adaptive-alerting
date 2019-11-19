@@ -38,10 +38,6 @@
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Adaptive Alerting reporting module.</description>
 
-    <properties>
-        <main.basedir>${project.parent.basedir}</main.basedir>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>com.expedia.adaptivealerting</groupId>

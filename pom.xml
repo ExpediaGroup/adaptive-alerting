@@ -140,9 +140,8 @@
         <nexus.staging.maven.plugin.version>1.6.8</nexus.staging.maven.plugin.version>
         <maven.checkstyle.plugin.version>3.1.0</maven.checkstyle.plugin.version>
 
-        <checkstyle.basedir>${main.basedir}/build/rules</checkstyle.basedir>
-        <checkstyle.config.location>${main.basedir}/build/rules/checkstyle_rules.xml</checkstyle.config.location>
-        <checkstyle.header.file>${main.basedir}/build/rules/license_header</checkstyle.header.file>
+        <checkstyle.config.location>checkstyle/checkstyle_rules.xml</checkstyle.config.location>
+        <checkstyle.header.file>checkstyle/license_header</checkstyle.header.file>
     </properties>
 
     <dependencyManagement>

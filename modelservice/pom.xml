@@ -34,7 +34,6 @@
     <description>Adaptive Alerting Model Service.</description>
 
     <properties>
-        <main.basedir>${project.parent.basedir}</main.basedir>
         <codahale.metrics.version>3.0.2</codahale.metrics.version>
         <jacoco-percentage>0.17</jacoco-percentage>
         <jacoco-branch-percentage>0.25</jacoco-branch-percentage>
