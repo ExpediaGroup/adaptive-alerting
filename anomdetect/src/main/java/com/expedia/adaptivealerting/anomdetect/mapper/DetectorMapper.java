@@ -16,9 +16,11 @@
 package com.expedia.adaptivealerting.anomdetect.mapper;
 
 
+import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
 import com.expedia.adaptivealerting.anomdetect.util.AssertUtil;
+import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.typesafe.config.Config;
 import lombok.Getter;
@@ -40,20 +42,27 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public class DetectorMapper {
+    private static final int OPTIMAL_BATCH_SIZE = 80;
     private static final String CK_DETECTOR_CACHE_UPDATE_PERIOD = "detector-mapping-cache-update-period";
+    private static final String DETECTOR_MAPPER_ERRORS = "detector-mapper.errors";
+    private static final String COUNTER_LAGGY_RECORDS = "detector-mapper.records-laggy";
+
+
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private AtomicLong lastElasticLookUpLatency = new AtomicLong(-1);
 
     @Getter
     @NonNull
     private DetectorSource detectorSource;
+
     private DetectorMapperCache cache;
+    private Counter errorCounter;
+    private Counter laggyRecords;
     private int detectorCacheUpdateTimePeriod;
-    private long syncedUptillTime = System.currentTimeMillis();
+    private long syncedUpTillTime = System.currentTimeMillis();
 
     public DetectorMapper(DetectorSource detectorSource, DetectorMapperCache cache, int detectorCacheUpdateTimePeriod) {
-        AssertUtil.notNull(detectorSource, "detectorSource can't be null");
-
+        AssertUtil.notNull(detectorSource, "Detector source can't be null");
         this.detectorSource = detectorSource;
         this.cache = cache;
         this.detectorCacheUpdateTimePeriod = detectorCacheUpdateTimePeriod;
@@ -62,6 +71,8 @@ public class DetectorMapper {
 
     public DetectorMapper(DetectorSource detectorSource, Config config, MetricRegistry metricRegistry) {
         this(detectorSource, new DetectorMapperCache(metricRegistry), config.getInt(CK_DETECTOR_CACHE_UPDATE_PERIOD));
+        this.errorCounter = metricRegistry.counter(DETECTOR_MAPPER_ERRORS);
+        this.laggyRecords = metricRegistry.counter(COUNTER_LAGGY_RECORDS);
     }
 
     private void initScheduler() {
@@ -71,41 +82,38 @@ public class DetectorMapper {
                 this.detectorMappingCacheSync(System.currentTimeMillis());
             } catch (Exception e) {
                 log.error("Error updating detectors mapping cache", e);
+                errorCounter.inc();
             }
         }, detectorCacheUpdateTimePeriod, detectorCacheUpdateTimePeriod, TimeUnit.MINUTES);
     }
 
-    public List<Detector> getDetectorsFromCache(MetricDefinition metricDefinition) {
-        String cacheKey = CacheUtil.getKey(metricDefinition.getTags().getKv());
+    public int optimalBatchSize() {
+        if (lastElasticLookUpLatency.longValue() == -1L || lastElasticLookUpLatency.longValue() > 10L) {
+            return OPTIMAL_BATCH_SIZE;
+        }
+        return 0;
+    }
+
+    public List<Detector> getDetectorsFromCache(MetricData metricData) {
+        String cacheKey = CacheUtil.getKey(metricData.getMetricDefinition().getTags().getKv());
+        long timestamp = metricData.getTimestamp();
+        long delay = System.currentTimeMillis() - (timestamp * 1000);
+        if (delay > 300_000) {
+            laggyRecords.inc();
+        }
         return cache.get(cacheKey);
     }
 
     public boolean isSuccessfulDetectorMappingLookup(List<Map<String, String>> cacheMissedMetricTags) {
 
-        DetectorMatchResponse matchingDetectorMappings = null;
-        try {
-            matchingDetectorMappings = detectorSource.findDetectorMappings(cacheMissedMetricTags);
-        } catch (RuntimeException e) {
-            //Disabling temporarily to reduce log
-           // log.error(e.getMessage());
-        }
-
+        DetectorMatchResponse matchingDetectorMappings = getMappingsFromElasticSearch(cacheMissedMetricTags);
         if (matchingDetectorMappings != null) {
-
             lastElasticLookUpLatency.set(matchingDetectorMappings.getLookupTimeInMillis());
             Map<Integer, List<Detector>> groupedDetectorsByIndex = matchingDetectorMappings.getGroupedDetectorsBySearchIndex();
-
-            //populate cache and result map
-            groupedDetectorsByIndex.forEach((index, detectors) -> {
-                String cacheKey = CacheUtil.getKey(cacheMissedMetricTags.get(index));
-                if (!detectors.isEmpty()) {
-                    cache.put(cacheKey, detectors);
-                }
-            });
-
+            populateCache(groupedDetectorsByIndex, cacheMissedMetricTags);
             Set<Integer> searchIndexes = groupedDetectorsByIndex.keySet();
 
-//For metrics with no matching detectors, set matching detectors to empty in cache to avoid repeated cache miss
+            //For metrics with no matching detectors, set matching detectors to empty in cache to avoid repeated cache miss
             int i = 0;
             for (Map<String, String> tags : cacheMissedMetricTags) {
                 if (!searchIndexes.contains(i)) {
@@ -114,26 +122,14 @@ public class DetectorMapper {
                 }
                 i++;
             }
-
         } else {
             lastElasticLookUpLatency.set(-2);
         }
         return matchingDetectorMappings != null;
     }
 
-    //TODO - make batch size configureable
-    public int optimalBatchSize() {
-        if (lastElasticLookUpLatency.longValue() == -1L || lastElasticLookUpLatency.longValue() > 10L) {
-            return 80;
-        }
-        return 0;
-    }
-
-
-    void detectorMappingCacheSync(long currentTime) {
-
-        long updateDurationInSeconds = (currentTime - syncedUptillTime) / 1000;
-
+    public void detectorMappingCacheSync(long currentTime) {
+        long updateDurationInSeconds = (currentTime - syncedUpTillTime) / 1000;
         if (updateDurationInSeconds <= 0) {
             return;
         }
@@ -156,8 +152,26 @@ public class DetectorMapper {
             log.info("Invalidating metrics for modified mappings  : {}", newDetectorMappings);
         }
 
-        syncedUptillTime = currentTime;
+        syncedUpTillTime = currentTime;
     }
 
+    private DetectorMatchResponse getMappingsFromElasticSearch(List<Map<String, String>> cacheMissedMetricTags) {
+        DetectorMatchResponse matchingDetectorMappings = null;
+        try {
+            matchingDetectorMappings = detectorSource.findDetectorMappings(cacheMissedMetricTags);
+        } catch (RuntimeException e) {
+            errorCounter.inc();
+        }
+        return matchingDetectorMappings;
+    }
+
+    private void populateCache(Map<Integer, List<Detector>> groupedDetectorsByIndex, List<Map<String, String>> cacheMissedMetricTags) {
+        groupedDetectorsByIndex.forEach((index, detectors) -> {
+            String cacheKey = CacheUtil.getKey(cacheMissedMetricTags.get(index));
+            if (!detectors.isEmpty()) {
+                cache.put(cacheKey, detectors);
+            }
+        });
+    }
 }
 
