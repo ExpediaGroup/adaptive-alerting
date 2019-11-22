@@ -95,6 +95,11 @@ public final class EdmxDetector implements BreakoutDetector {
                 .setTrusted(trusted);
     }
 
+    @Override
+    public String getName() {
+        return "edmx";
+    }
+
     private AnomalyLevel calculateAnomalyLevel(EdmxEstimate estimate) {
         val pValue = estimate.getPValue();
         if (pValue <= hyperparams.getStrongAlpha()) {

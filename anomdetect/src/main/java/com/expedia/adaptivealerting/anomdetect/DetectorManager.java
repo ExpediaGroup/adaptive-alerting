@@ -15,6 +15,10 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
+import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
 import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
@@ -26,14 +30,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
@@ -51,16 +53,18 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 public class DetectorManager {
     private static final String CK_DETECTOR_REFRESH_PERIOD = "detector-refresh-period";
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-
-    @Getter
-    @NonNull
-    private DetectorSource detectorSource;
-
-    private int detectorRefreshTimePeriod;
+    private final Timer detectorForTimer;
+    private final Meter noDetectorFoundMeter;
+    private final Function<String, Timer> detectTimer;
+    private final BiFunction<String, AnomalyLevel, Meter> detectorAnomalyLevelMeter;
 
     // TODO Consider making this an explicit class so we can mock it and verify interactions
     //  against it. [WLW]
     private final Map<UUID, Detector> cachedDetectors;
+    @Getter
+    @NonNull
+    private DetectorSource detectorSource;
+    private int detectorRefreshTimePeriod;
     private long synchedTilTime = System.currentTimeMillis();
 
     /**
@@ -70,7 +74,7 @@ public class DetectorManager {
      * @param detectorRefreshTimePeriod detector refresh period in minutes
      * @param cachedDetectors           map containing cached detectors
      */
-    public DetectorManager(DetectorSource detectorSource, int detectorRefreshTimePeriod, Map<UUID, Detector> cachedDetectors) {
+    public DetectorManager(DetectorSource detectorSource, int detectorRefreshTimePeriod, Map<UUID, Detector> cachedDetectors, MetricRegistry metricRegistry) {
         // TODO Seems odd to include this constructor, whose purpose seems to be to support unit
         //  testing. At least I don't think it should be public. And it should take a Config
         //  since the other one does, and this is conceptually just the base constructor with
@@ -78,11 +82,17 @@ public class DetectorManager {
         this.detectorSource = detectorSource;
         this.detectorRefreshTimePeriod = detectorRefreshTimePeriod;
         this.cachedDetectors = cachedDetectors;
+
+        detectorForTimer = metricRegistry.timer("detector.detectorFor");
+        noDetectorFoundMeter = metricRegistry.meter("detector.nullDetector");
+        detectTimer = (name) -> metricRegistry.timer("detector." + name + ".detect");
+        detectorAnomalyLevelMeter = (name, al) -> metricRegistry.meter("detector." + name + "." + al.name());
+
         this.initScheduler();
     }
 
-    public DetectorManager(DetectorSource detectorSource, Config config) {
-        this(detectorSource, config.getInt(CK_DETECTOR_REFRESH_PERIOD), new HashMap<>());
+    public DetectorManager(DetectorSource detectorSource, Config config, MetricRegistry metricRegistry) {
+        this(detectorSource, config.getInt(CK_DETECTOR_REFRESH_PERIOD), new HashMap<>(), metricRegistry);
     }
 
     private void initScheduler() {
@@ -106,13 +116,22 @@ public class DetectorManager {
     public DetectorResult detect(MappedMetricData mappedMetricData) {
         notNull(mappedMetricData, "mappedMetricData can't be null");
 
+        //timer ...
+        Timer.Context ctxt = detectorForTimer.time();
         val detector = detectorFor(mappedMetricData);
+        ctxt.close();
         if (detector == null) {
             log.warn("No detector for mappedMetricData={}", mappedMetricData);
+            noDetectorFoundMeter.mark();
             return null;
         }
         val metricData = mappedMetricData.getMetricData();
-        return detector.detect(metricData);
+        ctxt = detectTimer.apply(detector.getName()).time();
+        final DetectorResult result = detector.detect(metricData);
+        ctxt.close();
+
+        detectorAnomalyLevelMeter.apply(detector.getName(), result.getAnomalyLevel()).mark();
+        return result;
     }
 
     private Detector detectorFor(MappedMetricData mappedMetricData) {

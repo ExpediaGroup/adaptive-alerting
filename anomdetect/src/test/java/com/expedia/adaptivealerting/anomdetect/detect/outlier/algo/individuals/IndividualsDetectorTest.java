@@ -69,7 +69,7 @@ public class IndividualsDetectorTest {
         val params = new IndividualsDetectorParams()
                 .setInitValue(observed0)
                 .setWarmUpPeriod(WARMUP_PERIOD);
-        val detector = new IndividualsDetector(detectorUuid, params, trusted);
+        val detector = new IndividualsDetector(detectorUuid, params, trusted, "test");
 
         assertEquals(detectorUuid, detector.getUuid());
         assertEquals(trusted, detector.isTrusted());

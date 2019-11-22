@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.kafka;
 
+import com.codahale.metrics.SharedMetricRegistries;
 import com.expedia.adaptivealerting.anomdetect.DetectorManager;
 import com.expedia.adaptivealerting.anomdetect.detect.breakout.BreakoutDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
@@ -86,8 +87,9 @@ public class KafkaDetectorManager implements Runnable {
 
     // Extracted for unit testing
     static KafkaDetectorManager buildManager(Config config) {
+        val metricRegistry = SharedMetricRegistries.getOrCreate(APP_ID);
         val detectorSource = DetectorUtil.buildDetectorSource(config);
-        val detectorManager = new DetectorManager(detectorSource, config);
+        val detectorManager = new DetectorManager(detectorSource, config, metricRegistry);
 
         val metricConsumerConfig = config.getConfig(METRIC_CONSUMER);
         val metricConsumerProps = ConfigUtil.toConsumerConfig(metricConsumerConfig);

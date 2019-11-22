@@ -31,6 +31,6 @@ public class IndividualsDetectorFactoryProvider implements DetectorFactoryProvid
         val paramsMap = document.getConfig().get("params");
         val params = objectMapper.convertValue(paramsMap, IndividualsDetectorParams.class);
         val trusted = document.isTrusted();
-        return new IndividualsDetector(document.getUuid(), params, trusted);
+        return new IndividualsDetector(document.getUuid(), params, trusted, "individuals");
     }
 }

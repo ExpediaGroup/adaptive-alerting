@@ -46,4 +46,7 @@ public interface Detector {
      * @return Anomaly result.
      */
     DetectorResult detect(MetricData metricData);
+
+
+    String getName();
 }

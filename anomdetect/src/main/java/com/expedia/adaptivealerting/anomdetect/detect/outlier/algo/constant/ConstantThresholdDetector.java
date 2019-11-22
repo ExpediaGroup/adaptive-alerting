@@ -33,6 +33,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
  */
 @ToString(callSuper = true)
 public final class ConstantThresholdDetector extends AbstractOutlierDetector {
+    String NAME = "constant";
 
     @Getter
     private final ConstantThresholdDetectorParams params;
@@ -62,5 +63,10 @@ public final class ConstantThresholdDetector extends AbstractOutlierDetector {
                 .setThresholds(thresholds)
                 .setTrusted(trusted);
         return outlierResult;
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 }
