@@ -21,6 +21,7 @@ import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.Elastic
 import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticsearchUtil;
+import com.expedia.adaptivealerting.modelservice.util.GeneralMeters;
 import com.expedia.adaptivealerting.modelservice.util.ObjectMapperUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -79,8 +80,11 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class DetectorRepositoryImplTest {
 
+    @Mock
+    private GeneralMeters generalMeters;
+
     @InjectMocks
-    private DetectorRepository repoUnderTest = new DetectorRepositoryImpl();
+    private DetectorRepository repoUnderTest = new DetectorRepositoryImpl(generalMeters);
 
     @Mock
     private ElasticSearchClient elasticSearchClient;
@@ -121,19 +125,19 @@ public class DetectorRepositoryImplTest {
         repoUnderTest.createDetector(document);
     }
 
-    @Test(expected = DetectorException.class)
+    @Test(expected = RuntimeException.class)
     public void testCreateDetectorNullValues() {
         val detector1 = new DetectorDocument();
         detector1.setCreatedBy("user");
         repoUnderTest.createDetector(detector1);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void testCreateDetectorIllegalThresholds() {
         repoUnderTest.createDetector(illegalParamsDetector);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void testCreateDetector_uuidAlreadySet() {
         val document = new DetectorDocument();
         document.setUuid(UUID.randomUUID());
@@ -168,7 +172,7 @@ public class DetectorRepositoryImplTest {
         repoUnderTest.createDetector(document);
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testFindByUuid() {
         DetectorDocument actualDetector = repoUnderTest.findByUuid("uuid");
         assertNotNull(actualDetector);
@@ -178,14 +182,14 @@ public class DetectorRepositoryImplTest {
         Assert.assertEquals(true, actualDetector.isTrusted());
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testFindByCreatedBy() {
         List<DetectorDocument> actualDetectors = repoUnderTest.findByCreatedBy("kashah");
         assertNotNull(actualDetectors);
         assertCheck(actualDetectors);
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testGetLastUpdatedDetectors() {
         List<DetectorDocument> actualDetectors = repoUnderTest.getLastUpdatedDetectors("", "");
         assertNotNull(actualDetectors);

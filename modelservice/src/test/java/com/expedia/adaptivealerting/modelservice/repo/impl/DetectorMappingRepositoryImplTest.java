@@ -15,9 +15,8 @@
  */
 package com.expedia.adaptivealerting.modelservice.repo.impl;
 
-import com.codahale.metrics.Counter;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.Timer;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Timer;
 import com.expedia.adaptivealerting.modelservice.entity.Detector;
 import com.expedia.adaptivealerting.modelservice.entity.User;
 import com.expedia.adaptivealerting.modelservice.repo.impl.percolator.PercolatorDetectorMapping;
@@ -30,6 +29,7 @@ import com.expedia.adaptivealerting.modelservice.repo.response.MatchingDetectors
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticsearchUtil;
 import com.expedia.adaptivealerting.modelservice.util.ObjectMapperUtil;
+import com.expedia.adaptivealerting.modelservice.util.GeneralMeters;
 import lombok.val;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.DocWriteResponse.Result;
@@ -82,8 +82,11 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class DetectorMappingRepositoryImplTest {
 
+//    @Mock
+//    private MeterRegistry meterRegistry;
+
     @Mock
-    private MetricRegistry metricRegistry;
+    private GeneralMeters generalMeters;
 
     @Mock
     private ElasticSearchClient elasticSearchClient;
@@ -107,13 +110,13 @@ public class DetectorMappingRepositoryImplTest {
         val config = new ElasticSearchProperties.Config().setConnectionTimeout(100);
 
         percolatorDetectorMapping = mom.getPercolatorDetectorMapping();
-        when(metricRegistry.timer(any())).thenReturn(mock(Timer.class));
-        when(metricRegistry.counter(any())).thenReturn(mock(Counter.class));
+        when(generalMeters.getDelayMappingTimer()).thenReturn(mock(Timer.class));
+        when(generalMeters.getMappingExceptionCount()).thenReturn(mock(Counter.class));
         when(elasticSearchProperties.getIndexName()).thenReturn("detector-mappings");
         when(elasticSearchProperties.getDocType()).thenReturn("details");
         when(elasticSearchProperties.getConfig()).thenReturn(config);
 
-        this.repoUnderTest = new DetectorMappingRepositoryImpl(metricRegistry);
+        this.repoUnderTest = new DetectorMappingRepositoryImpl(generalMeters);
         ReflectionTestUtils.setField(repoUnderTest, "elasticSearchClient", elasticSearchClient);
         ReflectionTestUtils.setField(repoUnderTest, "elasticSearchProperties", elasticSearchProperties);
         ReflectionTestUtils.setField(repoUnderTest, "elasticsearchUtil", elasticsearchUtil);

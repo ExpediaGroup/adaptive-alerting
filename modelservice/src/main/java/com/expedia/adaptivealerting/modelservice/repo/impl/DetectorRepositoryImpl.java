@@ -20,6 +20,7 @@ import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.Elastic
 import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
 import com.expedia.adaptivealerting.modelservice.util.DateUtil;
 import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticsearchUtil;
+import com.expedia.adaptivealerting.modelservice.util.GeneralMeters;
 import com.expedia.adaptivealerting.modelservice.util.ObjectMapperUtil;
 import com.expedia.adaptivealerting.modelservice.util.RequestValidator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -41,6 +42,7 @@ import org.springframework.util.ReflectionUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -69,43 +71,56 @@ public class DetectorRepositoryImpl implements DetectorRepository {
     @Autowired
     private ElasticsearchUtil elasticsearchUtil;
 
+    private final GeneralMeters generalMeters;
+
+    public DetectorRepositoryImpl(GeneralMeters generalMeters) {
+        this.generalMeters = generalMeters;
+    }
+
     @Override
     public UUID createDetector(DetectorDocument document) {
-        notNull(document, "document can't be null");
-        isNull(document.getUuid(), "Required: document.uuid == null");
+        try {
+            notNull(document, "document can't be null");
+            isNull(document.getUuid(), "Required: document.uuid == null");
 
-        val uuid = UUID.randomUUID();
-        document.setUuid(uuid);
-        Date nowDate = DateUtil.now();
+            val uuid = UUID.randomUUID();
+            document.setUuid(uuid);
+            Date nowDate = DateUtil.now();
 
-        // Force setting last update time to current time. Although deprecated, this field is still used to determine what changed for cache loading.
-        // In the future this can change to the field within Meta
-        document.setLastUpdateTimestamp(nowDate);
+            // Force setting last update time to current time. Although deprecated, this field is still used to determine what changed for cache loading.
+            // In the future this can change to the field within Meta
+            document.setLastUpdateTimestamp(nowDate);
 
-        // Set meta fields if none are provided
-        if (document.getMeta() == null) {
-            DetectorDocument.Meta metaBlock = new DetectorDocument.Meta();
-            metaBlock.setDateCreated(nowDate);
-            metaBlock.setCreatedBy(document.getCreatedBy());
-            document.setMeta(metaBlock);
-        } else {
-            DetectorDocument.Meta metaBlock = document.getMeta();
-            metaBlock.setDateCreated(nowDate);
-            if (metaBlock.getCreatedBy() == null) {
+            // Set meta fields if none are provided
+            if (document.getMeta() == null) {
+                DetectorDocument.Meta metaBlock = new DetectorDocument.Meta();
+                metaBlock.setDateCreated(nowDate);
                 metaBlock.setCreatedBy(document.getCreatedBy());
+                document.setMeta(metaBlock);
+            } else {
+                DetectorDocument.Meta metaBlock = document.getMeta();
+                metaBlock.setDateCreated(nowDate);
+                if (metaBlock.getCreatedBy() == null) {
+                    metaBlock.setCreatedBy(document.getCreatedBy());
+                }
             }
+
+            // Do this after setting the UUID since validation checks for the UUID.
+            RequestValidator.validateDetector(document);
+
+            val indexRequest = new IndexRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, uuid.toString());
+            val json = objectMapperUtil.convertToString(getElasticSearchDetector(document));
+
+            // FIXME We should not be returning an implementation-specific ID here. (This is an Elasticsearch document ID.)
+//        return elasticsearchUtil.index(indexRequest, json).getId();
+            elasticsearchUtil.index(indexRequest, json);
+            return uuid;
+        } catch (Exception e) {
+            log.error("Error in creating detector", e);
+            generalMeters.getDetectorExceptionCount().increment();
+            throw new RuntimeException(e);
         }
 
-        // Do this after setting the UUID since validation checks for the UUID.
-        RequestValidator.validateDetector(document);
-
-        val indexRequest = new IndexRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, uuid.toString());
-        val json = objectMapperUtil.convertToString(getElasticSearchDetector(document));
-
-        // FIXME We should not be returning an implementation-specific ID here. (This is an Elasticsearch document ID.)
-//        return elasticsearchUtil.index(indexRequest, json).getId();
-        elasticsearchUtil.index(indexRequest, json);
-        return uuid;
     }
 
     @Override
@@ -114,7 +129,8 @@ public class DetectorRepositoryImpl implements DetectorRepository {
         try {
             elasticSearchClient.delete(deleteRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
-            log.error(String.format("Deleting detector %s failed", uuid), e);
+            log.error("Deleting detector failed", e);
+            generalMeters.getDetectorExceptionCount().increment();
             throw new RuntimeException(e);
         }
     }
@@ -170,24 +186,38 @@ public class DetectorRepositoryImpl implements DetectorRepository {
             elasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
             log.error(String.format("Updating elastic search failed", e));
+            generalMeters.getDetectorExceptionCount().increment();
             throw new RuntimeException(e);
         }
     }
 
     @Override
     public DetectorDocument findByUuid(String uuid) {
-        val queryBuilder = QueryBuilders.termQuery("uuid", uuid);
-        val searchSourceBuilder = elasticsearchUtil.getSourceBuilder(queryBuilder).size(DEFAULT_ES_RESULTS_SIZE);
-        val searchRequest = elasticsearchUtil.getSearchRequest(searchSourceBuilder, DETECTOR_INDEX, DETECTOR_DOC_TYPE);
-        return getDetectorsFromElasticSearch(searchRequest).get(0);
+        try {
+            val queryBuilder = QueryBuilders.termQuery("uuid", uuid);
+            val searchSourceBuilder = elasticsearchUtil.getSourceBuilder(queryBuilder).size(DEFAULT_ES_RESULTS_SIZE);
+            val searchRequest = elasticsearchUtil.getSearchRequest(searchSourceBuilder, DETECTOR_INDEX, DETECTOR_DOC_TYPE);
+            return getDetectorsFromElasticSearch(searchRequest).get(0);
+        } catch(Exception e) {
+            log.error("Unable to find detector",e);
+            generalMeters.getDetectorExceptionCount().increment();
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public List<DetectorDocument> findByCreatedBy(String user) {
-        val queryBuilder = QueryBuilders.termQuery("createdBy", user);
-        val searchSourceBuilder = elasticsearchUtil.getSourceBuilder(queryBuilder).size(DEFAULT_ES_RESULTS_SIZE);
-        val searchRequest = elasticsearchUtil.getSearchRequest(searchSourceBuilder, DETECTOR_INDEX, DETECTOR_DOC_TYPE);
-        return getDetectorsFromElasticSearch(searchRequest);
+        try {
+            val queryBuilder = QueryBuilders.termQuery("createdBy", user);
+            val searchSourceBuilder = elasticsearchUtil.getSourceBuilder(queryBuilder).size(DEFAULT_ES_RESULTS_SIZE);
+            val searchRequest = elasticsearchUtil.getSearchRequest(searchSourceBuilder, DETECTOR_INDEX, DETECTOR_DOC_TYPE);
+            return getDetectorsFromElasticSearch(searchRequest);
+        } catch (Exception e) {
+            log.error("Unable to find detector created by user", e);
+            generalMeters.getDetectorExceptionCount().increment();
+            throw new RuntimeException(e);
+        }
+
     }
 
     @Override
@@ -208,6 +238,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
             elasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
             log.error(String.format("Updating elastic search failed", e));
+            generalMeters.getDetectorExceptionCount().increment();
             throw new RuntimeException(e);
         }
     }
@@ -230,32 +261,48 @@ public class DetectorRepositoryImpl implements DetectorRepository {
             elasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
             log.error(String.format("Updating elastic search failed", e));
+            generalMeters.getDetectorExceptionCount().increment();
             throw new RuntimeException(e);
         }
     }
 
     @Override
     public List<DetectorDocument> getLastUpdatedDetectors(long interval) {
-        // Replaced Lombok val with explicit types here because the Maven compiler plugin was breaking under
-        // OpenJDK 12. Not sure what the issue was but this fixed it. [WLW]
-        Instant now = DateUtil.now().toInstant();
-        String fromDate = DateUtil.toUtcDateString((now.minus(interval, ChronoUnit.SECONDS)));
-        String toDate = DateUtil.toUtcDateString(now);
-        return getLastUpdatedDetectors(fromDate, toDate);
+        try {
+            // Replaced Lombok val with explicit types here because the Maven compiler plugin was breaking under
+            // OpenJDK 12. Not sure what the issue was but this fixed it. [WLW]
+            Instant now = DateUtil.now().toInstant();
+            String fromDate = DateUtil.toUtcDateString((now.minus(interval, ChronoUnit.SECONDS)));
+            String toDate = DateUtil.toUtcDateString(now);
+            return getLastUpdatedDetectors(fromDate, toDate);
+        } catch (Exception e) {
+            log.error("Unable to get last updated detectors for given interval", e);
+            generalMeters.getDetectorExceptionCount().increment();
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public List<DetectorDocument> getLastUpdatedDetectors(String fromDate, String toDate) {
-        val queryBuilder = QueryBuilders.rangeQuery("lastUpdateTimestamp").from(fromDate).to(toDate);
-        val searchSourceBuilder = elasticsearchUtil.getSourceBuilder(queryBuilder).size(DEFAULT_ES_RESULTS_SIZE);
-        val searchRequest = elasticsearchUtil.getSearchRequest(searchSourceBuilder, DETECTOR_INDEX, DETECTOR_DOC_TYPE);
-        return getDetectorsFromElasticSearch(searchRequest);
+        try {
+            val queryBuilder = QueryBuilders.rangeQuery("lastUpdateTimestamp").from(fromDate).to(toDate);
+            val searchSourceBuilder = elasticsearchUtil.getSourceBuilder(queryBuilder).size(DEFAULT_ES_RESULTS_SIZE);
+            val searchRequest = elasticsearchUtil.getSearchRequest(searchSourceBuilder, DETECTOR_INDEX, DETECTOR_DOC_TYPE);
+            return getDetectorsFromElasticSearch(searchRequest);
+        }catch (Exception e) {
+            log.error("Unable to get last updated detectors from given dates", e);
+            generalMeters.getDetectorExceptionCount().increment();
+            throw new RuntimeException(e);
+        }
     }
 
     private List<DetectorDocument> getDetectorsFromElasticSearch(SearchRequest searchRequest) {
         SearchResponse response;
         try {
             response = elasticSearchClient.search(searchRequest, RequestOptions.DEFAULT);
+            long timestamp = System.currentTimeMillis();
+            long delay = (response.getTook().getMillis() - timestamp);
+            generalMeters.getDelayGettingDetectors().record(Duration.ofMillis(delay));
         } catch (IOException e) {
             log.error("Error ES lookup", e);
             throw new RuntimeException(e);

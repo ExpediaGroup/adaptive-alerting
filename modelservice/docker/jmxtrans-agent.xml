@@ -56,10 +56,19 @@
         <!-- POST Requests -->
         <query objectName="spring:name=httpServerRequests.exception.None.method.POST.status.201.uri./api/{repository}" attribute="Count"
                resultAlias="http.post.201Count"/>
+        <query objectName="spring:name=httpServerRequests.exception.None.method.POST.status.200.uri./api/{repository}/search" attribute="Count"
+               resultAlias="http.post.200.count"/>
         <query objectName="spring:name=httpServerRequests.exception.HttpMessageNotReadableException.method.POST.status.400.uri./api/{repository}" attribute="Count"
                resultAlias="http.post.400Count"/>
         <query objectName="spring:name=&quot;httpServerRequests.exception.None.method.POST.status.500.uri./\*\*&quot;" attribute="Count"
                resultAlias="http.post.500Count"/>
+        <!-- ES Exceptions -->
+        <query objectName="spring:name=es-lookupDetector-exception" attribute="Count" resultAlias="es-lookup-detector-exception"/>
+        <query objectName="spring:name=es-lookupMapping-exception" attribute="Count" resultAlias="es-lookup-mapping-exception"/>
+        <!-- ES Time Delay-->
+        <query objectName="spring:name=es-lookupDelay-getting-detectors" attribute="Count" resultAlias="es-lookup-detector-timeDelay"/>
+        <query objectName="spring:name=es-lookupDelay-getting-mapping" attribute="Count" resultAlias="es-lookup-mapping-timeDelay"/>
+
     </queries>
     <outputWriter class="org.jmxtrans.agent.GraphitePlainTextTcpOutputWriter">
         <host>${AA_GRAPHITE_HOST:metrics}</host>
