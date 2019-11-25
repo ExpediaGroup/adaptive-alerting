@@ -93,32 +93,26 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
 
     @Override
     public String createDetectorMapping(CreateDetectorMappingRequest request) {
-        try{
-            val indexName = elasticSearchProperties.getIndexName();
-            val docType = elasticSearchProperties.getDocType();
+        val indexName = elasticSearchProperties.getIndexName();
+        val docType = elasticSearchProperties.getDocType();
 
-            // Index mappings
-            val fields = request.getFields();
-            val newFieldMappings = elasticsearchUtil.removeFieldsHavingExistingMapping(fields, indexName, docType);
-            elasticsearchUtil.updateIndexMappings(newFieldMappings, indexName, docType);
+        // Index mappings
+        val fields = request.getFields();
+        val newFieldMappings = elasticsearchUtil.removeFieldsHavingExistingMapping(fields, indexName, docType);
+        elasticsearchUtil.updateIndexMappings(newFieldMappings, indexName, docType);
 
-            // Index
-            val indexRequest = new IndexRequest(indexName, docType);
-            val now = System.currentTimeMillis();
-            val mapping = new PercolatorDetectorMapping()
-                    .setUser(request.getUser())
-                    .setDetector(request.getDetector())
-                    .setQuery(QueryUtil.buildQuery(request.getExpression()))
-                    .setEnabled(true)
-                    .setLastModifiedTimeInMillis(now)
-                    .setCreatedTimeInMillis(now);
-            val mappingJson = objectMapperUtil.convertToString(mapping);
-            return elasticsearchUtil.index(indexRequest, mappingJson).getId();
-        } catch (Exception e) {
-            log.error("Error in creating detector mapping", e);
-            generalMeters.getMappingExceptionCount().increment();
-            throw new RuntimeException(e);
-        }
+        // Index
+        val indexRequest = new IndexRequest(indexName, docType);
+        val now = System.currentTimeMillis();
+        val mapping = new PercolatorDetectorMapping()
+                .setUser(request.getUser())
+                .setDetector(request.getDetector())
+                .setQuery(QueryUtil.buildQuery(request.getExpression()))
+                .setEnabled(true)
+                .setLastModifiedTimeInMillis(now)
+                .setCreatedTimeInMillis(now);
+        val mappingJson = objectMapperUtil.convertToString(mapping);
+        return elasticsearchUtil.index(indexRequest, mappingJson).getId();
 
     }
 
@@ -295,32 +289,26 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
     }
 
     private DetectorMapping getDetectorMapping(String json, String id, Optional<Map<String, DocumentField>> documentFieldMap) {
-        try {
-            PercolatorDetectorMapping detectorEntity = (PercolatorDetectorMapping) objectMapperUtil.convertToObject(json, new TypeReference<PercolatorDetectorMapping>() {
+        PercolatorDetectorMapping detectorEntity = (PercolatorDetectorMapping) objectMapperUtil.convertToObject(json, new TypeReference<PercolatorDetectorMapping>() {
+        });
+        log.info("detectorEntity:{}", detectorEntity);
+        DetectorMapping detectorMapping = new DetectorMapping()
+                .setId(id)
+                .setDetector(new Detector(detectorEntity.getDetector().getUuid()))
+                .setExpression(QueryUtil.buildExpression(detectorEntity.getQuery()))
+                .setEnabled(detectorEntity.isEnabled())
+                .setCreatedTimeInMillis(detectorEntity.getCreatedTimeInMillis())
+                .setLastModifiedTimeInMillis(detectorEntity.getLastModifiedTimeInMillis())
+                .setUser(detectorEntity.getUser());
+        documentFieldMap.ifPresent(dfm -> {
+            List values = dfm.get("_percolator_document_slot").getValues();
+            List<Integer> indexes = new ArrayList<>();
+            values.forEach(index -> {
+                indexes.add(Integer.valueOf(index.toString()));
             });
-            log.info("detectorEntity:{}", detectorEntity);
-            DetectorMapping detectorMapping = new DetectorMapping()
-                    .setId(id)
-                    .setDetector(new Detector(detectorEntity.getDetector().getUuid()))
-                    .setExpression(QueryUtil.buildExpression(detectorEntity.getQuery()))
-                    .setEnabled(detectorEntity.isEnabled())
-                    .setCreatedTimeInMillis(detectorEntity.getCreatedTimeInMillis())
-                    .setLastModifiedTimeInMillis(detectorEntity.getLastModifiedTimeInMillis())
-                    .setUser(detectorEntity.getUser());
-            documentFieldMap.ifPresent(dfm -> {
-                List values = dfm.get("_percolator_document_slot").getValues();
-                List<Integer> indexes = new ArrayList<>();
-                values.forEach(index -> {
-                    indexes.add(Integer.valueOf(index.toString()));
-                });
-                detectorMapping.setSearchIndexes(indexes);
-            });
-            return detectorMapping;
-        } catch (NullPointerException e) {
-            generalMeters.getMappingExceptionCount().increment();
-            log.error("Unable to get detector mapping", e);
-            throw new RuntimeException("Search failed", e);
-        }
+            detectorMapping.setSearchIndexes(indexes);
+        });
+        return detectorMapping;
 
     }
 
