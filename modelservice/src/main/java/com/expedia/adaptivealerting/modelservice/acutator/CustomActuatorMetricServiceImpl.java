@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+Custom service to track HTTP status. Micrometer by default tracks http status by URI which is pretty hard to manage. [Karan Shah]
+ */
 @Service
 public class CustomActuatorMetricServiceImpl implements CustomActuatorMetricService {
 
