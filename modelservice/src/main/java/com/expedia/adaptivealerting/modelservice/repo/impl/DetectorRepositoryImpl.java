@@ -26,6 +26,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
@@ -112,7 +113,8 @@ public class DetectorRepositoryImpl implements DetectorRepository {
     public void deleteDetector(String uuid) {
         val deleteRequest = new DeleteRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, uuid);
         try {
-            elasticSearchClient.delete(deleteRequest, RequestOptions.DEFAULT);
+            val deleteResponse = elasticSearchClient.delete(deleteRequest, RequestOptions.DEFAULT);
+            elasticsearchUtil.checkNullResponse(deleteResponse.getResult(), uuid);
         } catch (IOException e) {
             log.error(String.format("Deleting detector %s failed", uuid), e);
             throw new RuntimeException(e);
@@ -167,7 +169,8 @@ public class DetectorRepositoryImpl implements DetectorRepository {
         val json = objectMapperUtil.convertToString(jsonMap);   // Convert hashmap to JSON for elasticsearch
         updateRequest.doc(json, XContentType.JSON);
         try {
-            elasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
+            val updateResponse = elasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
+            elasticsearchUtil.checkNullResponse(updateResponse.getResult(), uuid);
         } catch (IOException e) {
             log.error(String.format("Updating elastic search failed", e));
             throw new RuntimeException(e);
@@ -205,7 +208,9 @@ public class DetectorRepositoryImpl implements DetectorRepository {
         jsonMap.put("meta", metaMap);
         updateRequest.doc(jsonMap);
         try {
-            elasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
+            val updateResponse = elasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
+            elasticsearchUtil.checkNullResponse(updateResponse.getResult(), uuid);
+
         } catch (IOException e) {
             log.error(String.format("Updating elastic search failed", e));
             throw new RuntimeException(e);
@@ -227,7 +232,8 @@ public class DetectorRepositoryImpl implements DetectorRepository {
         jsonMap.put("meta", metaMap);
         updateRequest.doc(jsonMap);
         try {
-            elasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
+            val updateResponse = elasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
+            elasticsearchUtil.checkNullResponse(updateResponse.getResult(), uuid);
         } catch (IOException e) {
             log.error(String.format("Updating elastic search failed", e));
             throw new RuntimeException(e);

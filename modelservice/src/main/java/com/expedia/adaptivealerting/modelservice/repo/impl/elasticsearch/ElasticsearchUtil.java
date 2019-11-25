@@ -15,10 +15,11 @@
  */
 package com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch;
 
-import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticSearchClient;
+import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
 import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsRequest;
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
@@ -114,6 +115,12 @@ public class ElasticsearchUtil {
         } catch (IOException e) {
             log.error("Error updating mappings", e);
             throw new RuntimeException(e);
+        }
+    }
+
+    public void checkNullResponse(DocWriteResponse.Result result, String param){
+        if (result == DocWriteResponse.Result.NOT_FOUND) {
+            throw new RecordNotFoundException("Invalid request: " + param);
         }
     }
 }

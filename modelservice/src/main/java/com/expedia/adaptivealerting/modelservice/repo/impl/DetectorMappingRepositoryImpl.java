@@ -150,10 +150,10 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
 
     @Override
     public DetectorMapping findDetectorMapping(String id) {
-        GetRequest getRequest = new GetRequest(elasticSearchProperties.getIndexName(),
+        val getRequest = new GetRequest(elasticSearchProperties.getIndexName(),
                 elasticSearchProperties.getDocType(), id);
         try {
-            GetResponse response = elasticSearchClient.get(getRequest, RequestOptions.DEFAULT);
+            val response = elasticSearchClient.get(getRequest, RequestOptions.DEFAULT);
             return getDetectorMapping(response.getSourceAsString(), response.getId(), Optional.empty());
         } catch (IOException e) {
             log.error(String.format("Get mapping %s failed", id), e);
@@ -163,14 +163,14 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
 
     @Override
     public List<DetectorMapping> findLastUpdated(int timeInSeconds) {
-        final SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
-        final BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
-        long fromTime = System.currentTimeMillis() - timeInSeconds * 1000;
+        val sourceBuilder = new SearchSourceBuilder();
+        val boolQuery = QueryBuilders.boolQuery();
+        val fromTime = System.currentTimeMillis() - timeInSeconds * 1000;
         boolQuery.must(new RangeQueryBuilder(LAST_MOD_TIME_KEYWORD).gt(fromTime));
         sourceBuilder.query(boolQuery);
         //FIXME setting default result set size to 500.
         sourceBuilder.size(500);
-        final SearchRequest searchRequest =
+        val searchRequest =
                 new SearchRequest()
                         .source(sourceBuilder)
                         .indices(elasticSearchProperties.getIndexName())
@@ -180,7 +180,7 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
 
     @Override
     public List<DetectorMapping> search(SearchMappingsRequest request) {
-        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        val query = QueryBuilders.boolQuery();
         if (request.getUserId() != null) {
             query.must(userIdQuery(request));
         }
@@ -188,7 +188,7 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
             query.must(detectorIdQuery(request));
         }
 
-        SearchSourceBuilder searchSourceBuilder = elasticsearchUtil.getSourceBuilder(query);
+        val searchSourceBuilder = elasticsearchUtil.getSourceBuilder(query);
         //FIXME setting default result set size to 500 until we have pagination.
         searchSourceBuilder.size(500);
         SearchRequest searchRequest = elasticsearchUtil.getSearchRequest(searchSourceBuilder, elasticSearchProperties.getIndexName(), elasticSearchProperties.getDocType());
@@ -199,7 +199,7 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
 
     @Override
     public void disableDetectorMapping(String id) {
-        DetectorMapping detectorMapping = findDetectorMapping(id);
+        val detectorMapping = findDetectorMapping(id);
         if (detectorMapping.isEnabled()) {
             final PercolatorDetectorMapping percolatorDetectorMapping = new PercolatorDetectorMapping()
                     .setUser(detectorMapping.getUser())
@@ -214,10 +214,12 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
 
     @Override
     public void deleteDetectorMapping(String id) {
-        final DeleteRequest deleteRequest = new DeleteRequest(elasticSearchProperties.getIndexName(),
+        val deleteRequest = new DeleteRequest(elasticSearchProperties.getIndexName(),
                 elasticSearchProperties.getDocType(), id);
+
         try {
-            elasticSearchClient.delete(deleteRequest, RequestOptions.DEFAULT);
+            val deleteResponse = elasticSearchClient.delete(deleteRequest, RequestOptions.DEFAULT);
+            elasticsearchUtil.checkNullResponse(deleteResponse.getResult(), id);
         } catch (IOException e) {
             log.error(String.format("Deleting mapping %s failed", id), e);
             throw new RuntimeException(e);
@@ -226,8 +228,8 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
 
     private List<DetectorMapping> getDetectorMappings(SearchRequest searchRequest) {
         try {
-            SearchResponse searchResponse = elasticSearchClient.search(searchRequest, RequestOptions.DEFAULT);
-            SearchHits hits = searchResponse.getHits();
+            val searchResponse = elasticSearchClient.search(searchRequest, RequestOptions.DEFAULT);
+            val hits = searchResponse.getHits();
             return Arrays.asList(hits.getHits()).stream()
                     .map(hit -> getDetectorMapping(hit.getSourceAsString(), hit.getId(), Optional.empty()))
                     .collect(Collectors.toList());
@@ -255,13 +257,14 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
 
     private MatchingDetectorsResponse getDetectorMappings(SearchSourceBuilder searchSourceBuilder,
                                                           List<Map<String, String>> tagsList) throws IOException {
-        final SearchRequest searchRequest =
-                new SearchRequest()
-                        .source(searchSourceBuilder)
-                        .indices(elasticSearchProperties.getIndexName());
-        SearchResponse searchResponse = elasticSearchClient.search(searchRequest, RequestOptions.DEFAULT);
+        val searchRequest = new SearchRequest()
+                .source(searchSourceBuilder)
+                .indices(elasticSearchProperties.getIndexName());
+
+        val searchResponse = elasticSearchClient.search(searchRequest, RequestOptions.DEFAULT);
         delayTimer.update(searchResponse.getTook().getMillis(), TimeUnit.MILLISECONDS);
-        SearchHit[] hits = searchResponse.getHits().getHits();
+        val hits = searchResponse.getHits().getHits();
+
         List<DetectorMapping> detectorMappings = Arrays.asList(hits).stream()
                 .map(hit -> getDetectorMapping(hit.getSourceAsString(), hit.getId(), Optional.of(hit.getFields())))
                 // .filter(detectorMapping -> detectorMapping.isEnabled()) //FIXME - move this condition into search query
@@ -271,10 +274,9 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
     }
 
     private DetectorMapping getDetectorMapping(String json, String id, Optional<Map<String, DocumentField>> documentFieldMap) {
-        PercolatorDetectorMapping detectorEntity = (PercolatorDetectorMapping) objectMapperUtil.convertToObject(json, new TypeReference<PercolatorDetectorMapping>() {
+        val detectorEntity = (PercolatorDetectorMapping) objectMapperUtil.convertToObject(json, new TypeReference<PercolatorDetectorMapping>() {
         });
-        log.info("detectorEntity:{}", detectorEntity);
-        DetectorMapping detectorMapping = new DetectorMapping()
+        val detectorMapping = new DetectorMapping()
                 .setId(id)
                 .setDetector(new Detector(detectorEntity.getDetector().getUuid()))
                 .setExpression(QueryUtil.buildExpression(detectorEntity.getQuery()))
@@ -311,7 +313,7 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
 
     private void updateDetectorMapping(String index, PercolatorDetectorMapping percolatorDetectorMapping) {
         val indexRequest = new IndexRequest(elasticSearchProperties.getIndexName(), elasticSearchProperties.getDocType(), index);
-        String json = objectMapperUtil.convertToString(percolatorDetectorMapping);
+        val json = objectMapperUtil.convertToString(percolatorDetectorMapping);
         elasticsearchUtil.index(indexRequest, json).getId();
     }
 }
