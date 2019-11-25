@@ -55,6 +55,7 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ServerErrorException;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -141,7 +142,6 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
             return getDetectorMappings(searchSourceBuilder, tagsList);
         } catch (IOException e) {
             log.error("Error ES lookup", e);
-            generalMeters.getMappingExceptionCount().increment();
             throw new RuntimeException(e);
         }
     }
@@ -154,7 +154,6 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
             GetResponse response = elasticSearchClient.get(getRequest, RequestOptions.DEFAULT);
             return getDetectorMapping(response.getSourceAsString(), response.getId(), Optional.empty());
         } catch (IOException e) {
-            generalMeters.getMappingExceptionCount().increment();
             log.error(String.format("Get mapping %s failed", id), e);
             throw new RuntimeException(e);
         }
@@ -178,7 +177,6 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
             return getDetectorMappings(searchRequest);
         } catch (Exception e) {
             log.error("Error in finding last updated mapping", e);
-            generalMeters.getMappingExceptionCount().increment();
             throw new RuntimeException(e);
         }
 
@@ -232,7 +230,6 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
         try {
             elasticSearchClient.delete(deleteRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
-            generalMeters.getMappingExceptionCount().increment();
             log.error(String.format("Deleting mapping %s failed", id), e);
             throw new RuntimeException(e);
         }
@@ -246,7 +243,6 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
                     .map(hit -> getDetectorMapping(hit.getSourceAsString(), hit.getId(), Optional.empty()))
                     .collect(Collectors.toList());
         } catch (IOException e) {
-            generalMeters.getMappingExceptionCount().increment();
             log.error("Search failed", e);
             throw new RuntimeException("Search failed", e);
         }
