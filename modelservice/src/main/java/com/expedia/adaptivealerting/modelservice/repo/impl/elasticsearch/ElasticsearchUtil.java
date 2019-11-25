@@ -67,10 +67,10 @@ public class ElasticsearchUtil {
         return searchRequest.source(searchSourceBuilder).indices(indexName).types(docType);
     }
 
-     // Skipping unit tests for below two functions. [KS]
-     // when(elasticSearchClient.indices()).thenReturn(mock(IndicesClient.class));
-     // IndicesClient is final class and we can't mock it.
-     // One of the solutions can be to wrap the client and hide it behind an interface which is then mockable
+    // Skipping unit tests for below two functions. [KS]
+    // when(elasticSearchClient.indices()).thenReturn(mock(IndicesClient.class));
+    // IndicesClient is final class and we can't mock it.
+    // One of the solutions can be to wrap the client and hide it behind an interface which is then mockable
     @Generated
     public Set<String> removeFieldsHavingExistingMapping(Set<String> fields, String indexName, String docType) {
         GetMappingsRequest request = new GetMappingsRequest();
@@ -118,8 +118,8 @@ public class ElasticsearchUtil {
         }
     }
 
-    public void checkNullResponse(DocWriteResponse.Result result, String param){
-        if (result == DocWriteResponse.Result.NOT_FOUND) {
+    public void checkNullResponse(DocWriteResponse.Result result, String param) {
+        if (result == null || result == DocWriteResponse.Result.NOT_FOUND) {
             throw new RecordNotFoundException("Invalid request: " + param);
         }
     }

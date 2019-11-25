@@ -11,7 +11,6 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Component
@@ -29,7 +28,6 @@ public class MetricFilter implements Filter {
 
     @Override
     public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws java.io.IOException, ServletException {
-        val httpRequest = ((HttpServletRequest) request);
         chain.doFilter(request, response);
         val status = ((HttpServletResponse) response).getStatus();
         actuatorMetricService.increaseCount(status);

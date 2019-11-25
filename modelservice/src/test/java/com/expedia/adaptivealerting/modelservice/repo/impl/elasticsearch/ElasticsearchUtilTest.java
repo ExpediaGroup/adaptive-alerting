@@ -15,12 +15,15 @@
  */
 package com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch;
 
+import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -78,5 +81,10 @@ public class ElasticsearchUtilTest {
         val actualSearchRequest = elasticsearchUtil.getSearchRequest(new SearchSourceBuilder(), "index", "docType");
         assertNotNull(actualSearchRequest);
         assertEquals(SearchRequest.class, actualSearchRequest.getClass());
+    }
+
+    @Test(expected = RecordNotFoundException.class)
+    public void testCheckNullResponse() {
+        elasticsearchUtil.checkNullResponse(new UpdateResponse().getResult(), "uuid");
     }
 }
