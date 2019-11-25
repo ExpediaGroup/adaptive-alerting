@@ -72,6 +72,9 @@ public class ForecastingDetectorTest {
         assertEquals(intervalForecaster, detectorUnderTest.getIntervalForecaster());
         assertEquals(anomalyType, detectorUnderTest.getAnomalyType());
         assertEquals(trusted, detectorUnderTest.isTrusted());
+
+        assertNotNull(detectorUnderTest.getName());
+        assertEquals("test", detectorUnderTest.getName());
     }
 
     @Test

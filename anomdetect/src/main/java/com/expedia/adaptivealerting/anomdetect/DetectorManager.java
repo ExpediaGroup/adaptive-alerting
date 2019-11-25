@@ -126,9 +126,14 @@ public class DetectorManager {
             return null;
         }
         val metricData = mappedMetricData.getMetricData();
-        ctxt = detectTimer.apply(detector.getName()).time();
-        final DetectorResult result = detector.detect(metricData);
-        ctxt.close();
+        DetectorResult result = null;
+        try {
+            ctxt = detectTimer.apply(detector.getName()).time();
+            result = detector.detect(metricData);
+            ctxt.close();
+        }catch (Exception e){
+            log.error("Error in detector.detect", e);
+        }
 
         detectorAnomalyLevelMeter.apply(detector.getName(), result.getAnomalyLevel()).mark();
         return result;
