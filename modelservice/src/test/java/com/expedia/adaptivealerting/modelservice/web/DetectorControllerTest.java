@@ -67,7 +67,7 @@ public class DetectorControllerTest {
         assertNotNull(actualDetector);
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void testFindByCreatedBy() {
         val actualDetectors = controllerUnderTest.findByCreatedBy("kashah");
         assertNotNull(actualDetectors);
