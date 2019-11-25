@@ -92,7 +92,7 @@ public final class KafkaAnomalyDetectorMapperTest {
     @Test
     public void testMetricDataToMappedMetricData() {
         initLogAndFail();
-        when(mapper.getDetectorsFromCache(any(MetricData.class)))
+        when(mapper.getDetectorsFromCache(any(MetricDefinition.class)))
                 .thenReturn(Collections.singletonList(detector));
 
         logAndFailDriver.pipeInput(metricDataFactory.create(INPUT_TOPIC, KAFKA_KEY, metricData));
@@ -157,7 +157,7 @@ public final class KafkaAnomalyDetectorMapperTest {
     public void shouldOutputResultWhenReceivedMoreEntriesThanOptimumBatchSize() {
         initLogAndContinue();
 
-        when(mapper.getDetectorsFromCache(any(MetricData.class)))
+        when(mapper.getDetectorsFromCache(any(MetricDefinition.class)))
                 .thenReturn(Collections.singletonList(detector));
         when(mapper.optimalBatchSize()).thenReturn(2);
 

@@ -116,7 +116,12 @@ public final class DetectorMapperTest {
         final int batchSize = detectorMapper.optimalBatchSize();
         assertEquals(0, batchSize);
         assertFalse(results);
+    }
 
+    @Test(expected = RuntimeException.class)
+    public void isSuccessfulDetectorMappingLookup_fail() {
+        when(detectorSource.findDetectorMappings(tag_bigList)).thenThrow(new RuntimeException());
+        detectorMapper.isSuccessfulDetectorMappingLookup(tag_bigList);
     }
 
     private void initTestObjects() {
@@ -183,7 +188,7 @@ public final class DetectorMapperTest {
         listOfMetricTags.forEach(tags -> {
             MetricData metricData = new MetricData(new MetricDefinition(new TagCollection(tags)), 0.0, 1L);
 
-            List detector = detectorMapper.getDetectorsFromCache(metricData);
+            List detector = detectorMapper.getDetectorsFromCache(metricData.getMetricDefinition());
             if (!detector.isEmpty())
                 detectorResults.put(CacheUtil.getKey(tags), detector);
         });
@@ -192,7 +197,6 @@ public final class DetectorMapperTest {
         assertThat(detectorResults, IsMapContaining.hasEntry("key->DvFWUhv25h,name->61EKBCrwvI", Collections.singletonList(new Detector(UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689")))));
         assertThat(detectorResults, IsMapContaining.hasEntry("key->dAqbZZVPZ8,name->fbWTiRlxkt", Collections.singletonList(new Detector(UUID.fromString("5eaa54e9-7406-4a1d-bd9b-e055eca1a423")))));
         assertThat(detectorResults, IsMapContaining.hasEntry("name->hiw,region->us-west-2", Collections.singletonList(new Detector(UUID.fromString("d86b798c-cfee-4a2c-a17a-aa2ba79ccf51")))));
-
     }
 
     @Test
@@ -202,16 +206,13 @@ public final class DetectorMapperTest {
         DetectorMapping modifiedDetectorMapping = new DetectorMapping().setDetector(new Detector(UUID.fromString("4d49ba26-1a7d-43f4-b70c-ee644a2c1689"))).setEnabled(true);
         List<DetectorMapping> updateDetectorMappings = Arrays.asList(disabledDetectorMapping, modifiedDetectorMapping);
 
-
         when(detectorSource.findUpdatedDetectorMappings(60)).thenReturn(updateDetectorMappings);
         doAnswer((e) -> null).when(cache).removeDisabledDetectorMappings(anyList());
         doAnswer((e) -> null).when(cache).invalidateMetricsWithOldDetectorMappings(anyList());
 
-        detectorMapper.detectorMappingCacheSync(System.currentTimeMillis()+60000);
+        detectorMapper.detectorMappingCacheSync(System.currentTimeMillis() + 60000);
 
         verify(cache).removeDisabledDetectorMappings(Collections.singletonList(disabledDetectorMapping));
         verify(cache).invalidateMetricsWithOldDetectorMappings(Collections.singletonList(modifiedDetectorMapping));
-
-
     }
 }

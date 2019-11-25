@@ -44,9 +44,7 @@ import java.util.stream.Collectors;
 public class DetectorMapper {
     private static final int OPTIMAL_BATCH_SIZE = 80;
     private static final String CK_DETECTOR_CACHE_UPDATE_PERIOD = "detector-mapping-cache-update-period";
-    private static final String DETECTOR_MAPPER_ERRORS = "detector-mapper.errors";
-    private static final String COUNTER_LAGGY_RECORDS = "detector-mapper.records-laggy";
-
+    private static final String DETECTOR_MAPPER_ERRORS = "detector-mapper.exceptions";
 
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private AtomicLong lastElasticLookUpLatency = new AtomicLong(-1);
@@ -56,8 +54,7 @@ public class DetectorMapper {
     private DetectorSource detectorSource;
 
     private DetectorMapperCache cache;
-    private Counter errorCounter;
-    private Counter laggyRecords;
+    private Counter exceptionCounter;
     private int detectorCacheUpdateTimePeriod;
     private long syncedUpTillTime = System.currentTimeMillis();
 
@@ -71,8 +68,7 @@ public class DetectorMapper {
 
     public DetectorMapper(DetectorSource detectorSource, Config config, MetricRegistry metricRegistry) {
         this(detectorSource, new DetectorMapperCache(metricRegistry), config.getInt(CK_DETECTOR_CACHE_UPDATE_PERIOD));
-        this.errorCounter = metricRegistry.counter(DETECTOR_MAPPER_ERRORS);
-        this.laggyRecords = metricRegistry.counter(COUNTER_LAGGY_RECORDS);
+        this.exceptionCounter = metricRegistry.counter(DETECTOR_MAPPER_ERRORS);
     }
 
     private void initScheduler() {
@@ -82,7 +78,7 @@ public class DetectorMapper {
                 this.detectorMappingCacheSync(System.currentTimeMillis());
             } catch (Exception e) {
                 log.error("Error updating detectors mapping cache", e);
-                errorCounter.inc();
+                exceptionCounter.inc();
             }
         }, detectorCacheUpdateTimePeriod, detectorCacheUpdateTimePeriod, TimeUnit.MINUTES);
     }
@@ -94,13 +90,8 @@ public class DetectorMapper {
         return 0;
     }
 
-    public List<Detector> getDetectorsFromCache(MetricData metricData) {
-        String cacheKey = CacheUtil.getKey(metricData.getMetricDefinition().getTags().getKv());
-        long timestamp = metricData.getTimestamp();
-        long delay = System.currentTimeMillis() - (timestamp * 1000);
-        if (delay > 300_000) {
-            laggyRecords.inc();
-        }
+    public List<Detector> getDetectorsFromCache(MetricDefinition metricDefinition) {
+        String cacheKey = CacheUtil.getKey(metricDefinition.getTags().getKv());
         return cache.get(cacheKey);
     }
 
@@ -141,7 +132,7 @@ public class DetectorMapper {
                 .collect(Collectors.toList());
         if (!disabledDetectorMappings.isEmpty()) {
             cache.removeDisabledDetectorMappings(disabledDetectorMappings);
-            log.info("Removing disabled mapping  : {}", disabledDetectorMappings);
+            log.info("Removing disabled mapping: {}", disabledDetectorMappings);
         }
 
         List<DetectorMapping> newDetectorMappings = detectorMappings.stream()
@@ -149,7 +140,7 @@ public class DetectorMapper {
                 .collect(Collectors.toList());
         if (!newDetectorMappings.isEmpty()) {
             cache.invalidateMetricsWithOldDetectorMappings(newDetectorMappings);
-            log.info("Invalidating metrics for modified mappings  : {}", newDetectorMappings);
+            log.info("Invalidating metrics for modified mappings: {}", newDetectorMappings);
         }
 
         syncedUpTillTime = currentTime;
@@ -160,7 +151,7 @@ public class DetectorMapper {
         try {
             matchingDetectorMappings = detectorSource.findDetectorMappings(cacheMissedMetricTags);
         } catch (RuntimeException e) {
-            errorCounter.inc();
+            exceptionCounter.inc();
         }
         return matchingDetectorMappings;
     }

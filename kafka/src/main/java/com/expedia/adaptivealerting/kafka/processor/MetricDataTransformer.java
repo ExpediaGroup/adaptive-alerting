@@ -107,7 +107,7 @@ class MetricDataTransformer implements Transformer<String, MetricData, KeyValue<
                 if (detectorMapper.isSuccessfulDetectorMappingLookup(cacheMissedMetricTags)) {
 
                     cacheMissedMetrics.forEach((originalKey, metricData) -> {
-                        List<Detector> detectors = detectorMapper.getDetectorsFromCache(metricData);
+                        List<Detector> detectors = detectorMapper.getDetectorsFromCache(metricData.getMetricDefinition());
                         if (!detectors.isEmpty()) {
                             context.forward(removeSalt(originalKey), new MapperResult(metricData, detectors));
                         }
@@ -131,7 +131,7 @@ class MetricDataTransformer implements Transformer<String, MetricData, KeyValue<
             key = "place-holder-key";
         }
 
-        List<Detector> detectors = detectorMapper.getDetectorsFromCache(metricData);
+        List<Detector> detectors = detectorMapper.getDetectorsFromCache(metricData.getMetricDefinition());
 
         if (detectors.isEmpty()) {
             //adding salt to key to prevent incoming records with same key being over-ridden
