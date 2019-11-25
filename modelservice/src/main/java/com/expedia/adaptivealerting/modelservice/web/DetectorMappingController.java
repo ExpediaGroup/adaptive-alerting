@@ -78,7 +78,7 @@ public class DetectorMappingController {
         AssertUtil.isTrue(request.getUserId() != null || request.getDetectorUuid() != null,
                 "user id and detector UUID can't both be null");
         List<DetectorMapping> detectorMappings = detectorMappingRepo.search(request);
-        if (detectorMappings.isEmpty()) {
+        if (detectorMappings == null || detectorMappings.isEmpty()) {
             throw new IllegalArgumentException("Invalid request: " + request);
         }
         return detectorMappingRepo.search(request);

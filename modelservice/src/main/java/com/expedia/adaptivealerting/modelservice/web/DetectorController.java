@@ -65,7 +65,7 @@ public class DetectorController {
     @ResponseStatus(HttpStatus.OK)
     public List<DetectorDocument> findByCreatedBy(@RequestParam String user) {
         List<DetectorDocument> detectors = detectorRepo.findByCreatedBy(user);
-        if (detectors.isEmpty()) {
+        if (detectors == null || detectors.isEmpty()) {
             throw new IllegalArgumentException("Invalid user: " + user);
         }
         return detectors;
@@ -91,7 +91,7 @@ public class DetectorController {
     @ResponseStatus(HttpStatus.OK)
     public List<DetectorDocument> getLastUpdatedDetectors(@RequestParam long interval) {
         List<DetectorDocument> detectors = detectorRepo.getLastUpdatedDetectors(interval);
-        if (detectors.isEmpty()) {
+        if (detectors == null || detectors.isEmpty()) {
             throw new IllegalArgumentException("Not detectors updated during this interval: " + interval);
         }
         return detectors;
