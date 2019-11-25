@@ -170,7 +170,6 @@ public class DetectorRepositoryImpl implements DetectorRepository {
         try {
             val updateResponse = elasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
             elasticsearchUtil.checkNullResponse(updateResponse.getResult(), uuid);
-            log.info("updateResponse:{}", updateResponse.getResult());
         } catch (IOException e) {
             log.error(String.format("Updating elastic search failed", e));
             throw new RuntimeException(e);
