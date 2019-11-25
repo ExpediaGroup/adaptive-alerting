@@ -26,7 +26,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
@@ -170,6 +169,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
         updateRequest.doc(json, XContentType.JSON);
         try {
             val updateResponse = elasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
+            log.info("updateResponse:{}", updateResponse.getResult());
             elasticsearchUtil.checkNullResponse(updateResponse.getResult(), uuid);
         } catch (IOException e) {
             log.error(String.format("Updating elastic search failed", e));
