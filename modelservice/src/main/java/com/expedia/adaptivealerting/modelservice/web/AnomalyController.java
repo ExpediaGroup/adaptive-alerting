@@ -16,8 +16,6 @@
 package com.expedia.adaptivealerting.modelservice.web;
 
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
-import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
-import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
 import com.expedia.adaptivealerting.modelservice.repo.request.AnomalyRequest;
 import com.expedia.adaptivealerting.modelservice.repo.AnomalyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
