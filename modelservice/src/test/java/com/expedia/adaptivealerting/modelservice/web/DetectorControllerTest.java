@@ -1,7 +1,6 @@
 package com.expedia.adaptivealerting.modelservice.web;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
-import com.expedia.adaptivealerting.modelservice.exception.CustomExceptionHandler;
 import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
@@ -14,13 +13,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -81,7 +80,7 @@ public class DetectorControllerTest {
     }
 
     @Test(expected = RecordNotFoundException.class)
-    public void testFindByUuid_record_not_found() {
+    public void testFindByUuid_record_not_found_null_response() {
         when(detectorRepo.findByUuid(anyString())).thenReturn(null);
         controllerUnderTest.findByUuid(someUuid.toString());
     }
@@ -99,9 +98,15 @@ public class DetectorControllerTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void test_exception_FindByCreatedBy() {
-        val actualDetectors = controllerUnderTest.findByCreatedBy("kashah");
-        assertNotNull(actualDetectors);
+    public void test_FindByCreatedBy_illegal_args() {
+        when(detectorRepo.findByCreatedBy(anyString())).thenReturn(null);
+        controllerUnderTest.findByCreatedBy("kashah");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFindByCreatedBy_illegal_args1() {
+        when(detectorRepo.findByCreatedBy(anyString())).thenReturn(new ArrayList<>());
+        controllerUnderTest.findByCreatedBy("kashah");
     }
 
     @Test
@@ -117,8 +122,14 @@ public class DetectorControllerTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testGetLastUpdatedDetectors_fail() {
+    public void testGetLastUpdatedDetectors_illegal_args() {
         when(detectorRepo.getLastUpdatedDetectors(anyLong())).thenReturn(null);
+        controllerUnderTest.getLastUpdatedDetectors(5);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetLastUpdatedDetectors__illegal_args1() {
+        when(detectorRepo.getLastUpdatedDetectors(anyLong())).thenReturn(new ArrayList<>());
         controllerUnderTest.getLastUpdatedDetectors(5);
     }
 

@@ -1,5 +1,6 @@
 package com.expedia.adaptivealerting.modelservice.exception;
 
+import lombok.Generated;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 @ControllerAdvice
+@Generated
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)

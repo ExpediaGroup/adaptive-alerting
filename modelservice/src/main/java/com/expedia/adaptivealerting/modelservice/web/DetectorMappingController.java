@@ -87,7 +87,7 @@ public class DetectorMappingController {
     public List<DetectorMapping> findDetectorMapping(@RequestParam int timeInSecs) {
         AssertUtil.notNull(timeInSecs, "timeInSecs can't be null");
         List<DetectorMapping> detectorMappings = detectorMappingRepo.findLastUpdated(timeInSecs);
-        if (detectorMappings.isEmpty()) {
+        if (detectorMappings == null || detectorMappings.isEmpty()) {
             throw new IllegalArgumentException("No mappings updated during this time interval: " + timeInSecs);
         }
         return detectorMappingRepo.findLastUpdated(timeInSecs);

@@ -86,7 +86,7 @@ public class DetectorMappingControllerTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void testGetDetectorMappings_fail() throws IOException {
+    public void testGetDetectorMappings_fail() {
         when(detectorMappingRepo.findDetectorMapping(id)).thenReturn(new DetectorMapping());
         DetectorMapping detectorMapping = controllerUnderTest.getDetectorMapping(id);
         assertNotNull("Response can't be null", detectorMapping);
@@ -107,22 +107,22 @@ public class DetectorMappingControllerTest {
 
     @Test
     @ResponseStatus(value = HttpStatus.OK)
-    public void testDeleteDetectorMappings() throws IOException {
+    public void testDeleteDetectorMappings() {
         controllerUnderTest.deleteDetectorMapping(id);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testDeleteDetectorMappings_notNull() throws IOException {
+    public void testDeleteDetectorMappings_notNull() {
         controllerUnderTest.deleteDetectorMapping(null);
     }
 
     @Test
-    public void testDetectorMappingSearch() throws Exception {
-        List<DetectorMapping> detectorMappingslist = mockDetectorMappingsList();
+    public void testDetectorMappingSearch() {
+        List<DetectorMapping> detectorMappings = mockDetectorMappingsList();
         SearchMappingsRequest searchMappingsRequest = new SearchMappingsRequest();
         searchMappingsRequest.setDetectorUuid(UUID.fromString(detectorUuid));
         searchMappingsRequest.setUserId(userVal);
-        when(detectorMappingRepo.search(searchMappingsRequest)).thenReturn(detectorMappingslist);
+        when(detectorMappingRepo.search(searchMappingsRequest)).thenReturn(detectorMappings);
         List<DetectorMapping> detectorMappingsResponse = controllerUnderTest.searchDetectorMapping(searchMappingsRequest);
         assertEquals(id, detectorMappingsResponse.get(0).getId());
         assertEquals(detectorUuid, detectorMappingsResponse.get(0).getDetector().getUuid().toString());
@@ -130,7 +130,7 @@ public class DetectorMappingControllerTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testDetectorMappingSearch_fail() throws Exception {
+    public void testDetectorMappingSearch_illegal_args() {
         SearchMappingsRequest searchMappingsRequest = new SearchMappingsRequest();
         searchMappingsRequest.setDetectorUuid(UUID.fromString(detectorUuid));
         searchMappingsRequest.setUserId(userVal);
@@ -138,36 +138,52 @@ public class DetectorMappingControllerTest {
         controllerUnderTest.searchDetectorMapping(searchMappingsRequest);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testDetectorMappingSearch_illegal_args1() {
+        SearchMappingsRequest searchMappingsRequest = new SearchMappingsRequest();
+        searchMappingsRequest.setDetectorUuid(UUID.fromString(detectorUuid));
+        searchMappingsRequest.setUserId(userVal);
+        when(detectorMappingRepo.search(searchMappingsRequest)).thenReturn(new ArrayList<>());
+        controllerUnderTest.searchDetectorMapping(searchMappingsRequest);
+    }
+
     @Test
-    public void testGetLastUpdated_successful() throws IOException {
+    public void testGetLastUpdated_successful() {
         val timeInSecs = 60;
-        List<DetectorMapping> mockeddetectorMappingsList = mockDetectorMappingsList();
-        when(detectorMappingRepo.findLastUpdated(timeInSecs)).thenReturn(mockeddetectorMappingsList);
-        List<DetectorMapping> listofdetectorMappingsreturned = controllerUnderTest.findDetectorMapping(timeInSecs);
-        assertNotNull("Response can't be null", listofdetectorMappingsreturned);
-        assertEquals(1, listofdetectorMappingsreturned.size());
-        assertEquals(UUID.fromString(detectorUuid), listofdetectorMappingsreturned.get(0).getDetector().getUuid());
-        assertEquals(id, listofdetectorMappingsreturned.get(0).getId());
+        List<DetectorMapping> mockDetectorMappings = mockDetectorMappingsList();
+        when(detectorMappingRepo.findLastUpdated(timeInSecs)).thenReturn(mockDetectorMappings);
+        List<DetectorMapping> detectorMappings = controllerUnderTest.findDetectorMapping(timeInSecs);
+        assertNotNull("Response can't be null", detectorMappings);
+        assertEquals(1, detectorMappings.size());
+        assertEquals(UUID.fromString(detectorUuid), detectorMappings.get(0).getDetector().getUuid());
+        assertEquals(id, detectorMappings.get(0).getId());
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testGetLastUpdated_illegal_args() throws IOException {
+    public void testGetLastUpdated_illegal_args() {
+        val timeInSecs = 60;
+        when(detectorMappingRepo.findLastUpdated(timeInSecs)).thenReturn(null);
+        controllerUnderTest.findDetectorMapping(timeInSecs);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetLastUpdated_illegal_args1() {
         val timeInSecs = 60;
         when(detectorMappingRepo.findLastUpdated(timeInSecs)).thenReturn(new ArrayList<>());
         controllerUnderTest.findDetectorMapping(timeInSecs);
     }
 
     @Test(expected = RuntimeException.class)
-    public void testGetLastUpdated_fail() throws IOException {
+    public void testGetLastUpdated_fail() {
         val TimeinSecs = 60;
         when(detectorMappingRepo.findLastUpdated(TimeinSecs)).thenThrow(new IOException());
-        List<DetectorMapping> listofdetectorMappingsreturned = controllerUnderTest.findDetectorMapping(TimeinSecs);
-        assertNotNull("Response can't be null", listofdetectorMappingsreturned);
-        assertEquals(0, listofdetectorMappingsreturned.size());
+        List<DetectorMapping> detectorMappings = controllerUnderTest.findDetectorMapping(TimeinSecs);
+        assertNotNull("Response can't be null", detectorMappings);
+        assertEquals(0, detectorMappings.size());
     }
 
     @Test
-    public void testFindMatchingByTags() throws Exception {
+    public void testFindMatchingByTags() {
         val lookupTime = 60;
         List<Map<String, String>> tagsList = new ArrayList<>();
         MatchingDetectorsResponse mockMatchingDetectorsResponse = mockMatchingDetectorsResponse(lookupTime, detectorUuid);
@@ -180,7 +196,7 @@ public class DetectorMappingControllerTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testFindMatchingByTags_illegal_args() throws IOException {
+    public void testFindMatchingByTags_illegal_args() {
         val lookupTime = 60;
         List<Map<String, String>> tagsList = new ArrayList<>();
         MatchingDetectorsResponse mockMatchingDetectorsResponse = mockMatchingDetectorsResponse(lookupTime, detectorUuid);
@@ -211,12 +227,12 @@ public class DetectorMappingControllerTest {
         return detectorMappingsList;
     }
 
-    private MatchingDetectorsResponse mockMatchingDetectorsResponse(int lookuptime, String detectorUuid) {
+    private MatchingDetectorsResponse mockMatchingDetectorsResponse(int lookupTime, String detectorUuid) {
         Map<Integer, List<Detector>> matchingDetectorsResponseMap = new HashMap<>();
         List<Detector> DetectorList = new ArrayList<>();
         DetectorList.add(new Detector(UUID.fromString(detectorUuid)));
         matchingDetectorsResponseMap.put(1, DetectorList);
-        MatchingDetectorsResponse matchingDetectorsResponse = new MatchingDetectorsResponse(matchingDetectorsResponseMap, lookuptime);
+        MatchingDetectorsResponse matchingDetectorsResponse = new MatchingDetectorsResponse(matchingDetectorsResponseMap, lookupTime);
         return matchingDetectorsResponse;
     }
 }
