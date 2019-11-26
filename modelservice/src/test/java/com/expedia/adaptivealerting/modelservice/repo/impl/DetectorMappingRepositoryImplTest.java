@@ -82,9 +82,6 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class DetectorMappingRepositoryImplTest {
 
-//    @Mock
-//    private MeterRegistry meterRegistry;
-
     @Mock
     private GeneralMeters generalMeters;
 

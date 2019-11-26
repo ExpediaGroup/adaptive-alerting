@@ -3,14 +3,12 @@ package com.expedia.adaptivealerting.modelservice.util;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 @Getter
-@Ignore
 public class GeneralMeters {
 
     //ELASTIC SEARCH COUNTERS

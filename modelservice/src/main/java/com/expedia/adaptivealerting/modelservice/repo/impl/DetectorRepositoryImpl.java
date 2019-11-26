@@ -27,8 +27,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.ElasticsearchParseException;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
@@ -44,8 +42,6 @@ import org.springframework.util.ReflectionUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.text.ParseException;
-import java.time.DateTimeException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -115,7 +111,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
             elasticsearchUtil.index(indexRequest, json);
             return uuid;
         } catch (Exception e) {
-            log.error("Error in finding last updated mapping", e);
+            log.error("Error creating detector", e);
             generalMeters.getDetectorExceptionCount().increment();
             throw new RuntimeException(e);
         }
@@ -182,7 +178,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
         updateRequest.doc(json, XContentType.JSON);
         try {
             elasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error(String.format("Updating elastic search failed", e));
             throw new RuntimeException(e);
         }
@@ -195,7 +191,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
             val searchSourceBuilder = elasticsearchUtil.getSourceBuilder(queryBuilder).size(DEFAULT_ES_RESULTS_SIZE);
             val searchRequest = elasticsearchUtil.getSearchRequest(searchSourceBuilder, DETECTOR_INDEX, DETECTOR_DOC_TYPE);
             return getDetectorsFromElasticSearch(searchRequest).get(0);
-        } catch(ElasticsearchException e) {
+        } catch(Exception e) {
             log.error("Unable to find detector",e);
             generalMeters.getDetectorExceptionCount().increment();
             throw new RuntimeException(e);
@@ -207,8 +203,8 @@ public class DetectorRepositoryImpl implements DetectorRepository {
         val queryBuilder = QueryBuilders.termQuery("createdBy", user);
         val searchSourceBuilder = elasticsearchUtil.getSourceBuilder(queryBuilder).size(DEFAULT_ES_RESULTS_SIZE);
         val searchRequest = elasticsearchUtil.getSearchRequest(searchSourceBuilder, DETECTOR_INDEX, DETECTOR_DOC_TYPE);
-            return getDetectorsFromElasticSearch(searchRequest);
-        }
+        return getDetectorsFromElasticSearch(searchRequest);
+    }
 
     @Override
     public void toggleDetector(String uuid, Boolean enabled) {
@@ -282,10 +278,8 @@ public class DetectorRepositoryImpl implements DetectorRepository {
             generalMeters.getDelayGettingDetectors().record(Duration.ofMillis(delay));
         } catch (IOException e) {
             log.error("Error ES lookup", e);
-            generalMeters.getDetectorExceptionCount().increment();
             throw new RuntimeException(e);
         }
-
         SearchHit[] hits = response.getHits().getHits();
         List<DetectorDocument> detectors = new ArrayList<>();
         for (val hit : hits) {
