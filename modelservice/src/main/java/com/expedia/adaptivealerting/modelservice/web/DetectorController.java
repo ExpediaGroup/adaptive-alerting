@@ -38,7 +38,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path = "/api/v2/detectors")
-@Slf4j
 public class DetectorController {
 
     @Autowired

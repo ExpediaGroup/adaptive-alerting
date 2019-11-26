@@ -1,16 +1,18 @@
 package com.expedia.adaptivealerting.modelservice.acutator;
 
+import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticsearchUtil;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -27,12 +29,19 @@ public class CustomActuatorMetricServiceImplTest {
     @Mock
     private MeterRegistry registry;
 
+
+    @Before
+    public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
+        initDependencies();
+    }
+
     @Test
     public void increaseCount() {
-        Mockito.when(registry.counter(anyString())).thenReturn(getCounter());
+        actuatorMetricService.increaseCount(200);
         actuatorMetricService.increaseCount(200);
         actuatorMetricService.increaseCount(404);
-        verify(actuatorMetricService, times(2)).increaseCount(anyInt());
+        verify(actuatorMetricService, times(3)).increaseCount(anyInt());
     }
 
     private Counter getCounter() {
@@ -41,5 +50,9 @@ public class CustomActuatorMetricServiceImplTest {
                 .description("test counter")
                 .tags("dev", "performance")
                 .register(new SimpleMeterRegistry());
+    }
+
+    private void initDependencies() {
+        Mockito.when(registry.counter(anyString())).thenReturn(getCounter());
     }
 }

@@ -2,6 +2,7 @@ package com.expedia.adaptivealerting.modelservice.web;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.modelservice.exception.CustomExceptionHandler;
+import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import lombok.extern.slf4j.Slf4j;
@@ -77,6 +78,12 @@ public class DetectorControllerTest {
     public void testFindByUuid() {
         val actualDetector = controllerUnderTest.findByUuid(someUuid.toString());
         assertNotNull(actualDetector);
+    }
+
+    @Test(expected = RecordNotFoundException.class)
+    public void testFindByUuid_record_not_found() {
+        when(detectorRepo.findByUuid(anyString())).thenReturn(null);
+        controllerUnderTest.findByUuid(someUuid.toString());
     }
 
     @Test

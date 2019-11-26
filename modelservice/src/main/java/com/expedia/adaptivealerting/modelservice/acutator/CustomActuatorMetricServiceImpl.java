@@ -3,6 +3,7 @@ package com.expedia.adaptivealerting.modelservice.acutator;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.search.Search;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import java.util.List;
 Custom service to track HTTP status. Micrometer by default tracks http status by URI which is pretty hard to manage. [Karan Shah]
  */
 @Service
+@Slf4j
 public class CustomActuatorMetricServiceImpl implements CustomActuatorMetricService {
 
     @Autowired
