@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.repo.impl;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
+import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
 import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticSearchClient;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
 import com.expedia.adaptivealerting.modelservice.util.DateUtil;
@@ -113,7 +114,9 @@ public class DetectorRepositoryImpl implements DetectorRepository {
         val deleteRequest = new DeleteRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, uuid);
         try {
             val deleteResponse = elasticSearchClient.delete(deleteRequest, RequestOptions.DEFAULT);
-            elasticsearchUtil.checkNullResponse(deleteResponse.getResult(), uuid);
+            if (elasticsearchUtil.checkNullResponse(deleteResponse.getResult())) {
+                throw new RecordNotFoundException("Invalid request: " + uuid);
+            }
         } catch (IOException e) {
             log.error(String.format("Deleting detector %s failed", uuid), e);
             throw new RuntimeException(e);
@@ -169,7 +172,9 @@ public class DetectorRepositoryImpl implements DetectorRepository {
         updateRequest.doc(json, XContentType.JSON);
         try {
             val updateResponse = elasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
-            elasticsearchUtil.checkNullResponse(updateResponse.getResult(), uuid);
+            if (elasticsearchUtil.checkNullResponse(updateResponse.getResult())) {
+                throw new RecordNotFoundException("Invalid request: " + uuid);
+            }
         } catch (IOException e) {
             log.error(String.format("Updating elastic search failed", e));
             throw new RuntimeException(e);
@@ -195,7 +200,6 @@ public class DetectorRepositoryImpl implements DetectorRepository {
     @Override
     public void toggleDetector(String uuid, Boolean enabled) {
         val updateRequest = new UpdateRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, uuid);
-
         Date nowDate = DateUtil.now();
         String nowValue = DateUtil.toDateString(nowDate.toInstant());
 
@@ -208,8 +212,9 @@ public class DetectorRepositoryImpl implements DetectorRepository {
         updateRequest.doc(jsonMap);
         try {
             val updateResponse = elasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
-            elasticsearchUtil.checkNullResponse(updateResponse.getResult(), uuid);
-
+            if (elasticsearchUtil.checkNullResponse(updateResponse.getResult())) {
+                throw new RecordNotFoundException("Invalid request: " + uuid);
+            }
         } catch (IOException e) {
             log.error(String.format("Updating elastic search failed", e));
             throw new RuntimeException(e);
@@ -219,7 +224,6 @@ public class DetectorRepositoryImpl implements DetectorRepository {
     @Override
     public void trustDetector(String uuid, Boolean trusted) {
         val updateRequest = new UpdateRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, uuid);
-
         Date nowDate = DateUtil.now();
         String nowValue = DateUtil.toDateString(nowDate.toInstant());
 
@@ -232,7 +236,9 @@ public class DetectorRepositoryImpl implements DetectorRepository {
         updateRequest.doc(jsonMap);
         try {
             val updateResponse = elasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
-            elasticsearchUtil.checkNullResponse(updateResponse.getResult(), uuid);
+            if (elasticsearchUtil.checkNullResponse(updateResponse.getResult())) {
+                throw new RecordNotFoundException("Invalid request: " + uuid);
+            }
         } catch (IOException e) {
             log.error(String.format("Updating elastic search failed", e));
             throw new RuntimeException(e);

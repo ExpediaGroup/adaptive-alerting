@@ -82,8 +82,8 @@ public class ElasticsearchUtilTest {
         assertEquals(SearchRequest.class, actualSearchRequest.getClass());
     }
 
-    @Test(expected = RecordNotFoundException.class)
+    @Test
     public void testCheckNullResponse() {
-        elasticsearchUtil.checkNullResponse(new UpdateResponse().getResult(), "uuid");
+        assertEquals(true, elasticsearchUtil.checkNullResponse(new UpdateResponse().getResult()));
     }
 }

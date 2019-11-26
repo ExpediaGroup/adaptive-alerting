@@ -118,9 +118,7 @@ public class ElasticsearchUtil {
         }
     }
 
-    public void checkNullResponse(DocWriteResponse.Result result, String param) {
-        if (result == null || result == DocWriteResponse.Result.NOT_FOUND) {
-            throw new RecordNotFoundException("Invalid request: " + param);
-        }
+    public Boolean checkNullResponse(DocWriteResponse.Result result) {
+        return (result == null || result == DocWriteResponse.Result.NOT_FOUND);
     }
 }

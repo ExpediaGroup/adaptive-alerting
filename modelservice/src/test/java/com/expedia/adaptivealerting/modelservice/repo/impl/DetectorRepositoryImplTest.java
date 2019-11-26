@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.modelservice.repo.impl;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorException;
+import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
 import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticSearchClient;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
@@ -168,36 +169,6 @@ public class DetectorRepositoryImplTest {
     }
 
     @Test
-    public void testFindByUuid() {
-        DetectorDocument actualDetector = repoUnderTest.findByUuid("uuid");
-        assertNotNull(actualDetector);
-        Assert.assertEquals(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"), actualDetector.getUuid());
-        Assert.assertEquals("test-user", actualDetector.getCreatedBy());
-        Assert.assertEquals(true, actualDetector.isEnabled());
-        Assert.assertEquals(true, actualDetector.isTrusted());
-    }
-
-    @Test
-    public void testFindByCreatedBy() {
-        List<DetectorDocument> actualDetectors = repoUnderTest.findByCreatedBy("kashah");
-        assertNotNull(actualDetectors);
-        assertCheck(actualDetectors);
-    }
-
-    @Test
-    public void testGetLastUpdatedDetectors() {
-        List<DetectorDocument> actualDetectors = repoUnderTest.getLastUpdatedDetectors("", "");
-        assertNotNull(actualDetectors);
-        assertCheck(actualDetectors);
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void searchDetectorFail() throws IOException {
-        Mockito.when(elasticSearchClient.search(any(SearchRequest.class), any(RequestOptions.class))).thenThrow(new IOException());
-        repoUnderTest.findByUuid("aeb4d849-847a-45c0-8312-dc0fcf22b639");
-    }
-
-    @Test
     public void testUpdateDetector() {
         DetectorRepository detectorRepository = mock(DetectorRepository.class);
         doNothing().when(detectorRepository).updateDetector(anyString(), any(DetectorDocument.class));
@@ -217,22 +188,13 @@ public class DetectorRepositoryImplTest {
         repoUnderTest.updateDetector("", illegalParamsDetector);
     }
 
-    @Test(expected = RuntimeException.class)
-    public void updateDetectorFail() throws IOException {
-        Mockito.when(elasticSearchClient.update(any(UpdateRequest.class), any(RequestOptions.class))).thenThrow(new IOException());
-        repoUnderTest.toggleDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
-    }
-
     @Test
     public void testUpdateDetector_emptyMeta() {
         val mom = ObjectMother.instance();
         val document = mom.getDetectorDocument();
-
         document.setMeta(null);
-
         UUID someUuid = UUID.randomUUID();
         document.setUuid(someUuid);
-
         repoUnderTest.updateDetector(someUuid.toString(), document);
     }
 
@@ -264,27 +226,16 @@ public class DetectorRepositoryImplTest {
         repoUnderTest.updateDetector(someUuid.toString(), document);
     }
 
-    @Test
-    public void testToggleDetector() {
-        DetectorRepository detectorRepository = mock(DetectorRepository.class);
-        doNothing().when(detectorRepository).toggleDetector(anyString(), anyBoolean());
-        detectorRepository.toggleDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
-        verify(detectorRepository, times(1)).toggleDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
-    }
-
-
-    @Test(expected = RuntimeException.class)
-    public void trustDetectorFail() throws IOException {
-        Mockito.when(elasticSearchClient.update(any(UpdateRequest.class), any(RequestOptions.class))).thenThrow(new IOException());
-        repoUnderTest.trustDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
-    }
-
-    @Test
-    public void testTrustDetector() {
-        DetectorRepository detectorRepository = mock(DetectorRepository.class);
-        doNothing().when(detectorRepository).trustDetector(anyString(), anyBoolean());
-        detectorRepository.trustDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
-        verify(detectorRepository, times(1)).trustDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
+    @Test(expected = RecordNotFoundException.class)
+    public void updateDetector_illegal_args() {
+        val updateResponse = mock(UpdateResponse.class);
+        val result = updateResponse.getResult();
+        val mom = ObjectMother.instance();
+        val document = mom.getDetectorDocument();
+        document.setUuid(UUID.randomUUID());
+        Mockito.when(result).thenReturn(DocWriteResponse.Result.NOT_FOUND);
+        Mockito.when(elasticsearchUtil.checkNullResponse(result)).thenReturn(true);
+        repoUnderTest.updateDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", document);
     }
 
     @Test
@@ -299,6 +250,82 @@ public class DetectorRepositoryImplTest {
     public void deleteDetectorFail() throws IOException {
         Mockito.when(elasticSearchClient.delete(any(DeleteRequest.class), any(RequestOptions.class))).thenThrow(new IOException());
         repoUnderTest.deleteDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639");
+    }
+
+    @Test
+    public void testFindByUuid() {
+        DetectorDocument actualDetector = repoUnderTest.findByUuid("uuid");
+        assertNotNull(actualDetector);
+        Assert.assertEquals(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"), actualDetector.getUuid());
+        Assert.assertEquals("test-user", actualDetector.getCreatedBy());
+        Assert.assertEquals(true, actualDetector.isEnabled());
+        Assert.assertEquals(true, actualDetector.isTrusted());
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void searchDetectorFail() throws IOException {
+        Mockito.when(elasticSearchClient.search(any(SearchRequest.class), any(RequestOptions.class))).thenThrow(new IOException());
+        repoUnderTest.findByUuid("aeb4d849-847a-45c0-8312-dc0fcf22b639");
+    }
+
+    @Test
+    public void testFindByCreatedBy() {
+        List<DetectorDocument> actualDetectors = repoUnderTest.findByCreatedBy("kashah");
+        assertNotNull(actualDetectors);
+        assertCheck(actualDetectors);
+    }
+
+    @Test
+    public void testToggleDetector() {
+        DetectorRepository detectorRepository = mock(DetectorRepository.class);
+        doNothing().when(detectorRepository).toggleDetector(anyString(), anyBoolean());
+        detectorRepository.toggleDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
+        verify(detectorRepository, times(1)).toggleDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void toggleDetectorFail() throws IOException {
+        Mockito.when(elasticSearchClient.update(any(UpdateRequest.class), any(RequestOptions.class))).thenThrow(new IOException());
+        repoUnderTest.toggleDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
+    }
+
+    @Test(expected = RecordNotFoundException.class)
+    public void toggleDetector_illegal_args() {
+        val updateResponse = mock(UpdateResponse.class);
+        val result = updateResponse.getResult();
+        Mockito.when(result).thenReturn(DocWriteResponse.Result.NOT_FOUND);
+        Mockito.when(elasticsearchUtil.checkNullResponse(result)).thenReturn(true);
+        repoUnderTest.toggleDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
+    }
+
+    @Test
+    public void testTrustDetector() {
+        DetectorRepository detectorRepository = mock(DetectorRepository.class);
+        doNothing().when(detectorRepository).trustDetector(anyString(), anyBoolean());
+        detectorRepository.trustDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
+        verify(detectorRepository, times(1)).trustDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void trustDetectorFail() throws IOException {
+        Mockito.when(elasticSearchClient.update(any(UpdateRequest.class), any(RequestOptions.class))).thenThrow(new IOException());
+        repoUnderTest.trustDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
+    }
+
+    @Test(expected = RecordNotFoundException.class)
+    public void trustDetector_illegal_args() {
+        val updateResponse = mock(UpdateResponse.class);
+        val result = updateResponse.getResult();
+        Mockito.when(result).thenReturn(DocWriteResponse.Result.NOT_FOUND);
+        Mockito.when(elasticsearchUtil.checkNullResponse(result)).thenReturn(true);
+        repoUnderTest.trustDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
+    }
+
+    @Test
+    public void testGetLastUpdatedDetectors() {
+        List<DetectorDocument> actualDetectors = repoUnderTest.getLastUpdatedDetectors("", "");
+        assertNotNull(actualDetectors);
+        assertCheck(actualDetectors);
     }
 
     private void initTestObjects() {
@@ -359,10 +386,10 @@ public class DetectorRepositoryImplTest {
         String indexName = "index";
         when(deleteResponse.getIndex()).thenReturn(indexName);
         try {
-            byte[] byteopt = new byte[]{2}; // 2 - DELETED, DeleteResponse.Result
-            ByteBuffer byteBuffer = ByteBuffer.wrap(byteopt);
-            ByteBufferStreamInput byteoptbytebufferstream = new ByteBufferStreamInput(byteBuffer);
-            ResultOpt = DocWriteResponse.Result.readFrom(byteoptbytebufferstream);
+            byte[] byteOpt = new byte[]{2}; // 2 - DELETED, DeleteResponse.Result
+            ByteBuffer byteBuffer = ByteBuffer.wrap(byteOpt);
+            ByteBufferStreamInput byteOptBufferStream = new ByteBufferStreamInput(byteBuffer);
+            ResultOpt = DocWriteResponse.Result.readFrom(byteOptBufferStream);
             when(deleteResponse.getResult()).thenReturn(ResultOpt);
         } catch (IOException e) {
         }

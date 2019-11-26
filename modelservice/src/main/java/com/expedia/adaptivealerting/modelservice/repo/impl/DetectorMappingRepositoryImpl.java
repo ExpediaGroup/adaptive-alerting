@@ -19,6 +19,7 @@ import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.expedia.adaptivealerting.modelservice.entity.Detector;
+import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
 import com.expedia.adaptivealerting.modelservice.repo.impl.percolator.PercolatorDetectorMapping;
 import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticSearchClient;
 import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticSearchProperties;
@@ -214,12 +215,12 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
 
     @Override
     public void deleteDetectorMapping(String id) {
-        val deleteRequest = new DeleteRequest(elasticSearchProperties.getIndexName(),
-                elasticSearchProperties.getDocType(), id);
-
+        val deleteRequest = new DeleteRequest(elasticSearchProperties.getIndexName(), elasticSearchProperties.getDocType(), id);
         try {
             val deleteResponse = elasticSearchClient.delete(deleteRequest, RequestOptions.DEFAULT);
-            elasticsearchUtil.checkNullResponse(deleteResponse.getResult(), id);
+            if (elasticsearchUtil.checkNullResponse(deleteResponse.getResult())) {
+                throw new RecordNotFoundException("Invalid request: " + id);
+            }
         } catch (IOException e) {
             log.error(String.format("Deleting mapping %s failed", id), e);
             throw new RuntimeException(e);
