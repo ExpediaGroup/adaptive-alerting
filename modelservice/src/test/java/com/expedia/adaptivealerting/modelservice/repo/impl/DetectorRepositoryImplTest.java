@@ -252,6 +252,13 @@ public class DetectorRepositoryImplTest {
         repoUnderTest.deleteDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639");
     }
 
+    @Test(expected = RecordNotFoundException.class)
+    public void deleteDetector_illegal_args() {
+        Mockito.when(deleteResponse.getResult()).thenReturn(DocWriteResponse.Result.NOT_FOUND);
+        Mockito.when(elasticsearchUtil.checkNullResponse(deleteResponse.getResult())).thenReturn(true);
+        repoUnderTest.deleteDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639");
+    }
+
     @Test
     public void testFindByUuid() {
         DetectorDocument actualDetector = repoUnderTest.findByUuid("uuid");

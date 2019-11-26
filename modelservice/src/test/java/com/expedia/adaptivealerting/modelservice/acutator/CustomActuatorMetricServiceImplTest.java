@@ -1,6 +1,5 @@
 package com.expedia.adaptivealerting.modelservice.acutator;
 
-import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticsearchUtil;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
@@ -37,7 +36,7 @@ public class CustomActuatorMetricServiceImplTest {
     }
 
     @Test
-    public void increaseCount() {
+    public void testIncreaseCount() {
         actuatorMetricService.increaseCount(200);
         actuatorMetricService.increaseCount(200);
         actuatorMetricService.increaseCount(404);

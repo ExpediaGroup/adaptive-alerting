@@ -3,6 +3,7 @@ package com.expedia.adaptivealerting.modelservice.acutator;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.search.Search;
+import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -39,6 +40,7 @@ public class CustomActuatorMetricServiceImpl implements CustomActuatorMetricServ
         }
     }
 
+    @Generated
     @Scheduled(fixedDelay = 60000)
     private void exportMetrics() {
         final List<Integer> statusCount = new ArrayList<>();

@@ -20,6 +20,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.expedia.adaptivealerting.modelservice.entity.Detector;
 import com.expedia.adaptivealerting.modelservice.entity.User;
+import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
 import com.expedia.adaptivealerting.modelservice.repo.impl.percolator.PercolatorDetectorMapping;
 import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticSearchClient;
 import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticSearchProperties;
@@ -41,6 +42,7 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.common.bytes.BytesArray;
 import org.elasticsearch.common.bytes.BytesReference;
@@ -135,8 +137,7 @@ public class DetectorMappingRepositoryImplTest {
         val detector = new Detector(UUID.randomUUID());
         val user = new User("yoda");
         val request = new CreateDetectorMappingRequest(expr, detector, user);
-
-        val actualMappingId = repoUnderTest.createDetectorMapping(request);
+        repoUnderTest.createDetectorMapping(request);
     }
 
     @Test
@@ -229,9 +230,9 @@ public class DetectorMappingRepositoryImplTest {
 
     @Test(expected = RuntimeException.class)
     public void findLastUpdated_fail() throws IOException {
-        int TimeinSeconds = 60;
+        int timeInSecs = 60;
         when(elasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenThrow(new IOException());
-        repoUnderTest.findLastUpdated(TimeinSeconds);
+        repoUnderTest.findLastUpdated(timeInSecs);
     }
 
     @Test
@@ -260,7 +261,7 @@ public class DetectorMappingRepositoryImplTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void search_conditionalbranches() throws IOException {
+    public void search_conditional_branches() throws IOException {
         SearchMappingsRequest searchMappingsRequest = new SearchMappingsRequest();
         searchMappingsRequest.setUserId("test-user");
         searchMappingsRequest.setDetectorUuid(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"));
@@ -270,9 +271,9 @@ public class DetectorMappingRepositoryImplTest {
 
     @Test(expected = RuntimeException.class)
     public void search_fail() throws IOException {
-        int TimeinSeconds = 60;
+        int timeinSecs = 60;
         when(elasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenThrow(new IOException());
-        repoUnderTest.findLastUpdated(TimeinSeconds);
+        repoUnderTest.findLastUpdated(timeinSecs);
     }
 
     @Test
@@ -303,6 +304,16 @@ public class DetectorMappingRepositoryImplTest {
                 elasticSearchProperties.getDocType(), id);
         when(elasticSearchClient.delete(any(DeleteRequest.class), eq(RequestOptions.DEFAULT))).thenThrow(new IOException());
         repoUnderTest.deleteDetectorMapping(id);
+    }
+
+
+    @Test(expected = RecordNotFoundException.class)
+    public void deleteDetectorMapping_illegal_args() throws Exception {
+        val deleteResponse = mockDeleteResponse("1");
+        Mockito.when(elasticSearchClient.delete(any(DeleteRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(deleteResponse);
+        Mockito.when(deleteResponse.getResult()).thenReturn(DocWriteResponse.Result.NOT_FOUND);
+        Mockito.when(elasticsearchUtil.checkNullResponse(deleteResponse.getResult())).thenReturn(true);
+        repoUnderTest.deleteDetectorMapping("1");
     }
 
     private IndexResponse mockIndexResponse() {
