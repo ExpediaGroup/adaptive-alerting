@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.modelservice.web;
 import com.expedia.adaptivealerting.modelservice.entity.Detector;
 import com.expedia.adaptivealerting.modelservice.entity.User;
 import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
+import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorMappingRepository;
 import com.expedia.adaptivealerting.modelservice.repo.request.SearchMappingsRequest;
 import com.expedia.adaptivealerting.modelservice.repo.response.MatchingDetectorsResponse;
@@ -78,6 +79,12 @@ public class DetectorMappingControllerTest {
         assertEquals(true, detectorMapping.isEnabled());
     }
 
+    @Test(expected = RecordNotFoundException.class)
+    public void testGetDetectorMappings_record_not_found() {
+        when(detectorMappingRepo.findDetectorMapping(id)).thenReturn(null);
+        DetectorMapping detectorMapping = controllerUnderTest.getDetectorMapping(id);
+    }
+
     @Test(expected = RuntimeException.class)
     public void testGetDetectorMappings_fail() throws IOException {
         when(detectorMappingRepo.findDetectorMapping(id)).thenReturn(new DetectorMapping());
@@ -110,27 +117,6 @@ public class DetectorMappingControllerTest {
     }
 
     @Test
-    public void testGetLastUpdated_successful() throws IOException {
-        val timeInSecs = 60;
-        List<DetectorMapping> mockeddetectorMappingsList = mockDetectorMappingsList();
-        when(detectorMappingRepo.findLastUpdated(timeInSecs)).thenReturn(mockeddetectorMappingsList);
-        List<DetectorMapping> listofdetectorMappingsreturned = controllerUnderTest.findDetectorMapping(timeInSecs);
-        assertNotNull("Response can't be null", listofdetectorMappingsreturned);
-        assertEquals(1, listofdetectorMappingsreturned.size());
-        assertEquals(UUID.fromString(detectorUuid), listofdetectorMappingsreturned.get(0).getDetector().getUuid());
-        assertEquals(id, listofdetectorMappingsreturned.get(0).getId());
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void testGetLastUpdated_fail() throws IOException {
-        val TimeinSecs = 60;
-        when(detectorMappingRepo.findLastUpdated(TimeinSecs)).thenThrow(new IOException());
-        List<DetectorMapping> listofdetectorMappingsreturned = controllerUnderTest.findDetectorMapping(TimeinSecs);
-        assertNotNull("Response can't be null", listofdetectorMappingsreturned);
-        assertEquals(0, listofdetectorMappingsreturned.size());
-    }
-
-    @Test
     public void testDetectorMappingSearch() throws Exception {
         List<DetectorMapping> detectorMappingslist = mockDetectorMappingsList();
         SearchMappingsRequest searchMappingsRequest = new SearchMappingsRequest();
@@ -153,6 +139,34 @@ public class DetectorMappingControllerTest {
     }
 
     @Test
+    public void testGetLastUpdated_successful() throws IOException {
+        val timeInSecs = 60;
+        List<DetectorMapping> mockeddetectorMappingsList = mockDetectorMappingsList();
+        when(detectorMappingRepo.findLastUpdated(timeInSecs)).thenReturn(mockeddetectorMappingsList);
+        List<DetectorMapping> listofdetectorMappingsreturned = controllerUnderTest.findDetectorMapping(timeInSecs);
+        assertNotNull("Response can't be null", listofdetectorMappingsreturned);
+        assertEquals(1, listofdetectorMappingsreturned.size());
+        assertEquals(UUID.fromString(detectorUuid), listofdetectorMappingsreturned.get(0).getDetector().getUuid());
+        assertEquals(id, listofdetectorMappingsreturned.get(0).getId());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetLastUpdated_illegal_args() throws IOException {
+        val timeInSecs = 60;
+        when(detectorMappingRepo.findLastUpdated(timeInSecs)).thenReturn(new ArrayList<>());
+        controllerUnderTest.findDetectorMapping(timeInSecs);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testGetLastUpdated_fail() throws IOException {
+        val TimeinSecs = 60;
+        when(detectorMappingRepo.findLastUpdated(TimeinSecs)).thenThrow(new IOException());
+        List<DetectorMapping> listofdetectorMappingsreturned = controllerUnderTest.findDetectorMapping(TimeinSecs);
+        assertNotNull("Response can't be null", listofdetectorMappingsreturned);
+        assertEquals(0, listofdetectorMappingsreturned.size());
+    }
+
+    @Test
     public void testFindMatchingByTags() throws Exception {
         val lookupTime = 60;
         List<Map<String, String>> tagsList = new ArrayList<>();
@@ -163,6 +177,16 @@ public class DetectorMappingControllerTest {
         List<Detector> detectors = matchingDetectorsResult.getGroupedDetectorsBySearchIndex().get(1);
         assertEquals(1, detectors.size());
         assertEquals(UUID.fromString(detectorUuid), detectors.get(0).getUuid());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFindMatchingByTags_illegal_args() throws IOException {
+        val lookupTime = 60;
+        List<Map<String, String>> tagsList = new ArrayList<>();
+        MatchingDetectorsResponse mockMatchingDetectorsResponse = mockMatchingDetectorsResponse(lookupTime, detectorUuid);
+        mockMatchingDetectorsResponse.setGroupedDetectorsBySearchIndex(new HashMap<>());
+        when(detectorMappingRepo.findMatchingDetectorMappings(tagsList)).thenReturn(mockMatchingDetectorsResponse);
+        controllerUnderTest.searchDetectorMapping(tagsList);
     }
 
     private DetectorMapping mockDetectorMapping(String id) {

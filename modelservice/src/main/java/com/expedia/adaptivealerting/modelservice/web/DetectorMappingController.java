@@ -37,7 +37,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/detectorMappings")
-@Slf4j
 public class DetectorMappingController {
 
     @Autowired
