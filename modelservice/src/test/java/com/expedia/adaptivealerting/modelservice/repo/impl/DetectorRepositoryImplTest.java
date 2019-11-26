@@ -113,10 +113,11 @@ public class DetectorRepositoryImplTest {
         initDependencies();
     }
 
-    @Test
-    public void testCreateDetector() {
+    @Test(expected = RuntimeException.class)
+    public void testCreateDetector() throws Exception {
         val mom = ObjectMother.instance();
         val document = mom.getDetectorDocument();
+        Mockito.when(elasticSearchClient.search(any(SearchRequest.class), any(RequestOptions.class))).thenThrow(new Exception());
 
         // Disabled these because the contract does not require returning an implementation-specific ID. [WLW]
 //        val actualCreationId = repoUnderTest.createDetector(document);
@@ -174,9 +175,10 @@ public class DetectorRepositoryImplTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void testFindByUuid() {
+    public void testFindByUuid() throws IOException {
         DetectorDocument actualDetector = repoUnderTest.findByUuid("uuid");
         assertNotNull(actualDetector);
+        Mockito.when(elasticSearchClient.search(any(SearchRequest.class), any(RequestOptions.class))).thenThrow(new RuntimeException());
         Assert.assertEquals(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"), actualDetector.getUuid());
         Assert.assertEquals("test-user", actualDetector.getCreatedBy());
         Assert.assertEquals(true, actualDetector.isEnabled());
@@ -191,24 +193,24 @@ public class DetectorRepositoryImplTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void testGetLastUpdatedDetectors() {
+    public void testGetLastUpdatedDetectors() throws IOException {
         List<DetectorDocument> actualDetectors = repoUnderTest.getLastUpdatedDetectors("", "");
+        Mockito.when(elasticSearchClient.search(any(SearchRequest.class), any(RequestOptions.class))).thenThrow(new RuntimeException());
         assertNotNull(actualDetectors);
         assertCheck(actualDetectors);
     }
 
     @Test(expected = RuntimeException.class)
     public void searchDetectorFail() throws IOException {
-        Mockito.when(elasticSearchClient.search(any(SearchRequest.class), any(RequestOptions.class))).thenThrow(new IOException());
+        Mockito.when(elasticSearchClient.search(any(SearchRequest.class), any(RequestOptions.class))).thenThrow(new RuntimeException());
         repoUnderTest.findByUuid("aeb4d849-847a-45c0-8312-dc0fcf22b639");
     }
 
-    @Test
-    public void testUpdateDetector() {
-        DetectorRepository detectorRepository = mock(DetectorRepository.class);
-        doNothing().when(detectorRepository).updateDetector(anyString(), any(DetectorDocument.class));
-        detectorRepository.updateDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", new DetectorDocument());
-        verify(detectorRepository, times(1)).updateDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", new DetectorDocument());
+    @Test(expected = Exception.class)
+    public void testUpdateDetector() throws IOException {
+        Mockito.when(elasticSearchClient.update(any(UpdateRequest.class), any(RequestOptions.class))).thenThrow(new Exception());
+        repoUnderTest.updateDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", new DetectorDocument());
+        verify(repoUnderTest, times(1)).updateDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", new DetectorDocument());
     }
 
     @Test(expected = DetectorException.class)
@@ -242,8 +244,8 @@ public class DetectorRepositoryImplTest {
         repoUnderTest.updateDetector(someUuid.toString(), document);
     }
 
-    @Test
-    public void testUpdateDetector_populatedMeta() {
+    @Test(expected = RuntimeException.class)
+    public void testUpdateDetector_populatedMeta() throws IOException {
         val mom = ObjectMother.instance();
         val document = mom.getDetectorDocument();
 
@@ -253,6 +255,7 @@ public class DetectorRepositoryImplTest {
 
         UUID someUuid = UUID.randomUUID();
         document.setUuid(someUuid);
+        Mockito.when(elasticSearchClient.update(any(UpdateRequest.class), any(RequestOptions.class))).thenThrow(new RuntimeException());
         repoUnderTest.updateDetector(someUuid.toString(), document);
     }
 
@@ -270,18 +273,17 @@ public class DetectorRepositoryImplTest {
         repoUnderTest.updateDetector(someUuid.toString(), document);
     }
 
-    @Test
-    public void testToggleDetector() {
-        DetectorRepository detectorRepository = mock(DetectorRepository.class);
-        doNothing().when(detectorRepository).toggleDetector(anyString(), anyBoolean());
-        detectorRepository.toggleDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
-        verify(detectorRepository, times(1)).toggleDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
+    @Test (expected = RuntimeException.class)
+    public void testToggleDetector() throws IOException {
+        Mockito.when(elasticSearchClient.update(any(UpdateRequest.class), any(RequestOptions.class))).thenThrow(new RuntimeException());
+        repoUnderTest.toggleDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
+        verify(repoUnderTest, times(1)).toggleDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
     }
 
 
     @Test(expected = RuntimeException.class)
     public void trustDetectorFail() throws IOException {
-        Mockito.when(elasticSearchClient.update(any(UpdateRequest.class), any(RequestOptions.class))).thenThrow(new IOException());
+        Mockito.when(elasticSearchClient.update(any(UpdateRequest.class), any(RequestOptions.class))).thenThrow(new RuntimeException());
         repoUnderTest.trustDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
     }
 
@@ -293,12 +295,10 @@ public class DetectorRepositoryImplTest {
         verify(detectorRepository, times(1)).trustDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
     }
 
-    @Test
-    public void testDeleteDetector() {
-        val detectorRepository = mock(DetectorRepository.class);
-        doNothing().when(detectorRepository).deleteDetector(anyString());
-        detectorRepository.deleteDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639");
-        verify(detectorRepository, times(1)).deleteDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639");
+    @Test(expected = RuntimeException.class)
+    public void testDeleteDetector() throws IOException {
+        Mockito.when(elasticSearchClient.delete(any(DeleteRequest.class), any(RequestOptions.class))).thenThrow(new RuntimeException());
+        repoUnderTest.deleteDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639");
     }
 
     @Test(expected = RuntimeException.class)

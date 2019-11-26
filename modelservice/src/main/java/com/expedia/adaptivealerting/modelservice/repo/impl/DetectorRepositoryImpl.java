@@ -27,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
@@ -115,7 +116,6 @@ public class DetectorRepositoryImpl implements DetectorRepository {
             generalMeters.getDetectorExceptionCount().increment();
             throw new RuntimeException(e);
         }
-
     }
 
     @Override
@@ -178,7 +178,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
         updateRequest.doc(json, XContentType.JSON);
         try {
             elasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
-        } catch (Exception e) {
+        } catch (IOException e) {
             log.error(String.format("Updating elastic search failed", e));
             throw new RuntimeException(e);
         }
@@ -273,13 +273,14 @@ public class DetectorRepositoryImpl implements DetectorRepository {
         SearchResponse response;
         try {
             response = elasticSearchClient.search(searchRequest, RequestOptions.DEFAULT);
-            long timestamp = System.currentTimeMillis();
-            long delay = (response.getTook().getMillis() - timestamp);
-            generalMeters.getDelayGettingDetectors().record(Duration.ofMillis(delay));
         } catch (IOException e) {
             log.error("Error ES lookup", e);
             throw new RuntimeException(e);
         }
+        long timestamp = System.currentTimeMillis();
+        long delay = (response.getTook().getMillis() - timestamp);
+        generalMeters.getDelayGettingDetectors().record(Duration.ofMillis(delay));
+
         SearchHit[] hits = response.getHits().getHits();
         List<DetectorDocument> detectors = new ArrayList<>();
         for (val hit : hits) {
