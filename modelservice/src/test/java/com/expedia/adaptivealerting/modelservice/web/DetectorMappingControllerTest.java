@@ -175,9 +175,9 @@ public class DetectorMappingControllerTest {
 
     @Test(expected = RuntimeException.class)
     public void testGetLastUpdated_fail() {
-        val TimeinSecs = 60;
-        when(detectorMappingRepo.findLastUpdated(TimeinSecs)).thenThrow(new IOException());
-        List<DetectorMapping> detectorMappings = controllerUnderTest.findDetectorMapping(TimeinSecs);
+        val timeInSecs = 60;
+        when(detectorMappingRepo.findLastUpdated(timeInSecs)).thenThrow(new IOException());
+        List<DetectorMapping> detectorMappings = controllerUnderTest.findDetectorMapping(timeInSecs);
         assertNotNull("Response can't be null", detectorMappings);
         assertEquals(0, detectorMappings.size());
     }
