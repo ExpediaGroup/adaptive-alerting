@@ -170,7 +170,7 @@ public class CusumDetectorTest {
         assertEquals(detectorUuid, detector.getUuid());
         assertSame(params, detector.getParams());
 
-        // FIXME Hack to handle an off-by-one bu g in the CusumDetector. [WLW]
+        // FIXME Hack to handle an off-by-one bug in the CusumDetector. [WLW]
         val adjWarmupPeriod = params.getWarmUpPeriod() - 1;
 
         for (int i = 0; i < adjWarmupPeriod; i++) {
