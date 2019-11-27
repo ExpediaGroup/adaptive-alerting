@@ -95,6 +95,9 @@
 
         <query objectName="metrics:name=detector-mapper.exceptions" attributes="Count" resultAlias="detector-mapper.exceptions"/>
 
+<!--        manager-->
+        <query objectName="metrics:name=detector.*" attributes="*" />
+
     </queries>
 
     <outputWriter class="org.jmxtrans.agent.GraphitePlainTextTcpOutputWriter">
