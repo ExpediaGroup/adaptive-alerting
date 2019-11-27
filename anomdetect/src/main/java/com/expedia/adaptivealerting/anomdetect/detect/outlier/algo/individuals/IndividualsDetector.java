@@ -45,6 +45,7 @@ import static java.lang.Math.sqrt;
  */
 @ToString
 public final class IndividualsDetector implements Detector {
+    final private String NAME;
     private static final double R_CONTROL_CHART_CONSTANT_D4 = 3.267;
     private static final double R_CONTROL_CHART_CONSTANT_D2 = 1.128;
 
@@ -110,7 +111,7 @@ public final class IndividualsDetector implements Detector {
      */
     private double mean;
 
-    public IndividualsDetector(UUID uuid, IndividualsDetectorParams params, boolean trusted) {
+    public IndividualsDetector(UUID uuid, IndividualsDetectorParams params, boolean trusted, String name) {
         notNull(uuid, "uuid can't be null");
         notNull(params, "params can't be null");
         params.validate();
@@ -120,6 +121,7 @@ public final class IndividualsDetector implements Detector {
         this.prevValue = params.getInitValue();
         this.target = params.getInitValue();
         this.mean = params.getInitMeanEstimate();
+        this.NAME = name;
     }
 
     @Override
@@ -182,6 +184,11 @@ public final class IndividualsDetector implements Detector {
         result.setThresholds(thresholds);
         result.setTrusted(trusted);
         return result;
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 
     private double getRunningMean(double observed) {

@@ -16,12 +16,15 @@
 package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.individuals;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
+import com.expedia.adaptivealerting.anomdetect.detect.breakout.algo.edmx.EdmxDetector;
+import com.expedia.adaptivealerting.anomdetect.detect.breakout.algo.edmx.EdmxHyperparams;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.opencsv.bean.CsvToBeanBuilder;
 import junit.framework.TestCase;
 import lombok.val;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -32,6 +35,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
 public class IndividualsDetectorTest {
@@ -69,7 +73,7 @@ public class IndividualsDetectorTest {
         val params = new IndividualsDetectorParams()
                 .setInitValue(observed0)
                 .setWarmUpPeriod(WARMUP_PERIOD);
-        val detector = new IndividualsDetector(detectorUuid, params, trusted);
+        val detector = new IndividualsDetector(detectorUuid, params, trusted, "test");
 
         assertEquals(detectorUuid, detector.getUuid());
         assertEquals(trusted, detector.isTrusted());
@@ -95,6 +99,17 @@ public class IndividualsDetectorTest {
             }
             noOfDataPoints += 1;
         }
+    }
+
+    @Test
+    public void testName() {
+        val params = new IndividualsDetectorParams()
+                .setInitValue(0)
+                .setWarmUpPeriod(WARMUP_PERIOD);
+        val detectorUnderTest = new IndividualsDetector(detectorUuid, params, trusted, "test");
+
+        assertNotNull(detectorUnderTest.getName());
+        Assert.assertEquals("test", detectorUnderTest.getName());
     }
 
     private static void readDataFromCsv() {

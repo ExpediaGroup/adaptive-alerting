@@ -48,6 +48,6 @@ public class LegacyEwmaDetectorFactoryProvider implements DetectorFactoryProvide
 
         val trusted = document.isTrusted();
 
-        return new ForecastingDetector(uuid, ewma, welford, type, trusted);
+        return new ForecastingDetector(uuid, ewma, welford, type, trusted, "ewma");
     }
 }
