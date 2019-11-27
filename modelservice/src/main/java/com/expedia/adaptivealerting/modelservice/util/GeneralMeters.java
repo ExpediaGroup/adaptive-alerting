@@ -26,10 +26,6 @@ public class GeneralMeters {
 
     @Autowired
     public GeneralMeters(MeterRegistry meterRegistry) {
-        initGeneralMeters(meterRegistry);
-    }
-
-    private void initGeneralMeters(MeterRegistry meterRegistry) {
         this.delayMappingTimer = meterRegistry.timer(MAPPING_TIME_DELAY);
         this.delayGettingDetectors = meterRegistry.timer(DELAY_IN_GETTING_DETECTORS);
         this.mappingExceptionCount = meterRegistry.counter(MAPPING_EXCEPTION_COUNTER);

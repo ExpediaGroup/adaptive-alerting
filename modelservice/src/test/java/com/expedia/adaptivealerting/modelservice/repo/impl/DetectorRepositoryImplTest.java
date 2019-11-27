@@ -23,6 +23,7 @@ import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticsearchUtil;
 import com.expedia.adaptivealerting.modelservice.util.GeneralMeters;
 import com.expedia.adaptivealerting.modelservice.util.ObjectMapperUtil;
+import io.micrometer.core.instrument.Timer;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -125,6 +126,7 @@ public class DetectorRepositoryImplTest {
 //        assertEquals("1", actualCreationId);
 
         repoUnderTest.createDetector(document);
+        generalMeters.getDetectorExceptionCount().increment(1);
     }
 
     @Test(expected = RuntimeException.class)
@@ -195,6 +197,7 @@ public class DetectorRepositoryImplTest {
     @Test(expected = RuntimeException.class)
     public void testGetLastUpdatedDetectors() throws IOException {
         List<DetectorDocument> actualDetectors = repoUnderTest.getLastUpdatedDetectors("", "");
+        when(generalMeters.getDelayGettingDetectors()).thenReturn(mock(Timer.class));
         Mockito.when(elasticSearchClient.search(any(SearchRequest.class), any(RequestOptions.class))).thenThrow(new RuntimeException());
         assertNotNull(actualDetectors);
         assertCheck(actualDetectors);

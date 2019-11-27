@@ -1,44 +1,37 @@
 package com.expedia.adaptivealerting.modelservice.util;
 
-import io.micrometer.core.instrument.MeterRegistry;
+import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticSearchClient;
+import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticsearchUtil;
+import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Timer;
-import lombok.extern.slf4j.Slf4j;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mock;
 
-import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-@Slf4j
+
 public class GeneralMetersTest {
 
-    String mapping_time_delay = "es-lookup.delay-getting-mapping";
-    //int timer = 100;
-    long timer1 = System.currentTimeMillis();
-    MeterRegistry meterRegistry;
-    GeneralMeters generalMeters = new GeneralMeters(meterRegistry);
-    //long mapping_time_delay = 1234;
+    private GeneralMeters generalMeters = mock(GeneralMeters.class);
 
-    @Ignore
     @Test
     public void getDelayMappingTimer() {
-//      log.info("Inside getDelayMappingTimer()");
-//      mapping_time_delay = "es-lookup.delay-getting-mapping";
-//      timer1 = System.currentTimeMillis();
-//      assertEquals(timer1,generalMeters.getDelayMappingTimer());
+        when(generalMeters.getDelayMappingTimer()).thenReturn(mock(Timer.class));
     }
 
-    @Ignore
     @Test
     public void getDelayGettingDetectors() {
+        when(generalMeters.getDelayGettingDetectors()).thenReturn(mock(Timer.class));
     }
 
-    @Ignore
     @Test
     public void getMappingExceptionCount() {
+        when(generalMeters.getDelayMappingTimer()).thenReturn(mock(Timer.class));
     }
 
-    @Ignore
     @Test
     public void getDetectorExceptionCount() {
+        when(generalMeters.getDetectorExceptionCount()).thenReturn(mock(Counter.class));
     }
 }
