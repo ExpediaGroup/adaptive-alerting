@@ -45,7 +45,7 @@ import static java.lang.Math.sqrt;
  */
 @ToString
 public final class IndividualsDetector implements Detector {
-    final private String NAME;
+    private final String NAME;
     private static final double R_CONTROL_CHART_CONSTANT_D4 = 3.267;
     private static final double R_CONTROL_CHART_CONSTANT_D2 = 1.128;
 
