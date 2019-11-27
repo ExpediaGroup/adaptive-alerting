@@ -4,7 +4,6 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.search.Search;
 import lombok.Generated;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -12,11 +11,13 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
-Custom service to track HTTP status. Micrometer by default tracks http status by URI which is pretty hard to manage. [Karan Shah]
+
+/**
+ * Custom service to track HTTP status <br>
+ * Micrometer by default tracks HTTP status by URI which is pretty hard to manage <br>
+ * With this all the HTTP requests will be clubbed under counter.status.* metric [Karan Shah]
  */
 @Service
-@Slf4j
 public class CustomActuatorMetricServiceImpl implements CustomActuatorMetricService {
 
     @Autowired
@@ -26,7 +27,6 @@ public class CustomActuatorMetricServiceImpl implements CustomActuatorMetricServ
     private final List<String> statusList;
 
     public CustomActuatorMetricServiceImpl() {
-        super();
         statusMetricsByMinute = new ArrayList<>();
         statusList = new ArrayList<>();
     }
@@ -42,7 +42,7 @@ public class CustomActuatorMetricServiceImpl implements CustomActuatorMetricServ
 
     @Generated
     @Scheduled(fixedDelay = 60000)
-    private void exportMetrics() {
+    public void exportMetrics() {
         final List<Integer> statusCount = new ArrayList<>();
         for (final String status : statusList) {
             Search search = registry.find(status);
