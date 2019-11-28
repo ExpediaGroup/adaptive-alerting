@@ -20,7 +20,6 @@ import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
 import com.expedia.adaptivealerting.anomdetect.util.AssertUtil;
-import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.typesafe.config.Config;
 import lombok.Getter;
