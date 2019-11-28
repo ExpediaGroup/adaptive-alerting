@@ -181,16 +181,6 @@ public class DetectorMappingControllerTest {
         assertEquals(UUID.fromString(detectorUuid), detectors.get(0).getUuid());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testFindMatchingByTags_illegal_args() {
-        val lookupTime = 60;
-        List<Map<String, String>> tagsList = new ArrayList<>();
-        MatchingDetectorsResponse mockMatchingDetectorsResponse = mockMatchingDetectorsResponse(lookupTime, detectorUuid);
-        mockMatchingDetectorsResponse.setGroupedDetectorsBySearchIndex(new HashMap<>());
-        when(detectorMappingRepo.findMatchingDetectorMappings(tagsList)).thenReturn(mockMatchingDetectorsResponse);
-        controllerUnderTest.searchDetectorMapping(tagsList);
-    }
-
     private DetectorMapping mockDetectorMapping(String id) {
         DetectorMapping detectorMapping = mock(DetectorMapping.class);
         Detector detector = new Detector(UUID.fromString(detectorUuid));

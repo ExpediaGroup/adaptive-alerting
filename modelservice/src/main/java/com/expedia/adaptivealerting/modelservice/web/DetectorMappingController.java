@@ -92,9 +92,6 @@ public class DetectorMappingController {
     @RequestMapping(value = "/findMatchingByTags", method = RequestMethod.POST)
     public MatchingDetectorsResponse searchDetectorMapping(@RequestBody List<Map<String, String>> tagsList) {
         MatchingDetectorsResponse matchingDetectorMappings = detectorMappingRepo.findMatchingDetectorMappings(tagsList);
-        if (matchingDetectorMappings.getGroupedDetectorsBySearchIndex().size() == 0) {
-            throw new IllegalArgumentException("Invalid tags: " + tagsList);
-        }
         return matchingDetectorMappings;
     }
 }
