@@ -16,7 +16,6 @@
 package com.expedia.adaptivealerting.kafka;
 
 import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.SharedMetricRegistries;
 import com.expedia.adaptivealerting.anomdetect.DetectorManager;
 import com.expedia.adaptivealerting.anomdetect.detect.breakout.BreakoutDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
