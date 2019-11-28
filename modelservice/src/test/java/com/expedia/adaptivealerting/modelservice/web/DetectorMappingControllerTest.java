@@ -159,20 +159,6 @@ public class DetectorMappingControllerTest {
         assertEquals(id, detectorMappings.get(0).getId());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testGetLastUpdated_illegal_args() {
-        val timeInSecs = 60;
-        when(detectorMappingRepo.findLastUpdated(timeInSecs)).thenReturn(null);
-        controllerUnderTest.findDetectorMapping(timeInSecs);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testGetLastUpdated_illegal_args1() {
-        val timeInSecs = 60;
-        when(detectorMappingRepo.findLastUpdated(timeInSecs)).thenReturn(new ArrayList<>());
-        controllerUnderTest.findDetectorMapping(timeInSecs);
-    }
-
     @Test(expected = RuntimeException.class)
     public void testGetLastUpdated_fail() {
         val timeInSecs = 60;
