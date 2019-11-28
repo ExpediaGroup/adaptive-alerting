@@ -41,25 +41,16 @@
                resultAlias="tomcat.bytesReceived"/>
       
         <!-- HTTP Status -->
-        <!-- FIXME. Just trying out with this URI. Will make a more generic URI later on. [KS] -->
-        <!-- GET Requests -->
-        <query objectName="spring:name=httpServerRequests.exception.None.method.GET.status.200.uri./api/{repository}" attribute="Count"
-               resultAlias="http.get.200Count"/>
-        <query objectName="spring:name=httpServerRequests.exception.None.method.GET.status.200.uri./api/{repository}/search/{search}" attribute="Count"
-               resultAlias="http.get.200Count"/>
-        <query objectName="spring:name=&quot;httpServerRequests.exception.None.method.GET.status.404.uri./\*\*&quot;" attribute="Count"
-               resultAlias="http.get.404Count"/>
-        <query objectName="spring:name=httpServerRequests.exception.ResourceNotFoundException.method.GET.status.404.uri./api/{repository}/search/{search}" attribute="Count"
-               resultAlias="http.get.404Count"/>
-        <query objectName="spring:name=httpServerRequests.exception.None.method.GET.status.500.uri./api/{repository}" attribute="Count"
-               resultAlias="http.get.500Count"/>
-        <!-- POST Requests -->
-        <query objectName="spring:name=httpServerRequests.exception.None.method.POST.status.201.uri./api/{repository}" attribute="Count"
-               resultAlias="http.post.201Count"/>
-        <query objectName="spring:name=httpServerRequests.exception.HttpMessageNotReadableException.method.POST.status.400.uri./api/{repository}" attribute="Count"
-               resultAlias="http.post.400Count"/>
-        <query objectName="spring:name=&quot;httpServerRequests.exception.None.method.POST.status.500.uri./\*\*&quot;" attribute="Count"
-               resultAlias="http.post.500Count"/>
+        <query objectName="spring:name=counterStatus200" attribute="Count"
+               resultAlias="http.200Count"/>
+        <query objectName="spring:name=counterStatus201" attribute="Count"
+               resultAlias="http.201Count"/>
+        <query objectName="spring:name=counterStatus400" attribute="Count"
+               resultAlias="http.400Count"/>
+        <query objectName="spring:name=counterStatus404" attribute="Count"
+               resultAlias="http.404Count"/>
+        <query objectName="spring:name=counterStatus500" attribute="Count"
+               resultAlias="http.500Count"/>
     </queries>
     <outputWriter class="org.jmxtrans.agent.GraphitePlainTextTcpOutputWriter">
         <host>${AA_GRAPHITE_HOST:metrics}</host>

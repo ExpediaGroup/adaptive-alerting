@@ -15,14 +15,14 @@
  */
 package com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch;
 
-import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticSearchClient;
-import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticsearchUtil;
+import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -47,7 +47,7 @@ public class ElasticsearchUtilTest {
 
     @Mock
     private ElasticSearchClient elasticSearchClient;
-    
+
     @Before
     public void setUp() throws Exception {
         this.elasticsearchUtil = new ElasticsearchUtil();
@@ -80,5 +80,15 @@ public class ElasticsearchUtilTest {
         val actualSearchRequest = elasticsearchUtil.getSearchRequest(new SearchSourceBuilder(), "index", "docType");
         assertNotNull(actualSearchRequest);
         assertEquals(SearchRequest.class, actualSearchRequest.getClass());
+    }
+
+    @Test
+    public void testCheckNullResponse_empty_result() {
+        assertEquals(true, elasticsearchUtil.checkNullResponse(new UpdateResponse().getResult()));
+    }
+    
+    @Test
+    public void testCheckNullResponse_null_result() {
+        assertEquals(true, elasticsearchUtil.checkNullResponse(null));
     }
 }
