@@ -151,6 +151,7 @@ public class DetectorMapper {
         try {
             matchingDetectorMappings = detectorSource.findDetectorMappings(cacheMissedMetricTags);
         } catch (RuntimeException e) {
+            log.error("Error while updating cache", e);
             exceptionCounter.inc();
         }
         return matchingDetectorMappings;
