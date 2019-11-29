@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import io.micrometer.core.instrument.Counter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,20 +19,23 @@ import java.util.List;
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
-    public final ResponseEntity<Object> handleAllExceptions(Exception ex, WebRequest request) {
+    public final ResponseEntity<Object> handleAllExceptions(Exception ex, WebRequest request, Counter exceptionCounter) {
         List<String> details = new ArrayList<>();
         details.add(ex.getLocalizedMessage());
+        exceptionCounter.increment();
         ErrorResponse error = new ErrorResponse("Server Error", details);
         return new ResponseEntity(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(value = {RecordNotFoundException.class})
-    protected ResponseEntity<Object> handleRecordNotFound(final RuntimeException ex, final WebRequest request) {
+    protected ResponseEntity<Object> handleRecordNotFound(final RuntimeException ex, final WebRequest request, Counter exceptionCounter) {
+        exceptionCounter.increment();
         return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
 
     @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class})
-    public ResponseEntity<Object> handleIllegalArgument(final RuntimeException ex, final WebRequest request) {
+    public ResponseEntity<Object> handleIllegalArgument(final RuntimeException ex, final WebRequest request, Counter exceptionCounter) {
+        exceptionCounter.increment();
         return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
