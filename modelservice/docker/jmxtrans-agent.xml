@@ -51,6 +51,12 @@
                resultAlias="http.404Count"/>
         <query objectName="spring:name=counterStatus500" attribute="Count"
                resultAlias="http.500Count"/>
+
+        <!--Exception Counters -->
+        <query objectName="spring:name=detector-exception-counter" attribute="Count"
+               resultAlias="detector-exception-counter"/>
+        <query objectName="spring:name=mapping-exception-counter" attribute="Count"
+               resultAlias="mapping-exception-counter"/>
     </queries>
     <outputWriter class="org.jmxtrans.agent.GraphitePlainTextTcpOutputWriter">
         <host>${AA_GRAPHITE_HOST:metrics}</host>

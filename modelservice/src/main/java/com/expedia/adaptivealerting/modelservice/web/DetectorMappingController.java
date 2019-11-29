@@ -22,6 +22,8 @@ import com.expedia.adaptivealerting.modelservice.repo.DetectorMappingRepository;
 import com.expedia.adaptivealerting.modelservice.repo.request.CreateDetectorMappingRequest;
 import com.expedia.adaptivealerting.modelservice.repo.request.SearchMappingsRequest;
 import com.expedia.adaptivealerting.modelservice.repo.response.MatchingDetectorsResponse;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Metrics;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -41,6 +43,8 @@ public class DetectorMappingController {
 
     @Autowired
     private DetectorMappingRepository detectorMappingRepo;
+
+    private Counter exceptionCounter = Metrics.counter("mapping-exception-counter");
 
     @RequestMapping(produces = "application/json", method = RequestMethod.GET)
     public DetectorMapping getDetectorMapping(@RequestParam String id) {
@@ -78,6 +82,7 @@ public class DetectorMappingController {
                 "user id and detector UUID can't both be null");
         List<DetectorMapping> detectorMappings = detectorMappingRepo.search(request);
         if (detectorMappings == null || detectorMappings.isEmpty()) {
+            exceptionCounter.increment(1.0);
             throw new IllegalArgumentException("Invalid request: " + request);
         }
         return detectorMappingRepo.search(request);
