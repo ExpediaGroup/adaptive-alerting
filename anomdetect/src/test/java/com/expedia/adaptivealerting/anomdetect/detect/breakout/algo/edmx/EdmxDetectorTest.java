@@ -27,6 +27,7 @@ import org.junit.Test;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @Slf4j
 public final class EdmxDetectorTest {
@@ -63,4 +64,19 @@ public final class EdmxDetectorTest {
             assertEquals(i < bufferSize - 1, result.isWarmup());
         }
     }
+
+    @Test
+    public void testName() {
+        val hyperparams = new EdmxHyperparams()
+                .setDelta(6)
+                .setNumPerms(199)
+                .setStrongAlpha(0.01)
+                .setWeakAlpha(0.05);
+        val trusted = true;
+        val detectorUnderTest = new EdmxDetector(UUID.randomUUID(), hyperparams, trusted);
+
+        assertNotNull(detectorUnderTest.getName());
+        assertEquals("edmx", detectorUnderTest.getName());
+    }
+
 }

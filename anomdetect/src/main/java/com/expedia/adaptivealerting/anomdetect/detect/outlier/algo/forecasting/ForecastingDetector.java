@@ -53,7 +53,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
  */
 @ToString(callSuper = true)
 public final class ForecastingDetector extends AbstractOutlierDetector {
-
+    private final String NAME;
     @Getter
     @Generated // https://reflectoring.io/100-percent-test-coverage/
     private PointForecaster pointForecaster;
@@ -77,7 +77,8 @@ public final class ForecastingDetector extends AbstractOutlierDetector {
             PointForecaster pointForecaster,
             IntervalForecaster intervalForecaster,
             AnomalyType anomalyType,
-            boolean trusted) {
+            boolean trusted,
+            String name) {
 
         super(uuid);
 
@@ -90,6 +91,7 @@ public final class ForecastingDetector extends AbstractOutlierDetector {
         this.anomalyType = anomalyType;
         this.classifier = new AnomalyClassifier(anomalyType);
         this.trusted = trusted;
+        this.NAME = name;
     }
 
     @Override
@@ -114,6 +116,11 @@ public final class ForecastingDetector extends AbstractOutlierDetector {
                 .setPredicted(pointForecast.getValue())
                 .setThresholds(thresholds)
                 .setTrusted(trusted);
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 
     private AnomalyThresholds toAnomalyThresholds(IntervalForecast intervalForecast) {

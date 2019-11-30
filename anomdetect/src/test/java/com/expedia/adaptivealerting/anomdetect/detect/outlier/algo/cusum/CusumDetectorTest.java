@@ -22,6 +22,7 @@ import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.opencsv.bean.CsvToBeanBuilder;
 import lombok.val;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -144,6 +145,25 @@ public class CusumDetectorTest {
 
         testClassify(params, anomalyType, testRows, trusted);
     }
+
+    @Test
+    public void testName() {
+        val anomalyType = AnomalyType.TWO_TAILED;
+        val trusted = true;
+        val params = new CusumDetectorParams()
+                .setType(anomalyType)
+                .setTargetValue(1000.0)
+                .setWeakSigmas(WEAK_SIGMAS)
+                .setStrongSigmas(STRONG_SIGMAS)
+                .setSlackParam(0.5)
+                .setInitMeanEstimate(1000.0)
+                .setWarmUpPeriod(5);
+
+        val detector = new CusumDetector(detectorUuid, params, trusted);
+        Assert.assertNotNull(detector.getName());
+        Assert.assertEquals("cusum", detector.getName());
+    }
+
 
     private void testClassify(CusumDetectorParams params, AnomalyType anomalyType, CusumDetectorTestRow[] testRows, boolean trusted) {
         val detector = new CusumDetector(detectorUuid, params, trusted);

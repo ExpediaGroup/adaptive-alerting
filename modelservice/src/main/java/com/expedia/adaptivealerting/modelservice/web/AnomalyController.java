@@ -35,6 +35,10 @@ public class AnomalyController {
 
     @PostMapping(path = "/anomalies", consumes = "application/json", produces = "application/json")
     public List<OutlierDetectorResult> getAnomalies(@RequestBody AnomalyRequest request) {
-        return anomalyRepository.getAnomalies(request);
+        List<OutlierDetectorResult> detectorResults = anomalyRepository.getAnomalies(request);
+        if (detectorResults == null || detectorResults.isEmpty()) {
+            throw new IllegalArgumentException("Invalid request: " + request);
+        }
+        return detectorResults;
     }
 }

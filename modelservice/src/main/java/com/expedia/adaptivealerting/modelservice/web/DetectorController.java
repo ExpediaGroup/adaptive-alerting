@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.web;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
+import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,13 +52,21 @@ public class DetectorController {
     @GetMapping(path = "/findByUuid", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public DetectorDocument findByUuid(@RequestParam String uuid) {
-        return detectorRepo.findByUuid(uuid);
+        DetectorDocument detector = detectorRepo.findByUuid(uuid);
+        if (detector == null) {
+            throw new RecordNotFoundException("Invalid UUID: " + uuid);
+        }
+        return detector;
     }
 
     @GetMapping(path = "/findByCreatedBy", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public List<DetectorDocument> findByCreatedBy(@RequestParam String user) {
-        return detectorRepo.findByCreatedBy(user);
+        List<DetectorDocument> detectors = detectorRepo.findByCreatedBy(user);
+        if (detectors == null || detectors.isEmpty()) {
+            throw new IllegalArgumentException("Invalid user: " + user);
+        }
+        return detectors;
     }
 
     @PostMapping(path = "/toggleDetector", consumes = "application/json", produces = "application/json")
@@ -79,7 +88,11 @@ public class DetectorController {
     @GetMapping(path = "/getLastUpdatedDetectors", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public List<DetectorDocument> getLastUpdatedDetectors(@RequestParam long interval) {
-        return detectorRepo.getLastUpdatedDetectors(interval);
+        List<DetectorDocument> detectors = detectorRepo.getLastUpdatedDetectors(interval);
+        if (detectors == null || detectors.isEmpty()) {
+            throw new IllegalArgumentException("Not detectors updated during this interval: " + interval);
+        }
+        return detectors;
     }
 
     @PutMapping

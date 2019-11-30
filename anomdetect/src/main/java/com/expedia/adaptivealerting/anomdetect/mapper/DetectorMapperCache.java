@@ -75,20 +75,25 @@ public class DetectorMapperCache {
 
     }
 
+    /* Cache stat metrics: https://guava.dev/releases/23.0/api/docs/com/google/common/cache/CacheStats.html
+     */
     private MetricSet metricsFor(String cacheName, final Cache cache) {
 
         HashMap<String, Metric> metrics = new HashMap<>();
 
-        metrics.put(name(cacheName, "hitRate"), (Gauge<Double>) () -> cache.stats().hitRate());
+        metrics.put(name(cacheName, "requestCount"), (Gauge<Long>) () -> cache.stats().requestCount());
 
         metrics.put(name(cacheName, "hitCount"), (Gauge<Long>) () -> cache.stats().hitCount());
+        metrics.put(name(cacheName, "hitRate"), (Gauge<Double>) () -> cache.stats().hitRate());
 
         metrics.put(name(cacheName, "missCount"), (Gauge<Long>) () -> cache.stats().missCount());
-
         metrics.put(name(cacheName, "missRate"), (Gauge<Double>) () -> cache.stats().missRate());
 
         metrics.put(name(cacheName, "evictionCount"), (Gauge<Long>) () -> cache.stats().evictionCount());
+        metrics.put(name(cacheName, "exceptionCount"), (Gauge<Long>) () -> cache.stats().loadExceptionCount());
+        metrics.put(name(cacheName, "exceptionRate"), (Gauge<Double>) () -> cache.stats().loadExceptionRate());
 
+        metrics.put(name(cacheName, "totalLoadTime"), (Gauge<Long>) () -> cache.stats().totalLoadTime());
         metrics.put(name(cacheName, "size"), (Gauge<Long>) cache::size);
 
         return () -> metrics;

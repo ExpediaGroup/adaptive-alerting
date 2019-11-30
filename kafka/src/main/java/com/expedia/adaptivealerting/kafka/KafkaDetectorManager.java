@@ -15,11 +15,13 @@
  */
 package com.expedia.adaptivealerting.kafka;
 
+import com.codahale.metrics.MetricRegistry;
 import com.expedia.adaptivealerting.anomdetect.DetectorManager;
 import com.expedia.adaptivealerting.anomdetect.detect.breakout.BreakoutDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
+import com.expedia.adaptivealerting.anomdetect.util.JmxReporterFactory;
 import com.expedia.adaptivealerting.kafka.util.ConfigUtil;
 import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
 import com.typesafe.config.Config;
@@ -86,8 +88,9 @@ public class KafkaDetectorManager implements Runnable {
 
     // Extracted for unit testing
     static KafkaDetectorManager buildManager(Config config) {
+        MetricRegistry metricRegistry = getMetricRegistry();
         val detectorSource = DetectorUtil.buildDetectorSource(config);
-        val detectorManager = new DetectorManager(detectorSource, config);
+        val detectorManager = new DetectorManager(detectorSource, config, metricRegistry);
 
         val metricConsumerConfig = config.getConfig(METRIC_CONSUMER);
         val metricConsumerProps = ConfigUtil.toConsumerConfig(metricConsumerConfig);
@@ -107,6 +110,12 @@ public class KafkaDetectorManager implements Runnable {
                 metricConsumerTopic,
                 anomalyProducerOutlierTopic,
                 anomalyProducerBreakoutTopic);
+    }
+
+    private static MetricRegistry getMetricRegistry() {
+        JmxReporterFactory jmxReporterFactory = new JmxReporterFactory();
+        jmxReporterFactory.getJmxReporter().start();
+        return jmxReporterFactory.getMetricRegistry();
     }
 
     public KafkaDetectorManager(

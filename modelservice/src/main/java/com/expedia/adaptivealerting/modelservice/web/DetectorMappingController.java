@@ -17,10 +17,12 @@ package com.expedia.adaptivealerting.modelservice.web;
 
 import com.expedia.adaptivealerting.anomdetect.util.AssertUtil;
 import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
+import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorMappingRepository;
 import com.expedia.adaptivealerting.modelservice.repo.request.CreateDetectorMappingRequest;
 import com.expedia.adaptivealerting.modelservice.repo.request.SearchMappingsRequest;
 import com.expedia.adaptivealerting.modelservice.repo.response.MatchingDetectorsResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,7 +44,11 @@ public class DetectorMappingController {
 
     @RequestMapping(produces = "application/json", method = RequestMethod.GET)
     public DetectorMapping getDetectorMapping(@RequestParam String id) {
-        return detectorMappingRepo.findDetectorMapping(id);
+        DetectorMapping detectorMapping = detectorMappingRepo.findDetectorMapping(id);
+        if (detectorMapping == null) {
+            throw new RecordNotFoundException("Invalid mapping id: " + id);
+        }
+        return detectorMapping;
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -69,7 +75,11 @@ public class DetectorMappingController {
     @RequestMapping(value = "/search", method = RequestMethod.POST)
     public List<DetectorMapping> searchDetectorMapping(@RequestBody SearchMappingsRequest request) {
         AssertUtil.isTrue(request.getUserId() != null || request.getDetectorUuid() != null,
-                "userId and detectorId can't both be null");
+                "user id and detector UUID can't both be null");
+        List<DetectorMapping> detectorMappings = detectorMappingRepo.search(request);
+        if (detectorMappings == null || detectorMappings.isEmpty()) {
+            throw new IllegalArgumentException("Invalid request: " + request);
+        }
         return detectorMappingRepo.search(request);
     }
 
@@ -81,6 +91,7 @@ public class DetectorMappingController {
 
     @RequestMapping(value = "/findMatchingByTags", method = RequestMethod.POST)
     public MatchingDetectorsResponse searchDetectorMapping(@RequestBody List<Map<String, String>> tagsList) {
-        return detectorMappingRepo.findMatchingDetectorMappings(tagsList);
+        MatchingDetectorsResponse matchingDetectorMappings = detectorMappingRepo.findMatchingDetectorMappings(tagsList);
+        return matchingDetectorMappings;
     }
 }

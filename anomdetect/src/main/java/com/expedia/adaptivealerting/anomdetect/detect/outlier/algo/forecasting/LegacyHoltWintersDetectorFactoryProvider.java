@@ -43,6 +43,6 @@ public class LegacyHoltWintersDetectorFactoryProvider implements DetectorFactory
 
         val trusted = document.isTrusted();
 
-        return new ForecastingDetector(uuid, holtWinters, welford, type, trusted);
+        return new ForecastingDetector(uuid, holtWinters, welford, type, trusted, "holtwinters");
     }
 }

@@ -15,6 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
+import com.codahale.metrics.SharedMetricRegistries;
+import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
@@ -87,12 +89,12 @@ public final class DetectorManagerTest {
         MockitoAnnotations.initMocks(this);
         initTestObjects();
         initDependencies();
-        this.managerUnderTest = new DetectorManager(detectorSource, detectorRefreshPeriod, cachedDetectors);
+        this.managerUnderTest = new DetectorManager(detectorSource, detectorRefreshPeriod, cachedDetectors, SharedMetricRegistries.getOrCreate("test"));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testBadConfig() {
-        new DetectorManager(detectorSource, badConfig);
+        new DetectorManager(detectorSource, badConfig, SharedMetricRegistries.getOrCreate("test"));
     }
 
     @Test
@@ -149,6 +151,7 @@ public final class DetectorManagerTest {
     }
 
     private void initDependencies() {
+        when(outlierDetectorResult.getAnomalyLevel()).thenReturn(AnomalyLevel.NORMAL);
         when(detector.detect(goodMetricData)).thenReturn(outlierDetectorResult);
 
         when(cachedDetectors.containsKey(updatedDetectors.get(0))).thenReturn(true);

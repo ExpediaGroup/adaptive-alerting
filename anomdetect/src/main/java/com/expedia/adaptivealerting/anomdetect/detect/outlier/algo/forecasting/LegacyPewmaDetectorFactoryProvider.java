@@ -43,6 +43,6 @@ public class LegacyPewmaDetectorFactoryProvider implements DetectorFactoryProvid
 
         val trusted = document.isTrusted();
 
-        return new ForecastingDetector(uuid, pewma, welford, type, trusted);
+        return new ForecastingDetector(uuid, pewma, welford, type, trusted, "pewma");
     }
 }

@@ -81,12 +81,22 @@
 
 
         <!--ad-mapper-->
+        <!--cache-->
         <query objectName="metrics:name=cache.size" attributes="Value" resultAlias="mapping-cache.size"/>
-        <query objectName="metrics:name=cache.hitRate" attributes="Value" resultAlias="mapping-cache.hitRate"/>
+        <query objectName="metrics:name=cache.requestCount" attributes="Value" resultAlias="mapping-cache.requestCount"/>
         <query objectName="metrics:name=cache.hitCount" attributes="Value" resultAlias="mapping-cache.hitCount"/>
+        <query objectName="metrics:name=cache.hitRate" attributes="Value" resultAlias="mapping-cache.hitRate"/>
         <query objectName="metrics:name=cache.missCount" attributes="Value" resultAlias="mapping-cache.missCount"/>
         <query objectName="metrics:name=cache.missRate" attributes="Value" resultAlias="mapping-cache.missRate"/>
         <query objectName="metrics:name=cache.evictionCount" attributes="Value" resultAlias="mapping-cache.evictionCount"/>
+        <query objectName="metrics:name=cache.exceptionCount" attributes="Value" resultAlias="mapping-cache.exceptionCount"/>
+        <query objectName="metrics:name=cache.exceptionRate" attributes="Value" resultAlias="mapping-cache.exceptionRate"/>
+        <query objectName="metrics:name=cache.totalLoadTime" attributes="Value" resultAlias="mapping-cache.totalLoadTime"/>
+
+        <query objectName="metrics:name=detector-mapper.exceptions" attributes="Count" resultAlias="detector-mapper.exceptions"/>
+
+<!--        manager-->
+        <query objectName="metrics:name=detector.*" resultAlias="%name%.#attribute#" />
 
     </queries>
 

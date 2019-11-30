@@ -32,6 +32,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 @Slf4j
 public final class EdmxDetector implements BreakoutDetector {
+    private final String NAME = "edmx";
 
     @Getter
     private UUID uuid;
@@ -93,6 +94,11 @@ public final class EdmxDetector implements BreakoutDetector {
                 .setEdmxEstimate(estimate)
                 .setAnomalyLevel(anomalyLevel)
                 .setTrusted(trusted);
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 
     private AnomalyLevel calculateAnomalyLevel(EdmxEstimate estimate) {

@@ -15,10 +15,11 @@
  */
 package com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch;
 
-import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticSearchClient;
+import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
 import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsRequest;
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
@@ -66,10 +67,10 @@ public class ElasticsearchUtil {
         return searchRequest.source(searchSourceBuilder).indices(indexName).types(docType);
     }
 
-     // Skipping unit tests for below two functions. [KS]
-     // when(elasticSearchClient.indices()).thenReturn(mock(IndicesClient.class));
-     // IndicesClient is final class and we can't mock it.
-     // One of the solutions can be to wrap the client and hide it behind an interface which is then mockable
+    // Skipping unit tests for below two functions. [KS]
+    // when(elasticSearchClient.indices()).thenReturn(mock(IndicesClient.class));
+    // IndicesClient is final class and we can't mock it.
+    // One of the solutions can be to wrap the client and hide it behind an interface which is then mockable
     @Generated
     public Set<String> removeFieldsHavingExistingMapping(Set<String> fields, String indexName, String docType) {
         GetMappingsRequest request = new GetMappingsRequest();
@@ -115,5 +116,9 @@ public class ElasticsearchUtil {
             log.error("Error updating mappings", e);
             throw new RuntimeException(e);
         }
+    }
+
+    public Boolean checkNullResponse(DocWriteResponse.Result result) {
+        return (result == null || result == DocWriteResponse.Result.NOT_FOUND);
     }
 }

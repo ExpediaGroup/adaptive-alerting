@@ -43,6 +43,7 @@ import static com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel.WEAK;
  */
 @ToString(callSuper = true)
 public final class CusumDetector extends AbstractOutlierDetector {
+    private static final String NAME = "cusum";
     private static final double STD_DEV_DIVISOR = 1.128;
 
     @Getter
@@ -167,6 +168,11 @@ public final class CusumDetector extends AbstractOutlierDetector {
         }
 
         return new OutlierDetectorResult(level, trusted);
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 
     private void resetSums() {
