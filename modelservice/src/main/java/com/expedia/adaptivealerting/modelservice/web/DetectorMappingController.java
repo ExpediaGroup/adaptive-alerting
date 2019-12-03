@@ -75,11 +75,7 @@ public class DetectorMappingController {
     @RequestMapping(value = "/search", method = RequestMethod.POST)
     public List<DetectorMapping> searchDetectorMapping(@RequestBody SearchMappingsRequest request) {
         AssertUtil.isTrue(request.getUserId() != null || request.getDetectorUuid() != null,
-                "user id and detector UUID can't both be null");
-        List<DetectorMapping> detectorMappings = detectorMappingRepo.search(request);
-        if (detectorMappings == null || detectorMappings.isEmpty()) {
-            throw new IllegalArgumentException("Invalid request: " + request);
-        }
+                "User id and Detector UUID can't both be null");
         return detectorMappingRepo.search(request);
     }
 
