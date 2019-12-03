@@ -121,18 +121,6 @@ public class DetectorControllerTest {
         assertSame(detectors, actualDetectors);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testGetLastUpdatedDetectors_illegal_args() {
-        when(detectorRepo.getLastUpdatedDetectors(anyLong())).thenReturn(null);
-        controllerUnderTest.getLastUpdatedDetectors(5);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testGetLastUpdatedDetectors__illegal_args1() {
-        when(detectorRepo.getLastUpdatedDetectors(anyLong())).thenReturn(new ArrayList<>());
-        controllerUnderTest.getLastUpdatedDetectors(5);
-    }
-
     @Test
     public void testUpdateDetector() {
         controllerUnderTest.updateDetector(someUuid.toString(), legalParamsDetector);

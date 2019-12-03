@@ -89,11 +89,7 @@ public class DetectorController {
     @GetMapping(path = "/getLastUpdatedDetectors", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public List<DetectorDocument> getLastUpdatedDetectors(@RequestParam long interval) {
-        List<DetectorDocument> detectors = detectorRepo.getLastUpdatedDetectors(interval);
-        if (detectors == null || detectors.isEmpty()) {
-            throw new IllegalArgumentException("Not detectors updated during this interval: " + interval);
-        }
-        return detectors;
+        return detectorRepo.getLastUpdatedDetectors(interval);
     }
 
     @PutMapping

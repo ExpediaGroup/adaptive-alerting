@@ -129,24 +129,6 @@ public class DetectorMappingControllerTest {
         assertEquals("test-user", detectorMappingsResponse.get(0).getUser().getId());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testDetectorMappingSearch_illegal_args() {
-        SearchMappingsRequest searchMappingsRequest = new SearchMappingsRequest();
-        searchMappingsRequest.setDetectorUuid(UUID.fromString(detectorUuid));
-        searchMappingsRequest.setUserId(userVal);
-        when(detectorMappingRepo.search(searchMappingsRequest)).thenReturn(null);
-        controllerUnderTest.searchDetectorMapping(searchMappingsRequest);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testDetectorMappingSearch_illegal_args1() {
-        SearchMappingsRequest searchMappingsRequest = new SearchMappingsRequest();
-        searchMappingsRequest.setDetectorUuid(UUID.fromString(detectorUuid));
-        searchMappingsRequest.setUserId(userVal);
-        when(detectorMappingRepo.search(searchMappingsRequest)).thenReturn(new ArrayList<>());
-        controllerUnderTest.searchDetectorMapping(searchMappingsRequest);
-    }
-
     @Test
     public void testGetLastUpdated_successful() {
         val timeInSecs = 60;
