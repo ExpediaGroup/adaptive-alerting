@@ -18,7 +18,6 @@ package com.expedia.adaptivealerting.modelservice.web;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

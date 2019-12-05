@@ -86,7 +86,7 @@ public class ElasticsearchUtilTest {
     public void testCheckNullResponse_empty_result() {
         assertEquals(true, elasticsearchUtil.checkNullResponse(new UpdateResponse().getResult()));
     }
-    
+
     @Test
     public void testCheckNullResponse_null_result() {
         assertEquals(true, elasticsearchUtil.checkNullResponse(null));

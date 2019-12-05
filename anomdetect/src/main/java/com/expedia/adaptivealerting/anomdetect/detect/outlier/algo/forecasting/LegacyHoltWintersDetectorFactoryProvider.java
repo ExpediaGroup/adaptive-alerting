@@ -21,8 +21,6 @@ import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.holtwinters.H
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorFactoryProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 @Deprecated // Use ForecastingDetector with Holt-Winters point forecaster

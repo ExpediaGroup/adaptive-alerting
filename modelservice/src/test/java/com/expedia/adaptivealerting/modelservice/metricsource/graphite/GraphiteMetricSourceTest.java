@@ -16,9 +16,6 @@
 package com.expedia.adaptivealerting.modelservice.metricsource.graphite;
 
 import com.expedia.adaptivealerting.modelservice.metricsource.MetricSourceResult;
-import com.expedia.adaptivealerting.modelservice.metricsource.graphite.GraphiteMetricSource;
-import com.expedia.adaptivealerting.modelservice.metricsource.graphite.GraphiteProperties;
-import com.expedia.adaptivealerting.modelservice.metricsource.graphite.GraphiteResult;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import com.expedia.adaptivealerting.modelservice.util.BeanUtil;
 import lombok.extern.slf4j.Slf4j;

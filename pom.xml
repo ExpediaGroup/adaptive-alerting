@@ -137,6 +137,10 @@
         <maven.source.plugin.version>3.0.1</maven.source.plugin.version>
         <maven.surefire.plugin.version>2.22.1</maven.surefire.plugin.version>
         <nexus.staging.maven.plugin.version>1.6.8</nexus.staging.maven.plugin.version>
+        <maven.checkstyle.plugin.version>3.1.0</maven.checkstyle.plugin.version>
+
+        <checkstyle.config.location>checkstyle/checkstyle_rules.xml</checkstyle.config.location>
+        <checkstyle.header.file>checkstyle/license_header</checkstyle.header.file>
     </properties>
 
     <dependencyManagement>
@@ -750,6 +754,22 @@
                     <nexusUrl>https://oss.sonatype.org/</nexusUrl>
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${maven.checkstyle.plugin.version}</version>
+                <configuration>
+                    <configLocation>${checkstyle.config.location}</configLocation>
+                    <headerLocation>${checkstyle.header.file}</headerLocation>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

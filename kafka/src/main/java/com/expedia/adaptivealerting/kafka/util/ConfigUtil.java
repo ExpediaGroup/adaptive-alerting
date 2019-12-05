@@ -31,10 +31,10 @@ public class ConfigUtil {
 
     public static Properties toConsumerConfig(Config config) {
         val keys = new String[]{
-                ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
-                ConsumerConfig.GROUP_ID_CONFIG,
-                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
-                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG
+            ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
+            ConsumerConfig.GROUP_ID_CONFIG,
+            ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
+            ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG
         };
         val props = new Properties();
         copyProps(config, props, keys);
@@ -43,10 +43,10 @@ public class ConfigUtil {
 
     public static Properties toProducerConfig(Config config) {
         val keys = new String[]{
-                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
-                ProducerConfig.CLIENT_ID_CONFIG,
-                ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
-                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG
+            ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
+            ProducerConfig.CLIENT_ID_CONFIG,
+            ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+            ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG
         };
         val props = new Properties();
         copyProps(config, props, keys);

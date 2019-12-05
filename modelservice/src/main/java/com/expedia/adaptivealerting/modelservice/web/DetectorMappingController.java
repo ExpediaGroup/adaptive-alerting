@@ -22,7 +22,6 @@ import com.expedia.adaptivealerting.modelservice.repo.DetectorMappingRepository;
 import com.expedia.adaptivealerting.modelservice.repo.request.CreateDetectorMappingRequest;
 import com.expedia.adaptivealerting.modelservice.repo.request.SearchMappingsRequest;
 import com.expedia.adaptivealerting.modelservice.repo.response.MatchingDetectorsResponse;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;

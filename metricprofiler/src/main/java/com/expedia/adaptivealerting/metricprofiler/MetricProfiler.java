@@ -16,7 +16,6 @@
 package com.expedia.adaptivealerting.metricprofiler;
 
 import com.expedia.adaptivealerting.metricprofiler.source.ProfileSource;
-import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.metrictank.MetricTankIdFactory;
 import lombok.Getter;

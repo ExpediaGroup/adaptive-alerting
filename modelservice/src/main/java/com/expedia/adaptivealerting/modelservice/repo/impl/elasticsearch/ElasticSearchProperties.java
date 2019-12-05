@@ -60,7 +60,7 @@ public class ElasticSearchProperties {
         if (config.isAwsIamAuthRequired()) { // this is optional security for elastic search running in AWS
             AWSSigningRequestInterceptor signingInterceptor = getAWSRequestSignerInterceptor();
             clientBuilder.setHttpClientConfigCallback(
-                    clientConf -> clientConf.addInterceptorLast(signingInterceptor));
+                clientConf -> clientConf.addInterceptorLast(signingInterceptor));
         }
     }
 

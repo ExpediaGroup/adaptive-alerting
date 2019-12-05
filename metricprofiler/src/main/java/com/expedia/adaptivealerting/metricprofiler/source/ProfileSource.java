@@ -17,8 +17,6 @@ package com.expedia.adaptivealerting.metricprofiler.source;
 
 import com.expedia.metrics.MetricDefinition;
 
-import java.util.Map;
-
 public interface ProfileSource {
     Boolean profileExists(MetricDefinition metricDefinition);
 }

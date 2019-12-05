@@ -13,9 +13,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.acutator;
-
-public interface CustomActuatorMetricService {
-
-    void increaseCount(final int status);
-}
