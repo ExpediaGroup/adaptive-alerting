@@ -45,8 +45,6 @@ public class DetectorController {
     @Autowired
     private DetectorRepository detectorRepo;
 
-    private Counter exceptionCounter = Metrics.counter("detector-exception-counter");
-
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public String createDetector(@Valid @RequestBody DetectorDocument document) {
@@ -69,7 +67,6 @@ public class DetectorController {
     public List<DetectorDocument> findByCreatedBy(@RequestParam String user) {
         List<DetectorDocument> detectors = detectorRepo.findByCreatedBy(user);
         if (detectors == null || detectors.isEmpty()) {
-            exceptionCounter.increment(1.0);
             throw new IllegalArgumentException("Invalid user: " + user);
         }
         return detectors;
@@ -96,7 +93,6 @@ public class DetectorController {
     public List<DetectorDocument> getLastUpdatedDetectors(@RequestParam long interval) {
         List<DetectorDocument> detectors = detectorRepo.getLastUpdatedDetectors(interval);
         if (detectors == null || detectors.isEmpty()) {
-            exceptionCounter.increment(1.0);
             throw new IllegalArgumentException("Not detectors updated during this interval: " + interval);
         }
         return detectors;

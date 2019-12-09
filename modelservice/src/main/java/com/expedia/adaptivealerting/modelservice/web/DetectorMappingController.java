@@ -44,8 +44,6 @@ public class DetectorMappingController {
     @Autowired
     private DetectorMappingRepository detectorMappingRepo;
 
-    private Counter exceptionCounter = Metrics.counter("mapping-exception-counter");
-
     @RequestMapping(produces = "application/json", method = RequestMethod.GET)
     public DetectorMapping getDetectorMapping(@RequestParam String id) {
         DetectorMapping detectorMapping = detectorMappingRepo.findDetectorMapping(id);
@@ -82,7 +80,6 @@ public class DetectorMappingController {
                 "user id and detector UUID can't both be null");
         List<DetectorMapping> detectorMappings = detectorMappingRepo.search(request);
         if (detectorMappings == null || detectorMappings.isEmpty()) {
-            exceptionCounter.increment(1.0);
             throw new IllegalArgumentException("Invalid request: " + request);
         }
         return detectorMappingRepo.search(request);
