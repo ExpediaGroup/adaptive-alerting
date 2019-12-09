@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 @RequiredArgsConstructor
-public class SeasonalNaivePointForecasterFactory implements PointForecasterFactory<SeasonalNaivePointForecaster> {
+public class    SeasonalNaivePointForecasterFactory implements PointForecasterFactory<SeasonalNaivePointForecaster> {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @NonNull
