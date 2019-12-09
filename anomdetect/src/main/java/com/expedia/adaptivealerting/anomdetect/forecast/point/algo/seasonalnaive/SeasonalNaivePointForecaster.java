@@ -20,7 +20,11 @@ import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecaster;
 import com.expedia.metrics.MetricData;
 import lombok.Generated;
 import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
+
+import java.util.UUID;
 
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
@@ -28,10 +32,15 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
  * Point forecaster based on the seasonal naive method described in
  * https://otexts.com/fpp2/simple-methods.html#simple-methods.
  */
+@RequiredArgsConstructor
 public class SeasonalNaivePointForecaster implements PointForecaster {
 
+    @NonNull
     @Getter
-    @Generated // https://reflectoring.io/100-percent-test-coverage/
+    private UUID uuid;
+
+    @NonNull
+    @Getter
     private SeasonalNaivePointForecasterParams params;
 
     // TODO Currently we use a very simple ring buffer, and ignore timestamps completely. So missing and duplicate
