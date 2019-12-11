@@ -69,5 +69,5 @@ spec:
         configMap:
           name: ${configmap1_name}
       - name: functions-volume
-        configMap:
-          name: ${configmap2_name}
+        hostPath:
+          path: ${metric_functions_input_file}
