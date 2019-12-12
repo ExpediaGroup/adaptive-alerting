@@ -5,7 +5,6 @@ locals {
   count = "${var.enabled?1:0}"
   checksum = "${sha1("${data.template_file.config_data.rendered}")}"
   configmap1_name = "aa-metric-functions-config-${local.checksum}"
-  configmap2_name = "functions.txt"
 
 }
 
@@ -36,7 +35,6 @@ locals {
     memory_request = "${var.memory_request}"
     node_selector_label = "${var.node_selector_label}"
     configmap1_name = "${local.configmap1_name}"
-    configmap2_name = "${local.configmap2_name}"
 
      # Environment
     jvm_memory_limit = "${var.jvm_memory_limit}"
@@ -44,6 +42,8 @@ locals {
     graphite_host = "${var.graphite_hostname}"
     graphite_port = "${var.graphite_port}"
     graphite_prefix = "${var.graphite_prefix}"
+    initContainer_image = "${var.initContainer_image}"
+    download_input_file_command = "${var.download_input_file_command}"
     env_vars = "${indent(9,"${var.env_vars}")}"
   }
 }
@@ -55,14 +55,6 @@ locals {
   }
   data {
     "aa-metric-functions.conf" = "${data.template_file.config_data.rendered}"
-  }
-  count = "${local.count}"
-}
-
- # Creating input file as config map via kubectl.
-resource "null_resource" "kubectl_create_configmap" {
-  provisioner "local-exec" {
-    command = "${var.kubectl_executable_name} create configmap ${local.configmap2_name} --namespace=${var.namespace} --from-file=${var.metric_functions_input_file}"
   }
   count = "${local.count}"
 }

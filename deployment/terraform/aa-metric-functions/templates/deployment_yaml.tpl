@@ -62,6 +62,16 @@ spec:
 #          initialDelaySeconds: 30
 #          periodSeconds: 5
 #          failureThreshold: 6
+      # Add initContainer to download input file to /config/functions.txt
+      initContainers:
+      - name: download-input-file
+        # example - image: busybox
+        image: "${initContainer_image}"
+        # example - command: ["sh", "-c", "curl", "<input-file-location>", "-o", "/config/functions.txt"]
+        command: "${download_input_file_command}"
+        volumeMounts:
+        - mountPath:  /config
+          name: functions-volume
       nodeSelector:
         ${node_selector_label}
       volumes:
@@ -69,5 +79,4 @@ spec:
         configMap:
           name: ${configmap1_name}
       - name: functions-volume
-        configMap:
-          name: ${configmap2_name}
+        emptyDir: {}
