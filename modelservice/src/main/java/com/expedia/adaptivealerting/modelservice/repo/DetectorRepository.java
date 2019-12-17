@@ -35,7 +35,7 @@ public interface DetectorRepository {
 
     void updateDetector(String uuid, DetectorDocument document);
 
-    DetectorDocument findByUuid(String uuid);
+    List<DetectorDocument> findByUuid(String uuid);
 
     List<DetectorDocument> findByCreatedBy(String user);
 

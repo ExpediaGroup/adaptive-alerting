@@ -51,9 +51,9 @@ public class DetectorController {
 
     @GetMapping(path = "/findByUuid", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public DetectorDocument findByUuid(@RequestParam String uuid) {
-        DetectorDocument detector = detectorRepo.findByUuid(uuid);
-        if (detector == null) {
+    public List<DetectorDocument> findByUuid(@RequestParam String uuid) {
+        List<DetectorDocument> detector = detectorRepo.findByUuid(uuid);
+        if (detector == null || detector.isEmpty()) {
             throw new RecordNotFoundException("Invalid UUID: " + uuid);
         }
         return detector;
@@ -62,11 +62,11 @@ public class DetectorController {
     @GetMapping(path = "/findByCreatedBy", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public List<DetectorDocument> findByCreatedBy(@RequestParam String user) {
-        List<DetectorDocument> detectors = detectorRepo.findByCreatedBy(user);
-        if (detectors == null || detectors.isEmpty()) {
+        List<DetectorDocument> detector = detectorRepo.findByCreatedBy(user);
+        if (detector == null || detector.isEmpty()) {
             throw new IllegalArgumentException("Invalid user: " + user);
         }
-        return detectors;
+        return detector;
     }
 
     @PostMapping(path = "/toggleDetector", consumes = "application/json", produces = "application/json")

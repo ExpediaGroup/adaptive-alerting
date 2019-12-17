@@ -261,12 +261,9 @@ public class DetectorRepositoryImplTest {
 
     @Test
     public void testFindByUuid() {
-        DetectorDocument actualDetector = repoUnderTest.findByUuid("uuid");
+        List<DetectorDocument> actualDetector = repoUnderTest.findByUuid("aeb4d849-847a-45c0-8312-dc0fcf22b639");
         assertNotNull(actualDetector);
-        Assert.assertEquals(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"), actualDetector.getUuid());
-        Assert.assertEquals("test-user", actualDetector.getCreatedBy());
-        Assert.assertEquals(true, actualDetector.isEnabled());
-        Assert.assertEquals(true, actualDetector.isTrusted());
+        assertCheck(actualDetector);
     }
 
     @Test(expected = RuntimeException.class)
