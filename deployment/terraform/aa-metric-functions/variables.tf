@@ -31,3 +31,5 @@ variable "kafka_endpoint" {}
 variable "metric_source_graphite_host" {}
 variable "aggregator_producer_topic" {}
 variable "metric_functions_input_file" {}
+variable "initContainer_image" {}
+variable "download_input_file_command" {}

@@ -15,7 +15,11 @@
  */
 package com.expedia.adaptivealerting.modelservice.exception;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.Generated;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,15 +32,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
+@Slf4j
 @ControllerAdvice
 @Generated
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
+    private Counter exceptionCounter;
+
+    @Autowired
+    public CustomExceptionHandler(MeterRegistry meterRegistry) {
+        this.exceptionCounter = meterRegistry.counter("exceptionCounter");
+    }
+
     @ExceptionHandler(Exception.class)
-    public final ResponseEntity<Object> handleAllExceptions(Exception ex, WebRequest request) {
+    public final ResponseEntity<Object> handleAllExceptions(Exception ex) {
         List<String> details = new ArrayList<>();
         details.add(ex.getLocalizedMessage());
         ErrorResponse error = new ErrorResponse("Server Error", details);
+        log.error("Unhandled exception encountered, responding with internal server error ", ex);
+        exceptionCounter.increment();
         return new ResponseEntity(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
