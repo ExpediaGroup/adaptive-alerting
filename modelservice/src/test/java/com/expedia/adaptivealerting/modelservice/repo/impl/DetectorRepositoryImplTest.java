@@ -36,6 +36,7 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchResponseSections;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -66,6 +67,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -267,6 +269,16 @@ public class DetectorRepositoryImplTest {
         Assert.assertEquals("test-user", actualDetector.getCreatedBy());
         Assert.assertEquals(true, actualDetector.isEnabled());
         Assert.assertEquals(true, actualDetector.isTrusted());
+    }
+
+    @Test
+    public void testFindByUuid_emptyResult() throws IOException {
+        SearchHits hits = new SearchHits(new SearchHit[]{}, 0, 0);
+        SearchResponseSections searchResponseSections = new SearchResponseSections(hits, null, null, false, null, null, 5);
+        SearchResponse emptySearchResponse = new SearchResponse(searchResponseSections, "", 0, 0, 0, 0, null, null);
+        Mockito.when(elasticSearchClient.search(any(SearchRequest.class), any(RequestOptions.class))).thenReturn(emptySearchResponse);
+        DetectorDocument actualDetector = repoUnderTest.findByUuid("missing-uuid");
+        assertNull(actualDetector);
     }
 
     @Test(expected = RuntimeException.class)
