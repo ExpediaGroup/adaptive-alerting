@@ -273,8 +273,8 @@ public class DetectorRepositoryImplTest {
 
     @Test
     public void testFindByUuid_emptyResult() throws IOException {
-        SearchHits hits = new SearchHits( new SearchHit[] { }, 0, 0 );
-        SearchResponseSections searchResponseSections = new SearchResponseSections( hits, null, null, false, null, null, 5 );
+        SearchHits hits = new SearchHits(new SearchHit[]{}, 0, 0);
+        SearchResponseSections searchResponseSections = new SearchResponseSections(hits, null, null, false, null, null, 5);
         SearchResponse emptySearchResponse = new SearchResponse(searchResponseSections, "", 0, 0, 0, 0, null, null);
         Mockito.when(elasticSearchClient.search(any(SearchRequest.class), any(RequestOptions.class))).thenReturn(emptySearchResponse);
         DetectorDocument actualDetector = repoUnderTest.findByUuid("missing-uuid");
