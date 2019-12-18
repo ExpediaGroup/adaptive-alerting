@@ -68,7 +68,6 @@ public class DetectorControllerTest {
     @Mock
     private List<DetectorDocument> detectors;
 
-
     private UUID someUuid;
     private DetectorDocument legalParamsDetector;
 
