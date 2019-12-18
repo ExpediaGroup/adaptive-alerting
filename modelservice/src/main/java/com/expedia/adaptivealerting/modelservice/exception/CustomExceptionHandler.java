@@ -49,7 +49,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         List<String> details = new ArrayList<>();
         details.add(ex.getLocalizedMessage());
         ErrorResponse error = new ErrorResponse("Server Error", details);
-        log.error(String.format("Unhandled exception encountered (class=%s) responding with internal server error ",
+        log.error(String.format("Unhandled exception encountered (class=%s). Responding with internal server error ",
                 ex.getClass().getName()), ex);
         exceptionCounter.increment();
         return new ResponseEntity(error, HttpStatus.INTERNAL_SERVER_ERROR);

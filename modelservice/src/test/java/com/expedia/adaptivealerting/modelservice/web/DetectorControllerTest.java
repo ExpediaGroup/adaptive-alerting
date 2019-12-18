@@ -63,7 +63,11 @@ public class DetectorControllerTest {
     private DetectorRepository detectorRepo;
 
     @Mock
-    private List<DetectorDocument> detector;
+    private DetectorDocument detector;
+
+    @Mock
+    private List<DetectorDocument> detectors;
+
 
     private UUID someUuid;
     private DetectorDocument legalParamsDetector;
@@ -104,7 +108,7 @@ public class DetectorControllerTest {
 
     @Test
     public void testFindByCreatedBy() {
-        when(detectorRepo.findByCreatedBy(anyString())).thenReturn(detector);
+        when(detectorRepo.findByCreatedBy(anyString())).thenReturn(detectors);
         val actualDetectors = controllerUnderTest.findByCreatedBy("kashah");
         assertNotNull(actualDetectors);
     }
@@ -165,6 +169,6 @@ public class DetectorControllerTest {
     private void initDependencies() {
         when(detectorRepo.createDetector(any(DetectorDocument.class))).thenReturn(someUuid);
         when(detectorRepo.findByUuid(someUuid.toString())).thenReturn(detector);
-        when(detectorRepo.getLastUpdatedDetectors(anyLong())).thenReturn(detector);
+        when(detectorRepo.getLastUpdatedDetectors(anyLong())).thenReturn(detectors);
     }
 }
