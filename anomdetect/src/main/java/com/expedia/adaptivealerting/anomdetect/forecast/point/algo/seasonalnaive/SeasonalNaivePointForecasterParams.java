@@ -41,5 +41,6 @@ public class SeasonalNaivePointForecasterParams implements AlgoParams {
     @Override
     public void validate() {
         isStrictlyPositive(cycleLength, "Required: cycleLength > 0");
+        isStrictlyPositive(intervalLength, "Required: intervalLength > 0");
     }
 }

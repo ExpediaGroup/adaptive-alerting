@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.anomdetect.util;
 import org.junit.Test;
 
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isBetween;
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isStrictlyPositive;
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isTrue;
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
@@ -42,6 +43,17 @@ public final class AssertUtilTest {
     @Test(expected = IllegalArgumentException.class)
     public void testNotNull_falseValue() {
         notNull(null, "The param must be null");
+    }
+
+    @Test
+    public void testIsStrictlyPositive_trueValue() {
+        isStrictlyPositive(3, "Blah blah blah");
+        isStrictlyPositive(3L, "Blah blah blah");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testIsStrictlyPositive_falseValue() {
+        isStrictlyPositive(-3, "Blah blah blah");
     }
 
     @Test

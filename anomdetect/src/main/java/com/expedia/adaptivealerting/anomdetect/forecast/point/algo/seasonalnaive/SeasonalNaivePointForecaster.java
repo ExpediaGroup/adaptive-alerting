@@ -35,7 +35,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 @RequiredArgsConstructor
 public class SeasonalNaivePointForecaster implements PointForecaster {
 
-    private static final long TIMESTAMP_DEFAULT_VALUE = -1L;
+    private static final long NOT_YET_INITIALIZED = -1L;
 
     /**
      * Detector UUID.
@@ -84,7 +84,7 @@ public class SeasonalNaivePointForecaster implements PointForecaster {
         val n = this.params.getCycleLength();
         this.buffer = new Double[n];
         this.currIndex = 0;
-        lastTimestamp = TIMESTAMP_DEFAULT_VALUE;
+        lastTimestamp = NOT_YET_INITIALIZED;
     }
 
     /**
@@ -108,39 +108,40 @@ public class SeasonalNaivePointForecaster implements PointForecaster {
      * @param metricData The new data point.
      */
     private void handleMissingDataPoints(MetricData metricData) {
-        if (isValidTimestamp()) {
-            // Find number of missing data points based on the last timestamp and
-            // the metrics interval.
-            int timeDifference = new Long(
-                    metricData.getTimestamp() - lastTimestamp).intValue();
-            int intervalLength = this.params.getIntervalLength();
-            val missingDataPointsCount = timeDifference / intervalLength - 1;
-
-            // Fill data points between last datapoint timestamp and current data point timestamp
-            // with null values.
-            IntStream.range(0, missingDataPointsCount).forEach( __ -> {
-                buffer[currIndex] = null;
-                currIndex = (currIndex + 1) % this.buffer.length;
-            });
+        if (isFirstDataPoint()) {
+            // This is the first metric value we've received, therefore there are no missing data points prior to this one.
+            return;
         }
+        // Find number of missing data points based on the last timestamp and
+        // the metrics interval.
+        int timeDifference = new Long(metricData.getTimestamp() - lastTimestamp).intValue();
+        int intervalLength = this.params.getIntervalLength();
+        val missingDataPointsCount = timeDifference / intervalLength - 1;
+
+        // Fill data points between last datapoint timestamp and current data point timestamp
+        // with null values.
+        IntStream.range(0, missingDataPointsCount).forEach( __ -> {
+            buffer[currIndex] = null;
+            currIndex = (currIndex + 1) % this.buffer.length;
+        });
     }
 
     /**
-     * Updateds buffer with the new data point for the next forecasting cycle.
+     * Is this the first time the forecaster has been used?
+     * 
+     * @return false if we have set lastTimestamp at least once before
+     */
+    private boolean isFirstDataPoint() {
+        return lastTimestamp == NOT_YET_INITIALIZED;
+    }
+
+    /**
+     * Updates buffer with the new data point for the next forecasting cycle.
      * @param metricData Data point to update buffer with.
      */
     private void updateBuffer(MetricData metricData) {
         this.buffer[currIndex] = metricData.getValue();
         this.currIndex = (this.currIndex + 1) % this.buffer.length;
         this.lastTimestamp = metricData.getTimestamp();
-    }
-
-    /**
-     * Checks if timestamp is populated from a real data point or just initialised to a default
-     * value in the initialisation phase.
-     * @return true if lastTimestam does not have TIMESTAMP_DEFAULT_VALUE, false oherwise.
-     */
-    private boolean isValidTimestamp() {
-        return lastTimestamp != TIMESTAMP_DEFAULT_VALUE;
     }
 }
