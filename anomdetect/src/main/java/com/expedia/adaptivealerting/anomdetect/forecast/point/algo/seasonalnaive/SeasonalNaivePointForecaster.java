@@ -18,13 +18,13 @@ package com.expedia.adaptivealerting.anomdetect.forecast.point.algo.seasonalnaiv
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecast;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecaster;
 import com.expedia.metrics.MetricData;
-import lombok.Generated;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
@@ -35,23 +35,39 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 @RequiredArgsConstructor
 public class SeasonalNaivePointForecaster implements PointForecaster {
 
+    private static final long TIMESTAMP_DEFAULT_VALUE = -1L;
+
+    /**
+     * Detector UUID.
+     */
     @NonNull
     @Getter
     private UUID uuid;
 
+    /**
+     * Configuration parameters for the {@link SeasonalNaivePointForecaster}.
+     */
     @NonNull
     @Getter
     private SeasonalNaivePointForecasterParams params;
 
-    // TODO Currently we use a very simple ring buffer, and ignore timestamps completely. So missing and duplicate
-    //  values mess things up, though this gets flushed out over time as long as the issue isn't systematic. At any
-    //  rate, we need to come up with a more robust approach that accounts for timestamps.
+    /**
+     * Buffer holding {@link SeasonalNaivePointForecasterParams#getCycleLength()} data points.
+     */
     private Double[] buffer;
+
+    /**
+     * Current index for the buffer.
+     */
     private int currIndex;
 
     /**
+     * Timestamp of the last data point.
+     */
+    private long lastTimestamp;
+
+    /**
      * Creates a new forecaster from the given configuration parameters.
-     *
      * @param params Configuration parameters.
      */
     public SeasonalNaivePointForecaster(SeasonalNaivePointForecasterParams params) {
@@ -61,18 +77,70 @@ public class SeasonalNaivePointForecaster implements PointForecaster {
         initState();
     }
 
-    @Override
-    public PointForecast forecast(MetricData metricData) {
-        notNull(metricData, "metricData can't be null");
-        val currForecastValue = buffer[currIndex];
-        buffer[currIndex] = metricData.getValue();
-        this.currIndex = (currIndex + 1) % buffer.length;
-        return currForecastValue == null ? null : new PointForecast(currForecastValue, false);
-    }
-
+    /**
+     * Sets up the initial state.
+     */
     private void initState() {
         val n = this.params.getCycleLength();
         this.buffer = new Double[n];
         this.currIndex = 0;
+        lastTimestamp = TIMESTAMP_DEFAULT_VALUE;
+    }
+
+    /**
+     * Forecasts the data point value for the given data point using seasonal naive algorithm.
+     * @param metricData The data point.
+     * @return Forecast for the given data point.
+     */
+    @Override
+    public PointForecast forecast(MetricData metricData) {
+        notNull(metricData, "metricData can't be null");
+
+        handleMissingDataPoints(metricData);
+        val currForecastValue = this.buffer[currIndex];
+        updateBuffer(metricData);
+
+        return currForecastValue == null ? null : new PointForecast(currForecastValue, false);
+    }
+
+    /**
+     * Moves currIndex for the number of missing data points and fills blanks with null values.
+     * @param metricData The new data point.
+     */
+    private void handleMissingDataPoints(MetricData metricData) {
+        if (isValidTimestamp()) {
+            // Find number of missing data points based on the last timestamp and
+            // the metrics interval.
+            int timeDifference = new Long(
+                    metricData.getTimestamp() - lastTimestamp).intValue();
+            int intervalLength = this.params.getIntervalLength();
+            val missingDataPointsCount = timeDifference / intervalLength - 1;
+
+            // Fill data points between last datapoint timestamp and current data point timestamp
+            // with null values.
+            IntStream.range(0, missingDataPointsCount).forEach( __ -> {
+                buffer[currIndex] = null;
+                currIndex = (currIndex + 1) % this.buffer.length;
+            });
+        }
+    }
+
+    /**
+     * Updateds buffer with the new data point for the next forecasting cycle.
+     * @param metricData Data point to update buffer with.
+     */
+    private void updateBuffer(MetricData metricData) {
+        this.buffer[currIndex] = metricData.getValue();
+        this.currIndex = (this.currIndex + 1) % this.buffer.length;
+        this.lastTimestamp = metricData.getTimestamp();
+    }
+
+    /**
+     * Checks if timestamp is populated from a real data point or just initialised to a default
+     * value in the initialisation phase.
+     * @return true if lastTimestam does not have TIMESTAMP_DEFAULT_VALUE, false oherwise.
+     */
+    private boolean isValidTimestamp() {
+        return lastTimestamp != TIMESTAMP_DEFAULT_VALUE;
     }
 }

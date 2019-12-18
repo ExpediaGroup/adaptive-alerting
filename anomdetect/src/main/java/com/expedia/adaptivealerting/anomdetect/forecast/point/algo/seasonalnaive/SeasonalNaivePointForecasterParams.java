@@ -33,6 +33,11 @@ public class SeasonalNaivePointForecasterParams implements AlgoParams {
      */
     private int cycleLength;
 
+    /**
+     * Number of seconds between two observations.
+     */
+    private int intervalLength;
+
     @Override
     public void validate() {
         isStrictlyPositive(cycleLength, "Required: cycleLength > 0");

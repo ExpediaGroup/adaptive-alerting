@@ -37,8 +37,8 @@ public class SeasonalNaivePointForecasterTest {
     }
 
     @Test
-    public void testForecast() {
-        val params = new SeasonalNaivePointForecasterParams().setCycleLength(3);
+    public void testForecast_allDatapointsPresent() {
+        val params = new SeasonalNaivePointForecasterParams().setCycleLength(5).setIntervalLength(10);
         val forecasterUnderTest = new SeasonalNaivePointForecaster(params);
 
         MetricData metricData;
@@ -47,37 +47,157 @@ public class SeasonalNaivePointForecasterTest {
         // First we have to initialize the forecaster.
         // Here we're just filling up the buffer forecast.
 
-        metricData = new MetricData(metricDef, 10.0, 0L);
+        metricData = new MetricData(metricDef, 10.0, 1563428100L);
         forecast = forecasterUnderTest.forecast(metricData);
         assertNull(forecast);
 
-        metricData = new MetricData(metricDef, 20.0, 1L);
+        metricData = new MetricData(metricDef, 20.0, 1563428110L);
         forecast = forecasterUnderTest.forecast(metricData);
         assertNull(forecast);
 
-        metricData = new MetricData(metricDef, 30.0, 2L);
+        metricData = new MetricData(metricDef, 30.0, 1563428120L);
+        forecast = forecasterUnderTest.forecast(metricData);
+        assertNull(forecast);
+
+        metricData = new MetricData(metricDef, 40.0, 1563428130L);
+        forecast = forecasterUnderTest.forecast(metricData);
+        assertNull(forecast);
+
+        metricData = new MetricData(metricDef, 50.0, 1563428140L);
+        forecast = forecasterUnderTest.forecast(metricData);
+        assertNull(forecast);
+
+        // Now the buffer is full, we can forecast.
+
+        metricData = new MetricData(metricDef, 60.0, 1563428150L);
+        forecast = forecasterUnderTest.forecast(metricData);
+        assertEquals(10.0, forecast.getValue(), TOLERANCE);
+
+        metricData = new MetricData(metricDef, 70.0, 1563428160L);
+        forecast = forecasterUnderTest.forecast(metricData);
+        assertEquals(20.0, forecast.getValue(), TOLERANCE);
+    }
+
+    @Test
+    public void testForecast_missingOneDatapoint() {
+        val params = new SeasonalNaivePointForecasterParams().setCycleLength(5).setIntervalLength(10);
+        val forecasterUnderTest = new SeasonalNaivePointForecaster(params);
+
+        MetricData metricData;
+        PointForecast forecast;
+
+        // First we have to initialize the forecaster.
+        // Here we're just filling up the buffer forecast.
+
+        metricData = new MetricData(metricDef, 10.0, 1563428100L);
+        forecast = forecasterUnderTest.forecast(metricData);
+        assertNull(forecast);
+        // we miss one observation here
+        metricData = new MetricData(metricDef, 20.0, 1563428120L);
+        forecast = forecasterUnderTest.forecast(metricData);
+        assertNull(forecast);
+
+        metricData = new MetricData(metricDef, 30.0, 1563428130L);
+        forecast = forecasterUnderTest.forecast(metricData);
+        assertNull(forecast);
+
+        metricData = new MetricData(metricDef, 40.0, 1563428140L);
         forecast = forecasterUnderTest.forecast(metricData);
         assertNull(forecast);
 
         // Now the buffer is full, so we can forecast.
 
-        metricData = new MetricData(metricDef, 40.0, 3L);
+        metricData = new MetricData(metricDef, 60.0, 1563428150L);
         forecast = forecasterUnderTest.forecast(metricData);
         assertEquals(10.0, forecast.getValue(), TOLERANCE);
 
-        metricData = new MetricData(metricDef, 50.0, 4L);
+        // next observation is a null value
+        metricData = new MetricData(metricDef, 90.0, 1563428260L);
+        forecast = forecasterUnderTest.forecast(metricData);
+        assertNull(forecast);
+    }
+
+    @Test
+    public void testForecast_missingTwoDatapoints() {
+        val params = new SeasonalNaivePointForecasterParams().setCycleLength(5).setIntervalLength(10);
+        val forecasterUnderTest = new SeasonalNaivePointForecaster(params);
+
+        MetricData metricData;
+        PointForecast forecast;
+
+        // First we have to initialize the forecaster.
+        // Here we're just filling up the buffer forecast.
+
+        metricData = new MetricData(metricDef, 10.0, 1563428100L);
+        forecast = forecasterUnderTest.forecast(metricData);
+        assertNull(forecast);
+
+        metricData = new MetricData(metricDef, 20.0, 1563428130L);
+        forecast = forecasterUnderTest.forecast(metricData);
+        assertNull(forecast);
+
+        metricData = new MetricData(metricDef, 30.0, 1563428140L);
+        forecast = forecasterUnderTest.forecast(metricData);
+        assertNull(forecast);
+
+
+        metricData = new MetricData(metricDef, 40.0, 1563428150L);
+        forecast = forecasterUnderTest.forecast(metricData);
+        assertEquals(10.0, forecast.getValue(), TOLERANCE);
+
+        metricData = new MetricData(metricDef, 50.0, 1563428160L);
+        forecast = forecasterUnderTest.forecast(metricData);
+        assertNull(forecast);
+    }
+
+
+    @Test
+    public void testForecast_missingTwoDatapointsWithWrap() {
+        val params = new SeasonalNaivePointForecasterParams().setCycleLength(5).setIntervalLength(10);
+        val forecasterUnderTest = new SeasonalNaivePointForecaster(params);
+
+        MetricData metricData;
+        PointForecast forecast;
+
+        // First we have to initialize the forecaster.
+        // Here we're just filling up the buffer forecast.
+
+        metricData = new MetricData(metricDef, 10.0, 1563428100L);
+        forecast = forecasterUnderTest.forecast(metricData);
+        assertNull(forecast);
+        // we miss one observation here
+        metricData = new MetricData(metricDef, 20.0, 1563428110L);
+        forecast = forecasterUnderTest.forecast(metricData);
+        assertNull(forecast);
+
+        metricData = new MetricData(metricDef, 30.0, 1563428120L);
+        forecast = forecasterUnderTest.forecast(metricData);
+        assertNull(forecast);
+
+        metricData = new MetricData(metricDef, 40.0, 1563428130L);
+        forecast = forecasterUnderTest.forecast(metricData);
+        assertNull(forecast);
+
+        // we will miss the last and then the first position in the buffer now
+
+        // and do the forecast
+
+        metricData = new MetricData(metricDef, 50.0, 1563428160L);
         forecast = forecasterUnderTest.forecast(metricData);
         assertEquals(20.0, forecast.getValue(), TOLERANCE);
 
-        metricData = new MetricData(metricDef, 60.0, 5L);
+        metricData = new MetricData(metricDef, 60.0, 1563428170L);
         forecast = forecasterUnderTest.forecast(metricData);
         assertEquals(30.0, forecast.getValue(), TOLERANCE);
 
-        // Second cycle through
-
-        metricData = new MetricData(metricDef, 70.0, 6L);
+        metricData = new MetricData(metricDef, 70.0, 1563428180L);
         forecast = forecasterUnderTest.forecast(metricData);
         assertEquals(40.0, forecast.getValue(), TOLERANCE);
+
+        // next observation is a null value
+        metricData = new MetricData(metricDef, 80.0, 1563428290L);
+        forecast = forecasterUnderTest.forecast(metricData);
+        assertNull(forecast);
     }
 
     @Test(expected = IllegalArgumentException.class)
