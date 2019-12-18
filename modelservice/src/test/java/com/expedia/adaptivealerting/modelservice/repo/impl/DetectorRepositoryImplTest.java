@@ -66,8 +66,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
