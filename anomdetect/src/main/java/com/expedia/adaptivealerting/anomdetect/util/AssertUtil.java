@@ -45,7 +45,7 @@ public class AssertUtil {
         isTrue(v1 == v2, message);
     }
 
-    public static void isStrictlyPositive(int value, String message) {
+    public static void isStrictlyPositive(long value, String message) {
         isTrue(value > 0, message);
     }
 

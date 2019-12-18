@@ -25,7 +25,6 @@ import lombok.val;
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 import static java.lang.String.format;
 
-// TODO Rename to HoltWintersPointForecaster [WLW]
 public class HoltWintersPointForecaster implements PointForecaster {
 
     @Getter
