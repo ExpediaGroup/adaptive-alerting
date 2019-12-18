@@ -134,7 +134,7 @@ public class DetectorControllerTest {
     public void testGetLastUpdatedDetectors() {
         val actualDetectors = controllerUnderTest.getLastUpdatedDetectors(5);
         assertNotNull(actualDetectors);
-        assertSame(detector, actualDetectors);
+        assertSame(detectors, actualDetectors);
     }
 
     @Test
