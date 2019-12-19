@@ -32,7 +32,6 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 @Slf4j
 public class SeasonalBuffer {
 
-    public static final double DEFAULT_MISSING_VALUE = Double.NEGATIVE_INFINITY;
     private static final long NOT_YET_INITIALIZED = -1L;
 
     /**
@@ -106,7 +105,7 @@ public class SeasonalBuffer {
     }
 
     public boolean isValueForCurrentIndexMissing() {
-        return getValueForCurrentIndex() == DEFAULT_MISSING_VALUE;
+        return getValueForCurrentIndex() == this.missingValuePlaceholder;
     }
 
     public double getValueForCurrentIndex() {
