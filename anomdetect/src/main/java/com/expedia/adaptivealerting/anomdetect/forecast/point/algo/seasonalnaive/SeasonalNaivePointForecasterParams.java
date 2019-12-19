@@ -28,6 +28,8 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isStrictly
 @Accessors(chain = true)
 public class SeasonalNaivePointForecasterParams implements AlgoParams {
 
+    public static final double DEFAULT_MISSING_VALUE_PLACEHOLDER = Double.NEGATIVE_INFINITY;
+
     /**
      * Number of observations per cycle.
      */
@@ -37,6 +39,11 @@ public class SeasonalNaivePointForecasterParams implements AlgoParams {
      * Number of seconds between two observations.
      */
     private int intervalLength;
+
+    /**
+     * Value to use to represent a missing datapoint.
+     */
+    private Double missingValuePlaceholder = DEFAULT_MISSING_VALUE_PLACEHOLDER;
 
     @Override
     public void validate() {
