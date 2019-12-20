@@ -41,6 +41,7 @@ public class HoltWintersOnlineComponents {
     private double level = 0;
     private double base = 0;
 
+    // TODO: Replace seasonal with SeasonalBuffer object. Potentially add summary statistics to SeasonalBuffer
     @NonNull
     private double[] seasonal;
 
