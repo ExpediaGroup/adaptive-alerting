@@ -19,6 +19,7 @@ import com.expedia.metrics.MetricData;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
@@ -47,12 +48,12 @@ public class SeasonalBuffer {
     /**
      * Value to use to represent a missing datapoint.
      */
-    private Double missingValuePlaceholder;
+    private double missingValuePlaceholder;
 
     /**
      * Buffer holding {@link SeasonalNaivePointForecasterParams#getCycleLength()} datapoints.
      */
-    private Double[] buffer;
+    private double[] buffer;
 
     /**
      * Current index for the buffer.
@@ -64,7 +65,7 @@ public class SeasonalBuffer {
      */
     private long lastTimestamp;
 
-    public SeasonalBuffer(int cycleLength, int interval, Double missingValuePlaceholder) {
+    public SeasonalBuffer(int cycleLength, int interval, double missingValuePlaceholder) {
         isStrictlyPositive(cycleLength, "Required: cycleLength > 0");
         isStrictlyPositive(interval, "Required: interval > 0");
         notNull(interval, "Required: missingValue");
@@ -74,9 +75,18 @@ public class SeasonalBuffer {
         initState();
     }
 
+    public double updateWhilePadding(MetricData metricData) {
+        notNull(metricData, "metricData can't be null");
+        checkValidTimestamp(metricData);
+        padMissingDataPoints(metricData);
+        double oldValue = getValueForCurrentIndex();
+        updateBuffer(metricData);
+        return oldValue;
+    }
+
     private void initState() {
         this.lastTimestamp = NOT_YET_INITIALIZED;
-        this.buffer = new Double[this.cycleLength];
+        this.buffer = new double[this.cycleLength];
         Arrays.fill(this.buffer, this.missingValuePlaceholder);
         this.currIndex = 0;
     }
@@ -86,9 +96,8 @@ public class SeasonalBuffer {
      *
      * @param metricData The new datapoint.
      */
-    public void padMissingDataPoints(MetricData metricData) {
+    private void padMissingDataPoints(MetricData metricData) {
         if (isFirstDataPoint()) return; // This is first metric value received. Assume it starts the cycle (i.e. no prior datapoints to pad)
-        if (!checkValidTimestamp(metricData)) return;
         int numSkippedDataPoints = countIntervalsSkippedSinceLastTimestamp(metricData);
         insertSkippedDataPoints(numSkippedDataPoints);
     }
@@ -98,17 +107,13 @@ public class SeasonalBuffer {
      *
      * @param metricData Datapoint to update buffer with.
      */
-    public void updateBuffer(MetricData metricData) {
+    private void updateBuffer(MetricData metricData) {
         this.buffer[currIndex] = metricData.getValue();
         this.currIndex = (this.currIndex + 1) % this.buffer.length;
         this.lastTimestamp = metricData.getTimestamp();
     }
 
-    public boolean isValueForCurrentIndexMissing() {
-        return getValueForCurrentIndex() == this.missingValuePlaceholder;
-    }
-
-    public double getValueForCurrentIndex() {
+    private double getValueForCurrentIndex() {
         return this.buffer[currIndex];
     }
 
@@ -130,12 +135,21 @@ public class SeasonalBuffer {
         return timeDifference / this.interval - 1;
     }
 
-    private boolean checkValidTimestamp(MetricData metricData) {
-        if (metricData.getTimestamp() < lastTimestamp) {
-            log.warn(String.format("%s arrived after a metric with future timestamp %d", metricData, lastTimestamp));
-            return false;
+    private void checkValidTimestamp(MetricData metricData) {
+        long timestamp = metricData.getTimestamp();
+        if (timestamp < lastTimestamp) {
+            String error = String.format("new Metric %s has a timestamp (%s) dated before the last data point we observed (which had timestamp %s)",
+                    metricData, dateStr(timestamp), dateStr(lastTimestamp));
+            throw new MetricDeliveryTimeException(error);
         }
-        return true;
+        if (timestamp == lastTimestamp) {
+            String error = String.format("new Metric %s has the same timestamp as the last data point observed (%s)", metricData, dateStr(timestamp));
+            throw new MetricDeliveryDuplicateException(error);
+        }
+    }
+
+    private String dateStr(long timestamp) {
+        return Instant.ofEpochSecond(timestamp).toString();
     }
 
     /**

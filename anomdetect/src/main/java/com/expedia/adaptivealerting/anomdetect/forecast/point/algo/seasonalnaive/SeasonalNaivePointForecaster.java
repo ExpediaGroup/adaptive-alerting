@@ -21,6 +21,7 @@ import com.expedia.metrics.MetricData;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 
 import java.util.UUID;
 
@@ -68,23 +69,18 @@ public class SeasonalNaivePointForecaster implements PointForecaster {
     /**
      * Forecasts the datapoint value for the given datapoint using seasonal naive algorithm.
      * @param metricData The datapoint.
-     * @return Forecast for the given datapoint.
+     * @return Forecast for the given datapoint. Returns params.getMissingValuePlaceholder() for missing values.
      */
     @Override
     public PointForecast forecast(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
-        this.buffer.padMissingDataPoints(metricData);
-        PointForecast pointForecast = getPreviousValueOrNull();
-        updateBuffer(metricData);
-        return pointForecast;
+        val oldValue = this.buffer.updateWhilePadding(metricData);
+        return getPreviousValueOrNull(oldValue);
     }
 
-    private PointForecast getPreviousValueOrNull() {
-        if (this.buffer.isValueForCurrentIndexMissing()) return null;
-        return new PointForecast(this.buffer.getValueForCurrentIndex(), false);
+    private PointForecast getPreviousValueOrNull(double oldValue) {
+        if (this.params.getMissingValuePlaceholder().equals(oldValue)) return null;
+        return new PointForecast(oldValue, false);
     }
 
-    private void updateBuffer(MetricData metricData) {
-        this.buffer.updateBuffer(metricData);
-    }
 }
