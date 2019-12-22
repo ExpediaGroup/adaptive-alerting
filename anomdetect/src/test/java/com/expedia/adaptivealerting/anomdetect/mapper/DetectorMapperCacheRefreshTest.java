@@ -23,14 +23,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
+import static com.expedia.adaptivealerting.anomdetect.util.TestFileHelper.getResourceAsFile;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -78,7 +77,7 @@ public class DetectorMapperCacheRefreshTest {
         ObjectMapper mapper = new ObjectMapper();
 
         List<DetectorMapping> newDetectorMappings = mapper.readValue(
-                new File(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("testDetectorMapping.json")).getFile()),
+                getResourceAsFile("testDetectorMapping.json"),
                 new TypeReference<List<DetectorMapping>>() {
                 });
 

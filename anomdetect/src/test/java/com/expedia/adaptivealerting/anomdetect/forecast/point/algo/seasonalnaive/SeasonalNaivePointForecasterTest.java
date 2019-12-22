@@ -24,10 +24,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-// TODO: Also test what happens when timestamps do not align perfectly with interval
-// TODO: Make these tests more data-driven for readability
 public class SeasonalNaivePointForecasterTest {
-    private static final double TOLERANCE = 0.001;
     private static final int CYCLE_LENGTH = 5;
     private static final int INTERVAL_LENGTH = 10;
     private static final long FIRST_CYCLE_FIRST_SLOT = 1563428100L;
@@ -40,6 +37,7 @@ public class SeasonalNaivePointForecasterTest {
     private static final long SECOND_CYCLE_THIRD_SLOT = FIRST_CYCLE_FIRST_SLOT + (INTERVAL_LENGTH * 7);
     private static final long SECOND_CYCLE_FOURTH_SLOT = FIRST_CYCLE_FIRST_SLOT + (INTERVAL_LENGTH * 8);
     private static final long SECOND_CYCLE_FIFTH_SLOT = FIRST_CYCLE_FIRST_SLOT + (INTERVAL_LENGTH * 9);
+    private static final long THIRD_CYCLE_FIRST_SLOT = FIRST_CYCLE_FIRST_SLOT + (INTERVAL_LENGTH * 10);
     private static final double FIRST_CYCLE_FIRST_SLOT_VALUE = 10.0;
     private static final double FIRST_CYCLE_SECOND_SLOT_VALUE = 20.0;
     private static final double FIRST_CYCLE_THIRD_SLOT_VALUE = 30.0;
@@ -50,186 +48,53 @@ public class SeasonalNaivePointForecasterTest {
     private static final double SECOND_CYCLE_THIRD_SLOT_VALUE = 80.0;
     private static final double SECOND_CYCLE_FOURTH_SLOT_VALUE = 90.0;
     private static final double SECOND_CYCLE_FIFTH_SLOT_VALUE = 100.0;
+    private static final double THIRD_CYCLE_THIRD_SLOT_VALUE = 110.0;
+    private static final double VALID_PLACEHOLDER = Double.POSITIVE_INFINITY;
+    private static final SeasonalNaivePointForecasterParams PARAMS =
+            new SeasonalNaivePointForecasterParams().setCycleLength(CYCLE_LENGTH).setIntervalLength(INTERVAL_LENGTH);
+    private static final MetricDefinition METRIC_DEF = new MetricDefinition("some-key");
 
-    private MetricDefinition metricDef = new MetricDefinition("some-key");
+    private SeasonalNaivePointForecaster subject = new SeasonalNaivePointForecaster(PARAMS);
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructor_notNull() {
         new SeasonalNaivePointForecaster(null);
     }
 
-    @Test
-    public void testForecast_allDatapointsPresent() {
-        val params = new SeasonalNaivePointForecasterParams().setCycleLength(CYCLE_LENGTH).setIntervalLength(INTERVAL_LENGTH);
-        val forecasterUnderTest = new SeasonalNaivePointForecaster(params);
-
-        MetricData metricData;
-        PointForecast forecast;
-
-        // First we have to initialize the forecaster.
-        // Here we're just filling up the buffer forecast.
-
-        metricData = new MetricData(metricDef, FIRST_CYCLE_FIRST_SLOT_VALUE, FIRST_CYCLE_FIRST_SLOT);
-        forecast = forecasterUnderTest.forecast(metricData);
-        assertNull(forecast);
-
-        metricData = new MetricData(metricDef, FIRST_CYCLE_SECOND_SLOT_VALUE, FIRST_CYCLE_SECOND_SLOT);
-        forecast = forecasterUnderTest.forecast(metricData);
-        assertNull(forecast);
-
-        metricData = new MetricData(metricDef, FIRST_CYCLE_THIRD_SLOT_VALUE, FIRST_CYCLE_THIRD_SLOT);
-        forecast = forecasterUnderTest.forecast(metricData);
-        assertNull(forecast);
-
-        metricData = new MetricData(metricDef, FIRST_CYCLE_FOURTH_SLOT_VALUE, FIRST_CYCLE_FOURTH_SLOT);
-        forecast = forecasterUnderTest.forecast(metricData);
-        assertNull(forecast);
-
-        metricData = new MetricData(metricDef, FIRST_CYCLE_FIFTH_SLOT_VALUE, FIRST_CYCLE_FIFTH_SLOT);
-        forecast = forecasterUnderTest.forecast(metricData);
-        assertNull(forecast);
-
-        // Now the buffer is full, we can forecast.
-
-        metricData = new MetricData(metricDef, SECOND_CYCLE_FIRST_SLOT_VALUE, SECOND_CYCLE_FIRST_SLOT);
-        forecast = forecasterUnderTest.forecast(metricData);
-        assertEquals(FIRST_CYCLE_FIRST_SLOT_VALUE, forecast.getValue(), TOLERANCE);
-
-        metricData = new MetricData(metricDef, SECOND_CYCLE_SECOND_SLOT_VALUE, SECOND_CYCLE_SECOND_SLOT);
-        forecast = forecasterUnderTest.forecast(metricData);
-        assertEquals(FIRST_CYCLE_SECOND_SLOT_VALUE, forecast.getValue(), TOLERANCE);
-    }
-
-    @Test
-    public void testForecast_missingOneDatapoint() {
-        val params = new SeasonalNaivePointForecasterParams().setCycleLength(5).setIntervalLength(10);
-        val forecasterUnderTest = new SeasonalNaivePointForecaster(params);
-
-        MetricData metricData;
-        PointForecast forecast;
-
-        // Fill buffer with first cycle but with second slot missing
-
-        metricData = new MetricData(metricDef, FIRST_CYCLE_FIRST_SLOT_VALUE, FIRST_CYCLE_FIRST_SLOT);
-        forecasterUnderTest.forecast(metricData);
-
-        // [Skip one datapoint here]
-
-        metricData = new MetricData(metricDef, FIRST_CYCLE_SECOND_SLOT_VALUE, FIRST_CYCLE_THIRD_SLOT);
-        forecasterUnderTest.forecast(metricData);
-
-        metricData = new MetricData(metricDef, FIRST_CYCLE_THIRD_SLOT_VALUE, FIRST_CYCLE_FOURTH_SLOT);
-        forecasterUnderTest.forecast(metricData);
-
-        metricData = new MetricData(metricDef, FIRST_CYCLE_FOURTH_SLOT_VALUE, FIRST_CYCLE_FIFTH_SLOT);
-        forecasterUnderTest.forecast(metricData);
-
-        // Now the buffer is full, forecasts should match the data point values for same slot in previous cycle
-
-        metricData = new MetricData(metricDef, SECOND_CYCLE_FIRST_SLOT_VALUE, SECOND_CYCLE_FIRST_SLOT);
-        forecast = forecasterUnderTest.forecast(metricData);
-        assertEquals(FIRST_CYCLE_FIRST_SLOT_VALUE, forecast.getValue(), TOLERANCE);
-
-        // Next observation should be null (as 2nd slot of first cycle was missing)
-        metricData = new MetricData(metricDef, SECOND_CYCLE_SECOND_SLOT_VALUE, SECOND_CYCLE_SECOND_SLOT);
-        forecast = forecasterUnderTest.forecast(metricData);
-        assertNull(forecast);
-    }
-
-    @Test
-    public void testForecast_missingTwoDatapoints() {
-        val params = new SeasonalNaivePointForecasterParams().setCycleLength(5).setIntervalLength(10);
-        val forecasterUnderTest = new SeasonalNaivePointForecaster(params);
-
-        MetricData metricData;
-        PointForecast forecast;
-
-        // Fill buffer with first cycle but with second and third slots missing
-
-        metricData = new MetricData(metricDef, FIRST_CYCLE_FIRST_SLOT_VALUE, FIRST_CYCLE_FIRST_SLOT);
-        forecasterUnderTest.forecast(metricData);
-
-        // [Skip two datapoint here]
-
-        metricData = new MetricData(metricDef, FIRST_CYCLE_FOURTH_SLOT_VALUE, FIRST_CYCLE_FOURTH_SLOT);
-        forecasterUnderTest.forecast(metricData);
-
-        metricData = new MetricData(metricDef, FIRST_CYCLE_FIFTH_SLOT_VALUE, FIRST_CYCLE_FIFTH_SLOT);
-        forecasterUnderTest.forecast(metricData);
-
-        // Now the buffer is full, forecasts should match the data point values for same slot in previous cycle (with nulls for missing):
-
-        metricData = new MetricData(metricDef, SECOND_CYCLE_FIRST_SLOT_VALUE, SECOND_CYCLE_FIRST_SLOT);
-        forecast = forecasterUnderTest.forecast(metricData);
-        assertEquals(FIRST_CYCLE_FIRST_SLOT_VALUE, forecast.getValue(), TOLERANCE);
-
-        metricData = new MetricData(metricDef, SECOND_CYCLE_SECOND_SLOT_VALUE, SECOND_CYCLE_SECOND_SLOT);
-        forecast = forecasterUnderTest.forecast(metricData);
-        assertNull(forecast);
-
-        metricData = new MetricData(metricDef, SECOND_CYCLE_THIRD_SLOT_VALUE, SECOND_CYCLE_THIRD_SLOT);
-        forecast = forecasterUnderTest.forecast(metricData);
-        assertNull(forecast);
-
-        metricData = new MetricData(metricDef, SECOND_CYCLE_FOURTH_SLOT_VALUE, SECOND_CYCLE_FOURTH_SLOT);
-        forecast = forecasterUnderTest.forecast(metricData);
-        assertEquals(FIRST_CYCLE_FOURTH_SLOT_VALUE, forecast.getValue(), TOLERANCE);
-
-        metricData = new MetricData(metricDef, SECOND_CYCLE_FIFTH_SLOT_VALUE, SECOND_CYCLE_FIFTH_SLOT);
-        forecast = forecasterUnderTest.forecast(metricData);
-        assertEquals(FIRST_CYCLE_FIFTH_SLOT_VALUE, forecast.getValue(), TOLERANCE);
+    @Test(expected = IllegalArgumentException.class)
+    public void testForecast_nullMetricData() {
+        subject.forecast(null);
     }
 
     @Test
     public void testForecast_missingTwoDatapointsWithWrap() {
-        val params = new SeasonalNaivePointForecasterParams().setCycleLength(5).setIntervalLength(10);
-        val forecasterUnderTest = new SeasonalNaivePointForecaster(params);
-
-        MetricData metricData;
-        PointForecast forecast;
-
-        // Fill buffer with last slot of first cycle missing and first slot of last cycle missing
-
-        metricData = new MetricData(metricDef, FIRST_CYCLE_FIRST_SLOT_VALUE, FIRST_CYCLE_FIRST_SLOT);
-        forecast = forecasterUnderTest.forecast(metricData);
-        assertNull(forecast);
-        // we miss one observation here
-        metricData = new MetricData(metricDef, FIRST_CYCLE_SECOND_SLOT_VALUE, FIRST_CYCLE_SECOND_SLOT);
-        forecast = forecasterUnderTest.forecast(metricData);
-        assertNull(forecast);
-
-        metricData = new MetricData(metricDef, FIRST_CYCLE_THIRD_SLOT_VALUE, FIRST_CYCLE_THIRD_SLOT);
-        forecast = forecasterUnderTest.forecast(metricData);
-        assertNull(forecast);
-
-        metricData = new MetricData(metricDef, FIRST_CYCLE_FOURTH_SLOT_VALUE, FIRST_CYCLE_FOURTH_SLOT);
-        forecast = forecasterUnderTest.forecast(metricData);
-        assertNull(forecast);
+        // Fill buffer with last slot of first cycle missing and first slot of second cycle missing
+        forecastAndExpectNull(subject, FIRST_CYCLE_FIRST_SLOT, FIRST_CYCLE_FIRST_SLOT_VALUE);
+        forecastAndExpectNull(subject, FIRST_CYCLE_SECOND_SLOT, FIRST_CYCLE_SECOND_SLOT_VALUE);
+        forecastAndExpectNull(subject, FIRST_CYCLE_THIRD_SLOT, FIRST_CYCLE_THIRD_SLOT_VALUE);
+        forecastAndExpectNull(subject, FIRST_CYCLE_FOURTH_SLOT, FIRST_CYCLE_FOURTH_SLOT_VALUE);
 
         // [Skip both the last and first slot in the buffer]
 
-        // Now do the forecast:
+        forecastAndCompare(subject, SECOND_CYCLE_SECOND_SLOT, SECOND_CYCLE_SECOND_SLOT_VALUE, FIRST_CYCLE_SECOND_SLOT_VALUE);
+        forecastAndCompare(subject, SECOND_CYCLE_THIRD_SLOT, SECOND_CYCLE_THIRD_SLOT_VALUE, FIRST_CYCLE_THIRD_SLOT_VALUE);
+        forecastAndCompare(subject, SECOND_CYCLE_FOURTH_SLOT, SECOND_CYCLE_FOURTH_SLOT_VALUE, FIRST_CYCLE_FOURTH_SLOT_VALUE);
+        // Last slot of second cycle should be a placeholder as last slot of first cycle was skipped
+        forecastAndExpectNull(subject, SECOND_CYCLE_FIFTH_SLOT, SECOND_CYCLE_FIFTH_SLOT_VALUE);
 
-        metricData = new MetricData(metricDef, SECOND_CYCLE_SECOND_SLOT_VALUE, SECOND_CYCLE_SECOND_SLOT);
-        forecast = forecasterUnderTest.forecast(metricData);
-        assertEquals(FIRST_CYCLE_SECOND_SLOT_VALUE, forecast.getValue(), TOLERANCE);
-
-        metricData = new MetricData(metricDef, SECOND_CYCLE_THIRD_SLOT_VALUE, SECOND_CYCLE_THIRD_SLOT);
-        forecast = forecasterUnderTest.forecast(metricData);
-        assertEquals(FIRST_CYCLE_THIRD_SLOT_VALUE, forecast.getValue(), TOLERANCE);
-
-        metricData = new MetricData(metricDef, SECOND_CYCLE_FOURTH_SLOT_VALUE, SECOND_CYCLE_FOURTH_SLOT);
-        forecast = forecasterUnderTest.forecast(metricData);
-        assertEquals(FIRST_CYCLE_FOURTH_SLOT_VALUE, forecast.getValue(), TOLERANCE);
-
-        // next observation is a null value
-        metricData = new MetricData(metricDef, SECOND_CYCLE_FIRST_SLOT_VALUE, SECOND_CYCLE_FIFTH_SLOT);
-        forecast = forecasterUnderTest.forecast(metricData);
-        assertNull(forecast);
+        // First slot of third cycle should be a placeholder as first slot of second cycle was skipped
+        forecastAndExpectNull(subject, THIRD_CYCLE_FIRST_SLOT, THIRD_CYCLE_THIRD_SLOT_VALUE);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testForecast_nullMetricData() {
-        new SeasonalNaivePointForecaster(new SeasonalNaivePointForecasterParams()).forecast(null);
+    private void forecastAndExpectNull(SeasonalNaivePointForecaster subject, long timestamp, double newValue) {
+        MetricData metricData = new MetricData(METRIC_DEF, newValue, timestamp);
+        assertNull(subject.forecast(metricData));
     }
+
+    private void forecastAndCompare(SeasonalNaivePointForecaster subject, long timestamp, double newValue, double expectedForecastValue) {
+        MetricData metricData = new MetricData(METRIC_DEF, newValue, timestamp);
+        val actualForecast = subject.forecast(metricData);
+        assertEquals(new PointForecast(expectedForecastValue, false), actualForecast);
+    }
+
 }
