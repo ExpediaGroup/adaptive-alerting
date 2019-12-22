@@ -21,9 +21,9 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.Test;
 
-import java.io.File;
 import java.util.HashMap;
 
+import static com.expedia.adaptivealerting.anomdetect.util.TestFileHelper.getResourceAsFile;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -39,10 +39,8 @@ public class MetricFrameLoaderTest {
 
     @Test
     public void testLoadCsv_files() throws Exception {
-        val defFilename = ClassLoader.getSystemResource(DEF_FILENAME).getFile();
-        val dataFilename = ClassLoader.getSystemResource(DATA_FILENAME).getFile();
-        val defFile = new File(defFilename);
-        val dataFile = new File(dataFilename);
+        val defFile = getResourceAsFile(DEF_FILENAME);
+        val dataFile = getResourceAsFile(DATA_FILENAME);
         log.info("defFile={}, dataFile={}", defFile, dataFile);
         val frame = MetricFrameLoader.loadCsv(defFile, dataFile, true);
         assertEquals(5040, frame.getNumRows());

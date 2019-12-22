@@ -31,7 +31,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,9 +38,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
+import static com.expedia.adaptivealerting.anomdetect.util.TestFileHelper.getResourceAsFile;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -161,13 +160,13 @@ public final class DetectorMapperTest {
     private void initTagsFromFile() throws IOException {
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         this.listOfMetricTags = mapper.readValue(
-                new File(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("dummyListOfMetricTags.json")).getFile()),
+                getResourceAsFile("dummyListOfMetricTags.json"),
                 new TypeReference<List<Map<String, String>>>() {
                 });
 
 
         DetectorMatchResponse detectorMatchResponse = mapper.readValue(
-                new File(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("groupedDetectors.json")).getFile()),
+                getResourceAsFile("groupedDetectors.json"),
                 DetectorMatchResponse.class);
 
         when(detectorSource.findDetectorMappings(listOfMetricTags)).thenReturn(detectorMatchResponse);
