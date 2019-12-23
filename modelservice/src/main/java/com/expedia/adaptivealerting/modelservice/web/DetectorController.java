@@ -19,6 +19,7 @@ import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
 import lombok.val;
+import org.elasticsearch.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.Assert;
@@ -54,7 +55,7 @@ public class DetectorController {
     public DetectorDocument findByUuid(@RequestParam String uuid) {
         DetectorDocument detector = detectorRepo.findByUuid(uuid);
         if (detector == null) {
-            throw new RecordNotFoundException("Invalid UUID: " + uuid);
+            throw new ResourceNotFoundException("Invalid UUID: " + uuid);
         }
         return detector;
     }

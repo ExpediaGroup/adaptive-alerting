@@ -21,6 +21,7 @@ import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.elasticsearch.ResourceNotFoundException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -94,7 +95,7 @@ public class DetectorControllerTest {
         assertNotNull(actualDetector);
     }
 
-    @Test(expected = RecordNotFoundException.class)
+    @Test(expected = ResourceNotFoundException.class)
     public void testFindByUuid_record_not_found_null_response() {
         when(detectorRepo.findByUuid(anyString())).thenReturn(null);
         controllerUnderTest.findByUuid(someUuid.toString());
