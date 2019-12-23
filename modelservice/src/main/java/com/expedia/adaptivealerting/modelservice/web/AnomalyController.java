@@ -37,6 +37,7 @@ public class AnomalyController {
     public List<OutlierDetectorResult> getAnomalies(@RequestBody AnomalyRequest request) {
         List<OutlierDetectorResult> detectorResults = anomalyRepository.getAnomalies(request);
         if (detectorResults == null || detectorResults.isEmpty()) {
+            // TODO: This should be RecordNotFoundException
             throw new IllegalArgumentException("Invalid request: " + request);
         }
         return detectorResults;

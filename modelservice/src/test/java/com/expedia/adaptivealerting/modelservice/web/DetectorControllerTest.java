@@ -101,11 +101,6 @@ public class DetectorControllerTest {
     }
 
     @Test
-    public void testFindByUuid_fail() throws Exception {
-        mockMvc.perform(get("/findByUuid").contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)).andExpect(status().is4xxClientError());
-    }
-
-    @Test
     public void testFindByCreatedBy() {
         when(detectorRepo.findByCreatedBy(anyString())).thenReturn(detectors);
         val actualDetectors = controllerUnderTest.findByCreatedBy("kashah");
@@ -125,7 +120,8 @@ public class DetectorControllerTest {
     }
 
     @Test
-    public void testFindByCreatedBy_fail() throws Exception {
+    public void testUrlsWithoutFullPath_fail() throws Exception {
+        mockMvc.perform(get("/findByUuid").contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)).andExpect(status().is4xxClientError());
         mockMvc.perform(get("/findByCreatedBy").contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)).andExpect(status().is4xxClientError());
     }
 

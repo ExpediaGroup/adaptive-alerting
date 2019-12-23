@@ -64,6 +64,7 @@ public class DetectorController {
     public List<DetectorDocument> findByCreatedBy(@RequestParam String user) {
         List<DetectorDocument> detectors = detectorRepo.findByCreatedBy(user);
         if (detectors == null || detectors.isEmpty()) {
+            // TODO: This should be RecordNotFoundException
             throw new IllegalArgumentException("Invalid user: " + user);
         }
         return detectors;
