@@ -57,6 +57,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = {RecordNotFoundException.class})
     public ResponseEntity<Object> handleRecordNotFound(final RuntimeException ex, final WebRequest request) {
+        log.error(String.format("RecordNotFoundException occurred for %s", request), ex);
         return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
 
