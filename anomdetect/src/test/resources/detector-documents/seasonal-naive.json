@@ -1,0 +1,22 @@
+{
+  "uuid": "6ec81aa2-2cdc-415e-b4f3-abc123cba321",
+  "type": "seasonalnaive-detector",
+  "enabled": true,
+  "trusted": true,
+  "meta": {
+    "dateCreated": "2019-10-16T17:08:40Z",
+    "dateUpdated": "2019-10-16T17:08:40Z",
+    "createdBy": "mcallanan",
+    "updatedBy": "mcallanan"
+  },
+  "detectorConfig": {
+    "type": "RIGHT_TAILED",
+    "hyperparams": {},
+    "params": {
+      "cycleLength": 10080,
+      "intervalLength": 60,
+      "weakSigmas": 3,
+      "strongSigmas": 4
+    }
+  }
+}

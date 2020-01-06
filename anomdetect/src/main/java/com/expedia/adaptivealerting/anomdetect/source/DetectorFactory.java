@@ -16,13 +16,14 @@
 package com.expedia.adaptivealerting.anomdetect.source;
 
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
+import com.expedia.adaptivealerting.anomdetect.detect.breakout.algo.edmx.EdmxDetectorFactoryProvider;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.constant.ConstantThresholdDetectorFactoryProvider;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.cusum.CusumDetectorFactoryProvider;
-import com.expedia.adaptivealerting.anomdetect.detect.breakout.algo.edmx.EdmxDetectorFactoryProvider;
-import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.individuals.IndividualsDetectorFactoryProvider;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.forecasting.LegacyEwmaDetectorFactoryProvider;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.forecasting.LegacyHoltWintersDetectorFactoryProvider;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.forecasting.LegacyPewmaDetectorFactoryProvider;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.forecasting.LegacySeasonalNaiveDetectorFactoryProvider;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.individuals.IndividualsDetectorFactoryProvider;
 import lombok.val;
 
 import java.util.HashMap;
@@ -46,6 +47,7 @@ public class DetectorFactory {
         providers.put("ewma-detector", new LegacyEwmaDetectorFactoryProvider());
         providers.put("holtwinters-detector", new LegacyHoltWintersDetectorFactoryProvider());
         providers.put("pewma-detector", new LegacyPewmaDetectorFactoryProvider());
+        providers.put("seasonalnaive-detector", new LegacySeasonalNaiveDetectorFactoryProvider());
     }
 
     public Detector buildDetector(DetectorDocument document) {
