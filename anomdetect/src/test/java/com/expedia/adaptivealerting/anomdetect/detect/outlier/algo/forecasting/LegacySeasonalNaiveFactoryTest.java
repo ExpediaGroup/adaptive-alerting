@@ -17,7 +17,7 @@ package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.forecasting;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AbstractDetectorFactoryTest;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
-import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.expwelford.ExponentialWelfordIntervalForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.multiplicative.MultiplicativeIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.seasonalnaive.SeasonalNaivePointForecaster;
 import lombok.val;
 import org.junit.Test;
@@ -38,8 +38,8 @@ public class LegacySeasonalNaiveFactoryTest extends AbstractDetectorFactoryTest 
         val detector = factoryUnderTest.buildDetector(document);
         val seasonalNaive = (SeasonalNaivePointForecaster) detector.getPointForecaster();
         val seasonalNaiveParams = seasonalNaive.getParams();
-        val welford = (ExponentialWelfordIntervalForecaster) detector.getIntervalForecaster();
-        val welfordParams = welford.getParams();
+        val multiplicative = (MultiplicativeIntervalForecaster) detector.getIntervalForecaster();
+        val multiplicativeParams = multiplicative.getParams();
 
         assertEquals(ForecastingDetector.class, detector.getClass());
         assertEquals("6ec81aa2-2cdc-415e-b4f3-abc123cba321", detector.getUuid().toString());
@@ -47,7 +47,7 @@ public class LegacySeasonalNaiveFactoryTest extends AbstractDetectorFactoryTest 
         assertEquals(ONE_WEEK_IN_SECONDS, seasonalNaiveParams.getCycleLength(), TOLERANCE);
         assertEquals(ONE_MINUTE_IN_SECONDS, seasonalNaiveParams.getIntervalLength(), TOLERANCE);
         assertEquals(DEFAULT_MISSING_VALUE_PLACEHOLDER, seasonalNaiveParams.getMissingValuePlaceholder(), TOLERANCE);
-        assertEquals(3, welfordParams.getWeakSigmas(), TOLERANCE);
-        assertEquals(4, welfordParams.getStrongSigmas(), TOLERANCE);
+        assertEquals(3, multiplicativeParams.getWeakMultiplier(), TOLERANCE);
+        assertEquals(4, multiplicativeParams.getStrongMultiplier(), TOLERANCE);
     }
 }

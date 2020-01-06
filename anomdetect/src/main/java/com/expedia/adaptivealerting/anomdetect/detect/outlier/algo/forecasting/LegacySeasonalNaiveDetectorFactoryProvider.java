@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.forecasting;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
-import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.expwelford.ExponentialWelfordIntervalForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.multiplicative.MultiplicativeIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.seasonalnaive.SeasonalNaivePointForecaster;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorFactoryProvider;
@@ -36,13 +36,13 @@ public class LegacySeasonalNaiveDetectorFactoryProvider implements DetectorFacto
         val paramsMap = config.get("params");
         val legacyParams = objectMapper.convertValue(paramsMap, LegacySeasonalNaiveDetectorParams.class);
         val seasonalNaiveParams = legacyParams.toSeasonalNaiveParams();
-        val welfordParams = legacyParams.toWelfordParams();
+        val multiplicativeParams = legacyParams.toMultiplicativeParams();
 
         val seasonalNaive = new SeasonalNaivePointForecaster(seasonalNaiveParams);
-        val welford = new ExponentialWelfordIntervalForecaster(welfordParams);
+        val multiplicativeIntervalForecaster = new MultiplicativeIntervalForecaster(multiplicativeParams);
 
         val trusted = document.isTrusted();
 
-        return new ForecastingDetector(uuid, seasonalNaive, welford, type, trusted, "seasonalnaive");
+        return new ForecastingDetector(uuid, seasonalNaive, multiplicativeIntervalForecaster, type, trusted, "seasonalnaive");
     }
 }

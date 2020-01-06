@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.forecasting;
 
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.expwelford.ExponentialWelfordIntervalForecasterParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.multiplicative.MultiplicativeIntervalForecasterParams;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.seasonalnaive.SeasonalNaivePointForecasterParams;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Setter;
@@ -35,16 +36,16 @@ public class LegacySeasonalNaiveDetectorParams {
     @Setter
     private double missingValuePlaceholder;
 
-    // Welford params
+    // Multiplicative params
     @Setter
-    private double weakSigmas;
+    private double weakMultiplier;
     @Setter
-    private double strongSigmas;
+    private double strongMultiplier;
 
     public LegacySeasonalNaiveDetectorParams() {
         // These keep the default values DRY.
         initWithSeasonalNaiveDefaults();
-        initWithWelfordDefaults();
+        initWithMultiplicativeDefaults();
     }
 
     public SeasonalNaivePointForecasterParams toSeasonalNaiveParams() {
@@ -54,10 +55,10 @@ public class LegacySeasonalNaiveDetectorParams {
                 .setMissingValuePlaceholder(missingValuePlaceholder);
     }
 
-    public ExponentialWelfordIntervalForecasterParams toWelfordParams() {
-        return new ExponentialWelfordIntervalForecasterParams()
-                .setWeakSigmas(weakSigmas)
-                .setStrongSigmas(strongSigmas);
+    public MultiplicativeIntervalForecasterParams toMultiplicativeParams() {
+        return new MultiplicativeIntervalForecasterParams()
+                .setWeakMultiplier(weakMultiplier)
+                .setStrongMultiplier(strongMultiplier);
     }
 
     private void initWithSeasonalNaiveDefaults() {
@@ -67,9 +68,9 @@ public class LegacySeasonalNaiveDetectorParams {
         this.missingValuePlaceholder = params.getMissingValuePlaceholder();
     }
 
-    private void initWithWelfordDefaults() {
+    private void initWithMultiplicativeDefaults() {
         val params = new ExponentialWelfordIntervalForecasterParams();
-        this.weakSigmas = params.getWeakSigmas();
-        this.strongSigmas = params.getStrongSigmas();
+        this.weakMultiplier = params.getWeakSigmas();
+        this.strongMultiplier = params.getStrongSigmas();
     }
 }
