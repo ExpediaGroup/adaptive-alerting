@@ -15,8 +15,8 @@
     "params": {
       "cycleLength": 10080,
       "intervalLength": 60,
-      "weakSigmas": 3,
-      "strongSigmas": 4
+      "weakMultiplier": 3,
+      "strongMultiplier": 4
     }
   }
 }
