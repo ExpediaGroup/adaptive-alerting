@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.forecasting;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.expwelford.ExponentialWelfordIntervalForecasterParams;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.multiplicative.MultiplicativeIntervalForecasterParams;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.seasonalnaive.SeasonalNaivePointForecasterParams;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -69,8 +68,8 @@ public class LegacySeasonalNaiveDetectorParams {
     }
 
     private void initWithMultiplicativeDefaults() {
-        val params = new ExponentialWelfordIntervalForecasterParams();
-        this.weakMultiplier = params.getWeakSigmas();
-        this.strongMultiplier = params.getStrongSigmas();
+        val params = new MultiplicativeIntervalForecasterParams();
+        this.weakMultiplier = params.getWeakMultiplier();
+        this.strongMultiplier = params.getStrongMultiplier();
     }
 }
