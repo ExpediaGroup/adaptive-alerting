@@ -26,7 +26,7 @@ import static com.expedia.adaptivealerting.anomdetect.forecast.point.algo.season
 import static org.junit.Assert.assertEquals;
 
 @Deprecated // Use ForecastingDetectorFactory
-public class LegacySeasonalNaiveFactoryTest extends AbstractDetectorFactoryTest {
+public class LegacySeasonalNaiveDetectorFactoryProviderTest extends AbstractDetectorFactoryTest {
     private static final double TOLERANCE = 0.001;
     private static final int ONE_WEEK_IN_SECONDS = 60 * 24 * 7;
     private static final int ONE_MINUTE_IN_SECONDS = 60;
