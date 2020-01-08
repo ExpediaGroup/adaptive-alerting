@@ -61,7 +61,7 @@ public class GraphiteClient {
         // https://graphite/render?from=-7d&format=json&maxDataPoints=2016&target=sortByMaxima(groupByNodes(stats.gauges.adaptive-alerting-metric-mapper.*.NORMALIZED.kafka-message-processor.consumed.count,%20%27sum%27,%200))
         // https://graphite/render?from=-600s&until=now&format=json&target=seriesByTag("name=cpu")|aliasByTags("server","name")
 
-        val uri = String.format(baseUri + FETCH_METRICS_PATH, getValueOrDefault(from, "1d"), getValueOrDefault(maxDataPoints, 2016), target);
+        val uri = String.format(baseUri + FETCH_METRICS_PATH, getValueOrDefault(from, "1d"), getValueOrDefault(maxDataPoints, 288), target);
         Content content;
         try {
             content = httpClient.get(uri);
