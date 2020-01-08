@@ -36,7 +36,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 @Slf4j
 public class GraphiteClient {
 
-    public final static String FETCH_METRICS_PATH = "/render?from=-%s&format=json&maxDataPoints=%d&target=%s";
+    public static final String FETCH_METRICS_PATH = "/render?from=-%s&format=json&maxDataPoints=%d&target=%s";
 
     @NonNull
     private final String baseUri;
