@@ -18,7 +18,6 @@ import static org.mockito.Mockito.when;
 
 @Slf4j
 public class GraphiteClientTest {
-
     private static final String BASE_URI = "http://graphite";
     private static final String METRIC_URI = uri(FETCH_METRICS_PATH, DEFAULT_FROM_VALUE, DEFAULT_MAX_DATA_POINTS, "metricName");
     private static final String METRIC_URI_CANT_GET = uri(FETCH_METRICS_PATH, DEFAULT_FROM_VALUE, DEFAULT_MAX_DATA_POINTS, "metricNameCantGet");
