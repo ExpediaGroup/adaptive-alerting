@@ -42,12 +42,12 @@ public class GraphiteSource implements DataSource {
         if (graphiteResult.length != 0) {
             String[][] dataPoints = graphiteResult[0].getDatapoints();
             for (String[] dataPoint : dataPoints) {
-                Double dataPointValue = 0.0;
-                long epochSeconds = Long.parseLong(dataPoint[1]);
+                Double value = Double.NEGATIVE_INFINITY;
                 if (dataPoint[0] != null) {
-                    dataPointValue = Double.parseDouble(dataPoint[0]);
+                    value = Double.parseDouble(dataPoint[0]);
                 }
-                DataSourceResult result = new DataSourceResult(dataPointValue, epochSeconds);
+                long epochSeconds = Long.parseLong(dataPoint[1]);
+                DataSourceResult result = new DataSourceResult(value, epochSeconds);
                 results.add(result);
             }
         }

@@ -11,6 +11,8 @@ import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
 
+import static com.expedia.adaptivealerting.anomdetect.source.data.graphite.GraphiteClient.DEFAULT_FROM_VALUE;
+import static com.expedia.adaptivealerting.anomdetect.source.data.graphite.GraphiteClient.DEFAULT_MAX_DATA_POINTS;
 import static com.expedia.adaptivealerting.anomdetect.source.data.graphite.GraphiteClient.FETCH_METRICS_PATH;
 import static org.mockito.Mockito.when;
 
@@ -18,6 +20,9 @@ import static org.mockito.Mockito.when;
 public class GraphiteClientTest {
 
     private static final String BASE_URI = "http://graphite";
+    private static final String METRIC_URI = uri(FETCH_METRICS_PATH, DEFAULT_FROM_VALUE, DEFAULT_MAX_DATA_POINTS, "metricName");
+    private static final String METRIC_URI_CANT_GET = uri(FETCH_METRICS_PATH, DEFAULT_FROM_VALUE, DEFAULT_MAX_DATA_POINTS, "metricNameCantGet");
+    private static final String METRIC_URI_CANT_READ = uri(FETCH_METRICS_PATH, DEFAULT_FROM_VALUE, DEFAULT_MAX_DATA_POINTS, "metricNameCantRead");
 
     private GraphiteClient clientUnderTest;
 
@@ -31,26 +36,11 @@ public class GraphiteClientTest {
     private Content docsContent;
 
     @Mock
-    private Content docContent_cantGet;
-
-    @Mock
     private Content docContent_cantRead;
 
     private byte[] docsBytes = "docsBytes".getBytes();
-
-    private byte[] docBytes_cantGet = "docBytes_cantGet".getBytes();
-
     private byte[] docBytes_cantRead = "docBytes_cantRead".getBytes();
-
-
     private GraphiteResult[] docs = {};
-
-    private static final String METRIC_URI = uri(FETCH_METRICS_PATH, "1d", 2016, "metricName");
-
-    private static final String METRIC_URI_CANT_GET = uri(FETCH_METRICS_PATH, "1d", 2016, "metricNameCantGet");
-
-    private static final String METRIC_URI_CANT_READ = uri(FETCH_METRICS_PATH, "1d", 2016, "metricNameCantRead");
-
 
     @Before
     public void setUp() throws Exception {
@@ -61,17 +51,17 @@ public class GraphiteClientTest {
 
     @Test
     public void testGetMetricData() {
-        clientUnderTest.getMetricData("1d", 2016, "metricName");
+        clientUnderTest.getMetricData(DEFAULT_FROM_VALUE, DEFAULT_MAX_DATA_POINTS, "metricName");
     }
 
     @Test(expected = RuntimeException.class)
     public void testGetMetricData_cant_get() {
-        clientUnderTest.getMetricData("1d", 2016, "metricNameCantGet");
+        clientUnderTest.getMetricData(DEFAULT_FROM_VALUE, DEFAULT_MAX_DATA_POINTS, "metricNameCantGet");
     }
 
     @Test(expected = RuntimeException.class)
     public void testGetMetricData_cant_read() {
-        clientUnderTest.getMetricData("1d", 2016, "metricNameCantRead");
+        clientUnderTest.getMetricData(DEFAULT_FROM_VALUE, DEFAULT_MAX_DATA_POINTS, "metricNameCantRead");
     }
 
     private void initMetricData() throws IOException {
@@ -79,9 +69,7 @@ public class GraphiteClientTest {
         when(docsContent.asBytes()).thenReturn(docsBytes);
         when(objectMapper.readValue(docsBytes, GraphiteResult[].class)).thenReturn(docs);
 
-        when(httpClient.get(METRIC_URI_CANT_GET)).thenReturn(docContent_cantGet);
-        when(docContent_cantGet.asBytes()).thenReturn(docBytes_cantGet);
-        when(objectMapper.readValue(docBytes_cantGet, GraphiteResult[].class)).thenThrow(new IOException());
+        when(httpClient.get(METRIC_URI_CANT_GET)).thenThrow(new IOException());
 
         when(httpClient.get(METRIC_URI_CANT_READ)).thenReturn(docContent_cantRead);
         when(docContent_cantRead.asBytes()).thenReturn(docBytes_cantRead);
