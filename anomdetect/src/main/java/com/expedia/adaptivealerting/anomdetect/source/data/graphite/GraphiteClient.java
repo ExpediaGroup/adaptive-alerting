@@ -31,8 +31,8 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
  * <p>
  * Connector for interacting with graphite API. This allows the anomaly detection module to fetch data from graphite for a given set of metrics.
  * Sample graphite calls. Target could just be a metric name or a combination of metric name and graphite function.
- * https://graphite/render?from=-7d&format=json&maxDataPoints=2016&target=sortByMaxima(groupByNodes(stats.gauges.adaptive-alerting-metric-mapper.*.NORMALIZED.kafka-message-processor.consumed.count,%20%27sum%27,%200))
- * https://graphite/render?from=-600s&until=now&format=json&target=seriesByTag("name=cpu")|aliasByTags("server","name")
+ * https://graphite/render?from=-7d&format=json&maxDataPoints=2016&target=sortByMaxima(groupByNodes(stats.gauges.adaptive-alerting-metric-mapper.*.NORMALIZED.kafka-message-processor.consumed.count,%20%27sum%27,%200));
+ * https://graphite/render?from=-600s&until=now&format=json&target=seriesByTag("name=cpu")|aliasByTags("server","name");
  * </p>
  */
 @RequiredArgsConstructor
