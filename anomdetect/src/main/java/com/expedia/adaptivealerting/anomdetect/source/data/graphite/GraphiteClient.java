@@ -39,10 +39,6 @@ public class GraphiteClient {
 
     public static final String FETCH_METRICS_PATH = "/render?from=-%s&format=json&maxDataPoints=%d&target=%s";
 
-    //Fetches 1 day of data at 5m granularity by default
-    public static final String DEFAULT_FROM_VALUE = "1d";
-    public static final Integer DEFAULT_MAX_DATA_POINTS = 288;
-
     @NonNull
     private final String baseUri;
 
@@ -61,10 +57,11 @@ public class GraphiteClient {
      * @return time series for the specified metric
      */
     public GraphiteResult[] getMetricData(String from, Integer maxDataPoints, String target) {
+        notNull(from, "from can't be null");
         notNull(target, "target can't be null");
-        val fromValue = getValueOrDefault(from, DEFAULT_FROM_VALUE);
-        val maxDataPointsValue = getValueOrDefault(maxDataPoints, DEFAULT_MAX_DATA_POINTS);
-        val uri = String.format(baseUri + FETCH_METRICS_PATH, fromValue, maxDataPointsValue, target);
+        notNull(maxDataPoints, "maxDataPoints can't be null");
+
+        val uri = String.format(baseUri + FETCH_METRICS_PATH, from, maxDataPoints, target);
         Content content;
         try {
             content = httpClient.get(uri);

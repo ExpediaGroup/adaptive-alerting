@@ -19,10 +19,6 @@ import java.util.List;
 
 /**
  * Data source interface
- * <p>
- * Fetches metric data from the source for the specified metric.
- * Currently it supports only graphite as data source.
- * </p>
  */
 public interface DataSource {
 

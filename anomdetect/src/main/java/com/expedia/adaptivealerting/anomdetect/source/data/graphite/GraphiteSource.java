@@ -29,6 +29,8 @@ import java.util.List;
 @Slf4j
 public class GraphiteSource implements DataSource {
 
+    public static final Double MISSING_VALUE = Double.NEGATIVE_INFINITY;
+
     /**
      * Client to load metric data from graphite.
      */
@@ -42,7 +44,7 @@ public class GraphiteSource implements DataSource {
         if (graphiteResult.length != 0) {
             String[][] dataPoints = graphiteResult[0].getDatapoints();
             for (String[] dataPoint : dataPoints) {
-                Double value = Double.NEGATIVE_INFINITY;
+                Double value = MISSING_VALUE;
                 if (dataPoint[0] != null) {
                     value = Double.parseDouble(dataPoint[0]);
                 }

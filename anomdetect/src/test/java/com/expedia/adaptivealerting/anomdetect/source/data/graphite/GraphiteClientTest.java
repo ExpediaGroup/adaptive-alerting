@@ -11,17 +11,15 @@ import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
 
-import static com.expedia.adaptivealerting.anomdetect.source.data.graphite.GraphiteClient.DEFAULT_FROM_VALUE;
-import static com.expedia.adaptivealerting.anomdetect.source.data.graphite.GraphiteClient.DEFAULT_MAX_DATA_POINTS;
 import static com.expedia.adaptivealerting.anomdetect.source.data.graphite.GraphiteClient.FETCH_METRICS_PATH;
 import static org.mockito.Mockito.when;
 
 @Slf4j
 public class GraphiteClientTest {
     private static final String BASE_URI = "http://graphite";
-    private static final String METRIC_URI = uri(FETCH_METRICS_PATH, DEFAULT_FROM_VALUE, DEFAULT_MAX_DATA_POINTS, "metricName");
-    private static final String METRIC_URI_CANT_GET = uri(FETCH_METRICS_PATH, DEFAULT_FROM_VALUE, DEFAULT_MAX_DATA_POINTS, "metricNameCantGet");
-    private static final String METRIC_URI_CANT_READ = uri(FETCH_METRICS_PATH, DEFAULT_FROM_VALUE, DEFAULT_MAX_DATA_POINTS, "metricNameCantRead");
+    private static final String METRIC_URI = uri(FETCH_METRICS_PATH, "1d", 288, "metricName");
+    private static final String METRIC_URI_CANT_GET = uri(FETCH_METRICS_PATH, "1d", 288, "metricNameCantGet");
+    private static final String METRIC_URI_CANT_READ = uri(FETCH_METRICS_PATH, "1d", 288, "metricNameCantRead");
 
     private GraphiteClient clientUnderTest;
 
@@ -40,6 +38,8 @@ public class GraphiteClientTest {
     private byte[] docsBytes = "docsBytes".getBytes();
     private byte[] docBytes_cantRead = "docBytes_cantRead".getBytes();
     private GraphiteResult[] docs = {};
+    private String from = "1d";
+    private Integer maxDataPoints = 288;
 
     @Before
     public void setUp() throws Exception {
@@ -50,17 +50,17 @@ public class GraphiteClientTest {
 
     @Test
     public void testGetMetricData() {
-        clientUnderTest.getMetricData(DEFAULT_FROM_VALUE, DEFAULT_MAX_DATA_POINTS, "metricName");
+        clientUnderTest.getMetricData(from, maxDataPoints, "metricName");
     }
 
     @Test(expected = RuntimeException.class)
     public void testGetMetricData_cant_get() {
-        clientUnderTest.getMetricData(DEFAULT_FROM_VALUE, DEFAULT_MAX_DATA_POINTS, "metricNameCantGet");
+        clientUnderTest.getMetricData(from, maxDataPoints, "metricNameCantGet");
     }
 
     @Test(expected = RuntimeException.class)
     public void testGetMetricData_cant_read() {
-        clientUnderTest.getMetricData(DEFAULT_FROM_VALUE, DEFAULT_MAX_DATA_POINTS, "metricNameCantRead");
+        clientUnderTest.getMetricData(from, maxDataPoints, "metricNameCantRead");
     }
 
     private void initMetricData() throws IOException {
