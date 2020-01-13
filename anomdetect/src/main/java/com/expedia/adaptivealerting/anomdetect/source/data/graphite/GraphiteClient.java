@@ -81,9 +81,5 @@ public class GraphiteClient {
         }
         return results;
     }
-
-    private <T> T getValueOrDefault(T value, T defaultValue) {
-        return value == null ? defaultValue : value;
-    }
 }
 
