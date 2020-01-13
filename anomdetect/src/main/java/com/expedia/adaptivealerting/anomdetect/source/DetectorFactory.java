@@ -24,6 +24,7 @@ import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.forecasting.L
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.forecasting.LegacyPewmaDetectorFactoryProvider;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.forecasting.LegacySeasonalNaiveDetectorFactoryProvider;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.individuals.IndividualsDetectorFactoryProvider;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 import java.util.HashMap;
@@ -34,6 +35,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 /**
  * Builds a detector from a detector document.
  */
+@Slf4j
 public class DetectorFactory {
     private final Map<String, DetectorFactoryProvider> providers = new HashMap<>();
 
@@ -47,7 +49,12 @@ public class DetectorFactory {
         providers.put("ewma-detector", new LegacyEwmaDetectorFactoryProvider());
         providers.put("holtwinters-detector", new LegacyHoltWintersDetectorFactoryProvider());
         providers.put("pewma-detector", new LegacyPewmaDetectorFactoryProvider());
-        providers.put("seasonalnaive-detector", new LegacySeasonalNaiveDetectorFactoryProvider());
+        try {
+            providers.put("seasonalnaive-detector", new LegacySeasonalNaiveDetectorFactoryProvider());
+            log.info("LegacySeasonalNaiveDetectorFactoryProvider created.");
+        } catch (Exception e) {
+            log.error("Error creating LegacySeasonalNaiveDetectorFactoryProvider.", e);
+        }
     }
 
     public Detector buildDetector(DetectorDocument document) {
@@ -55,6 +62,7 @@ public class DetectorFactory {
         val type = document.getType();
         val factory = providers.get(type);
         if (factory == null) {
+            log.error("Could not find factory for type {}", type);
             throw new DetectorException("Illegal detector type: " + type);
         }
         return factory.buildDetector(document);
