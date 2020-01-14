@@ -49,12 +49,7 @@ public class DetectorFactory {
         providers.put("ewma-detector", new LegacyEwmaDetectorFactoryProvider());
         providers.put("holtwinters-detector", new LegacyHoltWintersDetectorFactoryProvider());
         providers.put("pewma-detector", new LegacyPewmaDetectorFactoryProvider());
-        try {
-            providers.put("seasonalnaive-detector", new LegacySeasonalNaiveDetectorFactoryProvider());
-            log.info("LegacySeasonalNaiveDetectorFactoryProvider created.");
-        } catch (Exception e) {
-            log.error("Error creating LegacySeasonalNaiveDetectorFactoryProvider.", e);
-        }
+        providers.put("seasonalnaive-detector", new LegacySeasonalNaiveDetectorFactoryProvider());
     }
 
     public Detector buildDetector(DetectorDocument document) {
@@ -62,7 +57,6 @@ public class DetectorFactory {
         val type = document.getType();
         val factory = providers.get(type);
         if (factory == null) {
-            log.error("Could not find factory for type {}", type);
             throw new DetectorException("Illegal detector type: " + type);
         }
         return factory.buildDetector(document);
