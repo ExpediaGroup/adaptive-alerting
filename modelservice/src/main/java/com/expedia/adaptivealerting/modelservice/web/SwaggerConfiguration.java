@@ -85,7 +85,7 @@ public class SwaggerConfiguration {
                 regex("/api/detectorMappings.*?"),
                 regex("/api/v2/detectors.*?"),
                 regex("/api/metricProfiling.*?"),
-                regex("/anomalies.*?")
+                regex("/api/anomalies.*?")
         );
     }
 

@@ -72,6 +72,7 @@ public class DetectorManager {
      *
      * @param detectorSource            detector source
      * @param detectorRefreshTimePeriod detector refresh period in minutes
+     * @param metricRegistry            metric registry
      * @param cachedDetectors           map containing cached detectors
      */
     public DetectorManager(DetectorSource detectorSource, int detectorRefreshTimePeriod, Map<UUID, Detector> cachedDetectors, MetricRegistry metricRegistry) {
@@ -131,7 +132,7 @@ public class DetectorManager {
             ctxt = detectTimer.apply(detector.getName()).time();
             result = detector.detect(metricData);
             ctxt.close();
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("Error in detector.detect", e);
         }
 
