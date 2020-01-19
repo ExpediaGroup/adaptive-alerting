@@ -39,9 +39,9 @@ public class GraphiteSource implements DataSource {
 
     @Override
     public List<DataSourceResult> getMetricData(String from, Integer maxDataPoints, String metric) {
-        GraphiteResult[] graphiteResult = graphiteClient.getMetricData(from, maxDataPoints, metric);
+        GraphiteResult[] graphiteResult = graphiteClient.getData(from, maxDataPoints, metric);
         List<DataSourceResult> results = new ArrayList<>();
-        if (graphiteResult.length != 0) {
+        if (graphiteResult != null && graphiteResult.length != 0) {
             String[][] dataPoints = graphiteResult[0].getDatapoints();
             for (String[] dataPoint : dataPoints) {
                 Double value = MISSING_VALUE;

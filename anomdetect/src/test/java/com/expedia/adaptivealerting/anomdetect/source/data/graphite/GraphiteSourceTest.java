@@ -64,9 +64,9 @@ public class GraphiteSourceTest {
     }
 
     private void initDependencies() {
-        when(graphiteClient.getMetricData(from, maxDataPoints, "metric_name")).thenReturn(graphiteResults);
-        when(graphiteClient.getMetricData(from, maxDataPoints, "null_metric")).thenReturn(new GraphiteResult[0]);
-        when(graphiteClient.getMetricData(from, maxDataPoints, "null_value")).thenReturn(graphiteResults_null);
+        when(graphiteClient.getData(from, maxDataPoints, "metric_name")).thenReturn(graphiteResults);
+        when(graphiteClient.getData(from, maxDataPoints, "null_metric")).thenReturn(new GraphiteResult[0]);
+        when(graphiteClient.getData(from, maxDataPoints, "null_value")).thenReturn(graphiteResults_null);
     }
 
     private GraphiteResult buildGraphiteResult() {

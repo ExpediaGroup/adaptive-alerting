@@ -50,17 +50,17 @@ public class GraphiteClientTest {
 
     @Test
     public void testGetMetricData() {
-        clientUnderTest.getMetricData(from, maxDataPoints, "metricName");
+        clientUnderTest.getData(from, maxDataPoints, "metricName");
     }
 
     @Test(expected = RuntimeException.class)
     public void testGetMetricData_cant_get() {
-        clientUnderTest.getMetricData(from, maxDataPoints, "metricNameCantGet");
+        clientUnderTest.getData(from, maxDataPoints, "metricNameCantGet");
     }
 
     @Test(expected = RuntimeException.class)
     public void testGetMetricData_cant_read() {
-        clientUnderTest.getMetricData(from, maxDataPoints, "metricNameCantRead");
+        clientUnderTest.getData(from, maxDataPoints, "metricNameCantRead");
     }
 
     private void initMetricData() throws IOException {

@@ -56,7 +56,7 @@ public class GraphiteClient {
      * @param target        metric name or tag with an optional graphite function
      * @return time series for the specified metric
      */
-    public GraphiteResult[] getMetricData(String from, Integer maxDataPoints, String target) {
+    public GraphiteResult[] getData(String from, Integer maxDataPoints, String target) {
         notNull(from, "from can't be null");
         notNull(target, "target can't be null");
         notNull(maxDataPoints, "maxDataPoints can't be null");

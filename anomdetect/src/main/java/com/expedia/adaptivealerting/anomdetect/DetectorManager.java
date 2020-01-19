@@ -23,8 +23,13 @@ import com.expedia.adaptivealerting.anomdetect.detect.Detector;
 import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
+import com.expedia.adaptivealerting.anomdetect.source.data.DataSource;
+import com.expedia.adaptivealerting.anomdetect.source.data.graphite.GraphiteClient;
+import com.expedia.adaptivealerting.anomdetect.source.data.graphite.GraphiteSource;
 import com.expedia.adaptivealerting.anomdetect.source.data.initializer.DataInitializer;
-import com.expedia.adaptivealerting.anomdetect.source.data.initializer.GraphiteDataInitializer;
+import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
+import com.expedia.adaptivealerting.anomdetect.util.PropertyValues;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import lombok.Getter;
 import lombok.NonNull;
@@ -32,6 +37,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -87,7 +93,7 @@ public class DetectorManager {
         this.detectorSource = detectorSource;
         this.detectorRefreshTimePeriod = detectorRefreshTimePeriod;
         this.cachedDetectors = cachedDetectors;
-        this.dataInitializer = new GraphiteDataInitializer();
+        this.dataInitializer = new DataInitializer(getDataSource());
 
         detectorForTimer = metricRegistry.timer("detector.detectorFor");
         noDetectorFoundMeter = metricRegistry.meter("detector.nullDetector");
@@ -185,5 +191,17 @@ public class DetectorManager {
         log.info("Removed detectors on refresh : {}", updatedDetectors);
         synchedTilTime = currentTime;
         return updatedDetectors;
+    }
+
+    private DataSource getDataSource() {
+        Properties properties = null;
+        try {
+            properties = new PropertyValues().getPropValues();
+            val graphiteBaseUri = properties.getProperty("graphite.baseUri");
+            val graphiteClient = new GraphiteClient(graphiteBaseUri, new HttpClientWrapper(), new ObjectMapper());
+            return new GraphiteSource(graphiteClient);
+        } catch (IOException exception) {
+            throw new RuntimeException(exception);
+        }
     }
 }

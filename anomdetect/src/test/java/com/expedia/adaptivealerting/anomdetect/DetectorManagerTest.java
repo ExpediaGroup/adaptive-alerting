@@ -49,7 +49,7 @@ public final class DetectorManagerTest {
     private final int detectorRefreshPeriod = 1;
     private final int badDetectorRefreshPeriod = 0;
 
-//    @InjectMocks
+    //    @InjectMocks
     private DetectorManager managerUnderTest;
 
     @Mock
@@ -105,7 +105,7 @@ public final class DetectorManagerTest {
 
     @Test
     public void testDetectorRefresh() {
-        val result = managerUnderTest.detectorCacheSync(System.currentTimeMillis()+1000*60);
+        val result = managerUnderTest.detectorCacheSync(System.currentTimeMillis() + 1000 * 60);
         assertNotNull(result);
         assertEquals(updatedDetectors, result);
     }
