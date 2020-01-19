@@ -28,6 +28,7 @@ import lombok.val;
 @AllArgsConstructor
 @Slf4j
 public class DataInitializer {
+    //TODO Find appropriate earliest time and max data point values.
     private static final String EARLIEST_TIME = "7d";
     private static final Integer MAX_DATA_POINTS = 2016;
 
@@ -35,7 +36,7 @@ public class DataInitializer {
     private DataSource dataSource;
 
     public void initializeDetector(MappedMetricData metricData, Detector detector) {
-        if (detector != null && detector.getName().equals("seasonalnaive")) {
+        if (detector != null && "seasonalnaive".equals(detector.getName())) {
             val forecastingDetector = (ForecastingDetector) detector;
             val seasonalNaivePointForecaster = (SeasonalNaivePointForecaster) forecastingDetector.getPointForecaster();
             val data = getHistoricalData(metricData);
