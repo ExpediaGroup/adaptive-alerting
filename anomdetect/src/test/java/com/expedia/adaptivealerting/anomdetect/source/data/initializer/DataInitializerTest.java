@@ -28,6 +28,8 @@ import java.util.UUID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.atMost;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class DataInitializerTest {
@@ -55,6 +57,7 @@ public class DataInitializerTest {
     @Test
     public void testInitializeDetector() {
         initializerUnderTest.initializeDetector(mappedMetricData, detector);
+        verify(initializerUnderTest, atMost(1)).initializeDetector(any(MappedMetricData.class), any(Detector.class));
     }
 
     public void initTestObjects() {

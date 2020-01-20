@@ -42,7 +42,7 @@ public class DataInitializer {
 
     public void initializeDetector(MappedMetricData mappedMetricData, Detector detector) {
         if (detector != null) {
-            if (detector instanceof ForecastingDetector) {
+            if (detector instanceof ForecastingDetector && "seasonalnaive".equals(detector.getName())) {
                 val data = getHistoricalData(mappedMetricData);
                 val forecastingDetector = (ForecastingDetector) detector;
                 val metricDefinition = mappedMetricData.getMetricData().getMetricDefinition();
