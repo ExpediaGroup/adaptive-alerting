@@ -19,7 +19,6 @@ import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.http.client.fluent.Content;
 

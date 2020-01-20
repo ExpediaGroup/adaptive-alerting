@@ -6,7 +6,7 @@ import java.util.Properties;
 public class PropertiesUtil {
 
     public static String getValueFromProperty(String key) {
-        Properties props = null;
+        Properties props;
         try {
             props = new PropertiesLoader().getPropValues();
             return props.getProperty(key);
