@@ -27,12 +27,12 @@ public class PropertiesLoader {
     private static final String CONFIG_FILE_NAME = "config.properties";
 
     public Properties getPropValues() throws IOException {
-        Properties prop = new Properties();
+        Properties props = new Properties();
         InputStream inputStream = null;
         try {
             inputStream = getClass().getClassLoader().getResourceAsStream(CONFIG_FILE_NAME);
             if (inputStream != null) {
-                prop.load(inputStream);
+                props.load(inputStream);
             } else {
                 throw new FileNotFoundException("property file '" + CONFIG_FILE_NAME + "' not found in the classpath");
             }
@@ -41,6 +41,6 @@ public class PropertiesLoader {
         } finally {
             inputStream.close();
         }
-        return prop;
+        return props;
     }
 }
