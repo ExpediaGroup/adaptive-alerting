@@ -53,15 +53,14 @@ public class DataInitializer {
 
     private void populateForecastingDetectorWIthHistoricalData(ForecastingDetector forecastingDetector, List<DataSourceResult> data, MetricDefinition metricDefinition) {
         for (DataSourceResult dataSourceResult : data) {
-            MetricData metricData = dataSourceResultToMetricData(dataSourceResult, metricDefinition);
-            // We throw away the forecast as we only care about letting the forecaster "see" the historical value to update its internal model
+            val metricData = dataSourceResultToMetricData(dataSourceResult, metricDefinition);
             forecastingDetector.getPointForecaster().forecast(metricData);
         }
     }
 
     private MetricData dataSourceResultToMetricData(DataSourceResult dataSourceResult, MetricDefinition metricDefinition) {
-        Double dataPoint = dataSourceResult.getDataPoint();
-        long epochSecond = dataSourceResult.getEpochSecond();
+        val dataPoint = dataSourceResult.getDataPoint();
+        val epochSecond = dataSourceResult.getEpochSecond();
         return new MetricData(metricDefinition, dataPoint, epochSecond);
     }
 
