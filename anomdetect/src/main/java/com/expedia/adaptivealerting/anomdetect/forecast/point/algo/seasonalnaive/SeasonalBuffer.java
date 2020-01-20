@@ -97,8 +97,7 @@ public class SeasonalBuffer {
      * @param metricData The new datapoint.
      */
     private void padMissingDataPoints(MetricData metricData) {
-        if (isFirstDataPoint())
-            return; // This is first metric value received. Assume it starts the cycle (i.e. no prior datapoints to pad)
+        if (isFirstDataPoint()) return; // This is first metric value received. Assume it starts the cycle (i.e. no prior datapoints to pad)
         int numSkippedDataPoints = countIntervalsSkippedSinceLastTimestamp(metricData);
         insertSkippedDataPoints(numSkippedDataPoints);
     }

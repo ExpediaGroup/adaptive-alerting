@@ -36,6 +36,8 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 @UtilityClass
 public class MetricUtil {
 
+    public static final String METRIC_FUNCTION_KEY = "graphite.functionTagKey";
+
     public static Map<String, String> defaultKvTags() {
         val kvTags = new HashMap<String, String>();
         kvTags.put(MetricDefinition.UNIT, "");
@@ -98,7 +100,7 @@ public class MetricUtil {
     }
 
     /**
-     * Convenience method to create a new {@link MetricData} from the given definition, value and epoch second.
+     * Convenience method to get metric function if available else return metric key.
      *
      * @param mappedMetricData Mapped metric data
      * @return Returns metric function if available else metric key
@@ -107,7 +109,7 @@ public class MetricUtil {
         val metricData = mappedMetricData.getMetricData();
         val metricDefinition = metricData.getMetricDefinition();
         val metricTags = metricDefinition.getTags();
-        val functionTagKey = PropertiesUtil.getValueFromProperty("graphite.functionTagKey");
+        val functionTagKey = PropertiesUtil.getValueFromProperty(METRIC_FUNCTION_KEY);
         val metricFunction = metricTags != null && metricTags.getKv() != null
                 ? metricTags.getKv().get(functionTagKey) : null;
         return metricFunction != null

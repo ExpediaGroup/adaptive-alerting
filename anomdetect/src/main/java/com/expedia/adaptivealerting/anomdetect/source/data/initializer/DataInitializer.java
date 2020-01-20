@@ -36,6 +36,10 @@ import java.util.List;
 @Slf4j
 public class DataInitializer {
 
+    public static final String BASE_URI = "graphite.baseUri";
+    public static final String EARLIEST_TIME = "graphite.earliestTime";
+    public static final String MAX_DATA_POINTS = "graphite.maxDataDataPoints";
+
     public void initializeDetector(MappedMetricData mappedMetricData, Detector detector) {
         if (detector != null) {
             if (detector instanceof ForecastingDetector) {
@@ -65,13 +69,13 @@ public class DataInitializer {
         val target = MetricUtil.getMetricFunctionOrKey(mappedMetricData);
         val client = getClient();
         val dataSource = makeSource(client);
-        val earliest = PropertiesUtil.getValueFromProperty("graphite.earliestTime");
-        val maxDataPoints = Integer.parseInt(PropertiesUtil.getValueFromProperty("graphite.maxDataDataPoints"));
+        val earliest = PropertiesUtil.getValueFromProperty(EARLIEST_TIME);
+        val maxDataPoints = Integer.parseInt(PropertiesUtil.getValueFromProperty(MAX_DATA_POINTS));
         return dataSource.getMetricData(earliest, maxDataPoints, target);
     }
 
     private GraphiteClient getClient() {
-        val graphiteBaseUri = PropertiesUtil.getValueFromProperty("graphite.baseUri");
+        val graphiteBaseUri = PropertiesUtil.getValueFromProperty(BASE_URI);
         return makeClient(graphiteBaseUri);
     }
 
