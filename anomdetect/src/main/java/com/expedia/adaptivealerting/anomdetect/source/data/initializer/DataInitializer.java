@@ -18,50 +18,69 @@ package com.expedia.adaptivealerting.anomdetect.source.data.initializer;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.forecasting.ForecastingDetector;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.seasonalnaive.SeasonalNaivePointForecaster;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSource;
-import lombok.AllArgsConstructor;
-import lombok.NonNull;
+import com.expedia.adaptivealerting.anomdetect.source.data.DataSourceResult;
+import com.expedia.adaptivealerting.anomdetect.source.data.graphite.GraphiteClient;
+import com.expedia.adaptivealerting.anomdetect.source.data.graphite.GraphiteSource;
+import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
+import com.expedia.adaptivealerting.anomdetect.util.MetricUtil;
+import com.expedia.adaptivealerting.anomdetect.util.PropertiesUtil;
+import com.expedia.metrics.MetricData;
+import com.expedia.metrics.MetricDefinition;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
-@AllArgsConstructor
+import java.util.List;
+
 @Slf4j
 public class DataInitializer {
-    //TODO Find appropriate earliest time and max data point values.
-    private static final String EARLIEST_TIME = "7d";
-    private static final Integer MAX_DATA_POINTS = 2016;
 
-    @NonNull
-    private DataSource dataSource;
-
-    public void initializeDetector(MappedMetricData metricData, Detector detector) {
-        if (detector != null && "seasonalnaive".equals(detector.getName())) {
-            val forecastingDetector = (ForecastingDetector) detector;
-            val seasonalNaivePointForecaster = (SeasonalNaivePointForecaster) forecastingDetector.getPointForecaster();
-            val data = getHistoricalData(metricData);
-            seasonalNaivePointForecaster.getBuffer().initBuffer(data);
+    public void initializeDetector(MappedMetricData mappedMetricData, Detector detector) {
+        if (detector != null) {
+            if (detector instanceof ForecastingDetector) {
+                val data = getHistoricalData(mappedMetricData);
+                val forecastingDetector = (ForecastingDetector) detector;
+                val metricDefinition = mappedMetricData.getMetricData().getMetricDefinition();
+                populateForecastingDetectorWIthHistoricalData(forecastingDetector, data, metricDefinition);
+            }
         }
     }
 
-    private double[] getHistoricalData(MappedMetricData mappedMetricData) {
-        val target = getTarget(mappedMetricData);
-        val results = dataSource.getMetricData(EARLIEST_TIME, MAX_DATA_POINTS, target);
-        val resultsSize = results.size();
-        val data = new double[resultsSize];
-        for (int i = 0; i < resultsSize; i++) {
-            data[i] = results.get(i).getDataPoint();
+    private void populateForecastingDetectorWIthHistoricalData(ForecastingDetector forecastingDetector, List<DataSourceResult> data, MetricDefinition metricDefinition) {
+        for (DataSourceResult dataSourceResult : data) {
+            MetricData metricData = dataSourceResultToMetricData(dataSourceResult, metricDefinition);
+            // We throw away the forecast as we only care about letting the forecaster "see" the historical value to update its internal model
+            forecastingDetector.getPointForecaster().forecast(metricData);
         }
-        return data;
     }
 
-    private String getTarget(MappedMetricData mappedMetricData) {
-        val metricData = mappedMetricData.getMetricData();
-        val metricDefinition = metricData.getMetricDefinition();
-        val metricTags = metricDefinition.getTags();
-        val metricFunction = metricTags != null && metricTags.getKv() != null
-                ? metricTags.getKv().get("function") : null;
-        return metricFunction != null
-                ? metricFunction : metricDefinition.getKey();
+    private MetricData dataSourceResultToMetricData(DataSourceResult dataSourceResult, MetricDefinition metricDefinition) {
+        Double dataPoint = dataSourceResult.getDataPoint();
+        long epochSecond = dataSourceResult.getEpochSecond();
+        return new MetricData(metricDefinition, dataPoint, epochSecond);
+    }
+
+    private List<DataSourceResult> getHistoricalData(MappedMetricData mappedMetricData) {
+        val target = MetricUtil.getMetricFunctionOrKey(mappedMetricData);
+        val client = getClient();
+        val dataSource = makeSource(client);
+        val earliest = PropertiesUtil.getValueFromProperty("graphite.earliestTime");
+        val maxDataPoints = Integer.parseInt(PropertiesUtil.getValueFromProperty("graphite.maxDataDataPoints"));
+        return dataSource.getMetricData(earliest, maxDataPoints, target);
+    }
+
+    private GraphiteClient getClient() {
+        val graphiteBaseUri = PropertiesUtil.getValueFromProperty("graphite.baseUri");
+        return makeClient(graphiteBaseUri);
+    }
+
+    //Using one-line methods for object creation to support unit testing
+    GraphiteClient makeClient(String graphiteBaseUri) {
+        return new GraphiteClient(graphiteBaseUri, new HttpClientWrapper(), new ObjectMapper());
+    }
+
+    DataSource makeSource(GraphiteClient client) {
+        return new GraphiteSource(client);
     }
 }

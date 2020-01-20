@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.util;
 
+import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.TagCollection;
@@ -94,5 +95,22 @@ public class MetricUtil {
      */
     public static MetricData metricData(MetricDefinition metricDef, double value, long epochSecond) {
         return new MetricData(metricDef, value, epochSecond);
+    }
+
+    /**
+     * Convenience method to create a new {@link MetricData} from the given definition, value and epoch second.
+     *
+     * @param mappedMetricData Mapped metric data
+     * @return Returns metric function if available else metric key
+     */
+    public static String getMetricFunctionOrKey(MappedMetricData mappedMetricData) {
+        val metricData = mappedMetricData.getMetricData();
+        val metricDefinition = metricData.getMetricDefinition();
+        val metricTags = metricDefinition.getTags();
+        val functionTagKey = PropertiesUtil.getValueFromProperty("graphite.functionTagKey");
+        val metricFunction = metricTags != null && metricTags.getKv() != null
+                ? metricTags.getKv().get(functionTagKey) : null;
+        return metricFunction != null
+                ? metricFunction : metricDefinition.getKey();
     }
 }

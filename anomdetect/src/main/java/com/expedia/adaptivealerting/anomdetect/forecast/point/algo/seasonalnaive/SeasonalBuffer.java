@@ -91,17 +91,14 @@ public class SeasonalBuffer {
         this.currIndex = 0;
     }
 
-    public void initBuffer(double[] data) {
-        System.arraycopy(data, 0, this.buffer, 0, data.length);
-    }
-
     /**
      * Moves currIndex for the number of missing datapoints and fills blanks with MISSING_VALUE values.
      *
      * @param metricData The new datapoint.
      */
     private void padMissingDataPoints(MetricData metricData) {
-        if (isFirstDataPoint()) return; // This is first metric value received. Assume it starts the cycle (i.e. no prior datapoints to pad)
+        if (isFirstDataPoint())
+            return; // This is first metric value received. Assume it starts the cycle (i.e. no prior datapoints to pad)
         int numSkippedDataPoints = countIntervalsSkippedSinceLastTimestamp(metricData);
         insertSkippedDataPoints(numSkippedDataPoints);
     }

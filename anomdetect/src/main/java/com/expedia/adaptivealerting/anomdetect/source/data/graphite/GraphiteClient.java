@@ -34,7 +34,6 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
  * </p>
  */
 @RequiredArgsConstructor
-@Slf4j
 public class GraphiteClient {
 
     public static final String FETCH_METRICS_PATH = "/render?from=-%s&format=json&maxDataPoints=%d&target=%s";
@@ -73,6 +72,7 @@ public class GraphiteClient {
             throw new RuntimeException(message, e);
         }
         GraphiteResult[] results;
+
         try {
             results = objectMapper.readValue(content.asBytes(), GraphiteResult[].class);
         } catch (IOException e) {

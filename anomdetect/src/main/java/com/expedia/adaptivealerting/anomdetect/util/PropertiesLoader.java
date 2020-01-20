@@ -23,7 +23,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 @Generated
-public class PropertyValues {
+public class PropertiesLoader {
     private static final String CONFIG_FILE_NAME = "config.properties";
 
     public Properties getPropValues() throws IOException {

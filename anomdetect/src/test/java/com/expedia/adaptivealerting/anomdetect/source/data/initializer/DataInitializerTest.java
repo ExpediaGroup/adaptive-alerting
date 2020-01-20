@@ -10,6 +10,7 @@ import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.seasonalnaive
 import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.seasonalnaive.SeasonalNaivePointForecasterParams;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSource;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSourceResult;;
+import com.expedia.adaptivealerting.anomdetect.source.data.graphite.GraphiteClient;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import lombok.val;
@@ -17,20 +18,29 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 public class DataInitializerTest {
 
+    @Spy
+    private DataInitializer initializerUnderTest;
+
     @Mock
     private DataSource dataSource;
 
-    private DataInitializer initializerUnderTest;
+    @Mock
+    private GraphiteClient graphiteClient;
+
     private Detector detector;
     private MappedMetricData mappedMetricData;
     private List<DataSourceResult> dataSourceResults;
@@ -40,7 +50,6 @@ public class DataInitializerTest {
         MockitoAnnotations.initMocks(this);
         initTestObjects();
         initDependencies();
-        this.initializerUnderTest = new DataInitializer(dataSource);
     }
 
     @Test
@@ -57,7 +66,9 @@ public class DataInitializerTest {
     }
 
     private void initDependencies() {
-        when(dataSource.getMetricData("7d", 2016, "metric-definition")).thenReturn(dataSourceResults);
+        when(initializerUnderTest.makeClient(anyString())).thenReturn(graphiteClient);
+        when(initializerUnderTest.makeSource(graphiteClient)).thenReturn(dataSource);
+        when(dataSource.getMetricData(anyString(), anyInt(), anyString())).thenReturn(dataSourceResults);
     }
 
     private DataSourceResult buildDataSourceResult(Double value, long epochSecs) {
