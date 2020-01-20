@@ -41,13 +41,11 @@ public class DataInitializer {
     public static final String MAX_DATA_POINTS = "graphite.maxDataDataPoints";
 
     public void initializeDetector(MappedMetricData mappedMetricData, Detector detector) {
-        if (detector != null) {
-            if (detector instanceof ForecastingDetector && "seasonalnaive".equals(detector.getName())) {
-                val data = getHistoricalData(mappedMetricData);
-                val forecastingDetector = (ForecastingDetector) detector;
-                val metricDefinition = mappedMetricData.getMetricData().getMetricDefinition();
-                populateForecastingDetectorWIthHistoricalData(forecastingDetector, data, metricDefinition);
-            }
+        if (detector != null && isSeasonalNaiveDetector(detector)) {
+            val data = getHistoricalData(mappedMetricData);
+            val forecastingDetector = (ForecastingDetector) detector;
+            val metricDefinition = mappedMetricData.getMetricData().getMetricDefinition();
+            populateForecastingDetectorWIthHistoricalData(forecastingDetector, data, metricDefinition);
         }
     }
 
@@ -76,6 +74,10 @@ public class DataInitializer {
     private GraphiteClient getClient() {
         val graphiteBaseUri = PropertiesUtil.getValueFromProperty(BASE_URI);
         return makeClient(graphiteBaseUri);
+    }
+
+    private boolean isSeasonalNaiveDetector(Detector detector) {
+        return detector instanceof ForecastingDetector && "seasonalnaive".equals(detector.getName());
     }
 
     //Using one-line methods for object creation to support unit testing
