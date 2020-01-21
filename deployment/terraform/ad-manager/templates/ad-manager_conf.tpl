@@ -16,6 +16,12 @@ ad-manager {
   }
   model-service-base-uri = "${modelservice_base_uri}"
 
+  # Graphite data source config
+  graphite-base-uri = "${graphite-base-uri}"
+  graphite-earliest-time ="${graphite-earliest-time}"
+  graphite-max-data-points = "${graphite-max-data-point}"
+  graphite-data-retrieval-key = "${graphite-data-retrieval-key}"
+
   # Detector refresh period in minutes
   detector-refresh-period = ${detector_refresh_period}
 }
