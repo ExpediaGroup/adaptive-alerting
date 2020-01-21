@@ -20,8 +20,8 @@ public class GraphiteSourceTest {
     private GraphiteClient graphiteClient;
 
     private GraphiteSource sourceUnderTest;
-    private GraphiteResult[] graphiteResults = new GraphiteResult[2];
-    private GraphiteResult[] graphiteResults_null = new GraphiteResult[2];
+    private List<GraphiteResult> graphiteResults = new ArrayList<>();
+    private List<GraphiteResult> graphiteResults_null = new ArrayList<>();
     private String from = "1d";
     private Integer maxDataPoints = 288;
 
@@ -59,13 +59,13 @@ public class GraphiteSourceTest {
     }
 
     private void initTestObjects() {
-        graphiteResults[0] = buildGraphiteResult();
-        graphiteResults_null[0] = buildNullValueGraphiteResult();
+        graphiteResults.add(buildGraphiteResult());
+        graphiteResults_null.add(buildNullValueGraphiteResult());
     }
 
     private void initDependencies() {
         when(graphiteClient.getData(from, maxDataPoints, "metric_name")).thenReturn(graphiteResults);
-        when(graphiteClient.getData(from, maxDataPoints, "null_metric")).thenReturn(new GraphiteResult[0]);
+        when(graphiteClient.getData(from, maxDataPoints, "null_metric")).thenReturn(new ArrayList<>());
         when(graphiteClient.getData(from, maxDataPoints, "null_value")).thenReturn(graphiteResults_null);
     }
 

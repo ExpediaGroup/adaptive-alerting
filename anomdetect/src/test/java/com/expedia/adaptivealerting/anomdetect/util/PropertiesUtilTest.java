@@ -13,7 +13,7 @@ public class PropertiesUtilTest {
         val baseUri = PropertiesUtil.getValueFromProperty(DataInitializer.BASE_URI);
         val earliestTime = PropertiesUtil.getValueFromProperty(DataInitializer.EARLIEST_TIME);
         val maxDataDataPoints = PropertiesUtil.getValueFromProperty(DataInitializer.MAX_DATA_POINTS);
-        val functionTagKey = PropertiesUtil.getValueFromProperty(MetricUtil.METRIC_FUNCTION_KEY);
+        val functionTagKey = PropertiesUtil.getValueFromProperty(MetricUtil.DATA_RETRIEVAL_TAG_KEY);
 
         assertEquals("http://graphite", baseUri);
         assertEquals("7d", earliestTime);

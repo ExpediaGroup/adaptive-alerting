@@ -20,6 +20,7 @@ import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.TagCollection;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 import java.time.Instant;
@@ -34,9 +35,10 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
  * Metric utilities.
  */
 @UtilityClass
+@Slf4j
 public class MetricUtil {
 
-    public static final String METRIC_FUNCTION_KEY = "graphite.functionTagKey";
+    public static final String DATA_RETRIEVAL_TAG_KEY = "graphite.functionTagKey";
 
     public static Map<String, String> defaultKvTags() {
         val kvTags = new HashMap<String, String>();
@@ -100,19 +102,34 @@ public class MetricUtil {
     }
 
     /**
-     * Convenience method to get metric function if available else return metric key.
+     * Convenience method to get the value of the tag that has a key matching DATA_RETRIEVAL_TAG_KEY for the provided metric.
+     * If the provided metric does not contain that tag, the key of the metric's MetricDefinition will be returned.
      *
      * @param mappedMetricData Mapped metric data
-     * @return Returns metric function if available else metric key
+     * @return Returns value for the provided data retrieval tag key. If value is not present then the key of the metric's MetricDefinition will be returned.
      */
     public static String getMetricFunctionOrKey(MappedMetricData mappedMetricData) {
         val metricData = mappedMetricData.getMetricData();
         val metricDefinition = metricData.getMetricDefinition();
         val metricTags = metricDefinition.getTags();
-        val functionTagKey = PropertiesUtil.getValueFromProperty(METRIC_FUNCTION_KEY);
-        val metricFunction = metricTags != null && metricTags.getKv() != null
-                ? metricTags.getKv().get(functionTagKey) : null;
-        return metricFunction != null
-                ? metricFunction : metricDefinition.getKey();
+        val dataRetrievalTagKey = PropertiesUtil.getValueFromProperty(DATA_RETRIEVAL_TAG_KEY);
+        val metricKey = metricDefinition.getKey();
+
+        if (dataRetrievalTagKey == null) {
+            return metricKey;
+        }
+
+        val dataRetrievalTagValue = getValueFromTagKey(metricTags, dataRetrievalTagKey);
+        if (dataRetrievalTagValue != null) {
+            return dataRetrievalTagValue;
+        } else {
+            log.warn("Provided data retrieval key={} doesn't exist. Returning metric key instead", dataRetrievalTagKey);
+            return metricKey;
+        }
+    }
+
+    private String getValueFromTagKey(TagCollection metricTags, String dataRetrievalTagKey) {
+        return metricTags != null && metricTags.getKv() != null
+                ? metricTags.getKv().get(dataRetrievalTagKey) : null;
     }
 }

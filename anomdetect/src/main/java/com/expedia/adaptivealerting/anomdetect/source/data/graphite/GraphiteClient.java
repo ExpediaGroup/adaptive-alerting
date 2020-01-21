@@ -23,6 +23,9 @@ import lombok.val;
 import org.apache.http.client.fluent.Content;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
@@ -54,7 +57,7 @@ public class GraphiteClient {
      * @param target        metric name or tag with an optional graphite function
      * @return time series for the specified metric
      */
-    public GraphiteResult[] getData(String from, Integer maxDataPoints, String target) {
+    public List<GraphiteResult> getData(String from, Integer maxDataPoints, String target) {
         notNull(from, "from can't be null");
         notNull(target, "target can't be null");
         notNull(maxDataPoints, "maxDataPoints can't be null");
@@ -70,10 +73,10 @@ public class GraphiteClient {
                     ", message=" + e.getMessage();
             throw new RuntimeException(message, e);
         }
-        GraphiteResult[] results;
 
+        List<GraphiteResult> results = new ArrayList<>();
         try {
-            results = objectMapper.readValue(content.asBytes(), GraphiteResult[].class);
+            results = Arrays.asList(objectMapper.readValue(content.asBytes(), GraphiteResult[].class));
         } catch (IOException e) {
             val message = "IOException while reading graphite data " + target;
             throw new RuntimeException(message, e);

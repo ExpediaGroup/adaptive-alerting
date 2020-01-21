@@ -45,21 +45,12 @@ public class DataInitializer {
             val data = getHistoricalData(mappedMetricData);
             val forecastingDetector = (ForecastingDetector) detector;
             val metricDefinition = mappedMetricData.getMetricData().getMetricDefinition();
-            populateForecastingDetectorWIthHistoricalData(forecastingDetector, data, metricDefinition);
+            populateForecastingDetectorWithHistoricalData(forecastingDetector, data, metricDefinition);
         }
     }
 
-    private void populateForecastingDetectorWIthHistoricalData(ForecastingDetector forecastingDetector, List<DataSourceResult> data, MetricDefinition metricDefinition) {
-        for (DataSourceResult dataSourceResult : data) {
-            val metricData = dataSourceResultToMetricData(dataSourceResult, metricDefinition);
-            forecastingDetector.getPointForecaster().forecast(metricData);
-        }
-    }
-
-    private MetricData dataSourceResultToMetricData(DataSourceResult dataSourceResult, MetricDefinition metricDefinition) {
-        val dataPoint = dataSourceResult.getDataPoint();
-        val epochSecond = dataSourceResult.getEpochSecond();
-        return new MetricData(metricDefinition, dataPoint, epochSecond);
+    private boolean isSeasonalNaiveDetector(Detector detector) {
+        return detector instanceof ForecastingDetector && "seasonalnaive".equals(detector.getName());
     }
 
     private List<DataSourceResult> getHistoricalData(MappedMetricData mappedMetricData) {
@@ -76,16 +67,26 @@ public class DataInitializer {
         return makeClient(graphiteBaseUri);
     }
 
-    private boolean isSeasonalNaiveDetector(Detector detector) {
-        return detector instanceof ForecastingDetector && "seasonalnaive".equals(detector.getName());
-    }
-
-    //Using one-line methods for object creation to support unit testing
+    //TODO. Using one-line methods for object creation to support unit testing. We can replace this with factories later on.
+    // https://github.com/mockito/mockito/wiki/Mocking-Object-Creation#pattern-1---using-one-line-methods-for-object-creation
     GraphiteClient makeClient(String graphiteBaseUri) {
         return new GraphiteClient(graphiteBaseUri, new HttpClientWrapper(), new ObjectMapper());
     }
 
     DataSource makeSource(GraphiteClient client) {
         return new GraphiteSource(client);
+    }
+
+    private void populateForecastingDetectorWithHistoricalData(ForecastingDetector forecastingDetector, List<DataSourceResult> data, MetricDefinition metricDefinition) {
+        for (DataSourceResult dataSourceResult : data) {
+            val metricData = dataSourceResultToMetricData(dataSourceResult, metricDefinition);
+            forecastingDetector.getPointForecaster().forecast(metricData);
+        }
+    }
+
+    private MetricData dataSourceResultToMetricData(DataSourceResult dataSourceResult, MetricDefinition metricDefinition) {
+        val dataPoint = dataSourceResult.getDataPoint();
+        val epochSecond = dataSourceResult.getEpochSecond();
+        return new MetricData(metricDefinition, dataPoint, epochSecond);
     }
 }
