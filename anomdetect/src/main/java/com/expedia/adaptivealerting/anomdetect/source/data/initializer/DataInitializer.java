@@ -54,7 +54,7 @@ public class DataInitializer {
     }
 
     private List<DataSourceResult> getHistoricalData(MappedMetricData mappedMetricData) {
-        val target = MetricUtil.getMetricFunctionOrKey(mappedMetricData);
+        val target = MetricUtil.getDataRetrievalValueOrMetricKey(mappedMetricData);
         val client = getClient();
         val dataSource = makeSource(client);
         val earliest = PropertiesUtil.getValueFromProperty(EARLIEST_TIME);

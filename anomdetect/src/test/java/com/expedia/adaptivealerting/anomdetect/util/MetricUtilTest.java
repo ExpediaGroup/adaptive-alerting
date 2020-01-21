@@ -86,24 +86,24 @@ public final class MetricUtilTest {
     }
 
     @Test
-    public void testGetMetricFunctionOrKey_getFunction() {
+    public void testGetDataRetrievalValueOrMetricKey_getValue() {
         val mappedUuid = UUID.randomUUID();
         Map<String, String> tags = new HashMap<>();
         tags.put("function", "sum(test.metrics)");
         val metricDefinition = new MetricDefinition(new TagCollection(tags));
         val metricData = new MetricData(metricDefinition, 100.0, Instant.now().getEpochSecond());
         val mappedMetricData = new MappedMetricData(metricData, mappedUuid);
-        val value = MetricUtil.getMetricFunctionOrKey(mappedMetricData);
+        val value = MetricUtil.getDataRetrievalValueOrMetricKey(mappedMetricData);
         assertEquals("sum(test.metrics)", value);
     }
 
     @Test
-    public void testGetMetricFunctionOrKey_getKey() {
+    public void testGetDataRetrievalValueOrMetricKey_getKey() {
         val mappedUuid = UUID.randomUUID();
         val metricDefinition = new MetricDefinition("metric-definition");
         val metricData = new MetricData(metricDefinition, 100.0, Instant.now().getEpochSecond());
         val mappedMetricData = new MappedMetricData(metricData, mappedUuid);
-        val value = MetricUtil.getMetricFunctionOrKey(mappedMetricData);
+        val value = MetricUtil.getDataRetrievalValueOrMetricKey(mappedMetricData);
         assertEquals("metric-definition", value);
     }
 }
