@@ -23,6 +23,7 @@ import com.expedia.adaptivealerting.anomdetect.detect.Detector;
 import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
+import com.expedia.adaptivealerting.anomdetect.source.data.initializer.DataInitializer;
 import com.typesafe.config.Config;
 import lombok.Getter;
 import lombok.NonNull;
@@ -66,6 +67,8 @@ public class DetectorManager {
     private DetectorSource detectorSource;
     private int detectorRefreshTimePeriod;
     private long synchedTilTime = System.currentTimeMillis();
+    private DataInitializer dataInitializer;
+
 
     /**
      * Creates a new detector manager from the given parameters.
@@ -83,6 +86,7 @@ public class DetectorManager {
         this.detectorSource = detectorSource;
         this.detectorRefreshTimePeriod = detectorRefreshTimePeriod;
         this.cachedDetectors = cachedDetectors;
+        this.dataInitializer = new DataInitializer();
 
         detectorForTimer = metricRegistry.timer("detector.detectorFor");
         noDetectorFoundMeter = metricRegistry.meter("detector.nullDetector");
@@ -147,6 +151,7 @@ public class DetectorManager {
         Detector detector = cachedDetectors.get(detectorUuid);
         if (detector == null) {
             detector = detectorSource.findDetector(detectorUuid);
+            dataInitializer.initializeDetector(mappedMetricData, detector);
             cachedDetectors.put(detectorUuid, detector);
         } else {
             log.trace("Got cached detector");

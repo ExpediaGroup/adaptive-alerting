@@ -49,7 +49,7 @@ public final class DetectorManagerTest {
     private final int detectorRefreshPeriod = 1;
     private final int badDetectorRefreshPeriod = 0;
 
-//    @InjectMocks
+    //    @InjectMocks
     private DetectorManager managerUnderTest;
 
     @Mock

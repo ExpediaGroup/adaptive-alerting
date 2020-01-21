@@ -39,10 +39,11 @@ public class GraphiteSource implements DataSource {
 
     @Override
     public List<DataSourceResult> getMetricData(String from, Integer maxDataPoints, String metric) {
-        GraphiteResult[] graphiteResult = graphiteClient.getMetricData(from, maxDataPoints, metric);
+        List<GraphiteResult> graphiteResults = graphiteClient.getData(from, maxDataPoints, metric);
         List<DataSourceResult> results = new ArrayList<>();
-        if (graphiteResult.length != 0) {
-            String[][] dataPoints = graphiteResult[0].getDatapoints();
+        if (graphiteResults.size() > 0) {
+            String[][] dataPoints = graphiteResults.get(0).getDatapoints();
+            //TODO Convert this to use JAVA stream
             for (String[] dataPoint : dataPoints) {
                 Double value = MISSING_VALUE;
                 if (dataPoint[0] != null) {

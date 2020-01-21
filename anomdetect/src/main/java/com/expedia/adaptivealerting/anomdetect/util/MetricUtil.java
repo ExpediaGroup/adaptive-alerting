@@ -15,10 +15,12 @@
  */
 package com.expedia.adaptivealerting.anomdetect.util;
 
+import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.TagCollection;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 import java.time.Instant;
@@ -33,7 +35,10 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
  * Metric utilities.
  */
 @UtilityClass
+@Slf4j
 public class MetricUtil {
+
+    public static final String DATA_RETRIEVAL_TAG_KEY = "graphite.dataRetrievalKey";
 
     public static Map<String, String> defaultKvTags() {
         val kvTags = new HashMap<String, String>();
@@ -94,5 +99,37 @@ public class MetricUtil {
      */
     public static MetricData metricData(MetricDefinition metricDef, double value, long epochSecond) {
         return new MetricData(metricDef, value, epochSecond);
+    }
+
+    /**
+     * Convenience method to get the value of the tag that has a key matching DATA_RETRIEVAL_TAG_KEY for the provided metric.
+     * If the provided metric does not contain that tag, the key of the metric's MetricDefinition will be returned.
+     *
+     * @param mappedMetricData Mapped metric data
+     * @return Returns value for the provided data retrieval tag key. If value is not present then the key of the metric's MetricDefinition will be returned.
+     */
+    public static String getDataRetrievalValueOrMetricKey(MappedMetricData mappedMetricData) {
+        val metricData = mappedMetricData.getMetricData();
+        val metricDefinition = metricData.getMetricDefinition();
+        val metricTags = metricDefinition.getTags();
+        val dataRetrievalTagKey = PropertiesUtil.getValueFromProperty(DATA_RETRIEVAL_TAG_KEY);
+        val metricKey = metricDefinition.getKey();
+
+        if (dataRetrievalTagKey == null) {
+            return metricKey;
+        }
+
+        val dataRetrievalTagValue = getValueFromTagKey(metricTags, dataRetrievalTagKey);
+        if (dataRetrievalTagValue != null) {
+            return dataRetrievalTagValue;
+        } else {
+            log.warn("Provided data retrieval key={} doesn't exist. Returning metric key instead", dataRetrievalTagKey);
+            return metricKey;
+        }
+    }
+
+    private String getValueFromTagKey(TagCollection metricTags, String dataRetrievalTagKey) {
+        return metricTags != null && metricTags.getKv() != null
+                ? metricTags.getKv().get(dataRetrievalTagKey) : null;
     }
 }

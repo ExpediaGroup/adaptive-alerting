@@ -15,9 +15,19 @@
  */
 package com.expedia.adaptivealerting.anomdetect.util;
 
+import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
+import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
+import com.expedia.metrics.TagCollection;
 import lombok.val;
 import org.junit.Test;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -73,5 +83,27 @@ public final class MetricUtilTest {
         val metricData = MetricUtil.metricData(metricDef, 3.14159, 1554702637);
         assertEquals(3.14159, metricData.getValue(), 0.001);
         assertEquals(1554702637, metricData.getTimestamp(), 0.001);
+    }
+
+    @Test
+    public void testGetDataRetrievalValueOrMetricKey_getValue() {
+        val mappedUuid = UUID.randomUUID();
+        Map<String, String> tags = new HashMap<>();
+        tags.put("function", "sum(test.metrics)");
+        val metricDefinition = new MetricDefinition(new TagCollection(tags));
+        val metricData = new MetricData(metricDefinition, 100.0, Instant.now().getEpochSecond());
+        val mappedMetricData = new MappedMetricData(metricData, mappedUuid);
+        val value = MetricUtil.getDataRetrievalValueOrMetricKey(mappedMetricData);
+        assertEquals("sum(test.metrics)", value);
+    }
+
+    @Test
+    public void testGetDataRetrievalValueOrMetricKey_getKey() {
+        val mappedUuid = UUID.randomUUID();
+        val metricDefinition = new MetricDefinition("metric-definition");
+        val metricData = new MetricData(metricDefinition, 100.0, Instant.now().getEpochSecond());
+        val mappedMetricData = new MappedMetricData(metricData, mappedUuid);
+        val value = MetricUtil.getDataRetrievalValueOrMetricKey(mappedMetricData);
+        assertEquals("metric-definition", value);
     }
 }
