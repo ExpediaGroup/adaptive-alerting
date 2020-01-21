@@ -38,7 +38,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 @Slf4j
 public class MetricUtil {
 
-    public static final String DATA_RETRIEVAL_TAG_KEY = "graphite.functionTagKey";
+    public static final String DATA_RETRIEVAL_TAG_KEY = "graphite.dataRetrievalKey";
 
     public static Map<String, String> defaultKvTags() {
         val kvTags = new HashMap<String, String>();
