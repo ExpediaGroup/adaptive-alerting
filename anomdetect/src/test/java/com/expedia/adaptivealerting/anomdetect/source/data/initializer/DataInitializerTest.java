@@ -13,12 +13,12 @@ import com.expedia.adaptivealerting.anomdetect.source.data.DataSourceResult;;
 import com.expedia.adaptivealerting.anomdetect.source.data.graphite.GraphiteClient;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
+import com.typesafe.config.Config;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -29,16 +29,19 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atMost;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class DataInitializerTest {
 
-    @Spy
     private DataInitializer initializerUnderTest;
 
     @Mock
     private DataSource dataSource;
+
+    @Mock
+    private Config config;
 
     @Mock
     private GraphiteClient graphiteClient;
@@ -50,6 +53,8 @@ public class DataInitializerTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
+        initConfig();
+        this.initializerUnderTest = spy(new DataInitializer(config));
         initTestObjects();
         initDependencies();
     }
@@ -60,25 +65,18 @@ public class DataInitializerTest {
         verify(initializerUnderTest, atMost(1)).initializeDetector(any(MappedMetricData.class), any(Detector.class));
     }
 
+    private void initConfig() {
+        when(config.getString(DataInitializer.BASE_URI)).thenReturn("http://graphite");
+        when(config.getString(DataInitializer.EARLIEST_TIME)).thenReturn("7d");
+        when(config.getInt(DataInitializer.MAX_DATA_POINTS)).thenReturn(2016);
+    }
+
     public void initTestObjects() {
         this.mappedMetricData = buildMappedMetricData();
         this.detector = buildDetector();
         this.dataSourceResults = new ArrayList<>();
         dataSourceResults.add(buildDataSourceResult(1.0, 1578307488));
         dataSourceResults.add(buildDataSourceResult(3.0, 1578307489));
-    }
-
-    private void initDependencies() {
-        when(initializerUnderTest.makeClient(anyString())).thenReturn(graphiteClient);
-        when(initializerUnderTest.makeSource(graphiteClient)).thenReturn(dataSource);
-        when(dataSource.getMetricData(anyString(), anyInt(), anyString())).thenReturn(dataSourceResults);
-    }
-
-    private DataSourceResult buildDataSourceResult(Double value, long epochSecs) {
-        val dataSourceResult = new DataSourceResult();
-        dataSourceResult.setDataPoint(value);
-        dataSourceResult.setEpochSecond(epochSecs);
-        return dataSourceResult;
     }
 
     private MappedMetricData buildMappedMetricData() {
@@ -92,5 +90,18 @@ public class DataInitializerTest {
         val seasonalNaivePointForecaster = new SeasonalNaivePointForecaster(new SeasonalNaivePointForecasterParams().setCycleLength(22).setIntervalLength(11));
         val multiplicativeIntervalForecaster = new MultiplicativeIntervalForecaster(new MultiplicativeIntervalForecasterParams().setStrongMultiplier(3.0).setWeakMultiplier(1.0));
         return new ForecastingDetector(UUID.randomUUID(), seasonalNaivePointForecaster, multiplicativeIntervalForecaster, AnomalyType.TWO_TAILED, true, "seasonalnaive");
+    }
+
+    private void initDependencies() {
+        when(initializerUnderTest.makeClient(anyString())).thenReturn(graphiteClient);
+        when(initializerUnderTest.makeSource(graphiteClient)).thenReturn(dataSource);
+        when(dataSource.getMetricData(anyString(), anyInt(), anyString())).thenReturn(dataSourceResults);
+    }
+
+    private DataSourceResult buildDataSourceResult(Double value, long epochSecs) {
+        val dataSourceResult = new DataSourceResult();
+        dataSourceResult.setDataPoint(value);
+        dataSourceResult.setEpochSecond(epochSecs);
+        return dataSourceResult;
     }
 }

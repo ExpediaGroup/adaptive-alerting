@@ -89,7 +89,7 @@ public final class DetectorManagerTest {
         MockitoAnnotations.initMocks(this);
         initTestObjects();
         initDependencies();
-        this.managerUnderTest = new DetectorManager(detectorSource, detectorRefreshPeriod, cachedDetectors, SharedMetricRegistries.getOrCreate("test"));
+        this.managerUnderTest = new DetectorManager(detectorSource, config, cachedDetectors, SharedMetricRegistries.getOrCreate("test"));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -105,7 +105,7 @@ public final class DetectorManagerTest {
 
     @Test
     public void testDetectorRefresh() {
-        val result = managerUnderTest.detectorCacheSync(System.currentTimeMillis()+1000*60);
+        val result = managerUnderTest.detectorCacheSync(System.currentTimeMillis() + 1000 * 60);
         assertNotNull(result);
         assertEquals(updatedDetectors, result);
     }

@@ -39,6 +39,10 @@ variable "anomaly_producer_breakout_topic" {}
 variable "anomaly_producer_key_serializer" {}
 variable "anomaly_producer_value_serializer" {}
 variable "modelservice_base_uri" {}
+variable "graphite-base-uri" {}
+variable "graphite-earliest-time" {}
+variable "graphite-max-data-points" {}
+variable "graphite-data-retrieval-key" {}
 variable "detector_refresh_period" {
   default = 5
 }

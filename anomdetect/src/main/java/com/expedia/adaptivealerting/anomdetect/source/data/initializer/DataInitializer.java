@@ -24,10 +24,10 @@ import com.expedia.adaptivealerting.anomdetect.source.data.graphite.GraphiteClie
 import com.expedia.adaptivealerting.anomdetect.source.data.graphite.GraphiteSource;
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.expedia.adaptivealerting.anomdetect.util.MetricUtil;
-import com.expedia.adaptivealerting.anomdetect.util.PropertiesUtil;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -36,9 +36,22 @@ import java.util.List;
 @Slf4j
 public class DataInitializer {
 
-    public static final String BASE_URI = "graphite.baseUri";
-    public static final String EARLIEST_TIME = "graphite.earliestTime";
-    public static final String MAX_DATA_POINTS = "graphite.maxDataDataPoints";
+    public static final String BASE_URI = "graphite-base-uri";
+    public static final String EARLIEST_TIME = "graphite-earliest-time";
+    public static final String MAX_DATA_POINTS = "graphite-max-data-points";
+    public static final String DATA_RETRIEVAL_TAG_KEY = "graphite-data-retrieval-key";
+
+    private String baseUri;
+    private String earliestTime;
+    private Integer maxDataPoints;
+    private String dataRetrievalTagKey;
+
+    public DataInitializer(Config config) {
+        this.baseUri = config.getString(BASE_URI);
+        this.earliestTime = config.getString(EARLIEST_TIME);
+        this.maxDataPoints = config.getInt(MAX_DATA_POINTS);
+        this.dataRetrievalTagKey = config.getString(DATA_RETRIEVAL_TAG_KEY);
+    }
 
     public void initializeDetector(MappedMetricData mappedMetricData, Detector detector) {
         if (detector != null && isSeasonalNaiveDetector(detector)) {
@@ -54,21 +67,15 @@ public class DataInitializer {
     }
 
     private List<DataSourceResult> getHistoricalData(MappedMetricData mappedMetricData) {
-        val target = MetricUtil.getDataRetrievalValueOrMetricKey(mappedMetricData);
-        val client = getClient();
+        val target = MetricUtil.getDataRetrievalValueOrMetricKey(mappedMetricData, dataRetrievalTagKey);
+        val client = makeClient(baseUri);
         val dataSource = makeSource(client);
-        val earliest = PropertiesUtil.getValueFromProperty(EARLIEST_TIME);
-        val maxDataPoints = Integer.parseInt(PropertiesUtil.getValueFromProperty(MAX_DATA_POINTS));
-        return dataSource.getMetricData(earliest, maxDataPoints, target);
-    }
-
-    private GraphiteClient getClient() {
-        val graphiteBaseUri = PropertiesUtil.getValueFromProperty(BASE_URI);
-        return makeClient(graphiteBaseUri);
+        return dataSource.getMetricData(earliestTime, maxDataPoints, target);
     }
 
     //TODO. Using one-line methods for object creation to support unit testing. We can replace this with factories later on.
     // https://github.com/mockito/mockito/wiki/Mocking-Object-Creation#pattern-1---using-one-line-methods-for-object-creation
+
     GraphiteClient makeClient(String graphiteBaseUri) {
         return new GraphiteClient(graphiteBaseUri, new HttpClientWrapper(), new ObjectMapper());
     }

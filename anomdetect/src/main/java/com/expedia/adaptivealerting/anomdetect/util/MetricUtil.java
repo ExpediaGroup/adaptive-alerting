@@ -38,8 +38,6 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 @Slf4j
 public class MetricUtil {
 
-    public static final String DATA_RETRIEVAL_TAG_KEY = "graphite.dataRetrievalKey";
-
     public static Map<String, String> defaultKvTags() {
         val kvTags = new HashMap<String, String>();
         kvTags.put(MetricDefinition.UNIT, "");
@@ -108,11 +106,10 @@ public class MetricUtil {
      * @param mappedMetricData Mapped metric data
      * @return Returns value for the provided data retrieval tag key. If value is not present then the key of the metric's MetricDefinition will be returned.
      */
-    public static String getDataRetrievalValueOrMetricKey(MappedMetricData mappedMetricData) {
+    public static String getDataRetrievalValueOrMetricKey(MappedMetricData mappedMetricData, String dataRetrievalTagKey) {
         val metricData = mappedMetricData.getMetricData();
         val metricDefinition = metricData.getMetricDefinition();
         val metricTags = metricDefinition.getTags();
-        val dataRetrievalTagKey = PropertiesUtil.getValueFromProperty(DATA_RETRIEVAL_TAG_KEY);
         val metricKey = metricDefinition.getKey();
 
         if (dataRetrievalTagKey == null) {

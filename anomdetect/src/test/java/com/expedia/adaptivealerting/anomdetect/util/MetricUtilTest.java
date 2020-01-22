@@ -1,3 +1,4 @@
+  
 /*
  * Copyright 2018-2019 Expedia Group, Inc.
  *
@@ -23,9 +24,7 @@ import lombok.val;
 import org.junit.Test;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -93,7 +92,7 @@ public final class MetricUtilTest {
         val metricDefinition = new MetricDefinition(new TagCollection(tags));
         val metricData = new MetricData(metricDefinition, 100.0, Instant.now().getEpochSecond());
         val mappedMetricData = new MappedMetricData(metricData, mappedUuid);
-        val value = MetricUtil.getDataRetrievalValueOrMetricKey(mappedMetricData);
+        val value = MetricUtil.getDataRetrievalValueOrMetricKey(mappedMetricData, "function");
         assertEquals("sum(test.metrics)", value);
     }
 
@@ -103,7 +102,7 @@ public final class MetricUtilTest {
         val metricDefinition = new MetricDefinition("metric-definition");
         val metricData = new MetricData(metricDefinition, 100.0, Instant.now().getEpochSecond());
         val mappedMetricData = new MappedMetricData(metricData, mappedUuid);
-        val value = MetricUtil.getDataRetrievalValueOrMetricKey(mappedMetricData);
+        val value = MetricUtil.getDataRetrievalValueOrMetricKey(mappedMetricData, "");
         assertEquals("metric-definition", value);
     }
 }
