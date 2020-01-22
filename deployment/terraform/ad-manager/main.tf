@@ -22,10 +22,10 @@ data "template_file" "config_data" {
     anomaly_producer_key_serializer = "${var.anomaly_producer_key_serializer}"
     anomaly_producer_value_serializer = "${var.anomaly_producer_value_serializer}"
     modelservice_base_uri = "${var.modelservice_base_uri}"
-    graphite-base-uri = "${var.graphite-base-uri}"
-    graphite-earliest-time ="${var.graphite-earliest-time}"
-    graphite-max-data-points = "${var.graphite-max-data-points}"
-    graphite-data-retrieval-key = "${var.graphite-data-retrieval-key}"
+    graphite_base_uri = "${var.graphite_base_uri}"
+    graphite_earliest_time ="${var.graphite_earliest_time}"
+    graphite_max_data_points = "${var.graphite_max_data_points}"
+    graphite_data_retrieval_key = "${var.graphite_data_retrieval_key}"
     detector_refresh_period = "${var.detector_refresh_period}"
   }
 }
