@@ -36,6 +36,10 @@ module "ad-mapper" {
   # App
   kafka_endpoint = "${local.kafka_endpoint}"
   modelservice_base_uri = "${var.ad-mapper["modelservice_base_uri"]}"
+  graphite_base_uri = "${var.ad-mapper["graphite_base_uri"]}"
+  graphite_earliest_time = "${var.ad-mapper["graphite_earliest_time"]}"
+  graphite_max_data_points = "${var.ad-mapper["graphite_max_data_points"]}"
+  graphite_data_retrieval_key = "${var.ad-mapper["graphite_data_retrieval_key"]}"
   detector_mapping_cache_update_period = "${var.ad-mapper["detector_mapping_cache_update_period"]}"
 }
 
