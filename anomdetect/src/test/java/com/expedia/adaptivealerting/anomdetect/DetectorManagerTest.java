@@ -89,7 +89,7 @@ public final class DetectorManagerTest {
         MockitoAnnotations.initMocks(this);
         initTestObjects();
         initDependencies();
-        this.managerUnderTest = new DetectorManager(detectorSource, config, detectorRefreshPeriod, cachedDetectors, SharedMetricRegistries.getOrCreate("test"));
+        this.managerUnderTest = new DetectorManager(detectorSource, config, cachedDetectors, SharedMetricRegistries.getOrCreate("test"));
     }
 
     @Test(expected = IllegalArgumentException.class)

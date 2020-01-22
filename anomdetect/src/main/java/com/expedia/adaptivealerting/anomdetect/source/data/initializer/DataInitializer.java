@@ -41,7 +41,6 @@ public class DataInitializer {
     public static final String MAX_DATA_POINTS = "graphite-max-data-points";
     public static final String DATA_RETRIEVAL_TAG_KEY = "graphite-data-retrieval-key";
 
-
     private String baseUri;
     private String earliestTime;
     private Integer maxDataPoints;

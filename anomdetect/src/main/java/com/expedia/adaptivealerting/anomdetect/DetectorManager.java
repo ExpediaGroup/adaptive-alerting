@@ -74,17 +74,16 @@ public class DetectorManager {
      * Creates a new detector manager from the given parameters.
      *
      * @param detectorSource            detector source
-     * @param detectorRefreshTimePeriod detector refresh period in minutes
      * @param metricRegistry            metric registry
      * @param cachedDetectors           map containing cached detectors
      */
-    public DetectorManager(DetectorSource detectorSource, Config config, int detectorRefreshTimePeriod, Map<UUID, Detector> cachedDetectors, MetricRegistry metricRegistry) {
+    public DetectorManager(DetectorSource detectorSource, Config config, Map<UUID, Detector> cachedDetectors, MetricRegistry metricRegistry) {
         // TODO Seems odd to include this constructor, whose purpose seems to be to support unit
         //  testing. At least I don't think it should be public. And it should take a Config
         //  since the other one does, and this is conceptually just the base constructor with
         //  the cache exposed.[WLW]
         this.detectorSource = detectorSource;
-        this.detectorRefreshTimePeriod = detectorRefreshTimePeriod;
+        this.detectorRefreshTimePeriod = config.getInt(CK_DETECTOR_REFRESH_PERIOD);
         this.cachedDetectors = cachedDetectors;
         this.dataInitializer = new DataInitializer(config);
 
@@ -97,7 +96,7 @@ public class DetectorManager {
     }
 
     public DetectorManager(DetectorSource detectorSource, Config config, MetricRegistry metricRegistry) {
-        this(detectorSource, config, config.getInt(CK_DETECTOR_REFRESH_PERIOD), new HashMap<>(), metricRegistry);
+        this(detectorSource, config, new HashMap<>(), metricRegistry);
     }
 
     private void initScheduler() {
