@@ -36,10 +36,6 @@ module "ad-mapper" {
   # App
   kafka_endpoint = "${local.kafka_endpoint}"
   modelservice_base_uri = "${var.ad-mapper["modelservice_base_uri"]}"
-  graphite_base_uri = "${var.ad-mapper["graphite_base_uri"]}"
-  graphite_earliest_time = "${var.ad-mapper["graphite_earliest_time"]}"
-  graphite_max_data_points = "${var.ad-mapper["graphite_max_data_points"]}"
-  graphite_data_retrieval_key = "${var.ad-mapper["graphite_data_retrieval_key"]}"
   detector_mapping_cache_update_period = "${var.ad-mapper["detector_mapping_cache_update_period"]}"
 }
 
@@ -83,6 +79,10 @@ module "ad-manager" {
   anomaly_producer_key_serializer = "${var.ad-manager["anomaly_producer_key_serializer"]}"
   anomaly_producer_value_serializer = "${var.ad-manager["anomaly_producer_value_serializer"]}"
   modelservice_base_uri = "${var.ad-manager["modelservice_base_uri"]}"
+  graphite_base_uri = "${var.ad-manager["graphite_base_uri"]}"
+  graphite_earliest_time = "${var.ad-manager["graphite_earliest_time"]}"
+  graphite_max_data_points = "${var.ad-manager["graphite_max_data_points"]}"
+  graphite_data_retrieval_key = "${var.ad-manager["graphite_data_retrieval_key"]}"
   detector_refresh_period = "${var.ad-manager["detector_refresh_period"]}"
 }
 
