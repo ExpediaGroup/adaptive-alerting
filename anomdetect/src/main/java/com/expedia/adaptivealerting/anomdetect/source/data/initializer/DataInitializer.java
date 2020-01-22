@@ -68,17 +68,14 @@ public class DataInitializer {
 
     private List<DataSourceResult> getHistoricalData(MappedMetricData mappedMetricData) {
         val target = MetricUtil.getDataRetrievalValueOrMetricKey(mappedMetricData, dataRetrievalTagKey);
-        val client = getClient();
+        val client = makeClient(baseUri);
         val dataSource = makeSource(client);
         return dataSource.getMetricData(earliestTime, maxDataPoints, target);
     }
 
-    private GraphiteClient getClient() {
-        return makeClient(baseUri);
-    }
-
     //TODO. Using one-line methods for object creation to support unit testing. We can replace this with factories later on.
     // https://github.com/mockito/mockito/wiki/Mocking-Object-Creation#pattern-1---using-one-line-methods-for-object-creation
+
     GraphiteClient makeClient(String graphiteBaseUri) {
         return new GraphiteClient(graphiteBaseUri, new HttpClientWrapper(), new ObjectMapper());
     }
