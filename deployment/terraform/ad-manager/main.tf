@@ -24,7 +24,7 @@ data "template_file" "config_data" {
     modelservice_base_uri = "${var.modelservice_base_uri}"
     graphite-base-uri = "${var.graphite-base-uri}"
     graphite-earliest-time ="${var.graphite-earliest-time}"
-    graphite-max-data-points = "${var.graphite-max-data-point}"
+    graphite-max-data-points = "${var.graphite-max-data-points}"
     graphite-data-retrieval-key = "${var.graphite-data-retrieval-key}"
     detector_refresh_period = "${var.detector_refresh_period}"
   }
