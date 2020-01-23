@@ -17,10 +17,10 @@ package com.expedia.adaptivealerting.modelservice.repo.impl;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
-import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticSearchClient;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
-import com.expedia.adaptivealerting.modelservice.util.DateUtil;
+import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticSearchClient;
 import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticsearchUtil;
+import com.expedia.adaptivealerting.modelservice.util.DateUtil;
 import com.expedia.adaptivealerting.modelservice.util.ObjectMapperUtil;
 import com.expedia.adaptivealerting.modelservice.util.RequestValidator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -141,7 +141,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
                 try {
                     value = field.get(document);
                 } catch (IllegalAccessException e) {
-                    log.error(String.format("Updating elastic search failed", e));
+                    log.error("Updating elastic search failed", e);
                     throw new RuntimeException(e);
                 }
                 if ("lastUpdateTimestamp".equals(name)) {
@@ -176,7 +176,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
                 throw new RecordNotFoundException("Invalid request: " + uuid);
             }
         } catch (IOException e) {
-            log.error(String.format("Updating elastic search failed", e));
+            log.error("Updating elastic search failed", e);
             throw new RuntimeException(e);
         }
     }
@@ -217,7 +217,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
                 throw new RecordNotFoundException("Invalid request: " + uuid);
             }
         } catch (IOException e) {
-            log.error(String.format("Updating elastic search failed", e));
+            log.error("Updating elastic search failed", e);
             throw new RuntimeException(e);
         }
     }
@@ -241,7 +241,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
                 throw new RecordNotFoundException("Invalid request: " + uuid);
             }
         } catch (IOException e) {
-            log.error(String.format("Updating elastic search failed", e));
+            log.error("Updating elastic search failed", e);
             throw new RuntimeException(e);
         }
     }

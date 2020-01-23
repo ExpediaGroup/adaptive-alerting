@@ -34,9 +34,9 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -50,7 +50,7 @@ public class ElasticsearchUtil {
             indexRequest.source(json, XContentType.JSON);
             return elasticSearchClient.index(indexRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
-            log.error(String.format("Indexing mapping %s failed", json, e));
+            log.error(String.format("Indexing mapping %s failed", json), e);
             throw new RuntimeException(e);
         }
     }
@@ -82,8 +82,7 @@ public class ElasticsearchUtil {
                     .get(docType)
                     .sourceAsMap().get("properties"));
 
-            Set<String> mappedFields = mapProperties.entrySet().stream()
-                    .map(en -> en.getKey()).collect(Collectors.toSet());
+            Set<String> mappedFields = new HashSet<>(mapProperties.keySet());
             fields.removeAll(mappedFields);
             return fields;
         } catch (IOException e) {

@@ -15,8 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.expwelford;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.expwelford.ExponentialWelfordIntervalForecaster;
-import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.expwelford.ExponentialWelfordIntervalForecasterParams;
 import com.expedia.adaptivealerting.anomdetect.util.TestObjectMother;
 import com.expedia.metrics.MetricData;
 import com.opencsv.bean.CsvBindByName;

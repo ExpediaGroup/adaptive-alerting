@@ -20,11 +20,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
-import java.util.ListIterator;
 
 import static org.junit.Assert.assertEquals;
 
@@ -33,7 +31,7 @@ public class RmsePointForecastEvaluatorTest {
     private static List<RmseEvaluatorTestRow> calInflowTestRows;
 
     @BeforeClass
-    public static void setUpClass() throws IOException {
+    public static void setUpClass() {
         readData_calInflow();
     }
 
@@ -47,9 +45,7 @@ public class RmsePointForecastEvaluatorTest {
 
     @Test
     public void testScore() {
-        final ListIterator<RmseEvaluatorTestRow> testRows = calInflowTestRows.listIterator();
-        while (testRows.hasNext()) {
-            final RmseEvaluatorTestRow testRow = testRows.next();
+        for (RmseEvaluatorTestRow testRow : calInflowTestRows) {
             final double observed = testRow.getObserved();
             final double predicted = testRow.getPredicted();
             evaluator.update(observed, predicted);

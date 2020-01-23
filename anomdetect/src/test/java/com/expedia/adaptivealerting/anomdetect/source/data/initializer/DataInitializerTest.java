@@ -9,7 +9,7 @@ import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.multiplica
 import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.seasonalnaive.SeasonalNaivePointForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.seasonalnaive.SeasonalNaivePointForecasterParams;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSource;
-import com.expedia.adaptivealerting.anomdetect.source.data.DataSourceResult;;
+import com.expedia.adaptivealerting.anomdetect.source.data.DataSourceResult;
 import com.expedia.adaptivealerting.anomdetect.source.data.graphite.GraphiteClient;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
@@ -31,6 +31,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atMost;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 
 public class DataInitializerTest {
 

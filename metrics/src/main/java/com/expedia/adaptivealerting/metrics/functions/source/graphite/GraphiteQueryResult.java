@@ -82,9 +82,7 @@ public class GraphiteQueryResult {
             if (graphiteResultJsonObject.getJSONArray(GRAPHITE_RESULT_DATAPOINTS_KEY).length() > 0) {
                 String[] datapointString = graphiteResultJsonObject.getJSONArray(GRAPHITE_RESULT_DATAPOINTS_KEY).get(0).toString().split(",");
                 if (datapointString.length > 1) {
-                    if (datapointString[0].substring(1).equals("null")) {
-                        return true;
-                    }
+                    return datapointString[0].substring(1).equals("null");
                 }
             }
         }

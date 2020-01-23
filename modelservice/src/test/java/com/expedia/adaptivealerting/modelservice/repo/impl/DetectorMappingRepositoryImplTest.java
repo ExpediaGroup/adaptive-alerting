@@ -124,7 +124,7 @@ public class DetectorMappingRepositoryImplTest {
         when(elasticsearchUtil.getSearchRequest(any(SearchSourceBuilder.class), anyString(), anyString())).thenReturn(new SearchRequest());
         when(elasticsearchUtil.index(any(IndexRequest.class), anyString())).thenReturn(new IndexResponse());
 
-        when(objectMapperUtil.convertToString(any())).thenReturn(new String());
+        when(objectMapperUtil.convertToString(any())).thenReturn("");
         when(objectMapperUtil.convertToObject(anyString(), any())).thenReturn(percolatorDetectorMapping);
     }
 

@@ -56,11 +56,10 @@ public class KafkaMetricFunctions implements MetricFunctionsPublish {
         aggregatorProducer = new KafkaProducer<>(aggregatorProducerProps);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void publishMetrics(MetricData metricData) {
         try {
-            ProducerRecord aggregateProducerRecord = new ProducerRecord(
+            ProducerRecord<String, MetricData> aggregateProducerRecord = new ProducerRecord<>(
                     metricSinkConfig.getString(OUTPUT_TOPIC_KEY_STRING),
                     metricData.getMetricDefinition().getKey(), metricData);
             aggregatorProducer.send(aggregateProducerRecord);

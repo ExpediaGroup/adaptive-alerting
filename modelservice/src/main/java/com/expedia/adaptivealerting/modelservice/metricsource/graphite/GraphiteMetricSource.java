@@ -47,7 +47,7 @@ public class GraphiteMetricSource implements MetricSource {
         if (graphiteResult.length != 0) {
             String[][] dataPoints = graphiteResult[0].getDatapoints();
             for (String[] dataPoint : dataPoints) {
-                Double dataPointValue = 0.0;
+                double dataPointValue = 0.0;
                 long epochSeconds = Long.parseLong(dataPoint[1]);
                 if (dataPoint[0] != null) {
                     dataPointValue = Double.parseDouble(dataPoint[0]);
