@@ -41,7 +41,6 @@ import static springfox.documentation.schema.AlternateTypeRules.newRule;
 @EnableSwagger2
 @Configuration
 @Generated //(exclude from code coverage)
-@SuppressWarnings("unused")
 public class SwaggerConfiguration {
 
     @Value("${swagger.service.version}")
@@ -59,7 +58,6 @@ public class SwaggerConfiguration {
      * @return Returns a Swagger 2.0 Specification for the current application
      */
     @Bean
-    @SuppressWarnings("javadoc")
     public Docket swaggerSpringMvcPlugin() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()

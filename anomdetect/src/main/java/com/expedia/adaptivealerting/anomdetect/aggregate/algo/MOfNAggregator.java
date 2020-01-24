@@ -86,8 +86,8 @@ public class MOfNAggregator implements Aggregator {
 
     private int numAnomalies() {
         int numAnomalies = 0;
-        for (int i = 0; i < buffer.length; i++) {
-            if (buffer[i] == AnomalyLevel.WEAK || buffer[i] == AnomalyLevel.STRONG) {
+        for (AnomalyLevel anomalyLevel : buffer) {
+            if (anomalyLevel == AnomalyLevel.WEAK || anomalyLevel == AnomalyLevel.STRONG) {
                 numAnomalies++;
             }
         }

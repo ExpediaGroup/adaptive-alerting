@@ -89,7 +89,7 @@ public class MetricProfileRepositoryImpl implements MetricProfileRepository {
         try {
             elasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
-            log.error(String.format("Updating elastic search failed", e));
+            log.error("Updating elastic search failed", e);
             throw new RuntimeException(e);
         }
     }

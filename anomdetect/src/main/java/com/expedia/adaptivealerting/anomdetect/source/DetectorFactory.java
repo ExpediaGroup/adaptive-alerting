@@ -37,7 +37,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
  */
 @Slf4j
 public class DetectorFactory {
-    private final Map<String, DetectorFactoryProvider> providers = new HashMap<>();
+    private final Map<String, DetectorFactoryProvider<?>> providers = new HashMap<>();
 
     public DetectorFactory() {
         providers.put("constant-detector", new ConstantThresholdDetectorFactoryProvider());

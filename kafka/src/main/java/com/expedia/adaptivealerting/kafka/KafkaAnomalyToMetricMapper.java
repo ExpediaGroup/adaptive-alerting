@@ -142,7 +142,7 @@ public class KafkaAnomalyToMetricMapper implements Runnable {
             val anomalyResult = anomalyMMD.getAnomalyResult();
 
             // FIXME Handle BreakoutDetectorResult in addition to OutlierDetectorResult.
-            val anomalyLevel = ((OutlierDetectorResult) anomalyResult).getAnomalyLevel();
+            val anomalyLevel = anomalyResult.getAnomalyLevel();
 
             if (anomalyLevel == AnomalyLevel.WEAK || anomalyLevel == AnomalyLevel.STRONG) {
                 val metricDataRecord = toMetricDataRecord(anomalyRecord);

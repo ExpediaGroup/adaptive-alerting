@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.util;
 
-import com.expedia.adaptivealerting.anomdetect.util.DataUtil;
 import lombok.val;
 import org.junit.Test;
 

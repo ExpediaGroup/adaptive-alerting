@@ -15,8 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.powerlaw;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.powerlaw.PowerLawIntervalForecaster;
-import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.powerlaw.PowerLawIntervalForecasterParams;
 import com.expedia.metrics.MetricData;
 import lombok.val;
 import org.junit.Before;

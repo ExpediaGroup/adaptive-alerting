@@ -37,6 +37,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 
 @Slf4j
@@ -143,7 +144,7 @@ public final class DefaultDetectorSourceTest {
     }
 
     private void initDependencies() {
-        when(detectorClient.findMatchingDetectorMappings(any(List.class)))
+        when(detectorClient.findMatchingDetectorMappings(anyList()))
                 .thenReturn(detectorMatchResponse);
         when(detectorClient.findUpdatedDetectorDocuments(1))
                 .thenReturn(Arrays.asList(updatedDetectorDocuments));

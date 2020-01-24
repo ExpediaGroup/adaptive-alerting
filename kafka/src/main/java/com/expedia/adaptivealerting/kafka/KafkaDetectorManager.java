@@ -182,9 +182,6 @@ public class KafkaDetectorManager implements Runnable {
         // [WLW]
         log.trace("Wrote {} anomaly records", numProduced);
 
-        if (metricRecords.isEmpty()) {
-            return;
-        }
     }
 
     private ProducerRecord<String, MappedMetricData> toAnomalyRecord(

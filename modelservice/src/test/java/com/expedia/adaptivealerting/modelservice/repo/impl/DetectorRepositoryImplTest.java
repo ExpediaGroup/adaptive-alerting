@@ -370,7 +370,7 @@ public class DetectorRepositoryImplTest {
         Mockito.when(elasticsearchUtil.getSearchRequest(any(SearchSourceBuilder.class), anyString(), anyString())).thenReturn(new SearchRequest());
         Mockito.when(elasticsearchUtil.index(any(IndexRequest.class), anyString())).thenReturn(indexResponse);
 
-        Mockito.when(objectMapperUtil.convertToString(any())).thenReturn(new String());
+        Mockito.when(objectMapperUtil.convertToString(any())).thenReturn("");
         Mockito.when(objectMapperUtil.convertToObject(anyString(), any())).thenReturn(detector);
         Mockito.when(elasticSearchClient.search(any(SearchRequest.class), any(RequestOptions.class))).thenReturn(searchResponse);
         Mockito.when(elasticSearchClient.get(any(GetRequest.class), any(RequestOptions.class))).thenReturn(getResponse);
