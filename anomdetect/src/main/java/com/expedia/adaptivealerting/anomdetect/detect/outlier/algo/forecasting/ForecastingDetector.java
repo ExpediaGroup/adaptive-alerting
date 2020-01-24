@@ -101,9 +101,9 @@ public final class ForecastingDetector extends AbstractOutlierDetector {
         val pointForecast = pointForecaster.forecast(metricData);
 
         if (pointForecast == null) {
-            // Naive forecasters have a warmup period, but we don't currently have a way for the forecaster to
-            // communicate that up to the detector. So for now we will just treat this as an "unknown" level.
             return new OutlierDetectorResult(AnomalyLevel.UNKNOWN);
+        } else if (pointForecast.isWarmup()) {
+            return new OutlierDetectorResult(true, AnomalyLevel.UNKNOWN);
         }
 
         val intervalForecast = intervalForecaster.forecast(metricData, pointForecast.getValue());

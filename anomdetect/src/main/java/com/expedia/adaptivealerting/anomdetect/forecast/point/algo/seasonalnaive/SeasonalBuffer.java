@@ -65,6 +65,11 @@ public class SeasonalBuffer {
      */
     private long lastTimestamp;
 
+    /**
+     * Timestamp of the first datapoint
+     */
+    private long firstTimestamp;
+
     public SeasonalBuffer(int cycleLength, int interval, double missingValuePlaceholder) {
         isStrictlyPositive(cycleLength, "Required: cycleLength > 0");
         isStrictlyPositive(interval, "Required: interval > 0");
@@ -84,7 +89,12 @@ public class SeasonalBuffer {
         return oldValue;
     }
 
+    public boolean isReady() {
+        return this.lastTimestamp - this.firstTimestamp > cycleLength - interval;
+    }
+
     private void initState() {
+        this.firstTimestamp = NOT_YET_INITIALIZED;
         this.lastTimestamp = NOT_YET_INITIALIZED;
         this.buffer = new double[this.cycleLength];
         Arrays.fill(this.buffer, this.missingValuePlaceholder);
@@ -97,7 +107,10 @@ public class SeasonalBuffer {
      * @param metricData The new datapoint.
      */
     private void padMissingDataPoints(MetricData metricData) {
-        if (isFirstDataPoint()) return; // This is first metric value received. Assume it starts the cycle (i.e. no prior datapoints to pad)
+        if (isFirstDataPoint()) { // This is first metric value received. Assume it starts the cycle (i.e. no prior datapoints to pad)
+            firstTimestamp = metricData.getTimestamp();
+            return;
+        }
         int numSkippedDataPoints = countIntervalsSkippedSinceLastTimestamp(metricData);
         insertSkippedDataPoints(numSkippedDataPoints);
     }

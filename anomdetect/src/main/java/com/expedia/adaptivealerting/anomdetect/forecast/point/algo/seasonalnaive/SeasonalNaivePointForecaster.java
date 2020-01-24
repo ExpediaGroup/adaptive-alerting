@@ -79,8 +79,12 @@ public class SeasonalNaivePointForecaster implements PointForecaster {
     }
 
     private PointForecast getPreviousValueOrNull(double oldValue) {
-        if (this.params.getMissingValuePlaceholder().equals(oldValue)) return null;
-        return new PointForecast(oldValue, false);
+        if (buffer.isReady()) {
+            if (this.params.getMissingValuePlaceholder().equals(oldValue)) return null;
+            return new PointForecast(oldValue, false);
+        } else {
+            return new PointForecast(Double.NaN, true);
+        }
     }
 
 }
