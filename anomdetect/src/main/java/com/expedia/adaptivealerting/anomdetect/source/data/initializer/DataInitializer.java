@@ -58,7 +58,7 @@ public class DataInitializer {
             val metricDefinition = mappedMetricData.getMetricData().getMetricDefinition();
             log.debug("Initializing seasonal naive detector for metric " + metricDefinition);
             val data = getHistoricalData(mappedMetricData);
-            log.debug("Fetched historical data "  + data + " for metric " + metricDefinition);
+            log.debug("Fetched historical data " + data + " for metric " + metricDefinition);
             val forecastingDetector = (ForecastingDetector) detector;
             populateForecastingDetectorWithHistoricalData(forecastingDetector, data, metricDefinition);
             log.debug("Populated detector with historical data for metric " + metricDefinition);
