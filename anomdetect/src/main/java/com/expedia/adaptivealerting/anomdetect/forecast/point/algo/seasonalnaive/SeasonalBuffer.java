@@ -148,6 +148,12 @@ public class SeasonalBuffer {
         return timeDifference / this.interval - 1;
     }
 
+    /**
+     * This metricData timestamp has to come chronologically after previous datapoint. In addition,
+     * the previous datapoint's timestamp needs to be different to the current datapoint one.
+     *
+     * @param metricData Datapoint to check timestamp for.
+     */
     private void checkValidTimestamp(MetricData metricData) {
         long timestamp = metricData.getTimestamp();
         if (timestamp < lastTimestamp) {
