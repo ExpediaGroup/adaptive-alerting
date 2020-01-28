@@ -15,8 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.additive;
 
-import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.additive.AdditiveIntervalForecaster;
-import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.additive.AdditiveIntervalForecasterParams;
 import com.expedia.metrics.MetricData;
 import lombok.val;
 import org.junit.Before;

@@ -75,8 +75,7 @@ public class DefaultProfileSource implements ProfileSource {
     //FIXME - This is a temporary fix to remove IP value which comes as part of tags format.
     // We don't want to keep IP while querying since profile doesn't change for same type of metrics. [KS]
     private Map<String, String> getMutableTagsMap(Map<String, String> tags) {
-        val mutableTags = new HashMap<String, String>();
-        mutableTags.putAll(tags);
+        val mutableTags = new HashMap<String, String>(tags);
         mutableTags.remove("box");
         return mutableTags;
     }

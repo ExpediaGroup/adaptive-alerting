@@ -108,7 +108,7 @@ public class DetectorMapper {
             for (Map<String, String> tags : cacheMissedMetricTags) {
                 if (!searchIndexes.contains(i)) {
                     String cacheKey = CacheUtil.getKey(tags);
-                    cache.put(cacheKey, Collections.EMPTY_LIST);
+                    cache.put(cacheKey, Collections.emptyList());
                 }
                 i++;
             }

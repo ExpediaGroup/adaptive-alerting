@@ -37,7 +37,6 @@ public class MetricFunctionsTask implements Runnable {
         this.metricSourceSinkConfig = metricSourceSinkConfig;
     }
 
-    @SuppressWarnings("unchecked")
     public void run() {
         HttpClientWrapper httpClientWrapper = new HttpClientWrapper();
         GraphiteQueryService graphiteQueryService = new GraphiteQueryService(httpClientWrapper);

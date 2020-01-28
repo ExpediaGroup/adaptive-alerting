@@ -31,7 +31,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings({"unchecked", "rawtypes"})
 @Slf4j
 @ControllerAdvice
 @Generated
@@ -52,7 +51,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         log.error(String.format("Unhandled exception encountered (class=%s). Responding with internal server error ",
                 ex.getClass().getName()), ex);
         exceptionCounter.increment();
-        return new ResponseEntity(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(value = {RecordNotFoundException.class})

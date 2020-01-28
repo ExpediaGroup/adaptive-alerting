@@ -31,7 +31,7 @@ public final class RunningMedian {
     public void add(double value) {
 
         // Add the value to one or the other heap
-        if (upperHalf.isEmpty() || value <= (Double) upperHalf.peek()) {
+        if (upperHalf.isEmpty() || value <= upperHalf.peek()) {
             lowerHalf.add(value);
         } else {
             upperHalf.add(value);

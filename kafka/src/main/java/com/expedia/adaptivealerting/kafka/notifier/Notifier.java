@@ -34,7 +34,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PreDestroy;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -82,7 +82,7 @@ public class Notifier implements ApplicationListener<ApplicationReadyEvent> {
     private void loopUntilShutdown() {
         try (KafkaConsumer<String, MappedMetricData> kafkaConsumer =
                      new KafkaConsumer<>(notifierConfig.getKafkaConsumerConfig())) {
-            kafkaConsumer.subscribe(Arrays.asList(notifierConfig.getKafkaTopic()));
+            kafkaConsumer.subscribe(Collections.singletonList(notifierConfig.getKafkaTopic()));
 
             while (running.get()) {
                 processAlerts(kafkaConsumer);
@@ -98,7 +98,7 @@ public class Notifier implements ApplicationListener<ApplicationReadyEvent> {
                 headers.setContentType(MediaType.APPLICATION_JSON);
                 HttpEntity<String> entity = new HttpEntity<>(json, headers);
                 try {
-                    ResponseEntity responseEntity =
+                    ResponseEntity<?> responseEntity =
                             restTemplate.exchange(webhookUrl, HttpMethod.POST, entity, ResponseEntity.class);
                     if (responseEntity.getStatusCode().is2xxSuccessful()) {
                         MetricsMonitor.notification_success.mark();

@@ -19,7 +19,7 @@ import com.expedia.metrics.MetricData;
 
 public interface MetricFunctionsPublish {
 
-    public void initPublisher();
+    void initPublisher();
 
-    public void publishMetrics(MetricData metricData);
+    void publishMetrics(MetricData metricData);
 }

@@ -24,11 +24,10 @@ public class ConstructSourceURI {
     private final String GRAPHITE_TIME_UNIT_STRING = "s";
 
     public String getGraphiteURI(Config metricSourceSinkConfig, MetricFunctionsSpec metricFunctionsSpec) {
-        String URI = metricSourceSinkConfig.getString(GRAPHITE_URI_KEY)
+        return metricSourceSinkConfig.getString(GRAPHITE_URI_KEY)
                 + metricFunctionsSpec.getFunction()
                 + GRAPHITE_FROM_TIME_PARAM_STRING
                 + metricFunctionsSpec.getIntervalInSecs() + GRAPHITE_TIME_UNIT_STRING;
-        return URI;
     }
 
 }

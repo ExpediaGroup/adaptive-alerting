@@ -17,9 +17,9 @@ package com.expedia.adaptivealerting.anomdetect;
 
 import com.codahale.metrics.SharedMetricRegistries;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
-import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;

@@ -109,6 +109,8 @@ public class SeasonalBuffer {
     private void padMissingDataPoints(MetricData metricData) {
         if (isFirstDataPoint()) { // This is first metric value received. Assume it starts the cycle (i.e. no prior datapoints to pad)
             firstTimestamp = metricData.getTimestamp();
+            log.debug("First data point received for Seasonal Buffer.  Buffer has cycleLength=" + this.cycleLength + ", interval=" + this.interval +
+                    ", and starts at timestamp " + metricData.getTimestamp() + " (" + dateStr(metricData.getTimestamp()) + "). First metric details: " + metricData);
             return;
         }
         int numSkippedDataPoints = countIntervalsSkippedSinceLastTimestamp(metricData);
@@ -121,7 +123,7 @@ public class SeasonalBuffer {
      * @param metricData Datapoint to update buffer with.
      */
     private void updateBuffer(MetricData metricData) {
-        this.buffer[currIndex] = metricData.getValue();
+        setBufferValue(metricData.getValue());
         this.currIndex = (this.currIndex + 1) % this.buffer.length;
         this.lastTimestamp = metricData.getTimestamp();
     }
@@ -135,9 +137,15 @@ public class SeasonalBuffer {
      */
     private void insertSkippedDataPoints(int numSkippedDataPoints) {
         IntStream.range(0, numSkippedDataPoints).forEach(__ -> {
-            buffer[currIndex] = this.missingValuePlaceholder;
+            setBufferValue(this.missingValuePlaceholder);
             currIndex = (currIndex + 1) % this.buffer.length;
         });
+    }
+
+    private void setBufferValue(double value) {
+        String valueStr = value == this.missingValuePlaceholder ? "MISSING PLACEHOLDER value (" + this.missingValuePlaceholder + ")" : ("value " + value);
+        log.debug("Updating buffer index " + currIndex + " with " + valueStr);
+        this.buffer[currIndex] = value;
     }
 
     /**
@@ -145,7 +153,10 @@ public class SeasonalBuffer {
      */
     private int countIntervalsSkippedSinceLastTimestamp(MetricData metricData) {
         int timeDifference = new Long(metricData.getTimestamp() - lastTimestamp).intValue();
-        return timeDifference / this.interval - 1;
+        int intervalsSkipped = timeDifference / this.interval - 1;
+        log.debug("Current metric timestamp " + metricData.getTimestamp() + " (" + dateStr(metricData.getTimestamp()) + ") includes " +
+                intervalsSkipped + " skipped data points since last timestamp " + lastTimestamp + " (" + dateStr(lastTimestamp) + ")");
+        return intervalsSkipped;
     }
 
     /**
@@ -157,12 +168,12 @@ public class SeasonalBuffer {
     private void checkValidTimestamp(MetricData metricData) {
         long timestamp = metricData.getTimestamp();
         if (timestamp < lastTimestamp) {
-            String error = String.format("new Metric %s has a timestamp (%s) dated before the last data point we observed (which had timestamp %s)",
+            String error = String.format("Current metric %s has a timestamp (%s) dated before the last data point we observed (which had timestamp %s)",
                     metricData, dateStr(timestamp), dateStr(lastTimestamp));
             throw new MetricDeliveryTimeException(error);
         }
         if (timestamp == lastTimestamp) {
-            String error = String.format("new Metric %s has the same timestamp as the last data point observed (%s)", metricData, dateStr(timestamp));
+            String error = String.format("Current metric %s has the same timestamp as the last data point observed (%s)", metricData, dateStr(timestamp));
             throw new MetricDeliveryDuplicateException(error);
         }
     }

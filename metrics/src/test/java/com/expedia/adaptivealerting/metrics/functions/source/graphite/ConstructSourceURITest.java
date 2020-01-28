@@ -20,6 +20,6 @@ public class ConstructSourceURITest {
         Config config = new TypesafeConfigLoader("aa-metric-functions-test").loadMergedConfig();
         val metricSourceSinkConfigTest = config.getConfig("metric-source-sink");
         ConstructSourceURI constructSourceURI = new ConstructSourceURI();
-        assertEquals(uri, constructSourceURI.getGraphiteURI(metricSourceSinkConfigTest, metricFunctionsSpec));;
+        assertEquals(uri, constructSourceURI.getGraphiteURI(metricSourceSinkConfigTest, metricFunctionsSpec));
     }
 }

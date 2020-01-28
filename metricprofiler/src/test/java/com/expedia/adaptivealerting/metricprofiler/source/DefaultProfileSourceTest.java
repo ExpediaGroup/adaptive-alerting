@@ -117,7 +117,7 @@ public class DefaultProfileSourceTest {
     }
 
     private static String uri(String path) {
-        return String.format(BASE_URI + path);
+        return BASE_URI + path;
     }
 
 }

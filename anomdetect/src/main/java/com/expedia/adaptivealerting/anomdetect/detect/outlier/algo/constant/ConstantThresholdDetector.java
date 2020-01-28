@@ -58,11 +58,10 @@ public final class ConstantThresholdDetector extends AbstractOutlierDetector {
         val thresholds = params.getThresholds();
         val trusted = isTrusted();
         val level = classifier.classify(thresholds, metricData.getValue());
-        OutlierDetectorResult outlierResult = new OutlierDetectorResult()
+        return new OutlierDetectorResult()
                 .setAnomalyLevel(level)
                 .setThresholds(thresholds)
                 .setTrusted(trusted);
-        return outlierResult;
     }
 
     @Override

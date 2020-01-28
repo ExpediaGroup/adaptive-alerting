@@ -16,9 +16,9 @@
 package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.cusum;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
-import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.AbstractOutlierDetector;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.util.AssertUtil;
 import com.expedia.metrics.MetricData;
 import lombok.Getter;
@@ -31,6 +31,7 @@ import static com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel.MODEL_
 import static com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel.NORMAL;
 import static com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel.STRONG;
 import static com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel.WEAK;
+
 
 /**
  * <p>
@@ -77,7 +78,7 @@ public final class CusumDetector extends AbstractOutlierDetector {
     /**
      * Previous value.
      */
-    private double prevValue = 0.0;
+    private double prevValue;
 
     public CusumDetector(UUID uuid, CusumDetectorParams params, boolean trusted) {
         super(uuid);

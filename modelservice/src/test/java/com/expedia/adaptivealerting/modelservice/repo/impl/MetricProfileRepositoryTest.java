@@ -106,7 +106,7 @@ public class MetricProfileRepositoryTest {
         Mockito.when(elasticsearchUtil.getSourceBuilder(any(QueryBuilder.class))).thenReturn(new SearchSourceBuilder());
         Mockito.when(elasticsearchUtil.index(any(IndexRequest.class), anyString())).thenReturn(indexResponse);
 
-        Mockito.when(objectMapperUtil.convertToString(any())).thenReturn(new String());
+        Mockito.when(objectMapperUtil.convertToString(any())).thenReturn("");
         Mockito.when(elasticSearchClient.search(any(SearchRequest.class), any(RequestOptions.class))).thenReturn(searchResponse);
         Mockito.when(elasticSearchClient.update(any(UpdateRequest.class), any(RequestOptions.class))).thenReturn(new UpdateResponse());
 

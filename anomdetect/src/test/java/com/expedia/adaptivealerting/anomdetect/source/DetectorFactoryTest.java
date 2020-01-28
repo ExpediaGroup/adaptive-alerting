@@ -87,7 +87,7 @@ public class DetectorFactoryTest {
         factoryUnderTest.buildDetector(document);
     }
 
-    private void testBuildDetector(String documentName, Class detectorClass) {
+    private void testBuildDetector(String documentName, Class<?> detectorClass) {
         val document = readDocument(documentName);
         val detector = factoryUnderTest.buildDetector(document);
         assertEquals(detectorClass, detector.getClass());
