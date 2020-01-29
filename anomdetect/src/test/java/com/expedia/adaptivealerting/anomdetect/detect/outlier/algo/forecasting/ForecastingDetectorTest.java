@@ -107,13 +107,6 @@ public class ForecastingDetectorTest {
         detectorUnderTest.detect(null);
     }
 
-    private void initDependencies(boolean warmup) {
-        when(pointForecaster.forecast(any(MetricData.class)))
-                .thenReturn(new PointForecast(50.0, warmup));
-        when(intervalForecaster.forecast(any(MetricData.class), anyDouble()))
-                .thenReturn(new IntervalForecast(100.0, 90.0, 20.0, 10.0));
-    }
-
     @Test
     public void testDetect_warmingUpForecast() {
         initDependencies(true);
@@ -123,4 +116,12 @@ public class ForecastingDetectorTest {
         assertTrue(result.isWarmup());
         assertNotNull(result);
     }
+
+    private void initDependencies(boolean warmup) {
+        when(pointForecaster.forecast(any(MetricData.class)))
+                .thenReturn(new PointForecast(50.0, warmup));
+        when(intervalForecaster.forecast(any(MetricData.class), anyDouble()))
+                .thenReturn(new IntervalForecast(100.0, 90.0, 20.0, 10.0));
+    }
+
 }
