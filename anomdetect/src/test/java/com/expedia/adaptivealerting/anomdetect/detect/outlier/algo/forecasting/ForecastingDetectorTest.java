@@ -37,6 +37,7 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.Mockito.when;
@@ -57,7 +58,6 @@ public class ForecastingDetectorTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        initDependencies();
         this.detectorUuid = UUID.randomUUID();
         this.anomalyType = AnomalyType.TWO_TAILED;
         this.trusted = true;
@@ -67,6 +67,7 @@ public class ForecastingDetectorTest {
 
     @Test
     public void testAccessors() {
+        initDependencies(false);
         assertEquals(detectorUuid, detectorUnderTest.getUuid());
         assertEquals(pointForecaster, detectorUnderTest.getPointForecaster());
         assertEquals(intervalForecaster, detectorUnderTest.getIntervalForecaster());
@@ -79,6 +80,7 @@ public class ForecastingDetectorTest {
 
     @Test
     public void testDetect() {
+        initDependencies(false);
         val metricDef = TestObjectMother.metricDefinition();
         val metricData = new MetricData(metricDef, 100.0, Instant.now().getEpochSecond());
         val result = (OutlierDetectorResult) detectorUnderTest.detect(metricData);
@@ -88,6 +90,7 @@ public class ForecastingDetectorTest {
 
     @Test
     public void testDetect_nullForecast() {
+        initDependencies(false);
         val metricDef = new MetricDefinition("some-key");
         val metricData = new MetricData(metricDef, 100.0, Instant.now().getEpochSecond());
 
@@ -104,10 +107,20 @@ public class ForecastingDetectorTest {
         detectorUnderTest.detect(null);
     }
 
-    private void initDependencies() {
+    private void initDependencies(boolean warmup) {
         when(pointForecaster.forecast(any(MetricData.class)))
-                .thenReturn(new PointForecast(50.0, false));
+                .thenReturn(new PointForecast(50.0, warmup));
         when(intervalForecaster.forecast(any(MetricData.class), anyDouble()))
                 .thenReturn(new IntervalForecast(100.0, 90.0, 20.0, 10.0));
+    }
+
+    @Test
+    public void testDetect_warmingUpForecast() {
+        initDependencies(true);
+        val metricDef = TestObjectMother.metricDefinition();
+        val metricData = new MetricData(metricDef, 100.0, Instant.now().getEpochSecond());
+        val result = (OutlierDetectorResult) detectorUnderTest.detect(metricData);
+        assertTrue(result.isWarmup());
+        assertNotNull(result);
     }
 }
