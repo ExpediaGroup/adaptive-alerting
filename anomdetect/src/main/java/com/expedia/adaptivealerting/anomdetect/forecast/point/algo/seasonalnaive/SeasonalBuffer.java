@@ -90,7 +90,7 @@ public class SeasonalBuffer {
     }
 
     public boolean isReady() {
-        return this.lastTimestamp - this.firstTimestamp > cycleLength - interval;
+        return this.lastTimestamp - (this.firstTimestamp + (cycleLength * interval)) >= 0;
     }
 
     private void initState() {
