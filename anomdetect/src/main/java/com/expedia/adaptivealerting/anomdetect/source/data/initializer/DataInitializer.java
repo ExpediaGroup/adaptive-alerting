@@ -55,13 +55,14 @@ public class DataInitializer {
 
     public void initializeDetector(MappedMetricData mappedMetricData, Detector detector) {
         if (detector != null && isSeasonalNaiveDetector(detector)) {
-            val metricDefinition = mappedMetricData.getMetricData().getMetricDefinition();
-            log.debug("Initializing seasonal naive detector for metric " + metricDefinition);
+            val detectorLogString = " for detector UUID " + detector.getUuid();
+            log.debug("Initializing seasonal naive detector" + detectorLogString);
             val data = getHistoricalData(mappedMetricData);
-            log.debug("Fetched historical data " + data + " for metric " + metricDefinition);
+            log.debug("Fetched total of " + data.size() + " historical data points" + detectorLogString);
             val forecastingDetector = (ForecastingDetector) detector;
+            val metricDefinition = mappedMetricData.getMetricData().getMetricDefinition();
             populateForecastingDetectorWithHistoricalData(forecastingDetector, data, metricDefinition);
-            log.debug("Populated detector with historical data for metric " + metricDefinition);
+            log.debug("Populated detector with historical data" + detectorLogString);
         }
     }
 
