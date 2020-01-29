@@ -54,12 +54,21 @@ public class DataInitializer {
     }
 
     public void initializeDetector(MappedMetricData mappedMetricData, Detector detector) {
+        // TODO: Foreasting Detector initialisation is currently limited to Seasonal Naive detector and assumes Graphite source
         if (detector != null && isSeasonalNaiveDetector(detector)) {
-            val data = getHistoricalData(mappedMetricData);
             val forecastingDetector = (ForecastingDetector) detector;
-            val metricDefinition = mappedMetricData.getMetricData().getMetricDefinition();
-            populateForecastingDetectorWithHistoricalData(forecastingDetector, data, metricDefinition);
+            initializeForecastingDetector(mappedMetricData, forecastingDetector);
         }
+    }
+
+    private void initializeForecastingDetector(MappedMetricData mappedMetricData, ForecastingDetector forecastingDetector) {
+        val detectorLogString = " for detector UUID " + forecastingDetector.getUuid();
+        log.info("Initializing detector data" + detectorLogString);
+        val data = getHistoricalData(mappedMetricData);
+        log.info("Fetched total of " + data.size() + " historical data points" + detectorLogString);
+        val metricDefinition = mappedMetricData.getMetricData().getMetricDefinition();
+        populateForecastingDetectorWithHistoricalData(forecastingDetector, data, metricDefinition);
+        log.info("Populated detector with historical data" + detectorLogString);
     }
 
     private boolean isSeasonalNaiveDetector(Detector detector) {
