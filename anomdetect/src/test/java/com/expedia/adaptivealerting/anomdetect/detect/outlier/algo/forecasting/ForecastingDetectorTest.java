@@ -18,7 +18,6 @@ package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.forecasting;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
-import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.forecasting.ForecastingDetector;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecast;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.IntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecast;
@@ -36,6 +35,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
@@ -82,6 +82,7 @@ public class ForecastingDetectorTest {
         val metricDef = TestObjectMother.metricDefinition();
         val metricData = new MetricData(metricDef, 100.0, Instant.now().getEpochSecond());
         val result = (OutlierDetectorResult) detectorUnderTest.detect(metricData);
+        assertFalse(result.isWarmup());
         assertNotNull(result);
     }
 
@@ -94,6 +95,7 @@ public class ForecastingDetectorTest {
 
         val result = (OutlierDetectorResult) detectorUnderTest.detect(metricData);
         assertNotNull(result);
+        assertFalse(result.isWarmup());
         assertEquals(AnomalyLevel.UNKNOWN, result.getAnomalyLevel());
     }
 

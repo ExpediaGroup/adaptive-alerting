@@ -67,13 +67,7 @@ public class SeasonalNaivePointForecasterTest {
     }
 
     @Test
-    public void testForecast_isWarmupPeriod() {
-        forecastAndExpectWarmup(subject, FIRST_CYCLE_FIRST_SLOT, FIRST_CYCLE_FIRST_SLOT_VALUE);
-        forecastAndExpectWarmup(subject, FIRST_CYCLE_SECOND_SLOT, FIRST_CYCLE_SECOND_SLOT_VALUE);
-    }
-
-    @Test
-    public void testForecast_warmupPeriodPassedExpectAnomalyResult() {
+    public void testForecast_warmupPeriodPassedExpectAnomalyResultAfter() {
         // Fill buffer
         forecastAndExpectWarmup(subject, FIRST_CYCLE_FIRST_SLOT, FIRST_CYCLE_FIRST_SLOT_VALUE);
         forecastAndExpectWarmup(subject, FIRST_CYCLE_SECOND_SLOT, FIRST_CYCLE_SECOND_SLOT_VALUE);
@@ -120,7 +114,6 @@ public class SeasonalNaivePointForecasterTest {
         MetricData metricData = new MetricData(METRIC_DEF, newValue, timestamp);
         val forecast = subject.forecast(metricData);
         assertTrue(forecast.isWarmup());
-
     }
 
     private void forecastAndExpectNotWarmup(SeasonalNaivePointForecaster subject, long timestamp, double newValue) {
