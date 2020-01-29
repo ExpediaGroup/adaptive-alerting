@@ -22,7 +22,9 @@ import lombok.val;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class SeasonalNaivePointForecasterTest {
     private static final int CYCLE_LENGTH = 5;
@@ -67,12 +69,25 @@ public class SeasonalNaivePointForecasterTest {
     }
 
     @Test
+    public void testForecast_warmupPeriodPassedExpectAnomalyResultAfter() {
+        // Fill buffer
+        forecastAndExpectWarmup(subject, FIRST_CYCLE_FIRST_SLOT, FIRST_CYCLE_FIRST_SLOT_VALUE);
+        forecastAndExpectWarmup(subject, FIRST_CYCLE_SECOND_SLOT, FIRST_CYCLE_SECOND_SLOT_VALUE);
+        forecastAndExpectWarmup(subject, FIRST_CYCLE_THIRD_SLOT, FIRST_CYCLE_THIRD_SLOT_VALUE);
+        forecastAndExpectWarmup(subject, FIRST_CYCLE_FOURTH_SLOT, FIRST_CYCLE_FOURTH_SLOT_VALUE);
+        forecastAndExpectWarmup(subject, FIRST_CYCLE_FIFTH_SLOT, FIRST_CYCLE_FIFTH_SLOT_VALUE);
+
+        // Buffer is full, warmup period has ended
+        forecastAndExpectNotWarmup(subject, SECOND_CYCLE_FIRST_SLOT, SECOND_CYCLE_FIRST_SLOT_VALUE);
+    }
+
+    @Test
     public void testForecast_missingTwoDatapointsWithWrap() {
         // Fill buffer with last slot of first cycle missing and first slot of second cycle missing
-        forecastAndExpectNull(subject, FIRST_CYCLE_FIRST_SLOT, FIRST_CYCLE_FIRST_SLOT_VALUE);
-        forecastAndExpectNull(subject, FIRST_CYCLE_SECOND_SLOT, FIRST_CYCLE_SECOND_SLOT_VALUE);
-        forecastAndExpectNull(subject, FIRST_CYCLE_THIRD_SLOT, FIRST_CYCLE_THIRD_SLOT_VALUE);
-        forecastAndExpectNull(subject, FIRST_CYCLE_FOURTH_SLOT, FIRST_CYCLE_FOURTH_SLOT_VALUE);
+        forecastAndExpectWarmup(subject, FIRST_CYCLE_FIRST_SLOT, FIRST_CYCLE_FIRST_SLOT_VALUE);
+        forecastAndExpectWarmup(subject, FIRST_CYCLE_SECOND_SLOT, FIRST_CYCLE_SECOND_SLOT_VALUE);
+        forecastAndExpectWarmup(subject, FIRST_CYCLE_THIRD_SLOT, FIRST_CYCLE_THIRD_SLOT_VALUE);
+        forecastAndExpectWarmup(subject, FIRST_CYCLE_FOURTH_SLOT, FIRST_CYCLE_FOURTH_SLOT_VALUE);
 
         // [Skip both the last and first slot in the buffer]
 
@@ -95,6 +110,18 @@ public class SeasonalNaivePointForecasterTest {
         MetricData metricData = new MetricData(METRIC_DEF, newValue, timestamp);
         val actualForecast = subject.forecast(metricData);
         assertEquals(new PointForecast(expectedForecastValue, false), actualForecast);
+    }
+
+    private void forecastAndExpectWarmup(SeasonalNaivePointForecaster subject, long timestamp, double newValue) {
+        MetricData metricData = new MetricData(METRIC_DEF, newValue, timestamp);
+        val forecast = subject.forecast(metricData);
+        assertTrue(forecast.isWarmup());
+    }
+
+    private void forecastAndExpectNotWarmup(SeasonalNaivePointForecaster subject, long timestamp, double newValue) {
+        MetricData metricData = new MetricData(METRIC_DEF, newValue, timestamp);
+        val forecast = subject.forecast(metricData);
+        assertFalse(forecast.isWarmup());
     }
 
 }

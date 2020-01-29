@@ -49,8 +49,9 @@ public class OutlierDetectorResult implements DetectorResult {
     private AnomalyThresholds thresholds;
 
     public OutlierDetectorResult(AnomalyLevel anomalyLevel) {
-        this(false, anomalyLevel);
-    }
+        // TODO: Do this instead while there are still deprecated usages of AnomalyLevel.MODEL_WARMUP
+        // this(MODEL_WARMUP.equals(anomalyLevel), MODEL_WARMUP.equals(anomalyLevel) ? UNKNOWN : anomalyLevel);
+        this(false, anomalyLevel);    }
 
     public OutlierDetectorResult(boolean warmup, AnomalyLevel anomalyLevel) {
         this.warmup = warmup;

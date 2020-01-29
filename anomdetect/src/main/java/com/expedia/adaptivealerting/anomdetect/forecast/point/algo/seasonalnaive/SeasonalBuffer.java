@@ -65,6 +65,11 @@ public class SeasonalBuffer {
      */
     private long lastTimestamp;
 
+    /**
+     * Timestamp of the first datapoint
+     */
+    private long firstTimestamp;
+
     public SeasonalBuffer(int cycleLength, int interval, double missingValuePlaceholder) {
         isStrictlyPositive(cycleLength, "Required: cycleLength > 0");
         isStrictlyPositive(interval, "Required: interval > 0");
@@ -84,7 +89,12 @@ public class SeasonalBuffer {
         return oldValue;
     }
 
+    public boolean isReady() {
+        return this.lastTimestamp - (this.firstTimestamp + (cycleLength * interval)) >= 0;
+    }
+
     private void initState() {
+        this.firstTimestamp = NOT_YET_INITIALIZED;
         this.lastTimestamp = NOT_YET_INITIALIZED;
         this.buffer = new double[this.cycleLength];
         Arrays.fill(this.buffer, this.missingValuePlaceholder);
@@ -97,10 +107,11 @@ public class SeasonalBuffer {
      * @param metricData The new datapoint.
      */
     private void padMissingDataPoints(MetricData metricData) {
-        if (isFirstDataPoint()) {
+        if (isFirstDataPoint()) { // This is first metric value received. Assume it starts the cycle (i.e. no prior datapoints to pad)
+            firstTimestamp = metricData.getTimestamp();
             log.debug("First data point received for Seasonal Buffer.  Buffer has cycleLength=" + this.cycleLength + ", interval=" + this.interval +
                     ", and starts at timestamp " + metricData.getTimestamp() + " (" + dateStr(metricData.getTimestamp()) + "). First metric details: " + metricData);
-            return; // This is first metric value received. Assume it starts the cycle (i.e. no prior datapoints to pad)
+            return;
         }
         int numSkippedDataPoints = countIntervalsSkippedSinceLastTimestamp(metricData);
         insertSkippedDataPoints(numSkippedDataPoints);
@@ -148,6 +159,12 @@ public class SeasonalBuffer {
         return intervalsSkipped;
     }
 
+    /**
+     * This metricData timestamp has to come chronologically after previous datapoint. In addition,
+     * the previous datapoint's timestamp needs to be different to the current datapoint one.
+     *
+     * @param metricData Datapoint to check timestamp for.
+     */
     private void checkValidTimestamp(MetricData metricData) {
         long timestamp = metricData.getTimestamp();
         if (timestamp < lastTimestamp) {
