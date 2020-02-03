@@ -36,6 +36,7 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
@@ -111,6 +112,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
 
     @Override
     public void deleteDetector(String uuid) {
+        MDC.put("DetectorUuid", uuid);
         val deleteRequest = new DeleteRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, uuid);
         try {
             val deleteResponse = elasticSearchClient.delete(deleteRequest, RequestOptions.DEFAULT);
@@ -118,14 +120,17 @@ public class DetectorRepositoryImpl implements DetectorRepository {
                 throw new RecordNotFoundException("Invalid request: " + uuid);
             }
         } catch (IOException e) {
-            log.error(String.format("Deleting detector %s failed", uuid), e);
+            log.error("Deleting detector failed", e);
             throw new RuntimeException(e);
+        } finally {
+            MDC.remove("DetectorUuid");
         }
     }
 
     @Override
     public void updateDetector(String uuid, DetectorDocument document) {
         notNull(document, "document can't be null");
+        MDC.put("DetectorUuid", uuid);
         RequestValidator.validateDetector(document);
 
         val updateRequest = new UpdateRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, uuid);
@@ -178,15 +183,19 @@ public class DetectorRepositoryImpl implements DetectorRepository {
         } catch (IOException e) {
             log.error("Updating elastic search failed", e);
             throw new RuntimeException(e);
+        } finally {
+            MDC.remove("DetectorUuid");
         }
     }
 
     @Override
     public DetectorDocument findByUuid(String uuid) {
+        MDC.put("DetectorUuid", uuid);
         val queryBuilder = QueryBuilders.termQuery("uuid", uuid);
         val searchSourceBuilder = elasticsearchUtil.getSourceBuilder(queryBuilder).size(DEFAULT_ES_RESULTS_SIZE);
         val searchRequest = elasticsearchUtil.getSearchRequest(searchSourceBuilder, DETECTOR_INDEX, DETECTOR_DOC_TYPE);
         val detectors = getDetectorsFromElasticSearch(searchRequest);
+        MDC.remove("DetectorUuid");
         return detectors.isEmpty() ? null : detectors.get(0);
     }
 
@@ -200,6 +209,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
 
     @Override
     public void toggleDetector(String uuid, Boolean enabled) {
+        MDC.put("DetectorUuid", uuid);
         val updateRequest = new UpdateRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, uuid);
         Date nowDate = DateUtil.now();
         String nowValue = DateUtil.toDateString(nowDate.toInstant());
@@ -219,11 +229,14 @@ public class DetectorRepositoryImpl implements DetectorRepository {
         } catch (IOException e) {
             log.error("Updating elastic search failed", e);
             throw new RuntimeException(e);
+        } finally {
+            MDC.remove("DetectorUuid");
         }
     }
 
     @Override
     public void trustDetector(String uuid, Boolean trusted) {
+        MDC.put("DetectorUuid", uuid);
         val updateRequest = new UpdateRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, uuid);
         Date nowDate = DateUtil.now();
         String nowValue = DateUtil.toDateString(nowDate.toInstant());
@@ -243,6 +256,8 @@ public class DetectorRepositoryImpl implements DetectorRepository {
         } catch (IOException e) {
             log.error("Updating elastic search failed", e);
             throw new RuntimeException(e);
+        } finally {
+            MDC.remove("DetectorUuid");
         }
     }
 

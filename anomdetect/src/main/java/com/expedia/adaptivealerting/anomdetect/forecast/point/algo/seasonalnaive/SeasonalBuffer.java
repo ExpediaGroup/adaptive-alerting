@@ -109,8 +109,10 @@ public class SeasonalBuffer {
     private void padMissingDataPoints(MetricData metricData) {
         if (isFirstDataPoint()) { // This is first metric value received. Assume it starts the cycle (i.e. no prior datapoints to pad)
             firstTimestamp = metricData.getTimestamp();
-            log.debug("First data point received for Seasonal Buffer.  Buffer has cycleLength=" + this.cycleLength + ", interval=" + this.interval +
-                    ", and starts at timestamp " + metricData.getTimestamp() + " (" + dateStr(metricData.getTimestamp()) + "). First metric details: " + metricData);
+            log.debug("First data point received for Seasonal Buffer. " +
+                            "Buffer has cycleLength={}, interval={}, and starts at timestamp {} ({}). " +
+                            "First metric details: {}",
+                    this.cycleLength, this.interval, metricData.getTimestamp(), dateStr(metricData.getTimestamp()), metricData);
             return;
         }
         int numSkippedDataPoints = countIntervalsSkippedSinceLastTimestamp(metricData);
@@ -151,6 +153,7 @@ public class SeasonalBuffer {
     /**
      * Find number of missing datapoints based on the last timestamp and interval.
      */
+    // TODO: Return 0 when difference between current and previous timestamps is less than interval.  Currently returns -1.
     private int countIntervalsSkippedSinceLastTimestamp(MetricData metricData) {
         int timeDifference = new Long(metricData.getTimestamp() - lastTimestamp).intValue();
         int intervalsSkipped = timeDifference / this.interval - 1;
@@ -168,12 +171,12 @@ public class SeasonalBuffer {
     private void checkValidTimestamp(MetricData metricData) {
         long timestamp = metricData.getTimestamp();
         if (timestamp < lastTimestamp) {
-            String error = String.format("Current metric %s has a timestamp (%s) dated before the last data point we observed (which had timestamp %s)",
-                    metricData, dateStr(timestamp), dateStr(lastTimestamp));
+            String error = String.format("Current metric %s has a timestamp (%s) dated before the last data point we observed (which had timestamp %d=%s)",
+                    metricData, dateStr(timestamp), lastTimestamp, dateStr(lastTimestamp));
             throw new MetricDeliveryTimeException(error);
         }
         if (timestamp == lastTimestamp) {
-            String error = String.format("Current metric %s has the same timestamp as the last data point observed (%s)", metricData, dateStr(timestamp));
+            String error = String.format("Current metric %s has the same timestamp (%s) as the last data point observed (%s)", metricData, dateStr(lastTimestamp), dateStr(timestamp));
             throw new MetricDeliveryDuplicateException(error);
         }
     }

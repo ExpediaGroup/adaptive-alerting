@@ -30,8 +30,13 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.slf4j.MDC;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -73,11 +78,12 @@ public class DetectorManager {
     /**
      * Creates a new detector manager from the given parameters.
      *
-     * @param detectorSource            detector source
-     * @param metricRegistry            metric registry
-     * @param cachedDetectors           map containing cached detectors
+     * @param detectorSource  detector source
+     * @param metricRegistry  metric registry
+     * @param cachedDetectors map containing cached detectors
      */
-    public DetectorManager(DetectorSource detectorSource, Config config, Map<UUID, Detector> cachedDetectors, MetricRegistry metricRegistry) {
+    public DetectorManager(DetectorSource detectorSource, DataInitializer dataInitializer, Config config, Map<UUID, Detector> cachedDetectors,
+                           MetricRegistry metricRegistry) {
         // TODO Seems odd to include this constructor, whose purpose seems to be to support unit
         //  testing. At least I don't think it should be public. And it should take a Config
         //  since the other one does, and this is conceptually just the base constructor with
@@ -85,7 +91,7 @@ public class DetectorManager {
         this.detectorSource = detectorSource;
         this.detectorRefreshTimePeriod = config.getInt(CK_DETECTOR_REFRESH_PERIOD);
         this.cachedDetectors = cachedDetectors;
-        this.dataInitializer = new DataInitializer(config);
+        this.dataInitializer = dataInitializer;
 
         detectorForTimer = metricRegistry.timer("detector.detectorFor");
         noDetectorFoundMeter = metricRegistry.meter("detector.nullDetector");
@@ -95,8 +101,8 @@ public class DetectorManager {
         this.initScheduler();
     }
 
-    public DetectorManager(DetectorSource detectorSource, Config config, MetricRegistry metricRegistry) {
-        this(detectorSource, config, new HashMap<>(), metricRegistry);
+    public DetectorManager(DetectorSource detectorSource, DataInitializer dataInitializer, Config config, MetricRegistry metricRegistry) {
+        this(detectorSource, dataInitializer, config, new HashMap<>(), metricRegistry);
     }
 
     private void initScheduler() {
@@ -119,38 +125,45 @@ public class DetectorManager {
      */
     public DetectorResult detect(MappedMetricData mappedMetricData) {
         notNull(mappedMetricData, "mappedMetricData can't be null");
-
-        //timer ...
-        Timer.Context ctxt = detectorForTimer.time();
-        val detector = detectorFor(mappedMetricData);
-        ctxt.close();
-        if (detector == null) {
-            log.warn("No detector for mappedMetricData={}", mappedMetricData);
-            noDetectorFoundMeter.mark();
-            return null;
-        }
-        val metricData = mappedMetricData.getMetricData();
-        DetectorResult result = null;
+        MDC.put("DetectorUuid", mappedMetricData.getDetectorUuid().toString());
         try {
-            ctxt = detectTimer.apply(detector.getName()).time();
-            result = detector.detect(metricData);
+            //timer ...
+            Timer.Context ctxt = detectorForTimer.time();
+            val detector = detectorFor(mappedMetricData);
             ctxt.close();
-        } catch (Exception e) {
-            log.error("Error in detector.detect", e);
-        }
+            if (detector == null) {
+                log.warn("No detector for mappedMetricData={}", mappedMetricData);
+                noDetectorFoundMeter.mark();
+                return null;
+            }
+            val metricData = mappedMetricData.getMetricData();
+            DetectorResult result = null;
+            try {
+                ctxt = detectTimer.apply(detector.getName()).time();
+                result = detector.detect(metricData);
+                ctxt.close();
+            } catch (Exception e) {
+                log.error("Error in detector.detect", e);
+            }
 
-        detectorAnomalyLevelMeter.apply(detector.getName(), result.getAnomalyLevel()).mark();
-        return result;
+            detectorAnomalyLevelMeter.apply(detector.getName(), result.getAnomalyLevel()).mark();
+            return result;
+        } finally {
+            MDC.remove("DetectorUuid");
+        }
     }
 
     private Detector detectorFor(MappedMetricData mappedMetricData) {
         notNull(mappedMetricData, "mappedMetricData can't be null");
-
         val detectorUuid = mappedMetricData.getDetectorUuid();
         Detector detector = cachedDetectors.get(detectorUuid);
         if (detector == null) {
             detector = detectorSource.findDetector(detectorUuid);
-            dataInitializer.initializeDetector(mappedMetricData, detector);
+            try {
+                dataInitializer.initializeDetector(mappedMetricData, detector);
+            } catch (Exception e) {
+                log.error("Error encountered while initialising detector. Ignoring error and proceeding with un-initialized detector.", e);
+            }
             cachedDetectors.put(detectorUuid, detector);
         } else {
             log.trace("Got cached detector");
@@ -180,7 +193,9 @@ public class DetectorManager {
             }
         });
 
-        log.info("Removed detectors on refresh : {}", updatedDetectors);
+        if (!updatedDetectors.isEmpty()) {
+            log.info("Removed these updated detectors from cache (so they can be reloaded at time of next metric observation): {}", updatedDetectors);
+        }
         synchedTilTime = currentTime;
         return updatedDetectors;
     }
