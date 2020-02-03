@@ -62,13 +62,12 @@ public class DataInitializer {
     }
 
     private void initializeForecastingDetector(MappedMetricData mappedMetricData, ForecastingDetector forecastingDetector) {
-        val detectorLogString = " for detector UUID " + forecastingDetector.getUuid();
-        log.info("Initializing detector data" + detectorLogString);
+        log.info("Initializing detector data");
         val data = getHistoricalData(mappedMetricData);
-        log.info("Fetched total of " + data.size() + " historical data points" + detectorLogString);
+        log.info("Fetched total of {} historical data points for buffer", data.size());
         val metricDefinition = mappedMetricData.getMetricData().getMetricDefinition();
         populateForecastingDetectorWithHistoricalData(forecastingDetector, data, metricDefinition);
-        log.info("Populated detector with historical data" + detectorLogString);
+        log.info("Replayed {} historical data points for {}", data.size(), forecastingDetector.getClass().getSimpleName());
     }
 
     private boolean isSeasonalNaiveDetector(Detector detector) {

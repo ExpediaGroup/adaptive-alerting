@@ -67,11 +67,8 @@ public class GraphiteClient {
         try {
             content = httpClient.get(uri);
         } catch (IOException e) {
-            val message = "IOException while calling graphite " + target +
-                    ": httpMethod=GET" +
-                    ", uri=" + uri +
-                    ", message=" + e.getMessage();
-            throw new RuntimeException(message, e);
+            val message = String.format("IOException while querying Graphite target '%s': httpMethod=GET, uri=%s, message=%s", target, uri, e.getMessage());
+            throw new GraphiteClientException(message, e);
         }
 
         List<GraphiteResult> results = new ArrayList<>();

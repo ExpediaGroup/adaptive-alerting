@@ -21,6 +21,7 @@ import com.expedia.adaptivealerting.anomdetect.detect.breakout.BreakoutDetectorR
 import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
+import com.expedia.adaptivealerting.anomdetect.source.data.initializer.DataInitializerFactory;
 import com.expedia.adaptivealerting.anomdetect.util.JmxReporterFactory;
 import com.expedia.adaptivealerting.kafka.util.ConfigUtil;
 import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
@@ -90,7 +91,8 @@ public class KafkaDetectorManager implements Runnable {
     static KafkaDetectorManager buildManager(Config config) {
         MetricRegistry metricRegistry = getMetricRegistry();
         val detectorSource = DetectorUtil.buildDetectorSource(config);
-        val detectorManager = new DetectorManager(detectorSource, config, metricRegistry);
+        val dataInitializer = DataInitializerFactory.buildDataInitializer(config);
+        val detectorManager = new DetectorManager(detectorSource, dataInitializer, config, metricRegistry);
 
         val metricConsumerConfig = config.getConfig(METRIC_CONSUMER);
         val metricConsumerProps = ConfigUtil.toConsumerConfig(metricConsumerConfig);

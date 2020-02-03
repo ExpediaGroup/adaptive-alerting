@@ -21,6 +21,7 @@ import com.expedia.adaptivealerting.anomdetect.detect.Detector;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
+import com.expedia.adaptivealerting.anomdetect.source.data.initializer.DataInitializer;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.typesafe.config.Config;
@@ -40,6 +41,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 /**
@@ -59,18 +62,26 @@ public final class DetectorManagerTest {
     private Map<UUID, Detector> cachedDetectors;
 
     private UUID mappedUuid;
+    private UUID mappedUuid2;
     private UUID unmappedUuid;
     private List<UUID> updatedDetectors;
 
     // "Good" just means the detector source can find a detector for the MMD.
     private MetricDefinition goodDefinition;
     private MetricData goodMetricData;
+
+    // "BadDataInit" simulates a failure in DataInitializer dependency
+    private MetricData goodMetricDataWithBadDataInit;
     private MappedMetricData goodMappedMetricData;
+    private MappedMetricData goodMappedMetricDataWithBadDataInit;
 
     // "Bad" just means that the detector source can't find a detector for the MMD.
     private MetricDefinition badDefinition;
     private MetricData badMetricData;
     private MappedMetricData badMappedMetricData;
+
+    @Mock
+    private DataInitializer dataInitializer;
 
     @Mock
     private Detector detector;
@@ -89,12 +100,12 @@ public final class DetectorManagerTest {
         MockitoAnnotations.initMocks(this);
         initTestObjects();
         initDependencies();
-        this.managerUnderTest = new DetectorManager(detectorSource, config, cachedDetectors, SharedMetricRegistries.getOrCreate("test"));
+        this.managerUnderTest = new DetectorManager(detectorSource, dataInitializer, config, cachedDetectors, SharedMetricRegistries.getOrCreate("test"));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testBadConfig() {
-        new DetectorManager(detectorSource, badConfig, SharedMetricRegistries.getOrCreate("test"));
+        new DetectorManager(detectorSource, dataInitializer, badConfig, SharedMetricRegistries.getOrCreate("test"));
     }
 
     @Test
@@ -118,6 +129,13 @@ public final class DetectorManagerTest {
     }
 
     @Test
+    public void testClassify_proceedsWhenDataInitFails() {
+        val result = managerUnderTest.detect(goodMappedMetricDataWithBadDataInit);
+        assertNotNull(result);
+        assertSame(outlierDetectorResult, result);
+    }
+
+    @Test
     public void testClassify_getCached() {
         managerUnderTest.detect(goodMappedMetricData);
 
@@ -135,11 +153,15 @@ public final class DetectorManagerTest {
 
     private void initTestObjects() {
         this.mappedUuid = UUID.randomUUID();
+        this.mappedUuid2 = UUID.randomUUID();
         this.unmappedUuid = UUID.randomUUID();
 
         this.goodDefinition = new MetricDefinition("good-definition");
         this.goodMetricData = new MetricData(goodDefinition, 100.0, Instant.now().getEpochSecond());
         this.goodMappedMetricData = new MappedMetricData(goodMetricData, mappedUuid);
+
+        this.goodMetricDataWithBadDataInit = new MetricData(goodDefinition, 100.0, Instant.now().getEpochSecond());
+        this.goodMappedMetricDataWithBadDataInit = new MappedMetricData(goodMetricDataWithBadDataInit, mappedUuid2);
 
         this.badDefinition = new MetricDefinition("bad-definition");
         this.badMetricData = new MetricData(badDefinition, 100.0, Instant.now().getEpochSecond());
@@ -147,16 +169,21 @@ public final class DetectorManagerTest {
 
         val detectorUuid = UUID.fromString("7629c28a-5958-4ca7-9aaa-49b95d3481ff");
         this.updatedDetectors = Collections.singletonList(detectorUuid);
-
     }
 
     private void initDependencies() {
         when(outlierDetectorResult.getAnomalyLevel()).thenReturn(AnomalyLevel.NORMAL);
         when(detector.detect(goodMetricData)).thenReturn(outlierDetectorResult);
+        when(detector.detect(goodMetricDataWithBadDataInit)).thenReturn(outlierDetectorResult);
+
+        doNothing().when(dataInitializer).initializeDetector(goodMappedMetricData, detector);
+        doThrow(new RuntimeException()).when(dataInitializer).initializeDetector(goodMappedMetricDataWithBadDataInit, detector);
+        doNothing().when(dataInitializer).initializeDetector(badMappedMetricData, detector);
 
         when(cachedDetectors.containsKey(updatedDetectors.get(0))).thenReturn(true);
 
         when(detectorSource.findDetector(mappedUuid)).thenReturn(detector);
+        when(detectorSource.findDetector(mappedUuid2)).thenReturn(detector);
         when(detectorSource.findDetector(unmappedUuid)).thenReturn(null);
         when(detectorSource.findUpdatedDetectors(detectorRefreshPeriod * 60)).thenReturn(updatedDetectors);
 
