@@ -64,10 +64,8 @@ public class GraphiteSourceTest {
     }
 
     private void initDependencies() {
-        when(graphiteClient.getData(3, 2, 288, "metric_name")).thenReturn(graphiteResults);
         when(graphiteClient.getData(2, 1, 288, "metric_name")).thenReturn(graphiteResults);
         when(graphiteClient.getData(1, 0, 288, "metric_name")).thenReturn(graphiteResults);
-
         when(graphiteClient.getData(1, 0, 288, "null_metric")).thenReturn(new ArrayList<>());
         when(graphiteClient.getData(1, 0, 288, "null_value")).thenReturn(graphiteResults_null);
     }
