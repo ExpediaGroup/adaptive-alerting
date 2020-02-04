@@ -21,7 +21,6 @@ public class GraphiteSourceTest {
     private GraphiteSource sourceUnderTest;
     private List<GraphiteResult> graphiteResults = new ArrayList<>();
     private List<GraphiteResult> graphiteResults_null = new ArrayList<>();
-    private int totalNoOfDays = 1;
     private int binSize = 5;
 
     @Before
@@ -37,20 +36,22 @@ public class GraphiteSourceTest {
         List<DataSourceResult> dataSourceResults = new ArrayList<>();
         dataSourceResults.add(buildDataSourceResult(1.0, 1578307488));
         dataSourceResults.add(buildDataSourceResult(3.0, 1578307489));
+        dataSourceResults.add(buildDataSourceResult(1.0, 1578307488));
+        dataSourceResults.add(buildDataSourceResult(3.0, 1578307489));
 
-        val actual = sourceUnderTest.getMetricData(totalNoOfDays, binSize, "metric_name");
+        val actual = sourceUnderTest.getMetricData(2, binSize, "metric_name");
         assertEquals(dataSourceResults, actual);
     }
 
     @Test
     public void testGetMetricData_null_metric_data() {
-        val actual = sourceUnderTest.getMetricData(totalNoOfDays, binSize, "null_metric");
+        val actual = sourceUnderTest.getMetricData(1, binSize, "null_metric");
         assertEquals(new ArrayList<>(), actual);
     }
 
     @Test
     public void testGetMetricData_null_value() {
-        val actual = sourceUnderTest.getMetricData(totalNoOfDays, binSize, "null_value");
+        val actual = sourceUnderTest.getMetricData(1, binSize, "null_value");
         val dataSourceResult = buildDataSourceResult(GraphiteSource.MISSING_VALUE, 1578307488);
         List<DataSourceResult> dataSourceResults = new ArrayList<>();
         dataSourceResults.add(dataSourceResult);
@@ -63,7 +64,10 @@ public class GraphiteSourceTest {
     }
 
     private void initDependencies() {
+        when(graphiteClient.getData(3, 2, 288, "metric_name")).thenReturn(graphiteResults);
+        when(graphiteClient.getData(2, 1, 288, "metric_name")).thenReturn(graphiteResults);
         when(graphiteClient.getData(1, 0, 288, "metric_name")).thenReturn(graphiteResults);
+
         when(graphiteClient.getData(1, 0, 288, "null_metric")).thenReturn(new ArrayList<>());
         when(graphiteClient.getData(1, 0, 288, "null_value")).thenReturn(graphiteResults_null);
     }
@@ -93,4 +97,5 @@ public class GraphiteSourceTest {
         dataSourceResult.setEpochSecond(epochSecs);
         return dataSourceResult;
     }
+
 }
