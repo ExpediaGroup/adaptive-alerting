@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-
 import static org.mockito.Mockito.when;
 
 public class GraphiteSourceTest {
@@ -22,8 +21,8 @@ public class GraphiteSourceTest {
     private GraphiteSource sourceUnderTest;
     private List<GraphiteResult> graphiteResults = new ArrayList<>();
     private List<GraphiteResult> graphiteResults_null = new ArrayList<>();
-    private String from = "1d";
-    private Integer maxDataPoints = 288;
+    private int totalNoOfDays = 1;
+    private int binSize = 5;
 
     @Before
     public void setUp() {
@@ -39,19 +38,19 @@ public class GraphiteSourceTest {
         dataSourceResults.add(buildDataSourceResult(1.0, 1578307488));
         dataSourceResults.add(buildDataSourceResult(3.0, 1578307489));
 
-        val actual = sourceUnderTest.getMetricData(from, maxDataPoints, "metric_name");
+        val actual = sourceUnderTest.getMetricData(totalNoOfDays, binSize, "metric_name");
         assertEquals(dataSourceResults, actual);
     }
 
     @Test
     public void testGetMetricData_null_metric_data() {
-        val actual = sourceUnderTest.getMetricData(from, maxDataPoints, "null_metric");
+        val actual = sourceUnderTest.getMetricData(totalNoOfDays, binSize, "null_metric");
         assertEquals(new ArrayList<>(), actual);
     }
 
     @Test
     public void testGetMetricData_null_value() {
-        val actual = sourceUnderTest.getMetricData(from, maxDataPoints, "null_value");
+        val actual = sourceUnderTest.getMetricData(totalNoOfDays, binSize, "null_value");
         val dataSourceResult = buildDataSourceResult(GraphiteSource.MISSING_VALUE, 1578307488);
         List<DataSourceResult> dataSourceResults = new ArrayList<>();
         dataSourceResults.add(dataSourceResult);
@@ -64,9 +63,9 @@ public class GraphiteSourceTest {
     }
 
     private void initDependencies() {
-        when(graphiteClient.getData(from, maxDataPoints, "metric_name")).thenReturn(graphiteResults);
-        when(graphiteClient.getData(from, maxDataPoints, "null_metric")).thenReturn(new ArrayList<>());
-        when(graphiteClient.getData(from, maxDataPoints, "null_value")).thenReturn(graphiteResults_null);
+        when(graphiteClient.getData(1, 0, 288, "metric_name")).thenReturn(graphiteResults);
+        when(graphiteClient.getData(1, 0, 288, "null_metric")).thenReturn(new ArrayList<>());
+        when(graphiteClient.getData(1, 0, 288, "null_value")).thenReturn(graphiteResults_null);
     }
 
     private GraphiteResult buildGraphiteResult() {

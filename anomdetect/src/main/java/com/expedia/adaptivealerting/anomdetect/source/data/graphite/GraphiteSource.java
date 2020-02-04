@@ -30,6 +30,9 @@ import java.util.List;
 public class GraphiteSource implements DataSource {
 
     public static final Double MISSING_VALUE = Double.NEGATIVE_INFINITY;
+    public static final int NO_OF_HOURS_DAY = 24;
+    public static final int NO_OF_MINS_IN_HOUR = 60;
+    public static final int BIN_SIZE = 5;
 
     /**
      * Client to load metric data from graphite.
@@ -38,22 +41,32 @@ public class GraphiteSource implements DataSource {
     private GraphiteClient graphiteClient;
 
     @Override
-    public List<DataSourceResult> getMetricData(String from, Integer maxDataPoints, String metric) {
-        List<GraphiteResult> graphiteResults = graphiteClient.getData(from, maxDataPoints, metric);
+    public List<DataSourceResult> getMetricData(int totalNoOfDays, int binSize, String metric) {
         List<DataSourceResult> results = new ArrayList<>();
-        if (graphiteResults.size() > 0) {
-            String[][] dataPoints = graphiteResults.get(0).getDatapoints();
-            //TODO Convert this to use JAVA stream
-            for (String[] dataPoint : dataPoints) {
-                Double value = MISSING_VALUE;
-                if (dataPoint[0] != null) {
-                    value = Double.parseDouble(dataPoint[0]);
+        int maxDataPoints = getMaxDataPointsPerDay(binSize);
+
+        for (int i = 0; i < totalNoOfDays; i++) {
+            int from = totalNoOfDays - i;
+            int until = from - 1;
+            List<GraphiteResult> graphiteResults = graphiteClient.getData(from, until, maxDataPoints, metric);
+            if (graphiteResults.size() > 0) {
+                String[][] dataPoints = graphiteResults.get(0).getDatapoints();
+                //TODO Convert this to use JAVA stream
+                for (String[] dataPoint : dataPoints) {
+                    Double value = MISSING_VALUE;
+                    if (dataPoint[0] != null) {
+                        value = Double.parseDouble(dataPoint[0]);
+                    }
+                    long epochSeconds = Long.parseLong(dataPoint[1]);
+                    DataSourceResult result = new DataSourceResult(value, epochSeconds);
+                    results.add(result);
                 }
-                long epochSeconds = Long.parseLong(dataPoint[1]);
-                DataSourceResult result = new DataSourceResult(value, epochSeconds);
-                results.add(result);
             }
         }
         return results;
+    }
+
+    private int getMaxDataPointsPerDay(int binSize) {
+        return (NO_OF_HOURS_DAY * NO_OF_MINS_IN_HOUR) / binSize;
     }
 }

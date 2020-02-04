@@ -22,6 +22,6 @@ import java.util.List;
  */
 public interface DataSource {
 
-    List<DataSourceResult> getMetricData(String from, Integer maxDataPoints, String metric);
+    List<DataSourceResult> getMetricData(int totalNoOfDays, int binSize, String metric);
 
 }

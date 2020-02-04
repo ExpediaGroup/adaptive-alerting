@@ -68,8 +68,8 @@ public class DataInitializerTest {
 
     private void initConfig() {
         when(config.getString(DataInitializer.BASE_URI)).thenReturn("http://graphite");
-        when(config.getString(DataInitializer.EARLIEST_TIME)).thenReturn("7d");
-        when(config.getInt(DataInitializer.MAX_DATA_POINTS)).thenReturn(2016);
+        when(config.getInt(DataInitializer.BIN_SIZE)).thenReturn(5);
+        when(config.getInt(DataInitializer.TOTAL_NO_OF_DAYS)).thenReturn(7);
     }
 
     public void initTestObjects() {
@@ -96,7 +96,7 @@ public class DataInitializerTest {
     private void initDependencies() {
         when(initializerUnderTest.makeClient(anyString())).thenReturn(graphiteClient);
         when(initializerUnderTest.makeSource(graphiteClient)).thenReturn(dataSource);
-        when(dataSource.getMetricData(anyString(), anyInt(), anyString())).thenReturn(dataSourceResults);
+        when(dataSource.getMetricData(anyInt(), anyInt(), anyString())).thenReturn(dataSourceResults);
     }
 
     private DataSourceResult buildDataSourceResult(Double value, long epochSecs) {

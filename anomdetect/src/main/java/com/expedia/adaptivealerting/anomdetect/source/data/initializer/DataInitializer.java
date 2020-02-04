@@ -37,20 +37,20 @@ import java.util.List;
 public class DataInitializer {
 
     public static final String BASE_URI = "graphite-base-uri";
-    public static final String EARLIEST_TIME = "graphite-earliest-time";
-    public static final String MAX_DATA_POINTS = "graphite-max-data-points";
+    public static final String BIN_SIZE = "graphite-bin-size-in-minutes";
     public static final String DATA_RETRIEVAL_TAG_KEY = "graphite-data-retrieval-key";
+    public static final String TOTAL_NO_OF_DAYS = "graphite-total-no-of-days";
 
     private String baseUri;
-    private String earliestTime;
-    private Integer maxDataPoints;
+    private int binSize;
     private String dataRetrievalTagKey;
+    private int totalNoOfDays;
 
     public DataInitializer(Config config) {
         this.baseUri = config.getString(BASE_URI);
-        this.earliestTime = config.getString(EARLIEST_TIME);
-        this.maxDataPoints = config.getInt(MAX_DATA_POINTS);
+        this.binSize = config.getInt(BIN_SIZE);
         this.dataRetrievalTagKey = config.getString(DATA_RETRIEVAL_TAG_KEY);
+        this.totalNoOfDays = config.getInt(TOTAL_NO_OF_DAYS);
     }
 
     public void initializeDetector(MappedMetricData mappedMetricData, Detector detector) {
@@ -78,7 +78,7 @@ public class DataInitializer {
         val target = MetricUtil.getDataRetrievalValueOrMetricKey(mappedMetricData, dataRetrievalTagKey);
         val client = makeClient(baseUri);
         val dataSource = makeSource(client);
-        return dataSource.getMetricData(earliestTime, maxDataPoints, target);
+        return dataSource.getMetricData(totalNoOfDays, binSize, target);
     }
 
     //TODO. Using one-line methods for object creation to support unit testing. We can replace this with factories later on.
