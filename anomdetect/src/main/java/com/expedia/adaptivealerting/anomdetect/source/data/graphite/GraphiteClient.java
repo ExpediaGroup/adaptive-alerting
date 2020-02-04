@@ -19,7 +19,6 @@ import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.http.client.fluent.Content;
 
@@ -37,7 +36,6 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
  * </p>
  */
 @RequiredArgsConstructor
-@Slf4j
 public class GraphiteClient {
 
     public static final String FETCH_METRICS_PATH = "/render?from=-%dd&until=-%dd&format=json&maxDataPoints=%d&target=%s";
