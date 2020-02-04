@@ -30,8 +30,8 @@ import java.util.List;
 public class GraphiteSource implements DataSource {
 
     public static final Double MISSING_VALUE = Double.NEGATIVE_INFINITY;
-    public static final int HOURS_PER_DAY = 24;
-    public static final int MINUTES_PER_HOUR = 60;
+    private static final int HOURS_PER_DAY = 24;
+    private static final int MINUTES_PER_HOUR = 60;
 
     /**
      * Client to load metric data from graphite.

@@ -37,7 +37,7 @@ import java.util.List;
 public class DataInitializer {
 
     public static final String BASE_URI = "graphite-base-uri";
-    public static final String BIN_SIZE = "graphite-bin-size-in-minutes";
+    public static final String BIN_SIZE = "graphite-bin-size-in-mins";
     public static final String DATA_RETRIEVAL_TAG_KEY = "graphite-data-retrieval-key";
     public static final String TOTAL_NO_OF_DAYS = "graphite-total-no-of-days";
 
