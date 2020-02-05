@@ -18,6 +18,9 @@ package com.expedia.adaptivealerting.anomdetect.source.data.initializer;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.forecasting.ForecastingDetector;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.SeasonalPointForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.seasonalnaive.SeasonalNaivePointForecaster;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSource;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSourceResult;
 import com.expedia.adaptivealerting.anomdetect.source.data.graphite.GraphiteClient;
@@ -63,7 +66,7 @@ public class DataInitializer {
 
     private void initializeForecastingDetector(MappedMetricData mappedMetricData, ForecastingDetector forecastingDetector) {
         log.info("Initializing detector data");
-        val data = getHistoricalData(mappedMetricData);
+        val data = getHistoricalData(mappedMetricData, forecastingDetector);
         log.info("Fetched total of {} historical data points for buffer", data.size());
         val metricDefinition = mappedMetricData.getMetricData().getMetricDefinition();
         populateForecastingDetectorWithHistoricalData(forecastingDetector, data, metricDefinition);
@@ -74,11 +77,19 @@ public class DataInitializer {
         return detector instanceof ForecastingDetector && "seasonalnaive".equals(detector.getName());
     }
 
-    private List<DataSourceResult> getHistoricalData(MappedMetricData mappedMetricData) {
+    private List<DataSourceResult> getHistoricalData(MappedMetricData mappedMetricData, ForecastingDetector forecastingDetector) {
         val target = MetricUtil.getDataRetrievalValueOrMetricKey(mappedMetricData, dataRetrievalTagKey);
         val client = makeClient(baseUri);
         val dataSource = makeSource(client);
-        return dataSource.getMetricData(totalNoOfDays, binSize, target);
+        PointForecaster pointForecaster = forecastingDetector.getPointForecaster();
+        if (pointForecaster instanceof SeasonalPointForecaster) {
+            int cycleLength = ((SeasonalPointForecaster) pointForecaster).getCycleLength();
+            int intervalLength = ((SeasonalPointForecaster) pointForecaster).getIntervalLength();
+            return dataSource.getMetricData(cycleLength, intervalLength, target);
+        } else {
+            // TODO: Better message!
+            throw new RuntimeException("ForecastingDetector with non-SeasonalPointForecaster");
+        }
     }
 
     //TODO. Using one-line methods for object creation to support unit testing. We can replace this with factories later on.
