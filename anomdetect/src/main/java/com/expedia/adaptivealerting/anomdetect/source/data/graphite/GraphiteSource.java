@@ -65,7 +65,7 @@ public class GraphiteSource implements DataSource {
         int from = earliestTimeInSecs - counter;
         int until = from - C.SECONDS_PER_DAY;
         log.debug("Fetching data from graphite for params:" +
-                "from={}, until={}, maxDataPoints={} and metric={} ", from, until, maxDataPoints, metric);
+                "from=-{}s, until=-{}s, maxDataPoints={} and metric={} ", from, until, maxDataPoints, metric);
         return graphiteClient.getData(from, until, maxDataPoints, metric);
     }
 
