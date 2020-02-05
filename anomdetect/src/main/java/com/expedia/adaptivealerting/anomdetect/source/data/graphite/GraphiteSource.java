@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.anomdetect.source.data.graphite;
 
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSource;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSourceResult;
+import com.expedia.adaptivealerting.anomdetect.util.C;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,6 @@ import java.util.List;
 public class GraphiteSource implements DataSource {
 
     public static final Double MISSING_VALUE = Double.NEGATIVE_INFINITY;
-    private static final int MINUTES_PER_DAY = 24 * 60;
 
     /**
      * Client to load metric data from graphite.
@@ -39,14 +39,11 @@ public class GraphiteSource implements DataSource {
     private GraphiteClient graphiteClient;
 
     @Override
-    public List<DataSourceResult> getMetricData(int totalNoOfDays, int binSize, String metric) {
+    public List<DataSourceResult> getMetricData(int earliestTimeInSecs, int binSizeInSecs, String metric) {
+        int maxDataPoints = getMaxDataPointsPerDay(binSizeInSecs);
         List<DataSourceResult> results = new ArrayList<>();
-        int maxDataPoints = getMaxDataPointsPerDay(binSize);
-
-        for (int i = 0; i < totalNoOfDays; i++) {
-            int from = totalNoOfDays - i;
-            int until = from - 1;
-            List<GraphiteResult> graphiteResults = graphiteClient.getData(from, until, maxDataPoints, metric);
+        for (int i = 0; i < earliestTimeInSecs; i += C.SECONDS_PER_DAY) {
+            List<GraphiteResult> graphiteResults = getDataFromGraphite(i, earliestTimeInSecs, maxDataPoints, metric);
             if (graphiteResults.size() > 0) {
                 String[][] dataPoints = graphiteResults.get(0).getDatapoints();
                 //TODO Convert this to use JAVA stream
@@ -64,7 +61,15 @@ public class GraphiteSource implements DataSource {
         return results;
     }
 
-    private int getMaxDataPointsPerDay(int binSize) {
-        return MINUTES_PER_DAY / binSize;
+    private List<GraphiteResult> getDataFromGraphite(int counter, int earliestTimeInSecs, int maxDataPoints, String metric) {
+        int from = earliestTimeInSecs - counter;
+        int until = from - C.SECONDS_PER_DAY;
+        log.debug("Fetching data from graphite for params:" +
+                "from={}, until={}, maxDataPoints={} and metric={} ", from, until, maxDataPoints, metric);
+        return graphiteClient.getData(from, until, maxDataPoints, metric);
+    }
+
+    private int getMaxDataPointsPerDay(int binSizeInSecs) {
+        return C.SECONDS_PER_DAY / binSizeInSecs;
     }
 }

@@ -68,8 +68,6 @@ public class DataInitializerTest {
 
     private void initConfig() {
         when(config.getString(DataInitializer.BASE_URI)).thenReturn("http://graphite");
-        when(config.getInt(DataInitializer.BIN_SIZE)).thenReturn(5);
-        when(config.getInt(DataInitializer.TOTAL_NO_OF_DAYS)).thenReturn(7);
     }
 
     public void initTestObjects() {

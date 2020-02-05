@@ -20,7 +20,6 @@ import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.forecasting.ForecastingDetector;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.SeasonalPointForecaster;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.seasonalnaive.SeasonalNaivePointForecaster;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSource;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSourceResult;
 import com.expedia.adaptivealerting.anomdetect.source.data.graphite.GraphiteClient;
@@ -40,24 +39,18 @@ import java.util.List;
 public class DataInitializer {
 
     public static final String BASE_URI = "graphite-base-uri";
-    public static final String BIN_SIZE = "graphite-bin-size-in-mins";
     public static final String DATA_RETRIEVAL_TAG_KEY = "graphite-data-retrieval-key";
-    public static final String TOTAL_NO_OF_DAYS = "graphite-total-no-of-days";
 
     private String baseUri;
-    private int binSize;
     private String dataRetrievalTagKey;
-    private int totalNoOfDays;
 
     public DataInitializer(Config config) {
         this.baseUri = config.getString(BASE_URI);
-        this.binSize = config.getInt(BIN_SIZE);
         this.dataRetrievalTagKey = config.getString(DATA_RETRIEVAL_TAG_KEY);
-        this.totalNoOfDays = config.getInt(TOTAL_NO_OF_DAYS);
     }
 
     public void initializeDetector(MappedMetricData mappedMetricData, Detector detector) {
-        // TODO: Foreasting Detector initialisation is currently limited to Seasonal Naive detector and assumes Graphite source
+        // TODO: Forecasting Detector initialisation is currently limited to Seasonal Naive detector and assumes Graphite source
         if (detector != null && isSeasonalNaiveDetector(detector)) {
             val forecastingDetector = (ForecastingDetector) detector;
             initializeForecastingDetector(mappedMetricData, forecastingDetector);
@@ -83,12 +76,13 @@ public class DataInitializer {
         val dataSource = makeSource(client);
         PointForecaster pointForecaster = forecastingDetector.getPointForecaster();
         if (pointForecaster instanceof SeasonalPointForecaster) {
-            int cycleLength = ((SeasonalPointForecaster) pointForecaster).getCycleLength();
-            int intervalLength = ((SeasonalPointForecaster) pointForecaster).getIntervalLength();
-            return dataSource.getMetricData(cycleLength, intervalLength, target);
+            val seasonalPointForecaster = ((SeasonalPointForecaster) pointForecaster);
+            val cycleLength = seasonalPointForecaster.getCycleLength();
+            val intervalLength = seasonalPointForecaster.getIntervalLength();
+            val earliestTime = cycleLength * intervalLength;
+            return dataSource.getMetricData(earliestTime, intervalLength, target);
         } else {
-            // TODO: Better message!
-            throw new RuntimeException("ForecastingDetector with non-SeasonalPointForecaster");
+            throw new RuntimeException("Forecasting detector doesn't has a Seasonal point forecaster");
         }
     }
 

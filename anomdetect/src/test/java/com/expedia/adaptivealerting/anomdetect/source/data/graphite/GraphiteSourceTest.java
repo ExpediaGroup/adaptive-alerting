@@ -1,6 +1,7 @@
 package com.expedia.adaptivealerting.anomdetect.source.data.graphite;
 
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSourceResult;
+import com.expedia.adaptivealerting.anomdetect.util.C;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +22,7 @@ public class GraphiteSourceTest {
     private GraphiteSource sourceUnderTest;
     private List<GraphiteResult> graphiteResults = new ArrayList<>();
     private List<GraphiteResult> graphiteResults_null = new ArrayList<>();
-    private int binSize = 5;
+    private int binSizeInSecs = 5 * C.SECS_PER_MIN;
 
     @Before
     public void setUp() {
@@ -38,20 +39,30 @@ public class GraphiteSourceTest {
         dataSourceResults.add(buildDataSourceResult(3.0, 1578307489));
         dataSourceResults.add(buildDataSourceResult(1.0, 1578307488));
         dataSourceResults.add(buildDataSourceResult(3.0, 1578307489));
+        dataSourceResults.add(buildDataSourceResult(1.0, 1578307488));
+        dataSourceResults.add(buildDataSourceResult(3.0, 1578307489));
+        dataSourceResults.add(buildDataSourceResult(1.0, 1578307488));
+        dataSourceResults.add(buildDataSourceResult(3.0, 1578307489));
+        dataSourceResults.add(buildDataSourceResult(1.0, 1578307488));
+        dataSourceResults.add(buildDataSourceResult(3.0, 1578307489));
+        dataSourceResults.add(buildDataSourceResult(1.0, 1578307488));
+        dataSourceResults.add(buildDataSourceResult(3.0, 1578307489));
+        dataSourceResults.add(buildDataSourceResult(1.0, 1578307488));
+        dataSourceResults.add(buildDataSourceResult(3.0, 1578307489));
 
-        val actual = sourceUnderTest.getMetricData(2, binSize, "metric_name");
+        val actual = sourceUnderTest.getMetricData(C.SECONDS_PER_DAY * 7, binSizeInSecs, "metric_name");
         assertEquals(dataSourceResults, actual);
     }
 
     @Test
     public void testGetMetricData_null_metric_data() {
-        val actual = sourceUnderTest.getMetricData(1, binSize, "null_metric");
+        val actual = sourceUnderTest.getMetricData(C.SECONDS_PER_DAY, binSizeInSecs, "null_metric");
         assertEquals(new ArrayList<>(), actual);
     }
 
     @Test
     public void testGetMetricData_null_value() {
-        val actual = sourceUnderTest.getMetricData(1, binSize, "null_value");
+        val actual = sourceUnderTest.getMetricData(C.SECONDS_PER_DAY, binSizeInSecs, "null_value");
         val dataSourceResult = buildDataSourceResult(GraphiteSource.MISSING_VALUE, 1578307488);
         List<DataSourceResult> dataSourceResults = new ArrayList<>();
         dataSourceResults.add(dataSourceResult);
@@ -64,10 +75,15 @@ public class GraphiteSourceTest {
     }
 
     private void initDependencies() {
-        when(graphiteClient.getData(2, 1, 288, "metric_name")).thenReturn(graphiteResults);
-        when(graphiteClient.getData(1, 0, 288, "metric_name")).thenReturn(graphiteResults);
-        when(graphiteClient.getData(1, 0, 288, "null_metric")).thenReturn(new ArrayList<>());
-        when(graphiteClient.getData(1, 0, 288, "null_value")).thenReturn(graphiteResults_null);
+        when(graphiteClient.getData(C.SECONDS_PER_DAY * 7, C.SECONDS_PER_DAY * 6, 288, "metric_name")).thenReturn(graphiteResults);
+        when(graphiteClient.getData(C.SECONDS_PER_DAY * 6, C.SECONDS_PER_DAY * 5, 288, "metric_name")).thenReturn(graphiteResults);
+        when(graphiteClient.getData(C.SECONDS_PER_DAY * 5, C.SECONDS_PER_DAY * 4, 288, "metric_name")).thenReturn(graphiteResults);
+        when(graphiteClient.getData(C.SECONDS_PER_DAY * 4, C.SECONDS_PER_DAY * 3, 288, "metric_name")).thenReturn(graphiteResults);
+        when(graphiteClient.getData(C.SECONDS_PER_DAY * 3, C.SECONDS_PER_DAY * 2, 288, "metric_name")).thenReturn(graphiteResults);
+        when(graphiteClient.getData(C.SECONDS_PER_DAY * 2, C.SECONDS_PER_DAY, 288, "metric_name")).thenReturn(graphiteResults);
+        when(graphiteClient.getData(C.SECONDS_PER_DAY, 0, 288, "metric_name")).thenReturn(graphiteResults);
+        when(graphiteClient.getData(C.SECONDS_PER_DAY, 0, 288, "null_metric")).thenReturn(new ArrayList<>());
+        when(graphiteClient.getData(C.SECONDS_PER_DAY, 0, 288, "null_value")).thenReturn(graphiteResults_null);
     }
 
     private GraphiteResult buildGraphiteResult() {
