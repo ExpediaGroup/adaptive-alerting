@@ -6,6 +6,8 @@ import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.forecasting.ForecastingDetector;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.multiplicative.MultiplicativeIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.multiplicative.MultiplicativeIntervalForecasterParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.pewma.PewmaPointForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.pewma.PewmaPointForecasterParams;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.seasonalnaive.SeasonalNaivePointForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.seasonalnaive.SeasonalNaivePointForecasterParams;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSource;
@@ -62,6 +64,15 @@ public class DataInitializerTest {
 
     @Test
     public void testInitializeDetector() {
+        initializerUnderTest.initializeDetector(mappedMetricData, detector);
+        verify(initializerUnderTest, atMost(1)).initializeDetector(any(MappedMetricData.class), any(Detector.class));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testInitializeDetector_illegal_point_forecaster() {
+        val pwmaPointForecaster = new PewmaPointForecaster(new PewmaPointForecasterParams().setAlpha(1.0).setBeta(2.0));
+        val multiplicativeIntervalForecaster = new MultiplicativeIntervalForecaster(new MultiplicativeIntervalForecasterParams().setStrongMultiplier(3.0).setWeakMultiplier(1.0));
+        val detector = new ForecastingDetector(UUID.randomUUID(), pwmaPointForecaster, multiplicativeIntervalForecaster, AnomalyType.TWO_TAILED, true, "seasonalnaive");
         initializerUnderTest.initializeDetector(mappedMetricData, detector);
         verify(initializerUnderTest, atMost(1)).initializeDetector(any(MappedMetricData.class), any(Detector.class));
     }
