@@ -40,9 +40,7 @@ variable "anomaly_producer_key_serializer" {}
 variable "anomaly_producer_value_serializer" {}
 variable "modelservice_base_uri" {}
 variable "graphite_base_uri" {}
-variable "graphite_bin_size_in_mins" {}
 variable "graphite_data_retrieval_key" {}
-variable "graphite_total_no_of_days" {}
 variable "detector_refresh_period" {
   default = 5
 }

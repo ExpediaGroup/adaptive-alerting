@@ -23,9 +23,7 @@ data "template_file" "config_data" {
     anomaly_producer_value_serializer = "${var.anomaly_producer_value_serializer}"
     modelservice_base_uri = "${var.modelservice_base_uri}"
     graphite_base_uri = "${var.graphite_base_uri}"
-    graphite_bin_size_in_mins = "${var.graphite_bin_size_in_mins}
     graphite_data_retrieval_key = "${var.graphite_data_retrieval_key}"
-    graphite_total_no_of_days = "${var.graphite_total_no_of_days}
     detector_refresh_period = "${var.detector_refresh_period}"
   }
 }
