@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 Expedia Group, Inc.
+ * Copyright 2018-2019 Expedia Group, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package com.expedia.adaptivealerting.anomdetect.forecast.point;
 
 public interface SeasonalPointForecaster extends PointForecaster {
-
     /**
      * Number of observations per cycle.
      */
@@ -26,5 +25,4 @@ public interface SeasonalPointForecaster extends PointForecaster {
      * Number of seconds between two observations.
      */
     int getIntervalLength();
-
 }
