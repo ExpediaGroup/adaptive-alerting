@@ -21,6 +21,7 @@ ad-manager {
   graphite-earliest-time ="${graphite_earliest_time}"
   graphite-max-data-points = "${graphite_max_data_points}"
   graphite-data-retrieval-key = "${graphite_data_retrieval_key}"
+  throttle-gate-likelihood = "${throttle_gate_likelihood}"
 
   # Detector refresh period in minutes
   detector-refresh-period = ${detector_refresh_period}

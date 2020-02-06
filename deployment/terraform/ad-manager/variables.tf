@@ -43,6 +43,7 @@ variable "graphite_base_uri" {}
 variable "graphite_earliest_time" {}
 variable "graphite_max_data_points" {}
 variable "graphite_data_retrieval_key" {}
+variable "throttle_gate_likelihood" {}
 variable "detector_refresh_period" {
   default = 5
 }

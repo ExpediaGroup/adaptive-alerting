@@ -83,6 +83,7 @@ module "ad-manager" {
   graphite_earliest_time = "${var.ad-manager["graphite_earliest_time"]}"
   graphite_max_data_points = "${var.ad-manager["graphite_max_data_points"]}"
   graphite_data_retrieval_key = "${var.ad-manager["graphite_data_retrieval_key"]}"
+  throttle_gate_likelihood = "${var.ad-manager["throttle_gate_likelihood"]}"
   detector_refresh_period = "${var.ad-manager["detector_refresh_period"]}"
 }
 

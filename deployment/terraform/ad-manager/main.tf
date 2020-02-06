@@ -26,6 +26,7 @@ data "template_file" "config_data" {
     graphite_earliest_time ="${var.graphite_earliest_time}"
     graphite_max_data_points = "${var.graphite_max_data_points}"
     graphite_data_retrieval_key = "${var.graphite_data_retrieval_key}"
+    throttle_gate_likelihood = "${var.throttle_gate_likelihood}"
     detector_refresh_period = "${var.detector_refresh_period}"
   }
 }

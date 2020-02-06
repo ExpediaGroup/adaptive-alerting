@@ -70,7 +70,8 @@ public class DataInitializer {
                 val forecastingDetector = (ForecastingDetector) detector;
                 initializeForecastingDetector(mappedMetricData, forecastingDetector);
             } else {
-                log.info("Throttle gate is closed, skipping initializing data and detector creation.");
+                throw new DetectorDataInitializationThrottledException(
+                        "Throttle gate is closed, skipping initializing data and detector creation.");
             }
         }
     }
