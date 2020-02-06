@@ -34,8 +34,15 @@ public class GraphiteSourceTest {
 
     @Test
     public void testGetMetricData() {
-        val dataSourceResults = buildDataSourceResults();
+        val dataSourceResults = buildDataSourceResults(7);
         val actual = sourceUnderTest.getMetricData(1580297095, 1580901895, intervalLength, "metric_name");
+        assertEquals(dataSourceResults, actual);
+    }
+
+    @Test
+    public void testGetMetricData_time_window_less_than_day() {
+        val dataSourceResults = buildDataSourceResults(1);
+        val actual = sourceUnderTest.getMetricData(1580297095, 1580340295, intervalLength, "metric_name");
         assertEquals(dataSourceResults, actual);
     }
 
@@ -67,6 +74,9 @@ public class GraphiteSourceTest {
         when(graphiteClient.getData(1580642695, 1580729095, 288, "metric_name")).thenReturn(graphiteResults);
         when(graphiteClient.getData(1580729095, 1580815495, 288, "metric_name")).thenReturn(graphiteResults);
         when(graphiteClient.getData(1580815495, 1580901895, 288, "metric_name")).thenReturn(graphiteResults);
+
+        when(graphiteClient.getData(1580297095, 1580383495, 288, "metric_name")).thenReturn(graphiteResults);
+
         when(graphiteClient.getData(1580815495, 1580901895, 288, "null_metric")).thenReturn(new ArrayList<>());
         when(graphiteClient.getData(1580815495, 1580901895, 288, "null_value")).thenReturn(graphiteResults_null);
     }
@@ -90,10 +100,10 @@ public class GraphiteSourceTest {
         return graphiteResult;
     }
 
-    private List<DataSourceResult> buildDataSourceResults() {
+    private List<DataSourceResult> buildDataSourceResults(int noOfResults) {
 
         List<DataSourceResult> dataSourceResults = new ArrayList<>();
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < noOfResults; i++) {
             dataSourceResults.add(buildDataSourceResult(1.0, 1578307488));
             dataSourceResults.add(buildDataSourceResult(3.0, 1578307489));
         }
