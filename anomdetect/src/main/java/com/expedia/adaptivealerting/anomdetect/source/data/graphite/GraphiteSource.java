@@ -25,6 +25,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.time.Instant.ofEpochSecond;
+
 @RequiredArgsConstructor
 @Slf4j
 public class GraphiteSource implements DataSource {
@@ -38,10 +40,9 @@ public class GraphiteSource implements DataSource {
     private GraphiteClient graphiteClient;
 
     @Override
-    public List<DataSourceResult> getMetricData(long earliestTime, long latestTime, int binSizeInSecs, String metric) {
-        int maxDataPoints = getMaxDataPointsPerDay(binSizeInSecs);
-        List<DataSourceResult> results = buildDataSourceResult(earliestTime, latestTime, maxDataPoints, metric);
-        return results;
+    public List<DataSourceResult> getMetricData(long earliestTime, long latestTime, int intervalLength, String target) {
+        int maxDataPoints = getMaxDataPointsPerDay(intervalLength);
+        return buildDataSourceResult(earliestTime, latestTime, maxDataPoints, target);
     }
 
     private List<DataSourceResult> buildDataSourceResult(long earliestTime, long latestTime, int maxDataPoints, String metric) {
@@ -67,12 +68,12 @@ public class GraphiteSource implements DataSource {
 
     private List<GraphiteResult> getDataFromGraphite(long from, int maxDataPoints, String metric) {
         long until = from + TimeConstantsUtil.SECONDS_PER_DAY;
-        log.debug("Fetching data from graphite for params:" +
-                "from={}, until={}, maxDataPoints={} and metric={} ", from, until, maxDataPoints, metric);
+        log.debug("Fetching data from graphite for params: from={} ({}), until={} ({}), maxDataPoints={}, metric='{}'",
+                from, ofEpochSecond(from), until, ofEpochSecond(until), maxDataPoints, metric);
         return graphiteClient.getData(from, until, maxDataPoints, metric);
     }
 
-    private int getMaxDataPointsPerDay(int binSizeInSecs) {
-        return TimeConstantsUtil.SECONDS_PER_DAY / binSizeInSecs;
+    private int getMaxDataPointsPerDay(int intervalLength) {
+        return TimeConstantsUtil.SECONDS_PER_DAY / intervalLength;
     }
 }

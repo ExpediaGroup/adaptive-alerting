@@ -22,7 +22,7 @@ public class GraphiteSourceTest {
     private GraphiteSource sourceUnderTest;
     private List<GraphiteResult> graphiteResults = new ArrayList<>();
     private List<GraphiteResult> graphiteResults_null = new ArrayList<>();
-    private int binSizeInSecs = 5 * TimeConstantsUtil.SECONDS_PER_MIN;
+    private int intervalLength = 5 * TimeConstantsUtil.SECONDS_PER_MIN;
 
     @Before
     public void setUp() {
@@ -35,19 +35,19 @@ public class GraphiteSourceTest {
     @Test
     public void testGetMetricData() {
         val dataSourceResults = buildDataSourceResults();
-        val actual = sourceUnderTest.getMetricData(1580297095, 1580901895, binSizeInSecs, "metric_name");
+        val actual = sourceUnderTest.getMetricData(1580297095, 1580901895, intervalLength, "metric_name");
         assertEquals(dataSourceResults, actual);
     }
 
     @Test
     public void testGetMetricData_null_metric_data() {
-        val actual = sourceUnderTest.getMetricData(1580815495, 1580901895, binSizeInSecs, "null_metric");
+        val actual = sourceUnderTest.getMetricData(1580815495, 1580901895, intervalLength, "null_metric");
         assertEquals(new ArrayList<>(), actual);
     }
 
     @Test
     public void testGetMetricData_null_value() {
-        val actual = sourceUnderTest.getMetricData(1580815495, 1580901895, binSizeInSecs, "null_value");
+        val actual = sourceUnderTest.getMetricData(1580815495, 1580901895, intervalLength, "null_value");
         val dataSourceResult = buildDataSourceResult(GraphiteSource.MISSING_VALUE, 1578307488);
         List<DataSourceResult> dataSourceResults = new ArrayList<>();
         dataSourceResults.add(dataSourceResult);
