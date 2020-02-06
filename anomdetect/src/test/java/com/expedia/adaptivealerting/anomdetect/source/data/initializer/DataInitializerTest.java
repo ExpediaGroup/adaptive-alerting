@@ -60,7 +60,7 @@ public class DataInitializerTest {
         initDependencies();
     }
 
-    @Test
+    @Test(expected = DetectorDataInitializationThrottledException.class)
     public void testInitializeDetector() {
         initializerUnderTest.initializeDetector(mappedMetricData, detector);
         verify(initializerUnderTest, atMost(1)).initializeDetector(any(MappedMetricData.class), any(Detector.class));
