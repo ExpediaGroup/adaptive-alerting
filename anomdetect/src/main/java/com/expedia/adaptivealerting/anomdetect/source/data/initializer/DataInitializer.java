@@ -22,6 +22,8 @@ import com.expedia.adaptivealerting.anomdetect.source.data.DataSource;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSourceResult;
 import com.expedia.adaptivealerting.anomdetect.source.data.graphite.GraphiteClient;
 import com.expedia.adaptivealerting.anomdetect.source.data.graphite.GraphiteSource;
+import com.expedia.adaptivealerting.anomdetect.source.data.initializer.throttlegate.RandomThrottleGate;
+import com.expedia.adaptivealerting.anomdetect.source.data.initializer.throttlegate.ThrottleGate;
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.expedia.adaptivealerting.anomdetect.util.MetricUtil;
 import com.expedia.metrics.MetricData;
@@ -40,24 +42,36 @@ public class DataInitializer {
     public static final String EARLIEST_TIME = "graphite-earliest-time";
     public static final String MAX_DATA_POINTS = "graphite-max-data-points";
     public static final String DATA_RETRIEVAL_TAG_KEY = "graphite-data-retrieval-key";
+    public static final String THROTTLE_GATE_LIKELIHOOD = "throttle-gate-likelihood";
 
     private String baseUri;
     private String earliestTime;
     private Integer maxDataPoints;
     private String dataRetrievalTagKey;
+    private ThrottleGate throttleGate;
 
     public DataInitializer(Config config) {
         this.baseUri = config.getString(BASE_URI);
         this.earliestTime = config.getString(EARLIEST_TIME);
         this.maxDataPoints = config.getInt(MAX_DATA_POINTS);
-        this.dataRetrievalTagKey = config.getString(DATA_RETRIEVAL_TAG_KEY);
+        try {
+            val throttleGateLikelihood = config.getDouble(THROTTLE_GATE_LIKELIHOOD);
+            this.throttleGate = new RandomThrottleGate(throttleGateLikelihood);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Could not load throttle-gate-likelihood from config.");
+        }
     }
 
     public void initializeDetector(MappedMetricData mappedMetricData, Detector detector) {
         // TODO: Foreasting Detector initialisation is currently limited to Seasonal Naive detector and assumes Graphite source
         if (detector != null && isSeasonalNaiveDetector(detector)) {
-            val forecastingDetector = (ForecastingDetector) detector;
-            initializeForecastingDetector(mappedMetricData, forecastingDetector);
+            if (throttleGate.isOpen()) {
+                log.info("Throttle gate is open, initializing data and creating a detector");
+                val forecastingDetector = (ForecastingDetector) detector;
+                initializeForecastingDetector(mappedMetricData, forecastingDetector);
+            } else {
+                log.info("Throttle gate is closed, skipping initializing data and detector creation.");
+            }
         }
     }
 
