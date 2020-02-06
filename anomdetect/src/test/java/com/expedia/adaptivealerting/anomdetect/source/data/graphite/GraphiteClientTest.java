@@ -17,9 +17,9 @@ import static org.mockito.Mockito.when;
 @Slf4j
 public class GraphiteClientTest {
     private static final String BASE_URI = "http://graphite";
-    private static final String METRIC_URI = uri(FETCH_METRICS_PATH, 2, 1, 288, "metricName");
-    private static final String METRIC_URI_CANT_GET = uri(FETCH_METRICS_PATH, 2, 1, 288, "metricNameCantGet");
-    private static final String METRIC_URI_CANT_READ = uri(FETCH_METRICS_PATH, 2, 1, 288, "metricNameCantRead");
+    private static final String METRIC_URI = uri(FETCH_METRICS_PATH, 1580815495, 1580901895, 288, "metricName");
+    private static final String METRIC_URI_CANT_GET = uri(FETCH_METRICS_PATH, 1580815495, 1580901895, 288, "metricNameCantGet");
+    private static final String METRIC_URI_CANT_READ = uri(FETCH_METRICS_PATH, 1580815495, 1580901895, 288, "metricNameCantRead");
 
     private GraphiteClient clientUnderTest;
 
@@ -38,8 +38,8 @@ public class GraphiteClientTest {
     private byte[] docsBytes = "docsBytes".getBytes();
     private byte[] docBytes_cantRead = "docBytes_cantRead".getBytes();
     private GraphiteResult[] docs = {};
-    private int from = 2;
-    private int until = 1;
+    private long from = 1580815495;
+    private long until = 1580901895;
     private Integer maxDataPoints = 288;
 
     @Before
