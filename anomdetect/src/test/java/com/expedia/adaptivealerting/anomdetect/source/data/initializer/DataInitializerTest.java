@@ -71,7 +71,6 @@ public class DataInitializerTest {
         when(config.getString(DataInitializer.EARLIEST_TIME)).thenReturn("7d");
         when(config.getInt(DataInitializer.MAX_DATA_POINTS)).thenReturn(2016);
         when(config.getDouble(DataInitializer.THROTTLE_GATE_LIKELIHOOD)).thenReturn(0.05);
-
     }
 
     public void initTestObjects() {

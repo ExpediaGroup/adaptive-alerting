@@ -15,8 +15,11 @@
  */
 package com.expedia.adaptivealerting.anomdetect.source.data.initializer.throttlegate;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Random;
 
+@Slf4j
 public class RandomThrottleGate implements ThrottleGate {
 
     double throttleGateLikelihood;
@@ -30,6 +33,12 @@ public class RandomThrottleGate implements ThrottleGate {
     @Override
     public boolean isOpen() {
         double chance = randomNumberGenerator.nextDouble();
-        return chance <= throttleGateLikelihood;
+        boolean result = chance <= throttleGateLikelihood;
+        log.debug(String.format("Generated random number %.2f, which is %s than throttleGateLikelihood (%.2f). ThrottleGate is %s.",
+                chance,
+                (result ? "less" : "greater"),
+                throttleGateLikelihood,
+                (result ? "OPEN" : "CLOSED")));
+        return result;
     }
 }
