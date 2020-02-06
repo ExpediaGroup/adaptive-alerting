@@ -79,8 +79,10 @@ public class DataInitializer {
             val seasonalPointForecaster = ((SeasonalPointForecaster) pointForecaster);
             val cycleLength = seasonalPointForecaster.getCycleLength();
             val intervalLength = seasonalPointForecaster.getIntervalLength();
-            val earliestTime = cycleLength * intervalLength;
-            return dataSource.getMetricData(earliestTime, intervalLength, target);
+            val fullWindow = cycleLength * intervalLength;
+            val latestTime = mappedMetricData.getMetricData().getTimestamp();
+            val earliestTime = latestTime - fullWindow;
+            return dataSource.getMetricData(earliestTime, latestTime, intervalLength, target);
         } else {
             val message = "No seasonal point forecaster found for forecasting detector " + forecastingDetector.getUuid();
             throw new RuntimeException(message);

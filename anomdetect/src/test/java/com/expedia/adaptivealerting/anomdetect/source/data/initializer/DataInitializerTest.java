@@ -29,6 +29,7 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atMost;
 import static org.mockito.Mockito.spy;
@@ -105,7 +106,7 @@ public class DataInitializerTest {
     private void initDependencies() {
         when(initializerUnderTest.makeClient(anyString())).thenReturn(graphiteClient);
         when(initializerUnderTest.makeSource(graphiteClient)).thenReturn(dataSource);
-        when(dataSource.getMetricData(anyInt(), anyInt(), anyString())).thenReturn(dataSourceResults);
+        when(dataSource.getMetricData(anyLong(), anyLong(), anyInt(), anyString())).thenReturn(dataSourceResults);
     }
 
     private DataSourceResult buildDataSourceResult(Double value, long epochSecs) {

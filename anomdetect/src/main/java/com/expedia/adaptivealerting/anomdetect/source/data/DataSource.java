@@ -22,6 +22,6 @@ import java.util.List;
  */
 public interface DataSource {
 
-    List<DataSourceResult> getMetricData(int earliestTime, int binSizeInSecs, String metric);
+    List<DataSourceResult> getMetricData(long earliestTime, long latestTime, int binSizeInSecs, String metric);
 
 }

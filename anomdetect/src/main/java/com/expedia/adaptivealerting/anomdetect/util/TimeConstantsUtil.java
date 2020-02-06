@@ -18,8 +18,8 @@ package com.expedia.adaptivealerting.anomdetect.util;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class C {
-    public static final int SECS_PER_MIN = 60;
-    public static final int SECS_PER_HOUR = 60 * SECS_PER_MIN;
-    public static final int SECONDS_PER_DAY = 24 * SECS_PER_HOUR;
+public class TimeConstantsUtil {
+    public static final int SECONDS_PER_MIN = 60;
+    public static final int SECONDS_PER_HOUR = 60 * SECONDS_PER_MIN;
+    public static final int SECONDS_PER_DAY = 24 * SECONDS_PER_HOUR;
 }
