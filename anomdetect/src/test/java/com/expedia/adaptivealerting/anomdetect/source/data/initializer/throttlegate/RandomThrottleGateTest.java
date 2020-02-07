@@ -3,33 +3,31 @@ package com.expedia.adaptivealerting.anomdetect.source.data.initializer.throttle
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import java.util.stream.IntStream;
+
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isBetween;
 import static org.mockito.Mockito.spy;
 
 public class RandomThrottleGateTest {
 
     private static final double THROTTLE_GATE_LIKELIHOOD = 0.05;
-    private static final int MAX_ITERATIONS = 1000;
-    private static final int EXPECTED_OPEN_GATES = (int) (THROTTLE_GATE_LIKELIHOOD * MAX_ITERATIONS);
-    private static final double VARIANCE = 0.7; // with respect to EXPECTED_OPEN_GATES
-    private static final int UPPER_GATE_LIMIT = (int) (EXPECTED_OPEN_GATES + EXPECTED_OPEN_GATES * VARIANCE);
-    private static final int LOWER_GATE_LIMiT = (int) (EXPECTED_OPEN_GATES - EXPECTED_OPEN_GATES * VARIANCE);
+    private static final int MAX_ITERATIONS = 10000;
+    private static final int MIN_OPEN_GATES = 1;
+    private static final int MAX_OPEN_GATES = MAX_ITERATIONS - 1;
 
     private RandomThrottleGate throttleGateUnderTest;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         this.throttleGateUnderTest = spy(new RandomThrottleGate(THROTTLE_GATE_LIKELIHOOD));
     }
 
     @Test
-    public void isOpenStatisticTest() {
-        int openGateCounter = 0;
-        for (int i = 0; i < 1000; i++) {
-            if (this.throttleGateUnderTest.isOpen()) {
-                openGateCounter = openGateCounter + 1;
-            }
-        }
-        assertTrue(openGateCounter > LOWER_GATE_LIMiT && openGateCounter < UPPER_GATE_LIMIT);
+    public void testNeverFullyOpenOrFullyClosed() {
+        int openGateCounter = (int) IntStream.range(0, MAX_ITERATIONS).filter(i -> this.throttleGateUnderTest.isOpen()).count();
+        String message = "Gate opened " + openGateCounter + "/" + MAX_ITERATIONS + " times " +
+                "(expecting at least " + MIN_OPEN_GATES + " and a maximum of " + MAX_OPEN_GATES + ")";
+        isBetween(openGateCounter, MIN_OPEN_GATES, MAX_OPEN_GATES, message);
+        System.out.println(message); // Show result of test even if it passes - can track progress via build logs
     }
 }
