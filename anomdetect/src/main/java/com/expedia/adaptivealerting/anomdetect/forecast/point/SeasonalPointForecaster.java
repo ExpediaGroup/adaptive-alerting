@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.source.data;
+package com.expedia.adaptivealerting.anomdetect.forecast.point;
 
-import java.util.List;
+public interface SeasonalPointForecaster extends PointForecaster {
+    /**
+     * Number of observations per cycle.
+     */
+    int getCycleLength();
 
-/**
- * Data source interface
- */
-public interface DataSource {
-
-    List<DataSourceResult> getMetricData(long earliestTime, long latestTime, int intervalLength, String target);
-
+    /**
+     * Number of seconds between two observations.
+     */
+    int getIntervalLength();
 }

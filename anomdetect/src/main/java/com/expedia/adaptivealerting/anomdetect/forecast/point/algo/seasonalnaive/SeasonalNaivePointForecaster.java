@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.forecast.point.algo.seasonalnaive;
 
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecast;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.SeasonalPointForecaster;
 import com.expedia.metrics.MetricData;
 import lombok.Getter;
 import lombok.NonNull;
@@ -32,7 +32,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
  * https://otexts.com/fpp2/simple-methods.html#simple-methods.
  */
 @RequiredArgsConstructor
-public class SeasonalNaivePointForecaster implements PointForecaster {
+public class SeasonalNaivePointForecaster implements SeasonalPointForecaster {
 
     /**
      * Detector UUID.
@@ -78,6 +78,16 @@ public class SeasonalNaivePointForecaster implements PointForecaster {
         return getPreviousValueOrNull(oldValue);
     }
 
+    @Override
+    public int getCycleLength() {
+        return params.getCycleLength();
+    }
+
+    @Override
+    public int getIntervalLength() {
+        return params.getIntervalLength();
+    }
+
     private PointForecast getPreviousValueOrNull(double oldValue) {
         if (isWarmingUp()) {
             return new PointForecast(Double.NaN, true);
@@ -94,5 +104,4 @@ public class SeasonalNaivePointForecaster implements PointForecaster {
     private boolean bufferContainedMissingValue(double oldValue) {
         return this.params.getMissingValuePlaceholder().equals(oldValue);
     }
-
 }

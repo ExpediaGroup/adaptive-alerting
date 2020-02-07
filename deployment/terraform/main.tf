@@ -80,8 +80,6 @@ module "ad-manager" {
   anomaly_producer_value_serializer = "${var.ad-manager["anomaly_producer_value_serializer"]}"
   modelservice_base_uri = "${var.ad-manager["modelservice_base_uri"]}"
   graphite_base_uri = "${var.ad-manager["graphite_base_uri"]}"
-  graphite_earliest_time = "${var.ad-manager["graphite_earliest_time"]}"
-  graphite_max_data_points = "${var.ad-manager["graphite_max_data_points"]}"
   graphite_data_retrieval_key = "${var.ad-manager["graphite_data_retrieval_key"]}"
   detector_refresh_period = "${var.ad-manager["detector_refresh_period"]}"
 }

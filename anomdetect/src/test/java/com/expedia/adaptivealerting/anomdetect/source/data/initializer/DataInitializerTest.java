@@ -6,6 +6,8 @@ import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.forecasting.ForecastingDetector;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.multiplicative.MultiplicativeIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.multiplicative.MultiplicativeIntervalForecasterParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.pewma.PewmaPointForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.pewma.PewmaPointForecasterParams;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.seasonalnaive.SeasonalNaivePointForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.seasonalnaive.SeasonalNaivePointForecasterParams;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSource;
@@ -27,6 +29,7 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atMost;
 import static org.mockito.Mockito.spy;
@@ -66,10 +69,17 @@ public class DataInitializerTest {
         verify(initializerUnderTest, atMost(1)).initializeDetector(any(MappedMetricData.class), any(Detector.class));
     }
 
+    @Test(expected = RuntimeException.class)
+    public void testInitializeDetector_illegal_point_forecaster() {
+        val pwmaPointForecaster = new PewmaPointForecaster(new PewmaPointForecasterParams().setAlpha(1.0).setBeta(2.0));
+        val multiplicativeIntervalForecaster = new MultiplicativeIntervalForecaster(new MultiplicativeIntervalForecasterParams().setStrongMultiplier(3.0).setWeakMultiplier(1.0));
+        val detector = new ForecastingDetector(UUID.randomUUID(), pwmaPointForecaster, multiplicativeIntervalForecaster, AnomalyType.TWO_TAILED, true, "seasonalnaive");
+        initializerUnderTest.initializeDetector(mappedMetricData, detector);
+        verify(initializerUnderTest, atMost(1)).initializeDetector(any(MappedMetricData.class), any(Detector.class));
+    }
+
     private void initConfig() {
         when(config.getString(DataInitializer.BASE_URI)).thenReturn("http://graphite");
-        when(config.getString(DataInitializer.EARLIEST_TIME)).thenReturn("7d");
-        when(config.getInt(DataInitializer.MAX_DATA_POINTS)).thenReturn(2016);
     }
 
     public void initTestObjects() {
@@ -88,7 +98,7 @@ public class DataInitializerTest {
     }
 
     private Detector buildDetector() {
-        val seasonalNaivePointForecaster = new SeasonalNaivePointForecaster(new SeasonalNaivePointForecasterParams().setCycleLength(22).setIntervalLength(11));
+        val seasonalNaivePointForecaster = new SeasonalNaivePointForecaster(new SeasonalNaivePointForecasterParams().setCycleLength(2016).setIntervalLength(300));
         val multiplicativeIntervalForecaster = new MultiplicativeIntervalForecaster(new MultiplicativeIntervalForecasterParams().setStrongMultiplier(3.0).setWeakMultiplier(1.0));
         return new ForecastingDetector(UUID.randomUUID(), seasonalNaivePointForecaster, multiplicativeIntervalForecaster, AnomalyType.TWO_TAILED, true, "seasonalnaive");
     }
@@ -96,7 +106,7 @@ public class DataInitializerTest {
     private void initDependencies() {
         when(initializerUnderTest.makeClient(anyString())).thenReturn(graphiteClient);
         when(initializerUnderTest.makeSource(graphiteClient)).thenReturn(dataSource);
-        when(dataSource.getMetricData(anyString(), anyInt(), anyString())).thenReturn(dataSourceResults);
+        when(dataSource.getMetricData(anyLong(), anyLong(), anyInt(), anyString())).thenReturn(dataSourceResults);
     }
 
     private DataSourceResult buildDataSourceResult(Double value, long epochSecs) {

@@ -18,8 +18,6 @@ ad-manager {
 
  # Graphite data source config
   graphite-base-uri = "${graphite_base_uri}"
-  graphite-earliest-time ="${graphite_earliest_time}"
-  graphite-max-data-points = "${graphite_max_data_points}"
   graphite-data-retrieval-key = "${graphite_data_retrieval_key}"
 
   # Detector refresh period in minutes
