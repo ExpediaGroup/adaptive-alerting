@@ -6,7 +6,6 @@ import org.junit.Test;
 import java.util.stream.IntStream;
 
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isBetween;
-import static org.mockito.Mockito.spy;
 
 public class RandomThrottleGateTest {
 
@@ -19,7 +18,7 @@ public class RandomThrottleGateTest {
 
     @Before
     public void setUp() {
-        this.throttleGateUnderTest = spy(new RandomThrottleGate(THROTTLE_GATE_LIKELIHOOD));
+        this.throttleGateUnderTest = new RandomThrottleGate(THROTTLE_GATE_LIKELIHOOD);
     }
 
     @Test

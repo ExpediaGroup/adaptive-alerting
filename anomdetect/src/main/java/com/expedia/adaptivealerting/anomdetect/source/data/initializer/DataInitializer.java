@@ -42,21 +42,19 @@ public class DataInitializer {
     public static final String EARLIEST_TIME = "graphite-earliest-time";
     public static final String MAX_DATA_POINTS = "graphite-max-data-points";
     public static final String DATA_RETRIEVAL_TAG_KEY = "graphite-data-retrieval-key";
-    public static final String THROTTLE_GATE_LIKELIHOOD = "throttle-gate-likelihood";
 
     private String baseUri;
     private String earliestTime;
     private Integer maxDataPoints;
     private String dataRetrievalTagKey;
-    private ThrottleGate throttleGate;
+    private final ThrottleGate throttleGate;
 
     public DataInitializer(Config config) {
         this.baseUri = config.getString(BASE_URI);
         this.earliestTime = config.getString(EARLIEST_TIME);
         this.maxDataPoints = config.getInt(MAX_DATA_POINTS);
         try {
-            val throttleGateLikelihood = config.getDouble(THROTTLE_GATE_LIKELIHOOD);
-            this.throttleGate = new RandomThrottleGate(throttleGateLikelihood);
+            this.throttleGate = ThrottleGateFactory.buildThrottleGate(config);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Could not load throttle-gate-likelihood from config.");
         }
