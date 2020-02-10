@@ -1,6 +1,7 @@
 package com.expedia.adaptivealerting.anomdetect.source.data.graphite;
 
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSourceResult;
+import com.expedia.adaptivealerting.anomdetect.util.TimeConstantsUtil;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-
 import static org.mockito.Mockito.when;
 
 public class GraphiteSourceTest {
@@ -22,8 +22,7 @@ public class GraphiteSourceTest {
     private GraphiteSource sourceUnderTest;
     private List<GraphiteResult> graphiteResults = new ArrayList<>();
     private List<GraphiteResult> graphiteResults_null = new ArrayList<>();
-    private String from = "1d";
-    private Integer maxDataPoints = 288;
+    private int intervalLength = 5 * TimeConstantsUtil.SECONDS_PER_MIN;
 
     @Before
     public void setUp() {
@@ -35,23 +34,27 @@ public class GraphiteSourceTest {
 
     @Test
     public void testGetMetricData() {
-        List<DataSourceResult> dataSourceResults = new ArrayList<>();
-        dataSourceResults.add(buildDataSourceResult(1.0, 1578307488));
-        dataSourceResults.add(buildDataSourceResult(3.0, 1578307489));
+        val dataSourceResults = buildDataSourceResults(7);
+        val actual = sourceUnderTest.getMetricData(1580297095, 1580901895, intervalLength, "metric_name");
+        assertEquals(dataSourceResults, actual);
+    }
 
-        val actual = sourceUnderTest.getMetricData(from, maxDataPoints, "metric_name");
+    @Test
+    public void testGetMetricData_time_window_less_than_day() {
+        val dataSourceResults = buildDataSourceResults(1);
+        val actual = sourceUnderTest.getMetricData(1580297095, 1580340295, intervalLength, "metric_name");
         assertEquals(dataSourceResults, actual);
     }
 
     @Test
     public void testGetMetricData_null_metric_data() {
-        val actual = sourceUnderTest.getMetricData(from, maxDataPoints, "null_metric");
+        val actual = sourceUnderTest.getMetricData(1580815495, 1580901895, intervalLength, "null_metric");
         assertEquals(new ArrayList<>(), actual);
     }
 
     @Test
     public void testGetMetricData_null_value() {
-        val actual = sourceUnderTest.getMetricData(from, maxDataPoints, "null_value");
+        val actual = sourceUnderTest.getMetricData(1580815495, 1580901895, intervalLength, "null_value");
         val dataSourceResult = buildDataSourceResult(GraphiteSource.MISSING_VALUE, 1578307488);
         List<DataSourceResult> dataSourceResults = new ArrayList<>();
         dataSourceResults.add(dataSourceResult);
@@ -64,9 +67,18 @@ public class GraphiteSourceTest {
     }
 
     private void initDependencies() {
-        when(graphiteClient.getData(from, maxDataPoints, "metric_name")).thenReturn(graphiteResults);
-        when(graphiteClient.getData(from, maxDataPoints, "null_metric")).thenReturn(new ArrayList<>());
-        when(graphiteClient.getData(from, maxDataPoints, "null_value")).thenReturn(graphiteResults_null);
+        when(graphiteClient.getData(1580297095, 1580383495, 288, "metric_name")).thenReturn(graphiteResults);
+        when(graphiteClient.getData(1580383495, 1580469895, 288, "metric_name")).thenReturn(graphiteResults);
+        when(graphiteClient.getData(1580469895, 1580556295, 288, "metric_name")).thenReturn(graphiteResults);
+        when(graphiteClient.getData(1580556295, 1580642695, 288, "metric_name")).thenReturn(graphiteResults);
+        when(graphiteClient.getData(1580642695, 1580729095, 288, "metric_name")).thenReturn(graphiteResults);
+        when(graphiteClient.getData(1580729095, 1580815495, 288, "metric_name")).thenReturn(graphiteResults);
+        when(graphiteClient.getData(1580815495, 1580901895, 288, "metric_name")).thenReturn(graphiteResults);
+
+        when(graphiteClient.getData(1580297095, 1580383495, 288, "metric_name")).thenReturn(graphiteResults);
+
+        when(graphiteClient.getData(1580815495, 1580901895, 288, "null_metric")).thenReturn(new ArrayList<>());
+        when(graphiteClient.getData(1580815495, 1580901895, 288, "null_value")).thenReturn(graphiteResults_null);
     }
 
     private GraphiteResult buildGraphiteResult() {
@@ -88,10 +100,21 @@ public class GraphiteSourceTest {
         return graphiteResult;
     }
 
+    private List<DataSourceResult> buildDataSourceResults(int noOfResults) {
+
+        List<DataSourceResult> dataSourceResults = new ArrayList<>();
+        for (int i = 0; i < noOfResults; i++) {
+            dataSourceResults.add(buildDataSourceResult(1.0, 1578307488));
+            dataSourceResults.add(buildDataSourceResult(3.0, 1578307489));
+        }
+        return dataSourceResults;
+    }
+
     private DataSourceResult buildDataSourceResult(Double value, long epochSecs) {
         DataSourceResult dataSourceResult = new DataSourceResult();
         dataSourceResult.setDataPoint(value);
         dataSourceResult.setEpochSecond(epochSecs);
         return dataSourceResult;
     }
+
 }
