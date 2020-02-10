@@ -45,8 +45,6 @@ public class DataInitializer {
     public static final String DATA_RETRIEVAL_TAG_KEY = "graphite-data-retrieval-key";
     public static final String THROTTLE_GATE_LIKELIHOOD = "throttle-gate-likelihood";
 
-    private String earliestTime;
-    private Integer maxDataPoints;
     private String dataRetrievalTagKey;
     private final DataSource dataSource;
     private final ThrottleGate throttleGate;
@@ -54,8 +52,6 @@ public class DataInitializer {
     public DataInitializer(Config config, ThrottleGate throttleGate, DataSource dataSource) {
         this.throttleGate = throttleGate;
         this.dataSource = dataSource;
-        this.earliestTime = config.getString(EARLIEST_TIME);
-        this.maxDataPoints = config.getInt(MAX_DATA_POINTS);
         this.dataRetrievalTagKey = config.getString(DATA_RETRIEVAL_TAG_KEY);
     }
 
@@ -64,11 +60,10 @@ public class DataInitializer {
         if (isSeasonalNaiveDetector(detector)) {
             if (throttleGate.isOpen()) {
                 log.info("Throttle gate is open, initializing data and creating a detector");
-            val forecastingDetector = (ForecastingDetector) detector;
-            initializeForecastingDetector(mappedMetricData, forecastingDetector);
+                val forecastingDetector = (ForecastingDetector) detector;
+                initializeForecastingDetector(mappedMetricData, forecastingDetector);
             } else {
-                throw new DetectorDataInitializationThrottledException(
-                        "Throttle gate is closed, skipping initializing data and detector creation.");
+                throw new DetectorDataInitializationThrottledException("Throttle gate is closed, skipping initializing data and detector creation.");
             }
         }
     }
