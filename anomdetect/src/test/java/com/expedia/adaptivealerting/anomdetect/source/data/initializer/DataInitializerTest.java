@@ -1,3 +1,18 @@
+/*
+ * Copyright 2018-2019 Expedia Group, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.expedia.adaptivealerting.anomdetect.source.data.initializer;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
@@ -13,12 +28,14 @@ import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.seasonalnaive
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSource;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSourceResult;
 import com.expedia.adaptivealerting.anomdetect.source.data.graphite.GraphiteClient;
+import com.expedia.adaptivealerting.anomdetect.source.data.initializer.throttlegate.ThrottleGate;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.typesafe.config.Config;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -32,13 +49,12 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atMost;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
 public class DataInitializerTest {
-
+    @InjectMocks
     private DataInitializer initializerUnderTest;
 
     @Mock
@@ -46,7 +62,8 @@ public class DataInitializerTest {
 
     @Mock
     private Config config;
-
+    @Mock
+    private ThrottleGate throttleGate;
     @Mock
     private GraphiteClient graphiteClient;
 
@@ -58,15 +75,23 @@ public class DataInitializerTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         initConfig();
-        this.initializerUnderTest = spy(new DataInitializer(config));
+        this.initializerUnderTest = new DataInitializer(config, throttleGate, dataSource);
         initTestObjects();
         initDependencies();
     }
 
     @Test
-    public void testInitializeDetector() {
+    public void testInitializeDetectorThrottleGateOpen() {
+        initThrottleGate(true);
         initializerUnderTest.initializeDetector(mappedMetricData, detector);
         verify(initializerUnderTest, atMost(1)).initializeDetector(any(MappedMetricData.class), any(Detector.class));
+    }
+
+    @Test(expected = DetectorDataInitializationThrottledException.class)
+    public void testInitializeDetectorThrottleGateClosed() {
+        initThrottleGate(false);
+        initializerUnderTest.initializeDetector(mappedMetricData, detector);
+        verify(initializerUnderTest, atMost(0)).initializeDetector(any(MappedMetricData.class), any(Detector.class));
     }
 
     @Test(expected = RuntimeException.class)
@@ -80,6 +105,13 @@ public class DataInitializerTest {
 
     private void initConfig() {
         when(config.getString(DataInitializer.BASE_URI)).thenReturn("http://graphite");
+        when(config.getString(DataInitializer.EARLIEST_TIME)).thenReturn("7d");
+        when(config.getInt(DataInitializer.MAX_DATA_POINTS)).thenReturn(2016);
+    }
+
+    private void initThrottleGate(boolean gateOpen) {
+        when(config.getString(DataInitializer.THROTTLE_GATE_LIKELIHOOD)).thenReturn("0.4");
+        when(throttleGate.isOpen()).thenReturn(gateOpen);
     }
 
     public void initTestObjects() {
@@ -104,8 +136,6 @@ public class DataInitializerTest {
     }
 
     private void initDependencies() {
-        when(initializerUnderTest.makeClient(anyString())).thenReturn(graphiteClient);
-        when(initializerUnderTest.makeSource(graphiteClient)).thenReturn(dataSource);
         when(dataSource.getMetricData(anyLong(), anyLong(), anyInt(), anyString())).thenReturn(dataSourceResults);
     }
 
