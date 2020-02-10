@@ -41,6 +41,7 @@ variable "anomaly_producer_value_serializer" {}
 variable "modelservice_base_uri" {}
 variable "graphite_base_uri" {}
 variable "graphite_data_retrieval_key" {}
+variable "throttle_gate_likelihood" {}
 variable "detector_refresh_period" {
   default = 5
 }

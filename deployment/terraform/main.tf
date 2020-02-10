@@ -81,6 +81,7 @@ module "ad-manager" {
   modelservice_base_uri = "${var.ad-manager["modelservice_base_uri"]}"
   graphite_base_uri = "${var.ad-manager["graphite_base_uri"]}"
   graphite_data_retrieval_key = "${var.ad-manager["graphite_data_retrieval_key"]}"
+  throttle_gate_likelihood = "${var.ad-manager["throttle_gate_likelihood"]}"
   detector_refresh_period = "${var.ad-manager["detector_refresh_period"]}"
 }
 

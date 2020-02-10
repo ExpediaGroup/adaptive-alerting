@@ -24,6 +24,7 @@ data "template_file" "config_data" {
     modelservice_base_uri = "${var.modelservice_base_uri}"
     graphite_base_uri = "${var.graphite_base_uri}"
     graphite_data_retrieval_key = "${var.graphite_data_retrieval_key}"
+    throttle_gate_likelihood = "${var.throttle_gate_likelihood}"
     detector_refresh_period = "${var.detector_refresh_period}"
   }
 }

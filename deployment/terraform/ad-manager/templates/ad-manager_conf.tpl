@@ -19,6 +19,7 @@ ad-manager {
  # Graphite data source config
   graphite-base-uri = "${graphite_base_uri}"
   graphite-data-retrieval-key = "${graphite_data_retrieval_key}"
+  throttle-gate-likelihood = "${throttle_gate_likelihood}"
 
   # Detector refresh period in minutes
   detector-refresh-period = ${detector_refresh_period}
