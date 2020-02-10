@@ -22,8 +22,8 @@ import java.util.Random;
 @Slf4j
 public class RandomThrottleGate implements ThrottleGate {
 
-    double throttleGateLikelihood;
-    Random randomNumberGenerator;
+    private double throttleGateLikelihood;
+    private Random randomNumberGenerator;
 
     public RandomThrottleGate(double throttleGateLikelihood) {
         this.throttleGateLikelihood = throttleGateLikelihood;

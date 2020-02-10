@@ -20,15 +20,10 @@ import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.forecasting.ForecastingDetector;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSource;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSourceResult;
-import com.expedia.adaptivealerting.anomdetect.source.data.graphite.GraphiteClient;
-import com.expedia.adaptivealerting.anomdetect.source.data.graphite.GraphiteSource;
-import com.expedia.adaptivealerting.anomdetect.source.data.initializer.throttlegate.RandomThrottleGate;
 import com.expedia.adaptivealerting.anomdetect.source.data.initializer.throttlegate.ThrottleGate;
-import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.expedia.adaptivealerting.anomdetect.util.MetricUtil;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -44,36 +39,35 @@ public class DataInitializer {
     public static final String DATA_RETRIEVAL_TAG_KEY = "graphite-data-retrieval-key";
     public static final String THROTTLE_GATE_LIKELIHOOD = "throttle-gate-likelihood";
 
-    private String baseUri;
     private String earliestTime;
     private Integer maxDataPoints;
     private String dataRetrievalTagKey;
+    private final DataSource dataSource;
     private final ThrottleGate throttleGate;
 
-    public DataInitializer(Config config) {
-        this.baseUri = config.getString(BASE_URI);
+    public DataInitializer(Config config, ThrottleGate throttleGate, DataSource dataSource) {
+        this.throttleGate = throttleGate;
+        this.dataSource = dataSource;
         this.earliestTime = config.getString(EARLIEST_TIME);
         this.maxDataPoints = config.getInt(MAX_DATA_POINTS);
-        try {
-            val throttleGateLikelihood = config.getDouble(THROTTLE_GATE_LIKELIHOOD);
-            this.throttleGate = ThrottleGateFactory.buildThrottleGate(throttleGateLikelihood);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Could not load throttle-gate-likelihood from config.");
-        }
+        this.dataRetrievalTagKey = config.getString(DATA_RETRIEVAL_TAG_KEY);
     }
 
     public void initializeDetector(MappedMetricData mappedMetricData, Detector detector) {
         // TODO: Foreasting Detector initialisation is currently limited to Seasonal Naive detector and assumes Graphite source
-        if (detector != null && isSeasonalNaiveDetector(detector)) {
+        if (isSeasonalNaiveDetector(detector)) {
             if (throttleGate.isOpen()) {
                 log.info("Throttle gate is open, initializing data and creating a detector");
                 val forecastingDetector = (ForecastingDetector) detector;
                 initializeForecastingDetector(mappedMetricData, forecastingDetector);
             } else {
-                throw new DetectorDataInitializationThrottledException(
-                        "Throttle gate is closed, skipping initializing data and detector creation.");
+                throw new DetectorDataInitializationThrottledException("Throttle gate is closed, skipping initializing data and detector creation.");
             }
         }
+    }
+
+    private boolean isSeasonalNaiveDetector(Detector detector) {
+        return detector instanceof ForecastingDetector && "seasonalnaive".equals(detector.getName());
     }
 
     private void initializeForecastingDetector(MappedMetricData mappedMetricData, ForecastingDetector forecastingDetector) {
@@ -85,30 +79,9 @@ public class DataInitializer {
         log.info("Replayed {} historical data points for {}", data.size(), forecastingDetector.getClass().getSimpleName());
     }
 
-    private boolean isSeasonalNaiveDetector(Detector detector) {
-        return detector instanceof ForecastingDetector && "seasonalnaive".equals(detector.getName());
-    }
-
     private List<DataSourceResult> getHistoricalData(MappedMetricData mappedMetricData) {
         val target = MetricUtil.getDataRetrievalValueOrMetricKey(mappedMetricData, dataRetrievalTagKey);
-        val client = makeClient(baseUri);
-        val dataSource = makeSource(client);
         return dataSource.getMetricData(earliestTime, maxDataPoints, target);
-    }
-
-    //TODO. Using one-line methods for object creation to support unit testing. We can replace this with factories later on.
-    // https://github.com/mockito/mockito/wiki/Mocking-Object-Creation#pattern-1---using-one-line-methods-for-object-creation
-
-    GraphiteClient makeClient(String graphiteBaseUri) {
-        return new GraphiteClient(graphiteBaseUri, new HttpClientWrapper(), new ObjectMapper());
-    }
-
-    DataSource makeSource(GraphiteClient client) {
-        return new GraphiteSource(client);
-    }
-
-    RandomThrottleGate makeThrottleGate(double throttleGateLikelihood) {
-        return ThrottleGateFactory.buildThrottleGate(throttleGateLikelihood);
     }
 
     private void populateForecastingDetectorWithHistoricalData(ForecastingDetector forecastingDetector, List<DataSourceResult> data, MetricDefinition metricDefinition) {

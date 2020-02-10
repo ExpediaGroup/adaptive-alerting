@@ -25,37 +25,39 @@ import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.seasonalnaive
 import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.seasonalnaive.SeasonalNaivePointForecasterParams;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSource;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSourceResult;
-import com.expedia.adaptivealerting.anomdetect.source.data.graphite.GraphiteClient;
-import com.expedia.adaptivealerting.anomdetect.source.data.initializer.throttlegate.RandomThrottleGate;
+import com.expedia.adaptivealerting.anomdetect.source.data.initializer.throttlegate.ThrottleGate;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.typesafe.config.Config;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.atMost;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class DataInitializerTest {
+    @InjectMocks
     private DataInitializer initializerUnderTest;
     @Mock
     private DataSource dataSource;
     @Mock
     private Config config;
     @Mock
-    private RandomThrottleGate throttleGate;
-    @Mock
-    private GraphiteClient graphiteClient;
+    private ThrottleGate throttleGate;
 
     private Detector detector;
     private MappedMetricData mappedMetricData;
@@ -65,7 +67,7 @@ public class DataInitializerTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         initConfig();
-        this.initializerUnderTest = spy(new DataInitializer(config));
+        this.initializerUnderTest = spy(new DataInitializer(config, throttleGate, dataSource));
         initTestObjects();
         initDependencies();
     }
@@ -91,6 +93,7 @@ public class DataInitializerTest {
     }
 
     private void initThrottleGate(boolean gateOpen) {
+        when(config.getString(DataInitializer.THROTTLE_GATE_LIKELIHOOD)).thenReturn("0.4");
         when(throttleGate.isOpen()).thenReturn(gateOpen);
     }
 
@@ -116,10 +119,7 @@ public class DataInitializerTest {
     }
 
     private void initDependencies() {
-        when(initializerUnderTest.makeClient(anyString())).thenReturn(graphiteClient);
-        when(initializerUnderTest.makeSource(graphiteClient)).thenReturn(dataSource);
         when(dataSource.getMetricData(anyString(), anyInt(), anyString())).thenReturn(dataSourceResults);
-        when(initializerUnderTest.makeThrottleGate(anyDouble())).thenReturn(throttleGate);
     }
 
     private DataSourceResult buildDataSourceResult(Double value, long epochSecs) {
