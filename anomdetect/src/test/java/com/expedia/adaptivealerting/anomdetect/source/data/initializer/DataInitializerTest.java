@@ -44,8 +44,8 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
-@PrepareForTest(ClassUnderTest)
 public class DataInitializerTest {
     private DataInitializer initializerUnderTest;
     @Mock
@@ -56,6 +56,7 @@ public class DataInitializerTest {
     private RandomThrottleGate throttleGate;
     @Mock
     private GraphiteClient graphiteClient;
+
     private Detector detector;
     private MappedMetricData mappedMetricData;
     private List<DataSourceResult> dataSourceResults;
@@ -87,7 +88,6 @@ public class DataInitializerTest {
         when(config.getString(DataInitializer.BASE_URI)).thenReturn("http://graphite");
         when(config.getString(DataInitializer.EARLIEST_TIME)).thenReturn("7d");
         when(config.getInt(DataInitializer.MAX_DATA_POINTS)).thenReturn(2016);
-        when(config.getDouble(ThrottleGateFactory.THROTTLE_GATE_LIKELIHOOD)).thenReturn(0.4);
     }
 
     private void initThrottleGate(boolean gateOpen) {
@@ -118,11 +118,8 @@ public class DataInitializerTest {
     private void initDependencies() {
         when(initializerUnderTest.makeClient(anyString())).thenReturn(graphiteClient);
         when(initializerUnderTest.makeSource(graphiteClient)).thenReturn(dataSource);
-        mockStatic(DiscountCategoryFinder.class);
-        when(DiscountCategoryFinder.getDiscountCategory()).thenReturn(DiscountCategory.PREMIUM);
-        verifyStatic(DiscountCategoryFinder.class, times(1));
-
         when(dataSource.getMetricData(anyString(), anyInt(), anyString())).thenReturn(dataSourceResults);
+        when(initializerUnderTest.makeThrottleGate(anyDouble())).thenReturn(throttleGate);
     }
 
     private DataSourceResult buildDataSourceResult(Double value, long epochSecs) {

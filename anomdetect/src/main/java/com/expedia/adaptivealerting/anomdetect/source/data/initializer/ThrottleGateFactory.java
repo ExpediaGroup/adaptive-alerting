@@ -16,14 +16,10 @@
 package com.expedia.adaptivealerting.anomdetect.source.data.initializer;
 
 import com.expedia.adaptivealerting.anomdetect.source.data.initializer.throttlegate.RandomThrottleGate;
-import com.typesafe.config.Config;
-import lombok.val;
 
 public class ThrottleGateFactory {
-    public static final String THROTTLE_GATE_LIKELIHOOD = "throttle-gate-likelihood";
 
-    public static RandomThrottleGate buildThrottleGate(Config config) {
-        val throttleGateLikelihood = config.getDouble(THROTTLE_GATE_LIKELIHOOD);
+    public static RandomThrottleGate buildThrottleGate(double throttleGateLikelihood) {
         return new RandomThrottleGate(throttleGateLikelihood);
     }
 }

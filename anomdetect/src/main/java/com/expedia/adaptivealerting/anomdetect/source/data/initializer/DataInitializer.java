@@ -42,6 +42,7 @@ public class DataInitializer {
     public static final String EARLIEST_TIME = "graphite-earliest-time";
     public static final String MAX_DATA_POINTS = "graphite-max-data-points";
     public static final String DATA_RETRIEVAL_TAG_KEY = "graphite-data-retrieval-key";
+    public static final String THROTTLE_GATE_LIKELIHOOD = "throttle-gate-likelihood";
 
     private String baseUri;
     private String earliestTime;
@@ -54,7 +55,8 @@ public class DataInitializer {
         this.earliestTime = config.getString(EARLIEST_TIME);
         this.maxDataPoints = config.getInt(MAX_DATA_POINTS);
         try {
-            this.throttleGate = ThrottleGateFactory.buildThrottleGate(config);
+            val throttleGateLikelihood = config.getDouble(THROTTLE_GATE_LIKELIHOOD);
+            this.throttleGate = ThrottleGateFactory.buildThrottleGate(throttleGateLikelihood);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Could not load throttle-gate-likelihood from config.");
         }
@@ -103,6 +105,10 @@ public class DataInitializer {
 
     DataSource makeSource(GraphiteClient client) {
         return new GraphiteSource(client);
+    }
+
+    RandomThrottleGate makeThrottleGate(double throttleGateLikelihood) {
+        return ThrottleGateFactory.buildThrottleGate(throttleGateLikelihood);
     }
 
     private void populateForecastingDetectorWithHistoricalData(ForecastingDetector forecastingDetector, List<DataSourceResult> data, MetricDefinition metricDefinition) {
