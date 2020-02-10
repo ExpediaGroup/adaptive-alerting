@@ -22,14 +22,10 @@ import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.SeasonalPointForecaster;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSource;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSourceResult;
-import com.expedia.adaptivealerting.anomdetect.source.data.graphite.GraphiteClient;
-import com.expedia.adaptivealerting.anomdetect.source.data.graphite.GraphiteSource;
 import com.expedia.adaptivealerting.anomdetect.source.data.initializer.throttlegate.ThrottleGate;
-import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.expedia.adaptivealerting.anomdetect.util.MetricUtil;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -93,20 +89,10 @@ public class DataInitializer {
             val earliestTime = latestTime - fullWindow;
             return dataSource.getMetricData(earliestTime, latestTime, intervalLength, target);
         } else {
+            // TODO: Write a test for this:
             val message = "No seasonal point forecaster found for forecasting detector " + forecastingDetector.getUuid();
             throw new RuntimeException(message);
         }
-    }
-
-    //TODO. Using one-line methods for object creation to support unit testing. We can replace this with factories later on.
-    // https://github.com/mockito/mockito/wiki/Mocking-Object-Creation#pattern-1---using-one-line-methods-for-object-creation
-
-    GraphiteClient makeClient(String graphiteBaseUri) {
-        return new GraphiteClient(graphiteBaseUri, new HttpClientWrapper(), new ObjectMapper());
-    }
-
-    DataSource makeSource(GraphiteClient client) {
-        return new GraphiteSource(client);
     }
 
     private void populateForecastingDetectorWithHistoricalData(ForecastingDetector forecastingDetector, List<DataSourceResult> data, MetricDefinition metricDefinition) {
