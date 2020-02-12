@@ -41,7 +41,7 @@ public class HttpClientWrapper {
         if (headers.isEmpty()) {
             return get(uri);
         }
-        Request getRequest = Request.Get(uri);
+        val getRequest = Request.Get(uri);
         return buildRequestWithHeaders(getRequest, headers)
                 .execute()
                 .returnContent();
@@ -78,8 +78,8 @@ public class HttpClientWrapper {
 
     private Request buildRequestWithHeaders(Request request, Map<String, String> headers) {
         for (val entry : headers.entrySet()) {
-            String key = entry.getKey();
-            String value = entry.getValue();
+            val key = entry.getKey();
+            val value = entry.getValue();
             request.addHeader(key, value);
         }
         return request;
