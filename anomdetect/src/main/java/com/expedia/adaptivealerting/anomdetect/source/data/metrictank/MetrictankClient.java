@@ -84,7 +84,7 @@ public class MetrictankClient {
         try {
             results = Arrays.asList(objectMapper.readValue(content.asBytes(), MetrictankResult[].class));
         } catch (IOException e) {
-            throw new MetrictankClientException(String.format("IOException while parsing response from Graphite target: %s", target), e);
+            throw new MetrictankClientException(String.format("IOException while parsing response from Metrictank target: %s", target), e);
         }
         return results;
     }
