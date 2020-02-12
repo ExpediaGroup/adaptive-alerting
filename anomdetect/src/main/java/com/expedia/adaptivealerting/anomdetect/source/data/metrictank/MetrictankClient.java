@@ -66,7 +66,7 @@ public class MetrictankClient {
         notNull(target, "target can't be null");
 
         val uri = String.format(baseUri + FETCH_METRICS_PATH, from, until, target);
-        log.debug("Sending query to Graphite target: {}", uri);
+        log.debug("Sending query to Metrictank target: {}", uri);
 
         Content content;
         val headers = buildHeaders();

@@ -68,7 +68,7 @@ public class MetrictankSource implements DataSource {
 
     private List<MetrictankResult> getDataFromGraphite(long from, String metric) {
         long until = from + TimeConstantsUtil.SECONDS_PER_DAY;
-        log.debug("Querying Graphite with: from={} ({}), until={} ({}), metric='{}'",
+        log.debug("Querying Metrictank with: from={} ({}), until={} ({}), metric='{}'",
                 from, ofEpochSecond(from), until, ofEpochSecond(until), metric);
         return metricTankClient.getData(from, until, metric);
     }
