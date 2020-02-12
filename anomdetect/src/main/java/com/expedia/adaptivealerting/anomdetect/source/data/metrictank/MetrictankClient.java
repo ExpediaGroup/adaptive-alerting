@@ -68,8 +68,8 @@ public class MetrictankClient {
         val uri = String.format(baseUri + FETCH_METRICS_PATH, from, until, target);
         log.debug("Sending query to Metrictank target: {}", uri);
 
+        val headers = Collections.singletonMap("x-org-id", "1");
         Content content;
-        val headers = buildHeaders();
         try {
             content = httpClient.get(uri, headers);
         } catch (IOException e) {
@@ -87,9 +87,5 @@ public class MetrictankClient {
             throw new MetrictankClientException(String.format("IOException while parsing response from Metrictank target: %s", target), e);
         }
         return results;
-    }
-
-    private Map<String, String> buildHeaders() {
-        return Collections.singletonMap("x-org-id", "1");
     }
 }
