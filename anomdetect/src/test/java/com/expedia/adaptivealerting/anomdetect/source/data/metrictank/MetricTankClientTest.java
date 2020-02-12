@@ -60,12 +60,12 @@ public class MetricTankClientTest {
         clientUnderTest.getData(FROM_TIME_IN_SECONDS, UNTIL_TIME_IN_SECONDS, "metricName");
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test(expected = MetricTankClientException.class)
     public void testGetMetricData_cant_get() {
         clientUnderTest.getData(FROM_TIME_IN_SECONDS, UNTIL_TIME_IN_SECONDS, "metricNameCantGet");
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test(expected = MetricTankClientException.class)
     public void testGetMetricData_cant_read() {
         clientUnderTest.getData(FROM_TIME_IN_SECONDS, UNTIL_TIME_IN_SECONDS, "metricNameCantRead");
     }

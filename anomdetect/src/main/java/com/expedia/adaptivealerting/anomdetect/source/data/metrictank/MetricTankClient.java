@@ -66,11 +66,12 @@ public class MetricTankClient {
         notNull(target, "target can't be null");
 
         val uri = String.format(baseUri + FETCH_METRICS_PATH, from, until, target);
-
         log.debug("Sending query to Graphite target: {}", uri);
+        
         Content content;
+        val headers = buildHeaders();
         try {
-            content = httpClient.get(uri, buildHeader());
+            content = httpClient.get(uri, headers);
         } catch (IOException e) {
             val message = String.format("Encountered IOException while querying Graphite target '%s': httpMethod=GET, uri=%s, message=%s",
                     target,
@@ -88,9 +89,9 @@ public class MetricTankClient {
         return results;
     }
 
-    private Map<String, String> buildHeader() {
-        val header = new HashMap<String, String>();
-        header.put("x-org-id", "1");
-        return header;
+    private Map<String, String> buildHeaders() {
+        val headers = new HashMap<String, String>();
+        headers.put("x-org-id", "1");
+        return headers;
     }
 }
