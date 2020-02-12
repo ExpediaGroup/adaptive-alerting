@@ -85,14 +85,27 @@ public class DataInitializer {
             val cycleLength = seasonalPointForecaster.getCycleLength();
             val intervalLength = seasonalPointForecaster.getIntervalLength();
             val fullWindow = cycleLength * intervalLength;
-            val latestTime = mappedMetricData.getMetricData().getTimestamp();
-            val earliestTime = latestTime - fullWindow;
+            val latestTime = calculateLatestTime(mappedMetricData, intervalLength);
+            val earliestTime = calculateEarliestTime(fullWindow, latestTime);
             return dataSource.getMetricData(earliestTime, latestTime, intervalLength, target);
         } else {
             // TODO: Write a test for this:
             val message = "No seasonal point forecaster found for forecasting detector " + forecastingDetector.getUuid();
             throw new RuntimeException(message);
         }
+    }
+
+    // TODO: Write a test for this
+    private long calculateEarliestTime(int fullWindow, long latestTime) {
+        return latestTime - fullWindow;
+    }
+
+    // TODO: Write a test for this
+    private long calculateLatestTime(MappedMetricData mappedMetricData, int intervalLength) {
+        long currentMetricTimestamp = mappedMetricData.getMetricData().getTimestamp();
+        long startOfCurrentBin = (currentMetricTimestamp / intervalLength) * intervalLength;
+        // We subtract 2 seconds to ensure current bin is not included in Graphite data retrieval. Why 2 seconds? 1 second does not reliably do this.
+        return startOfCurrentBin - 2;
     }
 
     private void populateForecastingDetectorWithHistoricalData(ForecastingDetector forecastingDetector, List<DataSourceResult> data, MetricDefinition metricDefinition) {
