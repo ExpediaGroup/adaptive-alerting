@@ -29,7 +29,7 @@ import static java.time.Instant.ofEpochSecond;
 
 @RequiredArgsConstructor
 @Slf4j
-public class MetricTankSource implements DataSource {
+public class MetrictankSource implements DataSource {
 
     public static final Double MISSING_VALUE = Double.NEGATIVE_INFINITY;
 
@@ -37,7 +37,7 @@ public class MetricTankSource implements DataSource {
      * Client to load metric data from graphite.
      */
     @NonNull
-    private MetricTankClient metricTankClient;
+    private MetrictankClient metricTankClient;
 
     @Override
     public List<DataSourceResult> getMetricData(long earliestTime, long latestTime, int intervalLength, String target) {
@@ -47,9 +47,9 @@ public class MetricTankSource implements DataSource {
     private List<DataSourceResult> buildDataSourceResult(long earliestTime, long latestTime, String metric) {
         List<DataSourceResult> results = new ArrayList<>();
         for (long i = earliestTime; i < latestTime; i += TimeConstantsUtil.SECONDS_PER_DAY) {
-            List<MetricTankResult> metricTankResults = getDataFromGraphite(i, metric);
-            if (metricTankResults.size() > 0) {
-                String[][] dataPoints = metricTankResults.get(0).getDatapoints();
+            List<MetrictankResult> metrictankResults = getDataFromGraphite(i, metric);
+            if (metrictankResults.size() > 0) {
+                String[][] dataPoints = metrictankResults.get(0).getDatapoints();
                 //TODO Convert this to use JAVA stream
                 for (String[] dataPoint : dataPoints) {
                     Double value = MISSING_VALUE;
@@ -66,7 +66,7 @@ public class MetricTankSource implements DataSource {
         return results;
     }
 
-    private List<MetricTankResult> getDataFromGraphite(long from, String metric) {
+    private List<MetrictankResult> getDataFromGraphite(long from, String metric) {
         long until = from + TimeConstantsUtil.SECONDS_PER_DAY;
         log.debug("Querying Graphite with: from={} ({}), until={} ({}), metric='{}'",
                 from, ofEpochSecond(from), until, ofEpochSecond(until), metric);

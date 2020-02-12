@@ -14,14 +14,14 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-public class MetricTankSourceTest {
+public class MetrictankSourceTest {
 
     @Mock
-    private MetricTankClient metricTankClient;
+    private MetrictankClient metricTankClient;
 
-    private MetricTankSource sourceUnderTest;
-    private List<MetricTankResult> metricTankResults = new ArrayList<>();
-    private List<MetricTankResult> metricTankResults_null = new ArrayList<>();
+    private MetrictankSource sourceUnderTest;
+    private List<MetrictankResult> metrictankResults = new ArrayList<>();
+    private List<MetrictankResult> metrictankResults_null = new ArrayList<>();
     private int intervalLength = 5 * TimeConstantsUtil.SECONDS_PER_MIN;
 
     @Before
@@ -29,7 +29,7 @@ public class MetricTankSourceTest {
         MockitoAnnotations.initMocks(this);
         initTestObjects();
         initDependencies();
-        this.sourceUnderTest = new MetricTankSource(metricTankClient);
+        this.sourceUnderTest = new MetrictankSource(metricTankClient);
     }
 
     @Test
@@ -55,34 +55,34 @@ public class MetricTankSourceTest {
     @Test
     public void testGetMetricData_null_value() {
         val actual = sourceUnderTest.getMetricData(1580815495, 1580901895, intervalLength, "null_value");
-        val dataSourceResult = buildDataSourceResult(MetricTankSource.MISSING_VALUE, 1578307488);
+        val dataSourceResult = buildDataSourceResult(MetrictankSource.MISSING_VALUE, 1578307488);
         List<DataSourceResult> dataSourceResults = new ArrayList<>();
         dataSourceResults.add(dataSourceResult);
         assertEquals(dataSourceResults, actual);
     }
 
     private void initTestObjects() {
-        metricTankResults.add(buildGraphiteResult());
-        metricTankResults_null.add(buildNullValueGraphiteResult());
+        metrictankResults.add(buildGraphiteResult());
+        metrictankResults_null.add(buildNullValueGraphiteResult());
     }
 
     private void initDependencies() {
-        when(metricTankClient.getData(1580297095, 1580383495, "metric_name")).thenReturn(metricTankResults);
-        when(metricTankClient.getData(1580383495, 1580469895, "metric_name")).thenReturn(metricTankResults);
-        when(metricTankClient.getData(1580469895, 1580556295, "metric_name")).thenReturn(metricTankResults);
-        when(metricTankClient.getData(1580556295, 1580642695, "metric_name")).thenReturn(metricTankResults);
-        when(metricTankClient.getData(1580642695, 1580729095, "metric_name")).thenReturn(metricTankResults);
-        when(metricTankClient.getData(1580729095, 1580815495, "metric_name")).thenReturn(metricTankResults);
-        when(metricTankClient.getData(1580815495, 1580901895, "metric_name")).thenReturn(metricTankResults);
+        when(metricTankClient.getData(1580297095, 1580383495, "metric_name")).thenReturn(metrictankResults);
+        when(metricTankClient.getData(1580383495, 1580469895, "metric_name")).thenReturn(metrictankResults);
+        when(metricTankClient.getData(1580469895, 1580556295, "metric_name")).thenReturn(metrictankResults);
+        when(metricTankClient.getData(1580556295, 1580642695, "metric_name")).thenReturn(metrictankResults);
+        when(metricTankClient.getData(1580642695, 1580729095, "metric_name")).thenReturn(metrictankResults);
+        when(metricTankClient.getData(1580729095, 1580815495, "metric_name")).thenReturn(metrictankResults);
+        when(metricTankClient.getData(1580815495, 1580901895, "metric_name")).thenReturn(metrictankResults);
 
-        when(metricTankClient.getData(1580297095, 1580383495, "metric_name")).thenReturn(metricTankResults);
+        when(metricTankClient.getData(1580297095, 1580383495, "metric_name")).thenReturn(metrictankResults);
 
         when(metricTankClient.getData(1580815495, 1580901895, "null_metric")).thenReturn(new ArrayList<>());
-        when(metricTankClient.getData(1580815495, 1580901895, "null_value")).thenReturn(metricTankResults_null);
+        when(metricTankClient.getData(1580815495, 1580901895, "null_value")).thenReturn(metrictankResults_null);
     }
 
-    private MetricTankResult buildGraphiteResult() {
-        MetricTankResult metricTankResult = new MetricTankResult();
+    private MetrictankResult buildGraphiteResult() {
+        MetrictankResult metricTankResult = new MetrictankResult();
         String[][] dataPoints = {
                 {"1", "1578307488"},
                 {"3", "1578307489"}
@@ -91,8 +91,8 @@ public class MetricTankSourceTest {
         return metricTankResult;
     }
 
-    private MetricTankResult buildNullValueGraphiteResult() {
-        MetricTankResult metricTankResult = new MetricTankResult();
+    private MetrictankResult buildNullValueGraphiteResult() {
+        MetrictankResult metricTankResult = new MetrictankResult();
         String[][] dataPoints = {
                 {null, "1578307488"}
         };

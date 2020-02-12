@@ -15,8 +15,19 @@
  */
 package com.expedia.adaptivealerting.anomdetect.source.data.metrictank;
 
-public class MetricTankClientException extends RuntimeException {
-    public MetricTankClientException(String message, Exception cause) {
-        super(message, cause);
-    }
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.Map;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class MetrictankResult {
+    private String[][] datapoints;
+    private String target;
+    private Map<String, Object> tags;
 }

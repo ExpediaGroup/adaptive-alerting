@@ -25,7 +25,7 @@ import org.apache.http.client.fluent.Content;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -39,7 +39,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
  */
 @RequiredArgsConstructor
 @Slf4j
-public class MetricTankClient {
+public class MetrictankClient {
 
     public static final String FETCH_METRICS_PATH = "/render?from=%d&until=%d&format=json&target=%s";
 
@@ -59,7 +59,7 @@ public class MetricTankClient {
      * @param target metric name or tag with an optional graphite function
      * @return time series for the specified metric
      */
-    public List<MetricTankResult> getData(long from, long until, String target) {
+    public List<MetrictankResult> getData(long from, long until, String target) {
 
         notNull(from, "from can't be null");
         notNull(until, "until can't be null");
@@ -67,31 +67,29 @@ public class MetricTankClient {
 
         val uri = String.format(baseUri + FETCH_METRICS_PATH, from, until, target);
         log.debug("Sending query to Graphite target: {}", uri);
-        
+
         Content content;
         val headers = buildHeaders();
         try {
             content = httpClient.get(uri, headers);
         } catch (IOException e) {
-            val message = String.format("Encountered IOException while querying Graphite target '%s': httpMethod=GET, uri=%s, message=%s",
+            val message = String.format("Encountered IOException while querying Metrictank target '%s': httpMethod=GET, uri=%s, message=%s",
                     target,
                     uri,
                     e.getMessage());
-            throw new MetricTankClientException(message, e);
+            throw new MetrictankClientException(message, e);
         }
 
-        List<MetricTankResult> results;
+        List<MetrictankResult> results;
         try {
-            results = Arrays.asList(objectMapper.readValue(content.asBytes(), MetricTankResult[].class));
+            results = Arrays.asList(objectMapper.readValue(content.asBytes(), MetrictankResult[].class));
         } catch (IOException e) {
-            throw new MetricTankClientException(String.format("IOException while parsing response from Graphite target: %s", target), e);
+            throw new MetrictankClientException(String.format("IOException while parsing response from Graphite target: %s", target), e);
         }
         return results;
     }
 
     private Map<String, String> buildHeaders() {
-        val headers = new HashMap<String, String>();
-        headers.put("x-org-id", "1");
-        return headers;
+        return Collections.singletonMap("x-org-id", "1");
     }
 }
