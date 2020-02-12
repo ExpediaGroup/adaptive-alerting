@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.source.data.graphite;
+package com.expedia.adaptivealerting.anomdetect.source.data.metrictank;
 
-public class GraphiteClientException extends RuntimeException {
-    public GraphiteClientException(String message, Exception cause) {
+public class MetrictankClientException extends RuntimeException {
+    public MetrictankClientException(String message, Exception cause) {
         super(message, cause);
     }
 }

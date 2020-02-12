@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.source.data.graphite;
+package com.expedia.adaptivealerting.anomdetect.source.data.metrictank;
 
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSource;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSourceResult;
@@ -29,7 +29,7 @@ import static java.time.Instant.ofEpochSecond;
 
 @RequiredArgsConstructor
 @Slf4j
-public class GraphiteSource implements DataSource {
+public class MetrictankSource implements DataSource {
 
     public static final Double MISSING_VALUE = Double.NEGATIVE_INFINITY;
 
@@ -37,7 +37,7 @@ public class GraphiteSource implements DataSource {
      * Client to load metric data from graphite.
      */
     @NonNull
-    private GraphiteClient graphiteClient;
+    private MetrictankClient metricTankClient;
 
     @Override
     public List<DataSourceResult> getMetricData(long earliestTime, long latestTime, int intervalLength, String target) {
@@ -47,9 +47,9 @@ public class GraphiteSource implements DataSource {
     private List<DataSourceResult> buildDataSourceResult(long earliestTime, long latestTime, String metric) {
         List<DataSourceResult> results = new ArrayList<>();
         for (long i = earliestTime; i < latestTime; i += TimeConstantsUtil.SECONDS_PER_DAY) {
-            List<GraphiteResult> graphiteResults = getDataFromGraphite(i, metric);
-            if (graphiteResults.size() > 0) {
-                String[][] dataPoints = graphiteResults.get(0).getDatapoints();
+            List<MetrictankResult> metrictankResults = getDataFromGraphite(i, metric);
+            if (metrictankResults.size() > 0) {
+                String[][] dataPoints = metrictankResults.get(0).getDatapoints();
                 //TODO Convert this to use JAVA stream
                 for (String[] dataPoint : dataPoints) {
                     Double value = MISSING_VALUE;
@@ -66,11 +66,11 @@ public class GraphiteSource implements DataSource {
         return results;
     }
 
-    private List<GraphiteResult> getDataFromGraphite(long from, String metric) {
+    private List<MetrictankResult> getDataFromGraphite(long from, String metric) {
         long until = from + TimeConstantsUtil.SECONDS_PER_DAY;
-        log.debug("Querying Graphite with: from={} ({}), until={} ({}), metric='{}'",
+        log.debug("Querying Metrictank with: from={} ({}), until={} ({}), metric='{}'",
                 from, ofEpochSecond(from), until, ofEpochSecond(until), metric);
-        return graphiteClient.getData(from, until, metric);
+        return metricTankClient.getData(from, until, metric);
     }
 
     private void logResults(List<DataSourceResult> results) {

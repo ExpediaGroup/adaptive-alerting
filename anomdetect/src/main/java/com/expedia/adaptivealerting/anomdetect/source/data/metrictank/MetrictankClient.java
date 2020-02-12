@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.source.data.graphite;
+package com.expedia.adaptivealerting.anomdetect.source.data.metrictank;
 
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,6 +25,7 @@ import org.apache.http.client.fluent.Content;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
@@ -37,7 +38,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
  */
 @RequiredArgsConstructor
 @Slf4j
-public class GraphiteClient {
+public class MetrictankClient {
 
     public static final String FETCH_METRICS_PATH = "/render?from=%d&until=%d&format=json&target=%s";
 
@@ -53,34 +54,36 @@ public class GraphiteClient {
     /**
      * Fetch metric data for a given set of metrics
      *
-     * @param from          earliest time
-     * @param target        metric name or tag with an optional graphite function
+     * @param from   earliest time
+     * @param target metric name or tag with an optional graphite function
      * @return time series for the specified metric
      */
-    public List<GraphiteResult> getData(long from, long until, String target) {
+    public List<MetrictankResult> getData(long from, long until, String target) {
 
         notNull(from, "from can't be null");
         notNull(until, "until can't be null");
         notNull(target, "target can't be null");
 
         val uri = String.format(baseUri + FETCH_METRICS_PATH, from, until, target);
-        log.debug("Sending query to Graphite target: {}", uri);
+        log.debug("Sending query to Metrictank target: {}", uri);
+
+        val headers = Collections.singletonMap("x-org-id", "1");
         Content content;
         try {
-            content = httpClient.get(uri);
+            content = httpClient.get(uri, headers);
         } catch (IOException e) {
-            val message = String.format("Encountered IOException while querying Graphite target '%s': httpMethod=GET, uri=%s, message=%s",
+            val message = String.format("Encountered IOException while querying Metrictank target '%s': httpMethod=GET, uri=%s, message=%s",
                     target,
                     uri,
                     e.getMessage());
-            throw new GraphiteClientException(message, e);
+            throw new MetrictankClientException(message, e);
         }
 
-        List<GraphiteResult> results;
+        List<MetrictankResult> results;
         try {
-            results = Arrays.asList(objectMapper.readValue(content.asBytes(), GraphiteResult[].class));
+            results = Arrays.asList(objectMapper.readValue(content.asBytes(), MetrictankResult[].class));
         } catch (IOException e) {
-            throw new GraphiteClientException(String.format("IOException while parsing response from Graphite target: %s", target), e);
+            throw new MetrictankClientException(String.format("IOException while parsing response from Metrictank target: %s", target), e);
         }
         return results;
     }

@@ -16,17 +16,36 @@
 package com.expedia.adaptivealerting.anomdetect.util;
 
 import lombok.Generated;
+import lombok.val;
 import org.apache.http.client.fluent.Content;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Simple wrapper around Apache's fluent HTTP client, intended to support mockability.
  */
 @Generated // https://reflectoring.io/100-percent-test-coverage/
 public class HttpClientWrapper {
+
+    /**
+     * Makes an HTTP GET call with headers to the given URI and returns the result.
+     *
+     * @param uri URI
+     * @return Call result
+     * @throws IOException if there's a problem making the call
+     */
+    public Content get(String uri, Map<String, String> headers) throws IOException {
+        if (headers.isEmpty()) {
+            return get(uri);
+        }
+        val getRequest = Request.Get(uri);
+        return buildRequestWithHeaders(getRequest, headers)
+                .execute()
+                .returnContent();
+    }
 
     /**
      * Makes an HTTP GET call to the given URI and returns the result.
@@ -55,5 +74,14 @@ public class HttpClientWrapper {
                 .bodyString(body, ContentType.APPLICATION_JSON)
                 .execute()
                 .returnContent();
+    }
+
+    private Request buildRequestWithHeaders(Request request, Map<String, String> headers) {
+        for (val entry : headers.entrySet()) {
+            val key = entry.getKey();
+            val value = entry.getValue();
+            request.addHeader(key, value);
+        }
+        return request;
     }
 }

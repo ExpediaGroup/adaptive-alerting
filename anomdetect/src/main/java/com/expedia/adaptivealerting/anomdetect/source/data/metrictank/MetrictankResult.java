@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.source.data.graphite;
+package com.expedia.adaptivealerting.anomdetect.source.data.metrictank;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
@@ -26,7 +26,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class GraphiteResult {
+public class MetrictankResult {
     private String[][] datapoints;
     private String target;
     private Map<String, Object> tags;
