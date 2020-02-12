@@ -22,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.http.client.fluent.Content;
-import org.apache.http.client.fluent.Request;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -87,12 +86,6 @@ public class MetricTankClient {
             throw new MetricTankClientException(String.format("IOException while parsing response from Graphite target: %s", target), e);
         }
         return results;
-    }
-
-    public Content get(String uri) throws IOException {
-        return Request.Get(uri).addHeader("x-org-id", "1")
-                .execute()
-                .returnContent();
     }
 
     private Map<String, String> buildHeader() {
