@@ -41,14 +41,13 @@ public class GraphiteSource implements DataSource {
 
     @Override
     public List<DataSourceResult> getMetricData(long earliestTime, long latestTime, int intervalLength, String target) {
-        int maxDataPoints = getMaxDataPointsPerDay(intervalLength);
-        return buildDataSourceResult(earliestTime, latestTime, maxDataPoints, target);
+        return buildDataSourceResult(earliestTime, latestTime, target);
     }
 
-    private List<DataSourceResult> buildDataSourceResult(long earliestTime, long latestTime, int maxDataPoints, String metric) {
+    private List<DataSourceResult> buildDataSourceResult(long earliestTime, long latestTime, String metric) {
         List<DataSourceResult> results = new ArrayList<>();
         for (long i = earliestTime; i < latestTime; i += TimeConstantsUtil.SECONDS_PER_DAY) {
-            List<GraphiteResult> graphiteResults = getDataFromGraphite(i, maxDataPoints, metric);
+            List<GraphiteResult> graphiteResults = getDataFromGraphite(i, metric);
             if (graphiteResults.size() > 0) {
                 String[][] dataPoints = graphiteResults.get(0).getDatapoints();
                 //TODO Convert this to use JAVA stream
@@ -66,14 +65,11 @@ public class GraphiteSource implements DataSource {
         return results;
     }
 
-    private List<GraphiteResult> getDataFromGraphite(long from, int maxDataPoints, String metric) {
+    private List<GraphiteResult> getDataFromGraphite(long from, String metric) {
         long until = from + TimeConstantsUtil.SECONDS_PER_DAY;
-        log.debug("Fetching data from graphite for params: from={} ({}), until={} ({}), maxDataPoints={}, metric='{}'",
-                from, ofEpochSecond(from), until, ofEpochSecond(until), maxDataPoints, metric);
-        return graphiteClient.getData(from, until, maxDataPoints, metric);
+        log.debug("Fetching data from graphite for params: from={} ({}), until={} ({}), metric='{}'",
+                from, ofEpochSecond(from), until, ofEpochSecond(until), metric);
+        return graphiteClient.getData(from, until, metric);
     }
 
-    private int getMaxDataPointsPerDay(int intervalLength) {
-        return TimeConstantsUtil.SECONDS_PER_DAY / intervalLength;
-    }
 }
