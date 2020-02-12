@@ -76,9 +76,9 @@ public class MetricTankClientTest {
         when(docsContent.asBytes()).thenReturn(docsBytes);
         when(objectMapper.readValue(docsBytes, MetricTankResult[].class)).thenReturn(docs);
 
-        when(httpClient.get(METRIC_URI_CANT_GET)).thenThrow(new IOException());
+        when(httpClient.get(METRIC_URI_CANT_GET, headers)).thenThrow(new IOException());
 
-        when(httpClient.get(METRIC_URI_CANT_READ)).thenReturn(docContent_cantRead);
+        when(httpClient.get(METRIC_URI_CANT_READ, headers)).thenReturn(docContent_cantRead);
         when(docContent_cantRead.asBytes()).thenReturn(docBytes_cantRead);
         when(objectMapper.readValue(docBytes_cantRead, MetricTankResult[].class)).thenThrow(new IOException());
     }
