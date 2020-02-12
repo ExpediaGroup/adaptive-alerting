@@ -19,11 +19,11 @@ import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.http.client.fluent.Content;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -36,6 +36,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
  * </p>
  */
 @RequiredArgsConstructor
+@Slf4j
 public class GraphiteClient {
 
     public static final String FETCH_METRICS_PATH = "/render?from=%d&until=%d&format=json&target=%s";
@@ -63,22 +64,24 @@ public class GraphiteClient {
         notNull(target, "target can't be null");
 
         val uri = String.format(baseUri + FETCH_METRICS_PATH, from, until, target);
+        log.debug("Sending query to Graphite target: {}", uri);
         Content content;
         try {
             content = httpClient.get(uri);
         } catch (IOException e) {
-            val message = String.format("IOException while querying Graphite target '%s': httpMethod=GET, uri=%s, message=%s", target, uri, e.getMessage());
+            val message = String.format("Encountered IOException while querying Graphite target '%s': httpMethod=GET, uri=%s, message=%s",
+                    target,
+                    uri,
+                    e.getMessage());
             throw new GraphiteClientException(message, e);
         }
 
-        List<GraphiteResult> results = new ArrayList<>();
+        List<GraphiteResult> results;
         try {
             results = Arrays.asList(objectMapper.readValue(content.asBytes(), GraphiteResult[].class));
         } catch (IOException e) {
-            val message = "IOException while reading graphite data " + target;
-            throw new RuntimeException(message, e);
+            throw new GraphiteClientException(String.format("IOException while parsing response from Graphite target: %s", target), e);
         }
         return results;
     }
 }
-

@@ -62,14 +62,30 @@ public class GraphiteSource implements DataSource {
                 }
             }
         }
+        logResults(results);
         return results;
     }
 
     private List<GraphiteResult> getDataFromGraphite(long from, String metric) {
         long until = from + TimeConstantsUtil.SECONDS_PER_DAY;
-        log.debug("Fetching data from graphite for params: from={} ({}), until={} ({}), metric='{}'",
+        log.debug("Querying Graphite with: from={} ({}), until={} ({}), metric='{}'",
                 from, ofEpochSecond(from), until, ofEpochSecond(until), metric);
         return graphiteClient.getData(from, until, metric);
+    }
+
+    private void logResults(List<DataSourceResult> results) {
+        if (!results.isEmpty()) {
+            DataSourceResult firstResult = results.get(0);
+            DataSourceResult lastResult = results.get(results.size() - 1);
+            long actualFrom = firstResult.getEpochSecond();
+            long actualUntil = lastResult.getEpochSecond();
+            log.debug(String.format("Retrieved %d data points from Graphite from %d (%s) until %d (%s)",
+                    results.size(),
+                    actualFrom,
+                    ofEpochSecond(actualFrom).toString(),
+                    actualUntil,
+                    ofEpochSecond(actualUntil).toString()));
+        }
     }
 
 }
