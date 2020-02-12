@@ -38,7 +38,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 @RequiredArgsConstructor
 public class GraphiteClient {
 
-    public static final String FETCH_METRICS_PATH = "/render?from=%d&until=%d&format=json&maxDataPoints=%d&target=%s";
+    public static final String FETCH_METRICS_PATH = "/render?from=%d&until=%d&format=json&target=%s";
 
     @NonNull
     private final String baseUri;
@@ -53,18 +53,16 @@ public class GraphiteClient {
      * Fetch metric data for a given set of metrics
      *
      * @param from          earliest time
-     * @param maxDataPoints max no of data points in result
      * @param target        metric name or tag with an optional graphite function
      * @return time series for the specified metric
      */
-    public List<GraphiteResult> getData(long from, long until, Integer maxDataPoints, String target) {
+    public List<GraphiteResult> getData(long from, long until, String target) {
 
         notNull(from, "from can't be null");
         notNull(until, "until can't be null");
         notNull(target, "target can't be null");
-        notNull(maxDataPoints, "maxDataPoints can't be null");
 
-        val uri = String.format(baseUri + FETCH_METRICS_PATH, from, until, maxDataPoints, target);
+        val uri = String.format(baseUri + FETCH_METRICS_PATH, from, until, target);
         Content content;
         try {
             content = httpClient.get(uri);
