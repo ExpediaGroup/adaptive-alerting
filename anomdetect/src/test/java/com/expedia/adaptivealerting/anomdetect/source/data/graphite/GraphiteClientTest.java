@@ -12,14 +12,18 @@ import org.mockito.MockitoAnnotations;
 import java.io.IOException;
 
 import static com.expedia.adaptivealerting.anomdetect.source.data.graphite.GraphiteClient.FETCH_METRICS_PATH;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 @Slf4j
 public class GraphiteClientTest {
     private static final String BASE_URI = "http://graphite";
-    private static final String METRIC_URI = uri(FETCH_METRICS_PATH, 1580815495, 1580901895, 288, "metricName");
-    private static final String METRIC_URI_CANT_GET = uri(FETCH_METRICS_PATH, 1580815495, 1580901895, 288, "metricNameCantGet");
-    private static final String METRIC_URI_CANT_READ = uri(FETCH_METRICS_PATH, 1580815495, 1580901895, 288, "metricNameCantRead");
+    private static final String METRIC_URI = fetchMetricsUri("metricName");
+    private static final String METRIC_URI_CANT_GET = fetchMetricsUri("metricNameCantGet");
+    private static final String METRIC_URI_CANT_READ = fetchMetricsUri("metricNameCantRead");
+    private static final int ONE_DAY_IN_SECONDS = 60 * 60 * 24;
+    private static final int FROM_TIME_IN_SECONDS = 1580815495;
+    private static final int UNTIL_TIME_IN_SECONDS = FROM_TIME_IN_SECONDS + ONE_DAY_IN_SECONDS;
 
     private GraphiteClient clientUnderTest;
 
@@ -36,11 +40,9 @@ public class GraphiteClientTest {
     private Content docContent_cantRead;
 
     private byte[] docsBytes = "docsBytes".getBytes();
+
     private byte[] docBytes_cantRead = "docBytes_cantRead".getBytes();
     private GraphiteResult[] docs = {};
-    private long from = 1580815495;
-    private long until = 1580901895;
-    private Integer maxDataPoints = 288;
 
     @Before
     public void setUp() throws Exception {
@@ -51,17 +53,18 @@ public class GraphiteClientTest {
 
     @Test
     public void testGetMetricData() {
-        clientUnderTest.getData(from, until, maxDataPoints, "metricName");
+        assertEquals(1580901895, UNTIL_TIME_IN_SECONDS);
+        clientUnderTest.getData(FROM_TIME_IN_SECONDS, UNTIL_TIME_IN_SECONDS, "metricName");
     }
 
     @Test(expected = RuntimeException.class)
     public void testGetMetricData_cant_get() {
-        clientUnderTest.getData(from, until, maxDataPoints, "metricNameCantGet");
+        clientUnderTest.getData(FROM_TIME_IN_SECONDS, UNTIL_TIME_IN_SECONDS, "metricNameCantGet");
     }
 
     @Test(expected = RuntimeException.class)
     public void testGetMetricData_cant_read() {
-        clientUnderTest.getData(from, until, maxDataPoints, "metricNameCantRead");
+        clientUnderTest.getData(FROM_TIME_IN_SECONDS, UNTIL_TIME_IN_SECONDS, "metricNameCantRead");
     }
 
     private void initMetricData() throws IOException {
@@ -76,8 +79,8 @@ public class GraphiteClientTest {
         when(objectMapper.readValue(docBytes_cantRead, GraphiteResult[].class)).thenThrow(new IOException());
     }
 
-    private static String uri(String path, Object param, Object param1, Object param2, Object param3) {
-        return String.format(BASE_URI + path, param, param1, param2, param3);
-    }
 
+    private static String fetchMetricsUri(String metricName) {
+        return String.format(BASE_URI + FETCH_METRICS_PATH, FROM_TIME_IN_SECONDS, UNTIL_TIME_IN_SECONDS, metricName);
+    }
 }

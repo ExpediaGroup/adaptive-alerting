@@ -95,8 +95,6 @@ public class DataInitializerTest {
 
     private void initConfig() {
         when(config.getString(DataInitializer.BASE_URI)).thenReturn("http://graphite");
-        when(config.getString(DataInitializer.EARLIEST_TIME)).thenReturn("7d");
-        when(config.getInt(DataInitializer.MAX_DATA_POINTS)).thenReturn(2016);
     }
 
     private void initThrottleGate(boolean gateOpen) {
