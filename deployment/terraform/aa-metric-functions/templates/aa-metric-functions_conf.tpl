@@ -10,5 +10,6 @@ aa-metric-functions {
     urlTemplate: "${metric_source_graphite_host}/render?until=now&format=json&target="
     graphite-host = "${metric_source_graphite_host}"
     output_topic = "${aggregator_producer_topic}"
+    is-graphite-server-metrictank = "${is_graphite_server_metrictank}"
   }
 } 

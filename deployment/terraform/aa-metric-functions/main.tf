@@ -14,6 +14,8 @@ locals {
         kafka_endpoint = "${var.kafka_endpoint}"
         aggregator_producer_topic = "${var.aggregator_producer_topic}"
         metric_source_graphite_host = "${var.metric_source_graphite_host}"
+        is-graphite-server-metrictank = "${var.is_graphite_server_metrictank}"
+
   }
 }
 
