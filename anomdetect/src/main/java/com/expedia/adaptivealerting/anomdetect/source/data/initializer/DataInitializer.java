@@ -20,6 +20,8 @@ import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.forecasting.ForecastingDetector;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.SeasonalPointForecaster;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.seasonalnaive.MetricDeliveryDuplicateException;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.seasonalnaive.MetricDeliveryTimeException;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSource;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSourceResult;
 import com.expedia.adaptivealerting.anomdetect.source.data.initializer.throttlegate.ThrottleGate;
@@ -111,7 +113,11 @@ public class DataInitializer {
     private void populateForecastingDetectorWithHistoricalData(ForecastingDetector forecastingDetector, List<DataSourceResult> data, MetricDefinition metricDefinition) {
         for (DataSourceResult dataSourceResult : data) {
             val metricData = dataSourceResultToMetricData(dataSourceResult, metricDefinition);
-            forecastingDetector.getPointForecaster().forecast(metricData);
+            try {
+                forecastingDetector.getPointForecaster().forecast(metricData);
+            } catch (MetricDeliveryDuplicateException | MetricDeliveryTimeException e) {
+                log.warn("Encountered {} during history replay. Ignoring. Details: {}", e.getClass().getSimpleName(), e.getMessage());
+            }
         }
     }
 

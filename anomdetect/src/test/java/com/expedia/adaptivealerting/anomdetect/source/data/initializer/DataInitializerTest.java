@@ -15,15 +15,15 @@
  */
 package com.expedia.adaptivealerting.anomdetect.source.data.initializer;
 
-import com.expedia.adaptivealerting.anomdetect.detect.Detector;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.forecasting.ForecastingDetector;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.multiplicative.MultiplicativeIntervalForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.interval.algo.multiplicative.MultiplicativeIntervalForecasterParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.SeasonalPointForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.pewma.PewmaPointForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.pewma.PewmaPointForecasterParams;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.seasonalnaive.SeasonalNaivePointForecaster;
-import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.seasonalnaive.SeasonalNaivePointForecasterParams;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.seasonalnaive.MetricDeliveryDuplicateException;
+import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.seasonalnaive.MetricDeliveryTimeException;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSource;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSourceResult;
 import com.expedia.adaptivealerting.anomdetect.source.data.initializer.throttlegate.ThrottleGate;
@@ -43,9 +43,11 @@ import java.util.List;
 
 import static com.expedia.adaptivealerting.anomdetect.detect.AnomalyType.TWO_TAILED;
 import static java.util.UUID.randomUUID;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 
@@ -58,8 +60,11 @@ public class DataInitializerTest {
     private Config config;
     @Mock
     private ThrottleGate throttleGate;
+    @Mock
+    private ForecastingDetector seasonalNaiveDetector;
+    @Mock
+    private SeasonalPointForecaster seasonalPointForecaster;
 
-    private Detector detector;
     private MappedMetricData mappedMetricData;
     private List<DataSourceResult> dataSourceResults;
 
@@ -74,13 +79,29 @@ public class DataInitializerTest {
     @Test
     public void testInitializeDetectorThrottleGateOpen() {
         initThrottleGate(true);
-        initializerUnderTest.initializeDetector(mappedMetricData, detector);
+        initializerUnderTest.initializeDetector(mappedMetricData, seasonalNaiveDetector);
     }
 
     @Test(expected = DetectorDataInitializationThrottledException.class)
     public void testInitializeDetectorThrottleGateClosed() {
         initThrottleGate(false);
-        initializerUnderTest.initializeDetector(mappedMetricData, detector);
+        initializerUnderTest.initializeDetector(mappedMetricData, seasonalNaiveDetector);
+    }
+
+    @Test
+    public void testInitializeDetectorWithDuplicateMetric() {
+        when(throttleGate.isOpen()).thenReturn(true);
+        doThrow(new MetricDeliveryDuplicateException("Metric with dodgy timestamp")).when(seasonalPointForecaster).forecast(any(MetricData.class));
+        initializerUnderTest.initializeDetector(mappedMetricData, seasonalNaiveDetector);
+        // Assertion here is that exception is swallowed
+    }
+
+    @Test
+    public void testInitializeDetectorWithTimeException() {
+        initThrottleGate(true);
+        doThrow(new MetricDeliveryTimeException("Metric with dodgy timestamp")).when(seasonalPointForecaster).forecast(any(MetricData.class));
+        initializerUnderTest.initializeDetector(mappedMetricData, seasonalNaiveDetector);
+        // Assertion here is that exception is swallowed
     }
 
     @Test(expected = RuntimeException.class)
@@ -103,11 +124,18 @@ public class DataInitializerTest {
 
     public void initTestObjects() {
         this.mappedMetricData = buildMappedMetricData();
-        this.detector = buildSeasonalDetector();
         this.dataSourceResults = new ArrayList<>();
         dataSourceResults.add(buildDataSourceResult(1.0, 1578307488));
         dataSourceResults.add(buildDataSourceResult(3.0, 1578307489));
         when(dataSource.getMetricData(anyLong(), anyLong(), anyInt(), anyString())).thenReturn(dataSourceResults);
+        initSeasonalNaiveDetector();
+    }
+
+    private void initSeasonalNaiveDetector() {
+        when(seasonalNaiveDetector.getName()).thenReturn("seasonalnaive");
+        when(seasonalNaiveDetector.getPointForecaster()).thenReturn(seasonalPointForecaster);
+        when(seasonalPointForecaster.getCycleLength()).thenReturn(2016);
+        when(seasonalPointForecaster.getIntervalLength()).thenReturn(300);
     }
 
     private MappedMetricData buildMappedMetricData() {
@@ -115,14 +143,6 @@ public class DataInitializerTest {
         val metricDefinition = new MetricDefinition("metric-definition");
         val metricData = new MetricData(metricDefinition, 100.0, Instant.now().getEpochSecond());
         return new MappedMetricData(metricData, mappedUuid);
-    }
-
-    private Detector buildSeasonalDetector() {
-        val pointParams = new SeasonalNaivePointForecasterParams().setCycleLength(2016).setIntervalLength(300);
-        val intervalParams = new MultiplicativeIntervalForecasterParams().setStrongMultiplier(3.0).setWeakMultiplier(1.0);
-        val seasonalForecaster = new SeasonalNaivePointForecaster(pointParams);
-        val intervalForecaster = new MultiplicativeIntervalForecaster(intervalParams);
-        return new ForecastingDetector(randomUUID(), seasonalForecaster, intervalForecaster, TWO_TAILED, true, "seasonalnaive");
     }
 
     private DataSourceResult buildDataSourceResult(Double value, long epochSecs) {
