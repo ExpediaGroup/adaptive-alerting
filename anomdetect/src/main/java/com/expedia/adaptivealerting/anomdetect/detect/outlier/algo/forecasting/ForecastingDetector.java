@@ -52,7 +52,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
  * @see IntervalForecaster
  */
 @ToString(callSuper = true)
-public final class ForecastingDetector extends AbstractOutlierDetector {
+public class ForecastingDetector extends AbstractOutlierDetector {
     private final String NAME;
     @Getter
     @Generated // https://reflectoring.io/100-percent-test-coverage/

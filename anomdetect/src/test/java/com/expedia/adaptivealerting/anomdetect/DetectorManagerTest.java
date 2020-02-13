@@ -22,6 +22,7 @@ import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
 import com.expedia.adaptivealerting.anomdetect.source.data.initializer.DataInitializer;
+import com.expedia.adaptivealerting.anomdetect.source.data.initializer.DetectorDataInitializationThrottledException;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import com.typesafe.config.Config;
@@ -63,6 +64,7 @@ public final class DetectorManagerTest {
 
     private UUID mappedUuid;
     private UUID mappedUuid2;
+    private UUID mappedUuid3;
     private UUID unmappedUuid;
     private List<UUID> updatedDetectors;
 
@@ -72,8 +74,10 @@ public final class DetectorManagerTest {
 
     // "BadDataInit" simulates a failure in DataInitializer dependency
     private MetricData goodMetricDataWithBadDataInit;
+    private MetricData goodMetricDataWithThrottledDataInit;
     private MappedMetricData goodMappedMetricData;
     private MappedMetricData goodMappedMetricDataWithBadDataInit;
+    private MappedMetricData goodMappedMetricDataWithThrottledDataInit;
 
     // "Bad" just means that the detector source can't find a detector for the MMD.
     private MetricDefinition badDefinition;
@@ -136,6 +140,13 @@ public final class DetectorManagerTest {
     }
 
     @Test
+    public void testClassify_skipsWhenDataInitThrottled() {
+        val result = managerUnderTest.detect(goodMappedMetricDataWithThrottledDataInit);
+        assertNotNull(result);
+        assertSame(outlierDetectorResult, result);
+    }
+
+    @Test
     public void testClassify_getCached() {
         managerUnderTest.detect(goodMappedMetricData);
 
@@ -154,6 +165,7 @@ public final class DetectorManagerTest {
     private void initTestObjects() {
         this.mappedUuid = UUID.randomUUID();
         this.mappedUuid2 = UUID.randomUUID();
+        this.mappedUuid3 = UUID.randomUUID();
         this.unmappedUuid = UUID.randomUUID();
 
         this.goodDefinition = new MetricDefinition("good-definition");
@@ -162,6 +174,8 @@ public final class DetectorManagerTest {
 
         this.goodMetricDataWithBadDataInit = new MetricData(goodDefinition, 100.0, Instant.now().getEpochSecond());
         this.goodMappedMetricDataWithBadDataInit = new MappedMetricData(goodMetricDataWithBadDataInit, mappedUuid2);
+        this.goodMetricDataWithThrottledDataInit = new MetricData(goodDefinition, 100.0, Instant.now().getEpochSecond());
+        this.goodMappedMetricDataWithThrottledDataInit = new MappedMetricData(goodMetricDataWithThrottledDataInit, mappedUuid3);
 
         this.badDefinition = new MetricDefinition("bad-definition");
         this.badMetricData = new MetricData(badDefinition, 100.0, Instant.now().getEpochSecond());
@@ -178,12 +192,14 @@ public final class DetectorManagerTest {
 
         doNothing().when(dataInitializer).initializeDetector(goodMappedMetricData, detector);
         doThrow(new RuntimeException()).when(dataInitializer).initializeDetector(goodMappedMetricDataWithBadDataInit, detector);
+        doThrow(new DetectorDataInitializationThrottledException("")).when(dataInitializer).initializeDetector(goodMappedMetricDataWithThrottledDataInit, detector);
         doNothing().when(dataInitializer).initializeDetector(badMappedMetricData, detector);
 
         when(cachedDetectors.containsKey(updatedDetectors.get(0))).thenReturn(true);
 
         when(detectorSource.findDetector(mappedUuid)).thenReturn(detector);
         when(detectorSource.findDetector(mappedUuid2)).thenReturn(detector);
+        when(detectorSource.findDetector(mappedUuid3)).thenReturn(detector);
         when(detectorSource.findDetector(unmappedUuid)).thenReturn(null);
         when(detectorSource.findUpdatedDetectors(detectorRefreshPeriod * 60)).thenReturn(updatedDetectors);
 

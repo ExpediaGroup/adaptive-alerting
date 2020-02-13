@@ -24,6 +24,7 @@ import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
 import com.expedia.adaptivealerting.anomdetect.source.data.initializer.DataInitializer;
+import com.expedia.adaptivealerting.anomdetect.source.data.initializer.DetectorDataInitializationThrottledException;
 import com.typesafe.config.Config;
 import lombok.Getter;
 import lombok.NonNull;
@@ -161,6 +162,8 @@ public class DetectorManager {
             detector = detectorSource.findDetector(detectorUuid);
             try {
                 dataInitializer.initializeDetector(mappedMetricData, detector);
+            } catch (DetectorDataInitializationThrottledException e) {
+                log.info("Data Initialization throttled: {}", e.getMessage());
             } catch (Exception e) {
                 log.error("Error encountered while initialising detector. Ignoring error and proceeding with un-initialized detector.", e);
             }
