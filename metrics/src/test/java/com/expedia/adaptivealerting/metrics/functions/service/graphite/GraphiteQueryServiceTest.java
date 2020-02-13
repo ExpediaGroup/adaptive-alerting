@@ -47,7 +47,9 @@ public class GraphiteQueryServiceTest {
     private double METRIC_DEFAULT_VALUE = 0.0;
     private static final String METRIC_SOURCE_SINK = "metric-source-sink";
     private static final String APP_ID = "aa-metric-functions-test";
-    private Map<String, String> metricTankOrgIdHeader = Collections.singletonMap("x-org-id", "1");
+    private final static String IS_GRAPHITE_SERVER_METRICTANK_KEY = "is-graphite-server-metrictank";
+    private final static String GRAPHITE_SERVER_METRICTANK = "metrictank";
+    private Map<String, String> metricTankOrgIdHeader;
 
 
 
@@ -75,6 +77,13 @@ public class GraphiteQueryServiceTest {
         sampleJsonGraphite.put(0, sampleJsonGraphiteResult);
         val uri = "samplegraphitehosturi/render?until=now&format=json&target=sumSeries(a.b.c)&from=-30s";
         Content mockGraphiteResult = new Content(sampleJsonGraphite.toString().getBytes(), ContentType.APPLICATION_JSON);
+        if (metricSourceSinkConfig.getString(IS_GRAPHITE_SERVER_METRICTANK_KEY).
+                equals(GRAPHITE_SERVER_METRICTANK)) {
+            metricTankOrgIdHeader = Collections.singletonMap("x-org-id", "1");
+        }
+        else {
+            metricTankOrgIdHeader = Collections.emptyMap();
+        }
         when(httpClientWrapper.get(uri, metricTankOrgIdHeader)).thenReturn(mockGraphiteResult);
         graphiteQueryService = new GraphiteQueryService(httpClientWrapper);
         initValidMetricDataSetup(sampleJsonGraphite.toString());
