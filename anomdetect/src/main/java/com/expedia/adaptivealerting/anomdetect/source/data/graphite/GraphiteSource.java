@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.source.data.metrictank;
+package com.expedia.adaptivealerting.anomdetect.source.data.graphite;
 
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSource;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSourceResult;
+import com.expedia.adaptivealerting.anomdetect.util.DateUtil;
 import com.expedia.adaptivealerting.anomdetect.util.TimeConstantsUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ import static java.time.Instant.ofEpochSecond;
 
 @RequiredArgsConstructor
 @Slf4j
-public class MetrictankSource implements DataSource {
+public class GraphiteSource implements DataSource {
 
     public static final Double MISSING_VALUE = Double.NEGATIVE_INFINITY;
 
@@ -37,19 +38,19 @@ public class MetrictankSource implements DataSource {
      * Client to load metric data from graphite.
      */
     @NonNull
-    private MetrictankClient metricTankClient;
+    private GraphiteClient graphiteClient;
 
     @Override
     public List<DataSourceResult> getMetricData(long earliestTime, long latestTime, int intervalLength, String target) {
-        return buildDataSourceResult(earliestTime, latestTime, target);
+        return buildDataSourceResult(earliestTime, latestTime, target, intervalLength);
     }
 
-    private List<DataSourceResult> buildDataSourceResult(long earliestTime, long latestTime, String metric) {
+    private List<DataSourceResult> buildDataSourceResult(long earliestTime, long latestTime, String metric, int intervalLength) {
         List<DataSourceResult> results = new ArrayList<>();
         for (long i = earliestTime; i < latestTime; i += TimeConstantsUtil.SECONDS_PER_DAY) {
-            List<MetrictankResult> metrictankResults = getDataFromGraphite(i, metric);
-            if (metrictankResults.size() > 0) {
-                String[][] dataPoints = metrictankResults.get(0).getDatapoints();
+            List<GraphiteResult> graphiteResults = getDataFromGraphite(i, metric, intervalLength);
+            if (graphiteResults.size() > 0) {
+                String[][] dataPoints = graphiteResults.get(0).getDatapoints();
                 //TODO Convert this to use JAVA stream
                 for (String[] dataPoint : dataPoints) {
                     Double value = MISSING_VALUE;
@@ -66,11 +67,14 @@ public class MetrictankSource implements DataSource {
         return results;
     }
 
-    private List<MetrictankResult> getDataFromGraphite(long from, String metric) {
+    private List<GraphiteResult> getDataFromGraphite(long from, String metric, int intervalLength) {
         long until = from + TimeConstantsUtil.SECONDS_PER_DAY;
-        log.debug("Querying Metrictank with: from={} ({}), until={} ({}), metric='{}'",
+        long fromSnappedToIntervalLength = epochTimeSnappedToSeconds(from, intervalLength);
+        long untilSnappedToIntervalLength = epochTimeSnappedToSeconds(until, intervalLength);
+
+        log.debug("Querying Graphite with: from={} ({}), until={} ({}), metric='{}'",
                 from, ofEpochSecond(from), until, ofEpochSecond(until), metric);
-        return metricTankClient.getData(from, until, metric);
+        return graphiteClient.getData(fromSnappedToIntervalLength, untilSnappedToIntervalLength, metric);
     }
 
     private void logResults(List<DataSourceResult> results) {
@@ -88,4 +92,7 @@ public class MetrictankSource implements DataSource {
         }
     }
 
+    private long epochTimeSnappedToSeconds(long time, int seconds) {
+        return DateUtil.snapToSeconds(ofEpochSecond(time), seconds).getEpochSecond();
+    }
 }

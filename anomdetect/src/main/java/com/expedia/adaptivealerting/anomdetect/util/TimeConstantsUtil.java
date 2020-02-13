@@ -16,8 +16,10 @@
 package com.expedia.adaptivealerting.anomdetect.util;
 
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
 @UtilityClass
+@Slf4j
 public class TimeConstantsUtil {
     public static final int SECONDS_PER_MIN = 60;
     public static final int SECONDS_PER_HOUR = 60 * SECONDS_PER_MIN;

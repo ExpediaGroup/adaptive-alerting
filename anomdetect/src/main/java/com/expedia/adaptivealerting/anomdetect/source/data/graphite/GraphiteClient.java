@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.source.data.metrictank;
+package com.expedia.adaptivealerting.anomdetect.source.data.graphite;
 
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,7 +38,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
  */
 @RequiredArgsConstructor
 @Slf4j
-public class MetrictankClient {
+public class GraphiteClient {
 
     public static final String FETCH_METRICS_PATH = "/render?from=%d&until=%d&format=json&target=%s";
 
@@ -58,7 +58,7 @@ public class MetrictankClient {
      * @param target metric name or tag with an optional graphite function
      * @return time series for the specified metric
      */
-    public List<MetrictankResult> getData(long from, long until, String target) {
+    public List<GraphiteResult> getData(long from, long until, String target) {
 
         notNull(from, "from can't be null");
         notNull(until, "until can't be null");
@@ -67,23 +67,25 @@ public class MetrictankClient {
         val uri = String.format(baseUri + FETCH_METRICS_PATH, from, until, target);
         log.debug("Sending query to Metrictank target: {}", uri);
 
+        //FIXME x-org-id is a mandatory header for metric tank.
+        // In future, would like to make it configurable as the only difference between graphite client and metric tank client is this header.
         val headers = Collections.singletonMap("x-org-id", "1");
         Content content;
         try {
             content = httpClient.get(uri, headers);
         } catch (IOException e) {
-            val message = String.format("Encountered IOException while querying Metrictank target '%s': httpMethod=GET, uri=%s, message=%s",
+            val message = String.format("Encountered IOException while querying Graphite target '%s': httpMethod=GET, uri=%s, message=%s",
                     target,
                     uri,
                     e.getMessage());
-            throw new MetrictankClientException(message, e);
+            throw new GraphiteClientException(message, e);
         }
 
-        List<MetrictankResult> results;
+        List<GraphiteResult> results;
         try {
-            results = Arrays.asList(objectMapper.readValue(content.asBytes(), MetrictankResult[].class));
+            results = Arrays.asList(objectMapper.readValue(content.asBytes(), GraphiteResult[].class));
         } catch (IOException e) {
-            throw new MetrictankClientException(String.format("IOException while parsing response from Metrictank target: %s", target), e);
+            throw new GraphiteClientException(String.format("IOException while parsing response from Graphite target: %s", target), e);
         }
         return results;
     }

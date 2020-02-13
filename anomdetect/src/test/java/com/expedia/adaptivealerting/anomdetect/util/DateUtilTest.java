@@ -15,10 +15,12 @@
  */
 package com.expedia.adaptivealerting.anomdetect.util;
 
+import lombok.val;
 import org.junit.Test;
 
 import java.time.Instant;
 
+import static java.time.Instant.ofEpochSecond;
 import static org.junit.Assert.assertEquals;
 
 public final class DateUtilTest {
@@ -54,6 +56,20 @@ public final class DateUtilTest {
         doTestTruncatedToWeek("2018-04-09T00:00:00Z", "2018-04-08T00:00:00Z");
     }
 
+    @Test
+    public void testSnapToSeconds() {
+        doTestSnappedToSeconds("2018-04-01T01:07:55Z", "2018-04-01T01:05:00Z", 300);
+        doTestSnappedToSeconds("2018-04-01T01:07:55Z", "2018-04-01T01:07:00Z", 60);
+        doTestSnappedToSeconds("2018-04-01T01:07:55Z", "2018-04-01T01:07:30Z", 30);
+    }
+
+    @Test
+    public void testTruncatedToSeconds() {
+        doTestTruncatedToSeconds("2018-04-01T09:24:54.63Z", "2018-04-01T09:24:54.00Z");
+        doTestTruncatedToSeconds("2018-04-01T09:24:54.01Z", "2018-04-01T09:24:54.00Z");
+        doTestTruncatedToSeconds("2018-04-01T09:24:53.41Z", "2018-04-01T09:24:53.00Z");
+    }
+
     private void doTestTruncatedToDay(String dateStr, String expectedStr) {
         final Instant date = Instant.parse(dateStr);
         final Instant day = Instant.parse(expectedStr);
@@ -65,6 +81,20 @@ public final class DateUtilTest {
         final Instant date = Instant.parse(dateStr);
         final Instant day = Instant.parse(expectedStr);
         final Instant actual = DateUtil.truncatedToWeek(date);
+        assertEquals(day, actual);
+    }
+
+    private void doTestSnappedToSeconds(String dateStr, String expectedStr, int seconds) {
+        final Instant expected = Instant.parse(expectedStr);
+        final Instant date = Instant.parse(dateStr);
+        final Instant actual = DateUtil.snapToSeconds(date, seconds);
+        assertEquals(expected, actual);
+    }
+
+    private void doTestTruncatedToSeconds(String dateStr, String expectedStr) {
+        final Instant date = Instant.parse(dateStr);
+        final Instant day = Instant.parse(expectedStr);
+        final Instant actual = DateUtil.truncatedToSeconds(date);
         assertEquals(day, actual);
     }
 }

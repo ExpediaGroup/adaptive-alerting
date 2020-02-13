@@ -1,7 +1,8 @@
-package com.expedia.adaptivealerting.anomdetect.source.data.metrictank;
+package com.expedia.adaptivealerting.anomdetect.source.data.graphite;
 
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSourceResult;
 import com.expedia.adaptivealerting.anomdetect.util.TimeConstantsUtil;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,14 +15,15 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-public class MetrictankSourceTest {
+@Slf4j
+public class GraphiteSourceTest {
 
     @Mock
-    private MetrictankClient metricTankClient;
+    private GraphiteClient graphiteClient;
 
-    private MetrictankSource sourceUnderTest;
-    private List<MetrictankResult> metrictankResults = new ArrayList<>();
-    private List<MetrictankResult> metrictankResults_null = new ArrayList<>();
+    private GraphiteSource sourceUnderTest;
+    private List<GraphiteResult> graphiteResults = new ArrayList<>();
+    private List<GraphiteResult> graphiteResults_null = new ArrayList<>();
     private int intervalLength = 5 * TimeConstantsUtil.SECONDS_PER_MIN;
 
     @Before
@@ -29,7 +31,7 @@ public class MetrictankSourceTest {
         MockitoAnnotations.initMocks(this);
         initTestObjects();
         initDependencies();
-        this.sourceUnderTest = new MetrictankSource(metricTankClient);
+        this.sourceUnderTest = new GraphiteSource(graphiteClient);
     }
 
     @Test
@@ -55,34 +57,34 @@ public class MetrictankSourceTest {
     @Test
     public void testGetMetricData_null_value() {
         val actual = sourceUnderTest.getMetricData(1580815495, 1580901895, intervalLength, "null_value");
-        val dataSourceResult = buildDataSourceResult(MetrictankSource.MISSING_VALUE, 1578307488);
+        val dataSourceResult = buildDataSourceResult(GraphiteSource.MISSING_VALUE, 1578307488);
         List<DataSourceResult> dataSourceResults = new ArrayList<>();
         dataSourceResults.add(dataSourceResult);
         assertEquals(dataSourceResults, actual);
     }
 
     private void initTestObjects() {
-        metrictankResults.add(buildGraphiteResult());
-        metrictankResults_null.add(buildNullValueGraphiteResult());
+        graphiteResults.add(buildGraphiteResult());
+        graphiteResults_null.add(buildNullValueGraphiteResult());
     }
 
     private void initDependencies() {
-        when(metricTankClient.getData(1580297095, 1580383495, "metric_name")).thenReturn(metrictankResults);
-        when(metricTankClient.getData(1580383495, 1580469895, "metric_name")).thenReturn(metrictankResults);
-        when(metricTankClient.getData(1580469895, 1580556295, "metric_name")).thenReturn(metrictankResults);
-        when(metricTankClient.getData(1580556295, 1580642695, "metric_name")).thenReturn(metrictankResults);
-        when(metricTankClient.getData(1580642695, 1580729095, "metric_name")).thenReturn(metrictankResults);
-        when(metricTankClient.getData(1580729095, 1580815495, "metric_name")).thenReturn(metrictankResults);
-        when(metricTankClient.getData(1580815495, 1580901895, "metric_name")).thenReturn(metrictankResults);
+        when(graphiteClient.getData(1580297095, 1580383495, "metric_name")).thenReturn(graphiteResults);
+        when(graphiteClient.getData(1580383495, 1580469895, "metric_name")).thenReturn(graphiteResults);
+        when(graphiteClient.getData(1580469895, 1580556295, "metric_name")).thenReturn(graphiteResults);
+        when(graphiteClient.getData(1580556295, 1580642695, "metric_name")).thenReturn(graphiteResults);
+        when(graphiteClient.getData(1580642695, 1580729095, "metric_name")).thenReturn(graphiteResults);
+        when(graphiteClient.getData(1580729095, 1580815495, "metric_name")).thenReturn(graphiteResults);
+        when(graphiteClient.getData(1580815495, 1580901895, "metric_name")).thenReturn(graphiteResults);
 
-        when(metricTankClient.getData(1580297095, 1580383495, "metric_name")).thenReturn(metrictankResults);
+        when(graphiteClient.getData(1580297095, 1580383495, "metric_name")).thenReturn(graphiteResults);
 
-        when(metricTankClient.getData(1580815495, 1580901895, "null_metric")).thenReturn(new ArrayList<>());
-        when(metricTankClient.getData(1580815495, 1580901895, "null_value")).thenReturn(metrictankResults_null);
+        when(graphiteClient.getData(1580815495, 1580901895, "null_metric")).thenReturn(new ArrayList<>());
+        when(graphiteClient.getData(1580815495, 1580901895, "null_value")).thenReturn(graphiteResults_null);
     }
 
-    private MetrictankResult buildGraphiteResult() {
-        MetrictankResult metricTankResult = new MetrictankResult();
+    private GraphiteResult buildGraphiteResult() {
+        GraphiteResult metricTankResult = new GraphiteResult();
         String[][] dataPoints = {
                 {"1", "1578307488"},
                 {"3", "1578307489"}
@@ -91,8 +93,8 @@ public class MetrictankSourceTest {
         return metricTankResult;
     }
 
-    private MetrictankResult buildNullValueGraphiteResult() {
-        MetrictankResult metricTankResult = new MetrictankResult();
+    private GraphiteResult buildNullValueGraphiteResult() {
+        GraphiteResult metricTankResult = new GraphiteResult();
         String[][] dataPoints = {
                 {null, "1578307488"}
         };
