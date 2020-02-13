@@ -25,8 +25,11 @@ import com.expedia.metrics.TagCollection;
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.fluent.Content;
+import java.util.Collections;
+
 
 import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 public class GraphiteQueryService {
@@ -39,6 +42,8 @@ public class GraphiteQueryService {
     private final String GRAPHITE_SOURCE_KEY = "graphite";
     private final String GRAPHITE_EMPTY_RESULT = "[]";
     private final static String GRAPHITE_KEY_TAG = "name";
+    private final static String IS_GRAPHITE_SERVER_METRICTANK_KEY = "is-graphite-server-metrictank";
+    private final static String GRAPHITE_SERVER_METRICTANK = "metrictank";
 
     public GraphiteQueryService(HttpClientWrapper httpClientWrapper) {
         metricFunctionHttpClient = httpClientWrapper;
@@ -59,7 +64,13 @@ public class GraphiteQueryService {
         try {
             ConstructSourceURI constructSourceURI = new ConstructSourceURI();
             String URI = constructSourceURI.getGraphiteURI(metricSourceSinkConfig, metricFunctionsSpec);
-            Content graphiteResult = metricFunctionHttpClient.get(URI);
+            Map<String, String> headers = Collections.emptyMap();
+            if (metricSourceSinkConfig.getString(IS_GRAPHITE_SERVER_METRICTANK_KEY).
+                    equals(GRAPHITE_SERVER_METRICTANK)) {
+                /* default metrictank orgId */
+                headers = Collections.singletonMap("x-org-id", "1");
+            }
+            Content graphiteResult = metricFunctionHttpClient.get(URI, headers);
             if (graphiteResult.asString().equals(GRAPHITE_EMPTY_RESULT)) {
                 return EMPTY_RESULT_FROM_SOURCE;
             }
@@ -101,4 +112,5 @@ public class GraphiteQueryService {
         return new MetricData(metricDefinition, METRICDATA_DEFAULT_VALUE,
                 System.currentTimeMillis()/1000);
     }
+
 }

@@ -229,6 +229,7 @@ module "aa-metric-functions" {
   metric_source_graphite_host = "${var.aa-metric-functions["metric_source_graphite_host"]}"
   aggregator_producer_topic = "${var.aa-metric-functions["aggregator_producer_topic"]}"
   metric_functions_input_file = "${var.aa-metric-functions["metric_functions_input_file"]}"
+  is-graphite-server-metrictank = "${var.aa-metric-functions["is_graphite_server_metrictank"]}"
   initContainer_image = "${var.aa-metric-functions["initContainer_image"]}"
   download_input_file_command = "${var.aa-metric-functions["download_input_file_command"]}"
 }

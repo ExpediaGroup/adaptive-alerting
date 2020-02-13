@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -46,6 +47,9 @@ public class GraphiteQueryServiceTest {
     private double METRIC_DEFAULT_VALUE = 0.0;
     private static final String METRIC_SOURCE_SINK = "metric-source-sink";
     private static final String APP_ID = "aa-metric-functions-test";
+    private Map<String, String> metricTankOrgIdHeader = Collections.singletonMap("x-org-id", "1");
+
+
 
 
 
@@ -71,8 +75,7 @@ public class GraphiteQueryServiceTest {
         sampleJsonGraphite.put(0, sampleJsonGraphiteResult);
         val uri = "samplegraphitehosturi/render?until=now&format=json&target=sumSeries(a.b.c)&from=-30s";
         Content mockGraphiteResult = new Content(sampleJsonGraphite.toString().getBytes(), ContentType.APPLICATION_JSON);
-
-        when(httpClientWrapper.get(uri)).thenReturn(mockGraphiteResult);
+        when(httpClientWrapper.get(uri, metricTankOrgIdHeader)).thenReturn(mockGraphiteResult);
         graphiteQueryService = new GraphiteQueryService(httpClientWrapper);
         initValidMetricDataSetup(sampleJsonGraphite.toString());
         initDefaultMetricDataSetup();
@@ -150,7 +153,7 @@ public class GraphiteQueryServiceTest {
         val uri = "samplegraphitehosturi/render?until=now&format=json&target=sumSeries(a.b.c)&from=-30s";
         val sampleJsonGraphite = "[]";
         Content mockGraphiteResult = new Content(sampleJsonGraphite.getBytes(), ContentType.APPLICATION_JSON);
-        when(httpClientWrapper.get(uri)).thenReturn(mockGraphiteResult);
+        when(httpClientWrapper.get(uri, metricTankOrgIdHeader)).thenReturn(mockGraphiteResult);
         MetricData metricDataResult = graphiteQueryService.queryMetricSource(metricSourceSinkConfig,
         metricFunctionsSpec);
         assertEquals(defaultMetricData.getValue(), metricDataResult.getValue(), 0.1);
@@ -178,7 +181,7 @@ public class GraphiteQueryServiceTest {
         sampleJsonGraphiteResult.put("tags", testTags);
         sampleJsonGraphite.put(0, sampleJsonGraphiteResult);
         Content mockGraphiteResult = new Content(sampleJsonGraphite.toString().getBytes(), ContentType.APPLICATION_JSON);
-        when(httpClientWrapper.get(uri)).thenReturn(mockGraphiteResult);
+        when(httpClientWrapper.get(uri, metricTankOrgIdHeader)).thenReturn(mockGraphiteResult);
         MetricData metricDataResult = graphiteQueryService.queryMetricSource(metricSourceSinkConfig,
                 metricFunctionsSpec);
         assertEquals(defaultMetricData.getValue(), metricDataResult.getValue(), 0.1);
