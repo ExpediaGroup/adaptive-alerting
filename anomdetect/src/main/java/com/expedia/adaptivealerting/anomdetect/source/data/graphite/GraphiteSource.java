@@ -67,7 +67,8 @@ public class GraphiteSource implements DataSource {
     }
 
     private List<GraphiteResult> getDataFromGraphite(long from, String metric) {
-        long until = from + TimeConstantsUtil.SECONDS_PER_DAY;
+        // TODO We subtract 2 seconds to ensure current bin is not included in Graphite data retrieval. Why 2 seconds? 1 second does not reliably do this.
+        long until = from + TimeConstantsUtil.SECONDS_PER_DAY - 2;
         log.debug("Querying Graphite with: from={} ({}), until={} ({}), metric='{}'",
                 from, ofEpochSecond(from), until, ofEpochSecond(until), metric);
         return graphiteClient.getData(from, until, metric);

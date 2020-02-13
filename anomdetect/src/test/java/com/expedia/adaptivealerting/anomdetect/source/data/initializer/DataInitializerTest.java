@@ -111,9 +111,13 @@ public class DataInitializerTest {
     }
 
     private MappedMetricData buildMappedMetricData() {
+        return buildMappedMetricDataWithTimestamp(100, Instant.now().getEpochSecond());
+    }
+
+    private MappedMetricData buildMappedMetricDataWithTimestamp(double value, long epochsec) {
         val mappedUuid = randomUUID();
         val metricDefinition = new MetricDefinition("metric-definition");
-        val metricData = new MetricData(metricDefinition, 100.0, Instant.now().getEpochSecond());
+        val metricData = new MetricData(metricDefinition, value, epochsec);
         return new MappedMetricData(metricData, mappedUuid);
     }
 
