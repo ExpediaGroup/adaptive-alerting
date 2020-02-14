@@ -149,9 +149,9 @@ public final class DetectorManagerTest {
     @Test
     public void testClassify_skipsWhenDataInitThrottled() {
         val result = managerUnderTest.detect(goodMappedMetricDataWithThrottledDataInit);
-        assertNotNull(result);
-        assertSame(outlierDetectorResult, result);
+        assertNull(result);
         verify(cachedDetectors, never()).put(any(UUID.class), any(Detector.class));
+        verify(detector, never()).detect(any(MetricData.class));
         // Also asserting that no exception is thrown
     }
 
@@ -200,8 +200,8 @@ public final class DetectorManagerTest {
         when(detector.detect(goodMetricDataWithBadDataInit)).thenReturn(outlierDetectorResult);
 
         doNothing().when(dataInitializer).initializeDetector(goodMappedMetricData, detector);
-        doThrow(new RuntimeException()).when(dataInitializer).initializeDetector(goodMappedMetricDataWithBadDataInit, detector);
-        doThrow(new DetectorDataInitializationThrottledException("")).when(dataInitializer).initializeDetector(goodMappedMetricDataWithThrottledDataInit, detector);
+        doThrow(new RuntimeException("Some Data Init Failure")).when(dataInitializer).initializeDetector(goodMappedMetricDataWithBadDataInit, detector);
+        doThrow(new DetectorDataInitializationThrottledException("Some Throttle Message")).when(dataInitializer).initializeDetector(goodMappedMetricDataWithThrottledDataInit, detector);
         doNothing().when(dataInitializer).initializeDetector(badMappedMetricData, detector);
 
         when(cachedDetectors.containsKey(updatedDetectors.get(0))).thenReturn(true);
