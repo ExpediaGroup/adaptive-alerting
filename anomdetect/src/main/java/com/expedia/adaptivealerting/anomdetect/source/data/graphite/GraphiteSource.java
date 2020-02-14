@@ -47,17 +47,24 @@ public class GraphiteSource implements DataSource {
 
     private List<DataSourceResult> buildDataSourceResult(long earliestTime, long latestTime, String metric, int intervalLength) {
         List<DataSourceResult> results = new ArrayList<>();
-        for (long i = earliestTime; i < latestTime; i += TimeConstantsUtil.SECONDS_PER_DAY) {
+
+        long earliestTimeSnappedToInterval = epochTimeSnappedToSeconds(earliestTime, intervalLength);
+        long latestTimeSnappedToInterval = epochTimeSnappedToSeconds(latestTime, intervalLength);
+
+
+        for (long i = earliestTimeSnappedToInterval; i < latestTimeSnappedToInterval; i += TimeConstantsUtil.SECONDS_PER_DAY) {
             List<GraphiteResult> graphiteResults = getDataFromGraphite(i, metric, intervalLength);
+
             if (graphiteResults.size() > 0) {
                 String[][] dataPoints = graphiteResults.get(0).getDatapoints();
                 //TODO Convert this to use JAVA stream
-                for (String[] dataPoint : dataPoints) {
+                // We discard the last data point to ensure current bin is not included in Graphite data retrieval.
+                for (int j = 0; j < dataPoints.length - 1; j++) {
                     Double value = MISSING_VALUE;
-                    if (dataPoint[0] != null) {
-                        value = Double.parseDouble(dataPoint[0]);
+                    if (dataPoints[j][0] != null) {
+                        value = Double.parseDouble(dataPoints[j][0]);
                     }
-                    long epochSeconds = Long.parseLong(dataPoint[1]);
+                    long epochSeconds = Long.parseLong(dataPoints[j][1]);
                     DataSourceResult result = new DataSourceResult(value, epochSeconds);
                     results.add(result);
                 }
@@ -69,12 +76,9 @@ public class GraphiteSource implements DataSource {
 
     private List<GraphiteResult> getDataFromGraphite(long from, String metric, int intervalLength) {
         long until = from + TimeConstantsUtil.SECONDS_PER_DAY;
-        long fromSnappedToIntervalLength = epochTimeSnappedToSeconds(from, intervalLength);
-        long untilSnappedToIntervalLength = epochTimeSnappedToSeconds(until, intervalLength);
-
         log.debug("Querying Graphite with: from={} ({}), until={} ({}), metric='{}'",
                 from, ofEpochSecond(from), until, ofEpochSecond(until), metric);
-        return graphiteClient.getData(fromSnappedToIntervalLength, untilSnappedToIntervalLength, metric);
+        return graphiteClient.getData(from, until, metric);
     }
 
     private void logResults(List<DataSourceResult> results) {

@@ -58,7 +58,7 @@ public final class DateUtilTest {
 
     @Test
     public void testSnapToSeconds() {
-        doTestSnappedToSeconds("2018-04-01T01:07:55Z", "2018-04-01T01:05:00Z", 300);
+        doTestSnappedToSeconds("2018-04-01T01:09:55Z", "2018-04-01T01:05:00Z", 300);
         doTestSnappedToSeconds("2018-04-01T01:07:55Z", "2018-04-01T01:07:00Z", 60);
         doTestSnappedToSeconds("2018-04-01T01:07:55Z", "2018-04-01T01:07:30Z", 30);
     }
