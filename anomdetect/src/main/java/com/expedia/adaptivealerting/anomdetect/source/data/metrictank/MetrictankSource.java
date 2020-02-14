@@ -75,7 +75,7 @@ public class MetrictankSource implements DataSource {
     private List<MetrictankResult> getOneDayDataFromGraphite(long from, int intervalLength, String metric) {
         // TODO: Ensure until is never greater than current metric's timestamp
         long until = from + TimeConstantsUtil.SECONDS_PER_DAY;
-        log.debug("Querying Metrictank with: from={} ({}), until={} ({}), metric='{}'",
+        log.debug("Querying Metric tank with: from={} ({}), until={} ({}), metric='{}'",
                 from, ofEpochSecond(from), until, ofEpochSecond(until), metric);
         return metricTankClient.getData(from, until, intervalLength, metric);
     }
