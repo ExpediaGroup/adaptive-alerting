@@ -67,18 +67,18 @@ public class MetrictankSourceTest {
     }
 
     private void initDependencies() {
-        when(metricTankClient.getData(1580297095, 1580383495, "metric_name")).thenReturn(metrictankResults);
-        when(metricTankClient.getData(1580383495, 1580469895, "metric_name")).thenReturn(metrictankResults);
-        when(metricTankClient.getData(1580469895, 1580556295, "metric_name")).thenReturn(metrictankResults);
-        when(metricTankClient.getData(1580556295, 1580642695, "metric_name")).thenReturn(metrictankResults);
-        when(metricTankClient.getData(1580642695, 1580729095, "metric_name")).thenReturn(metrictankResults);
-        when(metricTankClient.getData(1580729095, 1580815495, "metric_name")).thenReturn(metrictankResults);
-        when(metricTankClient.getData(1580815495, 1580901895, "metric_name")).thenReturn(metrictankResults);
+        when(metricTankClient.getData(1580297095, 1580383495, intervalLength, "metric_name")).thenReturn(metrictankResults);
+        when(metricTankClient.getData(1580383495, 1580469895, intervalLength, "metric_name")).thenReturn(metrictankResults);
+        when(metricTankClient.getData(1580469895, 1580556295, intervalLength, "metric_name")).thenReturn(metrictankResults);
+        when(metricTankClient.getData(1580556295, 1580642695, intervalLength, "metric_name")).thenReturn(metrictankResults);
+        when(metricTankClient.getData(1580642695, 1580729095, intervalLength, "metric_name")).thenReturn(metrictankResults);
+        when(metricTankClient.getData(1580729095, 1580815495, intervalLength, "metric_name")).thenReturn(metrictankResults);
+        when(metricTankClient.getData(1580815495, 1580901895, intervalLength, "metric_name")).thenReturn(metrictankResults);
 
-        when(metricTankClient.getData(1580297095, 1580383495, "metric_name")).thenReturn(metrictankResults);
+        when(metricTankClient.getData(1580297095, 1580383495, intervalLength, "metric_name")).thenReturn(metrictankResults);
 
-        when(metricTankClient.getData(1580815495, 1580901895, "null_metric")).thenReturn(new ArrayList<>());
-        when(metricTankClient.getData(1580815495, 1580901895, "null_value")).thenReturn(metrictankResults_null);
+        when(metricTankClient.getData(1580815495, 1580901895, intervalLength, "null_metric")).thenReturn(new ArrayList<>());
+        when(metricTankClient.getData(1580815495, 1580901895, intervalLength, "null_value")).thenReturn(metrictankResults_null);
     }
 
     private MetrictankResult buildGraphiteResult() {

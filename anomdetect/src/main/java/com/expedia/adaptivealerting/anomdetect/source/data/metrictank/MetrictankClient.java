@@ -40,7 +40,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 @Slf4j
 public class MetrictankClient {
 
-    public static final String FETCH_METRICS_PATH = "/render?from=%d&until=%d&format=json&target=%s";
+    public static final String FETCH_METRICS_PATH = "/render?from=%d&until=%d&maxDataPoints=%d&format=json&target=%s";
 
     @NonNull
     private final String baseUri;
@@ -54,17 +54,21 @@ public class MetrictankClient {
     /**
      * Fetch metric data for a given set of metrics
      *
-     * @param from   earliest time
+     * @param from earliest time (in epoch seconds)
+     * @param until latest time (in epoch seconds)
+     * @param intervalLength number of seconds per bin of data - used to calculate the maximum data points we expect to retrieve
      * @param target metric name or tag with an optional graphite function
      * @return time series for the specified metric
      */
-    public List<MetrictankResult> getData(long from, long until, String target) {
+    public List<MetrictankResult> getData(long from, long until, int intervalLength, String target) {
 
         notNull(from, "from can't be null");
         notNull(until, "until can't be null");
         notNull(target, "target can't be null");
 
-        val uri = String.format(baseUri + FETCH_METRICS_PATH, from, until, target);
+        // Explicitly specify maxDataPoints in case the number of metrics per day required exceeds server's default maxDataPoints limit
+        val maxDataPoints = calculateMaxDataPointsPerDay(from, until, intervalLength);
+        val uri = String.format(baseUri + FETCH_METRICS_PATH, from, until, maxDataPoints, target);
         log.debug("Sending query to Metrictank target: {}", uri);
 
         val headers = Collections.singletonMap("x-org-id", "1");
@@ -86,5 +90,11 @@ public class MetrictankClient {
             throw new MetrictankClientException(String.format("IOException while parsing response from Metrictank target: %s", target), e);
         }
         return results;
+    }
+
+    private long calculateMaxDataPointsPerDay(long from, long until, int intervalLength) {
+        long intervalsPerDay = (until - from) / intervalLength;
+        // We add 2 here to allow for boundary conditions where an extra metric before and/or after requested time window may be included in result
+        return intervalsPerDay + 2;
     }
 }
