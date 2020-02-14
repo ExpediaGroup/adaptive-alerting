@@ -42,8 +42,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -130,6 +134,7 @@ public final class DetectorManagerTest {
         val result = managerUnderTest.detect(goodMappedMetricData);
         assertNotNull(result);
         assertSame(outlierDetectorResult, result);
+        verify(cachedDetectors, atLeastOnce()).put(any(UUID.class), any(Detector.class));
     }
 
     @Test
@@ -137,6 +142,8 @@ public final class DetectorManagerTest {
         val result = managerUnderTest.detect(goodMappedMetricDataWithBadDataInit);
         assertNotNull(result);
         assertSame(outlierDetectorResult, result);
+        verify(cachedDetectors, atLeastOnce()).put(any(UUID.class), any(Detector.class));
+        // Also asserting that no exception is thrown
     }
 
     @Test
@@ -144,6 +151,8 @@ public final class DetectorManagerTest {
         val result = managerUnderTest.detect(goodMappedMetricDataWithThrottledDataInit);
         assertNotNull(result);
         assertSame(outlierDetectorResult, result);
+        verify(cachedDetectors, never()).put(any(UUID.class), any(Detector.class));
+        // Also asserting that no exception is thrown
     }
 
     @Test

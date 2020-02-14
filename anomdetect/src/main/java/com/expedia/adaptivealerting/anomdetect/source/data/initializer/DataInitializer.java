@@ -61,7 +61,9 @@ public class DataInitializer {
                 val forecastingDetector = (ForecastingDetector) detector;
                 initializeForecastingDetector(mappedMetricData, forecastingDetector);
             } else {
-                throw new DetectorDataInitializationThrottledException("Throttle gate is closed, skipping initializing data and detector creation.");
+                String message = "Throttle gate is closed, skipping data initialization";
+                log.info(message);
+                throw new DetectorDataInitializationThrottledException(message);
             }
         }
     }
@@ -76,7 +78,7 @@ public class DataInitializer {
         log.info("Fetched total of {} historical data points for buffer", data.size());
         val metricDefinition = mappedMetricData.getMetricData().getMetricDefinition();
         populateForecastingDetectorWithHistoricalData(forecastingDetector, data, metricDefinition);
-        log.info("Replayed {} historical data points for {}", data.size(), forecastingDetector.getClass().getSimpleName());
+        log.info("Replayed {} historical data points for '{}' detector", data.size(), forecastingDetector.getName());
     }
 
     private List<DataSourceResult> getHistoricalData(MappedMetricData mappedMetricData, ForecastingDetector forecastingDetector) {
