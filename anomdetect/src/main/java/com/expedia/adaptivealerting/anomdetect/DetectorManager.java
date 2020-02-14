@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -130,13 +131,14 @@ public class DetectorManager {
         try {
             //timer ...
             Timer.Context ctxt = detectorForTimer.time();
-            val detector = detectorFor(mappedMetricData);
+            Optional<Detector> optionalDetector = detectorFor(mappedMetricData);
             ctxt.close();
-            if (detector == null) {
+            if (!optionalDetector.isPresent()) {
                 log.warn("No detector for mappedMetricData={}", mappedMetricData);
                 noDetectorFoundMeter.mark();
                 return null;
             }
+            val detector = optionalDetector.get();
             val metricData = mappedMetricData.getMetricData();
             DetectorResult result = null;
             try {
@@ -154,23 +156,27 @@ public class DetectorManager {
         }
     }
 
-    private Detector detectorFor(MappedMetricData mappedMetricData) {
+    private Optional<Detector> detectorFor(MappedMetricData mappedMetricData) {
         notNull(mappedMetricData, "mappedMetricData can't be null");
         val detectorUuid = mappedMetricData.getDetectorUuid();
         Detector detector = cachedDetectors.get(detectorUuid);
         if (detector == null) {
             detector = detectorSource.findDetector(detectorUuid);
-            boolean dataInitCompleted = initData(mappedMetricData, detector);
+            boolean dataInitCompleted = attemptDataInitialization(mappedMetricData, detector);
             if (dataInitCompleted) {
                 cachedDetectors.put(detectorUuid, detector);
+                log.debug("Data Initialization phase is complete.  Caching detector.");
+            } else {
+                log.debug("Data Initialization incomplete.  Discarding detector from memory to allow future re-attempts.");
+                detector = null;
             }
         } else {
             log.trace("Got cached detector");
         }
-        return detector;
+        return Optional.ofNullable(detector);
     }
 
-    private boolean initData(MappedMetricData mappedMetricData, Detector detector) {
+    private boolean attemptDataInitialization(MappedMetricData mappedMetricData, Detector detector) {
         boolean dataInitCompleted;
         try {
             dataInitializer.initializeDetector(mappedMetricData, detector);
