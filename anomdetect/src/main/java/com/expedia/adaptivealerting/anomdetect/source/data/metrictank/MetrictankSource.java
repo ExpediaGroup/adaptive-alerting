@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.anomdetect.source.data.metrictank;
 
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSource;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSourceResult;
+import com.expedia.adaptivealerting.anomdetect.util.DateUtil;
 import com.expedia.adaptivealerting.anomdetect.util.TimeConstantsUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -46,17 +47,22 @@ public class MetrictankSource implements DataSource {
 
     private List<DataSourceResult> buildDataSourceResult(long earliestTime, long latestTime, int intervalLength, String metric) {
         List<DataSourceResult> results = new ArrayList<>();
-        for (long i = earliestTime; i < latestTime; i += TimeConstantsUtil.SECONDS_PER_DAY) {
-            List<MetrictankResult> metrictankResults = getOneDayDataFromGraphite(i, intervalLength, metric);
-            if (metrictankResults.size() > 0) {
-                String[][] dataPoints = metrictankResults.get(0).getDatapoints();
+        long earliestTimeSnappedToInterval = epochTimeSnappedToSeconds(earliestTime, intervalLength);
+        long latestTimeSnappedToInterval = epochTimeSnappedToSeconds(latestTime, intervalLength);
+
+        for (long i = earliestTimeSnappedToInterval; i < latestTimeSnappedToInterval; i += TimeConstantsUtil.SECONDS_PER_DAY) {
+            List<MetrictankResult> graphiteResults = getOneDayDataFromGraphite(i, intervalLength, metric);
+
+            if (graphiteResults.size() > 0) {
+                String[][] dataPoints = graphiteResults.get(0).getDatapoints();
                 //TODO Convert this to use JAVA stream
-                for (String[] dataPoint : dataPoints) {
+                // We discard the last data point to ensure current bin is not included in Graphite data retrieval.
+                for (int j = 0; j < dataPoints.length - 1; j++) {
                     Double value = MISSING_VALUE;
-                    if (dataPoint[0] != null) {
-                        value = Double.parseDouble(dataPoint[0]);
+                    if (dataPoints[j][0] != null) {
+                        value = Double.parseDouble(dataPoints[j][0]);
                     }
-                    long epochSeconds = Long.parseLong(dataPoint[1]);
+                    long epochSeconds = Long.parseLong(dataPoints[j][1]);
                     DataSourceResult result = new DataSourceResult(value, epochSeconds);
                     results.add(result);
                 }
@@ -89,4 +95,7 @@ public class MetrictankSource implements DataSource {
         }
     }
 
+    private long epochTimeSnappedToSeconds(long time, int seconds) {
+        return DateUtil.snapToSeconds(ofEpochSecond(time), seconds).getEpochSecond();
+    }
 }

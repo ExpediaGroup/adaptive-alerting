@@ -54,4 +54,23 @@ public class DateUtil {
         final DayOfWeek dow = ZonedDateTime.ofInstant(date, ZoneOffset.UTC).getDayOfWeek();
         return truncatedToDay(date).minus(Duration.ofDays(dow.getValue() % 7));
     }
+
+    /**
+     * Returns the time snapped to provided seconds
+     *
+     * @param date    A date.
+     * @param seconds No of seconds
+     * @return Time snapped to seconds
+     */
+    public static Instant snapToSeconds(Instant date, int seconds) {
+        notNull(date, "date can't be null");
+        Instant instantSnapToSeconds = truncatedToSeconds(date);
+        long remainder = instantSnapToSeconds.getEpochSecond() % seconds;
+        return truncatedToSeconds(date.minusSeconds(remainder));
+    }
+
+    public static Instant truncatedToSeconds(Instant date) {
+        notNull(date, "date can't be null");
+        return date.truncatedTo(ChronoUnit.SECONDS);
+    }
 }

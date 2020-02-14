@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +18,7 @@ import static org.mockito.Mockito.when;
 public class MetrictankSourceTest {
 
     @Mock
-    private MetrictankClient metricTankClient;
+    private MetrictankClient metrictankClient;
 
     private MetrictankSource sourceUnderTest;
     private List<MetrictankResult> metrictankResults = new ArrayList<>();
@@ -29,72 +30,72 @@ public class MetrictankSourceTest {
         MockitoAnnotations.initMocks(this);
         initTestObjects();
         initDependencies();
-        this.sourceUnderTest = new MetrictankSource(metricTankClient);
+        this.sourceUnderTest = new MetrictankSource(metrictankClient);
     }
 
     @Test
     public void testGetMetricData() {
         val dataSourceResults = buildDataSourceResults(7);
-        val actual = sourceUnderTest.getMetricData(1580297095, 1580901895, intervalLength, "metric_name");
+        val actual = sourceUnderTest.getMetricData(stringToEpochSeconds("2018-04-01T01:09:55Z"), stringToEpochSeconds("2018-04-08T01:09:55Z"), intervalLength, "metric_name");
         assertEquals(dataSourceResults, actual);
     }
 
     @Test
     public void testGetMetricData_time_window_less_than_day() {
         val dataSourceResults = buildDataSourceResults(1);
-        val actual = sourceUnderTest.getMetricData(1580297095, 1580340295, intervalLength, "metric_name");
+        val actual = sourceUnderTest.getMetricData(stringToEpochSeconds("2018-04-01T01:09:55Z"), stringToEpochSeconds("2018-04-02T00:09:55Z"), intervalLength, "metric_name");
         assertEquals(dataSourceResults, actual);
     }
 
     @Test
     public void testGetMetricData_null_metric_data() {
-        val actual = sourceUnderTest.getMetricData(1580815495, 1580901895, intervalLength, "null_metric");
+        val actual = sourceUnderTest.getMetricData(stringToEpochSeconds("2018-04-01T01:05:00Z"), stringToEpochSeconds("2018-04-02T01:05:00Z"), intervalLength, "null_metric");
         assertEquals(new ArrayList<>(), actual);
     }
 
     @Test
     public void testGetMetricData_null_value() {
-        val actual = sourceUnderTest.getMetricData(1580815495, 1580901895, intervalLength, "null_value");
-        val dataSourceResult = buildDataSourceResult(MetrictankSource.MISSING_VALUE, 1578307488);
+        val actual = sourceUnderTest.getMetricData(stringToEpochSeconds("2018-04-01T01:05:00Z"), stringToEpochSeconds("2018-04-02T01:05:00Z"), intervalLength, "null_value");
+        val dataSourceResult = buildDataSourceResult(MetrictankSource.MISSING_VALUE, stringToEpochSeconds("2018-04-01T01:05:00Z"));
         List<DataSourceResult> dataSourceResults = new ArrayList<>();
         dataSourceResults.add(dataSourceResult);
         assertEquals(dataSourceResults, actual);
     }
 
     private void initTestObjects() {
-        metrictankResults.add(buildGraphiteResult());
-        metrictankResults_null.add(buildNullValueGraphiteResult());
+        metrictankResults.add(buildMetrictankResult());
+        metrictankResults_null.add(buildNullValueMetrictankResult());
     }
 
     private void initDependencies() {
-        when(metricTankClient.getData(1580297095, 1580383495, intervalLength, "metric_name")).thenReturn(metrictankResults);
-        when(metricTankClient.getData(1580383495, 1580469895, intervalLength, "metric_name")).thenReturn(metrictankResults);
-        when(metricTankClient.getData(1580469895, 1580556295, intervalLength, "metric_name")).thenReturn(metrictankResults);
-        when(metricTankClient.getData(1580556295, 1580642695, intervalLength, "metric_name")).thenReturn(metrictankResults);
-        when(metricTankClient.getData(1580642695, 1580729095, intervalLength, "metric_name")).thenReturn(metrictankResults);
-        when(metricTankClient.getData(1580729095, 1580815495, intervalLength, "metric_name")).thenReturn(metrictankResults);
-        when(metricTankClient.getData(1580815495, 1580901895, intervalLength, "metric_name")).thenReturn(metrictankResults);
+        when(metrictankClient.getData(stringToEpochSeconds("2018-04-01T01:05:00Z"), stringToEpochSeconds("2018-04-02T01:05:00Z"), intervalLength, "metric_name")).thenReturn(metrictankResults);
+        when(metrictankClient.getData(stringToEpochSeconds("2018-04-02T01:05:00Z"), stringToEpochSeconds("2018-04-03T01:05:00Z"), intervalLength, "metric_name")).thenReturn(metrictankResults);
+        when(metrictankClient.getData(stringToEpochSeconds("2018-04-03T01:05:00Z"), stringToEpochSeconds("2018-04-04T01:05:00Z"), intervalLength, "metric_name")).thenReturn(metrictankResults);
+        when(metrictankClient.getData(stringToEpochSeconds("2018-04-04T01:05:00Z"), stringToEpochSeconds("2018-04-05T01:05:00Z"), intervalLength, "metric_name")).thenReturn(metrictankResults);
+        when(metrictankClient.getData(stringToEpochSeconds("2018-04-05T01:05:00Z"), stringToEpochSeconds("2018-04-06T01:05:00Z"), intervalLength, "metric_name")).thenReturn(metrictankResults);
+        when(metrictankClient.getData(stringToEpochSeconds("2018-04-06T01:05:00Z"), stringToEpochSeconds("2018-04-07T01:05:00Z"), intervalLength, "metric_name")).thenReturn(metrictankResults);
+        when(metrictankClient.getData(stringToEpochSeconds("2018-04-07T01:05:00Z"), stringToEpochSeconds("2018-04-08T01:05:00Z"), intervalLength, "metric_name")).thenReturn(metrictankResults);
 
-        when(metricTankClient.getData(1580297095, 1580383495, intervalLength, "metric_name")).thenReturn(metrictankResults);
-
-        when(metricTankClient.getData(1580815495, 1580901895, intervalLength, "null_metric")).thenReturn(new ArrayList<>());
-        when(metricTankClient.getData(1580815495, 1580901895, intervalLength, "null_value")).thenReturn(metrictankResults_null);
+        when(metrictankClient.getData(stringToEpochSeconds("2018-04-01T01:05:00Z"), stringToEpochSeconds("2018-04-02T01:05:00Z"), intervalLength, "null_metric")).thenReturn(new ArrayList<>());
+        when(metrictankClient.getData(stringToEpochSeconds("2018-04-01T01:05:00Z"), stringToEpochSeconds("2018-04-02T01:05:00Z"), intervalLength, "null_value")).thenReturn(metrictankResults_null);
     }
 
-    private MetrictankResult buildGraphiteResult() {
+    private MetrictankResult buildMetrictankResult() {
         MetrictankResult metricTankResult = new MetrictankResult();
         String[][] dataPoints = {
-                {"1", "1578307488"},
-                {"3", "1578307489"}
+                {"1", "1522544700"},
+                {"3", "1523144900"},
+                {"5", "1523149500"}
         };
         metricTankResult.setDatapoints(dataPoints);
         return metricTankResult;
     }
 
-    private MetrictankResult buildNullValueGraphiteResult() {
+    private MetrictankResult buildNullValueMetrictankResult() {
         MetrictankResult metricTankResult = new MetrictankResult();
         String[][] dataPoints = {
-                {null, "1578307488"}
+                {null, "1522544700"},
+                {null, "1523144900"}
         };
         metricTankResult.setDatapoints(dataPoints);
         return metricTankResult;
@@ -104,8 +105,8 @@ public class MetrictankSourceTest {
 
         List<DataSourceResult> dataSourceResults = new ArrayList<>();
         for (int i = 0; i < noOfResults; i++) {
-            dataSourceResults.add(buildDataSourceResult(1.0, 1578307488));
-            dataSourceResults.add(buildDataSourceResult(3.0, 1578307489));
+            dataSourceResults.add(buildDataSourceResult(1.0, 1522544700));
+            dataSourceResults.add(buildDataSourceResult(3.0, 1523144900));
         }
         return dataSourceResults;
     }
@@ -115,6 +116,10 @@ public class MetrictankSourceTest {
         dataSourceResult.setDataPoint(value);
         dataSourceResult.setEpochSecond(epochSecs);
         return dataSourceResult;
+    }
+
+    private long stringToEpochSeconds(String time) {
+        return Instant.parse(time).getEpochSecond();
     }
 
 }
