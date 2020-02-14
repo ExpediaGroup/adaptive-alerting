@@ -11,7 +11,6 @@ import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import static com.expedia.adaptivealerting.anomdetect.source.data.metrictank.MetrictankClient.FETCH_METRICS_PATH;
@@ -27,6 +26,7 @@ public class MetrictankClientTest {
     private static final int ONE_DAY_IN_SECONDS = 60 * 60 * 24;
     private static final int FROM_TIME_IN_SECONDS = 1580815495;
     private static final int UNTIL_TIME_IN_SECONDS = FROM_TIME_IN_SECONDS + ONE_DAY_IN_SECONDS;
+    private static final int INTERVAL_LENGTH = 60;
 
     private MetrictankClient clientUnderTest;
 
@@ -58,17 +58,17 @@ public class MetrictankClientTest {
     @Test
     public void testGetMetricData() {
         assertEquals(1580901895, UNTIL_TIME_IN_SECONDS);
-        clientUnderTest.getData(FROM_TIME_IN_SECONDS, UNTIL_TIME_IN_SECONDS, "metricName");
+        clientUnderTest.getData(FROM_TIME_IN_SECONDS, UNTIL_TIME_IN_SECONDS, INTERVAL_LENGTH, "metricName");
     }
 
     @Test(expected = MetrictankClientException.class)
     public void testGetMetricData_cant_get() {
-        clientUnderTest.getData(FROM_TIME_IN_SECONDS, UNTIL_TIME_IN_SECONDS, "metricNameCantGet");
+        clientUnderTest.getData(FROM_TIME_IN_SECONDS, UNTIL_TIME_IN_SECONDS, INTERVAL_LENGTH, "metricNameCantGet");
     }
 
     @Test(expected = MetrictankClientException.class)
     public void testGetMetricData_cant_read() {
-        clientUnderTest.getData(FROM_TIME_IN_SECONDS, UNTIL_TIME_IN_SECONDS, "metricNameCantRead");
+        clientUnderTest.getData(FROM_TIME_IN_SECONDS, UNTIL_TIME_IN_SECONDS, INTERVAL_LENGTH, "metricNameCantRead");
     }
 
     private void initMetricData() throws IOException {
@@ -85,6 +85,7 @@ public class MetrictankClientTest {
 
 
     private static String fetchMetricsUri(String metricName) {
-        return String.format(BASE_URI + FETCH_METRICS_PATH, FROM_TIME_IN_SECONDS, UNTIL_TIME_IN_SECONDS, metricName);
+        int expectedMaxDataPoints = ((UNTIL_TIME_IN_SECONDS - FROM_TIME_IN_SECONDS) / INTERVAL_LENGTH) + 2;
+        return String.format(BASE_URI + FETCH_METRICS_PATH, FROM_TIME_IN_SECONDS, UNTIL_TIME_IN_SECONDS, expectedMaxDataPoints, metricName);
     }
 }

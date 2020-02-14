@@ -41,13 +41,13 @@ public class MetrictankSource implements DataSource {
 
     @Override
     public List<DataSourceResult> getMetricData(long earliestTime, long latestTime, int intervalLength, String target) {
-        return buildDataSourceResult(earliestTime, latestTime, target);
+        return buildDataSourceResult(earliestTime, latestTime, intervalLength, target);
     }
 
-    private List<DataSourceResult> buildDataSourceResult(long earliestTime, long latestTime, String metric) {
+    private List<DataSourceResult> buildDataSourceResult(long earliestTime, long latestTime, int intervalLength, String metric) {
         List<DataSourceResult> results = new ArrayList<>();
         for (long i = earliestTime; i < latestTime; i += TimeConstantsUtil.SECONDS_PER_DAY) {
-            List<MetrictankResult> metrictankResults = getDataFromGraphite(i, metric);
+            List<MetrictankResult> metrictankResults = getOneDayDataFromGraphite(i, intervalLength, metric);
             if (metrictankResults.size() > 0) {
                 String[][] dataPoints = metrictankResults.get(0).getDatapoints();
                 //TODO Convert this to use JAVA stream
@@ -66,11 +66,12 @@ public class MetrictankSource implements DataSource {
         return results;
     }
 
-    private List<MetrictankResult> getDataFromGraphite(long from, String metric) {
+    private List<MetrictankResult> getOneDayDataFromGraphite(long from, int intervalLength, String metric) {
+        // TODO: Ensure until is never greater than current metric's timestamp
         long until = from + TimeConstantsUtil.SECONDS_PER_DAY;
         log.debug("Querying Metrictank with: from={} ({}), until={} ({}), metric='{}'",
                 from, ofEpochSecond(from), until, ofEpochSecond(until), metric);
-        return metricTankClient.getData(from, until, metric);
+        return metricTankClient.getData(from, until, intervalLength, metric);
     }
 
     private void logResults(List<DataSourceResult> results) {
