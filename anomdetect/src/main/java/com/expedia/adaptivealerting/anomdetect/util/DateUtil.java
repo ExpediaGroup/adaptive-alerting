@@ -58,8 +58,8 @@ public class DateUtil {
     /**
      * Returns the time snapped to provided seconds
      *
-     * @param date    A date
-     * @param seconds Seconds
+     * @param date    A date.
+     * @param seconds No of seconds
      * @return Time snapped to seconds
      */
     public static Instant snapToSeconds(Instant date, int seconds) {

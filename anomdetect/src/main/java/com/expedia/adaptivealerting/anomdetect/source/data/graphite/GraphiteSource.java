@@ -47,10 +47,8 @@ public class GraphiteSource implements DataSource {
 
     private List<DataSourceResult> buildDataSourceResult(long earliestTime, long latestTime, String metric, int intervalLength) {
         List<DataSourceResult> results = new ArrayList<>();
-
         long earliestTimeSnappedToInterval = epochTimeSnappedToSeconds(earliestTime, intervalLength);
         long latestTimeSnappedToInterval = epochTimeSnappedToSeconds(latestTime, intervalLength);
-
 
         for (long i = earliestTimeSnappedToInterval; i < latestTimeSnappedToInterval; i += TimeConstantsUtil.SECONDS_PER_DAY) {
             List<GraphiteResult> graphiteResults = getDataFromGraphite(i, metric, intervalLength);
