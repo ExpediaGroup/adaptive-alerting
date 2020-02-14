@@ -160,18 +160,29 @@ public class DetectorManager {
         Detector detector = cachedDetectors.get(detectorUuid);
         if (detector == null) {
             detector = detectorSource.findDetector(detectorUuid);
-            try {
-                dataInitializer.initializeDetector(mappedMetricData, detector);
-            } catch (DetectorDataInitializationThrottledException e) {
-                log.info("Data Initialization throttled: {}", e.getMessage());
-            } catch (Exception e) {
-                log.error("Error encountered while initialising detector. Ignoring error and proceeding with un-initialized detector.", e);
+            boolean dataInitCompleted = initData(mappedMetricData, detector);
+            if (dataInitCompleted) {
+                cachedDetectors.put(detectorUuid, detector);
             }
-            cachedDetectors.put(detectorUuid, detector);
         } else {
             log.trace("Got cached detector");
         }
         return detector;
+    }
+
+    private boolean initData(MappedMetricData mappedMetricData, Detector detector) {
+        boolean dataInitCompleted;
+        try {
+            dataInitializer.initializeDetector(mappedMetricData, detector);
+            dataInitCompleted = true;
+        } catch (DetectorDataInitializationThrottledException e) {
+            log.info("Data Initialization throttled: {}", e.getMessage());
+            dataInitCompleted = false;
+        } catch (Exception e) {
+            log.error("Error encountered while initialising detector. Ignoring error and proceeding with un-initialized detector.", e);
+            dataInitCompleted = true;
+        }
+        return dataInitCompleted;
     }
 
     /**
