@@ -78,7 +78,7 @@ public class MetrictankSource implements DataSource {
         // We subtract 1 second from FROM time to get complete data for the first bin from Graphite. Graphite for some reason gives incomplete data for first bin if we don't do this.
         long fromMinusOneSecond = from - 1;
         log.debug("Querying Metric tank with: from={} ({}), until={} ({}), metric='{}'",
-                from, ofEpochSecond(fromMinusOneSecond), until, ofEpochSecond(until), metric);
+                fromMinusOneSecond, ofEpochSecond(fromMinusOneSecond), until, ofEpochSecond(until), metric);
         return metricTankClient.getData(fromMinusOneSecond, until, intervalLength, metric);
     }
 
