@@ -14,6 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @Slf4j
@@ -39,31 +42,31 @@ public class MetrictankSourceTest {
 
         List<MetrictankResult> resultsFirstDay = new ArrayList<>();
         resultsFirstDay.add(buildResult("2018-04-01T01:05:00Z"));
-        when(client.getData(stringToEpochSeconds("2018-04-01T01:05:00Z"), stringToEpochSeconds("2018-04-02T01:05:00Z"), intervalLength, "metric_name")).thenReturn(resultsFirstDay);
+        when(client.getData(stringToEpochSeconds("2018-04-01T01:04:59Z"), stringToEpochSeconds("2018-04-02T01:05:00Z"), intervalLength, "metric_name")).thenReturn(resultsFirstDay);
 
         List<MetrictankResult> resultsSecondDay = new ArrayList<>();
         resultsSecondDay.add(buildResult("2018-04-02T01:05:00Z"));
-        when(client.getData(stringToEpochSeconds("2018-04-02T01:05:00Z"), stringToEpochSeconds("2018-04-03T01:05:00Z"), intervalLength, "metric_name")).thenReturn(resultsSecondDay);
+        when(client.getData(stringToEpochSeconds("2018-04-02T01:04:59Z"), stringToEpochSeconds("2018-04-03T01:05:00Z"), intervalLength, "metric_name")).thenReturn(resultsSecondDay);
 
         List<MetrictankResult> resultsThirdDay = new ArrayList<>();
         resultsThirdDay.add(buildResult("2018-04-03T01:05:00Z"));
-        when(client.getData(stringToEpochSeconds("2018-04-03T01:05:00Z"), stringToEpochSeconds("2018-04-04T01:05:00Z"), intervalLength, "metric_name")).thenReturn(resultsThirdDay);
+        when(client.getData(stringToEpochSeconds("2018-04-03T01:04:59Z"), stringToEpochSeconds("2018-04-04T01:05:00Z"), intervalLength, "metric_name")).thenReturn(resultsThirdDay);
 
         List<MetrictankResult> resultsFourthDay = new ArrayList<>();
         resultsFourthDay.add(buildResult("2018-04-04T01:05:00Z"));
-        when(client.getData(stringToEpochSeconds("2018-04-04T01:05:00Z"), stringToEpochSeconds("2018-04-05T01:05:00Z"), intervalLength, "metric_name")).thenReturn(resultsFourthDay);
+        when(client.getData(stringToEpochSeconds("2018-04-04T01:04:59Z"), stringToEpochSeconds("2018-04-05T01:05:00Z"), intervalLength, "metric_name")).thenReturn(resultsFourthDay);
 
         List<MetrictankResult> resultsFifthDay = new ArrayList<>();
         resultsFifthDay.add(buildResult("2018-04-05T01:05:00Z"));
-        when(client.getData(stringToEpochSeconds("2018-04-05T01:05:00Z"), stringToEpochSeconds("2018-04-06T01:05:00Z"), intervalLength, "metric_name")).thenReturn(resultsFifthDay);
+        when(client.getData(stringToEpochSeconds("2018-04-05T01:04:59Z"), stringToEpochSeconds("2018-04-06T01:05:00Z"), intervalLength, "metric_name")).thenReturn(resultsFifthDay);
 
         List<MetrictankResult> resultsSixthDay = new ArrayList<>();
         resultsSixthDay.add(buildResult("2018-04-06T01:05:00Z"));
-        when(client.getData(stringToEpochSeconds("2018-04-06T01:05:00Z"), stringToEpochSeconds("2018-04-07T01:05:00Z"), intervalLength, "metric_name")).thenReturn(resultsSixthDay);
+        when(client.getData(stringToEpochSeconds("2018-04-06T01:04:59Z"), stringToEpochSeconds("2018-04-07T01:05:00Z"), intervalLength, "metric_name")).thenReturn(resultsSixthDay);
 
         List<MetrictankResult> resultsSeventhDay = new ArrayList<>();
         resultsSeventhDay.add(buildResult("2018-04-07T01:05:00Z"));
-        when(client.getData(stringToEpochSeconds("2018-04-07T01:05:00Z"), stringToEpochSeconds("2018-04-08T01:05:00Z"), intervalLength, "metric_name")).thenReturn(resultsSeventhDay);
+        when(client.getData(stringToEpochSeconds("2018-04-07T01:04:59Z"), stringToEpochSeconds("2018-04-08T01:05:00Z"), intervalLength, "metric_name")).thenReturn(resultsSeventhDay);
 
         val expected = buildDataSourceResults("2018-04-01T01:05:00Z", "2018-04-08T01:05:00Z");
         val actual = sourceUnderTest.getMetricData(stringToEpochSeconds("2018-04-01T01:09:55Z"), stringToEpochSeconds("2018-04-08T01:09:55Z"), intervalLength, "metric_name");
@@ -76,7 +79,7 @@ public class MetrictankSourceTest {
 
         List<MetrictankResult> resultsFirstDay = new ArrayList<>();
         resultsFirstDay.add(buildResult("2018-04-01T01:05:00Z"));
-        when(client.getData(stringToEpochSeconds("2018-04-01T01:05:00Z"), stringToEpochSeconds("2018-04-02T01:05:00Z"), intervalLength, "metric_name")).thenReturn(resultsFirstDay);
+        when(client.getData(stringToEpochSeconds("2018-04-01T01:04:59Z"), stringToEpochSeconds("2018-04-02T01:05:00Z"), intervalLength, "metric_name")).thenReturn(resultsFirstDay);
 
         val expected = buildDataSourceResults("2018-04-01T01:05:00Z", "2018-04-02T01:05:00Z");
         val actual = sourceUnderTest.getMetricData(stringToEpochSeconds("2018-04-01T01:09:55Z"), stringToEpochSeconds("2018-04-02T00:09:55Z"), intervalLength, "metric_name");
@@ -85,14 +88,14 @@ public class MetrictankSourceTest {
 
     @Test
     public void testGetMetricData_null_metric_data() {
-        when(client.getData(stringToEpochSeconds("2018-04-01T01:05:00Z"), stringToEpochSeconds("2018-04-02T01:05:00Z"), intervalLength, "null_metric")).thenReturn(new ArrayList<>());
+        when(client.getData(stringToEpochSeconds("2018-04-01T01:04:59Z"), stringToEpochSeconds("2018-04-02T01:05:00Z"), intervalLength, "null_metric")).thenReturn(new ArrayList<>());
         val actual = sourceUnderTest.getMetricData(stringToEpochSeconds("2018-04-01T01:05:00Z"), stringToEpochSeconds("2018-04-02T01:05:00Z"), intervalLength, "null_metric");
         assertEquals(new ArrayList<>(), actual);
     }
 
     @Test
     public void testGetMetricData_null_value() {
-        when(client.getData(stringToEpochSeconds("2018-04-01T01:05:00Z"), stringToEpochSeconds("2018-04-02T01:05:00Z"), intervalLength, "null_value")).thenReturn(results_null);
+        when(client.getData(stringToEpochSeconds("2018-04-01T01:04:59Z"), stringToEpochSeconds("2018-04-02T01:05:00Z"), intervalLength, "null_value")).thenReturn(results_null);
         val actual = sourceUnderTest.getMetricData(stringToEpochSeconds("2018-04-01T01:05:00Z"), stringToEpochSeconds("2018-04-02T01:05:00Z"), intervalLength, "null_value");
         val dataSourceResult = buildDataSourceResult(MetrictankSource.MISSING_VALUE, stringToEpochSeconds("2018-04-01T01:05:00Z"));
         List<DataSourceResult> expected = new ArrayList<>();
