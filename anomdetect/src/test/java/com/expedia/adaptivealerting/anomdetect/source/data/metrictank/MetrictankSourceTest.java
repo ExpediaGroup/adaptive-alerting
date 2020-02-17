@@ -85,9 +85,9 @@ public class MetrictankSourceTest {
         long earliest = stringToEpochSeconds(time);
         //For testing, we return an extra data point to see if graphite source discards it or not.
         String[][] dataPoints = new String[noOfBinsInADay + 1][2];
-        for (int j = 0; j < dataPoints.length; j++) {
-            dataPoints[j][0] = String.valueOf(j);
-            dataPoints[j][1] = String.valueOf(earliest);
+        for (int i = 0; i < dataPoints.length; i++) {
+            dataPoints[i][0] = String.valueOf(i);
+            dataPoints[i][1] = String.valueOf(earliest);
             earliest = earliest + intervalLength;
         }
         MetrictankResult result = new MetrictankResult();
