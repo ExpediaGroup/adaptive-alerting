@@ -28,8 +28,8 @@ public class MetrictankSourceTest {
     private MetrictankSource sourceUnderTest;
     private int intervalLength = 5 * TimeConstantsUtil.SECONDS_PER_MIN;
     private int noOfBinsInADay;
-    private List<MetrictankResult> results = new ArrayList<>();
-    private List<MetrictankResult> results_null = new ArrayList<>();
+    private List<MetrictankResult> metrictankResults = new ArrayList<>();
+    private List<MetrictankResult> metrictankResults_null = new ArrayList<>();
 
     @Before
     public void setUp() {
@@ -71,17 +71,17 @@ public class MetrictankSourceTest {
 
     private void initTestObjects() {
         noOfBinsInADay = getBinsInDay(intervalLength);
-        results.add(buildResult("2018-04-01T01:05:00Z"));
-        results_null.add(buildNullValueResult());
+        metrictankResults.add(buildMetrictankResult("2018-04-01T01:05:00Z"));
+        metrictankResults_null.add(buildNullMetrictankResult());
     }
 
     private void initDependencies() {
-        when(client.getData(anyLong(), anyLong(), anyInt(), eq("metric_name"))).thenReturn(results);
+        when(client.getData(anyLong(), anyLong(), anyInt(), eq("metric_name"))).thenReturn(metrictankResults);
         when(client.getData(anyLong(), anyLong(), anyInt(), eq("null_metric"))).thenReturn(new ArrayList<>());
-        when(client.getData(anyLong(), anyLong(), anyInt(), eq("null_value"))).thenReturn(results_null);
+        when(client.getData(anyLong(), anyLong(), anyInt(), eq("null_value"))).thenReturn(metrictankResults_null);
     }
 
-    private MetrictankResult buildResult(String time) {
+    private MetrictankResult buildMetrictankResult(String time) {
         long earliest = stringToEpochSeconds(time);
         //For testing, we return an extra data point to see if graphite source discards it or not.
         String[][] dataPoints = new String[noOfBinsInADay + 1][2];
@@ -95,7 +95,7 @@ public class MetrictankSourceTest {
         return result;
     }
 
-    private MetrictankResult buildNullValueResult() {
+    private MetrictankResult buildNullMetrictankResult() {
         MetrictankResult result = new MetrictankResult();
         String[][] dataPoints = {
                 {null, "1522544700"},
