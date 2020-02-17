@@ -22,12 +22,17 @@ import static org.mockito.Mockito.when;
 @Slf4j
 public class MetrictankSourceTest {
 
+    private static final String EARLIEST_TIME = "2018-04-01T01:05:00Z";
+
     @Mock
     private MetrictankClient client;
 
     private MetrictankSource sourceUnderTest;
+
+    private long earliestTimeInEpoch;
     private int intervalLength = 5 * TimeConstantsUtil.SECONDS_PER_MIN;
     private int noOfBinsInADay;
+
     private List<MetrictankResult> metrictankResults = new ArrayList<>();
     private List<MetrictankResult> metrictankResults_null = new ArrayList<>();
 
@@ -41,37 +46,43 @@ public class MetrictankSourceTest {
 
     @Test
     public void testGetMetricData_seven_days() {
-        val expected = buildExpectedResults(stringToEpochSeconds("2018-04-01T01:05:00Z"), 7);
-        val actual = sourceUnderTest.getMetricData(stringToEpochSeconds("2018-04-01T01:09:55Z"), stringToEpochSeconds("2018-04-08T01:09:55Z"), intervalLength, "metric_name");
+        val windowLength = 7;
+        val latestTimeInEpoch = earliestTimeInEpoch + windowLength * TimeConstantsUtil.SECONDS_PER_DAY;
+        val expected = buildExpectedResults(earliestTimeInEpoch, windowLength);
+        val actual = sourceUnderTest.getMetricData(earliestTimeInEpoch, latestTimeInEpoch, intervalLength, "metric_name");
         assertEquals(expected, actual);
-        assertEquals(noOfBinsInADay * 7, actual.size());
+        assertEquals(noOfBinsInADay * windowLength, actual.size());
     }
 
     @Test
     public void testGetMetricData_time_window_less_than_day() {
-        val expected = buildExpectedResults(stringToEpochSeconds("2018-04-01T01:05:00Z"), 1);
-        val actual = sourceUnderTest.getMetricData(stringToEpochSeconds("2018-04-01T01:09:55Z"), stringToEpochSeconds("2018-04-02T00:09:55Z"), intervalLength, "metric_name");
+        val latestTimeInEpoch = earliestTimeInEpoch + TimeConstantsUtil.SECONDS_PER_DAY / 2;
+        val expected = buildExpectedResults(earliestTimeInEpoch, 1);
+        val actual = sourceUnderTest.getMetricData(earliestTimeInEpoch, latestTimeInEpoch, intervalLength, "metric_name");
         assertEquals(expected, actual);
     }
 
     @Test
     public void testGetMetricData_null_metric_data() {
-        val actual = sourceUnderTest.getMetricData(stringToEpochSeconds("2018-04-01T01:05:00Z"), stringToEpochSeconds("2018-04-02T01:05:00Z"), intervalLength, "null_metric");
+        val latestTimeInEpoch = earliestTimeInEpoch + TimeConstantsUtil.SECONDS_PER_DAY;
+        val actual = sourceUnderTest.getMetricData(earliestTimeInEpoch, latestTimeInEpoch, intervalLength, "null_metric");
         assertEquals(new ArrayList<>(), actual);
     }
 
     @Test
     public void testGetMetricData_null_value() {
-        val actual = sourceUnderTest.getMetricData(stringToEpochSeconds("2018-04-01T01:05:00Z"), stringToEpochSeconds("2018-04-02T01:05:00Z"), intervalLength, "null_value");
-        val dataSourceResult = buildDataSourceResult(MetrictankSource.MISSING_VALUE, stringToEpochSeconds("2018-04-01T01:05:00Z"));
+        val latestTimeInEpoch = earliestTimeInEpoch + TimeConstantsUtil.SECONDS_PER_DAY;
+        val actual = sourceUnderTest.getMetricData(earliestTimeInEpoch, latestTimeInEpoch, intervalLength, "null_value");
+        val dataSourceResult = buildDataSourceResult(MetrictankSource.MISSING_VALUE, earliestTimeInEpoch);
         val expected = new ArrayList<>();
         expected.add(dataSourceResult);
         assertEquals(expected, actual);
     }
 
     private void initTestObjects() {
+        earliestTimeInEpoch = Instant.parse(EARLIEST_TIME).getEpochSecond();
         noOfBinsInADay = getBinsInDay(intervalLength);
-        metrictankResults.add(buildMetrictankResult("2018-04-01T01:05:00Z"));
+        metrictankResults.add(buildMetrictankResult(earliestTimeInEpoch));
         metrictankResults_null.add(buildNullMetrictankResult());
     }
 
@@ -81,14 +92,13 @@ public class MetrictankSourceTest {
         when(client.getData(anyLong(), anyLong(), anyInt(), eq("null_value"))).thenReturn(metrictankResults_null);
     }
 
-    private MetrictankResult buildMetrictankResult(String time) {
-        long earliest = stringToEpochSeconds(time);
+    private MetrictankResult buildMetrictankResult(long earliestTime) {
         //For testing, we return an extra data point to see if graphite source discards it or not.
         String[][] dataPoints = new String[noOfBinsInADay + 1][2];
         for (int i = 0; i < dataPoints.length; i++) {
             dataPoints[i][0] = String.valueOf(i);
-            dataPoints[i][1] = String.valueOf(earliest);
-            earliest = earliest + intervalLength;
+            dataPoints[i][1] = String.valueOf(earliestTime);
+            earliestTime = earliestTime + intervalLength;
         }
         MetrictankResult result = new MetrictankResult();
         result.setDatapoints(dataPoints);
@@ -105,12 +115,12 @@ public class MetrictankSourceTest {
         return result;
     }
 
-    private List<DataSourceResult> buildExpectedResults(long earliestTime, int noOfDays) {
+    private List<DataSourceResult> buildExpectedResults(long earliestTime, int windowLength) {
         List<DataSourceResult> dataSourceResults = new ArrayList<>();
         double value = 0;
         long epochSecond = earliestTime;
 
-        for (int i = 0; i < noOfDays * noOfBinsInADay; i++) {
+        for (int i = 0; i < windowLength * noOfBinsInADay; i++) {
             if (value > noOfBinsInADay - 1) {
                 value = 0;
                 epochSecond = earliestTime;
@@ -127,10 +137,6 @@ public class MetrictankSourceTest {
         dataSourceResult.setDataPoint(value);
         dataSourceResult.setEpochSecond(epochSecs);
         return dataSourceResult;
-    }
-
-    private long stringToEpochSeconds(String time) {
-        return Instant.parse(time).getEpochSecond();
     }
 
     private int getBinsInDay(int intervalLength) {
