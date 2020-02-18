@@ -1,4 +1,4 @@
-package com.expedia.adaptivealerting.anomdetect.source.data.metrictank;
+package com.expedia.adaptivealerting.anomdetect.source.data.graphite;
 
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,12 +13,12 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 
-import static com.expedia.adaptivealerting.anomdetect.source.data.metrictank.MetrictankClient.FETCH_METRICS_PATH;
+import static com.expedia.adaptivealerting.anomdetect.source.data.graphite.GraphiteClient.FETCH_METRICS_PATH;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 @Slf4j
-public class MetrictankClientTest {
+public class GraphiteClientTest {
     private static final String BASE_URI = "http://graphite";
     private static final String METRIC_URI = fetchMetricsUri("metricName");
     private static final String METRIC_URI_CANT_GET = fetchMetricsUri("metricNameCantGet");
@@ -28,7 +28,7 @@ public class MetrictankClientTest {
     private static final int UNTIL_TIME_IN_SECONDS = FROM_TIME_IN_SECONDS + ONE_DAY_IN_SECONDS;
     private static final int INTERVAL_LENGTH = 60;
 
-    private MetrictankClient clientUnderTest;
+    private GraphiteClient clientUnderTest;
 
     @Mock
     private HttpClientWrapper httpClient;
@@ -45,14 +45,14 @@ public class MetrictankClientTest {
     private byte[] docsBytes = "docsBytes".getBytes();
 
     private byte[] docBytes_cantRead = "docBytes_cantRead".getBytes();
-    private MetrictankResult[] docs = {};
+    private GraphiteResult[] docs = {};
     private Map<String, String> headers = Collections.singletonMap("x-org-id", "1");
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         initMetricData();
-        this.clientUnderTest = new MetrictankClient(BASE_URI, httpClient, objectMapper);
+        this.clientUnderTest = new GraphiteClient(BASE_URI, httpClient, objectMapper);
     }
 
     @Test
@@ -61,12 +61,12 @@ public class MetrictankClientTest {
         clientUnderTest.getData(FROM_TIME_IN_SECONDS, UNTIL_TIME_IN_SECONDS, INTERVAL_LENGTH, "metricName");
     }
 
-    @Test(expected = MetrictankClientException.class)
+    @Test(expected = GraphiteClientException.class)
     public void testGetMetricData_cant_get() {
         clientUnderTest.getData(FROM_TIME_IN_SECONDS, UNTIL_TIME_IN_SECONDS, INTERVAL_LENGTH, "metricNameCantGet");
     }
 
-    @Test(expected = MetrictankClientException.class)
+    @Test(expected = GraphiteClientException.class)
     public void testGetMetricData_cant_read() {
         clientUnderTest.getData(FROM_TIME_IN_SECONDS, UNTIL_TIME_IN_SECONDS, INTERVAL_LENGTH, "metricNameCantRead");
     }
@@ -74,13 +74,13 @@ public class MetrictankClientTest {
     private void initMetricData() throws IOException {
         when(httpClient.get(METRIC_URI, headers)).thenReturn(docsContent);
         when(docsContent.asBytes()).thenReturn(docsBytes);
-        when(objectMapper.readValue(docsBytes, MetrictankResult[].class)).thenReturn(docs);
+        when(objectMapper.readValue(docsBytes, GraphiteResult[].class)).thenReturn(docs);
 
         when(httpClient.get(METRIC_URI_CANT_GET, headers)).thenThrow(new IOException());
 
         when(httpClient.get(METRIC_URI_CANT_READ, headers)).thenReturn(docContent_cantRead);
         when(docContent_cantRead.asBytes()).thenReturn(docBytes_cantRead);
-        when(objectMapper.readValue(docBytes_cantRead, MetrictankResult[].class)).thenThrow(new IOException());
+        when(objectMapper.readValue(docBytes_cantRead, GraphiteResult[].class)).thenThrow(new IOException());
     }
 
 

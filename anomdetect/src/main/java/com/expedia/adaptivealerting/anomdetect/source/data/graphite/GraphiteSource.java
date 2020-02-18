@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.source.data.metrictank;
+package com.expedia.adaptivealerting.anomdetect.source.data.graphite;
 
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSource;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSourceResult;
@@ -30,7 +30,7 @@ import static java.time.Instant.ofEpochSecond;
 
 @RequiredArgsConstructor
 @Slf4j
-public class MetrictankSource implements DataSource {
+public class GraphiteSource implements DataSource {
 
     public static final Double MISSING_VALUE = Double.NEGATIVE_INFINITY;
 
@@ -38,7 +38,7 @@ public class MetrictankSource implements DataSource {
      * Client to load metric data from graphite.
      */
     @NonNull
-    private MetrictankClient metricTankClient;
+    private GraphiteClient graphiteClient;
 
     @Override
     public List<DataSourceResult> getMetricData(long earliestTime, long latestTime, int intervalLength, String target) {
@@ -51,7 +51,7 @@ public class MetrictankSource implements DataSource {
         long latestTimeSnappedToInterval = epochTimeSnappedToSeconds(latestTime, intervalLength);
 
         for (long i = earliestTimeSnappedToInterval; i < latestTimeSnappedToInterval; i += TimeConstantsUtil.SECONDS_PER_DAY) {
-            List<MetrictankResult> graphiteResults = getOneDayDataFromGraphite(i, intervalLength, metric);
+            List<GraphiteResult> graphiteResults = getOneDayDataFromGraphite(i, intervalLength, metric);
 
             if (graphiteResults.size() > 0) {
                 String[][] dataPoints = graphiteResults.get(0).getDatapoints();
@@ -72,14 +72,14 @@ public class MetrictankSource implements DataSource {
         return results;
     }
 
-    private List<MetrictankResult> getOneDayDataFromGraphite(long from, int intervalLength, String metric) {
+    private List<GraphiteResult> getOneDayDataFromGraphite(long from, int intervalLength, String metric) {
         // TODO: Ensure until is never greater than current metric's timestamp
         long until = from + TimeConstantsUtil.SECONDS_PER_DAY;
         // We subtract 1 second from FROM time to get complete data for the first bin from Graphite. Graphite for some reason gives incomplete data for first bin if we don't do this.
         long fromMinusOneSecond = from - 1;
-        log.debug("Querying Metric tank with: from={} ({}), until={} ({}), metric='{}'",
+        log.debug("Querying Graphite with: from={} ({}), until={} ({}), metric='{}'",
                 fromMinusOneSecond, ofEpochSecond(fromMinusOneSecond), until, ofEpochSecond(until), metric);
-        return metricTankClient.getData(fromMinusOneSecond, until, intervalLength, metric);
+        return graphiteClient.getData(fromMinusOneSecond, until, intervalLength, metric);
     }
 
     private void logResults(List<DataSourceResult> results) {
