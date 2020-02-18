@@ -1,4 +1,4 @@
-package com.expedia.adaptivealerting.anomdetect.source.data.metrictank;
+package com.expedia.adaptivealerting.anomdetect.source.data.graphite;
 
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSourceResult;
 import com.expedia.adaptivealerting.anomdetect.util.TimeConstantsUtil;
@@ -20,28 +20,28 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @Slf4j
-public class MetrictankSourceTest {
+public class GraphiteSourceTest {
 
     private static final String EARLIEST_TIME = "2018-04-01T01:05:00Z";
 
     @Mock
-    private MetrictankClient client;
+    private GraphiteClient client;
 
-    private MetrictankSource sourceUnderTest;
+    private GraphiteSource sourceUnderTest;
 
     private long earliestTimeInEpoch;
     private int intervalLength = 5 * TimeConstantsUtil.SECONDS_PER_MIN;
     private int noOfBinsInADay;
 
-    private List<MetrictankResult> metrictankResults = new ArrayList<>();
-    private List<MetrictankResult> metrictankResults_null = new ArrayList<>();
+    private List<GraphiteResult> graphiteResults = new ArrayList<>();
+    private List<GraphiteResult> graphiteResults_null = new ArrayList<>();
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         initTestObjects();
         initDependencies();
-        this.sourceUnderTest = new MetrictankSource(client);
+        this.sourceUnderTest = new GraphiteSource(client);
     }
 
     @Test
@@ -73,7 +73,7 @@ public class MetrictankSourceTest {
     public void testGetMetricData_null_value() {
         val latestTimeInEpoch = earliestTimeInEpoch + TimeConstantsUtil.SECONDS_PER_DAY;
         val actual = sourceUnderTest.getMetricData(earliestTimeInEpoch, latestTimeInEpoch, intervalLength, "null_value");
-        val dataSourceResult = buildDataSourceResult(MetrictankSource.MISSING_VALUE, earliestTimeInEpoch);
+        val dataSourceResult = buildDataSourceResult(GraphiteSource.MISSING_VALUE, earliestTimeInEpoch);
         val expected = new ArrayList<>();
         expected.add(dataSourceResult);
         assertEquals(expected, actual);
@@ -82,17 +82,17 @@ public class MetrictankSourceTest {
     private void initTestObjects() {
         earliestTimeInEpoch = Instant.parse(EARLIEST_TIME).getEpochSecond();
         noOfBinsInADay = getBinsInDay(intervalLength);
-        metrictankResults.add(buildMetrictankResult(earliestTimeInEpoch));
-        metrictankResults_null.add(buildNullMetrictankResult());
+        graphiteResults.add(buildGraphiteResult(earliestTimeInEpoch));
+        graphiteResults_null.add(buildNullGraphiteResult());
     }
 
     private void initDependencies() {
-        when(client.getData(anyLong(), anyLong(), anyInt(), eq("metric_name"))).thenReturn(metrictankResults);
+        when(client.getData(anyLong(), anyLong(), anyInt(), eq("metric_name"))).thenReturn(graphiteResults);
         when(client.getData(anyLong(), anyLong(), anyInt(), eq("null_metric"))).thenReturn(new ArrayList<>());
-        when(client.getData(anyLong(), anyLong(), anyInt(), eq("null_value"))).thenReturn(metrictankResults_null);
+        when(client.getData(anyLong(), anyLong(), anyInt(), eq("null_value"))).thenReturn(graphiteResults_null);
     }
 
-    private MetrictankResult buildMetrictankResult(long earliestTime) {
+    private GraphiteResult buildGraphiteResult(long earliestTime) {
         //For testing, we return an extra data point to see if graphite source discards it or not.
         String[][] dataPoints = new String[noOfBinsInADay + 1][2];
         for (int i = 0; i < dataPoints.length; i++) {
@@ -100,13 +100,13 @@ public class MetrictankSourceTest {
             dataPoints[i][1] = String.valueOf(earliestTime);
             earliestTime = earliestTime + intervalLength;
         }
-        MetrictankResult result = new MetrictankResult();
+        GraphiteResult result = new GraphiteResult();
         result.setDatapoints(dataPoints);
         return result;
     }
 
-    private MetrictankResult buildNullMetrictankResult() {
-        MetrictankResult result = new MetrictankResult();
+    private GraphiteResult buildNullGraphiteResult() {
+        GraphiteResult result = new GraphiteResult();
         String[][] dataPoints = {
                 {null, "1522544700"},
                 {null, "1523144900"}

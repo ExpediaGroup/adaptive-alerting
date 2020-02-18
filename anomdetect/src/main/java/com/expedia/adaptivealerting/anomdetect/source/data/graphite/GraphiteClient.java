@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.source.data.metrictank;
+package com.expedia.adaptivealerting.anomdetect.source.data.graphite;
 
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,7 +38,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
  */
 @RequiredArgsConstructor
 @Slf4j
-public class MetrictankClient {
+public class GraphiteClient {
 
     public static final String FETCH_METRICS_PATH = "/render?from=%d&until=%d&maxDataPoints=%d&format=json&target=%s";
 
@@ -54,13 +54,13 @@ public class MetrictankClient {
     /**
      * Fetch metric data for a given set of metrics
      *
-     * @param from earliest time (in epoch seconds)
-     * @param until latest time (in epoch seconds)
+     * @param from           earliest time (in epoch seconds)
+     * @param until          latest time (in epoch seconds)
      * @param intervalLength number of seconds per bin of data - used to calculate the maximum data points we expect to retrieve
-     * @param target metric name or tag with an optional graphite function
+     * @param target         metric name or tag with an optional graphite function
      * @return time series for the specified metric
      */
-    public List<MetrictankResult> getData(long from, long until, int intervalLength, String target) {
+    public List<GraphiteResult> getData(long from, long until, int intervalLength, String target) {
 
         notNull(from, "from can't be null");
         notNull(until, "until can't be null");
@@ -69,8 +69,10 @@ public class MetrictankClient {
         // Explicitly specify maxDataPoints in case the number of metrics per day required exceeds server's default maxDataPoints limit
         val maxDataPoints = calculateMaxDataPointsPerDay(from, until, intervalLength);
         val uri = String.format(baseUri + FETCH_METRICS_PATH, from, until, maxDataPoints, target);
-        log.debug("Sending query to Metrictank target: {}", uri);
+        log.debug("Sending query to Graphite target: {}", uri);
 
+        //FIXME x-org-id is a mandatory header for metric tank.
+        // In future, we would like to make it configurable as the only difference between graphite client and metric tank client is x-org-id header.
         val headers = Collections.singletonMap("x-org-id", "1");
         Content content;
         try {
@@ -80,14 +82,14 @@ public class MetrictankClient {
                     target,
                     uri,
                     e.getMessage());
-            throw new MetrictankClientException(message, e);
+            throw new GraphiteClientException(message, e);
         }
 
-        List<MetrictankResult> results;
+        List<GraphiteResult> results;
         try {
-            results = Arrays.asList(objectMapper.readValue(content.asBytes(), MetrictankResult[].class));
+            results = Arrays.asList(objectMapper.readValue(content.asBytes(), GraphiteResult[].class));
         } catch (IOException e) {
-            throw new MetrictankClientException(String.format("IOException while parsing response from Metrictank target: %s", target), e);
+            throw new GraphiteClientException(String.format("IOException while parsing response from Metrictank target: %s", target), e);
         }
         return results;
     }

@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect.source.data.initializer;
 
-import com.expedia.adaptivealerting.anomdetect.source.data.metrictank.MetrictankClient;
-import com.expedia.adaptivealerting.anomdetect.source.data.metrictank.MetrictankSource;
+import com.expedia.adaptivealerting.anomdetect.source.data.graphite.GraphiteClient;
+import com.expedia.adaptivealerting.anomdetect.source.data.graphite.GraphiteSource;
 import com.expedia.adaptivealerting.anomdetect.source.data.initializer.throttlegate.RandomThrottleGate;
 import com.expedia.adaptivealerting.anomdetect.source.data.initializer.throttlegate.ThrottleGate;
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
@@ -32,8 +32,8 @@ public class DataInitializerFactory {
     public static DataInitializer buildDataInitializer(Config config) {
         val throttleGate = tryCreateThrottleGate(config);
         val baseUri = config.getString(BASE_URI);
-        val metrictankClient = new MetrictankClient(baseUri, new HttpClientWrapper(), new ObjectMapper());
-        val dataSource = new MetrictankSource(metrictankClient);
+        val graphiteClient = new GraphiteClient(baseUri, new HttpClientWrapper(), new ObjectMapper());
+        val dataSource = new GraphiteSource(graphiteClient);
         return new DataInitializer(config, throttleGate, dataSource);
     }
 
