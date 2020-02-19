@@ -20,14 +20,15 @@ import com.typesafe.config.Config;
 
 public class ConstructSourceURI {
     private final String GRAPHITE_URI_KEY = "urlTemplate";
-    private final String GRAPHITE_FROM_TIME_PARAM_STRING = "&from=-";
-    private final String GRAPHITE_TIME_UNIT_STRING = "s";
 
-    public String getGraphiteURI(Config metricSourceSinkConfig, MetricFunctionsSpec metricFunctionsSpec) {
-        return metricSourceSinkConfig.getString(GRAPHITE_URI_KEY)
-                + metricFunctionsSpec.getFunction()
-                + GRAPHITE_FROM_TIME_PARAM_STRING
-                + metricFunctionsSpec.getIntervalInSecs() + GRAPHITE_TIME_UNIT_STRING;
+    public String getGraphiteURI(Config metricSourceSinkConfig,
+                                 MetricFunctionsSpec metricFunctionsSpec,
+                                 GraphiteQueryInterval graphiteQueryInterval) {
+        String graphiteUri = metricSourceSinkConfig.getString(GRAPHITE_URI_KEY);
+        return String.format("%s%s&from=%d&until=%d",
+                graphiteUri,
+                metricFunctionsSpec.getFunction(),
+                graphiteQueryInterval.getFrom(),
+                graphiteQueryInterval.getUntil());
     }
-
 }

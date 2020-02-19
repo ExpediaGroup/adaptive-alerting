@@ -4,6 +4,7 @@ import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.expedia.adaptivealerting.metrics.functions.TypesafeConfigLoader;
 import com.expedia.adaptivealerting.metrics.functions.source.MetricFunctionsReader;
 import com.expedia.adaptivealerting.metrics.functions.source.MetricFunctionsSpec;
+import com.expedia.adaptivealerting.metrics.functions.source.graphite.GraphiteQueryInterval;
 import com.expedia.adaptivealerting.metrics.functions.source.graphite.GraphiteQueryResult;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
@@ -21,6 +22,7 @@ import org.mockito.MockitoAnnotations;
 
 import static org.mockito.Mockito.when;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -52,9 +54,6 @@ public class GraphiteQueryServiceTest {
     private Map<String, String> metricTankOrgIdHeader;
 
 
-
-
-
     @Before
     public void initMetricSourceSinkConfigSetup() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -75,7 +74,9 @@ public class GraphiteQueryServiceTest {
         sampleJsonGraphiteResult.put("target", "sumSeries(a.b.c)");
         sampleJsonGraphiteResult.put("tags", testTags);
         sampleJsonGraphite.put(0, sampleJsonGraphiteResult);
-        val uri = "samplegraphitehosturi/render?until=now&format=json&target=sumSeries(a.b.c)&from=-30s";
+
+        val uri = getGraphiteQueryUri();
+
         Content mockGraphiteResult = new Content(sampleJsonGraphite.toString().getBytes(), ContentType.APPLICATION_JSON);
         if (metricSourceSinkConfig.getString(IS_GRAPHITE_SERVER_METRICTANK_KEY).
                 equals(GRAPHITE_SERVER_METRICTANK)) {
@@ -141,7 +142,7 @@ public class GraphiteQueryServiceTest {
     }
 
     @Test
-    public void testGetMetricQueryResultException() throws Exception{
+    public void testGetMetricQueryResultException() throws Exception {
         HttpClientWrapper httpClientWrapper = new HttpClientWrapper();
         graphiteQueryService = new GraphiteQueryService(httpClientWrapper);
         val config = new TypesafeConfigLoader(APP_ID).loadMergedConfig();
@@ -157,14 +158,14 @@ public class GraphiteQueryServiceTest {
                 metricDataResult.getMetricDefinition().getMeta());
     }
 
-     @Test
-     public void testGetMetricQueryResultEmpty() throws Exception {
-        val uri = "samplegraphitehosturi/render?until=now&format=json&target=sumSeries(a.b.c)&from=-30s";
+    @Test
+    public void testGetMetricQueryResultEmpty() throws Exception {
+        val uri = getGraphiteQueryUri();
         val sampleJsonGraphite = "[]";
         Content mockGraphiteResult = new Content(sampleJsonGraphite.getBytes(), ContentType.APPLICATION_JSON);
         when(httpClientWrapper.get(uri, metricTankOrgIdHeader)).thenReturn(mockGraphiteResult);
         MetricData metricDataResult = graphiteQueryService.queryMetricSource(metricSourceSinkConfig,
-        metricFunctionsSpec);
+                metricFunctionsSpec);
         assertEquals(defaultMetricData.getValue(), metricDataResult.getValue(), 0.1);
         assertEquals(defaultMetricData.getMetricDefinition().getKey(),
                 metricDataResult.getMetricDefinition().getKey());
@@ -172,11 +173,11 @@ public class GraphiteQueryServiceTest {
                 metricDataResult.getMetricDefinition().getTags());
         assertEquals(TagCollection.EMPTY,
                 metricDataResult.getMetricDefinition().getMeta());
-        }
+    }
 
     @Test
     public void testGetMetricQueryResultNullDatapoint() throws Exception {
-        val uri = "samplegraphitehosturi/render?until=now&format=json&target=sumSeries(a.b.c)&from=-30s";
+        val uri = getGraphiteQueryUri();
         val testDatapoint = "[null,1568255056]";
         JSONArray sampleJsonGraphite = new JSONArray();
         JSONObject sampleJsonGraphiteResult = new JSONObject();
@@ -200,6 +201,13 @@ public class GraphiteQueryServiceTest {
                 metricDataResult.getMetricDefinition().getTags());
         assertEquals(TagCollection.EMPTY,
                 metricDataResult.getMetricDefinition().getMeta());
+    }
+
+    private String getGraphiteQueryUri() {
+        GraphiteQueryInterval interval = new GraphiteQueryInterval(Instant.now().getEpochSecond(), metricFunctionsSpec.getIntervalInSecs());
+        String from = String.valueOf(interval.getFrom());
+        String until = String.valueOf(interval.getUntil());
+        return String.format("samplegraphitehosturi/render?format=json&target=sumSeries(a.b.c)&from=%s&until=%s", from, until);
     }
 
 }
