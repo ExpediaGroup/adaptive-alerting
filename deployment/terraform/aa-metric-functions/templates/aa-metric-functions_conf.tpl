@@ -7,7 +7,7 @@ aa-metric-functions {
   }
   metric-source-sink {
     metric-source = "graphite"
-    urlTemplate: "${metric_source_graphite_host}/render?until=now&format=json&target="
+    urlTemplate: "${metric_source_graphite_host}/render?format=json&target="
     graphite-host = "${metric_source_graphite_host}"
     output_topic = "${aggregator_producer_topic}"
     is-graphite-server-metrictank = "${is_graphite_server_metrictank}"

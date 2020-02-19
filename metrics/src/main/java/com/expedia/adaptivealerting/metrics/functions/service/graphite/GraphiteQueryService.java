@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.metrics.functions.service.graphite;
 
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.expedia.adaptivealerting.metrics.functions.source.MetricFunctionsSpec;
+import com.expedia.adaptivealerting.metrics.functions.source.graphite.GraphiteQueryInterval;
 import com.expedia.adaptivealerting.metrics.functions.source.graphite.GraphiteQueryResult;
 import com.expedia.adaptivealerting.metrics.functions.source.graphite.ConstructSourceURI;
 import com.expedia.metrics.MetricData;
@@ -24,7 +25,10 @@ import com.expedia.metrics.MetricDefinition;
 import com.expedia.metrics.TagCollection;
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.apache.http.client.fluent.Content;
+
+import java.time.Instant;
 import java.util.Collections;
 
 
@@ -63,7 +67,10 @@ public class GraphiteQueryService {
     private String queryGraphiteSource(Config metricSourceSinkConfig, MetricFunctionsSpec metricFunctionsSpec) {
         try {
             ConstructSourceURI constructSourceURI = new ConstructSourceURI();
-            String URI = constructSourceURI.getGraphiteURI(metricSourceSinkConfig, metricFunctionsSpec);
+            val currentGraphiteEpochSeconds = Instant.now().getEpochSecond();
+            val intervalInSecs = metricFunctionsSpec.getIntervalInSecs();
+            GraphiteQueryInterval queryInterval = new GraphiteQueryInterval(currentGraphiteEpochSeconds, intervalInSecs);
+            String URI = constructSourceURI.getGraphiteURI(metricSourceSinkConfig, metricFunctionsSpec, queryInterval);
             Map<String, String> headers = Collections.emptyMap();
             if (metricSourceSinkConfig.getString(IS_GRAPHITE_SERVER_METRICTANK_KEY).
                     equals(GRAPHITE_SERVER_METRICTANK)) {

@@ -14,12 +14,17 @@ public class ConstructSourceURITest {
     @Test
     public void testGetGraphiteURI() {
         val functionsInputFileName = "config/functions-test.txt";
-        val uri = "samplegraphitehosturi/render?until=now&format=json&target=sumSeries(a.b.c)&from=-30s";
+        val uri = "samplegraphitehosturi/render?format=json&target=sumSeries(a.b.c)&from=89&until=120";
         MetricFunctionsSpec metricFunctionsSpec = MetricFunctionsReader.
                 readFromInputFile(ClassLoader.getSystemResource(functionsInputFileName).getPath()).get(0);
         Config config = new TypesafeConfigLoader("aa-metric-functions-test").loadMergedConfig();
         val metricSourceSinkConfigTest = config.getConfig("metric-source-sink");
+
+        val currentGraphiteEpochSeconds = 100;
+        val intervalInSecs = metricFunctionsSpec.getIntervalInSecs();
+        GraphiteQueryInterval queryInterval = new GraphiteQueryInterval(currentGraphiteEpochSeconds, intervalInSecs);
+
         ConstructSourceURI constructSourceURI = new ConstructSourceURI();
-        assertEquals(uri, constructSourceURI.getGraphiteURI(metricSourceSinkConfigTest, metricFunctionsSpec));
+        assertEquals(uri, constructSourceURI.getGraphiteURI(metricSourceSinkConfigTest, metricFunctionsSpec, queryInterval));
     }
 }
