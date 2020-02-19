@@ -21,12 +21,12 @@ import lombok.val;
 @Data
 public class GraphiteQueryInterval {
 
-    long from;
-    long until;
+    private long from;
+    private long until;
 
     public GraphiteQueryInterval(long date, long intervalInSeconds) {
         val startOfCurrentInterval = (date / intervalInSeconds) * intervalInSeconds;
-        from = startOfCurrentInterval - 1;
-        until = startOfCurrentInterval + intervalInSeconds;
+        this.from = startOfCurrentInterval - 1;
+        this.until = startOfCurrentInterval + intervalInSeconds;
     }
 }
