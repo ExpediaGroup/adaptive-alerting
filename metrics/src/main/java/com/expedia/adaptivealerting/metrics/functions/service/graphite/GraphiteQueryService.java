@@ -67,9 +67,9 @@ public class GraphiteQueryService {
     private String queryGraphiteSource(Config metricSourceSinkConfig, MetricFunctionsSpec metricFunctionsSpec) {
         try {
             ConstructSourceURI constructSourceURI = new ConstructSourceURI();
-            val currentGraphiteEpochSeconds = Instant.now().getEpochSecond();
+            val currentEpochTimeInSecs = Instant.now().getEpochSecond();
             val intervalInSecs = metricFunctionsSpec.getIntervalInSecs();
-            GraphiteQueryInterval queryInterval = new GraphiteQueryInterval(currentGraphiteEpochSeconds, intervalInSecs);
+            GraphiteQueryInterval queryInterval = new GraphiteQueryInterval(currentEpochTimeInSecs, intervalInSecs);
             String URI = constructSourceURI.getGraphiteURI(metricSourceSinkConfig, metricFunctionsSpec, queryInterval);
             Map<String, String> headers = Collections.emptyMap();
             if (metricSourceSinkConfig.getString(IS_GRAPHITE_SERVER_METRICTANK_KEY).
