@@ -14,7 +14,7 @@ public class ConstructSourceURITest {
     @Test
     public void testGetGraphiteURI() {
         val functionsInputFileName = "config/functions-test.txt";
-        val uri = "samplegraphitehosturi/render?format=json&target=sumSeries(a.b.c)&from=89&until=120";
+        val uri = "samplegraphitehosturi/render?format=json&target=sumSeries(a.b.c)&from=59&until=89";
         MetricFunctionsSpec metricFunctionsSpec = MetricFunctionsReader.
                 readFromInputFile(ClassLoader.getSystemResource(functionsInputFileName).getPath()).get(0);
         Config config = new TypesafeConfigLoader("aa-metric-functions-test").loadMergedConfig();

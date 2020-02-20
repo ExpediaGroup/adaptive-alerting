@@ -25,8 +25,12 @@ public class GraphiteQueryInterval {
     private long until;
 
     public GraphiteQueryInterval(long date, long intervalInSeconds) {
+        /* using absolute time instead of relative */
         val startOfCurrentInterval = (date / intervalInSeconds) * intervalInSeconds;
-        this.from = startOfCurrentInterval - 1;
-        this.until = startOfCurrentInterval + intervalInSeconds;
+        /* Ensuring query is run for the previous bucket of interval.
+           This is to improve accuracy of data returned when query is run.
+         */
+        this.from = startOfCurrentInterval - (1 + intervalInSeconds);
+        this.until = this.from + intervalInSeconds;
     }
 }
