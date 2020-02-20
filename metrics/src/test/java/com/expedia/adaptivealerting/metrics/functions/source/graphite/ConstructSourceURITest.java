@@ -20,9 +20,9 @@ public class ConstructSourceURITest {
         Config config = new TypesafeConfigLoader("aa-metric-functions-test").loadMergedConfig();
         val metricSourceSinkConfigTest = config.getConfig("metric-source-sink");
 
-        val currentGraphiteEpochSeconds = 100;
+        val currentEpochTimeInSecs = 100;
         val intervalInSecs = metricFunctionsSpec.getIntervalInSecs();
-        GraphiteQueryInterval queryInterval = new GraphiteQueryInterval(currentGraphiteEpochSeconds, intervalInSecs);
+        GraphiteQueryInterval queryInterval = new GraphiteQueryInterval(currentEpochTimeInSecs, intervalInSecs);
 
         ConstructSourceURI constructSourceURI = new ConstructSourceURI();
         assertEquals(uri, constructSourceURI.getGraphiteURI(metricSourceSinkConfigTest, metricFunctionsSpec, queryInterval));

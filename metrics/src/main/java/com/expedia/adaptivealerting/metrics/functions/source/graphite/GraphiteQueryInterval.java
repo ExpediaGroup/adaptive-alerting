@@ -16,21 +16,21 @@
 package com.expedia.adaptivealerting.metrics.functions.source.graphite;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 @Data
+@Slf4j
 public class GraphiteQueryInterval {
 
     private long from;
     private long until;
 
-    public GraphiteQueryInterval(long date, long intervalInSeconds) {
-        /* using absolute time instead of relative */
-        val startOfCurrentInterval = (date / intervalInSeconds) * intervalInSeconds;
-        /* Ensuring query is run for the previous bucket of interval.
-           This is to improve accuracy of data returned when query is run.
-         */
-        this.from = startOfCurrentInterval - (1 + intervalInSeconds);
-        this.until = this.from + intervalInSeconds;
+    public GraphiteQueryInterval(long startDate, long intervalInSeconds) {
+        val snappedStartDate = (startDate / intervalInSeconds) * intervalInSeconds;
+        // We subtract 1 second from FROM and UNTIL time to get complete data for the first bin from Graphite.
+        // Graphite for some reason gives incomplete data for first bin if we don't do this.
+        this.until = snappedStartDate - 1;
+        this.from = until - intervalInSeconds;
     }
 }
