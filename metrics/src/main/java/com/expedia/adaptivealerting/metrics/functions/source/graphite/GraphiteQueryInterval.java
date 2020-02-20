@@ -20,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 @Data
-@Slf4j
 public class GraphiteQueryInterval {
 
     private long from;
