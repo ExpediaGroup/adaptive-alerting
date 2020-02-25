@@ -49,10 +49,13 @@ public class GraphiteQueryService {
     private final static String IS_GRAPHITE_SERVER_METRICTANK_KEY = "is-graphite-server-metrictank";
     private final static String GRAPHITE_SERVER_METRICTANK = "metrictank";
 
+    public GraphiteQueryService() {
+        this(new HttpClientWrapper());
+    }
+
     public GraphiteQueryService(HttpClientWrapper httpClientWrapper) {
         metricFunctionHttpClient = httpClientWrapper;
     }
-
 
     public MetricData queryMetricSource(Config metricSourceSinkConfig, MetricFunctionsSpec metricFunctionsSpec) {
         /* For now source supported is graphite alone */
