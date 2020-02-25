@@ -22,11 +22,7 @@ import lombok.Data;
 @Data
 @JsonIgnoreProperties
 public class MetricFunctionsSpec {
-
     private String function;
-
     private int intervalInSecs;
-
     private HashMap<String, String> tags;
-
 }

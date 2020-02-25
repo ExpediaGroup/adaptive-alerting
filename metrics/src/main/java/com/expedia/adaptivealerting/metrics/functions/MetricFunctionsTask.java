@@ -15,35 +15,37 @@
  */
 package com.expedia.adaptivealerting.metrics.functions;
 
-import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.expedia.adaptivealerting.metrics.functions.service.graphite.GraphiteQueryService;
 import com.expedia.adaptivealerting.metrics.functions.sink.MetricFunctionsPublish;
 import com.expedia.adaptivealerting.metrics.functions.source.MetricFunctionsSpec;
-import com.expedia.metrics.MetricData;
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 @Slf4j
 public class MetricFunctionsTask implements Runnable {
-    private MetricFunctionsSpec metricFunctionsSpec;
-    private MetricFunctionsPublish metricFunctionsPublish;
-    private Config metricSourceSinkConfig;
+    private Config metricStoreConfig;
+    private MetricFunctionsSpec spec;
+    private MetricFunctionsPublish publisher;
+    private GraphiteQueryService graphiteQueryService;
 
+    public MetricFunctionsTask(Config metricStoreConfig, MetricFunctionsSpec spec, MetricFunctionsPublish publisher) {
+        notNull(metricStoreConfig, "metricStoreConfig can't be null");
+        notNull(spec, "spec can't be null");
+        notNull(publisher, "publisher can't be null");
 
-    public MetricFunctionsTask (MetricFunctionsSpec metricFunctionsSpec, MetricFunctionsPublish metricFunctionsPublish,
-                                Config metricSourceSinkConfig) {
-        this.metricFunctionsSpec = metricFunctionsSpec;
-        this.metricFunctionsPublish = metricFunctionsPublish;
-        this.metricSourceSinkConfig = metricSourceSinkConfig;
+        this.metricStoreConfig = metricStoreConfig;
+        this.spec = spec;
+        this.publisher = publisher;
+        this.graphiteQueryService = new GraphiteQueryService();
     }
 
     public void run() {
-        HttpClientWrapper httpClientWrapper = new HttpClientWrapper();
-        GraphiteQueryService graphiteQueryService = new GraphiteQueryService(httpClientWrapper);
         try {
-            MetricData metricData = graphiteQueryService.queryMetricSource(metricSourceSinkConfig,
-                    metricFunctionsSpec);
-            metricFunctionsPublish.publishMetrics(metricData);
+            val metricData = graphiteQueryService.queryMetricSource(metricStoreConfig, spec);
+            publisher.publishMetrics(metricData);
         }
         catch (Exception e) {
             log.error("Exception while processing metrics function", e);

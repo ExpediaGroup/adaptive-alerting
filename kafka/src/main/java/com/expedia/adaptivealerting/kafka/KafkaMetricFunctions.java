@@ -19,7 +19,6 @@ import com.expedia.adaptivealerting.kafka.util.ConfigUtil;
 import com.expedia.adaptivealerting.metrics.functions.MetricFunctionsTask;
 import com.expedia.adaptivealerting.metrics.functions.sink.MetricFunctionsPublish;
 import com.expedia.adaptivealerting.metrics.functions.source.MetricFunctionsReader;
-import com.expedia.adaptivealerting.metrics.functions.source.MetricFunctionsSpec;
 import com.expedia.metrics.MetricData;
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
@@ -28,67 +27,79 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
-import java.util.List;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
+
+/**
+ * Kafka producer app to derive new metrics by querying the backing data store, and then publish them to a Kafka topic
+ * for further processing. Aggregation across hosts (e.g., summing request counts across all hosts) is one common use
+ * case.
+ */
 @Slf4j
 public class KafkaMetricFunctions implements MetricFunctionsPublish {
-
     private static final String APP_ID = "aa-metric-functions";
-    private static final String AGGREGATOR_PRODUCER = "aggregator-producer";
-    private static final String METRIC_SOURCE_SINK = "metric-source-sink";
-    private final String OUTPUT_TOPIC_KEY_STRING = "output-topic";
     private static final String INPUT_FUNCTIONS_FILENAME ="functions.txt";
-    private final static String INPUT_FILE_PATH = "/config/";
-    private static final int corePoolSize = 15;
+    private static final String INPUT_FILE_PATH = "/config/";
+    private static final String METRIC_STORE_KEY = "metric-source-sink";
+    private static final String OUTPUT_TOPIC_KEY = "output-topic";
+    private static final int NUM_THREADS = 15;
 
-    private Producer<String, MetricData> aggregatorProducer;
+    // FIXME This is misleadingly named: derived metrics need not be aggregations. [WLW]
+    private static final String PRODUCER = "aggregator-producer";
 
-    private Config metricSinkConfig;
+    private Config metricStoreConfig;
+    private Producer<String, MetricData> producer;
 
+    public static void main(String[] args) {
+        val config = new TypesafeConfigLoader(APP_ID).loadMergedConfig();
+        val metricStoreConfig = config.getConfig(METRIC_STORE_KEY);
+
+        val inputFile = INPUT_FILE_PATH + INPUT_FUNCTIONS_FILENAME;
+        val specs = MetricFunctionsReader.readFromInputFile(inputFile);
+        if (specs.isEmpty()) {
+            log.error("Empty input functions file. Exiting." );
+            System.exit(-1);
+        }
+
+        for (val spec : specs) {
+            log.info("Loaded metric function: {}", spec);
+        }
+
+        val functions = new KafkaMetricFunctions();
+        functions.initPublisher();
+
+        val execService = Executors.newScheduledThreadPool(NUM_THREADS);
+        for (val spec : specs) {
+            val task = new MetricFunctionsTask(metricStoreConfig, spec, functions);
+            val intervalInSeconds = spec.getIntervalInSecs();
+            execService.scheduleAtFixedRate(task, 0, intervalInSeconds, TimeUnit.SECONDS);
+        }
+    }
+
+    @Override
     public void initPublisher() {
         val config = new TypesafeConfigLoader(APP_ID).loadMergedConfig();
-        val aggregatorProducerConfig = config.getConfig(AGGREGATOR_PRODUCER);
-        metricSinkConfig = config.getConfig(METRIC_SOURCE_SINK);
-        val aggregatorProducerProps = ConfigUtil.toProducerConfig(aggregatorProducerConfig);
-        aggregatorProducer = new KafkaProducer<>(aggregatorProducerProps);
+        val producerConfig = config.getConfig(PRODUCER);
+        val producerProps = ConfigUtil.toProducerConfig(producerConfig);
+
+        this.metricStoreConfig = config.getConfig(METRIC_STORE_KEY);
+        this.producer = new KafkaProducer<>(producerProps);
     }
 
     @Override
     public void publishMetrics(MetricData metricData) {
+        notNull(metricData, "metricData can't be null");
+
+        val topic = metricStoreConfig.getString(OUTPUT_TOPIC_KEY);
+        val metricKey = metricData.getMetricDefinition().getKey();
+
         try {
-            ProducerRecord<String, MetricData> aggregateProducerRecord = new ProducerRecord<>(
-                    metricSinkConfig.getString(OUTPUT_TOPIC_KEY_STRING),
-                    metricData.getMetricDefinition().getKey(), metricData);
-            aggregatorProducer.send(aggregateProducerRecord);
-            log.info("Record sent for function: {}", metricData.getMetricDefinition().getKey());
+            producer.send(new ProducerRecord<>(topic, metricKey, metricData));
+            log.info("Published derived metric: {}", metricKey);
         } catch (Exception e) {
-            log.error("Exception while sending to kafka", e);
+            log.error("Exception while publishing derived metric to Kafka: " + metricKey, e);
         }
-    }
-
-    public static void main(String[] args) {
-        val config = new TypesafeConfigLoader(APP_ID).loadMergedConfig();
-        val metricSourceConfig = config.getConfig(METRIC_SOURCE_SINK);
-        // This is absolute path of the file at run time environment
-        val input_file = INPUT_FILE_PATH + INPUT_FUNCTIONS_FILENAME;
-        List<MetricFunctionsSpec> metricFunctionSpecs = MetricFunctionsReader.readFromInputFile(input_file);
-        if (metricFunctionSpecs.isEmpty()) {
-            log.error("Error with input functions file, exiting..." );
-        }
-        KafkaMetricFunctions metricFunctionsPublish = new KafkaMetricFunctions();
-        metricFunctionsPublish.initPublisher();
-        ScheduledExecutorService execService
-                = Executors.newScheduledThreadPool(corePoolSize);
-        for (MetricFunctionsSpec metricFunctionSpec: metricFunctionSpecs) {
-            MetricFunctionsTask metricFunctionsTask = new MetricFunctionsTask(metricFunctionSpec,
-                    metricFunctionsPublish,
-                    metricSourceConfig);
-            execService.scheduleAtFixedRate(metricFunctionsTask,
-                    0, metricFunctionSpec.getIntervalInSecs(), TimeUnit.SECONDS);
-        }
-
     }
 }
