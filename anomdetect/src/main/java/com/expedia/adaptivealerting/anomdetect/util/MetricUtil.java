@@ -105,7 +105,7 @@ public class MetricUtil {
      * @param mappedMetricData Mapped metric data
      * @return Returns value for the provided data retrieval tag key.
      */
-    public static String getDataRetrievalValueOrTagsList(MappedMetricData mappedMetricData, String dataRetrievalTagKey, String dataRetrievalTags) {
+    public static String getDataRetrievalValue(MappedMetricData mappedMetricData, String dataRetrievalTagKey) {
         val metricData = mappedMetricData.getMetricData();
         val metricDefinition = metricData.getMetricDefinition();
         val metricTags = metricDefinition.getTags();

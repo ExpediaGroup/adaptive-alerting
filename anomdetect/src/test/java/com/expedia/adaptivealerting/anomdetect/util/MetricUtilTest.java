@@ -92,7 +92,7 @@ public final class MetricUtilTest {
         val metricDefinition = new MetricDefinition(new TagCollection(tags));
         val metricData = new MetricData(metricDefinition, 100.0, Instant.now().getEpochSecond());
         val mappedMetricData = new MappedMetricData(metricData, mappedUuid);
-        val value = MetricUtil.getDataRetrievalValueOrTagsList(mappedMetricData, "function", "tags");
+        val value = MetricUtil.getDataRetrievalValue(mappedMetricData, "function");
         assertEquals("sum(test.metrics)", value);
     }
 }

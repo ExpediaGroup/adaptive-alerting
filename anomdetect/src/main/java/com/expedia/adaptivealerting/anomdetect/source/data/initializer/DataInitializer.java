@@ -136,7 +136,7 @@ public class DataInitializer {
         val dataRetrievalTags = extractTagsFromExpression(detectorMapping.getExpression());
         String target = "seriesByTag(" + dataRetrievalTags + ")";
         if (dataRetrievalTagKey != null) {
-            target = MetricUtil.getDataRetrievalValueOrTagsList(mappedMetricData, dataRetrievalTagKey, dataRetrievalTags);
+            target = MetricUtil.getDataRetrievalValue(mappedMetricData, dataRetrievalTagKey);
         }
         return target;
     }
