@@ -60,6 +60,14 @@ public interface DetectorSource {
     List<DetectorMapping> findUpdatedDetectorMappings(long timePeriod);
 
     /**
+     * Finds a detector mapping for the given detector UUID
+     *
+     * @param uuid Detector UUID.
+     * @return Detector mapping
+     */
+    DetectorMapping findDetectorMappingByUuid(UUID uuid);
+
+    /**
      * Finds the detector for a given detector and, optionally, metric.
      *
      * @param uuid Detector UUID.

@@ -22,6 +22,7 @@ import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
 import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.mapper.ExpressionTree;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
 import com.expedia.adaptivealerting.anomdetect.source.data.initializer.DataInitializer;
 import com.expedia.adaptivealerting.anomdetect.source.data.initializer.DetectorDataInitializationThrottledException;
@@ -159,6 +160,7 @@ public class DetectorManager {
     private Optional<Detector> detectorFor(MappedMetricData mappedMetricData) {
         notNull(mappedMetricData, "mappedMetricData can't be null");
         val detectorUuid = mappedMetricData.getDetectorUuid();
+
         Detector detector = cachedDetectors.get(detectorUuid);
         if (detector == null) {
             detector = detectorSource.findDetector(detectorUuid);
@@ -179,7 +181,8 @@ public class DetectorManager {
     private boolean attemptDataInitialization(MappedMetricData mappedMetricData, Detector detector) {
         boolean dataInitCompleted;
         try {
-            dataInitializer.initializeDetector(mappedMetricData, detector);
+            val detectorMapping = detectorSource.findDetectorMappingByUuid(detector.getUuid());
+            dataInitializer.initializeDetector(mappedMetricData, detector, detectorMapping);
             dataInitCompleted = true;
         } catch (DetectorDataInitializationThrottledException e) {
             log.info("Data Initialization throttled: {}", e.getMessage());
@@ -192,7 +195,7 @@ public class DetectorManager {
     }
 
     /**
-     * Sync with detector datastore by polling to get all deleted detectors
+     * Sync with detector data store by polling to get all deleted detectors
      * The deleted detectors will be cleaned up and the detectors modified will be reloaded
      * when corresponding mapped-metric comes in.
      * On successful sync update syncUptill time to currentTime

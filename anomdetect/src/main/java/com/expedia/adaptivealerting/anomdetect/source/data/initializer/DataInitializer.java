@@ -22,6 +22,8 @@ import com.expedia.adaptivealerting.anomdetect.forecast.point.PointForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.SeasonalPointForecaster;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.seasonalnaive.MetricDeliveryDuplicateException;
 import com.expedia.adaptivealerting.anomdetect.forecast.point.algo.seasonalnaive.MetricDeliveryTimeException;
+import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMapping;
+import com.expedia.adaptivealerting.anomdetect.mapper.ExpressionTree;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSource;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSourceResult;
 import com.expedia.adaptivealerting.anomdetect.source.data.initializer.throttlegate.ThrottleGate;
@@ -32,7 +34,9 @@ import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 public class DataInitializer {
@@ -51,13 +55,13 @@ public class DataInitializer {
         this.dataRetrievalTagKey = config.getString(DATA_RETRIEVAL_TAG_KEY);
     }
 
-    public void initializeDetector(MappedMetricData mappedMetricData, Detector detector) {
+    public void initializeDetector(MappedMetricData mappedMetricData, Detector detector, DetectorMapping detectorMapping) {
         // TODO: Forecasting Detector initialisation is currently limited to Seasonal Naive detector and assumes Graphite source
         if (isSeasonalNaiveDetector(detector)) {
             if (throttleGate.isOpen()) {
                 log.info("Throttle gate is open, initializing data and creating a detector");
                 val forecastingDetector = (ForecastingDetector) detector;
-                initializeForecastingDetector(mappedMetricData, forecastingDetector);
+                initializeForecastingDetector(mappedMetricData, forecastingDetector, detectorMapping);
             } else {
                 String message = "Throttle gate is closed, skipping data initialization";
                 log.info(message);
@@ -70,17 +74,17 @@ public class DataInitializer {
         return detector instanceof ForecastingDetector && "seasonalnaive".equals(detector.getName());
     }
 
-    private void initializeForecastingDetector(MappedMetricData mappedMetricData, ForecastingDetector forecastingDetector) {
+    private void initializeForecastingDetector(MappedMetricData mappedMetricData, ForecastingDetector forecastingDetector, DetectorMapping detectorMapping) {
         log.info("Initializing detector data");
-        val data = getHistoricalData(mappedMetricData, forecastingDetector);
+        val data = getHistoricalData(mappedMetricData, forecastingDetector, detectorMapping);
         log.info("Fetched total of {} historical data points for buffer", data.size());
         val metricDefinition = mappedMetricData.getMetricData().getMetricDefinition();
         populateForecastingDetectorWithHistoricalData(forecastingDetector, data, metricDefinition);
         log.info("Replayed {} historical data points for '{}' detector", data.size(), forecastingDetector.getName());
     }
 
-    private List<DataSourceResult> getHistoricalData(MappedMetricData mappedMetricData, ForecastingDetector forecastingDetector) {
-        val target = MetricUtil.getDataRetrievalValueOrMetricKey(mappedMetricData, dataRetrievalTagKey);
+    private List<DataSourceResult> getHistoricalData(MappedMetricData mappedMetricData, ForecastingDetector forecastingDetector, DetectorMapping detectorMapping) {
+        String target = getTarget(mappedMetricData, detectorMapping);
         PointForecaster pointForecaster = forecastingDetector.getPointForecaster();
         if (pointForecaster instanceof SeasonalPointForecaster) {
             val seasonalPointForecaster = ((SeasonalPointForecaster) pointForecaster);
@@ -112,5 +116,28 @@ public class DataInitializer {
         val dataPoint = dataSourceResult.getDataPoint();
         val epochSecond = dataSourceResult.getEpochSecond();
         return new MetricData(metricDefinition, dataPoint, epochSecond);
+    }
+
+    private String extractTagsFromExpression(ExpressionTree expression) {
+        val operands = expression.getOperands();
+        Map<String, String> tags = new HashMap<>();
+        for (val operand : operands) {
+            val field = operand.getField();
+            tags.put("'" + field.getKey(), field.getValue() + "'");
+        }
+        return convertHashMapToQueryString(tags);
+    }
+
+    private String convertHashMapToQueryString(Map<String, String> mapToConvert) {
+        return mapToConvert.toString().replace("{", "").replace("}", "");
+    }
+
+    private String getTarget(MappedMetricData mappedMetricData, DetectorMapping detectorMapping) {
+        val dataRetrievalTags = extractTagsFromExpression(detectorMapping.getExpression());
+        String target = "seriesByTag(" + dataRetrievalTags + ")";
+        if (dataRetrievalTagKey != null) {
+            target = MetricUtil.getDataRetrievalValueOrTagsList(mappedMetricData, dataRetrievalTagKey, dataRetrievalTags);
+        }
+        return target;
     }
 }

@@ -62,6 +62,13 @@ public class DefaultDetectorSource implements DetectorSource {
     }
 
     @Override
+    public DetectorMapping findDetectorMappingByUuid(UUID uuid) {
+        notNull(uuid, "uuid can't be null");
+        return client.findDetectorMappingByUuid(uuid);
+    }
+
+
+    @Override
     public Detector findDetector(UUID uuid) {
         notNull(uuid, "uuid can't be null");
         val document = client.findDetectorDocument(uuid);

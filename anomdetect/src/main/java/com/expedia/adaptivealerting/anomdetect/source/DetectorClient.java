@@ -29,6 +29,8 @@ import org.apache.http.client.fluent.Content;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -56,6 +58,8 @@ public class DetectorClient {
     // TODO Shouldn't these also include the /api/v2 prefix? [WLW]
     static final String FIND_MAPPINGS_BY_TAGS_PATH = "/api/detectorMappings/findMatchingByTags";
     static final String FIND_UPDATED_MAPPINGS_PATH = "/api/detectorMappings/lastUpdated?timeInSecs=%d";
+    static final String FIND_MAPPINGS_BY_UUID_PATH = "api/detectorMappings/search";
+
 
     @NonNull
     private final HttpClientWrapper httpClient;
@@ -183,7 +187,8 @@ public class DetectorClient {
             throw new DetectorException(message, e);
         }
 
-        val typeRef = new TypeReference<List<DetectorMapping>>() {};
+        val typeRef = new TypeReference<List<DetectorMapping>>() {
+        };
         try {
             result = objectMapper.readValue(content.asBytes(), typeRef);
         } catch (IOException e) {
@@ -198,4 +203,44 @@ public class DetectorClient {
 
         return result;
     }
+
+    /**
+     * Finds a detector mapping for the given detector UUID
+     *
+     * @param uuid Detector UUID.
+     * @return Detector mapping
+     */
+    public DetectorMapping findDetectorMappingByUuid(UUID uuid) {
+        Content content;
+        List<DetectorMapping> result;
+
+        val uri = String.format(baseUri + FIND_MAPPINGS_BY_UUID_PATH);
+        val body = Collections.singletonMap("detectorUuid", uuid).toString();
+        try {
+            content = httpClient.post(uri, body);
+        } catch (IOException e) {
+            val message = "IOException while getting detectors mappings for" +
+                    ": uuid=" + uuid +
+                    ", httpMethod=POST" +
+                    ", uri=" + uri;
+            throw new DetectorException(message, e);
+        }
+
+        val typeRef = new TypeReference<List<DetectorMapping>>() {
+        };
+        try {
+            result = objectMapper.readValue(content.asBytes(), typeRef);
+        } catch (IOException e) {
+            val message = "IOException while reading detectors mappings for" +
+                    ": uuid=" + uuid;
+            throw new DetectorException(message, e);
+        }
+
+        if (result == null) {
+            throw new DetectorException("No detector mappings for" +
+                    ": uuid=" + uuid);
+        }
+        return result.get(0);
+    }
+
 }
