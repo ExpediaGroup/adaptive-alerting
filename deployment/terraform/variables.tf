@@ -27,14 +27,6 @@ variable "modelservice" {
   type = "map"
 }
 
-variable "a2m-mapper" {
-  type = "map"
-}
-
-variable "metric-profiler" {
-  type = "map"
-}
-
 variable "aa-metric-functions" {
   type = "map"
 }
