@@ -120,6 +120,7 @@ public class DataInitializer {
 
     private String getTarget(MappedMetricData mappedMetricData, DetectorMapping detectorMapping) {
         val dataRetrievalTags = extractTagsFromExpression(detectorMapping.getExpression());
+        //FIXME WE don't want to hardcode graphite function here. Ideally this should be part of graphite client.
         String target = "seriesByTag(" + dataRetrievalTags + ")";
         if (dataRetrievalTagKey != null) {
             target = MetricUtil.getDataRetrievalValue(mappedMetricData, dataRetrievalTagKey);
