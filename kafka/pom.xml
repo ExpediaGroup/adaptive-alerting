@@ -70,10 +70,6 @@
             <artifactId>adaptive-alerting-metrics</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.expedia.adaptivealerting</groupId>
-            <artifactId>adaptive-alerting-metricprofiler</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-streams</artifactId>
         </dependency>

@@ -37,19 +37,6 @@ services:
       timeout: 10s
       retries: 5
 
-  a2m-mapper:
-    image: adaptive-alerting-a2m-mapper
-    environment:
-      AA_GRAPHITE_ENABLED: "true"
-      JAVA_XMS: 128m
-    volumes:
-      - ./configs/a2m-mapper:/config
-    depends_on:
-      kafkasvc:
-        condition: service_healthy
-      metrics:
-        condition: service_healthy
-
   ad-mapper:
     image: adaptive-alerting-ad-mapper
     environment:
