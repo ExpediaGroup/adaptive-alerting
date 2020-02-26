@@ -128,8 +128,8 @@ public class DataInitializer {
     }
 
     private String extractTagsFromExpression(ExpressionTree expression) {
-        val operands = expression.getOperands();
         Map<String, String> tags = new HashMap<>();
+        val operands = expression.getOperands();
         for (val operand : operands) {
             val field = operand.getField();
             tags.put("'" + field.getKey(), field.getValue() + "'");
@@ -138,6 +138,8 @@ public class DataInitializer {
     }
 
     private String convertHashMapToQueryString(Map<String, String> mapToConvert) {
-        return mapToConvert.toString().replace("{", "").replace("}", "");
+        return mapToConvert.toString()
+                .replace("{", "")
+                .replace("}", "");
     }
 }

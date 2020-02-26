@@ -168,17 +168,16 @@ public class DataInitializerTest {
     }
 
     private ExpressionTree getExpression() {
-        ExpressionTree expression = new ExpressionTree();
+        val expression = new ExpressionTree();
         expression.setOperator(Operator.AND);
+        val tag1 = new Operand();
+        tag1.setField(new Field("name", "sample-app"));
+        val tag2 = new Operand();
+        tag2.setField(new Field("region", "us-west-2"));
+
         List<Operand> operands = new ArrayList<>();
-        val testOperand = new Operand();
-        testOperand.setField(new Field("name", "sample-app"));
-
-        val testOperand1 = new Operand();
-        testOperand1.setField(new Field("region", "us-west-2"));
-
-        operands.add(testOperand);
-        operands.add(testOperand1);
+        operands.add(tag1);
+        operands.add(tag2);
         expression.setOperands(operands);
         return expression;
     }
