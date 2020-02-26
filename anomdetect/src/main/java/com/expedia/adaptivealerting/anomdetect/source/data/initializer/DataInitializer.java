@@ -118,6 +118,15 @@ public class DataInitializer {
         return new MetricData(metricDefinition, dataPoint, epochSecond);
     }
 
+    private String getTarget(MappedMetricData mappedMetricData, DetectorMapping detectorMapping) {
+        val dataRetrievalTags = extractTagsFromExpression(detectorMapping.getExpression());
+        String target = "seriesByTag(" + dataRetrievalTags + ")";
+        if (dataRetrievalTagKey != null) {
+            target = MetricUtil.getDataRetrievalValue(mappedMetricData, dataRetrievalTagKey);
+        }
+        return target;
+    }
+
     private String extractTagsFromExpression(ExpressionTree expression) {
         val operands = expression.getOperands();
         Map<String, String> tags = new HashMap<>();
@@ -130,14 +139,5 @@ public class DataInitializer {
 
     private String convertHashMapToQueryString(Map<String, String> mapToConvert) {
         return mapToConvert.toString().replace("{", "").replace("}", "");
-    }
-
-    private String getTarget(MappedMetricData mappedMetricData, DetectorMapping detectorMapping) {
-        val dataRetrievalTags = extractTagsFromExpression(detectorMapping.getExpression());
-        String target = "seriesByTag(" + dataRetrievalTags + ")";
-        if (dataRetrievalTagKey != null) {
-            target = MetricUtil.getDataRetrievalValue(mappedMetricData, dataRetrievalTagKey);
-        }
-        return target;
     }
 }

@@ -49,7 +49,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.anomdetect.detect.AnomalyType.TWO_TAILED;
-import static com.sun.tools.classfile.AccessFlags.Kind.Field;
 import static java.util.UUID.randomUUID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
