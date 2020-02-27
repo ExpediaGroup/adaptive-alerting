@@ -85,7 +85,6 @@ public class DataInitializer {
 
     private List<DataSourceResult> getHistoricalData(MappedMetricData mappedMetricData, ForecastingDetector forecastingDetector, DetectorMapping detectorMapping) {
         val target = getTarget(mappedMetricData, detectorMapping);
-        log.info("target:{}", target);
         PointForecaster pointForecaster = forecastingDetector.getPointForecaster();
         if (pointForecaster instanceof SeasonalPointForecaster) {
             val seasonalPointForecaster = ((SeasonalPointForecaster) pointForecaster);
