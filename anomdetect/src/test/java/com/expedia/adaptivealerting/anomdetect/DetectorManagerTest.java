@@ -20,6 +20,7 @@ import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
+import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMapping;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
 import com.expedia.adaptivealerting.anomdetect.source.data.initializer.DataInitializer;
 import com.expedia.adaptivealerting.anomdetect.source.data.initializer.DetectorDataInitializationThrottledException;
@@ -87,6 +88,8 @@ public final class DetectorManagerTest {
     private MetricDefinition badDefinition;
     private MetricData badMetricData;
     private MappedMetricData badMappedMetricData;
+
+    private DetectorMapping detectorMapping;
 
     @Mock
     private DataInitializer dataInitializer;
@@ -190,6 +193,11 @@ public final class DetectorManagerTest {
         this.badMetricData = new MetricData(badDefinition, 100.0, Instant.now().getEpochSecond());
         this.badMappedMetricData = new MappedMetricData(badMetricData, unmappedUuid);
 
+        this.detectorMapping = new DetectorMapping()
+                .setDetector(new com.expedia.adaptivealerting.anomdetect.mapper.Detector(
+                        UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689")))
+                .setEnabled(false);
+
         val detectorUuid = UUID.fromString("7629c28a-5958-4ca7-9aaa-49b95d3481ff");
         this.updatedDetectors = Collections.singletonList(detectorUuid);
     }
@@ -199,10 +207,10 @@ public final class DetectorManagerTest {
         when(detector.detect(goodMetricData)).thenReturn(outlierDetectorResult);
         when(detector.detect(goodMetricDataWithBadDataInit)).thenReturn(outlierDetectorResult);
 
-        doNothing().when(dataInitializer).initializeDetector(goodMappedMetricData, detector);
-        doThrow(new RuntimeException("Some Data Init Failure")).when(dataInitializer).initializeDetector(goodMappedMetricDataWithBadDataInit, detector);
-        doThrow(new DetectorDataInitializationThrottledException("Some Throttle Message")).when(dataInitializer).initializeDetector(goodMappedMetricDataWithThrottledDataInit, detector);
-        doNothing().when(dataInitializer).initializeDetector(badMappedMetricData, detector);
+        doNothing().when(dataInitializer).initializeDetector(goodMappedMetricData, detector, detectorMapping);
+        doThrow(new RuntimeException("Some Data Init Failure")).when(dataInitializer).initializeDetector(goodMappedMetricDataWithBadDataInit, detector, detectorMapping);
+        doThrow(new DetectorDataInitializationThrottledException("Some Throttle Message")).when(dataInitializer).initializeDetector(goodMappedMetricDataWithThrottledDataInit, detector, detectorMapping);
+        doNothing().when(dataInitializer).initializeDetector(badMappedMetricData, detector, detectorMapping);
 
         when(cachedDetectors.containsKey(updatedDetectors.get(0))).thenReturn(true);
 
@@ -211,6 +219,7 @@ public final class DetectorManagerTest {
         when(detectorSource.findDetector(mappedUuid3)).thenReturn(detector);
         when(detectorSource.findDetector(unmappedUuid)).thenReturn(null);
         when(detectorSource.findUpdatedDetectors(detectorRefreshPeriod * 60)).thenReturn(updatedDetectors);
+        when(detectorSource.findDetectorMappingByUuid(detector.getUuid())).thenReturn(detectorMapping);
 
         when(config.getInt("detector-refresh-period")).thenReturn(detectorRefreshPeriod);
         when(badConfig.getInt("detector-refresh-period")).thenReturn(badDetectorRefreshPeriod);

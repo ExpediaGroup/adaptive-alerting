@@ -101,28 +101,15 @@ public class MetricUtil {
 
     /**
      * Convenience method to get the value of the tag that has a key matching DATA_RETRIEVAL_TAG_KEY for the provided metric.
-     * If the provided metric does not contain that tag, the key of the metric's MetricDefinition will be returned.
      *
      * @param mappedMetricData Mapped metric data
-     * @return Returns value for the provided data retrieval tag key. If value is not present then the key of the metric's MetricDefinition will be returned.
+     * @return Returns value for the provided data retrieval tag key.
      */
-    public static String getDataRetrievalValueOrMetricKey(MappedMetricData mappedMetricData, String dataRetrievalTagKey) {
+    public static String getDataRetrievalValue(MappedMetricData mappedMetricData, String dataRetrievalTagKey) {
         val metricData = mappedMetricData.getMetricData();
         val metricDefinition = metricData.getMetricDefinition();
         val metricTags = metricDefinition.getTags();
-        val metricKey = metricDefinition.getKey();
-
-        if (dataRetrievalTagKey == null) {
-            return metricKey;
-        }
-
-        val dataRetrievalTagValue = getValueFromTagKey(metricTags, dataRetrievalTagKey);
-        if (dataRetrievalTagValue != null) {
-            return dataRetrievalTagValue;
-        } else {
-            log.warn("Provided data retrieval key={} doesn't exist. Returning metric key instead", dataRetrievalTagKey);
-            return metricKey;
-        }
+        return getValueFromTagKey(metricTags, dataRetrievalTagKey);
     }
 
     private String getValueFromTagKey(TagCollection metricTags, String dataRetrievalTagKey) {
