@@ -286,7 +286,7 @@ public class DetectorClientTest {
     }
 
     @Test(expected = DetectorException.class)
-    public void testFindDetectorMappingByUuids_cantRead() {
+    public void testFindDetectorMappingByUuid_cantRead() {
         clientUnderTest.findDetectorMappingByUuid(DETECTOR_UUID_CANT_READ);
     }
 
