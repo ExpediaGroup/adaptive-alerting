@@ -84,7 +84,8 @@ public class DataInitializer {
     }
 
     private List<DataSourceResult> getHistoricalData(MappedMetricData mappedMetricData, ForecastingDetector forecastingDetector, DetectorMapping detectorMapping) {
-        String target = getTarget(mappedMetricData, detectorMapping);
+        val target = getTarget(mappedMetricData, detectorMapping);
+        log.info("target:{}", target);
         PointForecaster pointForecaster = forecastingDetector.getPointForecaster();
         if (pointForecaster instanceof SeasonalPointForecaster) {
             val seasonalPointForecaster = ((SeasonalPointForecaster) pointForecaster);
@@ -119,11 +120,11 @@ public class DataInitializer {
     }
 
     private String getTarget(MappedMetricData mappedMetricData, DetectorMapping detectorMapping) {
-        val dataRetrievalTags = extractTagsFromExpression(detectorMapping.getExpression());
-        //FIXME WE don't want to hardcode graphite function here. Ideally this should be part of graphite client.
-        String target = "seriesByTag(" + dataRetrievalTags + ")";
-        if (dataRetrievalTagKey != null) {
-            target = MetricUtil.getDataRetrievalValue(mappedMetricData, dataRetrievalTagKey);
+        String target = MetricUtil.getDataRetrievalValue(mappedMetricData, dataRetrievalTagKey);
+        if (target == null) {
+            //FIXME WE don't want to hardcode graphite function here. Ideally this should be part of graphite client.
+            val dataRetrievalTags = extractTagsFromExpression(detectorMapping.getExpression());
+            target = "seriesByTag(" + dataRetrievalTags + ")";
         }
         return target;
     }

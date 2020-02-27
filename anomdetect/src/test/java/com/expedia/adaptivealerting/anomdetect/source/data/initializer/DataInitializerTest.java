@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.anomdetect.detect.AnomalyType.TWO_TAILED;
+import static com.expedia.adaptivealerting.anomdetect.source.data.initializer.DataInitializer.DATA_RETRIEVAL_TAG_KEY;
 import static java.util.UUID.randomUUID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -60,16 +61,22 @@ import static org.mockito.Mockito.when;
 
 @Slf4j
 public class DataInitializerTest {
+
     @InjectMocks
     private DataInitializer initializerUnderTest;
+
     @Mock
     private DataSource dataSource;
+
     @Mock
     private Config config;
+
     @Mock
     private ThrottleGate throttleGate;
+
     @Mock
     private ForecastingDetector seasonalNaiveDetector;
+
     @Mock
     private SeasonalPointForecaster seasonalPointForecaster;
 
@@ -126,6 +133,7 @@ public class DataInitializerTest {
 
     private void initConfig() {
         when(config.getString(DataInitializer.BASE_URI)).thenReturn("http://graphite");
+        when(config.getString(DATA_RETRIEVAL_TAG_KEY)).thenReturn("function");
     }
 
     private void initThrottleGate(boolean gateOpen) {
@@ -179,6 +187,7 @@ public class DataInitializerTest {
         operands.add(tag1);
         operands.add(tag2);
         expression.setOperands(operands);
+
         return expression;
     }
 }
