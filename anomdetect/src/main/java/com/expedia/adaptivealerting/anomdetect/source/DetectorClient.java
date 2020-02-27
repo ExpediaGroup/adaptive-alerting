@@ -234,7 +234,7 @@ public class DetectorClient {
             throw new DetectorException(message, e);
         }
 
-        if (result == null || result.size() == 0) {
+        if (result == null || result.isEmpty()) {
             throw new DetectorException("No detector mappings for" +
                     ": uuid=" + uuid);
         }
