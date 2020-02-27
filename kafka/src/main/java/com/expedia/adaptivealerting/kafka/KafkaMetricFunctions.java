@@ -53,27 +53,29 @@ public class KafkaMetricFunctions implements MetricFunctionsPublish {
     private Producer<String, MetricData> producer;
 
     public static void main(String[] args) {
-        val config = new TypesafeConfigLoader(APP_ID).loadMergedConfig();
-        val metricStoreConfig = config.getConfig(METRIC_STORE_KEY);
-
         val inputFile = INPUT_FILE_PATH + INPUT_FUNCTIONS_FILENAME;
-        val specs = MetricFunctionsReader.readFromInputFile(inputFile);
-        if (specs.isEmpty()) {
-            log.error("Empty input functions file. Exiting." );
-            System.exit(-1);
+        val functions = MetricFunctionsReader.readFromInputFile(inputFile);
+        log.info("Loaded {} metric functions", functions.size());
+
+        if (functions.isEmpty()) {
+            log.info("No metric functions to execute. Exiting." );
+            System.exit(0);
         }
 
-        for (val spec : specs) {
+        for (val spec : functions) {
             log.info("Loaded metric function: {}", spec);
         }
 
-        val functions = new KafkaMetricFunctions();
-        functions.initPublisher();
+        val config = new TypesafeConfigLoader(APP_ID).loadMergedConfig();
+        val metricStoreConfig = config.getConfig(METRIC_STORE_KEY);
+
+        val kafkaMetricFunctions = new KafkaMetricFunctions();
+        kafkaMetricFunctions.initPublisher();
 
         val execService = Executors.newScheduledThreadPool(NUM_THREADS);
-        for (val spec : specs) {
-            val task = new MetricFunctionsTask(metricStoreConfig, spec, functions);
-            val intervalInSeconds = spec.getIntervalInSecs();
+        for (val function : functions) {
+            val task = new MetricFunctionsTask(metricStoreConfig, function, kafkaMetricFunctions);
+            val intervalInSeconds = function.getIntervalInSecs();
             execService.scheduleAtFixedRate(task, 0, intervalInSeconds, TimeUnit.SECONDS);
         }
     }
