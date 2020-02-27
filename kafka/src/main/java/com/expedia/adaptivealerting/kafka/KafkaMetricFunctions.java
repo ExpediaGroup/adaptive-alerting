@@ -54,15 +54,15 @@ public class KafkaMetricFunctions implements MetricFunctionsPublish {
 
     public static void main(String[] args) {
         val inputFile = INPUT_FILE_PATH + INPUT_FUNCTIONS_FILENAME;
-        val functions = MetricFunctionsReader.readFromInputFile(inputFile);
-        log.info("Loaded {} metric functions", functions.size());
+        val specs = MetricFunctionsReader.readFromInputFile(inputFile);
+        log.info("Loaded {} metric functions", specs.size());
 
-        if (functions.isEmpty()) {
+        if (specs.isEmpty()) {
             log.info("No metric functions to execute. Exiting." );
             System.exit(0);
         }
 
-        for (val spec : functions) {
+        for (val spec : specs) {
             log.info("Loaded metric function: {}", spec);
         }
 
@@ -73,9 +73,9 @@ public class KafkaMetricFunctions implements MetricFunctionsPublish {
         kafkaMetricFunctions.initPublisher();
 
         val execService = Executors.newScheduledThreadPool(NUM_THREADS);
-        for (val function : functions) {
-            val task = new MetricFunctionsTask(metricStoreConfig, function, kafkaMetricFunctions);
-            val intervalInSeconds = function.getIntervalInSecs();
+        for (val spec : specs) {
+            val task = new MetricFunctionsTask(metricStoreConfig, spec, kafkaMetricFunctions);
+            val intervalInSeconds = spec.getIntervalInSecs();
             execService.scheduleAtFixedRate(task, 0, intervalInSeconds, TimeUnit.SECONDS);
         }
     }
