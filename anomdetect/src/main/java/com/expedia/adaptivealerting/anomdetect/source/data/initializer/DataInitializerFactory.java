@@ -27,8 +27,6 @@ import lombok.val;
 import static com.expedia.adaptivealerting.anomdetect.source.data.initializer.DataInitializer.BASE_URI;
 import static com.expedia.adaptivealerting.anomdetect.source.data.initializer.DataInitializer.THROTTLE_GATE_LIKELIHOOD;
 
-// FIXME Shouldn't this go in the anomdetect module? [WLW]
-
 public class DataInitializerFactory {
 
     public static DataInitializer buildDataInitializer(Config config) {
