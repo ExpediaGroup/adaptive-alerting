@@ -180,11 +180,12 @@ public class DetectorManager {
     private boolean attemptDataInitialization(MappedMetricData mappedMetricData, Detector detector) {
         boolean dataInitCompleted;
         try {
-            log.info("Initializing detector for metric data: {}", mappedMetricData);
+            log.debug("Initializing detector for metric data: {}", mappedMetricData);
             val detectorMapping = detectorSource.findDetectorMappingByUuid(detector.getUuid());
 
-            log.info("Initializing detector with detector mapping: {}", detectorMapping);
+            log.debug("Initializing detector with detector mapping: {}", detectorMapping);
             dataInitializer.initializeDetector(mappedMetricData, detector, detectorMapping);
+            
             dataInitCompleted = true;
         } catch (DetectorDataInitializationThrottledException e) {
             log.info("Data Initialization throttled: {}", e.getMessage());
