@@ -57,7 +57,7 @@ public class DetectorClient {
     // TODO Shouldn't these also include the /api/v2 prefix? [WLW]
     static final String FIND_MAPPINGS_BY_TAGS_PATH = "/api/detectorMappings/findMatchingByTags";
     static final String FIND_UPDATED_MAPPINGS_PATH = "/api/detectorMappings/lastUpdated?timeInSecs=%d";
-    static final String FIND_MAPPINGS_BY_UUID_PATH = "api/detectorMappings/search";
+    static final String FIND_MAPPINGS_BY_UUID_PATH = "/api/detectorMappings/search";
 
 
     @NonNull
@@ -221,7 +221,8 @@ public class DetectorClient {
             val message = "IOException while getting detectors mappings for" +
                     ": uuid=" + uuid +
                     ", httpMethod=POST" +
-                    ", uri=" + uri;
+                    ", uri=" + uri +
+                    ", body=" + body;
             throw new DetectorException(message, e);
         }
         val typeRef = new TypeReference<List<DetectorMapping>>() {
