@@ -219,7 +219,7 @@ public class DetectorClient {
             val body = objectMapper.writeValueAsString(bodyMap);
             content = httpClient.post(uri, body);
         } catch (IOException e) {
-            val message = "IOException while getting detectors mappings for" +
+            String message = "IOException while getting detectors mappings for" +
                     ": uuid=" + uuid +
                     ", httpMethod=POST" +
                     ", uri=" + uri;
