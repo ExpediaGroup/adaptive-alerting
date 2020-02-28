@@ -221,7 +221,8 @@ public class DetectorClient {
             val message = "IOException while getting detectors mappings for" +
                     ": uuid=" + uuid +
                     ", httpMethod=POST" +
-                    ", uri=" + uri;
+                    ", uri=" + uri +
+                    ", body=" + body;
             throw new DetectorException(message, e);
         }
         val typeRef = new TypeReference<List<DetectorMapping>>() {
