@@ -58,6 +58,7 @@ public class DetectorClientTest {
     private static final UUID DETECTOR_UUID_CANT_GET = UUID.fromString("2c656ea0-dbf7-4081-aa01-55e86439ad22");
     private static final UUID DETECTOR_UUID_CANT_READ = UUID.fromString("2c656ea0-dbf7-4081-aa01-55e86439ad23");
     private static final UUID DETECTOR_UUID_NO_DOCS = UUID.fromString("2c656ea0-dbf7-4081-aa01-55e86439ad24");
+    private static final UUID DETECTOR_UUID_CANT_POST = UUID.fromString("2c656ea0-dbf7-4081-aa01-55e86439ad25");
 
     private static final int TIME_PERIOD_INVALID = 0;
     private static final int TIME_PERIOD_VALID = 1000;
@@ -158,6 +159,11 @@ public class DetectorClientTest {
     private String tagsBody = "tagsBody";
     private String tagsBody_cantPost = "tagsBody_cantPost";
     private String tagsBody_cantRead = "tagsBody_cantRead";
+
+    private String uuidMappingsBody = "uuidMappingsBody";
+    private String uuidMappingsBody_cantPost = "uuidMappingsBody_cantPost";
+    private String uuidMappingsBody_cantRead = "uuidMappingsBody_cantRead";
+    private String uuidMappingsBody_noMappings = "uuidMappingsBody_noMappings";
 
     private DetectorDocument[] docs = {};
     private List<DetectorMapping> mappings = new ArrayList<>();
@@ -281,8 +287,8 @@ public class DetectorClientTest {
     }
 
     @Test(expected = DetectorException.class)
-    public void testFindDetectorMappingByUuid_cantGet() {
-        clientUnderTest.findDetectorMappingByUuid(DETECTOR_UUID_CANT_GET);
+    public void testFindDetectorMappingByUuid_cantPost() {
+        clientUnderTest.findDetectorMappingByUuid(DETECTOR_UUID_CANT_POST);
     }
 
     @Test(expected = DetectorException.class)
@@ -364,26 +370,31 @@ public class DetectorClientTest {
 
     private void initFindDetectorMappingsByUuid() throws IOException {
         mappings.add(new DetectorMapping());
-        val body = buildDetectorMappingByUuidBody(DETECTOR_UUID);
-        when(httpClient.post(FIND_MAPPINGS_URI_BY_UUID, body)).thenReturn(mappingContent);
+
+        val bodyMap = buildDetectorMappingByUuidBody(DETECTOR_UUID);
+        when(objectMapper.writeValueAsString(bodyMap)).thenReturn(uuidMappingsBody);
+        when(httpClient.post(FIND_MAPPINGS_URI_BY_UUID, uuidMappingsBody)).thenReturn(mappingContent);
         when(mappingContent.asBytes()).thenReturn(mappingBytes);
         when(objectMapper.readValue(eq(mappingBytes), any(TypeReference.class))).thenReturn(mappings);
 
-        val bodyCantGet = buildDetectorMappingByUuidBody(DETECTOR_UUID_CANT_GET);
-        when(httpClient.post(FIND_MAPPINGS_URI_BY_UUID_URI_CANT_GET, bodyCantGet)).thenThrow(new IOException());
+        val bodyCantPostMap = buildDetectorMappingByUuidBody(DETECTOR_UUID_CANT_POST);
+        when(objectMapper.writeValueAsString(bodyCantPostMap)).thenReturn(uuidMappingsBody_cantPost);
+        when(httpClient.post(FIND_MAPPINGS_URI_BY_UUID_URI_CANT_GET, uuidMappingsBody_cantPost)).thenThrow(new IOException());
 
-        val bodyCantREAD = buildDetectorMappingByUuidBody(DETECTOR_UUID_CANT_READ);
-        when(httpClient.post(FIND_MAPPINGS_URI_BY_UUID_CANT_READ, bodyCantREAD)).thenReturn(mappingContent_cantRead);
+        val bodyCantReadMap = buildDetectorMappingByUuidBody(DETECTOR_UUID_CANT_READ);
+        when(objectMapper.writeValueAsString(bodyCantReadMap)).thenReturn(uuidMappingsBody_cantRead);
+        when(httpClient.post(FIND_MAPPINGS_URI_BY_UUID_CANT_READ, uuidMappingsBody_cantRead)).thenReturn(mappingContent_cantRead);
         when(mappingContent_cantRead.asBytes()).thenReturn(mappingBytes_cantRead);
         when(objectMapper.readValue(eq(mappingBytes_cantRead), any(TypeReference.class))).thenThrow(new IOException());
 
-        val bodyNoMappings = buildDetectorMappingByUuidBody(DETECTOR_UUID_NO_DOCS);
-        when(httpClient.post(FIND_MAPPINGS_URI_BY_UUID_NO_MAPPINGS, bodyNoMappings)).thenReturn(mappingContent_noMappings);
+        val bodyNoMappingsMap = buildDetectorMappingByUuidBody(DETECTOR_UUID_NO_DOCS);
+        when(objectMapper.writeValueAsString(bodyNoMappingsMap)).thenReturn(uuidMappingsBody_noMappings);
+        when(httpClient.post(FIND_MAPPINGS_URI_BY_UUID_NO_MAPPINGS, uuidMappingsBody_noMappings)).thenReturn(mappingContent_noMappings);
         when(mappingContent_noMappings.asBytes()).thenReturn(mappingBytes_noMappings);
         when(objectMapper.readValue(eq(mappingBytes_noMappings), any(TypeReference.class))).thenReturn(null);
     }
 
-    private String buildDetectorMappingByUuidBody(UUID uuid) {
-        return Collections.singletonMap("detectorUuid", uuid).toString();
+    private Map<String, UUID> buildDetectorMappingByUuidBody(UUID uuid) {
+        return Collections.singletonMap("detectorUuid", uuid);
     }
 }

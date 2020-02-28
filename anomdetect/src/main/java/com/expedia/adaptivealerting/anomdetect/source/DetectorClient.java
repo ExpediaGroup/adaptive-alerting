@@ -214,15 +214,16 @@ public class DetectorClient {
         List<DetectorMapping> result;
 
         val uri = String.format(baseUri + FIND_MAPPINGS_BY_UUID_PATH);
-        val body = Collections.singletonMap("detectorUuid", uuid).toString();
+        val bodyMap = Collections.singletonMap("detectorUuid", uuid);
+        String body;
         try {
+            body = objectMapper.writeValueAsString(bodyMap);
             content = httpClient.post(uri, body);
         } catch (IOException e) {
             val message = "IOException while getting detectors mappings for" +
                     ": uuid=" + uuid +
                     ", httpMethod=POST" +
-                    ", uri=" + uri +
-                    ", body=" + body;
+                    ", uri=" + uri;
             throw new DetectorException(message, e);
         }
         val typeRef = new TypeReference<List<DetectorMapping>>() {
