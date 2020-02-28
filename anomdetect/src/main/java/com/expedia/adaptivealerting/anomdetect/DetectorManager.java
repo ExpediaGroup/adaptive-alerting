@@ -168,7 +168,7 @@ public class DetectorManager {
                 cachedDetectors.put(detectorUuid, detector);
                 log.debug("Data Initialization phase is complete.  Caching detector.");
             } else {
-                log.debug("Data Initialization incomplete.  Discarding detector from memory to allow future re-attempts.");
+                log.debug("Data Initialization incomplete. Discarding detector from memory to allow future re-attempts.");
                 detector = null;
             }
         } else {
@@ -180,7 +180,10 @@ public class DetectorManager {
     private boolean attemptDataInitialization(MappedMetricData mappedMetricData, Detector detector) {
         boolean dataInitCompleted;
         try {
+            log.info("Initializing detector for metric data: {}", mappedMetricData);
             val detectorMapping = detectorSource.findDetectorMappingByUuid(detector.getUuid());
+
+            log.info("Initializing detector with detector mapping: {}", detectorMapping);
             dataInitializer.initializeDetector(mappedMetricData, detector, detectorMapping);
             dataInitCompleted = true;
         } catch (DetectorDataInitializationThrottledException e) {
