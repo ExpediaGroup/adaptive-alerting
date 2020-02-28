@@ -95,6 +95,18 @@ public final class DefaultDetectorSourceTest {
         sourceUnderTest.findUpdatedDetectorMappings(-1);
     }
 
+
+    @Test
+    public void testFindDetectorMappingByUuid() {
+        val results = sourceUnderTest.findDetectorMappingByUuid(UUID.randomUUID());
+        assertEquals(detectorMapping, results);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFindDetectorMappingByUuidFail() {
+        sourceUnderTest.findDetectorMappingByUuid(null);
+    }
+
     @Test
     public void testFindUpdatedDetectors() {
         val results = sourceUnderTest.findUpdatedDetectors(1);
@@ -156,7 +168,8 @@ public final class DefaultDetectorSourceTest {
                 .thenThrow(new DetectorException("Error finding latest model", new IOException()));
         when(detectorClient.findUpdatedDetectorMappings(1))
                 .thenReturn(Collections.singletonList(this.detectorMapping));
-
+        when(detectorClient.findDetectorMappingByUuid(any(UUID.class)))
+                .thenReturn(this.detectorMapping);
         when(detectorFactory.buildDetector(any(DetectorDocument.class))).thenReturn(detector);
     }
 }

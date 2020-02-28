@@ -37,6 +37,7 @@ import java.util.UUID;
 
 import static com.expedia.adaptivealerting.anomdetect.source.DetectorClient.FIND_DOCUMENT_PATH;
 import static com.expedia.adaptivealerting.anomdetect.source.DetectorClient.FIND_MAPPINGS_BY_TAGS_PATH;
+import static com.expedia.adaptivealerting.anomdetect.source.DetectorClient.FIND_MAPPINGS_BY_UUID_PATH;
 import static com.expedia.adaptivealerting.anomdetect.source.DetectorClient.FIND_UPDATED_DOCUMENTS_PATH;
 import static com.expedia.adaptivealerting.anomdetect.source.DetectorClient.FIND_UPDATED_MAPPINGS_PATH;
 import static org.junit.Assert.assertEquals;
@@ -53,10 +54,10 @@ import static org.mockito.Mockito.when;
 public class DetectorClientTest {
     private static final String BASE_URI = "http://example.com";
 
-    private static final UUID DETECTOR_UUID = UUID.randomUUID();
-    private static final UUID DETECTOR_UUID_CANT_GET = UUID.randomUUID();
-    private static final UUID DETECTOR_UUID_CANT_READ = UUID.randomUUID();
-    private static final UUID DETECTOR_UUID_NO_DOCS = UUID.randomUUID();
+    private static final UUID DETECTOR_UUID = UUID.fromString("2c656ea0-dbf7-4081-aa01-55e86439ad21");
+    private static final UUID DETECTOR_UUID_CANT_GET = UUID.fromString("2c656ea0-dbf7-4081-aa01-55e86439ad22");
+    private static final UUID DETECTOR_UUID_CANT_READ = UUID.fromString("2c656ea0-dbf7-4081-aa01-55e86439ad23");
+    private static final UUID DETECTOR_UUID_NO_DOCS = UUID.fromString("2c656ea0-dbf7-4081-aa01-55e86439ad24");
 
     private static final int TIME_PERIOD_INVALID = 0;
     private static final int TIME_PERIOD_VALID = 1000;
@@ -79,6 +80,11 @@ public class DetectorClientTest {
     private static final String FIND_UPDATED_MAPPINGS_URI_CANT_GET = uri(FIND_UPDATED_MAPPINGS_PATH, TIME_PERIOD_CANT_GET);
     private static final String FIND_UPDATED_MAPPINGS_URI_CANT_READ = uri(FIND_UPDATED_MAPPINGS_PATH, TIME_PERIOD_CANT_READ);
     private static final String FIND_UPDATED_MAPPINGS_URI_NO_MAPPINGS = uri(FIND_UPDATED_MAPPINGS_PATH, TIME_PERIOD_NO_MAPPINGS);
+
+    private static final String FIND_MAPPINGS_URI_BY_UUID = uri(FIND_MAPPINGS_BY_UUID_PATH, DETECTOR_UUID);
+    private static final String FIND_MAPPINGS_URI_BY_UUID_URI_CANT_GET = uri(FIND_MAPPINGS_BY_UUID_PATH, DETECTOR_UUID_CANT_GET);
+    private static final String FIND_MAPPINGS_URI_BY_UUID_CANT_READ = uri(FIND_MAPPINGS_BY_UUID_PATH, DETECTOR_UUID_CANT_READ);
+    private static final String FIND_MAPPINGS_URI_BY_UUID_NO_MAPPINGS = uri(FIND_MAPPINGS_BY_UUID_PATH, DETECTOR_UUID_NO_DOCS);
 
 
     private DetectorClient clientUnderTest;
@@ -124,6 +130,9 @@ public class DetectorClientTest {
     private Content mappingContent_cantRead;
 
     @Mock
+    private Content mappingContent_noMappings;
+
+    @Mock
     private Content updatedMappingContent;
 
     @Mock
@@ -132,6 +141,7 @@ public class DetectorClientTest {
     @Mock
     private Content updatedMappingContent_noMappings;
 
+
     private byte[] docBytes = "docBytes".getBytes();
     private byte[] docBytes_cantRead = "docBytes_cantRead".getBytes();
     private byte[] docBytes_noDocs = "docBytes_noDocs".getBytes();
@@ -139,6 +149,8 @@ public class DetectorClientTest {
     private byte[] updatedDocsBytes_cantRead = "updatedDocsBytes_cantRead".getBytes();
     private byte[] mappingBytes = "mappingBytes".getBytes();
     private byte[] mappingBytes_cantRead = "mappingBytes_cantRead".getBytes();
+    private byte[] mappingBytes_noMappings = "mappingBytes_noMappings".getBytes();
+
     private byte[] updatedMappingBytes = "updatedMappingBytes".getBytes();
     private byte[] updatedMappingBytes_cantRead = "updatedMappingBytes_cantRead".getBytes();
     private byte[] updatedMappingBytes_noMappings = "updatedMappingBytes_noMappings".getBytes();
@@ -163,6 +175,7 @@ public class DetectorClientTest {
         initFindUpdatedDetectorDocuments();
         initFindMatchingDetectorMappings();
         initFindUpdatedDetectorMappings();
+        initFindDetectorMappingsByUuid();
         this.clientUnderTest = new DetectorClient(httpClient, BASE_URI, objectMapper);
     }
 
@@ -257,6 +270,32 @@ public class DetectorClientTest {
     }
 
     // ================================================================================
+    // findDetectorMappingByUuid
+    // ================================================================================
+
+    @Test
+    public void testFindDetectorMappingByUuid() {
+        val mappings = clientUnderTest.findDetectorMappingByUuid(DETECTOR_UUID);
+        assertNotNull(mappings);
+        assertSame(mappings, mappings);
+    }
+
+    @Test(expected = DetectorException.class)
+    public void testFindDetectorMappingByUuid_cantGet() {
+        clientUnderTest.findDetectorMappingByUuid(DETECTOR_UUID_CANT_GET);
+    }
+
+    @Test(expected = DetectorException.class)
+    public void testFindDetectorMappingByUuid_cantRead() {
+        clientUnderTest.findDetectorMappingByUuid(DETECTOR_UUID_CANT_READ);
+    }
+
+    @Test(expected = DetectorException.class)
+    public void testFindDetectorMappingByUuid_noMappings() {
+        clientUnderTest.findDetectorMappingByUuid(DETECTOR_UUID_NO_DOCS);
+    }
+
+    // ================================================================================
     // Helpers
     // ================================================================================
 
@@ -321,5 +360,30 @@ public class DetectorClientTest {
         when(httpClient.get(FIND_UPDATED_MAPPINGS_URI_NO_MAPPINGS)).thenReturn(updatedMappingContent_noMappings);
         when(updatedMappingContent_noMappings.asBytes()).thenReturn(updatedMappingBytes_noMappings);
         when(objectMapper.readValue(eq(updatedMappingBytes_noMappings), any(TypeReference.class))).thenReturn(null);
+    }
+
+    private void initFindDetectorMappingsByUuid() throws IOException {
+        mappings.add(new DetectorMapping());
+        val body = buildDetectorMappingByUuidBody(DETECTOR_UUID);
+        when(httpClient.post(FIND_MAPPINGS_URI_BY_UUID, body)).thenReturn(mappingContent);
+        when(mappingContent.asBytes()).thenReturn(mappingBytes);
+        when(objectMapper.readValue(eq(mappingBytes), any(TypeReference.class))).thenReturn(mappings);
+
+        val bodyCantGet = buildDetectorMappingByUuidBody(DETECTOR_UUID_CANT_GET);
+        when(httpClient.post(FIND_MAPPINGS_URI_BY_UUID_URI_CANT_GET, bodyCantGet)).thenThrow(new IOException());
+
+        val bodyCantREAD = buildDetectorMappingByUuidBody(DETECTOR_UUID_CANT_READ);
+        when(httpClient.post(FIND_MAPPINGS_URI_BY_UUID_CANT_READ, bodyCantREAD)).thenReturn(mappingContent_cantRead);
+        when(mappingContent_cantRead.asBytes()).thenReturn(mappingBytes_cantRead);
+        when(objectMapper.readValue(eq(mappingBytes_cantRead), any(TypeReference.class))).thenThrow(new IOException());
+
+        val bodyNoMappings = buildDetectorMappingByUuidBody(DETECTOR_UUID_NO_DOCS);
+        when(httpClient.post(FIND_MAPPINGS_URI_BY_UUID_NO_MAPPINGS, bodyNoMappings)).thenReturn(mappingContent_noMappings);
+        when(mappingContent_noMappings.asBytes()).thenReturn(mappingBytes_noMappings);
+        when(objectMapper.readValue(eq(mappingBytes_noMappings), any(TypeReference.class))).thenReturn(null);
+    }
+
+    private String buildDetectorMappingByUuidBody(UUID uuid) {
+        return Collections.singletonMap("detectorUuid", uuid).toString();
     }
 }

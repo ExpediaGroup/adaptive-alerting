@@ -224,7 +224,6 @@ public class DetectorClient {
                     ", uri=" + uri;
             throw new DetectorException(message, e);
         }
-
         val typeRef = new TypeReference<List<DetectorMapping>>() {
         };
         try {
@@ -235,7 +234,7 @@ public class DetectorClient {
             throw new DetectorException(message, e);
         }
 
-        if (result == null) {
+        if (result == null || result.isEmpty()) {
             throw new DetectorException("No detector mappings for" +
                     ": uuid=" + uuid);
         }
