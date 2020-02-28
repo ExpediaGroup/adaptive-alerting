@@ -15,5 +15,35 @@
  */
 package com.expedia.adaptivealerting.kafka;
 
+import com.github.charithe.kafka.EphemeralKafkaBroker;
+import com.github.charithe.kafka.KafkaJunitRule;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.mockito.MockitoAnnotations;
+
+@Slf4j
 public class KafkaMetricFunctionsTest {
+
+    // Metric producer
+
+    @ClassRule
+    public static KafkaJunitRule kafka = new KafkaJunitRule(EphemeralKafkaBroker.create()).waitForStartup();
+
+    public KafkaMetricFunctions functionsUnderTest;
+
+    @Before
+    public void setUp() {
+        MockitoAnnotations.initMocks(this);
+        this.functionsUnderTest = new KafkaMetricFunctions();
+    }
+
+    // FIXME This is generating an error related to not seeing the proper config. Not sure what's up yet. [WLW]
+    @Test
+    @Ignore
+    public void testInitPublisher() {
+        functionsUnderTest.initPublisher();
+    }
 }

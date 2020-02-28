@@ -19,6 +19,7 @@ import com.expedia.adaptivealerting.kafka.util.ConfigUtil;
 import com.expedia.adaptivealerting.metrics.functions.MetricFunctionsTask;
 import com.expedia.adaptivealerting.metrics.functions.sink.MetricFunctionsPublish;
 import com.expedia.adaptivealerting.metrics.functions.source.MetricFunctionsReader;
+import com.expedia.adaptivealerting.metrics.functions.source.MetricFunctionsSpec;
 import com.expedia.metrics.MetricData;
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -39,32 +41,25 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
  */
 @Slf4j
 public class KafkaMetricFunctions implements MetricFunctionsPublish {
-    private static final String APP_ID = "aa-metric-functions";
-    private static final String INPUT_FUNCTIONS_FILENAME ="functions.txt";
-    private static final String INPUT_FILE_PATH = "/config/";
-    private static final String METRIC_STORE_KEY = "metric-source-sink";
-    private static final String OUTPUT_TOPIC_KEY = "output-topic";
-    private static final int NUM_THREADS = 15;
 
+    // Metric functions specs
+    private static final String SPECS_PATH = "/config/";
+    private static final String SPECS_FILENAME ="functions.txt";
+
+    // Metric functions Kafka app config
+    private static final String APP_ID = "aa-metric-functions";
     // FIXME This is misleadingly named: derived metrics need not be aggregations. [WLW]
     private static final String PRODUCER = "aggregator-producer";
+    private static final String METRIC_STORE_KEY = "metric-source-sink";
+    private static final String OUTPUT_TOPIC_KEY = "output-topic";
+
+    private static final int NUM_THREADS = 15;
 
     private Config metricStoreConfig;
     private Producer<String, MetricData> producer;
 
     public static void main(String[] args) {
-        val inputFile = INPUT_FILE_PATH + INPUT_FUNCTIONS_FILENAME;
-        val specs = MetricFunctionsReader.readFromInputFile(inputFile);
-        log.info("Loaded {} metric functions", specs.size());
-
-        if (specs.isEmpty()) {
-            log.info("No metric functions to execute. Exiting." );
-            System.exit(0);
-        }
-
-        for (val spec : specs) {
-            log.info("Loaded metric function: {}", spec);
-        }
+        val specs = readSpecs();
 
         val config = new TypesafeConfigLoader(APP_ID).loadMergedConfig();
         val metricStoreConfig = config.getConfig(METRIC_STORE_KEY);
@@ -80,14 +75,31 @@ public class KafkaMetricFunctions implements MetricFunctionsPublish {
         }
     }
 
+    private static List<MetricFunctionsSpec> readSpecs() {
+        val inputFile = SPECS_PATH + SPECS_FILENAME;
+        val specs = MetricFunctionsReader.readFromInputFile(inputFile);
+        log.info("Loaded {} metric functions", specs.size());
+
+        if (specs.isEmpty()) {
+            log.info("No metric functions to execute. Exiting." );
+            System.exit(0);
+        }
+
+        for (val spec : specs) {
+            log.info("Loaded metric function: {}", spec);
+        }
+        return specs;
+    }
+
     @Override
     public void initPublisher() {
         val config = new TypesafeConfigLoader(APP_ID).loadMergedConfig();
+
         val producerConfig = config.getConfig(PRODUCER);
         val producerProps = ConfigUtil.toProducerConfig(producerConfig);
+        this.producer = new KafkaProducer<>(producerProps);
 
         this.metricStoreConfig = config.getConfig(METRIC_STORE_KEY);
-        this.producer = new KafkaProducer<>(producerProps);
     }
 
     @Override

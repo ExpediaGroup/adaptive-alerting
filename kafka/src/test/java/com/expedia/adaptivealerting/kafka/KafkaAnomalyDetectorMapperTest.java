@@ -57,7 +57,6 @@ public final class KafkaAnomalyDetectorMapperTest {
     private static final String INVALID_INPUT_VALUE = "invalid-input-value";
     private static final String stateStoreName = "es-request-buffer";
 
-
     @Mock
     private DetectorMapper mapper;
 
