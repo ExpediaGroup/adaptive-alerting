@@ -214,7 +214,7 @@ public class DetectorClient {
         List<DetectorMapping> result;
 
         val uri = String.format(baseUri + FIND_MAPPINGS_BY_UUID_PATH);
-        val bodyMap = Collections.singletonMap("detectorUuid", uuid);
+        Map<String, UUID> bodyMap = Collections.singletonMap("detectorUuid", uuid);
         try {
             val body = objectMapper.writeValueAsString(bodyMap);
             content = httpClient.post(uri, body);
