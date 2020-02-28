@@ -57,7 +57,7 @@ public class DetectorClient {
     // TODO Shouldn't these also include the /api/v2 prefix? [WLW]
     static final String FIND_MAPPINGS_BY_TAGS_PATH = "/api/detectorMappings/findMatchingByTags";
     static final String FIND_UPDATED_MAPPINGS_PATH = "/api/detectorMappings/lastUpdated?timeInSecs=%d";
-    static final String FIND_MAPPINGS_BY_UUID_PATH = "api/detectorMappings/search";
+    static final String FIND_MAPPINGS_BY_UUID_PATH = "/api/detectorMappings/search";
 
 
     @NonNull

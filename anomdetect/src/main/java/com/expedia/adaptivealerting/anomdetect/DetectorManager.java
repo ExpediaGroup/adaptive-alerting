@@ -22,6 +22,7 @@ import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
 import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMapping;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
 import com.expedia.adaptivealerting.anomdetect.source.data.initializer.DataInitializer;
 import com.expedia.adaptivealerting.anomdetect.source.data.initializer.DetectorDataInitializationThrottledException;
@@ -163,7 +164,8 @@ public class DetectorManager {
         Detector detector = cachedDetectors.get(detectorUuid);
         if (detector == null) {
             detector = detectorSource.findDetector(detectorUuid);
-            boolean dataInitCompleted = attemptDataInitialization(mappedMetricData, detector);
+            val detectorMapping = detectorSource.findDetectorMappingByUuid(detectorUuid);
+            boolean dataInitCompleted = attemptDataInitialization(mappedMetricData, detector, detectorMapping);
             if (dataInitCompleted) {
                 cachedDetectors.put(detectorUuid, detector);
                 log.debug("Data Initialization phase is complete.  Caching detector.");
@@ -177,10 +179,9 @@ public class DetectorManager {
         return Optional.ofNullable(detector);
     }
 
-    private boolean attemptDataInitialization(MappedMetricData mappedMetricData, Detector detector) {
+    private boolean attemptDataInitialization(MappedMetricData mappedMetricData, Detector detector, DetectorMapping detectorMapping) {
         boolean dataInitCompleted;
         try {
-            val detectorMapping = detectorSource.findDetectorMappingByUuid(detector.getUuid());
             dataInitializer.initializeDetector(mappedMetricData, detector, detectorMapping);
             dataInitCompleted = true;
         } catch (DetectorDataInitializationThrottledException e) {
