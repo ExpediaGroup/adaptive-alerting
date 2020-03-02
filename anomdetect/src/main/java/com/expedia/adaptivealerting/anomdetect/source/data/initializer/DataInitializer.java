@@ -26,6 +26,7 @@ import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMapping;
 import com.expedia.adaptivealerting.anomdetect.mapper.ExpressionTree;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSource;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSourceResult;
+import com.expedia.adaptivealerting.anomdetect.source.data.initializer.reconstructbuffer.SeasonalBufferSynthesizer;
 import com.expedia.adaptivealerting.anomdetect.source.data.initializer.throttlegate.ThrottleGate;
 import com.expedia.adaptivealerting.anomdetect.util.MetricUtil;
 import com.expedia.metrics.MetricData;
@@ -34,6 +35,7 @@ import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,15 +46,18 @@ public class DataInitializer {
     public static final String BASE_URI = "graphite-base-uri";
     public static final String DATA_RETRIEVAL_TAG_KEY = "graphite-data-retrieval-key";
     public static final String THROTTLE_GATE_LIKELIHOOD = "throttle-gate-likelihood";
+    public static final String SCALE_FACTOR = "scale_factor.json";
 
     private String dataRetrievalTagKey;
     private final DataSource dataSource;
     private final ThrottleGate throttleGate;
+    private final List<Double> scaleFactor;
 
     public DataInitializer(Config config, ThrottleGate throttleGate, DataSource dataSource) {
         this.throttleGate = throttleGate;
         this.dataSource = dataSource;
         this.dataRetrievalTagKey = config.getString(DATA_RETRIEVAL_TAG_KEY);
+        this.scaleFactor = config.getDoubleList(SCALE_FACTOR);
     }
 
     public void initializeDetector(MappedMetricData mappedMetricData, Detector detector, DetectorMapping detectorMapping) {
@@ -76,9 +81,19 @@ public class DataInitializer {
 
     private void initializeForecastingDetector(MappedMetricData mappedMetricData, ForecastingDetector forecastingDetector, DetectorMapping detectorMapping) {
         log.info("Initializing detector data");
-        val data = getHistoricalData(mappedMetricData, forecastingDetector, detectorMapping);
-        log.info("Fetched total of {} historical data points for buffer", data.size());
+        boolean isCgp2xx = true;
         val metricDefinition = mappedMetricData.getMetricData().getMetricDefinition();
+        List<DataSourceResult> data;
+        if (isCgp2xx) {
+            // TODO READ A DAY HERE INSTEAD OF A WEEK
+            val aDayFromGraphite = getHistoricalData(mappedMetricData, forecastingDetector, detectorMapping);
+            SeasonalBufferSynthesizer seasonalBufferSynthesizer = new SeasonalBufferSynthesizer(mappedMetricData);
+            data = seasonalBufferSynthesizer.reconstructSeasonalBuffer(this.scaleFactor, aDayFromGraphite);
+            log.info("Reconstructed total of {} historical data points for buffer", data.size());
+        } else {
+            data = getHistoricalData(mappedMetricData, forecastingDetector, detectorMapping);
+            log.info("Fetched total of {} historical data points for buffer", data.size());
+        }
         populateForecastingDetectorWithHistoricalData(forecastingDetector, data, metricDefinition);
         log.info("Replayed {} historical data points for '{}' detector", data.size(), forecastingDetector.getName());
     }
