@@ -30,7 +30,3 @@ variable "modelservice" {
 variable "aa-metric-functions" {
   type = "map"
 }
-
-variable "notifier" {
-  type = "map"
-}
