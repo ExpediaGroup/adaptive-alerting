@@ -22,4 +22,6 @@ public class TimeConstantsUtil {
     public static final int SECONDS_PER_MIN = 60;
     public static final int SECONDS_PER_HOUR = 60 * SECONDS_PER_MIN;
     public static final int SECONDS_PER_DAY = 24 * SECONDS_PER_HOUR;
+    public static final int SECONDS_PER_WEEK = 7 * SECONDS_PER_DAY;
+
 }
