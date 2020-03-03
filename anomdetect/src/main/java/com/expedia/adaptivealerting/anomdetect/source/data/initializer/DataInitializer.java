@@ -26,6 +26,7 @@ import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMapping;
 import com.expedia.adaptivealerting.anomdetect.mapper.ExpressionTree;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSource;
 import com.expedia.adaptivealerting.anomdetect.source.data.DataSourceResult;
+import com.expedia.adaptivealerting.anomdetect.source.data.initializer.reconstructbuffer.ReconstructParameters;
 import com.expedia.adaptivealerting.anomdetect.source.data.initializer.reconstructbuffer.SeasonalDataSynthesizer;
 import com.expedia.adaptivealerting.anomdetect.source.data.initializer.throttlegate.ThrottleGate;
 import com.expedia.adaptivealerting.anomdetect.util.MetricUtil;
@@ -88,25 +89,32 @@ public class DataInitializer {
     }
 
     private List<DataSourceResult> getHistoricalData(MappedMetricData mappedMetricData, ForecastingDetector forecastingDetector, DetectorMapping detectorMapping, MetricDefinition metricDefinition) {
-        val target = getTarget(mappedMetricData, detectorMapping);
         PointForecaster pointForecaster = forecastingDetector.getPointForecaster();
         if (pointForecaster instanceof SeasonalPointForecaster) {
             val seasonalPointForecaster = ((SeasonalPointForecaster) pointForecaster);
-            val cycleLength = seasonalPointForecaster.getCycleLength();
-            val intervalLength = seasonalPointForecaster.getIntervalLength();
-            val latestTime = mappedMetricData.getMetricData().getTimestamp();
-            if (isSevenDataAvailableForMetric(metricDefinition)) {
-                val fullWindow = cycleLength * intervalLength;
-                val earliestTime = latestTime - fullWindow;
-                return dataSource.getMetricData(earliestTime, latestTime, intervalLength, target);
-            }
-            return reconstructSevenDaysDataFromOneDay(latestTime, intervalLength, target);
+            return retrieveOrReconstruct(mappedMetricData, seasonalPointForecaster, detectorMapping, metricDefinition);
         } else {
             // TODO: Write a test for this:
-            val message = "No seasonal point forecaster found for forecasting detector " + forecastingDetector.getUuid();
+            val message = String.format("No seasonal point forecaster found for forecasting detector %s ", forecastingDetector.getUuid());
             throw new RuntimeException(message);
         }
+    }
 
+    private List<DataSourceResult> retrieveOrReconstruct(MappedMetricData mappedMetricData, SeasonalPointForecaster seasonalPointForecaster, DetectorMapping detectorMapping, MetricDefinition metricDefinition) {
+        val target = getTarget(mappedMetricData, detectorMapping);
+        val cycleLength = seasonalPointForecaster.getCycleLength();
+        val intervalLength = seasonalPointForecaster.getIntervalLength();
+        val latestTime = mappedMetricData.getMetricData().getTimestamp();
+        val testReconstruct = false;
+        if (testReconstruct) {
+        // if (fullHistoryAvailable(metricDefinition)) {
+            val fullWindow = cycleLength * intervalLength;
+            val earliestTime = latestTime - fullWindow;
+            log.info("Full history is available, fetching metric datapoints.");
+            return dataSource.getMetricData(earliestTime, latestTime, intervalLength, target);
+        }
+        log.info("Full history is not available, reconstructing metric datapoints.");
+        return reconstructSeasonalData(latestTime, intervalLength, target);
     }
 
     private void populateForecastingDetectorWithHistoricalData(ForecastingDetector forecastingDetector, List<DataSourceResult> data, MetricDefinition metricDefinition) {
@@ -154,15 +162,17 @@ public class DataInitializer {
 
     //TODO CGP 2xx metrics doesn't have 7 days of data available in Graphite.
     // isDataAvailable flag needs to be moved to metric config and we can use that instead of hardcoding metric name here"
-    private boolean isSevenDataAvailableForMetric(MetricDefinition metricDefinition) {
+    private boolean fullHistoryAvailable(MetricDefinition metricDefinition) {
         val whatTag = metricDefinition.getTags().getKv().get("what");
         return !"cgp-2xx".equals(whatTag);
     }
 
-    private List<DataSourceResult> reconstructSevenDaysDataFromOneDay(long latestTime, int intervalLength, String target) {
+    private List<DataSourceResult> reconstructSeasonalData(long latestTime, int intervalLength, String target) {
         val earliestTime = latestTime - TimeConstantsUtil.SECONDS_PER_DAY;
         val seasonalDataSynthesizer = new SeasonalDataSynthesizer();
         val oneDayData = dataSource.getMetricData(earliestTime, latestTime, intervalLength, target);
-        return seasonalDataSynthesizer.reconstructSeasonalData(oneDayData, scaleFactor, intervalLength);
+        //FIXME scaleFactor is on 5 min interval, timeSeriesSize is one week (2016) if interval is 1 min
+        ReconstructParameters reconstructParameters = new ReconstructParameters(5, intervalLength, 2016);
+        return seasonalDataSynthesizer.reconstructSeasonalData(oneDayData, scaleFactor, reconstructParameters);
     }
 }

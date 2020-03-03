@@ -26,26 +26,31 @@ import java.util.List;
 @NoArgsConstructor
 public class SeasonalDataSynthesizer {
 
+    private static final int FIVE_MINUTE_INTERVALS_IN_A_WEEK = 12 * 24 * 7;
+
+    ReconstructParameters parameters;
+
     public List<DataSourceResult> reconstructSeasonalData(
-            List<DataSourceResult> oneDayData,
-            List<Double> scaleFactor,
-            int intervalLength) {
-        return reconstructSeasonalData(oneDayData, scaleFactor, 2016, intervalLength);
+                List<DataSourceResult> sampleData,
+                List<Double> scaleFactor,
+                ReconstructParameters parameters) {
+        this.parameters = parameters;
+        return reconstructSeasonalData(sampleData, scaleFactor);
     }
 
     private List<DataSourceResult> reconstructSeasonalData(
-            List<DataSourceResult> metricSampleData,
-            List<Double> coefficients,
-            int bufferSize,
-            int intervalLength) {
+                List<DataSourceResult> sampleData,
+                List<Double> coefficients) {
 
         // Reconstruct seasonal buffer using metrics from one day and coefficients
-        long startTime = metricSampleData.get(0).getEpochSecond();
+        long startTime = sampleData.get(0).getEpochSecond();
         long offset = getWeekOffset(startTime);
+        val bufferSize = this.parameters.getTimeSeriesSize();
+        val intervalLength = this.parameters.getTimeSeriesInterval();
         List<DataSourceResult> seasonalBuffer = new ArrayList<>(bufferSize);
         for (int i = 0; i < bufferSize; i++) {
             int seasonalBufferOffset = (int) ((offset + i) % bufferSize);
-            val pointValue = metricSampleData.get(i % 1440).getDataPoint();
+            val pointValue = sampleData.get(i % FIVE_MINUTE_INTERVALS_IN_A_WEEK).getDataPoint();
             val coefficient = coefficients.get(seasonalBufferOffset);
             val reconstructedValue = pointValue * coefficient;
             val reconstructedTime = startTime + i * intervalLength;

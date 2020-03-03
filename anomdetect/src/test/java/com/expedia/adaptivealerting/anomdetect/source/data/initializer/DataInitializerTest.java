@@ -106,6 +106,14 @@ public class DataInitializerTest {
     }
 
     @Test
+    public void testInitializeDetectorWithReconstructedDataset() {
+        initThrottleGate(true);
+        when(throttleGate.isOpen()).thenReturn(true);
+        initializerUnderTest.initializeDetector(mappedMetricData, seasonalNaiveDetector, detectorMapping);
+        // Assertion here is that exception is swallowed
+    }
+
+    @Test
     public void testInitializeDetectorWithDuplicateMetric() {
         when(throttleGate.isOpen()).thenReturn(true);
         doThrow(new MetricDeliveryDuplicateException("Metric with dodgy timestamp")).when(seasonalPointForecaster).forecast(any(MetricData.class));
