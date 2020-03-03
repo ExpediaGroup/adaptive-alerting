@@ -58,10 +58,7 @@ public class GraphiteSource implements DataSource {
                 //TODO Convert this to use JAVA stream
                 // We discard the last data point to ensure current bin is not included in Graphite data retrieval.
                 for (int j = 0; j < dataPoints.length - 1; j++) {
-                    Double value = MISSING_VALUE;
-                    if (dataPoints[j][0] != null) {
-                        value = Double.parseDouble(dataPoints[j][0]);
-                    }
+                    Double value = getDataPointValue(dataPoints, j);
                     long epochSeconds = Long.parseLong(dataPoints[j][1]);
                     DataSourceResult result = new DataSourceResult(value, epochSeconds);
                     results.add(result);
@@ -82,6 +79,28 @@ public class GraphiteSource implements DataSource {
         return graphiteClient.getData(fromMinusOneSecond, until, intervalLength, metric);
     }
 
+    private long epochTimeSnappedToSeconds(long time, int seconds) {
+        return DateUtil.snapToSeconds(ofEpochSecond(time), seconds).getEpochSecond();
+    }
+
+    // Graphite returns NULL values for some of the data points.
+    // We just use the immediate next value to fill up that missing value. If that is null as well then we return a default MISSING_VALUE.
+    private Double getDataPointValue(String[][] dataPoints, int index) {
+        Double value = MISSING_VALUE;
+        if (dataPoints[index][0] != null) {
+            value = Double.parseDouble(dataPoints[index][0]);
+        } else {
+            int nextIndex = index + 1;
+            if (nextIndex < dataPoints.length - 1 && dataPoints[nextIndex][0] != null) {
+                value = Double.parseDouble(dataPoints[nextIndex][0]);
+                log.debug("Encountered NULL value for index {}, filling this index value with the value of next index {} value {} ",
+                        index, nextIndex, value);
+            }
+            log.debug("Encountered NULL value for next index as well. Filling this index value with missing placeholder value");
+        }
+        return value;
+    }
+
     private void logResults(List<DataSourceResult> results) {
         if (!results.isEmpty()) {
             DataSourceResult firstResult = results.get(0);
@@ -95,9 +114,5 @@ public class GraphiteSource implements DataSource {
                     actualUntil,
                     ofEpochSecond(actualUntil).toString()));
         }
-    }
-
-    private long epochTimeSnappedToSeconds(long time, int seconds) {
-        return DateUtil.snapToSeconds(ofEpochSecond(time), seconds).getEpochSecond();
     }
 }
