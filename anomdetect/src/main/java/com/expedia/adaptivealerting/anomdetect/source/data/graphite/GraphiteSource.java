@@ -93,7 +93,10 @@ public class GraphiteSource implements DataSource {
             int nextIndex = index + 1;
             if (nextIndex < dataPoints.length - 1 && dataPoints[nextIndex][0] != null) {
                 value = Double.parseDouble(dataPoints[nextIndex][0]);
+                log.debug("Encountered NULL value for index {}, filling it with the value of next index {} value {} ",
+                        index, nextIndex, value);
             }
+            log.debug("Encountered NULL value for next index as well. Filling it with missing placeholder value");
         }
         return value;
     }
