@@ -85,9 +85,11 @@ public class GraphiteSourceTest {
     public void testGetMetricData_partial_null_value() {
         val latestTimeInEpoch = earliestTimeInEpoch + TimeConstantsUtil.SECONDS_PER_DAY;
         val actual = sourceUnderTest.getMetricData(earliestTimeInEpoch, latestTimeInEpoch, intervalLength, "partial_value");
-        val dataSourceResult = buildDataSourceResult(12.0, earliestTimeInEpoch);
         val expected = new ArrayList<>();
+        val dataSourceResult = buildDataSourceResult(12.0, earliestTimeInEpoch);
+        val dataSourceResult1 = buildDataSourceResult(12.0, earliestTimeInEpoch + TimeConstantsUtil.SECONDS_PER_MIN);
         expected.add(dataSourceResult);
+        expected.add(dataSourceResult1);
         assertEquals(expected, actual);
     }
 
@@ -123,7 +125,7 @@ public class GraphiteSourceTest {
         GraphiteResult result = new GraphiteResult();
         String[][] dataPoints = {
                 {null, "1522544700"},
-                {null, "1523144900"}
+                {null, "1522544760"}
         };
         result.setDatapoints(dataPoints);
         return result;
@@ -133,7 +135,8 @@ public class GraphiteSourceTest {
         GraphiteResult result = new GraphiteResult();
         String[][] dataPoints = {
                 {null, "1522544700"},
-                {"12", "1523144900"}
+                {"12", "1522544760"},
+                {null, "1522544790"}
         };
         result.setDatapoints(dataPoints);
         return result;

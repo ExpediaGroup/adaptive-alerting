@@ -91,7 +91,7 @@ public class GraphiteSource implements DataSource {
             value = Double.parseDouble(dataPoints[index][0]);
         } else {
             int nextIndex = index + 1;
-            if (nextIndex < dataPoints.length && dataPoints[nextIndex][0] != null) {
+            if (nextIndex < dataPoints.length - 1 && dataPoints[nextIndex][0] != null) {
                 value = Double.parseDouble(dataPoints[nextIndex][0]);
             }
         }
