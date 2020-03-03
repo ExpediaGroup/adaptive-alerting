@@ -35,6 +35,8 @@ public class GraphiteSourceTest {
 
     private List<GraphiteResult> graphiteResults = new ArrayList<>();
     private List<GraphiteResult> graphiteResults_null = new ArrayList<>();
+    private List<GraphiteResult> partialGraphiteResults_null = new ArrayList<>();
+
 
     @Before
     public void setUp() {
@@ -63,7 +65,7 @@ public class GraphiteSourceTest {
     }
 
     @Test
-    public void testGetMetricData_null_metric_data() {
+    public void testGetMetricData_empty_list() {
         val latestTimeInEpoch = earliestTimeInEpoch + TimeConstantsUtil.SECONDS_PER_DAY;
         val actual = sourceUnderTest.getMetricData(earliestTimeInEpoch, latestTimeInEpoch, intervalLength, "null_metric");
         assertEquals(new ArrayList<>(), actual);
@@ -79,17 +81,29 @@ public class GraphiteSourceTest {
         assertEquals(expected, actual);
     }
 
+    @Test
+    public void testGetMetricData_partial_null_value() {
+        val latestTimeInEpoch = earliestTimeInEpoch + TimeConstantsUtil.SECONDS_PER_DAY;
+        val actual = sourceUnderTest.getMetricData(earliestTimeInEpoch, latestTimeInEpoch, intervalLength, "partial_value");
+        val dataSourceResult = buildDataSourceResult(12.0, earliestTimeInEpoch);
+        val expected = new ArrayList<>();
+        expected.add(dataSourceResult);
+        assertEquals(expected, actual);
+    }
+
     private void initTestObjects() {
         earliestTimeInEpoch = Instant.parse(EARLIEST_TIME).getEpochSecond();
         noOfBinsInADay = getBinsInDay(intervalLength);
         graphiteResults.add(buildGraphiteResult(earliestTimeInEpoch));
         graphiteResults_null.add(buildNullGraphiteResult());
+        partialGraphiteResults_null.add(buildPartialNullGraphiteResult());
     }
 
     private void initDependencies() {
         when(client.getData(anyLong(), anyLong(), anyInt(), eq("metric_name"))).thenReturn(graphiteResults);
         when(client.getData(anyLong(), anyLong(), anyInt(), eq("null_metric"))).thenReturn(new ArrayList<>());
         when(client.getData(anyLong(), anyLong(), anyInt(), eq("null_value"))).thenReturn(graphiteResults_null);
+        when(client.getData(anyLong(), anyLong(), anyInt(), eq("partial_value"))).thenReturn(partialGraphiteResults_null);
     }
 
     private GraphiteResult buildGraphiteResult(long earliestTime) {
@@ -110,6 +124,16 @@ public class GraphiteSourceTest {
         String[][] dataPoints = {
                 {null, "1522544700"},
                 {null, "1523144900"}
+        };
+        result.setDatapoints(dataPoints);
+        return result;
+    }
+
+    private GraphiteResult buildPartialNullGraphiteResult() {
+        GraphiteResult result = new GraphiteResult();
+        String[][] dataPoints = {
+                {null, "1522544700"},
+                {"12", "1523144900"}
         };
         result.setDatapoints(dataPoints);
         return result;
