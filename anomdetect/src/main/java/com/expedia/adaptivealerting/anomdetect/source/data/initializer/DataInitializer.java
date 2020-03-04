@@ -44,8 +44,10 @@ public class DataInitializer {
     public static final String BASE_URI = "graphite-base-uri";
     public static final String DATA_RETRIEVAL_TAG_KEY = "graphite-data-retrieval-key";
     public static final String THROTTLE_GATE_LIKELIHOOD = "throttle-gate-likelihood";
+    //FIXME WE don't want to hardcode graphite function here. Ideally this should be part of graphite client.
+    public static final String DEFAULT_GRAPHITE_FUNCTION = "seriesByTag";
 
-    private String dataRetrievalTagKey;
+    private final String dataRetrievalTagKey;
     private final DataSource dataSource;
     private final ThrottleGate throttleGate;
 
@@ -121,10 +123,8 @@ public class DataInitializer {
     private String getTarget(MappedMetricData mappedMetricData, DetectorMapping detectorMapping) {
         String target = MetricUtil.getDataRetrievalValue(mappedMetricData, dataRetrievalTagKey);
         if (target == null) {
-            //FIXME WE don't want to hardcode graphite function here. Ideally this should be part of graphite client.
             val dataRetrievalTags = extractTagsFromExpression(detectorMapping.getExpression());
-            target = "seriesByTag(" + dataRetrievalTags + ")";
-            target.replaceAll("\\s+", "");
+            target = getDefaultTarget(dataRetrievalTags);
         }
         return target;
     }
@@ -143,5 +143,16 @@ public class DataInitializer {
         return mapToConvert.toString()
                 .replace("{", "")
                 .replace("}", "");
+    }
+
+    private String getDefaultTarget(String dataRetrievalTags) {
+        //We add 3 here to take account for brackets length
+        val capacity = DEFAULT_GRAPHITE_FUNCTION.length() + dataRetrievalTags.length() + 3;
+        val builder = new StringBuilder(capacity);
+        String target = builder.append(DEFAULT_GRAPHITE_FUNCTION)
+                .append("(")
+                .append(dataRetrievalTags)
+                .append(")").toString();
+        return target.replaceAll("\\s+", "");
     }
 }
