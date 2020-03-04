@@ -126,6 +126,7 @@ public class DataInitializer {
             val dataRetrievalTags = extractTagsFromExpression(detectorMapping.getExpression());
             target = getDefaultTarget(dataRetrievalTags);
         }
+        log.info("target:{}", target);
         return target;
     }
 
@@ -146,6 +147,7 @@ public class DataInitializer {
     }
 
     private String getDefaultTarget(String dataRetrievalTags) {
+        //We add 3 here to take account for brackets length
         val capacity = DEFAULT_GRAPHITE_FUNCTION.length() + dataRetrievalTags.length() + 3;
         val builder = new StringBuilder(capacity);
         String target = builder.append(DEFAULT_GRAPHITE_FUNCTION)
