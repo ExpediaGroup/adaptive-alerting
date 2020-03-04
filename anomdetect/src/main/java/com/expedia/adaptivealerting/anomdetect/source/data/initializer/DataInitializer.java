@@ -126,7 +126,6 @@ public class DataInitializer {
             val dataRetrievalTags = extractTagsFromExpression(detectorMapping.getExpression());
             target = getDefaultTarget(dataRetrievalTags);
         }
-        log.info("target:{}", target);
         return target;
     }
 
