@@ -124,8 +124,9 @@ public class DataInitializer {
             //FIXME WE don't want to hardcode graphite function here. Ideally this should be part of graphite client.
             val dataRetrievalTags = extractTagsFromExpression(detectorMapping.getExpression());
             target = "seriesByTag(" + dataRetrievalTags + ")";
+            target.replaceAll("\\s+", "");
         }
-        return removeWhiteSpacesFromString(target);
+        return target;
     }
 
     private String extractTagsFromExpression(ExpressionTree expression) {
@@ -142,9 +143,5 @@ public class DataInitializer {
         return mapToConvert.toString()
                 .replace("{", "")
                 .replace("}", "");
-    }
-
-    private String removeWhiteSpacesFromString(String value) {
-        return value.replaceAll("\\s+", "");
     }
 }
