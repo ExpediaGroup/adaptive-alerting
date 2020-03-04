@@ -96,7 +96,6 @@ public class GraphiteSource implements DataSource {
                 log.debug("Encountered NULL value for index {}, filling this index value with the value of next index {} value {} ",
                         index, nextIndex, value);
             }
-            log.debug("Encountered NULL value for next index as well. Filling this index value with missing placeholder value");
         }
         return value;
     }
