@@ -47,7 +47,7 @@ public class DataInitializer {
     //FIXME WE don't want to hardcode graphite function here. Ideally this should be part of graphite client.
     public static final String DEFAULT_GRAPHITE_FUNCTION = "seriesByTag";
 
-    private String dataRetrievalTagKey;
+    private final String dataRetrievalTagKey;
     private final DataSource dataSource;
     private final ThrottleGate throttleGate;
 
@@ -146,7 +146,8 @@ public class DataInitializer {
     }
 
     private String getDefaultTarget(String dataRetrievalTags) {
-        StringBuilder builder = new StringBuilder(DEFAULT_GRAPHITE_FUNCTION.length() + dataRetrievalTags.length() + 3);
+        val capacity = DEFAULT_GRAPHITE_FUNCTION.length() + dataRetrievalTags.length() + 3;
+        val builder = new StringBuilder(capacity);
         String target = builder.append(DEFAULT_GRAPHITE_FUNCTION)
                 .append("(")
                 .append(dataRetrievalTags)
