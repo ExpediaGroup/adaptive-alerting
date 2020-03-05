@@ -145,4 +145,20 @@ public class GraphiteQueryResultTest {
       GraphiteQueryResult graphiteQueryResult = new GraphiteQueryResult();
       assertFalse(graphiteQueryResult.validateNullDatapoint(sampleJsonGraphiteString));
    }
+
+   @Test
+   public void testJsonNoTags(){
+      JSONArray sampleJsonGraphite = new JSONArray();
+      JSONObject sampleJsonGraphiteResult = new JSONObject();
+      JSONArray testDatapoints = new JSONArray();
+      testDatapoints.put(0, "[12.0,1568255056]");
+      sampleJsonGraphiteResult.put("datapoints", testDatapoints);
+      sampleJsonGraphiteResult.put("target", "sumSeries(a.b.c)");
+      sampleJsonGraphite.put(0, sampleJsonGraphiteResult);
+      sampleJsonGraphiteString = sampleJsonGraphite.toString();
+      GraphiteQueryResult graphiteQueryResult = new GraphiteQueryResult();
+      graphiteQueryResult.getGraphiteQueryResultFromJson(sampleJsonGraphiteString);
+      assertEquals(12.0, graphiteQueryResult.getDatapoint().getValue(), 0.1);
+      assertEquals(1568255056, graphiteQueryResult.getDatapoint().getTimestamp());
+   }
 }
