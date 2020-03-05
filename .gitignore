@@ -31,11 +31,13 @@ target/
 .idea/
 *.ipr
 *.iws
+.java-version
 
 .DS_Store
 .project
 .settings
 *.classpath
+*.factorypath
 
 /kafka/docker/tmp
 /modelservice/application.yml
