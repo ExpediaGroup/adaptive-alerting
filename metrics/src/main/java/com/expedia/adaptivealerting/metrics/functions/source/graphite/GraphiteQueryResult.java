@@ -64,7 +64,8 @@ public class GraphiteQueryResult {
                 this.target = graphiteResultJsonObject.getString(GRAPHITE_RESULT_TARGET_KEY);
             }
 
-            if (graphiteResultJsonObject.get(GRAPHITE_RESULT_TAGS_KEY) != null) {
+            if (graphiteResultJsonObject.has(GRAPHITE_RESULT_TAGS_KEY) &&
+                    graphiteResultJsonObject.get(GRAPHITE_RESULT_TAGS_KEY) !=null) {
                 setTagsFromString(graphiteResultJsonObject.get(GRAPHITE_RESULT_TAGS_KEY).toString());
             }
         }
