@@ -98,11 +98,15 @@ public class GraphiteQueryService {
         if (!(EMPTY_RESULT_FROM_SOURCE.equals(metricQueryResult) ||
                 graphiteQueryResult.validateNullDatapoint(metricQueryResult))) {
             graphiteQueryResult.getGraphiteQueryResultFromJson(metricQueryResult);
-            String graphiteKey = graphiteQueryResult.getTags().get(GRAPHITE_KEY_TAG);
             HashMap<String, String> tagsBuilder = new HashMap<>();
             tagsBuilder.putAll(metricFunctionsSpec.getTags());
             tagsBuilder.putAll(graphiteQueryResult.getTags());
             TagCollection tags = new TagCollection(tagsBuilder);
+            /* name tag either is retrieved from graphite result
+                or specified in input file for metrics.
+               This tag is used as MetricTank key to publish to kafka.
+             */
+            String graphiteKey = tags.getKv().get(GRAPHITE_KEY_TAG);
             TagCollection meta = TagCollection.EMPTY;
             MetricDefinition metricDefinition = new MetricDefinition(graphiteKey, tags, meta);
             return new MetricData(metricDefinition, graphiteQueryResult.getDatapoint().getValue(),
