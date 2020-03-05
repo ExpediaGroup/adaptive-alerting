@@ -193,9 +193,9 @@ public final class DetectorMapperTest {
         });
 
         assertThat(detectorResults.size(), is(3));
-        assertThat(detectorResults, IsMapContaining.hasEntry("key->DvFWUhv25h,name->61EKBCrwvI", Collections.singletonList(new Detector(UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689")))));
-        assertThat(detectorResults, IsMapContaining.hasEntry("key->dAqbZZVPZ8,name->fbWTiRlxkt", Collections.singletonList(new Detector(UUID.fromString("5eaa54e9-7406-4a1d-bd9b-e055eca1a423")))));
-        assertThat(detectorResults, IsMapContaining.hasEntry("name->hiw,region->us-west-2", Collections.singletonList(new Detector(UUID.fromString("d86b798c-cfee-4a2c-a17a-aa2ba79ccf51")))));
+        assertThat(detectorResults, IsMapContaining.hasEntry("key->RHZGV1VodjI1aA==,name->NjFFS0JDcnd2SQ==", Collections.singletonList(new Detector(UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689")))));
+        assertThat(detectorResults, IsMapContaining.hasEntry("key->ZEFxYlpaVlBaOA==,name->ZmJXVGlSbHhrdA==", Collections.singletonList(new Detector(UUID.fromString("5eaa54e9-7406-4a1d-bd9b-e055eca1a423")))));
+        assertThat(detectorResults, IsMapContaining.hasEntry("name->aGl3,region->dXMtd2VzdC0y", Collections.singletonList(new Detector(UUID.fromString("d86b798c-cfee-4a2c-a17a-aa2ba79ccf51")))));
     }
 
     @Test

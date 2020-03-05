@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +38,10 @@ public final class CacheUtil {
     public static String getKey(Map<String, String> tags) {
         List<String> listOfEntries = tags.entrySet()
                 .stream()
-                .map(entry -> entry.getKey() + DELIMITER + entry.getValue())
+                .map(entry -> {
+                    String encodedValue = Base64.getEncoder().encodeToString(entry.getValue().getBytes());
+                    return entry.getKey() + DELIMITER + encodedValue;
+                })
                 .sorted()
                 .collect(Collectors.toList());
         return String.join(",", listOfEntries);
@@ -48,7 +52,9 @@ public final class CacheUtil {
         Map<String, String> tags = new HashMap<>();
         Arrays.asList(keyVals).forEach(keyVal -> {
             String[] kv = keyVal.split(DELIMITER);
-            tags.put(kv[0], kv[1]);
+            byte[] decodedValue = Base64.getDecoder().decode(kv[1]);
+            String value = new String(decodedValue);
+            tags.put(kv[0], value);
         });
         return tags;
     }
