@@ -32,7 +32,8 @@ public class MetricQueryServiceTest {
         @Mock
         private HttpClientWrapper httpClient;
 
-        private Map<String, String> headers = Collections.singletonMap("x-org-id", "1");
+        private Map<String, String> graphiteHeaders = Collections.emptyMap();
+        private Map<String, String> metrictankHeaders = Collections.singletonMap("x-org-id", "1");
 
         private MetricFunctionsSpec metricFunctionsSpec;
 
@@ -43,7 +44,7 @@ public class MetricQueryServiceTest {
         static {
                 metricSourceSinkConfigMap = new HashMap<>();
                 metricSourceSinkConfigMap.put("urlTemplate", "http://graphite/render?format=json&target=");
-                metricSourceSinkConfigMap.put("is-graphite-server-metrictank", "metrictank");
+                metricSourceSinkConfigMap.put("is-graphite-server-metrictank", "false");
                 metricSourceSinkConfigMap.put("metric-source", "graphite");
         }
 
@@ -71,21 +72,29 @@ public class MetricQueryServiceTest {
                                 ContentType.APPLICATION_JSON);
                 when(httpClient.get(
                                 "http://graphite/render?format=json&target=sumSeries(a.b.c)&from=1583039039&until=1583039099",
-                                headers)).thenReturn(validGraphiteResponseContent);
+                                graphiteHeaders)).thenReturn(validGraphiteResponseContent);
+                when(httpClient.get(
+                                "http://graphite/render?format=json&target=sumSeries(a.b.c)&from=1583039039&until=1583039099",
+                                metrictankHeaders)).thenReturn(validGraphiteResponseContent);
 
                 String validGraphiteResponseWithNull = readFile("tests/validGraphiteResponseWithNull.json");
                 Content validGraphiteResponseWithNullContent = new Content(validGraphiteResponseWithNull.getBytes(),
                                 ContentType.APPLICATION_JSON);
                 when(httpClient.get(
                                 "http://graphite/render?format=json&target=sumSeries(a.b.c)&from=1583125439&until=1583125499",
-                                headers)).thenReturn(validGraphiteResponseWithNullContent);
+                                graphiteHeaders)).thenReturn(validGraphiteResponseWithNullContent);
 
                 String invalidGraphiteResponse = readFile("tests/invalidGraphiteResponse.json");
                 Content invalidGraphiteResponseContent = new Content(invalidGraphiteResponse.getBytes(),
                                 ContentType.APPLICATION_JSON);
                 when(httpClient.get(
                                 "http://graphite/render?format=json&target=sumSeries(a.b.c)&from=1583211839&until=1583211899",
-                                headers)).thenReturn(invalidGraphiteResponseContent);
+                                graphiteHeaders)).thenReturn(invalidGraphiteResponseContent);
+
+                Content emptyGraphiteResponseContent = new Content("[]".getBytes(), ContentType.APPLICATION_JSON);
+                when(httpClient.get(
+                                "http://graphite/render?format=json&target=sumSeries(a.b.c)&from=1583298239&until=1583298299",
+                                graphiteHeaders)).thenReturn(emptyGraphiteResponseContent);
         }
 
         @Test
@@ -93,6 +102,25 @@ public class MetricQueryServiceTest {
                 Instant fixedInstant = Instant.parse("2020-03-01T05:05:39Z");
                 MetricQueryService metricQueryService = new MetricQueryService(httpClient, fixedInstant);
                 MetricData metricDataResult = metricQueryService.queryMetricSource(metricSourceSinkConfig,
+                                metricFunctionsSpec);
+                assertEquals(12.0, metricDataResult.getValue(), 0.1);
+                assertEquals(1583039100, metricDataResult.getTimestamp());
+                Map<String, String> tags = metricDataResult.getMetricDefinition().getTags().getKv();
+                assertEquals(2, tags.size());
+                assertEquals("sample_app1", tags.get("app_name"));
+                assertEquals("test", tags.get("env"));
+        }
+
+        @Test
+        public void testValidMetrictankMetricQueryResult() throws Exception {
+                Map<String, String> metrictankMetricSourceSinkConfigMap = new HashMap<>();
+                metrictankMetricSourceSinkConfigMap.put("urlTemplate", "http://graphite/render?format=json&target=");
+                metrictankMetricSourceSinkConfigMap.put("is-graphite-server-metrictank", "metrictank");
+                metrictankMetricSourceSinkConfigMap.put("metric-source", "graphite");
+                Config metrictankMetricSourceSinkConfig = ConfigFactory.parseMap(metrictankMetricSourceSinkConfigMap);
+                Instant fixedInstant = Instant.parse("2020-03-01T05:05:39Z");
+                MetricQueryService metricQueryService = new MetricQueryService(httpClient, fixedInstant);
+                MetricData metricDataResult = metricQueryService.queryMetricSource(metrictankMetricSourceSinkConfig,
                                 metricFunctionsSpec);
                 assertEquals(12.0, metricDataResult.getValue(), 0.1);
                 assertEquals(1583039100, metricDataResult.getTimestamp());
@@ -129,13 +157,23 @@ public class MetricQueryServiceTest {
                         Map<String, String> invalidMetricSourceSinkConfigMap = new HashMap<>();
                         invalidMetricSourceSinkConfigMap.put("urlTemplate",
                                         "http://graphite/render?format=json&target=");
-                        invalidMetricSourceSinkConfigMap.put("is-graphite-server-metrictank", "metrictank");
                         invalidMetricSourceSinkConfigMap.put("metric-source", "bad-metric-source");
                         Config invalidMetricSourceSinkConfig = ConfigFactory.parseMap(invalidMetricSourceSinkConfigMap);
                         Instant fixedInstant = Instant.parse("2020-03-03T05:05:39Z");
                         MetricQueryService metricQueryService = new MetricQueryService(httpClient, fixedInstant);
                         metricQueryService.queryMetricSource(invalidMetricSourceSinkConfig, metricFunctionsSpec);
                 } catch (IllegalStateException e) {
+                        assertTrue(true);
+                }
+        }
+
+        @Test
+        public void testEmptyGraphiteMetricQueryResult() {
+                try {
+                        Instant fixedInstant = Instant.parse("2020-03-04T05:05:00Z");
+                        MetricQueryService metricQueryService = new MetricQueryService(httpClient, fixedInstant);
+                        metricQueryService.queryMetricSource(metricSourceSinkConfig, metricFunctionsSpec);
+                } catch (MetricQueryServiceException e) {
                         assertTrue(true);
                 }
         }
