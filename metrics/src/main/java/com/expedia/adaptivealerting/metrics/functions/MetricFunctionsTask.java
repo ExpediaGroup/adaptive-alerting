@@ -15,7 +15,8 @@
  */
 package com.expedia.adaptivealerting.metrics.functions;
 
-import com.expedia.adaptivealerting.metrics.functions.service.graphite.GraphiteQueryService;
+import com.expedia.adaptivealerting.metrics.functions.service.MetricQueryService;
+import com.expedia.adaptivealerting.metrics.functions.service.MetricQueryServiceException;
 import com.expedia.adaptivealerting.metrics.functions.sink.MetricFunctionsPublish;
 import com.expedia.adaptivealerting.metrics.functions.source.MetricFunctionsSpec;
 import com.typesafe.config.Config;
@@ -29,7 +30,7 @@ public class MetricFunctionsTask implements Runnable {
     private Config metricStoreConfig;
     private MetricFunctionsSpec spec;
     private MetricFunctionsPublish publisher;
-    private GraphiteQueryService graphiteQueryService;
+    private MetricQueryService metricQueryService;
 
     public MetricFunctionsTask(Config metricStoreConfig, MetricFunctionsSpec spec, MetricFunctionsPublish publisher) {
         notNull(metricStoreConfig, "metricStoreConfig can't be null");
@@ -39,17 +40,17 @@ public class MetricFunctionsTask implements Runnable {
         this.metricStoreConfig = metricStoreConfig;
         this.spec = spec;
         this.publisher = publisher;
-        this.graphiteQueryService = new GraphiteQueryService();
+        this.metricQueryService = new MetricQueryService();
     }
 
     public void run() {
         try {
-            val metricData = graphiteQueryService.queryMetricSource(metricStoreConfig, spec);
+            val metricData = metricQueryService.queryMetricSource(metricStoreConfig, spec);
             publisher.publishMetrics(metricData);
-        }
-        catch (Exception e) {
-            log.error("Exception while processing metrics function", e);
-
+        } catch (MetricQueryServiceException metricQueryServiceException) {
+            log.error(metricQueryServiceException.getMessage(), metricQueryServiceException.getCause());
+        } catch (Exception e) {
+            log.error("Unhandled exception while processing metrics function", e);
         }
     }
 

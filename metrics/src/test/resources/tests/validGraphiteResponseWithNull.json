@@ -1,0 +1,13 @@
+[
+  {
+    "datapoints": [
+      [null, 1583125470],
+      [155.0, 1583125500]
+    ],
+    "target": "sumSeries(a.b.c)",
+    "tags": {
+      "aggregatedBy": "sum",
+      "name": "sumSeries(a.b.c)"
+    }
+  }
+]

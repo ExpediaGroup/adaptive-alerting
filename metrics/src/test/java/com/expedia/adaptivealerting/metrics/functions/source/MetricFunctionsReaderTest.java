@@ -14,19 +14,19 @@ import static org.junit.Assert.assertEquals;
 public class MetricFunctionsReaderTest {
 
     @Test
-    public void testReadFromInputFile(){
+    public void testReadFromInputFile() {
         val functionInputFileName = "config/functions-test.txt";
-        List<MetricFunctionsSpec> metricFunctionsSpecList = MetricFunctionsReader.readFromInputFile
-                (ClassLoader.getSystemResource(functionInputFileName).getPath());
+        List<MetricFunctionsSpec> metricFunctionsSpecList = MetricFunctionsReader
+                .readFromInputFile(ClassLoader.getSystemResource(functionInputFileName).getPath());
         assertEquals(1, metricFunctionsSpecList.size());
         MetricFunctionsSpec metricFunctionsSpec = metricFunctionsSpecList.get(0);
         assertEquals("sumSeries(a.b.c)", metricFunctionsSpec.getFunction());
-        assertEquals(30, metricFunctionsSpec.getIntervalInSecs());
+        assertEquals(60, metricFunctionsSpec.getIntervalInSecs());
         Iterator it = metricFunctionsSpec.getTags().entrySet().iterator();
-        Map.Entry tag1 = (Map.Entry)it.next();
+        Map.Entry tag1 = (Map.Entry) it.next();
         assertEquals(tag1.getKey(), "app_name");
         assertEquals(tag1.getValue(), "sample_app1");
-        Map.Entry tag2 = (Map.Entry)it.next();
+        Map.Entry tag2 = (Map.Entry) it.next();
         assertEquals(tag2.getKey(), "env");
         assertEquals(tag2.getValue(), "test");
     }

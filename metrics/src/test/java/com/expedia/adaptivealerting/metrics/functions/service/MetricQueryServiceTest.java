@@ -1,0 +1,143 @@
+package com.expedia.adaptivealerting.metrics.functions.service;
+
+import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
+import com.expedia.adaptivealerting.metrics.functions.source.MetricFunctionsReader;
+import com.expedia.adaptivealerting.metrics.functions.source.MetricFunctionsSpec;
+import com.expedia.metrics.MetricData;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import lombok.val;
+import org.apache.http.entity.ContentType;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.apache.http.client.fluent.Content;
+
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Collections;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class MetricQueryServiceTest {
+
+        @Mock
+        private HttpClientWrapper httpClient;
+
+        private Map<String, String> headers = Collections.singletonMap("x-org-id", "1");
+
+        private MetricFunctionsSpec metricFunctionsSpec;
+
+        private Config metricSourceSinkConfig;
+
+        public static Map<String, String> metricSourceSinkConfigMap;
+
+        static {
+                metricSourceSinkConfigMap = new HashMap<>();
+                metricSourceSinkConfigMap.put("urlTemplate", "http://graphite/render?format=json&target=");
+                metricSourceSinkConfigMap.put("is-graphite-server-metrictank", "metrictank");
+                metricSourceSinkConfigMap.put("metric-source", "graphite");
+        }
+
+        public static String readFile(String filePath) {
+                String content = "";
+
+                try {
+                        content = new String(Files
+                                        .readAllBytes(Paths.get(ClassLoader.getSystemResource(filePath).getPath())));
+                } catch (IOException e) {
+                        e.printStackTrace();
+                }
+                return content;
+        }
+
+        @Before
+        public void setup() throws Exception {
+                MockitoAnnotations.initMocks(this);
+                metricSourceSinkConfig = ConfigFactory.parseMap(metricSourceSinkConfigMap);
+                val functionsInputFile = "config/functions-test.txt";
+                metricFunctionsSpec = MetricFunctionsReader
+                                .readFromInputFile(ClassLoader.getSystemResource(functionsInputFile).getPath()).get(0);
+                String validGraphiteResponse = readFile("tests/validGraphiteResponse.json");
+                Content validGraphiteResponseContent = new Content(validGraphiteResponse.getBytes(),
+                                ContentType.APPLICATION_JSON);
+                when(httpClient.get(
+                                "http://graphite/render?format=json&target=sumSeries(a.b.c)&from=1583039039&until=1583039099",
+                                headers)).thenReturn(validGraphiteResponseContent);
+
+                String validGraphiteResponseWithNull = readFile("tests/validGraphiteResponseWithNull.json");
+                Content validGraphiteResponseWithNullContent = new Content(validGraphiteResponseWithNull.getBytes(),
+                                ContentType.APPLICATION_JSON);
+                when(httpClient.get(
+                                "http://graphite/render?format=json&target=sumSeries(a.b.c)&from=1583125439&until=1583125499",
+                                headers)).thenReturn(validGraphiteResponseWithNullContent);
+
+                String invalidGraphiteResponse = readFile("tests/invalidGraphiteResponse.json");
+                Content invalidGraphiteResponseContent = new Content(invalidGraphiteResponse.getBytes(),
+                                ContentType.APPLICATION_JSON);
+                when(httpClient.get(
+                                "http://graphite/render?format=json&target=sumSeries(a.b.c)&from=1583211839&until=1583211899",
+                                headers)).thenReturn(invalidGraphiteResponseContent);
+        }
+
+        @Test
+        public void testValidGraphiteMetricQueryResult() throws Exception {
+                Instant fixedInstant = Instant.parse("2020-03-01T05:05:39Z");
+                MetricQueryService metricQueryService = new MetricQueryService(httpClient, fixedInstant);
+                MetricData metricDataResult = metricQueryService.queryMetricSource(metricSourceSinkConfig,
+                                metricFunctionsSpec);
+                assertEquals(12.0, metricDataResult.getValue(), 0.1);
+                assertEquals(1583039100, metricDataResult.getTimestamp());
+                Map<String, String> tags = metricDataResult.getMetricDefinition().getTags().getKv();
+                assertEquals(2, tags.size());
+                assertEquals("sample_app1", tags.get("app_name"));
+                assertEquals("test", tags.get("env"));
+        }
+
+        @Test
+        public void testValidGraphiteMetricQueryResultWithNull() throws Exception {
+                Instant fixedInstant = Instant.parse("2020-03-02T05:05:39Z");
+                MetricQueryService metricQueryService = new MetricQueryService(httpClient, fixedInstant);
+                MetricData metricDataResult = metricQueryService.queryMetricSource(metricSourceSinkConfig,
+                                metricFunctionsSpec);
+                assertEquals(155.0, metricDataResult.getValue(), 0.1);
+                assertEquals(1583125500, metricDataResult.getTimestamp());
+        }
+
+        @Test
+        public void testInvalidGraphiteMetricQueryResult() {
+                try {
+                        Instant fixedInstant = Instant.parse("2020-03-03T05:05:39Z");
+                        MetricQueryService metricQueryService = new MetricQueryService(httpClient, fixedInstant);
+                        metricQueryService.queryMetricSource(metricSourceSinkConfig, metricFunctionsSpec);
+                } catch (MetricQueryServiceException e) {
+                        assertTrue(true);
+                }
+        }
+
+        @Test
+        public void testInvalidMetricQuerySource() {
+                try {
+                        Map<String, String> invalidMetricSourceSinkConfigMap = new HashMap<>();
+                        invalidMetricSourceSinkConfigMap.put("urlTemplate",
+                                        "http://graphite/render?format=json&target=");
+                        invalidMetricSourceSinkConfigMap.put("is-graphite-server-metrictank", "metrictank");
+                        invalidMetricSourceSinkConfigMap.put("metric-source", "bad-metric-source");
+                        Config invalidMetricSourceSinkConfig = ConfigFactory.parseMap(invalidMetricSourceSinkConfigMap);
+                        Instant fixedInstant = Instant.parse("2020-03-03T05:05:39Z");
+                        MetricQueryService metricQueryService = new MetricQueryService(httpClient, fixedInstant);
+                        metricQueryService.queryMetricSource(invalidMetricSourceSinkConfig, metricFunctionsSpec);
+                } catch (IllegalStateException e) {
+                        assertTrue(true);
+                }
+        }
+
+}
