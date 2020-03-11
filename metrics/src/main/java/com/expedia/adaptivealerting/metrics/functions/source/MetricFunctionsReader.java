@@ -40,9 +40,9 @@ public class MetricFunctionsReader {
                 ObjectMapper objectMapper = new ObjectMapper();
                 metricFunctionSpecList.add(objectMapper.readValue(metricFunctionSpecString, MetricFunctionsSpec.class));
             }
-        }
-        catch(Exception e) {
-            log.error("Exception while reading input functions' definition", e);
+            bufferedReader.close();
+        } catch (Exception e) {
+            log.error("Exception while reading input functions definition", e);
         }
         return metricFunctionSpecList;
     }

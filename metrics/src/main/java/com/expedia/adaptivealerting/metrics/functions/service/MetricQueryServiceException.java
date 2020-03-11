@@ -13,17 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.metrics.functions.source;
+package com.expedia.adaptivealerting.metrics.functions.service;
 
-import java.util.HashMap;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
-
-@Data
-@JsonIgnoreProperties
-public class MetricFunctionsSpec {
-    private String function;
-    private int intervalInSecs;
-    private HashMap<String, String> tags;
-    private Boolean mergeTags = true;
+public class MetricQueryServiceException extends RuntimeException {
+    public MetricQueryServiceException(String message, Exception cause) {
+        super(message, cause);
+    }
 }
