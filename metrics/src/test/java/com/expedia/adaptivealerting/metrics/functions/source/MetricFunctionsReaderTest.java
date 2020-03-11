@@ -22,13 +22,22 @@ public class MetricFunctionsReaderTest {
         MetricFunctionsSpec metricFunctionsSpec = metricFunctionsSpecList.get(0);
         assertEquals("sumSeries(a.b.c)", metricFunctionsSpec.getFunction());
         assertEquals(60, metricFunctionsSpec.getIntervalInSecs());
-        Iterator it = metricFunctionsSpec.getTags().entrySet().iterator();
-        Map.Entry tag1 = (Map.Entry) it.next();
-        assertEquals(tag1.getKey(), "app_name");
-        assertEquals(tag1.getValue(), "sample_app1");
-        Map.Entry tag2 = (Map.Entry) it.next();
-        assertEquals(tag2.getKey(), "env");
-        assertEquals(tag2.getValue(), "test");
+        Map<String, String> tags = metricFunctionsSpec.getTags();
+        assertEquals(3, tags.size());
+        assertEquals("sample_app1", tags.get("app_name"));
+        assertEquals("test", tags.get("env"));
+        assertEquals("custom_tag_value", tags.get("custom_tag"));
+        assertEquals(true, metricFunctionsSpec.getMergeTags());
+    }
+
+    @Test
+    public void testReadFromInputFileMergeTagsFalse() {
+        val functionInputFileName = "config/functions-mergeTags-false-test.txt";
+        List<MetricFunctionsSpec> metricFunctionsSpecList = MetricFunctionsReader
+                .readFromInputFile(ClassLoader.getSystemResource(functionInputFileName).getPath());
+        assertEquals(1, metricFunctionsSpecList.size());
+        MetricFunctionsSpec metricFunctionsSpec = metricFunctionsSpecList.get(0);
+        assertEquals(false, metricFunctionsSpec.getMergeTags());
     }
 
     @Test
