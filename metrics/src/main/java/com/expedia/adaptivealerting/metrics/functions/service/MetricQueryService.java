@@ -28,7 +28,6 @@ import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.fluent.Content;
 
-import java.time.Clock;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
@@ -39,7 +38,6 @@ import java.util.Map;
 @Slf4j
 public class MetricQueryService {
     private HttpClientWrapper metricFunctionHttpClient;
-    private static Clock clock;
     private Instant instant;
     // only 'graphite' is currently supported
     private final String METRIC_SOURCE_KEY = "metric-source";
@@ -50,7 +48,7 @@ public class MetricQueryService {
     private final String GRAPHITE_URL_TEMPLATE_KEY = "urlTemplate";
 
     public MetricQueryService() {
-        this(new HttpClientWrapper(), Instant.now(clock));
+        this(new HttpClientWrapper(), Instant.now());
     }
 
     public MetricQueryService(HttpClientWrapper httpClientWrapper, Instant instantWrapper) {

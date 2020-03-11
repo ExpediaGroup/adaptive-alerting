@@ -119,6 +119,12 @@ public class MetricQueryServiceTest {
         }
 
         @Test
+        public void testMetricQueryService() throws Exception {
+                MetricQueryService metricQueryService = new MetricQueryService();
+                assertTrue(metricQueryService != null);
+        }
+
+        @Test
         public void testValidGraphiteMetricQueryResultMergeTagsFalse() throws Exception {
                 String functionsInputFile = "config/functions-mergeTags-false-test.txt";
                 MetricFunctionsSpec metricFunctionsSpec = MetricFunctionsReader
