@@ -42,7 +42,7 @@ public class MetricFunctionsReader {
             }
             bufferedReader.close();
         } catch (Exception e) {
-            log.error("Exception while reading input functions' definition", e);
+            log.error("Exception while reading input functions definition", e);
         }
         return metricFunctionSpecList;
     }

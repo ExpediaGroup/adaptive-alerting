@@ -30,7 +30,7 @@ import java.util.Map;
 public class GraphiteResult {
     private String[][] datapoints;
     private String target;
-    private Map<String, Object> tags;
+    private Map<String, String> tags;
 
     public Datapoint getDatapoint() throws MissingDatapointException {
         Double value;

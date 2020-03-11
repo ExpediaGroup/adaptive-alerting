@@ -32,6 +32,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -106,9 +107,15 @@ public class MetricQueryService {
                 Datapoint datapoint = graphiteResult.getDatapoint();
                 logValue = String.valueOf(datapoint.getValue());
                 logTimestamp = String.valueOf(datapoint.getTimestamp());
-                TagCollection tags = new TagCollection(metricFunctionsSpec.getTags());
-                TagCollection meta = TagCollection.EMPTY;
-                MetricDefinition metricDefinition = new MetricDefinition(graphiteFunction, tags, meta);
+
+                HashMap<String, String> tagsBuilder = new HashMap<>();
+                tagsBuilder.putAll(metricFunctionsSpec.getTags());
+                if (metricFunctionsSpec.getMergeTags())
+                    tagsBuilder.putAll(graphiteResult.getTags());
+
+                TagCollection tags = new TagCollection(tagsBuilder);
+                TagCollection metaTags = TagCollection.EMPTY;
+                MetricDefinition metricDefinition = new MetricDefinition(graphiteFunction, tags, metaTags);
                 String infoMessage = String.format(
                         "step=queryGraphiteSource,success=%s,exception=%s,url=\"%s\",timestamp=%s,value=%s", success,
                         exceptionName, graphiteUrl, logTimestamp, logValue);

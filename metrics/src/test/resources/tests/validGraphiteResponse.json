@@ -4,7 +4,10 @@
     "target": "sumSeries(a.b.c)",
     "tags": {
       "aggregatedBy": "sum",
-      "name": "sumSeries(a.b.c)"
+      "name": "sumSeries(a.b.c)",
+      "app_name": "sample_app1",
+      "env": "test",
+      "added_tag": "added_tag_value"
     }
   }
 ]

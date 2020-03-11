@@ -64,7 +64,7 @@ public class MetricQueryServiceTest {
         public void setup() throws Exception {
                 MockitoAnnotations.initMocks(this);
                 metricSourceSinkConfig = ConfigFactory.parseMap(metricSourceSinkConfigMap);
-                val functionsInputFile = "config/functions-test.txt";
+                String functionsInputFile = "config/functions-test.txt";
                 metricFunctionsSpec = MetricFunctionsReader
                                 .readFromInputFile(ClassLoader.getSystemResource(functionsInputFile).getPath()).get(0);
                 String validGraphiteResponse = readFile("tests/validGraphiteResponse.json");
@@ -76,6 +76,9 @@ public class MetricQueryServiceTest {
                 when(httpClient.get(
                                 "http://graphite/render?format=json&target=sumSeries(a.b.c)&from=1583039039&until=1583039099",
                                 metrictankHeaders)).thenReturn(validGraphiteResponseContent);
+                when(httpClient.get(
+                                "http://graphite/render?format=json&target=sumSeries(d.e.f)&from=1583039039&until=1583039099",
+                                graphiteHeaders)).thenReturn(validGraphiteResponseContent);
 
                 String validGraphiteResponseWithNull = readFile("tests/validGraphiteResponseWithNull.json");
                 Content validGraphiteResponseWithNullContent = new Content(validGraphiteResponseWithNull.getBytes(),
@@ -106,8 +109,30 @@ public class MetricQueryServiceTest {
                 assertEquals(12.0, metricDataResult.getValue(), 0.1);
                 assertEquals(1583039100, metricDataResult.getTimestamp());
                 Map<String, String> tags = metricDataResult.getMetricDefinition().getTags().getKv();
-                assertEquals(2, tags.size());
+                assertEquals(6, tags.size());
                 assertEquals("sample_app1", tags.get("app_name"));
+                assertEquals("test", tags.get("env"));
+                assertEquals("custom_tag_value", tags.get("custom_tag"));
+                assertEquals("sum", tags.get("aggregatedBy"));
+                assertEquals("sumSeries(a.b.c)", tags.get("name"));
+                assertEquals("added_tag_value", tags.get("added_tag"));
+        }
+
+        @Test
+        public void testValidGraphiteMetricQueryResultMergeTagsFalse() throws Exception {
+                String functionsInputFile = "config/functions-mergeTags-false-test.txt";
+                MetricFunctionsSpec metricFunctionsSpec = MetricFunctionsReader
+                                .readFromInputFile(ClassLoader.getSystemResource(functionsInputFile).getPath()).get(0);
+
+                Instant fixedInstant = Instant.parse("2020-03-01T05:05:39Z");
+                MetricQueryService metricQueryService = new MetricQueryService(httpClient, fixedInstant);
+                MetricData metricDataResult = metricQueryService.queryMetricSource(metricSourceSinkConfig,
+                                metricFunctionsSpec);
+                assertEquals(12.0, metricDataResult.getValue(), 0.1);
+                assertEquals(1583039100, metricDataResult.getTimestamp());
+                Map<String, String> tags = metricDataResult.getMetricDefinition().getTags().getKv();
+                assertEquals(2, tags.size());
+                assertEquals("sample_app2", tags.get("app_name"));
                 assertEquals("test", tags.get("env"));
         }
 
@@ -125,9 +150,13 @@ public class MetricQueryServiceTest {
                 assertEquals(12.0, metricDataResult.getValue(), 0.1);
                 assertEquals(1583039100, metricDataResult.getTimestamp());
                 Map<String, String> tags = metricDataResult.getMetricDefinition().getTags().getKv();
-                assertEquals(2, tags.size());
+                assertEquals(6, tags.size());
                 assertEquals("sample_app1", tags.get("app_name"));
                 assertEquals("test", tags.get("env"));
+                assertEquals("custom_tag_value", tags.get("custom_tag"));
+                assertEquals("sum", tags.get("aggregatedBy"));
+                assertEquals("sumSeries(a.b.c)", tags.get("name"));
+                assertEquals("added_tag_value", tags.get("added_tag"));
         }
 
         @Test

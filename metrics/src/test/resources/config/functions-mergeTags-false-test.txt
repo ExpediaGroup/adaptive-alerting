@@ -1,0 +1,1 @@
+{"function": "sumSeries(d.e.f)", "intervalInSecs": 60, "mergeTags": false, "tags":{"app_name": "sample_app2", "env": "test"}}

@@ -25,4 +25,5 @@ public class MetricFunctionsSpec {
     private String function;
     private int intervalInSecs;
     private HashMap<String, String> tags;
+    private Boolean mergeTags = true;
 }
