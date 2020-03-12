@@ -38,7 +38,6 @@ import java.util.Map;
 @Slf4j
 public class MetricQueryService {
     private HttpClientWrapper metricFunctionHttpClient;
-    private Instant instant;
     // only 'graphite' is currently supported
     private final String METRIC_SOURCE_KEY = "metric-source";
 
@@ -48,27 +47,26 @@ public class MetricQueryService {
     private final String GRAPHITE_URL_TEMPLATE_KEY = "urlTemplate";
 
     public MetricQueryService() {
-        this(new HttpClientWrapper(), Instant.now());
+        this(new HttpClientWrapper());
     }
 
-    public MetricQueryService(HttpClientWrapper httpClientWrapper, Instant instantWrapper) {
+    public MetricQueryService(HttpClientWrapper httpClientWrapper) {
         metricFunctionHttpClient = httpClientWrapper;
-        instant = instantWrapper;
     }
 
-    public MetricData queryMetricSource(Config metricSourceSinkConfig, MetricFunctionsSpec metricFunctionsSpec)
-            throws IllegalStateException, MetricQueryServiceException {
+    public MetricData queryMetricSource(Config metricSourceSinkConfig, MetricFunctionsSpec metricFunctionsSpec,
+            Instant instant) throws IllegalStateException, MetricQueryServiceException {
         String metricSourceName = metricSourceSinkConfig.getString(METRIC_SOURCE_KEY);
         switch (metricSourceName) {
             case "graphite":
-                return queryGraphite(metricSourceSinkConfig, metricFunctionsSpec);
+                return queryGraphite(metricSourceSinkConfig, metricFunctionsSpec, instant);
             default:
                 throw new IllegalStateException(String.format("Unknown metric source '%s'.", metricSourceName));
         }
     }
 
-    private MetricData queryGraphite(Config metricSourceSinkConfig, MetricFunctionsSpec metricFunctionsSpec)
-            throws MetricQueryServiceException {
+    private MetricData queryGraphite(Config metricSourceSinkConfig, MetricFunctionsSpec metricFunctionsSpec,
+            Instant instant) throws MetricQueryServiceException {
         Boolean success = true;
         String graphiteUrl = "";
         String logTimestamp = "";

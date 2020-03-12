@@ -6,7 +6,6 @@ import com.expedia.adaptivealerting.metrics.functions.source.MetricFunctionsSpec
 import com.expedia.metrics.MetricData;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import lombok.val;
 import org.apache.http.entity.ContentType;
 import org.junit.Before;
 import org.junit.Test;
@@ -103,9 +102,9 @@ public class MetricQueryServiceTest {
         @Test
         public void testValidGraphiteMetricQueryResult() throws Exception {
                 Instant fixedInstant = Instant.parse("2020-03-01T05:05:39Z");
-                MetricQueryService metricQueryService = new MetricQueryService(httpClient, fixedInstant);
+                MetricQueryService metricQueryService = new MetricQueryService(httpClient);
                 MetricData metricDataResult = metricQueryService.queryMetricSource(metricSourceSinkConfig,
-                                metricFunctionsSpec);
+                                metricFunctionsSpec, fixedInstant);
                 assertEquals(12.0, metricDataResult.getValue(), 0.1);
                 assertEquals(1583039100, metricDataResult.getTimestamp());
                 Map<String, String> tags = metricDataResult.getMetricDefinition().getTags().getKv();
@@ -131,9 +130,9 @@ public class MetricQueryServiceTest {
                                 .readFromInputFile(ClassLoader.getSystemResource(functionsInputFile).getPath()).get(0);
 
                 Instant fixedInstant = Instant.parse("2020-03-01T05:05:39Z");
-                MetricQueryService metricQueryService = new MetricQueryService(httpClient, fixedInstant);
+                MetricQueryService metricQueryService = new MetricQueryService(httpClient);
                 MetricData metricDataResult = metricQueryService.queryMetricSource(metricSourceSinkConfig,
-                                metricFunctionsSpec);
+                                metricFunctionsSpec, fixedInstant);
                 assertEquals(12.0, metricDataResult.getValue(), 0.1);
                 assertEquals(1583039100, metricDataResult.getTimestamp());
                 Map<String, String> tags = metricDataResult.getMetricDefinition().getTags().getKv();
@@ -150,9 +149,9 @@ public class MetricQueryServiceTest {
                 metrictankMetricSourceSinkConfigMap.put("metric-source", "graphite");
                 Config metrictankMetricSourceSinkConfig = ConfigFactory.parseMap(metrictankMetricSourceSinkConfigMap);
                 Instant fixedInstant = Instant.parse("2020-03-01T05:05:39Z");
-                MetricQueryService metricQueryService = new MetricQueryService(httpClient, fixedInstant);
+                MetricQueryService metricQueryService = new MetricQueryService(httpClient);
                 MetricData metricDataResult = metricQueryService.queryMetricSource(metrictankMetricSourceSinkConfig,
-                                metricFunctionsSpec);
+                                metricFunctionsSpec, fixedInstant);
                 assertEquals(12.0, metricDataResult.getValue(), 0.1);
                 assertEquals(1583039100, metricDataResult.getTimestamp());
                 Map<String, String> tags = metricDataResult.getMetricDefinition().getTags().getKv();
@@ -168,9 +167,9 @@ public class MetricQueryServiceTest {
         @Test
         public void testValidGraphiteMetricQueryResultWithNull() throws Exception {
                 Instant fixedInstant = Instant.parse("2020-03-02T05:05:39Z");
-                MetricQueryService metricQueryService = new MetricQueryService(httpClient, fixedInstant);
+                MetricQueryService metricQueryService = new MetricQueryService(httpClient);
                 MetricData metricDataResult = metricQueryService.queryMetricSource(metricSourceSinkConfig,
-                                metricFunctionsSpec);
+                                metricFunctionsSpec, fixedInstant);
                 assertEquals(155.0, metricDataResult.getValue(), 0.1);
                 assertEquals(1583125500, metricDataResult.getTimestamp());
         }
@@ -179,8 +178,8 @@ public class MetricQueryServiceTest {
         public void testInvalidGraphiteMetricQueryResult() {
                 try {
                         Instant fixedInstant = Instant.parse("2020-03-03T05:05:39Z");
-                        MetricQueryService metricQueryService = new MetricQueryService(httpClient, fixedInstant);
-                        metricQueryService.queryMetricSource(metricSourceSinkConfig, metricFunctionsSpec);
+                        MetricQueryService metricQueryService = new MetricQueryService(httpClient);
+                        metricQueryService.queryMetricSource(metricSourceSinkConfig, metricFunctionsSpec, fixedInstant);
                 } catch (MetricQueryServiceException e) {
                         assertTrue(true);
                 }
@@ -195,9 +194,10 @@ public class MetricQueryServiceTest {
                         invalidMetricSourceSinkConfigMap.put("metric-source", "bad-metric-source");
                         Config invalidMetricSourceSinkConfig = ConfigFactory.parseMap(invalidMetricSourceSinkConfigMap);
                         Instant fixedInstant = Instant.parse("2020-03-03T05:05:39Z");
-                        MetricQueryService metricQueryService = new MetricQueryService(httpClient, fixedInstant);
-                        metricQueryService.queryMetricSource(invalidMetricSourceSinkConfig, metricFunctionsSpec);
+                        MetricQueryService metricQueryService = new MetricQueryService(httpClient);
+                        metricQueryService.queryMetricSource(invalidMetricSourceSinkConfig, metricFunctionsSpec, fixedInstant);
                 } catch (IllegalStateException e) {
+                                        
                         assertTrue(true);
                 }
         }
@@ -206,8 +206,8 @@ public class MetricQueryServiceTest {
         public void testEmptyGraphiteMetricQueryResult() {
                 try {
                         Instant fixedInstant = Instant.parse("2020-03-04T05:05:00Z");
-                        MetricQueryService metricQueryService = new MetricQueryService(httpClient, fixedInstant);
-                        metricQueryService.queryMetricSource(metricSourceSinkConfig, metricFunctionsSpec);
+                        MetricQueryService metricQueryService = new MetricQueryService(httpClient);
+                        metricQueryService.queryMetricSource(metricSourceSinkConfig, metricFunctionsSpec, fixedInstant);
                 } catch (MetricQueryServiceException e) {
                         assertTrue(true);
                 }
