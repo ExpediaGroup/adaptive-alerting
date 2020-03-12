@@ -19,11 +19,13 @@ import com.expedia.adaptivealerting.metrics.functions.service.MetricQueryService
 import com.expedia.adaptivealerting.metrics.functions.service.MetricQueryServiceException;
 import com.expedia.adaptivealerting.metrics.functions.sink.MetricFunctionsPublish;
 import com.expedia.adaptivealerting.metrics.functions.source.MetricFunctionsSpec;
+import com.expedia.metrics.MetricData;
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
+
+import java.time.Instant;
 
 @Slf4j
 public class MetricFunctionsTask implements Runnable {
@@ -45,7 +47,7 @@ public class MetricFunctionsTask implements Runnable {
 
     public void run() {
         try {
-            val metricData = metricQueryService.queryMetricSource(metricStoreConfig, spec);
+            MetricData metricData = metricQueryService.queryMetricSource(metricStoreConfig, spec, Instant.now());
             publisher.publishMetrics(metricData);
         } catch (MetricQueryServiceException metricQueryServiceException) {
             log.error(metricQueryServiceException.getMessage(), metricQueryServiceException.getCause());
