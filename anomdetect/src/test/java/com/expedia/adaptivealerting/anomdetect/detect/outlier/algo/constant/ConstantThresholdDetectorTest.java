@@ -20,8 +20,6 @@ import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorRes
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyThresholds;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
-import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.constant.ConstantThresholdDetector;
-import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.constant.ConstantThresholdDetectorParams;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
 import lombok.val;
@@ -67,10 +65,12 @@ public class ConstantThresholdDetectorTest {
         val thresholds = new AnomalyThresholds(null, null, 300.0, 100.0);
         val detector = detector(detectorUuid, thresholds, AnomalyType.LEFT_TAILED, trusted);
         verifyResult(AnomalyLevel.NORMAL, detector, epochSecond, 500.0);
-        verifyResult(AnomalyLevel.WEAK, detector, epochSecond, 300.0);
+        verifyResult(AnomalyLevel.NORMAL, detector, epochSecond, 300.0);
         verifyResult(AnomalyLevel.WEAK, detector, epochSecond, 200.0);
-        verifyResult(AnomalyLevel.STRONG, detector, epochSecond, 100.0);
+        verifyResult(AnomalyLevel.WEAK, detector, epochSecond, 100.0);
         verifyResult(AnomalyLevel.STRONG, detector, epochSecond, 50.0);
+        verifyResult(AnomalyLevel.STRONG, detector, epochSecond, 0.0);
+        verifyResult(AnomalyLevel.STRONG, detector, epochSecond, -50.0);
     }
 
     @Test
@@ -78,9 +78,9 @@ public class ConstantThresholdDetectorTest {
         val thresholds = new AnomalyThresholds(null, null, -10.0, -30.0);
         val detector = detector(detectorUuid, thresholds, AnomalyType.LEFT_TAILED, trusted);
         verifyResult(AnomalyLevel.NORMAL, detector, epochSecond, 1.0);
-        verifyResult(AnomalyLevel.WEAK, detector, epochSecond, -10.0);
+        verifyResult(AnomalyLevel.NORMAL, detector, epochSecond, -10.0);
         verifyResult(AnomalyLevel.WEAK, detector, epochSecond, -15.0);
-        verifyResult(AnomalyLevel.STRONG, detector, epochSecond, -30.0);
+        verifyResult(AnomalyLevel.WEAK, detector, epochSecond, -30.0);
         verifyResult(AnomalyLevel.STRONG, detector, epochSecond, -50.0);
     }
 
@@ -89,9 +89,9 @@ public class ConstantThresholdDetectorTest {
         val thresholds = new AnomalyThresholds(300.0, 200.0, null, null);
         val detector = detector(detectorUuid, thresholds, AnomalyType.RIGHT_TAILED, trusted);
         verifyResult(AnomalyLevel.NORMAL, detector, epochSecond, 100.0);
-        verifyResult(AnomalyLevel.WEAK, detector, epochSecond, 200.0);
+        verifyResult(AnomalyLevel.NORMAL, detector, epochSecond, 200.0);
         verifyResult(AnomalyLevel.WEAK, detector, epochSecond, 220.0);
-        verifyResult(AnomalyLevel.STRONG, detector, epochSecond, 300.0);
+        verifyResult(AnomalyLevel.WEAK, detector, epochSecond, 300.0);
         verifyResult(AnomalyLevel.STRONG, detector, epochSecond, 8675309.0);
     }
 
@@ -99,11 +99,20 @@ public class ConstantThresholdDetectorTest {
     public void testEvaluateRightTailed_negativeThresholds() {
         val thresholds = new AnomalyThresholds(-100.0, -300.0, null, null);
         val detector = detector(detectorUuid, thresholds, AnomalyType.RIGHT_TAILED, trusted);
-        verifyResult(AnomalyLevel.NORMAL, detector, epochSecond, -1000.0);
-        verifyResult(AnomalyLevel.WEAK, detector, epochSecond, -300.0);
+        verifyResult(AnomalyLevel.NORMAL, detector, epochSecond, -300.0);
         verifyResult(AnomalyLevel.WEAK, detector, epochSecond, -250.0);
-        verifyResult(AnomalyLevel.STRONG, detector, epochSecond, -100.0);
+        verifyResult(AnomalyLevel.WEAK, detector, epochSecond, -100.0);
         verifyResult(AnomalyLevel.STRONG, detector, epochSecond, 0.0);
+        verifyResult(AnomalyLevel.STRONG, detector, epochSecond, 1000.0);
+    }
+
+    @Test
+    public void testEvaluateTwoTailed_zeroThresholds() {
+        val thresholds = new AnomalyThresholds(0.0, 0.0, 0.0, 0.0);
+        val detector = detector(detectorUuid, thresholds, AnomalyType.TWO_TAILED, trusted);
+        verifyResult(AnomalyLevel.STRONG, detector, epochSecond, 1.0);
+        verifyResult(AnomalyLevel.NORMAL, detector, epochSecond, 0.0);
+        verifyResult(AnomalyLevel.STRONG, detector, epochSecond, -1.0);
     }
 
     @Test
@@ -113,16 +122,15 @@ public class ConstantThresholdDetectorTest {
         assertEquals("constant-threshold", detector.getName());
     }
 
-    private ConstantThresholdDetector detector(UUID uuid, AnomalyThresholds thresholds, AnomalyType type, boolean trusted) {
-        val params = new ConstantThresholdDetectorParams()
-                .setThresholds(thresholds)
-                .setType(type);
+    private ConstantThresholdDetector detector(UUID uuid, AnomalyThresholds thresholds, AnomalyType type,
+            boolean trusted) {
+        val params = new ConstantThresholdDetectorParams().setThresholds(thresholds).setType(type);
         return new ConstantThresholdDetector(uuid, params, trusted);
     }
 
     private void verifyResult(AnomalyLevel level, Detector detector, long epochSecond, double value) {
         val metricData = new MetricData(metricDefinition, value, epochSecond);
-        val result = (OutlierDetectorResult)  detector.detect(metricData);
+        val result = (OutlierDetectorResult) detector.detect(metricData);
         assertNull(result.getPredicted());
         assertNotNull(result.getThresholds());
         assertEquals(level, result.getAnomalyLevel());

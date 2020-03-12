@@ -51,11 +51,15 @@ public class AnomalyClassifierTest {
         assertEquals(AnomalyLevel.NORMAL, classifierUnderTest_leftTailed.classify(thresholds, 25.0));
 
         assertEquals(AnomalyLevel.STRONG, classifierUnderTest_rightTailed.classify(thresholds, 150.0));
+        assertEquals(AnomalyLevel.WEAK, classifierUnderTest_rightTailed.classify(thresholds, 100.0));
         assertEquals(AnomalyLevel.WEAK, classifierUnderTest_rightTailed.classify(thresholds, 75.0));
+        assertEquals(AnomalyLevel.NORMAL, classifierUnderTest_rightTailed.classify(thresholds, 50.0));
         assertEquals(AnomalyLevel.NORMAL, classifierUnderTest_rightTailed.classify(thresholds, 25.0));
 
         assertEquals(AnomalyLevel.STRONG, classifierUnderTest_twoTailed.classify(thresholds, 150.0));
+        assertEquals(AnomalyLevel.WEAK, classifierUnderTest_twoTailed.classify(thresholds, 100.0));
         assertEquals(AnomalyLevel.WEAK, classifierUnderTest_twoTailed.classify(thresholds, 75.0));
+        assertEquals(AnomalyLevel.NORMAL, classifierUnderTest_twoTailed.classify(thresholds, 50.0));
         assertEquals(AnomalyLevel.NORMAL, classifierUnderTest_twoTailed.classify(thresholds, 25.0));
     }
 
@@ -64,15 +68,21 @@ public class AnomalyClassifierTest {
         val thresholds = new AnomalyThresholds(null, null, 50.0, 25.0);
 
         assertEquals(AnomalyLevel.STRONG, classifierUnderTest_leftTailed.classify(thresholds, 0.0));
+        assertEquals(AnomalyLevel.WEAK, classifierUnderTest_leftTailed.classify(thresholds, 25.0));
         assertEquals(AnomalyLevel.WEAK, classifierUnderTest_leftTailed.classify(thresholds, 35.0));
+        assertEquals(AnomalyLevel.NORMAL, classifierUnderTest_leftTailed.classify(thresholds, 50.0));
         assertEquals(AnomalyLevel.NORMAL, classifierUnderTest_leftTailed.classify(thresholds, 100.0));
 
         assertEquals(AnomalyLevel.NORMAL, classifierUnderTest_rightTailed.classify(thresholds, 0.0));
+        assertEquals(AnomalyLevel.NORMAL, classifierUnderTest_rightTailed.classify(thresholds, 25.0));
         assertEquals(AnomalyLevel.NORMAL, classifierUnderTest_rightTailed.classify(thresholds, 35.0));
+        assertEquals(AnomalyLevel.NORMAL, classifierUnderTest_rightTailed.classify(thresholds, 50.0));
         assertEquals(AnomalyLevel.NORMAL, classifierUnderTest_rightTailed.classify(thresholds, 100.0));
 
         assertEquals(AnomalyLevel.STRONG, classifierUnderTest_twoTailed.classify(thresholds, 0.0));
+        assertEquals(AnomalyLevel.WEAK, classifierUnderTest_twoTailed.classify(thresholds, 25.0));
         assertEquals(AnomalyLevel.WEAK, classifierUnderTest_twoTailed.classify(thresholds, 35.0));
+        assertEquals(AnomalyLevel.NORMAL, classifierUnderTest_twoTailed.classify(thresholds, 50.0));
         assertEquals(AnomalyLevel.NORMAL, classifierUnderTest_twoTailed.classify(thresholds, 100.0));
     }
 }

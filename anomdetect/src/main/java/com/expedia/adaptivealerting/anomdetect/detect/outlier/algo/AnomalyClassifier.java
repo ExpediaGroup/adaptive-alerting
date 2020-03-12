@@ -32,6 +32,17 @@ public class AnomalyClassifier {
     @NonNull
     private AnomalyType anomalyType;
 
+    /*
+     * Greater than '>' and less than '<' operators are used instead of '<=' or '>='
+     * account for cases where the expected range is constant and any value above or
+     * below the expected range is an anomaly.
+     * 
+     * Example #1: Training data for an error count are all 0.0, and any value above
+     * 0.0 is an anomaly.
+     * 
+     * Example #2: Training data for an thread count are all 10.0, and any value
+     * above or below 10.0 is an anomaly.
+     */
     public AnomalyLevel classify(AnomalyThresholds thresholds, double observed) {
         notNull(thresholds, "thresholds can't be null");
 
@@ -44,17 +55,17 @@ public class AnomalyClassifier {
         val lowerStrong = thresholds.getLowerStrong();
 
         if (checkUpper) {
-            if (upperStrong != null && observed >= upperStrong) {
+            if (upperStrong != null && observed > upperStrong) {
                 return AnomalyLevel.STRONG;
-            } else if (upperWeak != null && observed >= upperWeak) {
+            } else if (upperWeak != null && observed > upperWeak) {
                 return AnomalyLevel.WEAK;
             }
         }
 
         if (checkLower) {
-            if (lowerStrong != null && observed <= lowerStrong) {
+            if (lowerStrong != null && observed < lowerStrong) {
                 return AnomalyLevel.STRONG;
-            } else if (lowerWeak != null && observed <= lowerWeak) {
+            } else if (lowerWeak != null && observed < lowerWeak) {
                 return AnomalyLevel.WEAK;
             }
         }
