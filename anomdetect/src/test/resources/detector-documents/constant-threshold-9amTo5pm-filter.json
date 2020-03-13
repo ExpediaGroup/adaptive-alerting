@@ -1,0 +1,44 @@
+{
+  "uuid": "42d242d2-42d2-42d2-42d2-42d242d242d2",
+  "type": "constant-detector",
+  "enabled": true,
+  "trusted": true,
+  "meta": {
+    "dateCreated": "2019-10-16T17:08:40Z",
+    "dateUpdated": "2019-10-16T17:08:40Z",
+    "createdBy": "hansolo",
+    "updatedBy": "hansolo"
+  },
+  "detectorConfig": {
+    "hyperparams": {},
+    "params": {
+      "type": "RIGHT_TAILED",
+      "thresholds": {
+        "upperStrong": 20000.0,
+        "upperWeak": 10000.0
+      }
+    },
+    "filters": {
+      "preDetectionFilters": [
+        {
+          "type": "hourOfDayPreDetectionFilter",
+          "utcStartHour": 9,
+          "utcEndHour": 17
+        },
+        {
+          "type": "passThroughPreDetectionFilter"
+        }
+      ],
+      "postDetectionFilters": [
+        {
+          "type": "mOfNAggregationFilter",
+          "m": 3,
+          "n": 5
+        },
+        {
+          "type": "passThroughPostDetectionFilter"
+        }
+      ]
+    }
+  }
+}

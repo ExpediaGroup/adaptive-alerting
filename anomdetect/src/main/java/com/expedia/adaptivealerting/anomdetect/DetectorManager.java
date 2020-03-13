@@ -25,6 +25,7 @@ import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
 import com.expedia.adaptivealerting.anomdetect.source.data.initializer.DataInitializer;
 import com.expedia.adaptivealerting.anomdetect.source.data.initializer.DetectorDataInitializationThrottledException;
+import com.expedia.metrics.MetricData;
 import com.typesafe.config.Config;
 import lombok.Getter;
 import lombok.NonNull;
@@ -42,10 +43,7 @@ import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.function.BiFunction;
 import java.util.function.Function;
-
-import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 /**
  * Component that manages a given set of anomaly detectors.
@@ -58,13 +56,15 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
  */
 @RequiredArgsConstructor
 @Slf4j
+// TODO: This class is getting much too big. Refactor by breaking out smaller, single-purpose collaborator classes.
 public class DetectorManager {
     private static final String CK_DETECTOR_REFRESH_PERIOD = "detector-refresh-period";
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final Timer detectorForTimer;
     private final Meter noDetectorFoundMeter;
     private final Function<String, Timer> detectTimer;
-    private final BiFunction<String, AnomalyLevel, Meter> detectorAnomalyLevelMeter;
+    private MetricRegistry metricRegistry;
+    private final DetectorExecutorImpl detectorExecutor = new DetectorExecutorImpl();
 
     // TODO Consider making this an explicit class so we can mock it and verify interactions
     //  against it. [WLW]
@@ -80,30 +80,37 @@ public class DetectorManager {
     /**
      * Creates a new detector manager from the given parameters.
      *
-     * @param detectorSource  detector source
-     * @param metricRegistry  metric registry
-     * @param cachedDetectors map containing cached detectors
+     * @param detectorSource  DetectorSource
+     * @param dataInitializer DataInitializer collaborator
+     * @param config          Config
+     * @param cachedDetectors Map containing cached detectors
+     * @param metricRegistry  MetricRegistry collaborator
      */
-    public DetectorManager(DetectorSource detectorSource, DataInitializer dataInitializer, Config config, Map<UUID, Detector> cachedDetectors,
+    public DetectorManager(DetectorSource detectorSource,
+                           DataInitializer dataInitializer,
+                           Config config,
+                           Map<UUID, Detector> cachedDetectors,
                            MetricRegistry metricRegistry) {
-        // TODO Seems odd to include this constructor, whose purpose seems to be to support unit
-        //  testing. At least I don't think it should be public. And it should take a Config
-        //  since the other one does, and this is conceptually just the base constructor with
-        //  the cache exposed.[WLW]
+        // TODO: Seems odd to include this constructor, whose purpose seems to be to support unit testing.
+        //  At least I don't think it should be public.
+        //  This is conceptually just the base constructor with the cache exposed.[WLW]
         this.detectorSource = detectorSource;
         this.detectorRefreshTimePeriod = config.getInt(CK_DETECTOR_REFRESH_PERIOD);
         this.cachedDetectors = cachedDetectors;
         this.dataInitializer = dataInitializer;
 
+        this.metricRegistry = metricRegistry;
         detectorForTimer = metricRegistry.timer("detector.detectorFor");
         noDetectorFoundMeter = metricRegistry.meter("detector.nullDetector");
         detectTimer = (name) -> metricRegistry.timer("detector." + name + ".detect");
-        detectorAnomalyLevelMeter = (name, al) -> metricRegistry.meter("detector." + name + "." + al.name());
 
         this.initScheduler();
     }
 
-    public DetectorManager(DetectorSource detectorSource, DataInitializer dataInitializer, Config config, MetricRegistry metricRegistry) {
+    public DetectorManager(DetectorSource detectorSource,
+                           DataInitializer dataInitializer,
+                           Config config,
+                           MetricRegistry metricRegistry) {
         this(detectorSource, dataInitializer, config, new HashMap<>(), metricRegistry);
     }
 
@@ -125,56 +132,55 @@ public class DetectorManager {
      * @param mappedMetricData Mapped metric data.
      * @return The anomaly result, or {@code null} if there's no associated detector.
      */
-    public DetectorResult detect(MappedMetricData mappedMetricData) {
-        notNull(mappedMetricData, "mappedMetricData can't be null");
-        MDC.put("DetectorUuid", mappedMetricData.getDetectorUuid().toString());
+    public DetectorResult detect(@NonNull MappedMetricData mappedMetricData) {
         try {
-            //timer ...
-            Timer.Context ctxt = detectorForTimer.time();
-            Optional<Detector> optionalDetector = detectorFor(mappedMetricData);
-            ctxt.close();
-            if (!optionalDetector.isPresent()) {
-                log.warn("No detector for mappedMetricData={}", mappedMetricData);
-                noDetectorFoundMeter.mark();
+            MDC.put("DetectorUuid", mappedMetricData.getDetectorUuid().toString());
+            Optional<Detector> detector = getDetector(mappedMetricData);
+            if (detector.isPresent()) {
+                val metricData = mappedMetricData.getMetricData();
+                Optional<DetectorResult> optionalDetectorResult = doDetection(detector.get(), metricData);
+                return optionalDetectorResult.orElse(null);
+            } else {
                 return null;
             }
-            val detector = optionalDetector.get();
-            val metricData = mappedMetricData.getMetricData();
-            DetectorResult result = null;
-            try {
-                ctxt = detectTimer.apply(detector.getName()).time();
-                result = detector.detect(metricData);
-                ctxt.close();
-            } catch (Exception e) {
-                log.error("Error in detector.detect", e);
-            }
-
-            detectorAnomalyLevelMeter.apply(detector.getName(), result.getAnomalyLevel()).mark();
-            return result;
         } finally {
             MDC.remove("DetectorUuid");
         }
     }
 
-    private Optional<Detector> detectorFor(MappedMetricData mappedMetricData) {
-        notNull(mappedMetricData, "mappedMetricData can't be null");
-        val detectorUuid = mappedMetricData.getDetectorUuid();
-
-        Detector detector = cachedDetectors.get(detectorUuid);
-        if (detector == null) {
-            detector = detectorSource.findDetector(detectorUuid);
-            boolean dataInitCompleted = attemptDataInitialization(mappedMetricData, detector);
-            if (dataInitCompleted) {
-                cachedDetectors.put(detectorUuid, detector);
-                log.debug("Data Initialization phase is complete.  Caching detector.");
-            } else {
-                log.debug("Data Initialization incomplete.  Discarding detector from memory to allow future re-attempts.");
-                detector = null;
-            }
-        } else {
-            log.trace("Got cached detector");
+    private Optional<Detector> getDetector(@NonNull MappedMetricData mappedMetricData) {
+        Optional<Detector> optionalDetector = detectorFor(mappedMetricData);
+        if (!optionalDetector.isPresent()) {
+            log.warn("No detector for mappedMetricData={}", mappedMetricData);
+            noDetectorFoundMeter.mark();
         }
-        return Optional.ofNullable(detector);
+        return optionalDetector;
+    }
+
+    private Optional<Detector> detectorFor(@NonNull MappedMetricData mappedMetricData) {
+        try (Timer.Context autoClosable = detectorForTimer.time()) {
+            val detectorUuid = mappedMetricData.getDetectorUuid();
+            Detector detector = cachedDetectors.get(detectorUuid);
+            if (detector == null) {
+                detector = detectorSource.findDetector(detectorUuid);
+                return initDataAndCacheIfSuccessful(mappedMetricData, detectorUuid, detector);
+            } else {
+                log.trace("Got cached detector");
+                return Optional.of(detector);
+            }
+        }
+    }
+
+    private Optional<Detector> initDataAndCacheIfSuccessful(@NonNull MappedMetricData mappedMetricData, @NonNull UUID detectorUuid, Detector detector) {
+        boolean dataInitCompleted = attemptDataInitialization(mappedMetricData, detector);
+        if (dataInitCompleted) {
+            cachedDetectors.put(detectorUuid, detector);
+            log.debug("Data Initialization phase is complete.  Caching detector.");
+            return Optional.ofNullable(detector);
+        } else {
+            log.debug("Data Initialization incomplete.  Discarding detector from memory to allow future re-attempts.");
+            return Optional.empty();
+        }
     }
 
     private boolean attemptDataInitialization(MappedMetricData mappedMetricData, Detector detector) {
@@ -191,6 +197,31 @@ public class DetectorManager {
             dataInitCompleted = true;
         }
         return dataInitCompleted;
+    }
+
+    private Optional<DetectorResult> doDetection(@NonNull Detector detector, @NonNull MetricData metricData) {
+        try (Timer.Context autoClosable = detectTimer.apply(detector.getName()).time()) {
+            Optional<DetectorResult> optionalDetectorResult = Optional.empty();
+            try {
+                DetectorResult detectorResult = detectorExecutor.doDetectionWithOptionalFiltering(detector, metricData);
+                optionalDetectorResult = Optional.of(detectorResult);
+            } catch (Exception e) {
+                log.error("Error during anomaly detection", e);
+            } finally {
+                markAnomalyLevelMeter(detector, optionalDetectorResult);
+            }
+            return optionalDetectorResult;
+        }
+    }
+
+    private void markAnomalyLevelMeter(@NonNull Detector detector, Optional<DetectorResult> optionalDetectorResult) {
+        AnomalyLevel anomalyLevel = optionalDetectorResult.map(DetectorResult::getAnomalyLevel).orElse(null);
+        getDetectorAndLevelMeter(detector.getName(), anomalyLevel).mark();
+    }
+
+    public Meter getDetectorAndLevelMeter(String name, AnomalyLevel anomalyLevel) {
+        String anomalyLevelStr = (anomalyLevel == null) ? "NONE" : anomalyLevel.name();
+        return metricRegistry.meter("detector." + name + "." + anomalyLevelStr);
     }
 
     /**

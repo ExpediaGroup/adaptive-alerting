@@ -18,10 +18,16 @@ package com.expedia.adaptivealerting.anomdetect.util;
 import org.junit.Test;
 
 import java.time.Instant;
+import java.time.ZonedDateTime;
 
+import static java.time.ZoneOffset.UTC;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public final class DateUtilTest {
+
+    private static long INSTANT_IN_EPOCH_SECONDS = 1583971200L;
 
     @Test
     public void testTruncatedToDay() {
@@ -75,6 +81,59 @@ public final class DateUtilTest {
         doTestTruncatedToSeconds("2018-04-01T09:24:54.63Z", "2018-04-01T09:24:54.00Z");
         doTestTruncatedToSeconds("2018-04-01T09:24:54.01Z", "2018-04-01T09:24:54.00Z");
         doTestTruncatedToSeconds("2018-04-01T09:24:53.41Z", "2018-04-01T09:24:53.00Z");
+    }
+
+    @Test
+    public void testEpochSecondToString() {
+        assertEquals("2020-03-12T00:00:00Z", DateUtil.epochSecondToString(INSTANT_IN_EPOCH_SECONDS));
+    }
+
+    @Test
+    public void testEpochSecondToInstant() {
+        assertEquals(Instant.ofEpochSecond(INSTANT_IN_EPOCH_SECONDS), DateUtil.epochSecondToInstant(INSTANT_IN_EPOCH_SECONDS));
+    }
+
+    @Test
+    public void testIsBetweenHours_AllDay() {
+        assertTrue(DateUtil.isBetweenHours(00, 00, 00));
+        assertTrue(DateUtil.isBetweenHours(01, 01, 01));
+    }
+
+    @Test
+    public void testIsBetweenHours_AfterMidnight() {
+        assertTrue(DateUtil.isBetweenHours(01, 00, 02));
+    }
+
+    @Test
+    public void testIsBetweenHours_SameAsStartHour() {
+        assertTrue(DateUtil.isBetweenHours(01, 01, 02));
+        assertTrue(DateUtil.isBetweenHours(23, 22, 00));
+        assertTrue(DateUtil.isBetweenHours(00, 23, 01));
+        assertTrue(DateUtil.isBetweenHours(00, 00, 23));
+    }
+
+    @Test
+    public void testIsBetweenHours_FalseWhenSameAsEndHour() {
+        assertFalse(DateUtil.isBetweenHours(23, 00, 23));
+        assertFalse(DateUtil.isBetweenHours(00, 23, 00));
+    }
+
+    @Test
+    public void testIsBetweenHours_FalseWhenOutsideHours() {
+        assertFalse(DateUtil.isBetweenHours(00, 01, 02));
+    }
+
+    @Test
+    public void testCrossesMidnight() {
+        assertTrue(DateUtil.crossesMidnight(23, 01));
+        assertFalse(DateUtil.crossesMidnight(00, 02));
+        assertFalse(DateUtil.crossesMidnight(22, 00));
+    }
+
+    @Test
+    public void testInstantToUTCDateTime() {
+        Instant instant = Instant.ofEpochSecond(INSTANT_IN_EPOCH_SECONDS);
+        assertEquals(ZonedDateTime.ofInstant(instant, UTC), DateUtil.instantToUTCDateTime(instant));
     }
 
     private void doTestTruncatedToDay(String dateStr, String expectedStr) {

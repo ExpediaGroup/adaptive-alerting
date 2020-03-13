@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.aggregate.algo;
+package com.expedia.adaptivealerting.anomdetect.filter.algo.post;
 
-import com.expedia.adaptivealerting.anomdetect.aggregate.Aggregator;
-import com.expedia.adaptivealerting.anomdetect.aggregate.AggregatorConfig;
-import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
+import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
+import com.expedia.adaptivealerting.anomdetect.filter.PostDetectionFilter;
+import com.expedia.adaptivealerting.anomdetect.filter.chain.PostDetectionFilterChain;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,22 +26,17 @@ import lombok.Setter;
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 /**
- * "Aggregator" that simply returns the passed {@link OutlierDetectorResult}.
+ * "PostDetectionFilter" that simply returns the passed {@link DetectorResult}.
  */
-public class PassThroughAggregator implements Aggregator {
+@Data
+@NoArgsConstructor
+@Setter(AccessLevel.NONE)
+public class PassThroughPostDetectionFilter implements PostDetectionFilter {
 
     @Override
-    public OutlierDetectorResult aggregate(OutlierDetectorResult result) {
+    public DetectorResult doFilter(DetectorResult result, PostDetectionFilterChain chain) {
         notNull(result, "result can't be null");
-        return result;
-    }
-
-    /**
-     * Dummy config for config deserialization. We don't actually use it for anything since it has no config params.
-     */
-    @Data
-    @NoArgsConstructor
-    @Setter(AccessLevel.NONE)
-    public static class Config implements AggregatorConfig {
+        notNull(chain, "chain can't be null");
+        return chain.doFilter(result);
     }
 }

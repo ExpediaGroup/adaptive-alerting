@@ -13,14 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.aggregate;
+package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
-
-/**
- * Interface for anomaly aggregation strategies,
- */
-public interface Aggregator {
-
-    OutlierDetectorResult aggregate(OutlierDetectorResult result);
+public interface DetectorExecutor {
 }

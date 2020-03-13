@@ -15,9 +15,7 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detect.outlier;
 
-import com.expedia.adaptivealerting.anomdetect.aggregate.Aggregator;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
-import com.expedia.adaptivealerting.anomdetect.aggregate.algo.PassThroughAggregator;
 import lombok.Getter;
 
 import java.util.UUID;
@@ -29,18 +27,9 @@ public abstract class AbstractOutlierDetector implements Detector {
     @Getter
     private UUID uuid;
 
-    @Getter
-    private Aggregator aggregator;
-
     public AbstractOutlierDetector(UUID uuid) {
-        this(uuid, new PassThroughAggregator());
-    }
-
-    public AbstractOutlierDetector(UUID uuid, Aggregator aggregator) {
         notNull(uuid, "uuid can't be null");
-        notNull(aggregator, "aggregator can't be null");
 
         this.uuid = uuid;
-        this.aggregator = aggregator;
     }
 }

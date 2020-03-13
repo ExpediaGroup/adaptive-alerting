@@ -15,46 +15,51 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.constant;
 
-import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
+import com.expedia.adaptivealerting.anomdetect.detect.FilterableDetector;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.AbstractOutlierDetector;
+import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.AnomalyClassifier;
+import com.expedia.adaptivealerting.anomdetect.filter.DetectionFilters;
+import com.expedia.adaptivealerting.anomdetect.filter.PostDetectionFilter;
+import com.expedia.adaptivealerting.anomdetect.filter.PreDetectionFilter;
 import com.expedia.metrics.MetricData;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.ToString;
 import lombok.val;
 
+import java.util.List;
 import java.util.UUID;
-
-import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 /**
  * Anomaly detector with constant threshold for weak and strong anomalies. Supports both one- and two-tailed tests.
  */
 @ToString(callSuper = true)
-public final class ConstantThresholdDetector extends AbstractOutlierDetector {
+public final class ConstantThresholdDetector extends AbstractOutlierDetector implements FilterableDetector {
     private static final String NAME = "constant-threshold";
 
     @Getter
     private final ConstantThresholdDetectorParams params;
-
-    private final AnomalyClassifier classifier;
-
     @Getter
     private final boolean trusted;
 
-    public ConstantThresholdDetector(UUID uuid, ConstantThresholdDetectorParams params, boolean trusted) {
+    private final AnomalyClassifier classifier;
+    private DetectionFilters detectionFilters;
+
+
+    public ConstantThresholdDetector(@NonNull UUID uuid, @NonNull ConstantThresholdDetectorParams params, boolean trusted,
+                                     DetectionFilters detectionFilters) {
         super(uuid);
-        notNull(params, "params can't be null");
         params.validate();
         this.params = params;
         this.trusted = trusted;
+        this.detectionFilters = detectionFilters;
         this.classifier = new AnomalyClassifier(params.getType());
     }
 
     @Override
-    public DetectorResult detect(MetricData metricData) {
-        notNull(metricData, "metricData can't be null");
+    public DetectorResult detect(@NonNull MetricData metricData) {
         val thresholds = params.getThresholds();
         val trusted = isTrusted();
         val level = classifier.classify(thresholds, metricData.getValue());
@@ -67,5 +72,15 @@ public final class ConstantThresholdDetector extends AbstractOutlierDetector {
     @Override
     public String getName() {
         return NAME;
+    }
+
+    @Override
+    public @NonNull List<PreDetectionFilter> getPreDetectionFilters() {
+        return detectionFilters.getPreDetectionFilters();
+    }
+
+    @Override
+    public @NonNull List<PostDetectionFilter> getPostDetectionFilters() {
+        return detectionFilters.getPostDetectionFilters();
     }
 }

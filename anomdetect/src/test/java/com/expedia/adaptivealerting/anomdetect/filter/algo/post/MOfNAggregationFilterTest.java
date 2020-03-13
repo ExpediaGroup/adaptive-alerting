@@ -13,22 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.aggregate.algo;
+package com.expedia.adaptivealerting.anomdetect.filter.algo.post;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyThresholds;
+import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
+import com.expedia.adaptivealerting.anomdetect.filter.chain.PostDetectionFilterChain;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
+import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
-public final class MOfNAggregatorTest {
+@RunWith(MockitoJUnitRunner.class)
+public final class MOfNAggregationFilterTest {
     private OutlierDetectorResult normalResult;
     private OutlierDetectorResult weakResult;
     private OutlierDetectorResult strongResult;
     private OutlierDetectorResult warmupResult;
+    @Mock
+    private DetectorResult mockNonOutlierResult;
 
     @Before
     public void setUp() {
@@ -56,15 +66,15 @@ public final class MOfNAggregatorTest {
 
     @Test
     public void testConstructor() {
-        val config = new MOfNAggregator.Config(4, 6);
-        val aggregator = new MOfNAggregator(config);
-        assertEquals(config, aggregator.getConfig());
+        val aggregator = new MOfNAggregationFilter(4, 6);
+        assertEquals(4, aggregator.getM());
+        assertEquals(6, aggregator.getN());
     }
 
     @Test
     public void testAggregate_singleNormal() {
-        val aggregator = new MOfNAggregator();
-        val aggregatedResult = aggregator.aggregate(normalResult);
+        val aggregator = new MOfNAggregationFilter(3, 5);
+        val aggregatedResult = ((OutlierDetectorResult) aggregator.doFilter(normalResult, noopChain()));
         assertEquals(AnomalyLevel.NORMAL, aggregatedResult.getAnomalyLevel());
         assertEquals(normalResult.getPredicted(), aggregatedResult.getPredicted());
         assertEquals(normalResult.getThresholds(), aggregatedResult.getThresholds());
@@ -73,8 +83,8 @@ public final class MOfNAggregatorTest {
 
     @Test
     public void testAggregate_singleWeak() {
-        val aggregator = new MOfNAggregator();
-        val aggregatedResult = aggregator.aggregate(weakResult);
+        val aggregator = new MOfNAggregationFilter(3, 5);
+        OutlierDetectorResult aggregatedResult = (OutlierDetectorResult) aggregator.doFilter(weakResult, noopChain());
         assertEquals(AnomalyLevel.WEAK, aggregatedResult.getAnomalyLevel());
         assertEquals(weakResult.getPredicted(), aggregatedResult.getPredicted());
         assertEquals(weakResult.getThresholds(), aggregatedResult.getThresholds());
@@ -83,110 +93,130 @@ public final class MOfNAggregatorTest {
 
     @Test
     public void testAggregate_mConsecutiveWeaks() {
-        val aggregator = new MOfNAggregator();
+        val aggregator = new MOfNAggregationFilter(3, 5);
 
         val inputResult = weakResult;
         OutlierDetectorResult outputResult;
 
-        outputResult = aggregator.aggregate(inputResult);
+        outputResult = (OutlierDetectorResult) aggregator.doFilter(inputResult, noopChain());
         assertEquals(inputResult.getAnomalyLevel(), outputResult.getAnomalyLevel());
 
-        outputResult = aggregator.aggregate(inputResult);
+        outputResult = (OutlierDetectorResult) aggregator.doFilter(inputResult, noopChain());
         assertEquals(inputResult.getAnomalyLevel(), outputResult.getAnomalyLevel());
 
-        outputResult = aggregator.aggregate(inputResult);
+        outputResult = (OutlierDetectorResult) aggregator.doFilter(inputResult, noopChain());
         assertEquals(AnomalyLevel.STRONG, outputResult.getAnomalyLevel());
     }
 
     @Test
     public void testAggregate_mNonConsecutiveWeaks() {
-        val aggregator = new MOfNAggregator();
+        val aggregator = new MOfNAggregationFilter(3, 5);
 
         OutlierDetectorResult inputResult;
         OutlierDetectorResult outputResult;
 
         inputResult = weakResult;
-        outputResult = aggregator.aggregate(inputResult);
+        outputResult = (OutlierDetectorResult) aggregator.doFilter(inputResult, noopChain());
         assertEquals(inputResult.getAnomalyLevel(), outputResult.getAnomalyLevel());
 
         inputResult = normalResult;
-        outputResult = aggregator.aggregate(inputResult);
+        outputResult = (OutlierDetectorResult) aggregator.doFilter(inputResult, noopChain());
         assertEquals(inputResult.getAnomalyLevel(), outputResult.getAnomalyLevel());
 
         inputResult = weakResult;
-        outputResult = aggregator.aggregate(inputResult);
+        outputResult = (OutlierDetectorResult) aggregator.doFilter(inputResult, noopChain());
         assertEquals(inputResult.getAnomalyLevel(), outputResult.getAnomalyLevel());
 
         inputResult = normalResult;
-        outputResult = aggregator.aggregate(inputResult);
+        outputResult = (OutlierDetectorResult) aggregator.doFilter(inputResult, noopChain());
         assertEquals(inputResult.getAnomalyLevel(), outputResult.getAnomalyLevel());
 
         inputResult = weakResult;
-        outputResult = aggregator.aggregate(inputResult);
+        outputResult = (OutlierDetectorResult) aggregator.doFilter(inputResult, noopChain());
         assertEquals(AnomalyLevel.STRONG, outputResult.getAnomalyLevel());
     }
 
     @Test
     public void testAggregate_mConsecutiveMixedAnomalies() {
-        val aggregator = new MOfNAggregator();
+        val aggregator = new MOfNAggregationFilter(3, 5);
 
         OutlierDetectorResult inputResult;
         OutlierDetectorResult outputResult;
 
         inputResult = weakResult;
-        outputResult = aggregator.aggregate(inputResult);
+        outputResult = (OutlierDetectorResult) aggregator.doFilter(inputResult, noopChain());
         assertEquals(inputResult.getAnomalyLevel(), outputResult.getAnomalyLevel());
 
         inputResult = strongResult;
-        outputResult = aggregator.aggregate(inputResult);
+        outputResult = (OutlierDetectorResult) aggregator.doFilter(inputResult, noopChain());
         assertEquals(inputResult.getAnomalyLevel(), outputResult.getAnomalyLevel());
 
         inputResult = weakResult;
-        outputResult = aggregator.aggregate(inputResult);
+        outputResult = (OutlierDetectorResult) aggregator.doFilter(inputResult, noopChain());
         assertEquals(AnomalyLevel.STRONG, outputResult.getAnomalyLevel());
     }
 
     @Test
     public void testAggregate_nWarmupsThenMixedLevels() {
-        val aggregator = new MOfNAggregator();
+        val aggregator = new MOfNAggregationFilter(3, 5);
 
         OutlierDetectorResult inputResult = warmupResult;
         OutlierDetectorResult outputResult;
 
-        outputResult = aggregator.aggregate(inputResult);
+        outputResult = (OutlierDetectorResult) aggregator.doFilter(inputResult, noopChain());
         assertEquals(inputResult.getAnomalyLevel(), outputResult.getAnomalyLevel());
 
-        outputResult = aggregator.aggregate(inputResult);
+        outputResult = (OutlierDetectorResult) aggregator.doFilter(inputResult, noopChain());
         assertEquals(inputResult.getAnomalyLevel(), outputResult.getAnomalyLevel());
 
-        outputResult = aggregator.aggregate(inputResult);
+        outputResult = (OutlierDetectorResult) aggregator.doFilter(inputResult, noopChain());
         assertEquals(inputResult.getAnomalyLevel(), outputResult.getAnomalyLevel());
 
-        outputResult = aggregator.aggregate(inputResult);
+        outputResult = (OutlierDetectorResult) aggregator.doFilter(inputResult, noopChain());
         assertEquals(inputResult.getAnomalyLevel(), outputResult.getAnomalyLevel());
 
-        outputResult = aggregator.aggregate(inputResult);
+        outputResult = (OutlierDetectorResult) aggregator.doFilter(inputResult, noopChain());
         assertEquals(inputResult.getAnomalyLevel(), outputResult.getAnomalyLevel());
 
         inputResult = weakResult;
-        outputResult = aggregator.aggregate(inputResult);
+        outputResult = (OutlierDetectorResult) aggregator.doFilter(inputResult, noopChain());
         assertEquals(inputResult.getAnomalyLevel(), outputResult.getAnomalyLevel());
 
         inputResult = strongResult;
-        outputResult = aggregator.aggregate(inputResult);
+        outputResult = (OutlierDetectorResult) aggregator.doFilter(inputResult, noopChain());
         assertEquals(inputResult.getAnomalyLevel(), outputResult.getAnomalyLevel());
 
         inputResult = normalResult;
-        outputResult = aggregator.aggregate(inputResult);
+        outputResult = (OutlierDetectorResult) aggregator.doFilter(inputResult, noopChain());
         assertEquals(inputResult.getAnomalyLevel(), outputResult.getAnomalyLevel());
 
         inputResult = weakResult;
-        outputResult = aggregator.aggregate(inputResult);
+        outputResult = (OutlierDetectorResult) aggregator.doFilter(inputResult, noopChain());
         assertEquals(AnomalyLevel.STRONG, outputResult.getAnomalyLevel());
+    }
+
+    @Test
+    public void testAggregate_nonOutlierResult() {
+        DetectorResult result = new MOfNAggregationFilter(3, 5).doFilter(mockNonOutlierResult, noopChain());
+        assertSame(mockNonOutlierResult, result);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testValidate_mZero() {
+        new MOfNAggregationFilter(0, 5);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testValidate_nGreaterThanM() {
+        new MOfNAggregationFilter(5, 3);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testAggregate_nullAnomalyResult() {
-        new MOfNAggregator().aggregate(null);
+        new MOfNAggregationFilter(3, 5).doFilter(null, noopChain());
+    }
+
+    private static PostDetectionFilterChain noopChain() {
+        return new PostDetectionFilterChain(emptyList());
     }
 }

@@ -32,6 +32,8 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 @UtilityClass
 public class DateUtil {
 
+    public static final int MIDNIGHT_HOUR = 0;
+
     /**
      * Returns the largest day either before or equal to the given date.
      *
@@ -72,5 +74,43 @@ public class DateUtil {
     public static Instant truncatedToSeconds(Instant date) {
         notNull(date, "date can't be null");
         return date.truncatedTo(ChronoUnit.SECONDS);
+    }
+
+    public static String epochSecondToString(long metricTimestamp) {
+        return epochSecondToInstant(metricTimestamp).toString();
+    }
+
+    public static Instant epochSecondToInstant(long metricTimestamp) {
+        return Instant.ofEpochSecond(metricTimestamp);
+    }
+
+    /**
+     *  Checks if provided hour falls within the startHour (inclusive) and the endHour (exclusive).<br>
+     *  If startHour &gt; endHour, the time range is considered to cross over midnight.<br>
+     *  E.g. all values in [22, 23, 0, 1] are considered hours between startHour==22 and endHour==2.<br>
+     *  Special Case: When utcStartHour and utcEndHour are configured with the same value (e.g. both equal 0), it is assumed the user intends to allow
+     *  detection to proceed at all hours of the day - i.e. this filter acts as a noop pass-through.
+     * @param hour The hour to check
+     * @param startHour The hour that starts the time range to check
+     * @param endHour   The hour that ends the time range to check
+     */
+    public static boolean isBetweenHours(int hour, int startHour, int endHour) {
+        if (startHour == endHour) {
+            return true;
+        } else {
+            boolean afterStartHour = crossesMidnight(startHour, endHour)
+                    ? ((hour >= startHour) || (hour >= MIDNIGHT_HOUR))
+                    : (hour >= startHour);
+            boolean beforeEndHour = hour < endHour || endHour == MIDNIGHT_HOUR;
+            return afterStartHour && beforeEndHour;
+        }
+    }
+
+    public static boolean crossesMidnight(int startHour, int endHour) {
+        return endHour < startHour && endHour > MIDNIGHT_HOUR;
+    }
+
+    public static ZonedDateTime instantToUTCDateTime(Instant epochSecond) {
+        return ZonedDateTime.ofInstant(epochSecond, ZoneOffset.UTC);
     }
 }

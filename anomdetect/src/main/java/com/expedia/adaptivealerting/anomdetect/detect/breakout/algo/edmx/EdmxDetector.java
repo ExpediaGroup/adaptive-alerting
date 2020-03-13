@@ -24,11 +24,11 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
-import java.time.Instant;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
+import static com.expedia.adaptivealerting.anomdetect.util.DateUtil.epochSecondToInstant;
 
 @Slf4j
 public final class EdmxDetector implements BreakoutDetector {
@@ -86,7 +86,7 @@ public final class EdmxDetector implements BreakoutDetector {
         }
 
         val epochSeconds = mdList.get(location).getTimestamp();
-        val instant = Instant.ofEpochSecond(epochSeconds);
+        val instant = epochSecondToInstant(epochSeconds);
         val anomalyLevel = calculateAnomalyLevel(estimate);
 
         return result

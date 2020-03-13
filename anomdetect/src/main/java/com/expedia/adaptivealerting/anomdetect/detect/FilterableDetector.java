@@ -15,37 +15,24 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detect;
 
-import com.expedia.metrics.MetricData;
+import com.expedia.adaptivealerting.anomdetect.filter.PostDetectionFilter;
+import com.expedia.adaptivealerting.anomdetect.filter.PreDetectionFilter;
+import lombok.NonNull;
 
-import java.util.UUID;
+import java.util.List;
 
 /**
- * Anomaly detector interface. Anomalies can be outliers (point-in-time) or breakouts (distributional shifts in the
- * recent past).
+ * Marker interface for detectors that are able to filter detection attempts.
  */
-public interface Detector {
+public interface FilterableDetector extends Detector {
 
     /**
-     * Returns the anomaly detector UUID.
-     *
-     * @return Anomaly detector UUID.
+     * Returns list of PreDetectionFilters that will be applied to the metricData prior to Detector.detect() being called.
      */
-    UUID getUuid();
+    @NonNull List<PreDetectionFilter> getPreDetectionFilters();
 
     /**
-     * Returns the anomaly detector trust value.
-     *
-     * @return Anomaly detector Trust Level.
+     * Returns list of PostDetectionFilters that will be applied to the DetectorResult after Detector.detect() has been called.
      */
-    boolean isTrusted();
-
-    /**
-     * Processes a given metric point.
-     *
-     * @param metricData Metric data point.
-     * @return Anomaly result.
-     */
-    DetectorResult detect(MetricData metricData);
-
-    String getName();
+    @NonNull List<PostDetectionFilter> getPostDetectionFilters();
 }

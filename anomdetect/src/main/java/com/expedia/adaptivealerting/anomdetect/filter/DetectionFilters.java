@@ -13,10 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect;
+package com.expedia.adaptivealerting.anomdetect.filter;
 
-public class DetectorInitializationException extends RuntimeException {
-    public DetectorInitializationException(String message, Exception cause) {
-        super(message, cause);
+import lombok.Data;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
+import java.util.Collections;
+import java.util.List;
+
+@Data
+@RequiredArgsConstructor
+public class DetectionFilters {
+    @NonNull
+    private List<PreDetectionFilter> preDetectionFilters;
+
+    @NonNull
+    private List<PostDetectionFilter> postDetectionFilters;
+
+    public DetectionFilters() {
+        this.preDetectionFilters = Collections.emptyList();
+        this.postDetectionFilters = Collections.emptyList();
     }
 }
