@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.anomdetect;
 import com.codahale.metrics.SharedMetricRegistries;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
+import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
 import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMapping;
@@ -166,6 +167,13 @@ public final class DetectorManagerTest {
         // TODO Come up with some way to actually prove this. E.g. mock the cache and verify().
         //  For now I just put a log.trace() in there. [WLW]
         managerUnderTest.detect(goodMappedMetricData);
+    }
+
+    @Test
+    public void testClassify_returnsNullWhenDetectorErrors() {
+        doThrow(new RuntimeException("Some Detector Failure")).when(detector).detect(goodMetricData);
+        DetectorResult detectorResult = managerUnderTest.detect(goodMappedMetricData);
+        assertNull(detectorResult);
     }
 
     @Test

@@ -15,11 +15,11 @@
  */
 package com.expedia.adaptivealerting.anomdetect.forecast.point.algo.seasonalnaive;
 
+import com.expedia.adaptivealerting.anomdetect.util.DateUtil;
 import com.expedia.metrics.MetricData;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
@@ -182,7 +182,7 @@ public class SeasonalBuffer {
     }
 
     private String dateStr(long timestamp) {
-        return Instant.ofEpochSecond(timestamp).toString();
+        return DateUtil.epochSecondToString(timestamp);
     }
 
     /**

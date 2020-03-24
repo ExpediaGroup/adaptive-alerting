@@ -16,8 +16,6 @@
 package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.individuals;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
-import com.expedia.adaptivealerting.anomdetect.detect.breakout.algo.edmx.EdmxDetector;
-import com.expedia.adaptivealerting.anomdetect.detect.breakout.algo.edmx.EdmxHyperparams;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
 import com.expedia.metrics.MetricData;
 import com.expedia.metrics.MetricDefinition;
@@ -70,10 +68,8 @@ public class IndividualsDetectorTest {
         val testRow0 = testRows.next();
         val observed0 = testRow0.getObserved();
 
-        val params = new IndividualsDetectorParams()
-                .setInitValue(observed0)
-                .setWarmUpPeriod(WARMUP_PERIOD);
-        val detector = new IndividualsDetector(detectorUuid, params, trusted, "test");
+        val params = buildParams(observed0);
+        val detector = buildDetector(params);
 
         assertEquals(detectorUuid, detector.getUuid());
         assertEquals(trusted, detector.isTrusted());
@@ -103,13 +99,20 @@ public class IndividualsDetectorTest {
 
     @Test
     public void testName() {
-        val params = new IndividualsDetectorParams()
-                .setInitValue(0)
-                .setWarmUpPeriod(WARMUP_PERIOD);
-        val detectorUnderTest = new IndividualsDetector(detectorUuid, params, trusted, "test");
+        val detectorUnderTest = buildDetector(buildParams(0));
 
         assertNotNull(detectorUnderTest.getName());
         Assert.assertEquals("test", detectorUnderTest.getName());
+    }
+
+    private IndividualsDetectorParams buildParams(double initValue) {
+        return new IndividualsDetectorParams()
+                .setInitValue(initValue)
+                .setWarmUpPeriod(WARMUP_PERIOD);
+    }
+
+    private IndividualsDetector buildDetector(IndividualsDetectorParams individualsDetectorParams) {
+        return new IndividualsDetector(detectorUuid, individualsDetectorParams, trusted, "test");
     }
 
     private static void readDataFromCsv() {

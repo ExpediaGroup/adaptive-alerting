@@ -1,0 +1,22 @@
+{
+    "preDetectionFilters": [
+      {
+        "type": "hourOfDayPreDetectionFilter",
+        "utcStartHour": 9,
+        "utcEndHour": 17
+      },
+      {
+        "type": "passThroughPreDetectionFilter"
+      }
+    ],
+    "postDetectionFilters": [
+      {
+        "type": "mOfNAggregationFilter",
+        "m": 3,
+        "n": 5
+      },
+      {
+        "type": "passThroughPostDetectionFilter"
+      }
+    ]
+}

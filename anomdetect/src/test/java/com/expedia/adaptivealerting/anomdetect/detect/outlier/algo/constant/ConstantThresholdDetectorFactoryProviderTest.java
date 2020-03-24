@@ -15,14 +15,26 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.constant;
 
-import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
 import com.expedia.adaptivealerting.anomdetect.detect.AbstractDetectorFactoryTest;
+import com.expedia.adaptivealerting.anomdetect.detect.AnomalyType;
+import com.expedia.adaptivealerting.anomdetect.filter.PostDetectionFilter;
+import com.expedia.adaptivealerting.anomdetect.filter.PreDetectionFilter;
+import com.expedia.adaptivealerting.anomdetect.filter.algo.post.MOfNAggregationFilter;
+import com.expedia.adaptivealerting.anomdetect.filter.algo.post.PassThroughPostDetectionFilter;
+import com.expedia.adaptivealerting.anomdetect.filter.algo.pre.HourOfDayDetectionFilter;
+import com.expedia.adaptivealerting.anomdetect.filter.algo.pre.PassThroughPreDetectionFilter;
+import com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.Test;
 
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 
 @Slf4j
 public class ConstantThresholdDetectorFactoryProviderTest extends AbstractDetectorFactoryTest {
@@ -37,16 +49,43 @@ public class ConstantThresholdDetectorFactoryProviderTest extends AbstractDetect
         val thresholds = params.getThresholds();
 
         assertNotNull(detector);
-        assertEquals(ConstantThresholdDetector.class, detector.getClass());
+        assertSame(ConstantThresholdDetector.class, detector.getClass());
         assertEquals("e2e290a0-d1c1-471e-9d72-79d43282cfbd", detector.getUuid().toString());
+        assertEquals(Collections.emptyList(), detector.getPreDetectionFilters());
+        assertEquals(Collections.emptyList(), detector.getPostDetectionFilters());
         assertEquals(AnomalyType.RIGHT_TAILED, params.getType());
         assertEquals(16666.0, thresholds.getUpperStrong(), TOLERANCE);
         assertEquals(2161.0, thresholds.getUpperWeak(), TOLERANCE);
     }
 
+    @Test
+    public void testBuildDetectorWithFilters() {
+        val factoryUnderTest = new ConstantThresholdDetectorFactoryProvider();
+        val document = readDocument("constant-threshold-9amTo5pm-filter");
+        val detector = factoryUnderTest.buildDetector(document);
+
+        assertNotNull(detector);
+        assertSame(ConstantThresholdDetector.class, detector.getClass());
+        assertEquals("42d242d2-42d2-42d2-42d2-42d242d242d2", detector.getUuid().toString());
+        assertArrayEquals(expectedPreDetectionFilters().toArray(), detector.getPreDetectionFilters().toArray());
+        assertArrayEquals(expectedPostDetectionFilters().toArray(), detector.getPostDetectionFilters().toArray());
+    }
+
     @Test(expected = RuntimeException.class)
     public void testBuildDetector_invalidUuid() {
         readDocument("constant-threshold-invalid-uuid");
+    }
+
+    private List<PreDetectionFilter> expectedPreDetectionFilters() {
+        return ImmutableList.of(
+                new HourOfDayDetectionFilter(9, 17),
+                new PassThroughPreDetectionFilter());
+    }
+
+    private List<PostDetectionFilter> expectedPostDetectionFilters() {
+        return ImmutableList.of(
+                new MOfNAggregationFilter(3, 5),
+                new PassThroughPostDetectionFilter());
     }
 
     @Test(expected = RuntimeException.class)

@@ -26,7 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.time.Instant.ofEpochSecond;
+import static com.expedia.adaptivealerting.anomdetect.util.DateUtil.epochSecondToInstant;
+import static com.expedia.adaptivealerting.anomdetect.util.DateUtil.epochSecondToString;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -75,12 +76,12 @@ public class GraphiteSource implements DataSource {
         // We subtract 1 second from FROM time to get complete data for the first bin from Graphite. Graphite for some reason gives incomplete data for first bin if we don't do this.
         long fromMinusOneSecond = from - 1;
         log.debug("Querying Graphite with: from={} ({}), until={} ({}), metric='{}'",
-                fromMinusOneSecond, ofEpochSecond(fromMinusOneSecond), until, ofEpochSecond(until), metric);
+                fromMinusOneSecond, epochSecondToInstant(fromMinusOneSecond), until, epochSecondToInstant(until), metric);
         return graphiteClient.getData(fromMinusOneSecond, until, intervalLength, metric);
     }
 
     private long epochTimeSnappedToSeconds(long time, int seconds) {
-        return DateUtil.snapToSeconds(ofEpochSecond(time), seconds).getEpochSecond();
+        return DateUtil.snapToSeconds(epochSecondToInstant(time), seconds).getEpochSecond();
     }
 
     // Graphite returns NULL values for some of the data points.
@@ -109,9 +110,10 @@ public class GraphiteSource implements DataSource {
             log.debug(String.format("Retrieved %d data points from Graphite from %d (%s) until %d (%s)",
                     results.size(),
                     actualFrom,
-                    ofEpochSecond(actualFrom).toString(),
+                    epochSecondToString(actualFrom),
                     actualUntil,
-                    ofEpochSecond(actualUntil).toString()));
+                    epochSecondToString(actualUntil))
+            );
         }
     }
 }

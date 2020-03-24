@@ -13,19 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.aggregate.algo;
+package com.expedia.adaptivealerting.anomdetect.testutil;
 
-import org.junit.Test;
+import java.time.ZonedDateTime;
 
-public class MOfNAggregatorConfigTest {
+import static java.time.ZoneOffset.UTC;
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testValidate_mZero() {
-        new MOfNAggregator.Config(0, 5);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testValidate_nGreaterThanM() {
-        new MOfNAggregator.Config(5, 3);
+public class DateHelper {
+    /**
+     * Creates a graphite-compatible timestamp long, i.e. result represents number of seconds since epoch, for given date/time
+     */
+    public static long timestamp(int year, int month, int dayOfMonth, int hour, int minute, int second) {
+        ZonedDateTime dateTime = ZonedDateTime.of(year, month, dayOfMonth, hour, minute, second, 0, UTC);
+        return dateTime.toInstant().getEpochSecond();
     }
 }

@@ -21,6 +21,7 @@ import lombok.val;
 
 import java.io.IOException;
 
+// TODO: Convert this to a collaborator so readDocument can be shared with other non-Detector classes
 public abstract class AbstractDetectorFactoryTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
