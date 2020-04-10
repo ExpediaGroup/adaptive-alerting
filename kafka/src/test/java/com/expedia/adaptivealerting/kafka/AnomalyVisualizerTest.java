@@ -13,6 +13,7 @@ public class AnomalyVisualizerTest {
 
     public AnomalyVisualizer anomalyVisualizer;
 
+
     @Before
     public void setUp() {
         anomalyVisualizer = new AnomalyVisualizer();
@@ -20,21 +21,12 @@ public class AnomalyVisualizerTest {
 
     @Test
     public void testPutdatatoElasticSearch() {
-        AnomalyModel anomalyModel = new AnomalyModel();
-        anomalyModel.setUuid("asca");
-        anomalyModel.setTimestamp(new Date());
-        anomalyModel.setKey("key");
-        anomalyModel.setLevel("level");
-        String json = anomalyVisualizer.convertToJson(anomalyModel);
-        Response response = anomalyVisualizer.sendMetricsToESSearch(json);
-        assertNotNull(response);
+
 
     }
 
     @Test
     public void testConvertTimestamp() {
-        long timestamp = 1586453367;
-        Date time = anomalyVisualizer.convertToDate(timestamp);
-        assertNotNull(time);
+
     }
 }
