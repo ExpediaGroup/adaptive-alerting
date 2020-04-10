@@ -71,6 +71,8 @@ services:
     environment:
       ES_JAVA_OPTS: "-Xms512m -Xmx512m"
       xpack.security.enabled: "false"
+      http.cors.allow-origin: "*"
+      http.cors.enabled: "true"
     ports:
       - "9200:9200"
     restart: always
@@ -131,3 +133,14 @@ services:
       - "2023-2024:2023-2024"
       - "8126:8126"
       - "80:80"
+
+  grafana:
+      image: "grafana/grafana:6.5.0"
+      healthcheck:
+        test: "nc -w 2 localhost 2003 || false"
+        interval: 30s
+        timeout: 10s
+        retries: 3
+      ports:
+          - "3000:3000"
+
