@@ -25,14 +25,14 @@ import threading
 kafka_boostrap_servers=['localhost:19092']
 
 def produce_to_kafka(topic):
-    num_samples = 50    # Minimum of 80 events need to be in Kafka topic to see output
+    num_samples = 250    # Minimum of 80 events need to be in Kafka topic to see output
     try:
         time.sleep(1)   # Wait to make sure we establish a connection to anomalies kafka first
         producer = KafkaProducer(bootstrap_servers=kafka_boostrap_servers)
         print("Sending", num_samples, "random sample messages to Kafka...")
         for i in range(0, num_samples):
             send_msgpack_to_kafka(producer, topic='aa-metrics') # Send to kafka using msgpack format
-          # send_json_to_kafka(producer, topic='aa-metrics')              # Send to kafka using JSON format
+          # send_json_to_kafka()              # Send to kafka using JSON format
         producer.flush()
     except KafkaError as e:
         print("Error connecting to", topic, "Kafka. Make sure your Docker Compose environment is up and running. EXCEPTION:",e)

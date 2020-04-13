@@ -3,20 +3,18 @@ package com.expedia.adaptivealerting.kafka.visualizer;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyThresholds;
 import com.expedia.metrics.TagCollection;
 
-import java.util.Date;
-
 public class AnomalyModel {
 
     String key;
+    double value;
     String level;
     String uuid;
-    Date timestamp;
+    String timestamp;
     AnomalyThresholds anomalyThresholds;
     TagCollection tags;
 
 
     public AnomalyModel() {
-
     }
 
     public String getKey() {
@@ -43,11 +41,11 @@ public class AnomalyModel {
         this.uuid = uuid;
     }
 
-    public Date getTimestamp() {
+    public String getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Date timestamp) {
+    public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -65,5 +63,13 @@ public class AnomalyModel {
 
     public void setTags(TagCollection tags) {
         this.tags = tags;
+    }
+
+    public double getValue() {
+        return value;
+    }
+
+    public void setValue(double value) {
+        this.value = value;
     }
 }

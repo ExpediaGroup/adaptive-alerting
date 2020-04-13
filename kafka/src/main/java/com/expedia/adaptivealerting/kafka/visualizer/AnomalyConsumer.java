@@ -11,6 +11,10 @@ import org.apache.kafka.common.errors.WakeupException;
 
 import java.util.Collections;
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 
 @Slf4j
@@ -21,13 +25,16 @@ public class AnomalyConsumer {
     private static long POLL_INTERVAL = 1000L;
 
     private AnomaliesProcessor anomaliesProcessor;
+    private ExecutorService executorService;
 
     public AnomalyConsumer() {
         Config config = new TypesafeConfigLoader("visualizer").loadMergedConfig();
         Config metricConsumerConfig = config.getConfig("metric-consumer");
         Properties metricConsumerProps = ConfigUtil.toConsumerConfig(metricConsumerConfig);
         kafkaConsumer = new KafkaConsumer(metricConsumerProps);
-        anomaliesProcessor = new AnomaliesProcessor(new ElasticSearchService());
+        anomaliesProcessor = new AnomaliesProcessor();
+        executorService = new ThreadPoolExecutor(10, 10, 0L, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<Runnable>());
     }
 
     public void listen() {
@@ -40,7 +47,7 @@ public class AnomalyConsumer {
                 ConsumerRecords<String, MappedMetricData> metricRecords = kafkaConsumer.poll(POLL_INTERVAL);
                 int numConsumed = metricRecords.count();
                 log.trace("Read {} metric records from topic={}", numConsumed, METRIC_TOPIC);
-                anomaliesProcessor.processMetrics(metricRecords);
+                anomaliesProcessor.processMetrics(metricRecords, executorService);
             } catch (WakeupException e) {
                 kafkaConsumer.close();
                 continueProcessing = false;
