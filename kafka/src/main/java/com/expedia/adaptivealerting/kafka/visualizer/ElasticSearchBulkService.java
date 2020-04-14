@@ -27,6 +27,7 @@ import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
 
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -39,38 +40,49 @@ public class ElasticSearchBulkService implements Runnable{
     private static String INDEX = "anomalies";
     private static String TYPE = "doc";
 
+    private  RestHighLevelClient client = restClientBuilder();
+
     private List<AnomalyModel> anomalyModels;
 
     public ElasticSearchBulkService(List<AnomalyModel> anomalyModels) {
         this.anomalyModels = anomalyModels;
     }
 
-    public void execute() {
-        RestHighLevelClient client = restClientBuilder();
-        RequestOptions requestOptions = RequestOptions.DEFAULT;
-        BulkResponse bulkResponse = null;
-
+    private void execute() {
+        BulkResponse bulkResponse;
         BulkRequest bulkRequest = buildBulkRequest(this.anomalyModels);
         try {
-            bulkResponse = client.bulk(bulkRequest, requestOptions);
+            bulkResponse = client.bulk(bulkRequest, RequestOptions.DEFAULT);
+            if (bulkResponse.hasFailures()) {
+                log.error(bulkResponse.buildFailureMessage());
+            }
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage(),e);
-        }
-        if (bulkResponse.hasFailures()) {
-            log.error(bulkResponse.buildFailureMessage());
+        } finally {
+            try {
+                client.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    public RestHighLevelClient restClientBuilder() {
-        RestHighLevelClient client = new RestHighLevelClient(
-                RestClient.builder(
-                        new HttpHost(HOST, PORT1, SCHEME),
-                        new HttpHost(HOST, PORT2, SCHEME)));
+    private RestHighLevelClient restClientBuilder() {
+
+        RestHighLevelClient client = null;
+        try {
+            client = new RestHighLevelClient(
+                    RestClient.builder(
+                            new HttpHost(HOST, PORT1, SCHEME),
+                            new HttpHost(HOST, PORT2, SCHEME)));
+        } catch (Exception e) {
+            log.error(e.getMessage(),e);
+        }
         return client;
     }
 
-    public BulkRequest buildBulkRequest(List<AnomalyModel> anomalyModels){
+    private BulkRequest buildBulkRequest(List<AnomalyModel> anomalyModels){
         BulkRequest bulkRequest = new BulkRequest();
         for (AnomalyModel anomalyModel : anomalyModels) {
             String json = Utility.convertToJson(anomalyModel);
@@ -78,7 +90,7 @@ public class ElasticSearchBulkService implements Runnable{
         }
         return bulkRequest;
     }
-    public IndexRequest buildIndexRequest(String json) {
+    private IndexRequest buildIndexRequest(String json) {
         IndexRequest request = new IndexRequest(INDEX, TYPE);
         request.source(json, XContentType.JSON);
         return request;
@@ -87,5 +99,4 @@ public class ElasticSearchBulkService implements Runnable{
     public void run(){
         execute();
     }
-
 }

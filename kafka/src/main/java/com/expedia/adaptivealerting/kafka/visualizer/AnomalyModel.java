@@ -19,73 +19,119 @@ package com.expedia.adaptivealerting.kafka.visualizer;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyThresholds;
 import com.expedia.metrics.TagCollection;
 
-public class AnomalyModel {
+public class AnomalyModel extends Object {
 
-    String key;
-    double value;
-    String level;
-    String uuid;
-    String timestamp;
-    AnomalyThresholds anomalyThresholds;
-    TagCollection tags;
+    private String key;
+    private double value;
+    private String level;
+    private String uuid;
+    private String timestamp;
+    private AnomalyThresholds anomalyThresholds;
+    private TagCollection tags;
 
+    private AnomalyModel(Builder builder){
+        this.key = builder.key;
+        this.value = builder.value;
+        this.level = builder.level;
+        this.uuid = builder.uuid;
+        this.timestamp = builder.timestamp;
+        this.anomalyThresholds = builder.anomalyThresholds;
+        this.tags = builder.tags;
+    }
 
-    public AnomalyModel() {
+    public static Builder newBuilder() {
+        return new Builder();
+    }
+
+    public static Builder newBuilder(AnomalyModel copy) {
+        Builder builder = new Builder();
+        builder.key = copy.getKey();
+        builder.value = copy.getValue();
+        builder.level = copy.getLevel();
+        builder.uuid = copy.getUuid();
+        builder.timestamp = copy.getTimestamp();
+        builder.anomalyThresholds = copy.getAnomalyThresholds();
+        builder.tags = copy.getTags();
+        return builder;
     }
 
     public String getKey() {
         return key;
     }
 
-    public void setKey(String key) {
-        this.key = key;
-    }
-
     public String getLevel() {
         return level;
-    }
-
-    public void setLevel(String level) {
-        this.level = level;
     }
 
     public String getUuid() {
         return uuid;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
     public String getTimestamp() {
         return timestamp;
-    }
-
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
     }
 
     public AnomalyThresholds getAnomalyThresholds() {
         return anomalyThresholds;
     }
 
-    public void setAnomalyThresholds(AnomalyThresholds anomalyThresholds) {
-        this.anomalyThresholds = anomalyThresholds;
-    }
-
     public TagCollection getTags() {
         return tags;
-    }
-
-    public void setTags(TagCollection tags) {
-        this.tags = tags;
     }
 
     public double getValue() {
         return value;
     }
 
-    public void setValue(double value) {
-        this.value = value;
+    public static final class Builder {
+        private String key;
+        private double value;
+        private String level;
+        private String uuid;
+        private String timestamp;
+        private AnomalyThresholds anomalyThresholds;
+        private TagCollection tags;
+
+        private Builder() {
+        }
+
+        public Builder key(String val) {
+            key = val;
+            return this;
+        }
+
+        public Builder value(double val) {
+            value = val;
+            return this;
+        }
+
+        public Builder level(String val) {
+            level = val;
+            return this;
+        }
+
+        public Builder uuid(String val) {
+            uuid = val;
+            return this;
+        }
+
+        public Builder timestamp(String val) {
+            timestamp = val;
+            return this;
+        }
+
+        public Builder anomalyThresholds(AnomalyThresholds val) {
+            anomalyThresholds = val;
+            return this;
+        }
+
+        public Builder tags(TagCollection val) {
+            tags = val;
+            return this;
+        }
+
+        public AnomalyModel build() {
+            return new AnomalyModel(this);
+        }
     }
 }

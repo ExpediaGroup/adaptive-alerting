@@ -36,28 +36,28 @@ public class AnomaliesProcessor {
 
         List<AnomalyModel> anomalyModels = new ArrayList();
         for (ConsumerRecord<String, MappedMetricData> consumerRecord : metricRecords) {
-            AnomalyModel anomalyModel = new AnomalyModel();
+            AnomalyModel.Builder anomalyModel = AnomalyModel.newBuilder();
             MappedMetricData mappedMetricData = consumerRecord.value();
             if (mappedMetricData != null) {
                 if (mappedMetricData.getDetectorUuid() != null) {
-                    anomalyModel.setUuid(mappedMetricData.getDetectorUuid().toString());
+                    anomalyModel.uuid(mappedMetricData.getDetectorUuid().toString());
                 }
                 MetricData metricData = mappedMetricData.getMetricData();
                 if (metricData != null) {
-                    anomalyModel.setTimestamp(Utility.convertToDate(metricData.getTimestamp()));
-                    anomalyModel.setValue(metricData.getValue());
+                    anomalyModel.timestamp(Utility.convertToDate(metricData.getTimestamp()));
+                    anomalyModel.value(metricData.getValue());
                     if (metricData.getMetricDefinition() != null) {
-                        anomalyModel.setKey(metricData.getMetricDefinition().getKey());
-                        anomalyModel.setTags(metricData.getMetricDefinition().getTags());
+                        anomalyModel.key(metricData.getMetricDefinition().getKey());
+                        anomalyModel.tags(metricData.getMetricDefinition().getTags());
                     }
                 }
                 OutlierDetectorResult outlierDetectorResult = (OutlierDetectorResult) mappedMetricData.getAnomalyResult();
                 if (outlierDetectorResult != null) {
-                    anomalyModel.setLevel(outlierDetectorResult.getAnomalyLevel().toString());
-                    anomalyModel.setAnomalyThresholds(outlierDetectorResult.getThresholds());
+                    anomalyModel.level(outlierDetectorResult.getAnomalyLevel().toString());
+                    anomalyModel.anomalyThresholds(outlierDetectorResult.getThresholds());
                 }
             }
-            anomalyModels.add(anomalyModel);
+            anomalyModels.add(anomalyModel.build());
         }
         if (anomalyModels.size() > 0) {
             ElasticSearchBulkService elasticSearchBulkService = new ElasticSearchBulkService(anomalyModels);
