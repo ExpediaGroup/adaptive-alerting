@@ -14,7 +14,7 @@
 #       See the License for the specific language governing permissions and
 #       limitations under the License.
 
- echo "--- Waiting for the Model Service API to become available before inserting sample detector and mapping..."
+echo "--- Waiting for the Model Service API to become available before inserting sample detector and mapping..."
 
 # Do not post sample detector to API until elasticsearch indexes pre-created by the modelservice
 # Prevents race condition where index mappings are incorrectly auto-created by the API post before the modelservice can build them
