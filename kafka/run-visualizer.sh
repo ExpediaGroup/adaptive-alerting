@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright 2019 Expedia Group, Inc.
+# Copyright 2018 Expedia Group, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,10 +14,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-APP_NAME="adaptive-alerting-anomaly-visualizer"
-DOTTED_APP_NAME="visualizer"
-MAIN_CLASS="com.expedia.adaptivealerting.kafka.AnomalyVisualizer"
-
-cd `cd -P -- "$(dirname --cd "$0")" && pwd -P`
-
-. common.sh
+mvn exec:java -Dexec.mainClass="com.expedia.adaptivealerting.kafka.AnomalyVisualizer"

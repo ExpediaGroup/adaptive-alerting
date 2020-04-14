@@ -65,6 +65,21 @@ services:
       metrics:
         condition: service_healthy
 
+  visualizer:
+    image: adaptive-alerting-anomaly-visualizer
+    environment:
+      AA_GRAPHITE_ENABLED: "true"
+      JAVA_XMS: 128m
+    volumes:
+        - ./configs/visualizer:/config
+    depends_on:
+      kafkasvc:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+      grafana:
+        condition: service_healthy
+
   # Dependencies
   elasticsearch:
     image: elasticsearch:6.5.0
