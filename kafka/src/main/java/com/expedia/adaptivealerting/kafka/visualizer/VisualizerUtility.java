@@ -16,14 +16,21 @@
 
 package com.expedia.adaptivealerting.kafka.visualizer;
 
+import com.expedia.adaptivealerting.kafka.TypesafeConfigLoader;
+import com.expedia.adaptivealerting.kafka.util.ConfigUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.typesafe.config.Config;
+import lombok.extern.slf4j.Slf4j;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Properties;
 
-public class Utility {
+@Slf4j
+public class VisualizerUtility {
 
+    private static Config config = new TypesafeConfigLoader("visualizer").loadMergedConfig();
 
     public static String convertToJson(Object object) {
         String json = "";
@@ -38,9 +45,18 @@ public class Utility {
 
     public static String convertToDate(long timestamp) {
         Date date = new Date(timestamp * 1000L);
-
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         String dateString = format.format(date);
         return dateString;
+    }
+
+    public static Properties getMetricConsumerProps() {
+        Config metricConsumerConfig = getConfig("metric-consumer");
+        Properties metricConsumerProps = ConfigUtil.toConsumerConfig(metricConsumerConfig);
+        log.info("metricConsumerProps {}", metricConsumerProps);
+        return metricConsumerProps;
+    }
+    public static Config getConfig(String configName) {
+        return config.getConfig(configName);
     }
 }

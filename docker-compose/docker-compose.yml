@@ -65,6 +65,21 @@ services:
       metrics:
         condition: service_healthy
 
+  visualizer:
+    image: adaptive-alerting-anomaly-visualizer
+    environment:
+      AA_GRAPHITE_ENABLED: "true"
+      JAVA_XMS: 128m
+    volumes:
+      - ./configs/visualizer:/config
+    depends_on:
+      kafkasvc:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+      grafana:
+        condition: service_healthy
+
   # Dependencies
   elasticsearch:
     image: elasticsearch:6.5.0
@@ -75,6 +90,7 @@ services:
       http.cors.enabled: "true"
     ports:
       - "9200:9200"
+      - "9201:9201"
     restart: always
     volumes:
       - "./scripts/populate-es.sh:/usr/local/bin/populate-es.sh"
@@ -137,7 +153,7 @@ services:
   grafana:
       image: "grafana/grafana:6.5.0"
       healthcheck:
-        test: "nc -w 2 localhost 2003 || false"
+        test: "nc -w 2 localhost 3000 || false"
         interval: 30s
         timeout: 10s
         retries: 3

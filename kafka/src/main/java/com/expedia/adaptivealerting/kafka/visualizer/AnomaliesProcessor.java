@@ -44,7 +44,7 @@ public class AnomaliesProcessor {
                 }
                 MetricData metricData = mappedMetricData.getMetricData();
                 if (metricData != null) {
-                    anomalyModel.timestamp(Utility.convertToDate(metricData.getTimestamp()));
+                    anomalyModel.timestamp(VisualizerUtility.convertToDate(metricData.getTimestamp()));
                     anomalyModel.value(metricData.getValue());
                     if (metricData.getMetricDefinition() != null) {
                         anomalyModel.key(metricData.getMetricDefinition().getKey());

@@ -17,8 +17,6 @@
 package com.expedia.adaptivealerting.kafka.visualizer;
 
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
-import com.expedia.adaptivealerting.kafka.TypesafeConfigLoader;
-import com.expedia.adaptivealerting.kafka.util.ConfigUtil;
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -37,24 +35,22 @@ import java.util.concurrent.TimeUnit;
 public class AnomalyConsumer {
 
     private KafkaConsumer<String, MappedMetricData> kafkaConsumer;
-    private static String METRIC_TOPIC = "anomalies";
+    private static String TOPIC = "topic";
     private static long POLL_INTERVAL = 1000L;
-
     private AnomaliesProcessor anomaliesProcessor;
     private ExecutorService executorService;
+    public Config consumerConfig = VisualizerUtility.getConfig("metric-consumer");
+    public Properties metricProps = VisualizerUtility.getMetricConsumerProps();
 
     public AnomalyConsumer() {
-        Config config = new TypesafeConfigLoader("visualizer").loadMergedConfig();
-        Config metricConsumerConfig = config.getConfig("metric-consumer");
-        Properties metricConsumerProps = ConfigUtil.toConsumerConfig(metricConsumerConfig);
-        kafkaConsumer = new KafkaConsumer(metricConsumerProps);
+        kafkaConsumer = new KafkaConsumer(metricProps);
         anomaliesProcessor = new AnomaliesProcessor();
         executorService = new ThreadPoolExecutor(10, 50, 0L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<Runnable>());
     }
 
     public void listen() {
-        kafkaConsumer.subscribe(Collections.singletonList(METRIC_TOPIC));
+        kafkaConsumer.subscribe(Collections.singletonList(consumerConfig.getString(TOPIC)));
         boolean continueProcessing = true;
 
         // See Kafka: The Definitive Guide, pp. 86 ff.
@@ -62,7 +58,7 @@ public class AnomalyConsumer {
             try {
                 ConsumerRecords<String, MappedMetricData> metricRecords = kafkaConsumer.poll(POLL_INTERVAL);
                 int numConsumed = metricRecords.count();
-                log.trace("Read {} metric records from topic={}", numConsumed, METRIC_TOPIC);
+                log.trace("Read {} metric records from topic={}", numConsumed, consumerConfig.getString(TOPIC));
                 anomaliesProcessor.processMetrics(metricRecords, executorService);
             } catch (WakeupException e) {
                 kafkaConsumer.close();

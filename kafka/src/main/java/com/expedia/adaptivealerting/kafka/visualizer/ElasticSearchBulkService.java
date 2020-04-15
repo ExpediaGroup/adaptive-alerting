@@ -16,6 +16,7 @@
 
 package com.expedia.adaptivealerting.kafka.visualizer;
 
+import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.bulk.BulkRequest;
@@ -33,14 +34,16 @@ import java.util.List;
 @Slf4j
 public class ElasticSearchBulkService implements Runnable{
 
-    private static String HOST = "localhost";
     private static int PORT1 = 9200;
     private static int PORT2 = 9201;
     private static String SCHEME = "http";
     private static String INDEX = "anomalies";
     private static String TYPE = "doc";
+    private static String HOST = "host";
 
-    private  RestHighLevelClient client = restClientBuilder();
+    private Config elasticSearchConfig = VisualizerUtility.getConfig("elastic-search");
+
+    private RestHighLevelClient client = restClientBuilder();
 
     private List<AnomalyModel> anomalyModels;
 
@@ -73,9 +76,8 @@ public class ElasticSearchBulkService implements Runnable{
         RestHighLevelClient client = null;
         try {
             client = new RestHighLevelClient(
-                    RestClient.builder(
-                            new HttpHost(HOST, PORT1, SCHEME),
-                            new HttpHost(HOST, PORT2, SCHEME)));
+                    RestClient.builder(new HttpHost(elasticSearchConfig.getString(HOST), PORT1, SCHEME),
+                            new HttpHost(elasticSearchConfig.getString(HOST), PORT2, SCHEME)));
         } catch (Exception e) {
             log.error(e.getMessage(),e);
         }
@@ -85,11 +87,12 @@ public class ElasticSearchBulkService implements Runnable{
     private BulkRequest buildBulkRequest(List<AnomalyModel> anomalyModels){
         BulkRequest bulkRequest = new BulkRequest();
         for (AnomalyModel anomalyModel : anomalyModels) {
-            String json = Utility.convertToJson(anomalyModel);
+            String json = VisualizerUtility.convertToJson(anomalyModel);
             bulkRequest.add(buildIndexRequest(json));
         }
         return bulkRequest;
     }
+
     private IndexRequest buildIndexRequest(String json) {
         IndexRequest request = new IndexRequest(INDEX, TYPE);
         request.source(json, XContentType.JSON);
