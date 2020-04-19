@@ -18,27 +18,20 @@
         "upperWeak": 10000.0
       }
     },
-    "filters": {
-      "preDetectionFilters": [
-        {
-          "type": "hourOfDayPreDetectionFilter",
-          "utcStartHour": 9,
-          "utcEndHour": 17
-        },
-        {
-          "type": "passThroughPreDetectionFilter"
-        }
-      ],
-      "postDetectionFilters": [
-        {
-          "type": "mOfNAggregationFilter",
-          "m": 3,
-          "n": 5
-        },
-        {
-          "type": "passThroughPostDetectionFilter"
-        }
-      ]
-    }
+    "filters": [
+      {
+        "type": "hourOfDayPreDetectionFilter",
+        "utcStartHour": 9,
+        "utcEndHour": 17
+      },
+      {
+        "type": "passThroughDetectionFilter"
+      },
+      {
+        "type": "mOfNAggregationFilter",
+        "m": 3,
+        "n": 5
+      }
+    ]
   }
 }

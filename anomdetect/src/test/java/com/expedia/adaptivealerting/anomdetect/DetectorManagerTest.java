@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.anomdetect;
 import com.codahale.metrics.SharedMetricRegistries;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
+import com.expedia.adaptivealerting.anomdetect.detect.DetectorContainer;
 import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
@@ -66,7 +67,7 @@ public final class DetectorManagerTest {
     private DetectorSource detectorSource;
 
     @Mock
-    private Map<UUID, Detector> cachedDetectors;
+    private Map<UUID, DetectorContainer> cachedDetectors;
 
     private UUID mappedUuid;
     private UUID mappedUuid2;
@@ -94,6 +95,9 @@ public final class DetectorManagerTest {
 
     @Mock
     private DataInitializer dataInitializer;
+
+    @Mock
+    private DetectorContainer detectorContainer;
 
     @Mock
     private Detector detector;
@@ -138,7 +142,7 @@ public final class DetectorManagerTest {
         val result = managerUnderTest.detect(goodMappedMetricData);
         assertNotNull(result);
         assertSame(outlierDetectorResult, result);
-        verify(cachedDetectors, atLeastOnce()).put(any(UUID.class), any(Detector.class));
+        verify(cachedDetectors, atLeastOnce()).put(any(UUID.class), any(DetectorContainer.class));
     }
 
     @Test
@@ -146,7 +150,7 @@ public final class DetectorManagerTest {
         val result = managerUnderTest.detect(goodMappedMetricDataWithBadDataInit);
         assertNotNull(result);
         assertSame(outlierDetectorResult, result);
-        verify(cachedDetectors, atLeastOnce()).put(any(UUID.class), any(Detector.class));
+        verify(cachedDetectors, atLeastOnce()).put(any(UUID.class), any(DetectorContainer.class));
         // Also asserting that no exception is thrown
     }
 
@@ -154,7 +158,7 @@ public final class DetectorManagerTest {
     public void testClassify_skipsWhenDataInitThrottled() {
         val result = managerUnderTest.detect(goodMappedMetricDataWithThrottledDataInit);
         assertNull(result);
-        verify(cachedDetectors, never()).put(any(UUID.class), any(Detector.class));
+        verify(cachedDetectors, never()).put(any(UUID.class), any(DetectorContainer.class));
         verify(detector, never()).detect(any(MetricData.class));
         // Also asserting that no exception is thrown
     }
@@ -212,6 +216,7 @@ public final class DetectorManagerTest {
 
     private void initDependencies() {
         when(outlierDetectorResult.getAnomalyLevel()).thenReturn(AnomalyLevel.NORMAL);
+        when(detectorContainer.getDetector()).thenReturn(detector);
         when(detector.detect(goodMetricData)).thenReturn(outlierDetectorResult);
         when(detector.detect(goodMetricDataWithBadDataInit)).thenReturn(outlierDetectorResult);
 
@@ -222,9 +227,9 @@ public final class DetectorManagerTest {
 
         when(cachedDetectors.containsKey(updatedDetectors.get(0))).thenReturn(true);
 
-        when(detectorSource.findDetector(mappedUuid)).thenReturn(detector);
-        when(detectorSource.findDetector(mappedUuid2)).thenReturn(detector);
-        when(detectorSource.findDetector(mappedUuid3)).thenReturn(detector);
+        when(detectorSource.findDetector(mappedUuid)).thenReturn(detectorContainer);
+        when(detectorSource.findDetector(mappedUuid2)).thenReturn(detectorContainer);
+        when(detectorSource.findDetector(mappedUuid3)).thenReturn(detectorContainer);
         when(detectorSource.findDetector(unmappedUuid)).thenReturn(null);
         when(detectorSource.findUpdatedDetectors(detectorRefreshPeriod * 60)).thenReturn(updatedDetectors);
         when(detectorSource.findDetectorMappingByUuid(detector.getUuid())).thenReturn(detectorMapping);

@@ -15,48 +15,26 @@
  */
 package com.expedia.adaptivealerting.anomdetect;
 
-import com.expedia.adaptivealerting.anomdetect.detect.Detector;
+import com.expedia.adaptivealerting.anomdetect.detect.DetectorContainer;
+import com.expedia.adaptivealerting.anomdetect.detect.DetectorRequest;
+import com.expedia.adaptivealerting.anomdetect.detect.DetectorResponse;
 import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
-import com.expedia.adaptivealerting.anomdetect.detect.FilterableDetector;
-import com.expedia.adaptivealerting.anomdetect.filter.PostDetectionFilter;
-import com.expedia.adaptivealerting.anomdetect.filter.PreDetectionFilter;
-import com.expedia.adaptivealerting.anomdetect.filter.chain.PostDetectionFilterChain;
-import com.expedia.adaptivealerting.anomdetect.filter.chain.PreDetectionFilterChain;
+import com.expedia.adaptivealerting.anomdetect.filter.chain.DetectionFilterChain;
 import com.expedia.metrics.MetricData;
 import lombok.NonNull;
 import lombok.val;
 
-import java.util.List;
-
-import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
-
 public class DetectorExecutorImpl implements DetectorExecutor {
 
-    public DetectorResult doDetectionWithOptionalFiltering(@NonNull Detector detector, @NonNull MetricData metricData) {
-        if (detector instanceof FilterableDetector) {
-            return detectWithFiltering((FilterableDetector) detector, metricData);
-        } else {
-            return detector.detect(metricData);
-        }
-    }
+    @Override
+    public DetectorResult doDetection(DetectorContainer detectorContainer, @NonNull MetricData metricData) {
+        val detectionFilterChain = new DetectionFilterChain(detectorContainer);
 
-    private DetectorResult detectWithFiltering(@NonNull FilterableDetector filterableDetector, @NonNull MetricData metricData) {
-        val preDetectionFilterChain = new PreDetectionFilterChain(getPreDetectionFilters(filterableDetector), filterableDetector);
-        val postDetectionFilterChain = new PostDetectionFilterChain(getPostDetectionFilters(filterableDetector));
-        val result = preDetectionFilterChain.doFilter(metricData);
-        return postDetectionFilterChain.doFilter(result);
-    }
+        val request = new DetectorRequest(metricData);
+        val response = new DetectorResponse();
 
-    private List<PreDetectionFilter> getPreDetectionFilters(@NonNull FilterableDetector filterableDetector) {
-        List<PreDetectionFilter> preDetectionFilters = filterableDetector.getPreDetectionFilters();
-        notNull(preDetectionFilters, "FilterableDetector must have non-null list of PreDetectionFilters");
-        return preDetectionFilters;
-    }
-
-    private List<PostDetectionFilter> getPostDetectionFilters(@NonNull FilterableDetector filterableDetector) {
-        List<PostDetectionFilter> postDetectionFilters = filterableDetector.getPostDetectionFilters();
-        notNull(postDetectionFilters, "FilterableDetector must have non-null list of PostDetectionFilters");
-        return postDetectionFilters;
+        detectionFilterChain.doFilter(request, response);
+        return response.getDetectorResult();
     }
 
 }

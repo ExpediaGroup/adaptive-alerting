@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.anomdetect.detect.outlier.algo.constant;
 
-import com.expedia.adaptivealerting.anomdetect.filter.DetectionFilters;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorFactoryProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,8 +29,7 @@ public class ConstantThresholdDetectorFactoryProvider implements DetectorFactory
     public ConstantThresholdDetector buildDetector(DetectorDocument document) {
         notNull(document, "document can't be null");
         val params = parseParams(document);
-        val filters = parseFilters(document);
-        return new ConstantThresholdDetector(document.getUuid(), params, document.isTrusted(), filters);
+        return new ConstantThresholdDetector(document.getUuid(), params, document.isTrusted());
     }
 
     private ConstantThresholdDetectorParams parseParams(DetectorDocument document) {
@@ -39,8 +37,4 @@ public class ConstantThresholdDetectorFactoryProvider implements DetectorFactory
         return objectMapper.convertValue(paramsMap, ConstantThresholdDetectorParams.class);
     }
 
-    private DetectionFilters parseFilters(DetectorDocument document) {
-        val filtersMap = document.getConfig().get("filters");
-        return filtersMap == null ? new DetectionFilters() : objectMapper.convertValue(filtersMap, DetectionFilters.class);
-    }
 }

@@ -15,42 +15,39 @@
  */
 package com.expedia.adaptivealerting.anomdetect.filter.chain;
 
-import com.expedia.adaptivealerting.anomdetect.filter.PreDetectionFilter;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
-import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
-import com.expedia.metrics.MetricData;
+import com.expedia.adaptivealerting.anomdetect.detect.DetectorContainer;
+import com.expedia.adaptivealerting.anomdetect.detect.DetectorRequest;
+import com.expedia.adaptivealerting.anomdetect.detect.DetectorResponse;
+import com.expedia.adaptivealerting.anomdetect.filter.DetectionFilter;
 import lombok.NonNull;
+import lombok.val;
 
-import java.util.List;
 import java.util.ListIterator;
 
-import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
-
-public class PreDetectionFilterChain {
+public class DetectionFilterChain {
     @NonNull
-    private ListIterator<PreDetectionFilter> filtersIterator;
+    private ListIterator<DetectionFilter> filtersIterator;
     @NonNull
     private Detector detector;
 
-    public PreDetectionFilterChain(List<PreDetectionFilter> filters, Detector detector) {
-        this.filtersIterator = filters.listIterator();
-        this.detector = detector;
+    public DetectionFilterChain(DetectorContainer detectorContainer) {
+        this.filtersIterator = detectorContainer.getFilters().listIterator();
+        this.detector = detectorContainer.getDetector();
     }
 
     /**
      * Calls the next PreDetectionFilter in the chain, or else the Detector, if this is the final filter in the chain.
      * The Filter may decide to terminate the chain, by not calling this method.
      * In this case, the filter <b>must</b> return a valid DetectorResult (because the Detector will not be invoked).
-     *
-     * @param metricData the MetricData
      */
-    public DetectorResult doFilter(MetricData metricData) {
-        notNull(metricData, "metricData can't be null");
+    public void doFilter(@NonNull DetectorRequest request, @NonNull DetectorResponse response) {
         if (!filtersIterator.hasNext()) {
-            return detector.detect(metricData);
+            val result = detector.detect(request.getMetricData());
+            response.setDetectorResult(result);
         } else {
-            PreDetectionFilter f = filtersIterator.next();
-            return f.doFilter(metricData, this);
+            DetectionFilter f = filtersIterator.next();
+            f.doFilter(request, response, this);
         }
     }
 }

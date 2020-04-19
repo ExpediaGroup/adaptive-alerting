@@ -114,7 +114,7 @@ public final class DefaultDetectorSourceTest {
     }
 
     @Test
-    public void testFindDetector() {
+    public void testBuildDetectorContainer() {
         val result = sourceUnderTest.findDetector(DETECTOR_UUID);
         assertNotNull(result);
     }

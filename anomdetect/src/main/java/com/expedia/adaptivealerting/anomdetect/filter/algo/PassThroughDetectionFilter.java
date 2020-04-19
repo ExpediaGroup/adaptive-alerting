@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.filter.algo.pre;
+package com.expedia.adaptivealerting.anomdetect.filter.algo;
 
-import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
-import com.expedia.adaptivealerting.anomdetect.filter.PreDetectionFilter;
-import com.expedia.adaptivealerting.anomdetect.filter.chain.PreDetectionFilterChain;
+import com.expedia.adaptivealerting.anomdetect.detect.DetectorRequest;
+import com.expedia.adaptivealerting.anomdetect.detect.DetectorResponse;
+import com.expedia.adaptivealerting.anomdetect.filter.DetectionFilter;
+import com.expedia.adaptivealerting.anomdetect.filter.chain.DetectionFilterChain;
 import com.expedia.metrics.MetricData;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
-
-import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 /**
  * "PreDetectionFilter" that simply passes along the {@link MetricData}.
@@ -32,12 +32,12 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 @Data
 @NoArgsConstructor
 @Setter(AccessLevel.NONE)
-public class PassThroughPreDetectionFilter implements PreDetectionFilter {
+public class PassThroughDetectionFilter implements DetectionFilter {
 
     @Override
-    public DetectorResult doFilter(MetricData metricData, PreDetectionFilterChain chain) {
-        notNull(metricData, "metricData can't be null");
-        notNull(chain, "chain can't be null");
-        return chain.doFilter(metricData);
+    public void doFilter(@NonNull DetectorRequest detectorRequest,
+                         @NonNull DetectorResponse detectorResponse,
+                         @NonNull DetectionFilterChain chain) {
+        chain.doFilter(detectorRequest, detectorResponse);
     }
 }
