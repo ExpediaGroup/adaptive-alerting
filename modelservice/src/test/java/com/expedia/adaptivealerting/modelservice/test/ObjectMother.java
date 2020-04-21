@@ -140,7 +140,7 @@ public class ObjectMother {
         detectorMapping.setCreatedTimeInMillis(10000);
         detectorMapping.setEnabled(true);
         detectorMapping.setUser(new User("test-user"));
-        detectorMapping.setDetector(new Detector(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639")));
+        detectorMapping.setDetector(new Detector("ad-manager", UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639")));
         return detectorMapping;
     }
 
@@ -160,14 +160,14 @@ public class ObjectMother {
         percolatorDetectorMapping.setEnabled(true);
         percolatorDetectorMapping.setLastModifiedTimeInMillis(1554828886);
         percolatorDetectorMapping.setUser(new User("test-user"));
-        percolatorDetectorMapping.setDetector(new Detector(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639")));
+        percolatorDetectorMapping.setDetector(new Detector("ad-manager", UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639")));
         percolatorDetectorMapping.setQuery(query);
         return percolatorDetectorMapping;
     }
 
     public MatchingDetectorsResponse getMatchingDetectorsResponse() {
         Map<Integer, List<Detector>> groupedDetectorsByIndex = new HashMap<>();
-        Detector detector = new Detector(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"));
+        Detector detector = new Detector("ad-manager", UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"));
         List<Detector> detectors = new ArrayList<>();
         detectors.add(detector);
         groupedDetectorsByIndex.put(0, detectors);

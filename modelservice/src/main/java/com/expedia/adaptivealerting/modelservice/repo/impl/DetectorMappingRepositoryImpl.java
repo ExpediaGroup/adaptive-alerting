@@ -275,7 +275,7 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
         });
         val detectorMapping = new DetectorMapping()
                 .setId(id)
-                .setDetector(new Detector(detectorEntity.getDetector().getUuid()))
+                .setDetector(new Detector(detectorEntity.getDetector().getConsumerId(), detectorEntity.getDetector().getUuid()))
                 .setExpression(QueryUtil.buildExpression(detectorEntity.getQuery()))
                 .setEnabled(detectorEntity.isEnabled())
                 .setCreatedTimeInMillis(detectorEntity.getCreatedTimeInMillis())

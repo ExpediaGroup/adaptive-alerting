@@ -29,7 +29,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -42,7 +41,7 @@ import static com.codahale.metrics.MetricRegistry.name;
  * Since this cache can grow in size, for space optimization we transform <br>
  * <p>
  * - metric into metric-key generated using {@link CacheUtil#getKey(Map)} <br>
- * - detector's list into a concatenated string of detector uuid generated using {@link CacheUtil#getDetectorIds(List)} <br>
+ * - detector's list into a concatenated string of detector uuid generated using {@link CacheUtil#getValue(List)} <br>
  * eg.
  * <pre>
  *   Metric1
@@ -52,7 +51,7 @@ import static com.codahale.metrics.MetricRegistry.name;
  *              }
  *      }
  *
- * has two matching detectors <em> D1(uuid= UUID_ONE), D2(uuid= UUID_TWO) </em> it will be stored in cache as <em>("k1:v1,k2:v2" : "UUID_ONE,UUID_TWO") </em>
+ * has two matching detectors <em> D1(consumerID= CID_ONE, uuid= UUID_ONE), D2(consumerID= CID_TWO, uuid= UUID_TWO) </em> it will be stored in cache as <em>("k1->v1,k2->v2" : "CID_ONE,UUID_ONE|CID_TWO,UUID_TWO") </em>
  * </pre>
  * The DetectorMapperCache can be updated using methods {@link #removeDisabledDetectorMappings(List)} and {@link #invalidateMetricsWithOldDetectorMappings(List)} }
  */
@@ -104,11 +103,11 @@ public class DetectorMapperCache {
      * @return the list of Detectors
      */
     public List<Detector> get(String key) {
-        String bunchOfCachedDetectorIds = cache.getIfPresent(key);
-        if (bunchOfCachedDetectorIds == null) {
+        String value = cache.getIfPresent(key);
+        if (value == null) {
             return Collections.emptyList();
         } else {
-            return CacheUtil.buildDetectors(bunchOfCachedDetectorIds);
+            return CacheUtil.buildDetectors(value);
         }
     }
 
@@ -117,59 +116,58 @@ public class DetectorMapperCache {
      * @param detectors the detectors
      */
     public void put(String key, List<Detector> detectors) {
-        String bunchOfDetectorIds = CacheUtil.getDetectorIds(detectors);
-        log.info("Updating cache with {} - {}", key, bunchOfDetectorIds);
-        cache.put(key, bunchOfDetectorIds);
+        String value = CacheUtil.getValue(detectors);
+        log.info("Updating cache with {} - {}", key, value);
+        cache.put(key, value);
     }
-
 
     /**
      * Remove disabled detector mappings from cache.
      * <pre>
      *  eg. If cache has entries
-     *  <em> ("k1:v1,k2:v2" : "UUID_ONE,UUID_TWO")</em>
-     *  <em> ("k3:v3,k3:v4" : "UUID_FIVE,UUID_ONE,UUID_THREE")</em>
+     *  <em> ("k1:v1,k2:v2" : "CID_ONE,UUID_ONE|CID_TWO,UUID_TWO")</em>
+     *  <em> ("k3:v3,k3:v4" : "CID_ONE,UUID_ONE|CID_THREE,UUID_THREE|CID_FIVE,UUID_FIVE")</em>
      *
-     *  and detector  <em> D1(uuid=UUID_ONE)</em> is disabled, this method removes UUID_ONE from all cache entry values.
+     *  and detector  <em> D1(cid=CID_ONE,uuid=UUID_ONE)</em> is disabled, this method removes CID_ONE,UUID_ONE from all cache entry values.
      *
-     *   <em> ("k1:v1,k2:v2" : "UUID_TWO")</em>
-     *   <em> ("k3:v3,k3:v4" : "UUID_FIVE,UUID_THREE")</em>
+     *   <em> ("k1:v1,k2:v2" : "CID_TWO,UUID_TWO")</em>
+     *   <em> ("k3:v3,k3:v4" : "CID_THREE,UUID_THREE|CID_FIVE,UUID_FIVE")</em>
      * </pre>
      *
      * @param disabledMappings the list of mappings
      */
     public void removeDisabledDetectorMappings(List<DetectorMapping> disabledMappings) {
-        List<UUID> detectorIdsOfDisabledMappings = disabledMappings.stream().map(detectorMapping -> detectorMapping.getDetector().getUuid()).collect(Collectors.toList());
+        List<Detector> detectorsOfDisabledMappings = disabledMappings.stream()
+                .map(detectorMapping -> detectorMapping.getDetector())
+                .collect(Collectors.toList());
 
         Map<String, String> mappingsWhichNeedsAnUpdate = new HashMap<>();
 
-        this.cache.asMap().forEach((key, bunchOfDetectorIds) -> {
-            if (detectorIdsOfDisabledMappings.stream().anyMatch(uuid -> bunchOfDetectorIds.contains(uuid.toString()))) {
-                mappingsWhichNeedsAnUpdate.put(key, bunchOfDetectorIds);
+        this.cache.asMap().forEach((key, value) -> {
+            if (detectorsOfDisabledMappings.stream().anyMatch(uuid -> value.contains(uuid.toString()))) {
+                mappingsWhichNeedsAnUpdate.put(key, value);
             }
         });
 
-
         Map<String, String> modifiedDetectorMappings = new HashMap<>();
-        mappingsWhichNeedsAnUpdate.forEach((key, bunchOfDetectorIds) -> {
-            String bunchOfUpdatedDetectorIds =
-                    removeDisabledDetectorIds(detectorIdsOfDisabledMappings, bunchOfDetectorIds);
-            modifiedDetectorMappings.put(key, bunchOfUpdatedDetectorIds);
+        mappingsWhichNeedsAnUpdate.forEach((key, value) -> {
+            String newValue = removeDisabledDetectors(detectorsOfDisabledMappings, value);
+            modifiedDetectorMappings.put(key, newValue);
         });
 
         log.info("removing mappings : {} from cache entries",
-                Arrays.toString(detectorIdsOfDisabledMappings.toArray()));
+                Arrays.toString(detectorsOfDisabledMappings.toArray()));
         modifiedDetectorMappings.forEach((key, value) -> log.info("cache key: {}, updated mapping {}", key, value));
 
         this.cache.putAll(modifiedDetectorMappings);
     }
 
-    private String removeDisabledDetectorIds(List<UUID> detectorUuids, String detectorIdsString) {
-        List<Detector> detectors = CacheUtil.buildDetectors(detectorIdsString);
-        detectorUuids.forEach(uuid -> {
-            detectors.remove(new Detector(uuid));
+    private String removeDisabledDetectors(List<Detector> detectorsToBeDisabled, String value) {
+        List<Detector> detectorsStoredInCache = CacheUtil.buildDetectors(value);
+        detectorsToBeDisabled.forEach(detectorToBeDisabled -> {
+            detectorsStoredInCache.remove(new Detector(detectorToBeDisabled.getConsumerId(), detectorToBeDisabled.getUuid()));
         });
-        return CacheUtil.getDetectorIds(detectors);
+        return CacheUtil.getValue(detectorsStoredInCache);
     }
 
     /**

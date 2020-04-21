@@ -44,6 +44,8 @@ public final class MappedMetricData {
     @NonNull
     private UUID detectorUuid;
 
+    private String consumerId;
+
     // Calling this anomalyResult because this is the original name for this property,
     // and various downstream processes assume this name.
     private DetectorResult anomalyResult;

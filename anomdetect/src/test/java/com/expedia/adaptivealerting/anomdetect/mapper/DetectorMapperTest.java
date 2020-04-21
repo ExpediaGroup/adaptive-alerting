@@ -138,8 +138,8 @@ public final class DetectorMapperTest {
         ));
 
         ArrayList<Detector> detectors = new ArrayList<>();
-        detectors.add(new Detector(UUID.fromString("fe1a2366-a73e-4c9d-9186-474e60df6de8")));
-        detectors.add(new Detector(UUID.fromString("65eea7d8-8ec3-4f8a-ab2c-7a9dc873723d")));
+        detectors.add(new Detector("", UUID.fromString("fe1a2366-a73e-4c9d-9186-474e60df6de8")));
+        detectors.add(new Detector("", UUID.fromString("65eea7d8-8ec3-4f8a-ab2c-7a9dc873723d")));
 
         Map<Integer, List<Detector>> groupedDetectorsBySearchIndex = ImmutableMap.of(0, detectors);
 
@@ -193,16 +193,16 @@ public final class DetectorMapperTest {
         });
 
         assertThat(detectorResults.size(), is(3));
-        assertThat(detectorResults, IsMapContaining.hasEntry("key->RHZGV1VodjI1aA==,name->NjFFS0JDcnd2SQ==", Collections.singletonList(new Detector(UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689")))));
-        assertThat(detectorResults, IsMapContaining.hasEntry("key->ZEFxYlpaVlBaOA==,name->ZmJXVGlSbHhrdA==", Collections.singletonList(new Detector(UUID.fromString("5eaa54e9-7406-4a1d-bd9b-e055eca1a423")))));
-        assertThat(detectorResults, IsMapContaining.hasEntry("name->aGl3,region->dXMtd2VzdC0y", Collections.singletonList(new Detector(UUID.fromString("d86b798c-cfee-4a2c-a17a-aa2ba79ccf51")))));
+        assertThat(detectorResults, IsMapContaining.hasEntry("key->RHZGV1VodjI1aA==,name->NjFFS0JDcnd2SQ==", Collections.singletonList(new Detector("", UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689")))));
+        assertThat(detectorResults, IsMapContaining.hasEntry("key->ZEFxYlpaVlBaOA==,name->ZmJXVGlSbHhrdA==", Collections.singletonList(new Detector("", UUID.fromString("5eaa54e9-7406-4a1d-bd9b-e055eca1a423")))));
+        assertThat(detectorResults, IsMapContaining.hasEntry("name->aGl3,region->dXMtd2VzdC0y", Collections.singletonList(new Detector("", UUID.fromString("d86b798c-cfee-4a2c-a17a-aa2ba79ccf51")))));
     }
 
     @Test
     public void detectorCacheUpdateTest() {
 
-        DetectorMapping disabledDetectorMapping = new DetectorMapping().setDetector(new Detector(UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689"))).setEnabled(false);
-        DetectorMapping modifiedDetectorMapping = new DetectorMapping().setDetector(new Detector(UUID.fromString("4d49ba26-1a7d-43f4-b70c-ee644a2c1689"))).setEnabled(true);
+        DetectorMapping disabledDetectorMapping = new DetectorMapping().setDetector(new Detector("", UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689"))).setEnabled(false);
+        DetectorMapping modifiedDetectorMapping = new DetectorMapping().setDetector(new Detector("", UUID.fromString("4d49ba26-1a7d-43f4-b70c-ee644a2c1689"))).setEnabled(true);
         List<DetectorMapping> updateDetectorMappings = Arrays.asList(disabledDetectorMapping, modifiedDetectorMapping);
 
         when(detectorSource.findUpdatedDetectorMappings(60)).thenReturn(updateDetectorMappings);

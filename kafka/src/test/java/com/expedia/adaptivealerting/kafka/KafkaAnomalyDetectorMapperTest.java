@@ -181,7 +181,7 @@ public final class KafkaAnomalyDetectorMapperTest {
     private void initTestObjects() {
         this.metricData = TestObjectMother.metricData();
         UUID uuid = UUID.randomUUID();
-        this.detector = new Detector(uuid);
+        this.detector = new Detector("", uuid);
         this.mappedMetricData = TestObjectMother.mappedMetricData(metricData, uuid);
     }
 

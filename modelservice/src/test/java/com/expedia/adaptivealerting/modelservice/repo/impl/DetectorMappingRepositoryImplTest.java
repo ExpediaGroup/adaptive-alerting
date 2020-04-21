@@ -133,7 +133,7 @@ public class DetectorMappingRepositoryImplTest {
         val mom = ObjectMother.instance();
 
         val expr = mom.getExpression();
-        val detector = new Detector(UUID.randomUUID());
+        val detector = new Detector("ad-manager", UUID.randomUUID());
         val user = new User("yoda");
         val request = new CreateDetectorMappingRequest(expr, detector, user);
         repoUnderTest.createDetectorMapping(request);

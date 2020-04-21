@@ -147,7 +147,7 @@ public class DataInitializerTest {
         dataSourceResults.add(buildDataSourceResult(3.0, 1578307489));
         this.detectorMapping = new DetectorMapping()
                 .setDetector(new com.expedia.adaptivealerting.anomdetect.mapper.Detector(
-                        UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689")))
+                        "", UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689")))
                 .setEnabled(false)
                 .setExpression(getExpression());
         when(dataSource.getMetricData(anyLong(), anyLong(), anyInt(), anyString())).thenReturn(dataSourceResults);

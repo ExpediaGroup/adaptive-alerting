@@ -35,6 +35,7 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Produced;
+import org.apache.kafka.streams.processor.TopicNameExtractor;
 import org.apache.kafka.streams.state.KeyValueStore;
 import org.apache.kafka.streams.state.StoreBuilder;
 import org.apache.kafka.streams.state.Stores;
@@ -45,12 +46,15 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 /**
  * Kafka Streams adapter for {@link DetectorMapper}. Reads metric data from an input topic, classifies individual metric
- * data points, and publishes the classifications to an anomalies output topic.
+ * data points, and publishes the classifications to type-specific topics where they can be picked up by the internal or external detectors
+ * For internal detectors, ad-manager is the consumer and all the messages are routed to defaultOutputTopic for it's consumption
+ * For external detectors, all the messages are routed to their own topics i.e. DEFAULT_EXTERNAL_DETECTOR_PREFIX + consumerId
  */
 @Slf4j
 public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
     private static final String CK_AD_MAPPER = "ad-mapper";
-    private static final String stateStoreName = "es-request-buffer";
+    private static final String STATE_STORE_NAME = "es-request-buffer";
+    private static final String DEFAULT_EXTERNAL_DETECTOR_PREFIX = "mapped-metrics-";
 
     private final DetectorMapper mapper;
 
@@ -87,29 +91,39 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
     protected Topology buildTopology() {
         val config = getConfig();
         val inputTopic = config.getInputTopic();
-        val outputTopic = config.getOutputTopic();
-        log.info("Initializing: inputTopic={}, outputTopic={}", inputTopic, outputTopic);
+        val defaultOutputTopic = config.getOutputTopic();
+        log.info("Initializing: inputTopic={}, defaultOutputTopic={}", inputTopic, defaultOutputTopic);
 
         val builder = new StreamsBuilder();
 
         // create store
         StoreBuilder<KeyValueStore<String, MetricData>> keyValueStoreBuilder =
-                Stores.keyValueStoreBuilder(Stores.inMemoryKeyValueStore(stateStoreName),
+                Stores.keyValueStoreBuilder(Stores.inMemoryKeyValueStore(STATE_STORE_NAME),
                         Serdes.String(),
                         new MetricDataJsonSerde())
                         .withLoggingDisabled();
         // register store
         builder.addStateStore(keyValueStoreBuilder);
 
+        //Dynamically choose kafka topic depending on the consumer id.
+        final TopicNameExtractor<String, MappedMetricData> kafkaTopicNameExtractor = (key, mappedMetricData, recordContext) -> {
+            final String consumerId = mappedMetricData.getConsumerId();
+            //FIXME This is for internal detectors
+            // We need to update current mappings to have ad-manager as consumer ID and then we can replace this check
+            if (consumerId == null) {
+                return defaultOutputTopic;
+            }
+            return DEFAULT_EXTERNAL_DETECTOR_PREFIX + consumerId;
+        };
+
         final KStream<String, MetricData> stream = builder.stream(inputTopic);
         stream
                 .filter((key, md) -> md != null)
-                .transform(new MetricDataTransformerSupplier(mapper, stateStoreName), stateStoreName)
+                .transform(new MetricDataTransformerSupplier(mapper, STATE_STORE_NAME), STATE_STORE_NAME)
                 .flatMap(this::metricsByDetector)
-                .to(outputTopic, Produced.with(outputKeySerde, outputValueSerde));
+                .to(kafkaTopicNameExtractor, Produced.with(outputKeySerde, outputValueSerde));
         return builder.build();
     }
-
 
     private Iterable<? extends KeyValue<String, MappedMetricData>> metricsByDetector(String key, MapperResult mmRes) {
         AssertUtil.notNull(mmRes, "MapperResult mmRes can't be null");
