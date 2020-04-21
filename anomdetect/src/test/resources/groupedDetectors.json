@@ -2,21 +2,25 @@
   "groupedDetectorsBySearchIndex": {
     "0": [
       {
+        "consumerId": "cid",
         "uuid": "2c49ba26-1a7d-43f4-b70c-c6644a2c1689"
       }
     ],
     "1": [
       {
+        "consumerId": "cid",
         "uuid": "d86b798c-cfee-4a2c-a17a-aa2ba79ccf51"
       }
     ],
     "2": [
       {
+        "consumerId": "cid",
         "uuid": "2c49ba26-1a7d-43f4-b70c-c6644a2c1689"
       }
     ],
     "4": [
       {
+        "consumerId": "cid",
         "uuid": "5eaa54e9-7406-4a1d-bd9b-e055eca1a423"
       }
     ]

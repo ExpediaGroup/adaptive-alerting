@@ -149,6 +149,7 @@ public class DetectorMapper {
         DetectorMatchResponse matchingDetectorMappings = null;
         try {
             matchingDetectorMappings = detectorSource.findDetectorMappings(cacheMissedMetricTags);
+            System.out.println("mathcing" + matchingDetectorMappings);
         } catch (RuntimeException e) {
             log.error("Error fetching detector mappings from elastic search", e);
             exceptionCounter.inc();
