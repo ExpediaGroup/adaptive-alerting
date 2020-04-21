@@ -144,12 +144,13 @@ public class DetectorMapperCache {
         Map<String, String> mappingsWhichNeedsAnUpdate = new HashMap<>();
 
         this.cache.asMap().forEach((key, value) -> {
-            if (detectorsOfDisabledMappings.stream().anyMatch(uuid -> value.contains(uuid.toString()))) {
+            if (detectorsOfDisabledMappings.stream().anyMatch(detector -> value.contains(detector.getUuid().toString()))) {
                 mappingsWhichNeedsAnUpdate.put(key, value);
             }
         });
 
         Map<String, String> modifiedDetectorMappings = new HashMap<>();
+
         mappingsWhichNeedsAnUpdate.forEach((key, value) -> {
             String newValue = removeDisabledDetectors(detectorsOfDisabledMappings, value);
             modifiedDetectorMappings.put(key, newValue);
