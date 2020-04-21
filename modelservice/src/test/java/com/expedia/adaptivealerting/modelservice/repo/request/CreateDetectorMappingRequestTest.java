@@ -42,7 +42,7 @@ public class CreateDetectorMappingRequestTest {
     private void initTestObjects() {
         val mom = ObjectMother.instance();
         this.expression = mom.getExpression();
-        this.detector = new Detector("ad-manager", UUID.randomUUID());
+        this.detector = new Detector("cid", UUID.randomUUID());
         this.user = new User("yoda");
     }
 

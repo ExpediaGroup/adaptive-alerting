@@ -138,8 +138,8 @@ public final class DetectorMapperTest {
         ));
 
         ArrayList<Detector> detectors = new ArrayList<>();
-        detectors.add(new Detector("", UUID.fromString("fe1a2366-a73e-4c9d-9186-474e60df6de8")));
-        detectors.add(new Detector("", UUID.fromString("65eea7d8-8ec3-4f8a-ab2c-7a9dc873723d")));
+        detectors.add(buildDetector("fe1a2366-a73e-4c9d-9186-474e60df6de8"));
+        detectors.add(buildDetector("65eea7d8-8ec3-4f8a-ab2c-7a9dc873723d"));
 
         Map<Integer, List<Detector>> groupedDetectorsBySearchIndex = ImmutableMap.of(0, detectors);
 
@@ -200,9 +200,9 @@ public final class DetectorMapperTest {
 
     @Test
     public void detectorCacheUpdateTest() {
-
-        DetectorMapping disabledDetectorMapping = new DetectorMapping().setDetector(new Detector("", UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689"))).setEnabled(false);
-        DetectorMapping modifiedDetectorMapping = new DetectorMapping().setDetector(new Detector("", UUID.fromString("4d49ba26-1a7d-43f4-b70c-ee644a2c1689"))).setEnabled(true);
+        
+        DetectorMapping disabledDetectorMapping = new DetectorMapping().setDetector(buildDetector("2c49ba26-1a7d-43f4-b70c-c6644a2c1689")).setEnabled(false);
+        DetectorMapping modifiedDetectorMapping = new DetectorMapping().setDetector(buildDetector("4d49ba26-1a7d-43f4-b70c-ee644a2c1689")).setEnabled(true);
         List<DetectorMapping> updateDetectorMappings = Arrays.asList(disabledDetectorMapping, modifiedDetectorMapping);
 
         when(detectorSource.findUpdatedDetectorMappings(60)).thenReturn(updateDetectorMappings);
@@ -214,4 +214,9 @@ public final class DetectorMapperTest {
         verify(cache).removeDisabledDetectorMappings(Collections.singletonList(disabledDetectorMapping));
         verify(cache).invalidateMetricsWithOldDetectorMappings(Collections.singletonList(modifiedDetectorMapping));
     }
+
+    private Detector buildDetector(String detectorUuid) {
+        return new Detector("cid", UUID.fromString(detectorUuid));
+    }
+
 }

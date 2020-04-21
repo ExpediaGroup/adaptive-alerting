@@ -54,6 +54,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
     private static final String CK_AD_MAPPER = "ad-mapper";
     private static final String STATE_STORE_NAME = "es-request-buffer";
+    private static final String DEFAULT_CONSUMER_ID = "ad-manager";
     private static final String DEFAULT_EXTERNAL_DETECTOR_PREFIX = "mapped-metrics-";
 
     private final DetectorMapper mapper;
@@ -108,9 +109,8 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
         //Dynamically choose kafka topic depending on the consumer id.
         final TopicNameExtractor<String, MappedMetricData> kafkaTopicNameExtractor = (key, mappedMetricData, recordContext) -> {
             final String consumerId = mappedMetricData.getConsumerId();
-            //FIXME This is for internal detectors
-            // We need to update current mappings to have ad-manager as consumer ID and then we can replace this check
-            if (consumerId == null) {
+            //FIXME We need to update current mappings to have ad-manager as consumer ID and then we can replace the NULL check
+            if (consumerId == null || DEFAULT_CONSUMER_ID.equals(consumerId)) {
                 return defaultOutputTopic;
             }
             return DEFAULT_EXTERNAL_DETECTOR_PREFIX + consumerId;

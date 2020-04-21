@@ -51,24 +51,24 @@ public class DetectorMapperCacheRefreshTest {
         UUID updateId1 = UUID.randomUUID();
         UUID updateId2 = UUID.randomUUID();
         List<DetectorMapping> detectorIdsOfDisabledMappings = new ArrayList<DetectorMapping>();
-        detectorIdsOfDisabledMappings.add(new DetectorMapping().setDetector(new Detector("", updateId1)).setEnabled(false));
-        detectorIdsOfDisabledMappings.add(new DetectorMapping().setDetector(new Detector("", updateId2)).setEnabled(false));
+        detectorIdsOfDisabledMappings.add(new DetectorMapping().setDetector(buildDetector(updateId1)).setEnabled(false));
+        detectorIdsOfDisabledMappings.add(new DetectorMapping().setDetector(buildDetector(updateId2)).setEnabled(false));
 
         List<Detector> mappings = new ArrayList<>();
-        mappings.add(new Detector("", UUID.randomUUID()));
-        mappings.add(new Detector("", updateId1));
-        mappings.add(new Detector("", updateId2));
+        mappings.add(buildDetector(UUID.randomUUID()));
+        mappings.add(buildDetector(updateId1));
+        mappings.add(buildDetector(updateId2));
 
         CacheUtil.getValue(mappings);
 
         detectorMapperCache.put("metricKey", mappings);
 
-        assertTrue(detectorMapperCache.get("metricKey").contains(new Detector("", updateId1)));
+        assertTrue(detectorMapperCache.get("metricKey").contains(buildDetector(updateId1)));
 
         detectorMapperCache.removeDisabledDetectorMappings(detectorIdsOfDisabledMappings);
 
-        assertFalse(detectorMapperCache.get("metricKey").contains(new Detector("", updateId1)));
-        assertFalse(detectorMapperCache.get("metricKey").contains(new Detector("", updateId2)));
+        assertFalse(detectorMapperCache.get("metricKey").contains(buildDetector(updateId1)));
+        assertFalse(detectorMapperCache.get("metricKey").contains(buildDetector(updateId2)));
 
     }
 
@@ -85,7 +85,7 @@ public class DetectorMapperCacheRefreshTest {
         String notMatchingMetricKey = CacheUtil.getKey(ImmutableMap.of("lob", "flight", "pos", "expedia.com"));
         String matchingMetricKey = CacheUtil.getKey(ImmutableMap.of("lob", "hotels", "pos", "expedia.com"));
 
-        Detector d = new Detector("", UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689"));
+        Detector d = buildDetector(UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689"));
         List<Detector> detectors = Collections.singletonList(d);
 
         detectorMapperCache.put(notMatchingMetricKey, detectors);
@@ -98,7 +98,10 @@ public class DetectorMapperCacheRefreshTest {
         assertFalse(detectorMapperCache.get(matchingMetricKey).contains(d));
         assertTrue(detectorMapperCache.get(matchingMetricKey).isEmpty());
 
+    }
 
+    private Detector buildDetector(UUID detectorUuid) {
+        return new Detector("cid", detectorUuid);
     }
 
 }
