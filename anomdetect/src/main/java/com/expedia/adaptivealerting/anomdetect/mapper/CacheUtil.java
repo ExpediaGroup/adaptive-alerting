@@ -40,7 +40,7 @@ public final class CacheUtil {
      * Converts map to cache's key format
      *
      * @param tags A Map {k1=v1, k2=v2, k3=v3}
-     * @return Returns a string in this format "k1->v1,k2->v2,k3->v3"
+     * @return Returns a string in this format {@literal "k1->v1,k2->v2,k3->v3"}
      */
     public static String getKey(Map<String, String> tags) {
         List<String> listOfEntries = tags.entrySet()
@@ -57,7 +57,7 @@ public final class CacheUtil {
     /**
      * Converts cache key in string format to map
      *
-     * @param key String "k1->v1,k2->v2,k3->v3"
+     * @param key String {@literal "k1->v1,k2->v2,k3->v3"}
      * @return Returns a map in this format {k1=v1, k2=v2, k3=v3}
      */
     public static Map<String, String> getTags(String key) {

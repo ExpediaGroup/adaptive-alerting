@@ -51,7 +51,7 @@ import static com.codahale.metrics.MetricRegistry.name;
  *              }
  *      }
  *
- * has two matching detectors <em> D1(consumerID= CID_ONE, uuid= UUID_ONE), D2(consumerID= CID_TWO, uuid= UUID_TWO) </em> it will be stored in cache as <em>("k1->v1,k2->v2" : "CID_ONE,UUID_ONE|CID_TWO,UUID_TWO") </em>
+ * has two matching detectors <em> D1(consumerID= CID_ONE, uuid= UUID_ONE), D2(consumerID= CID_TWO, uuid= UUID_TWO) </em> it will be stored in cache as <em> {@literal "k1->v1,k2->v2"} : "CID_ONE,UUID_ONE|CID_TWO,UUID_TWO" </em>
  * </pre>
  * The DetectorMapperCache can be updated using methods {@link #removeDisabledDetectorMappings(List)} and {@link #invalidateMetricsWithOldDetectorMappings(List)} }
  */
