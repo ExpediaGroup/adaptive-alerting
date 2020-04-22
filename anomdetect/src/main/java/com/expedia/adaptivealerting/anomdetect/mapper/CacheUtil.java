@@ -89,15 +89,15 @@ public final class CacheUtil {
     /**
      * Converts cache's value format to list of detectors
      *
-     * @param detectorInfo A String "c1,uuid1|c2,uuid2"
+     * @param detectorsString A String "c1,uuid1|c2,uuid2"
      * @return Returns a list of detectors in this format [Detector(consumerId=c1, uuid=uuid1), Detector(consumerId=c2, uuid=uuid)]
      */
-    public static List<Detector> buildDetectors(String detectorInfo) {
-        if (detectorInfo == null || "".equals(detectorInfo)) {
+    public static List<Detector> buildDetectors(String detectorsString) {
+        if (detectorsString == null || "".equals(detectorsString)) {
             return Collections.emptyList();
         }
-        String[] detectorList = detectorInfo.split("\\|");
-        return Arrays.asList(detectorList).stream()
+        String[] detectors = detectorsString.split("\\|");
+        return Arrays.asList(detectors).stream()
                 .map(detector -> new Detector(detector.split(",")[0], UUID.fromString(detector.split(",")[1]))) //update
                 .collect(Collectors.toList());
     }
