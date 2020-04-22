@@ -22,13 +22,13 @@ from sys import stdout
 import random
 import threading
 
-kafka_boostrap_servers=['localhost:19092']
+kafka_bootstrap_servers=['localhost:19092']
 
 def produce_to_kafka(topic):
     num_samples = 250    # Minimum of 80 events need to be in Kafka topic to see output
     try:
         time.sleep(1)   # Wait to make sure we establish a connection to anomalies kafka first
-        producer = KafkaProducer(bootstrap_servers=kafka_boostrap_servers)
+        producer = KafkaProducer(bootstrap_servers=kafka_bootstrap_servers)
         print("Sending", num_samples, "random sample messages to Kafka...")
         for i in range(0, num_samples):
             send_msgpack_to_kafka(producer, topic='aa-metrics') # Send to kafka using msgpack format
@@ -91,7 +91,7 @@ def consume_from_kafka(topic):
 
     try:
         consumer = KafkaConsumer(topic,
-                                bootstrap_servers=kafka_boostrap_servers, 
+                                bootstrap_servers=kafka_bootstrap_servers, 
                                 auto_offset_reset='latest', 
                                 enable_auto_commit=False, 
                                 consumer_timeout_ms=5000)
