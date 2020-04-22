@@ -107,8 +107,8 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
         //Dynamically choose kafka topic depending on the consumer id.
         final TopicNameExtractor<String, MappedMetricData> kafkaTopicNameExtractor = (key, mappedMetricData, recordContext) -> {
             final String consumerId = mappedMetricData.getConsumerId();
-            //FIXME We need to update current mappings to have ad-manager as consumer ID and then we can replace the NULL check
-            if (consumerId == null || DEFAULT_CONSUMER_ID.equals(consumerId)) {
+            //FIXME We need to update current mappings to have ad-manager as consumer ID and then we can remove the first condition
+            if (consumerId == "" || DEFAULT_CONSUMER_ID.equals(consumerId)) {
                 return defaultOutputTopic;
             }
             return defaultOutputTopic + "-" + consumerId;

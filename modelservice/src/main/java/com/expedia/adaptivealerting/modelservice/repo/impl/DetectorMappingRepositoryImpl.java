@@ -71,6 +71,8 @@ import static com.expedia.adaptivealerting.modelservice.repo.impl.percolator.Per
 @Slf4j
 public class DetectorMappingRepositoryImpl implements DetectorMappingRepository {
 
+    private static final String DEFAULT_CONSUMER_ID = "ad-manager";
+
     @Autowired
     private ElasticSearchProperties elasticSearchProperties;
 
@@ -275,7 +277,7 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
         });
         val detectorMapping = new DetectorMapping()
                 .setId(id)
-                .setDetector(new Detector(detectorEntity.getDetector().getConsumerId(), detectorEntity.getDetector().getUuid()))
+                .setDetector(new Detector(getConsumerId(detectorEntity.getDetector().getConsumerId()), detectorEntity.getDetector().getUuid()))
                 .setExpression(QueryUtil.buildExpression(detectorEntity.getQuery()))
                 .setEnabled(detectorEntity.isEnabled())
                 .setCreatedTimeInMillis(detectorEntity.getCreatedTimeInMillis())
@@ -312,5 +314,11 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
         val indexRequest = new IndexRequest(elasticSearchProperties.getIndexName(), elasticSearchProperties.getDocType(), index);
         val json = objectMapperUtil.convertToString(percolatorDetectorMapping);
         elasticsearchUtil.index(indexRequest, json).getId();
+    }
+
+    //FIXME This is to prevent NULL consumerId for existing mappings.
+    // This field will be made NON NULL once we update all the existing mappings to have consumerId
+    private String getConsumerId(String consumerId) {
+        return consumerId == null ? DEFAULT_CONSUMER_ID : consumerId;
     }
 }

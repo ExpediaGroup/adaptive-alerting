@@ -8,7 +8,7 @@
     ],
     "1": [
       {
-        "consumerId": "cid",
+        "consumerId": "",
         "uuid": "d86b798c-cfee-4a2c-a17a-aa2ba79ccf51"
       }
     ],
@@ -20,7 +20,7 @@
     ],
     "4": [
       {
-        "consumerId": "cid",
+        "consumerId": "ad-manager",
         "uuid": "5eaa54e9-7406-4a1d-bd9b-e055eca1a423"
       }
     ]

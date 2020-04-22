@@ -46,12 +46,14 @@ public class CacheUtilTest {
         UUID uuid1 = UUID.fromString("fe1a2366-a73e-4c9d-9186-474e60df6de8");
         UUID uuid2 = UUID.fromString("65eea7d8-8ec3-4f8a-ab2c-7a9dc873723d");
         UUID uuid3 = UUID.fromString("65eea7d8-8ec3-4f8a-ab2c-7a9dc8737231");
+        UUID uuid4 = UUID.fromString("fe1a2366-a73e-4c9d-9186-474e60df6de9");
+
         detectors = new ArrayList<>();
         detectors.add(new Detector("ad-manager", uuid1));
         detectors.add(new Detector("external-detector-1", uuid2));
         detectors.add(new Detector("external-detector-2", uuid3));
-
-        cacheValue = "ad-manager,fe1a2366-a73e-4c9d-9186-474e60df6de8|external-detector-1,65eea7d8-8ec3-4f8a-ab2c-7a9dc873723d|external-detector-2,65eea7d8-8ec3-4f8a-ab2c-7a9dc8737231";
+        detectors.add(new Detector("", uuid4));
+        cacheValue = "ad-manager,fe1a2366-a73e-4c9d-9186-474e60df6de8|external-detector-1,65eea7d8-8ec3-4f8a-ab2c-7a9dc873723d|external-detector-2,65eea7d8-8ec3-4f8a-ab2c-7a9dc8737231|,fe1a2366-a73e-4c9d-9186-474e60df6de9";
     }
 
     @Test
