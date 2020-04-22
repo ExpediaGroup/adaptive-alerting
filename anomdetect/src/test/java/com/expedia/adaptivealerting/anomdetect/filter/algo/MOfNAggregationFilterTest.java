@@ -83,17 +83,17 @@ public final class MOfNAggregationFilterTest {
     }
 
     @Test
-    public void testAggregate_singleNormal() {
+    public void testFilter_singleNormal() {
         checkFilterResult(new MOfNAggregationFilter(3, 5), normalResult, NORMAL);
     }
 
     @Test
-    public void testAggregate_singleWeak() {
+    public void testFilter_singleWeak() {
         checkFilterResult(new MOfNAggregationFilter(3, 5), weakResult, WEAK);
     }
 
     @Test
-    public void testAggregate_mConsecutiveWeaks() {
+    public void testFilter_mConsecutiveWeaks() {
         val aggregator = new MOfNAggregationFilter(3, 5);
 
         checkFilterResult(aggregator, weakResult, WEAK);
@@ -102,7 +102,7 @@ public final class MOfNAggregationFilterTest {
     }
 
     @Test
-    public void testAggregate_mNonConsecutiveWeaks() {
+    public void testFilter_mNonConsecutiveWeaks() {
         val aggregator = new MOfNAggregationFilter(3, 5);
 
         checkFilterResult(aggregator, weakResult, WEAK);
@@ -113,7 +113,7 @@ public final class MOfNAggregationFilterTest {
     }
 
     @Test
-    public void testAggregate_mConsecutiveMixedAnomalies() {
+    public void testFilter_mConsecutiveMixedAnomalies() {
         val aggregator = new MOfNAggregationFilter(3, 5);
 
         checkFilterResult(aggregator, weakResult, WEAK);
@@ -122,7 +122,7 @@ public final class MOfNAggregationFilterTest {
     }
 
     @Test
-    public void testAggregate_nWarmupsThenMixedLevels() {
+    public void testFilter_nWarmupsThenMixedLevels() {
         val aggregator = new MOfNAggregationFilter(3, 5);
 
         checkFilterResult(aggregator, warmupResult, MODEL_WARMUP);
@@ -138,10 +138,25 @@ public final class MOfNAggregationFilterTest {
     }
 
     @Test
-    public void testAggregate_ignoresNonOutlierResult() {
+    public void testFilter_ignoresNonOutlierResult() {
         val nonOutlierResponse = detectorResponse(mockNonOutlierResult);
         new MOfNAggregationFilter(3, 5).doFilter(detectorRequest, nonOutlierResponse, mockFilterChain);
         assertSame(mockNonOutlierResult, nonOutlierResponse.getDetectorResult());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testFilter_nullDetectorRequest() {
+        new MOfNAggregationFilter(3, 5).doFilter(null, detectorResponse(mockNonOutlierResult), mockFilterChain);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testFilter_nullDetectorResponse() {
+        new MOfNAggregationFilter(3, 5).doFilter(detectorRequest, null, mockFilterChain);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testFilter_nullFilterChain() {
+        new MOfNAggregationFilter(3, 5).doFilter(detectorRequest, detectorResponse(mockNonOutlierResult), null);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -155,19 +170,13 @@ public final class MOfNAggregationFilterTest {
     }
 
     @Test
-    public void testAggregate_nullResponseArgument() {
+    public void testFilter_nullResponseArgument() {
         try {
             new MOfNAggregationFilter(3, 5).doFilter(detectorRequest, null, mockFilterChain);
             fail("Expected NullPointerException to be thrown");
         } catch (NullPointerException e) {
             assertEquals("detectorResponse is marked non-null but is null", e.getMessage());
         }
-    }
-
-    private DetectorResponse detectorResponse(DetectorResult result) {
-        DetectorResponse response = new DetectorResponse();
-        response.setDetectorResult(result);
-        return response;
     }
 
     private void checkFilterResult(MOfNAggregationFilter aggregator, OutlierDetectorResult inputResult, AnomalyLevel expectedAnomalyLevel) {
@@ -178,6 +187,12 @@ public final class MOfNAggregationFilterTest {
         assertEquals(inputResult.getPredicted(), aggregatedResult.getPredicted());
         assertEquals(inputResult.getThresholds(), aggregatedResult.getThresholds());
         assertEquals(inputResult.isTrusted(), aggregatedResult.isTrusted());
+    }
+
+    private DetectorResponse detectorResponse(DetectorResult result) {
+        DetectorResponse response = new DetectorResponse();
+        response.setDetectorResult(result);
+        return response;
     }
 
 }

@@ -23,15 +23,12 @@ import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
 import com.expedia.adaptivealerting.anomdetect.filter.DetectionFilter;
 import com.expedia.metrics.MetricData;
 import com.google.common.collect.ImmutableList;
-import lombok.val;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertSame;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -41,11 +38,9 @@ public class DetectionFilterChainTest {
     @Mock
     private DetectorRequest detectorRequest;
     @Mock
-    private DetectorResponse mockDetectorResponse;
+    private DetectorResponse detectorResponse;
     @Mock
     private DetectorContainer detectorContainer;
-    @Mock
-    private DetectionFilter detectionFilter;
     @Mock
     private DetectorResult detectorResult;
     @Mock
@@ -53,32 +48,34 @@ public class DetectionFilterChainTest {
     @Mock
     private MetricData metricData;
 
-    @Before
-    public void setUp() {
-    }
-
     @Test
     public void doFilterWithEmptyChain() {
         when(detectorContainer.getDetector()).thenReturn(detector);
         when(detectorRequest.getMetricData()).thenReturn(metricData);
         chainUnderTest = new DetectionFilterChain(detectorContainer);
-        chainUnderTest.doFilter(detectorRequest, mockDetectorResponse);
+        chainUnderTest.doFilter(detectorRequest, detectorResponse);
     }
 
     @Test
-    public void doFilterWithChain() {
-        when(detectorContainer.getFilters()).thenReturn(ImmutableList.of(detectionFilter));
+    public void doFilterWithChain_ensureChainKeepsResultFromFilter() {
+        DetectionFilter stubDetectionFilter = (detectorRequest, detectorResponse, chain) -> detectorResponse.setDetectorResult(detectorResult);
+        DetectorContainer detectorContainer = new DetectorContainer(detector, ImmutableList.of(stubDetectionFilter));
         chainUnderTest = new DetectionFilterChain(detectorContainer);
 
-        val detectorResponse = new DetectorResponse();
-        doAnswer(invocation -> {
-            DetectorResponse response = invocation.getArgument(1);
-            response.setDetectorResult(detectorResult);
-            return null;
-        }).when(detectionFilter).doFilter(detectorRequest, detectorResponse, chainUnderTest);
+        DetectorResponse actualDetectorResponse = new DetectorResponse();
+        chainUnderTest.doFilter(detectorRequest, actualDetectorResponse);
 
-        chainUnderTest.doFilter(detectorRequest, detectorResponse);
-
-        assertSame(detectorResult, detectorResponse.getDetectorResult());
+        assertSame(detectorResult, actualDetectorResponse.getDetectorResult());
     }
+
+    @Test(expected = NullPointerException.class)
+    public void nullDetectorRequestNotAllowed() {
+        chainUnderTest.doFilter(null, detectorResponse);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void nullDetectorResponseNotAllowed() {
+        chainUnderTest.doFilter(detectorRequest, null);
+    }
+
 }

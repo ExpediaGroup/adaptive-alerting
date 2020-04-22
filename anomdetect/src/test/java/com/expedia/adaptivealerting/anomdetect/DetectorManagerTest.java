@@ -186,6 +186,11 @@ public final class DetectorManagerTest {
         assertNull(result);
     }
 
+    @Test(expected = NullPointerException.class)
+    public void testMetricDataCantBeNull() {
+        managerUnderTest.detect(null);
+    }
+
     private void initTestObjects() {
         this.mappedUuid = UUID.randomUUID();
         this.mappedUuid2 = UUID.randomUUID();

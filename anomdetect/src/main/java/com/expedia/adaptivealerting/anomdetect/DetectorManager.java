@@ -46,6 +46,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
+
 /**
  * Component that manages a given set of anomaly detectors.
  * <p>
@@ -136,10 +138,10 @@ public class DetectorManager {
     public DetectorResult detect(@NonNull MappedMetricData mappedMetricData) {
         try {
             MDC.put("DetectorUuid", mappedMetricData.getDetectorUuid().toString());
-            Optional<DetectorContainer> detector = getDetector(mappedMetricData);
-            if (detector.isPresent()) {
-                val metricData = mappedMetricData.getMetricData();
-                Optional<DetectorResult> optionalDetectorResult = doDetection(detector.get(), metricData);
+            checkMappedMetricData(mappedMetricData);
+            Optional<DetectorContainer> container = getDetector(mappedMetricData);
+            if (container.isPresent()) {
+                Optional<DetectorResult> optionalDetectorResult = doDetection(container.get(), mappedMetricData.getMetricData());
                 return optionalDetectorResult.orElse(null);
             } else {
                 return null;
@@ -149,7 +151,7 @@ public class DetectorManager {
         }
     }
 
-    private Optional<DetectorContainer> getDetector(@NonNull MappedMetricData mappedMetricData) {
+    private Optional<DetectorContainer> getDetector(MappedMetricData mappedMetricData) {
         Optional<DetectorContainer> optionalDetector = detectorFor(mappedMetricData);
         if (!optionalDetector.isPresent()) {
             log.warn("No detector for mappedMetricData={}", mappedMetricData);
@@ -158,7 +160,7 @@ public class DetectorManager {
         return optionalDetector;
     }
 
-    private Optional<DetectorContainer> detectorFor(@NonNull MappedMetricData mappedMetricData) {
+    private Optional<DetectorContainer> detectorFor(MappedMetricData mappedMetricData) {
         try (Timer.Context autoClosable = detectorForTimer.time()) {
             val detectorUuid = mappedMetricData.getDetectorUuid();
             DetectorContainer container = cachedDetectors.get(detectorUuid);
@@ -173,8 +175,8 @@ public class DetectorManager {
         }
     }
 
-    private Optional<DetectorContainer> initDataAndCacheIfSuccessful(@NonNull MappedMetricData mappedMetricData,
-                                                                     @NonNull UUID detectorUuid,
+    private Optional<DetectorContainer> initDataAndCacheIfSuccessful(MappedMetricData mappedMetricData,
+                                                                     UUID detectorUuid,
                                                                      DetectorContainer container) {
         // NPE HERE
         boolean dataInitCompleted = attemptDataInitialization(mappedMetricData, container.getDetector());
@@ -204,7 +206,7 @@ public class DetectorManager {
         return dataInitCompleted;
     }
 
-    private Optional<DetectorResult> doDetection(@NonNull DetectorContainer container, @NonNull MetricData metricData) {
+    private Optional<DetectorResult> doDetection(DetectorContainer container, MetricData metricData) {
         try (Timer.Context autoClosable = detectTimer.apply(container.getName()).time()) {
             Optional<DetectorResult> optionalDetectorResult = Optional.empty();
             try {
@@ -227,6 +229,11 @@ public class DetectorManager {
     public Meter getDetectorAndLevelMeter(String name, AnomalyLevel anomalyLevel) {
         String anomalyLevelStr = (anomalyLevel == null) ? "NONE" : anomalyLevel.name();
         return metricRegistry.meter("detector." + name + "." + anomalyLevelStr);
+    }
+
+    private void checkMappedMetricData(MappedMetricData mappedMetricData) {
+        notNull(mappedMetricData.getMetricData(), "MappedMetricData contains illegal metricData=null");
+        notNull(mappedMetricData.getDetectorUuid(), "MappedMetricData contains illegal detectorUuid=null");
     }
 
     /**

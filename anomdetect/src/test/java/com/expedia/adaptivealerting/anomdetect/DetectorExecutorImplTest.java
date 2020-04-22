@@ -81,6 +81,11 @@ public class DetectorExecutorImplTest {
         assertSame(detectorResult, actualResult);
     }
 
+    @Test(expected = NullPointerException.class)
+    public void nullMetricDataNotAllowed() {
+        executorUnderTest.doDetection(detectorContainer, null);
+    }
+
     private void initDependencies() {
         when(detectorContainer.getDetector()).thenReturn(detector);
         when(detector.detect(metricData)).thenReturn(detectorResult);

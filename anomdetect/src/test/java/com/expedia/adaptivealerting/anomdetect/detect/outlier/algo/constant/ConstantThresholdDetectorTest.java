@@ -132,6 +132,12 @@ public class ConstantThresholdDetectorTest {
         assertEquals("constant-threshold", detector.getName());
     }
 
+    @Test(expected = NullPointerException.class)
+    public void testMetricCantBeNull() {
+        val detector = detector(detectorUuid, thresholds, AnomalyType.LEFT_TAILED, trusted);
+        detector.detect(null);
+    }
+
     private ConstantThresholdDetector detector(UUID uuid, AnomalyThresholds thresholds, AnomalyType type, boolean trusted) {
         val params = new ConstantThresholdDetectorParams().setThresholds(thresholds).setType(type);
         return new ConstantThresholdDetector(uuid, params, trusted);
