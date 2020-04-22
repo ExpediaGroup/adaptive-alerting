@@ -101,4 +101,5 @@ public final class CacheUtil {
                 .map(detector -> new Detector(detector.split(",")[0], UUID.fromString(detector.split(",")[1]))) //update
                 .collect(Collectors.toList());
     }
+
 }
