@@ -37,7 +37,7 @@ public final class CacheUtil {
     private static final String CACHE_VALUE_DELIMITER = "|";
 
     /**
-     * Converts map to cache's key format
+     * Converts a map to cache's key format
      *
      * @param tags A Map {k1=v1, k2=v2, k3=v3}
      * @return Returns a string in this format {@literal "k1->v1,k2->v2,k3->v3"}
@@ -55,7 +55,7 @@ public final class CacheUtil {
     }
 
     /**
-     * Converts cache key in string format to map
+     * Converts cache's key format to map
      *
      * @param key String {@literal "k1->v1,k2->v2,k3->v3"}
      * @return Returns a map in this format {k1=v1, k2=v2, k3=v3}
@@ -73,7 +73,7 @@ public final class CacheUtil {
     }
 
     /**
-     * Converts list of detectors to cache's value format
+     * Converts a list of detectors to cache's value format
      *
      * @param detectors A list of detectors [Detector(consumerId=c1, uuid=uuid1), Detector(consumerId=c2, uuid=uuid)]
      * @return Returns a string in this format "c1,uuid1|c2,uuid2"
