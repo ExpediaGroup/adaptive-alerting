@@ -144,9 +144,9 @@ public final class TestObjectMother {
     public static MappedMetricData mappedMetricData(MetricData metricData) {
         return new MappedMetricData(metricData, UUID.randomUUID());
     }
-
-    public static MappedMetricData mappedMetricData(MetricData metricData, UUID uuid) {
-        return new MappedMetricData(metricData, uuid);
+    
+    public static MappedMetricData mappedMetricData(MetricData metricData, UUID uuid, String consumerId) {
+        return new MappedMetricData(metricData, uuid, consumerId);
     }
 
     public static MappedMetricData mappedMetricDataWithAnomalyResult() {

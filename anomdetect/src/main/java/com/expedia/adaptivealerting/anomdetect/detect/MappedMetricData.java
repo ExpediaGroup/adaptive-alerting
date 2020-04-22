@@ -34,8 +34,8 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
  * </p>
  */
 @Data
-@NoArgsConstructor
 @RequiredArgsConstructor
+@NoArgsConstructor
 public final class MappedMetricData {
 
     @NonNull
@@ -44,11 +44,21 @@ public final class MappedMetricData {
     @NonNull
     private UUID detectorUuid;
 
+    //Right now NULL consumerID is allowed. It will be made NON NULL once we update the existing mappings.
     private String consumerId;
 
     // Calling this anomalyResult because this is the original name for this property,
     // and various downstream processes assume this name.
     private DetectorResult anomalyResult;
+
+    public MappedMetricData(MetricData metricData, UUID detectorUuid, String consumerId) {
+        notNull(metricData, "metricData can't be null");
+        notNull(detectorUuid, "detectorUuid can't be null");
+
+        this.metricData = metricData;
+        this.detectorUuid = detectorUuid;
+        this.consumerId = consumerId;
+    }
 
     public MappedMetricData(MappedMetricData orig, DetectorResult anomalyResult) {
         notNull(orig, "orig can't be null");
