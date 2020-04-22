@@ -55,8 +55,6 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
     private static final String CK_AD_MAPPER = "ad-mapper";
     private static final String STATE_STORE_NAME = "es-request-buffer";
     private static final String DEFAULT_CONSUMER_ID = "ad-manager";
-    private static final String DEFAULT_EXTERNAL_DETECTOR_PREFIX = "mapped-metrics-";
-
     private final DetectorMapper mapper;
 
     // TODO Make these configurable. [WLW]
@@ -113,7 +111,7 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
             if (consumerId == null || DEFAULT_CONSUMER_ID.equals(consumerId)) {
                 return defaultOutputTopic;
             }
-            return DEFAULT_EXTERNAL_DETECTOR_PREFIX + consumerId;
+            return defaultOutputTopic + "-" + consumerId;
         };
 
         final KStream<String, MetricData> stream = builder.stream(inputTopic);
