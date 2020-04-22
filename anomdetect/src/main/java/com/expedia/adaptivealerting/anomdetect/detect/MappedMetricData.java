@@ -44,7 +44,7 @@ public final class MappedMetricData {
     @NonNull
     private UUID detectorUuid;
 
-    //Right now NULL consumerID is allowed. It will be made NON NULL once we update the existing mappings.
+    //FIXME Right now NULL consumerID is allowed. It will be made NON NULL once we update the existing internal detector mappings.
     private String consumerId;
 
     // Calling this anomalyResult because this is the original name for this property,
