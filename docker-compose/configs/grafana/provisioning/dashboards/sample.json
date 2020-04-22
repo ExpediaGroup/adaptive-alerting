@@ -15,7 +15,6 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 1,
   "links": [],
   "panels": [
     {
@@ -87,9 +86,11 @@
           ],
           "metrics": [
             {
-              "field": "select field",
+              "field": "value",
               "id": "1",
-              "type": "count"
+              "meta": {},
+              "settings": {},
+              "type": "avg"
             }
           ],
           "query": "level:NORMAL",
@@ -113,9 +114,11 @@
           "hide": false,
           "metrics": [
             {
-              "field": "select field",
+              "field": "value",
               "id": "1",
-              "type": "count"
+              "meta": {},
+              "settings": {},
+              "type": "avg"
             }
           ],
           "query": "level:WEAK",
@@ -139,9 +142,11 @@
           "hide": false,
           "metrics": [
             {
-              "field": "select field",
+              "field": "value",
               "id": "1",
-              "type": "count"
+              "meta": {},
+              "settings": {},
+              "type": "avg"
             }
           ],
           "query": "level:STRONG",
@@ -153,7 +158,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Anomaly Volume",
+      "title": "Sample Data",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -191,6 +196,7 @@
       }
     }
   ],
+  "refresh": "10s",
   "schemaVersion": 21,
   "style": "dark",
   "tags": [],
@@ -218,5 +224,5 @@
   "timezone": "",
   "title": "Sample Dashboard",
   "uid": "SWcxxf3Zz",
-  "version": 2
+  "version": 1
 }
