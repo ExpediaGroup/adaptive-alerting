@@ -34,8 +34,8 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
  * </p>
  */
 @Data
-@RequiredArgsConstructor
 @NoArgsConstructor
+@RequiredArgsConstructor
 public final class MappedMetricData {
 
     @NonNull
