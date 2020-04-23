@@ -72,7 +72,7 @@ public class CacheUtilTest {
     @Test
     public void getDetectorIds() {
         initDetectors();
-        Assert.assertEquals(cacheValue, CacheUtil.getValue(detectors));
+        Assert.assertEquals(cacheValue, CacheUtil.getDetectors(detectors));
     }
 
     @Test

@@ -56,7 +56,7 @@ public class DetectorMapperCacheTest {
         val key = "metricKeyWithValue";
         val key2 = "metricKeyWithOutValue";
         detectors = Collections.singletonList(new Detector("cid", UUID.randomUUID()));
-        detectorIds = CacheUtil.getValue(detectors);
+        detectorIds = CacheUtil.getDetectors(detectors);
 
         Mockito.when(cache.getIfPresent(key)).thenReturn(detectorIds);
 
@@ -73,7 +73,7 @@ public class DetectorMapperCacheTest {
         detectors = Collections.singletonList(new Detector("", UUID.randomUUID()));
 
         detectorMapperCache.put("key", detectors);
-        detectorIds = CacheUtil.getValue(detectors);
+        detectorIds = CacheUtil.getDetectors(detectors);
         verify(cache, times(1)).put("key", detectorIds);
     }
 }

@@ -59,7 +59,7 @@ public class DetectorMapperCacheRefreshTest {
         detectors.add(buildDetector(updateId1));
         detectors.add(buildDetector(updateId2));
 
-        CacheUtil.getValue(detectors);
+        CacheUtil.getDetectors(detectors);
 
         detectorMapperCache.put("metricKey", detectors);
 

@@ -41,7 +41,7 @@ import static com.codahale.metrics.MetricRegistry.name;
  * Since this cache can grow in size, for space optimization we transform <br>
  * <p>
  * - metric into metric-key generated using {@link CacheUtil#getKey(Map)} <br>
- * - detector's list into a concatenated string of detector uuid generated using {@link CacheUtil#getValue(List)} <br>
+ * - detector's list into a concatenated string of detector uuid generated using {@link CacheUtil#getDetectors(List)} <br>
  * eg.
  * <pre>
  *   Metric1
@@ -103,11 +103,11 @@ public class DetectorMapperCache {
      * @return the list of Detectors
      */
     public List<Detector> get(String key) {
-        String value = cache.getIfPresent(key);
-        if (value == null) {
+        String detectorsString = cache.getIfPresent(key);
+        if (detectorsString == null) {
             return Collections.emptyList();
         } else {
-            return CacheUtil.buildDetectors(value);
+            return CacheUtil.buildDetectors(detectorsString);
         }
     }
 
@@ -116,9 +116,9 @@ public class DetectorMapperCache {
      * @param detectors the detectors
      */
     public void put(String key, List<Detector> detectors) {
-        String value = CacheUtil.getValue(detectors);
-        log.info("Updating cache with {} - {}", key, value);
-        cache.put(key, value);
+        String detectorsString = CacheUtil.getDetectors(detectors);
+        log.info("Updating cache with {} - {}", key, detectorsString);
+        cache.put(key, detectorsString);
     }
 
     /**
@@ -143,32 +143,32 @@ public class DetectorMapperCache {
 
         Map<String, String> mappingsWhichNeedsAnUpdate = new HashMap<>();
 
-        this.cache.asMap().forEach((key, value) -> {
-            if (detectorsOfDisabledMappings.stream().anyMatch(detector -> value.contains(detector.getUuid().toString()))) {
-                mappingsWhichNeedsAnUpdate.put(key, value);
+        this.cache.asMap().forEach((key, detectorsString) -> {
+            if (detectorsOfDisabledMappings.stream().anyMatch(detector -> detectorsString.contains(detector.getUuid().toString()))) {
+                mappingsWhichNeedsAnUpdate.put(key, detectorsString);
             }
         });
 
         Map<String, String> modifiedDetectorMappings = new HashMap<>();
 
-        mappingsWhichNeedsAnUpdate.forEach((key, value) -> {
-            String newValue = removeDisabledDetectors(detectorsOfDisabledMappings, value);
-            modifiedDetectorMappings.put(key, newValue);
+        mappingsWhichNeedsAnUpdate.forEach((key, detectorsString) -> {
+            String updatedDetectorsString = removeDisabledDetectors(detectorsOfDisabledMappings, detectorsString);
+            modifiedDetectorMappings.put(key, updatedDetectorsString);
         });
 
         log.info("removing mappings : {} from cache entries",
                 Arrays.toString(detectorsOfDisabledMappings.toArray()));
-        modifiedDetectorMappings.forEach((key, value) -> log.info("cache key: {}, updated mapping {}", key, value));
+        modifiedDetectorMappings.forEach((key, detectorsString) -> log.info("cache key: {}, updated mapping {}", key, detectorsString));
 
         this.cache.putAll(modifiedDetectorMappings);
     }
 
-    private String removeDisabledDetectors(List<Detector> detectorsToBeDisabled, String value) {
-        List<Detector> detectorsStoredInCache = CacheUtil.buildDetectors(value);
+    private String removeDisabledDetectors(List<Detector> detectorsToBeDisabled, String detectorsString) {
+        List<Detector> detectorsStoredInCache = CacheUtil.buildDetectors(detectorsString);
         detectorsToBeDisabled.forEach(detectorToBeDisabled -> {
             detectorsStoredInCache.remove(new Detector(detectorToBeDisabled.getConsumerId(), detectorToBeDisabled.getUuid()));
         });
-        return CacheUtil.getValue(detectorsStoredInCache);
+        return CacheUtil.getDetectors(detectorsStoredInCache);
     }
 
     /**

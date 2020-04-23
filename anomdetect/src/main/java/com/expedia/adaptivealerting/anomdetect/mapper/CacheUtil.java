@@ -78,7 +78,7 @@ public final class CacheUtil {
      * @param detectors A list of detectors [Detector(consumerId=c1, uuid=uuid1), Detector(consumerId=c2, uuid=uuid)]
      * @return Returns a string in this format "c1,uuid1|c2,uuid2"
      */
-    public static String getValue(List<Detector> detectors) {
+    public static String getDetectors(List<Detector> detectors) {
         List<String> result = new ArrayList<>();
         detectors.forEach(detector -> {
             result.add(detector.getConsumerId() + "," + detector.getUuid().toString());

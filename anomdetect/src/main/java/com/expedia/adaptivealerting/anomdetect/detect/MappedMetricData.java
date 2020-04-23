@@ -41,22 +41,23 @@ public final class MappedMetricData {
     @NonNull
     private MetricData metricData;
 
+    private String consumerId;
+
     @NonNull
     private UUID detectorUuid;
 
-    private String consumerId;
 
     // Calling this anomalyResult because this is the original name for this property,
     // and various downstream processes assume this name.
     private DetectorResult anomalyResult;
 
-    public MappedMetricData(MetricData metricData, UUID detectorUuid, String consumerId) {
+    public MappedMetricData(MetricData metricData, String consumerId, UUID detectorUuid) {
         notNull(metricData, "metricData can't be null");
         notNull(detectorUuid, "detectorUuid can't be null");
 
         this.metricData = metricData;
-        this.detectorUuid = detectorUuid;
         this.consumerId = consumerId;
+        this.detectorUuid = detectorUuid;
     }
 
     public MappedMetricData(MappedMetricData orig, DetectorResult anomalyResult) {
