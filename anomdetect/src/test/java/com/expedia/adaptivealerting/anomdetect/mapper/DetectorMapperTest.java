@@ -186,7 +186,7 @@ public final class DetectorMapperTest {
         }
         expression.setOperands(operandsList);
         return new DetectorMapping()
-            .setDetector(new Detector(UUID.randomUUID()))
+            .setDetector(new Detector("cid", UUID.randomUUID()))
             .setEnabled(true)
             .setExpression(expression);
     }
@@ -260,8 +260,8 @@ public final class DetectorMapperTest {
     @Test
     public void detectorCacheUpdateTest() {
 
-        DetectorMapping disabledDetectorMapping = new DetectorMapping().setDetector(buildDetector("cid", "2c49ba26-1a7d-43f4-b70c-c6644a2c1689")).setEnabled(false);
-        DetectorMapping modifiedDetectorMapping = new DetectorMapping().setDetector(buildDetector("cid", "4d49ba26-1a7d-43f4-b70c-ee644a2c1689")).setEnabled(true);
+        DetectorMapping disabledDetectorMapping = generateDetectorMapping(generateTagsForIndex(1)).setEnabled(false);
+        DetectorMapping modifiedDetectorMapping = generateDetectorMapping(generateTagsForIndex(2));
         List<DetectorMapping> updateDetectorMappings = Arrays.asList(disabledDetectorMapping, modifiedDetectorMapping);
 
         when(detectorSource.findUpdatedDetectorMappings(60)).thenReturn(updateDetectorMappings);

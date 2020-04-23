@@ -159,6 +159,9 @@ public class DetectorMapper {
         if (!newDetectorMappings.isEmpty()) {
             cache.invalidateMetricsWithOldDetectorMappings(newDetectorMappings);
             log.info("Invalidating metrics for modified mappings: {}", newDetectorMappings);
+            for (DetectorMapping detectorMapping : newDetectorMappings) {
+                detectorMappingBloomFilter.put(detectorMapping.getKey());
+            }
         }
 
         syncedUpTillTime = currentTime;
@@ -180,6 +183,7 @@ public class DetectorMapper {
             String cacheKey = CacheUtil.getKey(cacheMissedMetricTags.get(index));
             if (!detectors.isEmpty()) {
                 cache.put(cacheKey, detectors);
+                detectorMappingBloomFilter.put(cacheKey);
             }
         });
     }
