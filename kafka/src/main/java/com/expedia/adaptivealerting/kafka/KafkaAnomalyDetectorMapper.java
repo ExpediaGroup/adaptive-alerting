@@ -48,7 +48,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
  * Kafka Streams adapter for {@link DetectorMapper}. Reads metric data from an input topic, classifies individual metric
  * data points, and publishes the classifications to type-specific topics where they can be picked up by the internal or external detectors
  * For internal detectors, ad-manager is the consumer and all the messages are routed to defaultOutputTopic for it's consumption
- * For external detectors, all the messages are routed to their own topics i.e. DEFAULT_EXTERNAL_DETECTOR_PREFIX + consumerId
+ * For external detectors, all the messages are routed to their own topics i.e. defaultOutputTopic + "-" + consumerId
  */
 @Slf4j
 public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
