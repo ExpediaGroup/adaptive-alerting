@@ -16,8 +16,12 @@
 package com.expedia.adaptivealerting.anomdetect.mapper;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.Base64;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.Data;
 import lombok.experimental.Accessors;
+
 
 @Data
 @Accessors(chain = true)
@@ -29,5 +33,28 @@ public class DetectorMapping {
     private long lastModifiedTimeInMillis;
     private long createdTimeInMillis;
     private boolean isEnabled;
+
+    
+    public Map<String, String> getTags() {
+        return this.getExpression()
+                .getOperands()
+                .stream()
+                .collect(Collectors.toMap(op -> op.getField().getKey(), op -> op.getField().getValue()));
+    }
+
+
+    public String getKey() {
+        final String KEY_VAL_DELIMITER = "->";
+        final String TAG_DELIMITER = ",";
+        
+        return this.getTags().entrySet()
+                .stream()
+                .map(entry -> {
+                    String encodedValue = Base64.getEncoder().encodeToString(entry.getValue().getBytes());
+                    return entry.getKey() + KEY_VAL_DELIMITER + encodedValue;
+                })
+                .sorted()
+                .collect(Collectors.joining(TAG_DELIMITER));
+    }
 
 }

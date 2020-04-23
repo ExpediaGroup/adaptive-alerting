@@ -15,12 +15,13 @@
  */
 package com.expedia.adaptivealerting.anomdetect.mapper;
 
-
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
 import com.expedia.adaptivealerting.anomdetect.util.AssertUtil;
 import com.expedia.metrics.MetricDefinition;
+import com.google.common.hash.BloomFilter;
+import com.google.common.hash.Funnels;
 import com.typesafe.config.Config;
 import lombok.Getter;
 import lombok.NonNull;
@@ -41,6 +42,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public class DetectorMapper {
+    public final double FILTER_FALSE_POSITIVE_PROB_THRESHOLD = 0.01;
     private static final int OPTIMAL_BATCH_SIZE = 80;
     private static final String CK_DETECTOR_CACHE_UPDATE_PERIOD = "detector-mapping-cache-update-period";
     private static final String DETECTOR_MAPPER_ERRORS = "detector-mapper.exceptions";
@@ -52,6 +54,7 @@ public class DetectorMapper {
     @NonNull
     private DetectorSource detectorSource;
 
+    private BloomFilter<String> detectorMappingBloomFilter;
     private DetectorMapperCache cache;
     private Counter exceptionCounter;
     private int detectorCacheUpdateTimePeriod;
@@ -62,6 +65,7 @@ public class DetectorMapper {
         this.detectorSource = detectorSource;
         this.cache = cache;
         this.detectorCacheUpdateTimePeriod = detectorCacheUpdateTimePeriod;
+        this.initBloomFilter();
         this.initScheduler();
     }
 
@@ -80,6 +84,21 @@ public class DetectorMapper {
                 exceptionCounter.inc();
             }
         }, detectorCacheUpdateTimePeriod, detectorCacheUpdateTimePeriod, TimeUnit.MINUTES);
+    }
+
+    private void initBloomFilter() {
+        final long detectorMappingEnabledCount = this.detectorSource.getEnabledDetectorMappingCount();
+        this.detectorMappingBloomFilter = BloomFilter.create(Funnels.unencodedCharsFunnel(), detectorMappingEnabledCount, FILTER_FALSE_POSITIVE_PROB_THRESHOLD);
+        int lastPageSize = 500;
+        final long lastModifiedTime = 0L;
+        while (lastPageSize == 500) {
+            final List<DetectorMapping> detectorMappings = detectorSource
+                    .findDetectorMappingsUpdatedSince(lastModifiedTime);
+            lastPageSize = detectorMappings.size();
+            for (final DetectorMapping detectorMapping : detectorMappings) {
+                detectorMappingBloomFilter.put(detectorMapping.getKey());
+            }
+        }
     }
 
     public int optimalBatchSize() {
@@ -164,5 +183,11 @@ public class DetectorMapper {
             }
         });
     }
+
+    public Boolean metricMightBeMapped(final MetricDefinition metricDefinition) {
+        final String metricKey = CacheUtil.getKey(metricDefinition.getTags().getKv());
+        return this.detectorMappingBloomFilter.mightContain(metricKey);
+    }
+
 }
 

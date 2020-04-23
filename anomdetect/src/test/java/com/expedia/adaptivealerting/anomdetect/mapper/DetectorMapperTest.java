@@ -16,6 +16,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import lombok.val;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +35,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -43,6 +46,7 @@ import static org.mockito.Mockito.when;
 public final class DetectorMapperTest {
     private DetectorMapper detectorMapper;
     private int detectorMappingCacheUpdatePeriod = 5;
+
     @Mock
     private DetectorSource detectorSource;
 
@@ -102,6 +106,43 @@ public final class DetectorMapperTest {
         assertFalse(results);
     }
 
+    @Test
+    public void testBloomFilter() {
+        // Out of 10,000 metrics, 9,696 are mapped (every 33rd was skipped)
+        // the Bloom Filter should accurately identify all positive cases, but may
+        // have some false positives.  The actual rate of false positives in the 
+        // test should not exceed the configured false positive threshold.
+        int bloomFilterTruePositiveCount = 0;
+        int bloomFilterFalsePositiveCount = 0;
+        int bloomFilterTrueNegativeCount = 0;
+        int bloomFilterFalseNegativeCount = 0;
+        for (int i = 0; i < 10_000; i++) {
+            MetricDefinition metricDefinition = new MetricDefinition(new TagCollection(generateTagsForIndex(i)));
+            Boolean metricMightBeMapped = detectorMapper.metricMightBeMapped(metricDefinition);
+            if (i % 33 == 0){
+                if (metricMightBeMapped){
+                    bloomFilterFalsePositiveCount++;
+                } else {
+                    bloomFilterTrueNegativeCount++;
+                }
+            } else {
+                if (metricMightBeMapped){
+                    bloomFilterTruePositiveCount++;
+                } else {
+                    bloomFilterFalseNegativeCount++;
+                }
+            }
+        }
+        assertEquals(9696, bloomFilterTruePositiveCount);
+        assertTrue(bloomFilterFalsePositiveCount <= 10_000 * detectorMapper.FILTER_FALSE_POSITIVE_PROB_THRESHOLD);
+        assertTrue(bloomFilterTrueNegativeCount >= 303 - (10_000 * detectorMapper.FILTER_FALSE_POSITIVE_PROB_THRESHOLD));
+        assertEquals(0, bloomFilterFalseNegativeCount);
+        System.out.println(String.format("Bloom Filter False Positive Threshold: %s%s, Actual: %s%s",
+            Math.floor(detectorMapper.FILTER_FALSE_POSITIVE_PROB_THRESHOLD*10_000)/100, "%",
+            Math.floor((bloomFilterFalsePositiveCount/10_000.0)*10_000)/100, "%"
+        )); 
+    }
+
     @Test(expected = RuntimeException.class)
     public void isSuccessfulDetectorMappingLookup_fail() {
         when(detectorSource.findDetectorMappings(tag_bigList)).thenThrow(new RuntimeException());
@@ -134,13 +175,46 @@ public final class DetectorMapperTest {
         this.emptyDetectorMatchResponse = null;
     }
 
+    private DetectorMapping generateDetectorMapping(Map<String, String> tags) {
+        ExpressionTree expression = new ExpressionTree();
+        expression.setOperator(Operator.AND);
+        List<Operand> operandsList = new ArrayList<>();
+        for (Map.Entry<String, String> entry : tags.entrySet()) {
+            Operand operand = new Operand();
+            operand.setField(new Field(entry.getKey(), entry.getValue()));
+            operandsList.add(operand);
+        }
+        expression.setOperands(operandsList);
+        return new DetectorMapping()
+            .setDetector(new Detector(UUID.randomUUID()))
+            .setEnabled(true)
+            .setExpression(expression);
+    }
+
+    private Map<String, String> generateTagsForIndex(int index){
+        val tags = new HashMap<String, String>();
+        tags.put("service", "service" + Integer.toString(index));
+        tags.put("type", "error_count");
+        return tags;
+    }
+
     private void initDependencies() {
+        when(detectorSource.getEnabledDetectorMappingCount()).thenReturn(10_000L);
+        List<DetectorMapping> detectorMappings = new ArrayList<DetectorMapping>();
+        for (int i = 0; i < 10_000; i++) {
+            if (i % 33 != 0){
+                detectorMappings.add(generateDetectorMapping(generateTagsForIndex(i)));
+            }
+        }
+        when(detectorSource.findDetectorMappingsUpdatedSince(anyLong())).thenReturn(detectorMappings);
         when(detectorSource.findDetectorMappings(tags)).thenReturn(detectorMatchResponse);
         when(detectorSource.findDetectorMappings(tag_bigList)).thenReturn(detectorMatchResponse_withMoreLookupTime);
         when(detectorSource.findDetectorMappings(tags_cantRetrieve)).thenReturn(emptyDetectorMatchResponse);
 
         when(config.getInt("detector-mapping-cache-update-period")).thenReturn(detectorMappingCacheUpdatePeriod);
     }
+
+
 
     private void initTagsFromFile() throws IOException {
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

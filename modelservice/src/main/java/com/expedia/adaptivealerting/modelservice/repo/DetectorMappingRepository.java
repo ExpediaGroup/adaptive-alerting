@@ -37,6 +37,8 @@ public interface DetectorMappingRepository {
 
     DetectorMapping findDetectorMapping(String id);
 
+    List<DetectorMapping> findUpdatedSince(long lastModifiedTime);
+
     List<DetectorMapping> findLastUpdated(int timeInSeconds);
 
     List<DetectorMapping> search(SearchMappingsRequest request);
@@ -44,4 +46,6 @@ public interface DetectorMappingRepository {
     void disableDetectorMapping(String id);
 
     void deleteDetectorMapping(String id);
+
+    long getEnabledDetectorMappingCount();
 }

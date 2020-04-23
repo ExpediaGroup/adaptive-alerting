@@ -71,6 +71,11 @@ public class DetectorMappingController {
         detectorMappingRepo.deleteDetectorMapping(id);
     }
 
+    @RequestMapping(value = "/count", method = RequestMethod.POST)
+    public long enabledDetectorMappingCount() {
+        return detectorMappingRepo.getEnabledDetectorMappingCount();
+    }
+
     @RequestMapping(value = "/search", method = RequestMethod.POST)
     public List<DetectorMapping> searchDetectorMapping(@RequestBody SearchMappingsRequest request) {
         AssertUtil.isTrue(request.getUserId() != null || request.getDetectorUuid() != null,
@@ -84,9 +89,17 @@ public class DetectorMappingController {
         return detectorMappingRepo.findLastUpdated(timeInSecs);
     }
 
+    @RequestMapping(value = "/updatedSince", method = RequestMethod.GET)
+    public List<DetectorMapping> findDetectorMappingsUpdatedSince(@RequestParam long lastModifiedTime) {
+        AssertUtil.notNull(lastModifiedTime, "timeInSecs can't be null");
+        return detectorMappingRepo.findUpdatedSince(lastModifiedTime);
+    }
+
     @RequestMapping(value = "/findMatchingByTags", method = RequestMethod.POST)
     public MatchingDetectorsResponse searchDetectorMapping(@RequestBody List<Map<String, String>> tagsList) {
         MatchingDetectorsResponse matchingDetectorMappings = detectorMappingRepo.findMatchingDetectorMappings(tagsList);
         return matchingDetectorMappings;
     }
+
+    
 }
