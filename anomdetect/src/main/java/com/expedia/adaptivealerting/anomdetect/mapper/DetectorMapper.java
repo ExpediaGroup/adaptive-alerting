@@ -87,6 +87,20 @@ public class DetectorMapper {
     }
 
     private void initBloomFilter() {
+        /*
+         * Bloom filters are a memory efficient way to filter out most items that don't exist is a set.
+         * By hashing all existing detector mappings in the filter, >99% of metrics that are not 
+         * mapped be efficiently skipped (without looking them up in the model service).  Some false 
+         * positives will make it past the filter, but as they don't have a mapping, there is no 
+         * harm done.
+         * 
+         * initBloomFilter: All detector mappings are retrieved from the model service at startup and 
+         * added to the Bloom filter.
+         * 
+         * If a mapping is added after startup, the new mappings will be added to the filter in 
+         * detectorMappingCacheSync.
+
+        */
         final long detectorMappingEnabledCount = this.detectorSource.getEnabledDetectorMappingCount();
         this.detectorMappingBloomFilter = BloomFilter.create(Funnels.unencodedCharsFunnel(), detectorMappingEnabledCount, FILTER_FALSE_POSITIVE_PROB_THRESHOLD);
         int lastPageSize = 500;
