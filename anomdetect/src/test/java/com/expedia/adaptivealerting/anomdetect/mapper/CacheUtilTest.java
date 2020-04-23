@@ -79,7 +79,6 @@ public class CacheUtilTest {
     public void buildDetectors() {
         initDetectors();
         Assert.assertEquals(detectors, CacheUtil.buildDetectors(cacheValue));
-        System.out.println(CacheUtil.buildDetectors(cacheValue));
         Assert.assertEquals(Collections.EMPTY_LIST, CacheUtil.buildDetectors(""));
     }
 }
