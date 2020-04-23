@@ -125,13 +125,13 @@ public class DetectorMapperCache {
      * Remove disabled detector mappings from cache.
      * <pre>
      *  eg. If cache has entries
-     *  <em> ("k1:v1,k2:v2" : "CID_ONE,UUID_ONE|CID_TWO,UUID_TWO")</em>
-     *  <em> ("k3:v3,k3:v4" : "CID_ONE,UUID_ONE|CID_THREE,UUID_THREE|CID_FIVE,UUID_FIVE")</em>
+     *  <em> ({@literal "k1->v1,k2->v2"} : "CID_ONE,UUID_ONE|CID_TWO,UUID_TWO")</em>
+     *  <em> ({@literal "k3->v3,k3->v4"} : "CID_ONE,UUID_ONE|CID_THREE,UUID_THREE|CID_FIVE,UUID_FIVE")</em>
      *
      *  and detector  <em> D1(cid=CID_ONE,uuid=UUID_ONE)</em> is disabled, this method removes CID_ONE,UUID_ONE from all cache entry values.
      *
-     *   <em> ("k1:v1,k2:v2" : "CID_TWO,UUID_TWO")</em>
-     *   <em> ("k3:v3,k3:v4" : "CID_THREE,UUID_THREE|CID_FIVE,UUID_FIVE")</em>
+     *   <em> ({@literal "k1->v1,k2->v2"} : "CID_TWO,UUID_TWO")</em>
+     *   <em> ({@literal "k3->v3,k3->v4"} : "CID_THREE,UUID_THREE|CID_FIVE,UUID_FIVE")</em>
      * </pre>
      *
      * @param disabledMappings the list of mappings
