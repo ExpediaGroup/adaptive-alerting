@@ -27,6 +27,7 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.msgpack.core.annotations.VisibleForTesting;
 
 import java.io.IOException;
 import java.util.List;
@@ -34,28 +35,23 @@ import java.util.List;
 @Slf4j
 public class ElasticSearchBulkService implements Runnable{
 
-    private static int PORT1 = 9200;
-    private static int PORT2 = 9201;
-    private static String SCHEME = "http";
     private static String INDEX = "anomalies";
     private static String TYPE = "doc";
-    private static String HOST = "host";
-
-    private Config elasticSearchConfig = VisualizerUtility.getConfig("elastic-search");
-
-    private RestHighLevelClient client = restClientBuilder();
 
     private List<AnomalyModel> anomalyModels;
+    private ElasticSearchClient elasticSearchClient;
+    private BulkResponse bulkResponse;
+
 
     public ElasticSearchBulkService(List<AnomalyModel> anomalyModels) {
         this.anomalyModels = anomalyModels;
     }
 
     private void execute() {
-        BulkResponse bulkResponse;
+
         BulkRequest bulkRequest = buildBulkRequest(this.anomalyModels);
         try {
-            bulkResponse = client.bulk(bulkRequest, RequestOptions.DEFAULT);
+            bulkResponse = elasticSearchClient.bulk(bulkRequest, RequestOptions.DEFAULT);
             if (bulkResponse.hasFailures()) {
                 log.error(bulkResponse.buildFailureMessage());
             }
@@ -63,25 +59,8 @@ public class ElasticSearchBulkService implements Runnable{
             e.printStackTrace();
             log.error(e.getMessage(),e);
         } finally {
-            try {
-                client.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            elasticSearchClient.close();
         }
-    }
-
-    private RestHighLevelClient restClientBuilder() {
-
-        RestHighLevelClient client = null;
-        try {
-            client = new RestHighLevelClient(
-                    RestClient.builder(new HttpHost(elasticSearchConfig.getString(HOST), PORT1, SCHEME),
-                            new HttpHost(elasticSearchConfig.getString(HOST), PORT2, SCHEME)));
-        } catch (Exception e) {
-            log.error(e.getMessage(),e);
-        }
-        return client;
     }
 
     private BulkRequest buildBulkRequest(List<AnomalyModel> anomalyModels){
@@ -101,5 +80,14 @@ public class ElasticSearchBulkService implements Runnable{
 
     public void run(){
         execute();
+    }
+
+    @VisibleForTesting
+    public void setElasticSearchClient(ElasticSearchClient elasticSearchClient) {
+        this.elasticSearchClient = elasticSearchClient;
+    }
+
+    public ElasticSearchClient getElasticSearchClient() {
+        return elasticSearchClient;
     }
 }

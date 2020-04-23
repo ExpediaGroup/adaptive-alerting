@@ -32,7 +32,7 @@ public class AnomaliesProcessor {
     public AnomaliesProcessor() {
     }
 
-    public void processMetrics(ConsumerRecords<String, MappedMetricData> metricRecords, ExecutorService executorService) {
+    public List<AnomalyModel> processMetrics(ConsumerRecords<String, MappedMetricData> metricRecords, ExecutorService executorService) {
 
         List<AnomalyModel> anomalyModels = new ArrayList();
         for (ConsumerRecord<String, MappedMetricData> consumerRecord : metricRecords) {
@@ -64,5 +64,6 @@ public class AnomaliesProcessor {
             executorService.submit(elasticSearchBulkService);
             log.info("sending anomaly records to elasticsearch: {}", anomalyModels.size());
         }
+        return anomalyModels;
     }
 }

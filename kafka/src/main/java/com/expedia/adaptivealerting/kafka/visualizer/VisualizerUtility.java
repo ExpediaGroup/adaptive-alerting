@@ -50,8 +50,7 @@ public class VisualizerUtility {
         return dateString;
     }
 
-    public static Properties getMetricConsumerProps() {
-        Config metricConsumerConfig = getConfig("metric-consumer");
+    public static Properties getMetricConsumerProps(Config metricConsumerConfig) {
         Properties metricConsumerProps = ConfigUtil.toConsumerConfig(metricConsumerConfig);
         log.info("metricConsumerProps {}", metricConsumerProps);
         return metricConsumerProps;

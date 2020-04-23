@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.errors.WakeupException;
+import org.msgpack.core.annotations.VisibleForTesting;
 
 import java.util.Collections;
 import java.util.Properties;
@@ -36,11 +37,12 @@ public class AnomalyConsumer {
 
     private KafkaConsumer<String, MappedMetricData> kafkaConsumer;
     private static String TOPIC = "topic";
+    private static String METRIC_CONSUMER = "metric-consumer";
     private static long POLL_INTERVAL = 1000L;
     private AnomaliesProcessor anomaliesProcessor;
     private ExecutorService executorService;
-    public Config consumerConfig = VisualizerUtility.getConfig("metric-consumer");
-    public Properties metricProps = VisualizerUtility.getMetricConsumerProps();
+    public Config consumerConfig = VisualizerUtility.getConfig(METRIC_CONSUMER);
+    public Properties metricProps = VisualizerUtility.getMetricConsumerProps(consumerConfig);
 
     public AnomalyConsumer() {
         kafkaConsumer = new KafkaConsumer(metricProps);
@@ -57,8 +59,7 @@ public class AnomalyConsumer {
         while (continueProcessing) {
             try {
                 ConsumerRecords<String, MappedMetricData> metricRecords = kafkaConsumer.poll(POLL_INTERVAL);
-                int numConsumed = metricRecords.count();
-                log.trace("Read {} metric records from topic={}", numConsumed, consumerConfig.getString(TOPIC));
+                log.trace("Read {} metric records from topic={}", metricRecords.count(), consumerConfig.getString(TOPIC));
                 anomaliesProcessor.processMetrics(metricRecords, executorService);
             } catch (WakeupException e) {
                 kafkaConsumer.close();
@@ -68,6 +69,5 @@ public class AnomalyConsumer {
                 e.printStackTrace();
             }
         }
-
     }
 }
