@@ -38,6 +38,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.internal.matchers.Any;
 
 import java.util.Collections;
 import java.util.UUID;
@@ -176,6 +177,7 @@ public final class KafkaAnomalyDetectorMapperTest {
         when(saConfig.getTypesafeConfig()).thenReturn(tsConfig);
         when(saConfig.getInputTopic()).thenReturn(INPUT_TOPIC);
         when(saConfig.getOutputTopic()).thenReturn(OUTPUT_TOPIC);
+        when(mapper.metricMightBeMapped(any(MetricDefinition.class))).thenReturn(true);
     }
 
     private void initTestObjects() {

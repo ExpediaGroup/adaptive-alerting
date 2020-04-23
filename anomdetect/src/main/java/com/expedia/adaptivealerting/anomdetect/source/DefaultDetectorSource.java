@@ -55,6 +55,14 @@ public class DefaultDetectorSource implements DetectorSource {
         return client.findMatchingDetectorMappings(metricTags);
     }
 
+
+    @Override
+    public List<DetectorMapping> findDetectorMappingsUpdatedSince(long lastModifiedTime) {
+        isTrue(lastModifiedTime > 0, "Required: lastModifiedTime > 0");
+        return client.findDetectorMappingsUpdatedSince(lastModifiedTime);
+    }
+
+
     @Override
     public List<DetectorMapping> findUpdatedDetectorMappings(long timePeriod) {
         isTrue(timePeriod > 0, "Required: timePeriod > 0");
@@ -83,5 +91,11 @@ public class DefaultDetectorSource implements DetectorSource {
                 .stream()
                 .map(document -> document.getUuid())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public long getEnabledDetectorMappingCount(){
+        return client
+                .getEnabledDetectorMappingCount();
     }
 }

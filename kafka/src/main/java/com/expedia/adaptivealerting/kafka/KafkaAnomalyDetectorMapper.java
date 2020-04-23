@@ -104,6 +104,7 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
         final KStream<String, MetricData> stream = builder.stream(inputTopic);
         stream
                 .filter((key, md) -> md != null)
+                .filter((key, md) -> mapper.metricMightBeMapped(md.getMetricDefinition()))
                 .transform(new MetricDataTransformerSupplier(mapper, stateStoreName), stateStoreName)
                 .flatMap(this::metricsByDetector)
                 .to(outputTopic, Produced.with(outputKeySerde, outputValueSerde));

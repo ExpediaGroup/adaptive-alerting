@@ -159,6 +159,26 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
     }
 
     @Override
+    public List<DetectorMapping> findUpdatedSince(long lastModifiedTime) {
+        val sourceBuilder = new SearchSourceBuilder();
+        val boolQuery = QueryBuilders.boolQuery();
+        val termQuery = QueryBuilders.termQuery("aa_enabled", true);
+        // LastModifiedTime may not be unique so 'greater than or equal to' ensures 
+        // paging returns all records.
+        boolQuery.must(new RangeQueryBuilder(LAST_MOD_TIME_KEYWORD)
+                 .gte(lastModifiedTime))
+                 .must(termQuery);
+        sourceBuilder.query(boolQuery);
+        sourceBuilder.size(500);
+        val searchRequest =
+                new SearchRequest()
+                        .source(sourceBuilder)
+                        .indices(elasticSearchProperties.getIndexName())
+                        .types(elasticSearchProperties.getDocType());
+        return getDetectorMappings(searchRequest);
+    }
+
+    @Override
     public List<DetectorMapping> findLastUpdated(int timeInSeconds) {
         val sourceBuilder = new SearchSourceBuilder();
         val boolQuery = QueryBuilders.boolQuery();
@@ -312,5 +332,28 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
         val indexRequest = new IndexRequest(elasticSearchProperties.getIndexName(), elasticSearchProperties.getDocType(), index);
         val json = objectMapperUtil.convertToString(percolatorDetectorMapping);
         elasticsearchUtil.index(indexRequest, json).getId();
+    }
+
+    @Override
+    public long getEnabledDetectorMappingCount() {
+        val termQuery = QueryBuilders.termQuery("aa_enabled", true);
+
+        BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+        boolQueryBuilder.filter(termQuery);
+
+        SearchSourceBuilder searchSourceBuilder = elasticsearchUtil.getSourceBuilder(boolQueryBuilder);
+        searchSourceBuilder.size(0);
+
+        val searchRequest = new SearchRequest()
+            .source(searchSourceBuilder)
+            .indices(elasticSearchProperties.getIndexName());
+
+        try {
+            val searchResponse = elasticSearchClient.search(searchRequest, RequestOptions.DEFAULT);
+            return searchResponse.getHits().getTotalHits();
+        } catch (IOException e) {
+            log.error(String.format("Get enabled count failed"), e);
+            throw new RuntimeException(e);
+        }
     }
 }
