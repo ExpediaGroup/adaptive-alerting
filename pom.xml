@@ -88,7 +88,7 @@
         <junit.version>4.12</junit.version>
 
         <!-- TODO Upgrade to 2.0.0 -->
-        <kafka.streams.version>1.1.1</kafka.streams.version>
+        <kafka.streams.version>2.3.1</kafka.streams.version>
 
         <lombok.version>1.18.10</lombok.version>
         <metrics.java.version>0.11.0</metrics.java.version>

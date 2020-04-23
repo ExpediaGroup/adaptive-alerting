@@ -39,10 +39,10 @@ public class CreateDetectorMappingRequestTest {
         initTestObjects();
     }
 
-    private void initTestObjects(){
+    private void initTestObjects() {
         val mom = ObjectMother.instance();
         this.expression = mom.getExpression();
-        this.detector = new Detector(UUID.randomUUID());
+        this.detector = new Detector("cid", UUID.randomUUID());
         this.user = new User("yoda");
     }
 

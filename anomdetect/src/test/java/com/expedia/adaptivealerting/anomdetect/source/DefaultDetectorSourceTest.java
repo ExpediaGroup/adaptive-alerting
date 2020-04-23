@@ -148,7 +148,7 @@ public final class DefaultDetectorSourceTest {
     private void initTestObjects_findUpdatedDetectors() {
         this.detectorMapping = new DetectorMapping()
                 .setDetector(new com.expedia.adaptivealerting.anomdetect.mapper.Detector(
-                        UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689")))
+                        "ad-manager", UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689")))
                 .setEnabled(false);
 
         this.updatedDetectorDocuments = new DetectorDocument[1];

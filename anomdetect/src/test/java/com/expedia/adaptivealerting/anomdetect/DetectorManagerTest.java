@@ -203,7 +203,7 @@ public final class DetectorManagerTest {
 
         this.detectorMapping = new DetectorMapping()
                 .setDetector(new com.expedia.adaptivealerting.anomdetect.mapper.Detector(
-                        UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689")))
+                        "ad-manager", UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689")))
                 .setEnabled(false);
 
         val detectorUuid = UUID.fromString("7629c28a-5958-4ca7-9aaa-49b95d3481ff");

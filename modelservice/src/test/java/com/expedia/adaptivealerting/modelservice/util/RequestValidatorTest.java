@@ -77,7 +77,7 @@ public class RequestValidatorTest {
 
     @Test
     public void testValidateMappingDetector_successful() {
-        Detector detector = new Detector(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"));
+        Detector detector = new Detector("cid", UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"));
         RequestValidator.validateMappingDetector(detector);
     }
 

@@ -27,5 +27,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Detector {
+    private String consumerId;
     private UUID uuid;
 }

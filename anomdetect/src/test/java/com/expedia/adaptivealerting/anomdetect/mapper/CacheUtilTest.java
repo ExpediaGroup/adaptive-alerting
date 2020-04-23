@@ -27,11 +27,10 @@ import java.util.UUID;
 
 public class CacheUtilTest {
 
-
     private Map<String, String> tags;
-    private String tagKey;
+    private String cacheKey;
     private List<Detector> detectors;
-    private String bunchOfDetectorIds;
+    private String cacheValue;
 
     private void initMap() {
         tags = new HashMap<>();
@@ -40,43 +39,46 @@ public class CacheUtilTest {
         tags.put("key3", "value3");
         tags.put("key4", "value4");
 
-        tagKey = "key1->dmFsdWUx,key2->dmFsdWUy,key3->dmFsdWUz,key4->dmFsdWU0";
+        cacheKey = "key1->dmFsdWUx,key2->dmFsdWUy,key3->dmFsdWUz,key4->dmFsdWU0";
     }
 
     private void initDetectors() {
         UUID uuid1 = UUID.fromString("fe1a2366-a73e-4c9d-9186-474e60df6de8");
         UUID uuid2 = UUID.fromString("65eea7d8-8ec3-4f8a-ab2c-7a9dc873723d");
+        UUID uuid3 = UUID.fromString("65eea7d8-8ec3-4f8a-ab2c-7a9dc8737231");
+        UUID uuid4 = UUID.fromString("fe1a2366-a73e-4c9d-9186-474e60df6de9");
+
         detectors = new ArrayList<>();
-        detectors.add(new Detector(uuid1));
-        detectors.add(new Detector(uuid2));
-
-        bunchOfDetectorIds = "fe1a2366-a73e-4c9d-9186-474e60df6de8|65eea7d8-8ec3-4f8a-ab2c-7a9dc873723d";
+        detectors.add(new Detector("ad-manager", uuid1));
+        detectors.add(new Detector("external-detector-1", uuid2));
+        detectors.add(new Detector("external-detector-2", uuid3));
+        detectors.add(new Detector("", uuid4));
+        cacheValue = "ad-manager,fe1a2366-a73e-4c9d-9186-474e60df6de8|external-detector-1,65eea7d8-8ec3-4f8a-ab2c-7a9dc873723d|external-detector-2,65eea7d8-8ec3-4f8a-ab2c-7a9dc8737231|,fe1a2366-a73e-4c9d-9186-474e60df6de9";
     }
-
 
     @Test
     public void getKey() {
         initMap();
-        Assert.assertEquals(tagKey, CacheUtil.getKey(tags));
+        Assert.assertEquals(cacheKey, CacheUtil.getKey(tags));
     }
 
     @Test
     public void getTags() {
         initMap();
-        Assert.assertEquals(tags, CacheUtil.getTags(tagKey));
+        Assert.assertEquals(tags, CacheUtil.getTags(cacheKey));
 
     }
 
     @Test
     public void getDetectorIds() {
         initDetectors();
-        Assert.assertEquals(bunchOfDetectorIds, CacheUtil.getDetectorIds(detectors));
+        Assert.assertEquals(cacheValue, CacheUtil.getDetectors(detectors));
     }
 
     @Test
     public void buildDetectors() {
         initDetectors();
-        Assert.assertEquals(detectors, CacheUtil.buildDetectors(bunchOfDetectorIds));
+        Assert.assertEquals(detectors, CacheUtil.buildDetectors(cacheValue));
         Assert.assertEquals(Collections.EMPTY_LIST, CacheUtil.buildDetectors(""));
     }
 }

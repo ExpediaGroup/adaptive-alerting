@@ -33,25 +33,38 @@ import java.util.stream.Collectors;
 @Slf4j
 public final class CacheUtil {
 
-    private static final String DELIMITER = "->";
+    private static final String CACHE_KEY_DELIMITER = "->";
+    private static final String CACHE_VALUE_DELIMITER = "|";
 
+    /**
+     * Converts a map to cache's key format
+     *
+     * @param tags A Map {k1=v1, k2=v2, k3=v3}
+     * @return Returns a string in this format {@literal "k1->v1,k2->v2,k3->v3"}
+     */
     public static String getKey(Map<String, String> tags) {
         List<String> listOfEntries = tags.entrySet()
                 .stream()
                 .map(entry -> {
                     String encodedValue = Base64.getEncoder().encodeToString(entry.getValue().getBytes());
-                    return entry.getKey() + DELIMITER + encodedValue;
+                    return entry.getKey() + CACHE_KEY_DELIMITER + encodedValue;
                 })
                 .sorted()
                 .collect(Collectors.toList());
         return String.join(",", listOfEntries);
     }
 
-    public static Map<String, String> getTags(String hashKey) {
-        String[] keyVals = hashKey.split(",");
+    /**
+     * Converts cache's key format to map
+     *
+     * @param key String {@literal "k1->v1,k2->v2,k3->v3"}
+     * @return Returns a map in this format {k1=v1, k2=v2, k3=v3}
+     */
+    public static Map<String, String> getTags(String key) {
+        String[] keyVals = key.split(",");
         Map<String, String> tags = new HashMap<>();
         Arrays.asList(keyVals).forEach(keyVal -> {
-            String[] kv = keyVal.split(DELIMITER);
+            String[] kv = keyVal.split(CACHE_KEY_DELIMITER);
             byte[] decodedValue = Base64.getDecoder().decode(kv[1]);
             String value = new String(decodedValue);
             tags.put(kv[0], value);
@@ -59,21 +72,34 @@ public final class CacheUtil {
         return tags;
     }
 
-    public static String getDetectorIds(List<Detector> detectors) {
+    /**
+     * Converts a list of detectors to cache's value format
+     *
+     * @param detectors A list of detectors [Detector(consumerId=c1, uuid=uuid1), Detector(consumerId=c2, uuid=uuid)]
+     * @return Returns a string in this format "c1,uuid1|c2,uuid2"
+     */
+    public static String getDetectors(List<Detector> detectors) {
         List<String> result = new ArrayList<>();
         detectors.forEach(detector -> {
-            result.add(detector.getUuid().toString());
+            result.add(detector.getConsumerId() + "," + detector.getUuid().toString());
         });
-        return String.join("|", result);
+        return String.join(CACHE_VALUE_DELIMITER, result);
     }
 
-    public static List<Detector> buildDetectors(String bunchOfDetectorIds) {
-        if (bunchOfDetectorIds == null || "".equals(bunchOfDetectorIds)) {
+    /**
+     * Converts cache's value format to list of detectors
+     *
+     * @param detectorsString A String "c1,uuid1|c2,uuid2"
+     * @return Returns a list of detectors in this format [Detector(consumerId=c1, uuid=uuid1), Detector(consumerId=c2, uuid=uuid)]
+     */
+    public static List<Detector> buildDetectors(String detectorsString) {
+        if (detectorsString == null || "".equals(detectorsString)) {
             return Collections.emptyList();
         }
-        String[] detectorList = bunchOfDetectorIds.split("\\|");
-        return Arrays.asList(detectorList).stream()
-                .map(detector -> new Detector(UUID.fromString(detector)))
+        String[] detectors = detectorsString.split("\\|");
+        return Arrays.asList(detectors).stream()
+                .map(detector -> new Detector(detector.split(",")[0], UUID.fromString(detector.split(",")[1]))) //update
                 .collect(Collectors.toList());
     }
+
 }

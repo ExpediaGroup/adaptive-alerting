@@ -43,6 +43,7 @@ public class PreDetectionFilterChain {
      * In this case, the filter <b>must</b> return a valid DetectorResult (because the Detector will not be invoked).
      *
      * @param metricData the MetricData
+     * @return Returns a detector result
      */
     public DetectorResult doFilter(MetricData metricData) {
         notNull(metricData, "metricData can't be null");
