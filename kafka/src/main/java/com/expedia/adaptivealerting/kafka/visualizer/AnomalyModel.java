@@ -18,7 +18,9 @@ package com.expedia.adaptivealerting.kafka.visualizer;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyThresholds;
 import com.expedia.metrics.TagCollection;
+import lombok.Generated;
 
+@Generated
 public class AnomalyModel extends Object {
 
     private String key;
