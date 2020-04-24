@@ -123,6 +123,6 @@ def consume_from_kafka(topic):
 
 
 if __name__ == '__main__':
-    #t = threading.Thread(target=consume_from_kafka, args=['anomalies'])
-    #t.start()
+    t = threading.Thread(target=consume_from_kafka, args=['anomalies'])
+    t.start()
     produce_to_kafka('aa-metrics')
