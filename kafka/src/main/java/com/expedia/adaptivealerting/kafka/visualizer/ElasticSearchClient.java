@@ -35,14 +35,17 @@ public class ElasticSearchClient {
     private static String HOST = "host";
     private static String ELASTIC_SEARCH_CONFIG = "elastic-search";
 
-    private RestHighLevelClient client = restClientBuilder(VisualizerUtility.getConfig(ELASTIC_SEARCH_CONFIG));
+    private RestHighLevelClient client;
+
+    public ElasticSearchClient() {
+        this.client = restClientBuilder(VisualizerUtility.getConfig(ELASTIC_SEARCH_CONFIG));
+    }
 
     public BulkResponse bulk(BulkRequest bulkRequest, RequestOptions requestOptions) throws IOException {
         return client.bulk(bulkRequest, requestOptions);
     }
 
-    private RestHighLevelClient restClientBuilder(Config elasticSearchConfig) {
-
+    protected RestHighLevelClient restClientBuilder(Config elasticSearchConfig) {
         RestHighLevelClient client = null;
         try {
             client = new RestHighLevelClient(

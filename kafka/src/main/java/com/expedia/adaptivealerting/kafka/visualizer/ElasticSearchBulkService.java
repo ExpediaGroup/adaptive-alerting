@@ -40,10 +40,10 @@ public class ElasticSearchBulkService implements Runnable{
 
     public ElasticSearchBulkService(List<AnomalyModel> anomalyModels) {
         this.anomalyModels = anomalyModels;
+        this.elasticSearchClient = new ElasticSearchClient();
     }
 
     private void execute() {
-
         BulkRequest bulkRequest = buildBulkRequest(this.anomalyModels);
         try {
             bulkResponse = elasticSearchClient.bulk(bulkRequest, RequestOptions.DEFAULT);

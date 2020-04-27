@@ -30,19 +30,12 @@ public class VisualizerUtilityTest {
         assertNotNull(config);
     }
 
-    @Test(expected = ConfigException.class)
-    public void testLoadWrongConfig() {
-        config = new TypesafeConfigLoader("test").loadMergedConfig();
-        assertNull(config);
-    }
-
     @Test
     public void testConvertJson() {
         AnomalyModel anomalyModel = AnomalyModel.newBuilder().build();
         assertNotNull(convertToJson(anomalyModel));
     }
 
-    @Test
     public void testConvertToDate() {
         long time = 1587665081L;
         String dateTime = convertToDate(time);
