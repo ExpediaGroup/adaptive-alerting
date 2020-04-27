@@ -54,7 +54,7 @@ public class AnomaliesProcessorTest {
         assertTrue(anomalyModels.size() == 0);
     }
 
-    public ConsumerRecords<String, MappedMetricData> buildMetricRecords(int no){
+    public static ConsumerRecords<String, MappedMetricData> buildMetricRecords(int no){
         TopicPartition topicPartition = new TopicPartition("test",2);
         List<ConsumerRecord<String,MappedMetricData>> consumerRecordList = new ArrayList<>();
         for (int i=0 ; i< no; i++) {
@@ -66,12 +66,12 @@ public class AnomaliesProcessorTest {
         return consumerRecords;
     }
 
-    public ConsumerRecord<String, MappedMetricData> buildConsumerRecord() {
+    public static ConsumerRecord<String, MappedMetricData> buildConsumerRecord() {
         ConsumerRecord<String, MappedMetricData> consumerRecord = new ConsumerRecord("", 1 , 2L,"key",buildMappedMetricData());
         return consumerRecord;
     }
 
-    public MappedMetricData buildMappedMetricData(){
+    public static MappedMetricData buildMappedMetricData(){
         MappedMetricData mappedMetricData = new MappedMetricData();
         mappedMetricData.setDetectorUuid(UUID.randomUUID());
         mappedMetricData.setMetricData(buildMetricData());
@@ -79,12 +79,12 @@ public class AnomaliesProcessorTest {
         return mappedMetricData;
     }
 
-    public MetricData buildMetricData() {
+    public static MetricData buildMetricData() {
         MetricData metricData = new MetricData(buildMetricDefinition(),1, 10000L);
         return metricData;
     }
 
-    public MetricDefinition buildMetricDefinition() {
+    public static MetricDefinition buildMetricDefinition() {
         HashMap<String,String> tags = new HashMap<>();
         tags.put("test", "tag");
         TagCollection tagCollection = new TagCollection(tags);
@@ -92,14 +92,14 @@ public class AnomaliesProcessorTest {
         return metricDefinition;
     }
 
-    public OutlierDetectorResult buildOutlierDetectorResult(){
+    public static OutlierDetectorResult buildOutlierDetectorResult(){
         OutlierDetectorResult outlierDetectorResult = new OutlierDetectorResult();
         outlierDetectorResult.setAnomalyLevel(AnomalyLevel.NORMAL);
         outlierDetectorResult.setThresholds(buildAnomalyThresholds());
         return outlierDetectorResult;
     }
 
-    public AnomalyThresholds buildAnomalyThresholds() {
+    public static AnomalyThresholds buildAnomalyThresholds() {
         return new AnomalyThresholds(20d,15d,10d,5d);
     }
 }
