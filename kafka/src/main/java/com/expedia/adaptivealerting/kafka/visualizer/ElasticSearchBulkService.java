@@ -16,20 +16,15 @@
 
 package com.expedia.adaptivealerting.kafka.visualizer;
 
-import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpHost;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
 
 import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.msgpack.core.annotations.VisibleForTesting;
 
-import java.io.IOException;
 import java.util.List;
 
 @Slf4j
