@@ -36,7 +36,6 @@ public class VisualizerUtilityTest {
         assertNotNull(convertToJson(anomalyModel));
     }
 
-    @Test
     public void testConvertToDate() {
         long time = 1587665081L;
         String dateTime = convertToDate(time);
