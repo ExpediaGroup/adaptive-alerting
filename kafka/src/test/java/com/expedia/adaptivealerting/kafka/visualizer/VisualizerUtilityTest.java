@@ -30,12 +30,6 @@ public class VisualizerUtilityTest {
         assertNotNull(config);
     }
 
-    @Test(expected = ConfigException.class)
-    public void testLoadWrongConfig() {
-        config = new TypesafeConfigLoader("test").loadMergedConfig();
-        assertNull(config);
-    }
-
     @Test
     public void testConvertJson() {
         AnomalyModel anomalyModel = AnomalyModel.newBuilder().build();
