@@ -36,6 +36,7 @@ public class VisualizerUtilityTest {
         assertNotNull(convertToJson(anomalyModel));
     }
 
+    @Test
     public void testConvertToDate() {
         long time = 1587665081L;
         String dateTime = convertToDate(time);
@@ -43,7 +44,8 @@ public class VisualizerUtilityTest {
         assertTrue(dateTime.contains("2020"));
         assertTrue(dateTime.contains("04"));
         assertTrue(dateTime.contains("23"));
-        assertTrue(dateTime.contains("13"));
+        assertTrue(dateTime.contains("18"));
+        assertTrue(dateTime.equalsIgnoreCase("2020-04-23T18:04:41.000+0000"));
     }
 
     @Test
@@ -57,5 +59,11 @@ public class VisualizerUtilityTest {
         assertTrue(properties.getProperty("group.id").equalsIgnoreCase("my-group"));
         assertTrue(properties.getProperty("value.deserializer")
                 .equalsIgnoreCase("com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde$Deser"));
+    }
+
+    @Test(expected = ConfigException.class)
+    public void testLoadWrongConfig() {
+        config = new TypesafeConfigLoader("test").loadMergedConfig();
+        assertNull(config);
     }
 }
