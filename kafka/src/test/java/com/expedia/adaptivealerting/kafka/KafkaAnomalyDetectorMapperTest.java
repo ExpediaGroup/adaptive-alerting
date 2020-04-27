@@ -181,13 +181,13 @@ public final class KafkaAnomalyDetectorMapperTest {
     private void initTestObjects() {
         this.metricData = TestObjectMother.metricData();
         UUID uuid = UUID.randomUUID();
-        this.detector = new Detector(uuid);
-        this.mappedMetricData = TestObjectMother.mappedMetricData(metricData, uuid);
+        this.detector = new Detector("ad-manager", uuid);
+        this.mappedMetricData = TestObjectMother.mappedMetricData(metricData, "ad-manager", uuid);
     }
 
     private void initLogAndFail() {
         // Topology test drivers
-        val topology = new KafkaAnomalyDetectorMapper(saConfig, mapper , new JmxReporterFactory()).buildTopology();
+        val topology = new KafkaAnomalyDetectorMapper(saConfig, mapper, new JmxReporterFactory()).buildTopology();
         this.logAndFailDriver = TestObjectMother.topologyTestDriver(topology, MetricDataJsonSerde.class, false);
     }
 

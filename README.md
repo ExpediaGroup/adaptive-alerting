@@ -16,6 +16,12 @@ To build the Maven project:
 $ ./mvnw clean verify
 ```
 
+To build the Docker images:
+
+```
+$ make docker_build
+```
+
 ### How the Travis CI build works
 
 We use Travis CI to build AA Docker images and push them to Docker Hub. Here's how it works:

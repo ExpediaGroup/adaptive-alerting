@@ -165,7 +165,7 @@ public class DetectorMappingControllerTest {
 
     private DetectorMapping mockDetectorMapping(String id) {
         DetectorMapping detectorMapping = mock(DetectorMapping.class);
-        Detector detector = new Detector(UUID.fromString(detectorUuid));
+        Detector detector = buildDetector(detectorUuid);
         User user = new User(userVal);
         when(detectorMapping.getDetector()).thenReturn(detector);
         when(detectorMapping.getId()).thenReturn(id);
@@ -177,7 +177,7 @@ public class DetectorMappingControllerTest {
     private List<DetectorMapping> mockDetectorMappingsList() {
         DetectorMapping detectorMapping = mock(DetectorMapping.class);
         List<DetectorMapping> detectorMappingsList = new ArrayList<>();
-        Detector detector = new Detector(UUID.fromString(detectorUuid));
+        Detector detector = buildDetector(detectorUuid);
         when(detectorMapping.getDetector()).thenReturn(detector);
         when(detectorMapping.getId()).thenReturn(id);
         when(detectorMapping.getUser()).thenReturn(new User(userVal));
@@ -188,9 +188,13 @@ public class DetectorMappingControllerTest {
     private MatchingDetectorsResponse mockMatchingDetectorsResponse(int lookupTime, String detectorUuid) {
         Map<Integer, List<Detector>> matchingDetectorsResponseMap = new HashMap<>();
         List<Detector> DetectorList = new ArrayList<>();
-        DetectorList.add(new Detector(UUID.fromString(detectorUuid)));
+        DetectorList.add(buildDetector(detectorUuid));
         matchingDetectorsResponseMap.put(1, DetectorList);
         MatchingDetectorsResponse matchingDetectorsResponse = new MatchingDetectorsResponse(matchingDetectorsResponseMap, lookupTime);
         return matchingDetectorsResponse;
+    }
+
+    private Detector buildDetector(String detectorUuid) {
+        return new Detector("cid", UUID.fromString(detectorUuid));
     }
 }

@@ -7,6 +7,7 @@ docker_build:
 	./docker/scripts/build-ad-manager.sh -b
 	./docker/scripts/build-a2a-mapper.sh -b
 	./docker/scripts/build-aa-metric-functions.sh -b
+	./docker/scripts/build-visualizer.sh -b
 integration_test:
 	${MAVEN} test
 
@@ -19,3 +20,4 @@ release: docker_build
 	./docker/scripts/build-ad-manager.sh --release
 	./docker/scripts/build-a2a-mapper.sh --release
 	./docker/scripts/build-aa-metric-functions.sh --release
+	./docker/scripts/build-visualizer.sh --release

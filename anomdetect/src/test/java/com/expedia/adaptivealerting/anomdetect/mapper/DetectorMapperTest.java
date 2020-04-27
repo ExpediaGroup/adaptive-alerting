@@ -1,18 +1,3 @@
-/*
- * Copyright 2018-2019 Expedia Group, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.expedia.adaptivealerting.anomdetect.mapper;
 
 import com.codahale.metrics.MetricRegistry;
@@ -138,8 +123,8 @@ public final class DetectorMapperTest {
         ));
 
         ArrayList<Detector> detectors = new ArrayList<>();
-        detectors.add(new Detector(UUID.fromString("fe1a2366-a73e-4c9d-9186-474e60df6de8")));
-        detectors.add(new Detector(UUID.fromString("65eea7d8-8ec3-4f8a-ab2c-7a9dc873723d")));
+        detectors.add(buildDetector("cid", "fe1a2366-a73e-4c9d-9186-474e60df6de8"));
+        detectors.add(buildDetector("cid", "65eea7d8-8ec3-4f8a-ab2c-7a9dc873723d"));
 
         Map<Integer, List<Detector>> groupedDetectorsBySearchIndex = ImmutableMap.of(0, detectors);
 
@@ -187,22 +172,22 @@ public final class DetectorMapperTest {
         listOfMetricTags.forEach(tags -> {
             MetricData metricData = new MetricData(new MetricDefinition(new TagCollection(tags)), 0.0, 1L);
 
-            List detector = detectorMapper.getDetectorsFromCache(metricData.getMetricDefinition());
+            List<Detector> detector = detectorMapper.getDetectorsFromCache(metricData.getMetricDefinition());
             if (!detector.isEmpty())
                 detectorResults.put(CacheUtil.getKey(tags), detector);
         });
 
         assertThat(detectorResults.size(), is(3));
-        assertThat(detectorResults, IsMapContaining.hasEntry("key->RHZGV1VodjI1aA==,name->NjFFS0JDcnd2SQ==", Collections.singletonList(new Detector(UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689")))));
-        assertThat(detectorResults, IsMapContaining.hasEntry("key->ZEFxYlpaVlBaOA==,name->ZmJXVGlSbHhrdA==", Collections.singletonList(new Detector(UUID.fromString("5eaa54e9-7406-4a1d-bd9b-e055eca1a423")))));
-        assertThat(detectorResults, IsMapContaining.hasEntry("name->aGl3,region->dXMtd2VzdC0y", Collections.singletonList(new Detector(UUID.fromString("d86b798c-cfee-4a2c-a17a-aa2ba79ccf51")))));
+        assertThat(detectorResults, IsMapContaining.hasEntry("key->RHZGV1VodjI1aA==,name->NjFFS0JDcnd2SQ==", Collections.singletonList(buildDetector("cid", "2c49ba26-1a7d-43f4-b70c-c6644a2c1689"))));
+        assertThat(detectorResults, IsMapContaining.hasEntry("key->ZEFxYlpaVlBaOA==,name->ZmJXVGlSbHhrdA==", Collections.singletonList(buildDetector("ad-manager", "5eaa54e9-7406-4a1d-bd9b-e055eca1a423"))));
+        assertThat(detectorResults, IsMapContaining.hasEntry("name->aGl3,region->dXMtd2VzdC0y", Collections.singletonList(buildDetector("", "d86b798c-cfee-4a2c-a17a-aa2ba79ccf51"))));
     }
 
     @Test
     public void detectorCacheUpdateTest() {
 
-        DetectorMapping disabledDetectorMapping = new DetectorMapping().setDetector(new Detector(UUID.fromString("2c49ba26-1a7d-43f4-b70c-c6644a2c1689"))).setEnabled(false);
-        DetectorMapping modifiedDetectorMapping = new DetectorMapping().setDetector(new Detector(UUID.fromString("4d49ba26-1a7d-43f4-b70c-ee644a2c1689"))).setEnabled(true);
+        DetectorMapping disabledDetectorMapping = new DetectorMapping().setDetector(buildDetector("cid", "2c49ba26-1a7d-43f4-b70c-c6644a2c1689")).setEnabled(false);
+        DetectorMapping modifiedDetectorMapping = new DetectorMapping().setDetector(buildDetector("cid", "4d49ba26-1a7d-43f4-b70c-ee644a2c1689")).setEnabled(true);
         List<DetectorMapping> updateDetectorMappings = Arrays.asList(disabledDetectorMapping, modifiedDetectorMapping);
 
         when(detectorSource.findUpdatedDetectorMappings(60)).thenReturn(updateDetectorMappings);
@@ -213,5 +198,9 @@ public final class DetectorMapperTest {
 
         verify(cache).removeDisabledDetectorMappings(Collections.singletonList(disabledDetectorMapping));
         verify(cache).invalidateMetricsWithOldDetectorMappings(Collections.singletonList(modifiedDetectorMapping));
+    }
+
+    private Detector buildDetector(String consumerId, String detectorUuid) {
+        return new Detector(consumerId, UUID.fromString(detectorUuid));
     }
 }

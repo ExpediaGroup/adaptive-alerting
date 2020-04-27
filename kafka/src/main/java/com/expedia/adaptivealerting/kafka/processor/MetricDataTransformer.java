@@ -144,12 +144,6 @@ class MetricDataTransformer implements Transformer<String, MetricData, KeyValue<
     }
 
     @Override
-    public KeyValue<String, MapperResult> punctuate(long timestamp) {
-        return null;
-    }
-
-
-    @Override
     public void close() {
     }
 }

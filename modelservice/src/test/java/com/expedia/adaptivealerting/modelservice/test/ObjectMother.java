@@ -135,15 +135,6 @@ public class ObjectMother {
                 .setLastUpdateTimestamp(DateUtil.toUtcDate("2019-04-06 22:00:00"));
     }
 
-    public DetectorMapping getDetectorMapping() {
-        DetectorMapping detectorMapping = new DetectorMapping();
-        detectorMapping.setCreatedTimeInMillis(10000);
-        detectorMapping.setEnabled(true);
-        detectorMapping.setUser(new User("test-user"));
-        detectorMapping.setDetector(new Detector(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639")));
-        return detectorMapping;
-    }
-
     public PercolatorDetectorMapping getPercolatorDetectorMapping() {
         PercolatorDetectorMapping percolatorDetectorMapping = new PercolatorDetectorMapping();
         Query query = new Query();
@@ -160,14 +151,14 @@ public class ObjectMother {
         percolatorDetectorMapping.setEnabled(true);
         percolatorDetectorMapping.setLastModifiedTimeInMillis(1554828886);
         percolatorDetectorMapping.setUser(new User("test-user"));
-        percolatorDetectorMapping.setDetector(new Detector(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639")));
+        percolatorDetectorMapping.setDetector(buildDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639"));
         percolatorDetectorMapping.setQuery(query);
         return percolatorDetectorMapping;
     }
 
     public MatchingDetectorsResponse getMatchingDetectorsResponse() {
         Map<Integer, List<Detector>> groupedDetectorsByIndex = new HashMap<>();
-        Detector detector = new Detector(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"));
+        Detector detector = buildDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639");
         List<Detector> detectors = new ArrayList<>();
         detectors.add(detector);
         groupedDetectorsByIndex.put(0, detectors);
@@ -204,6 +195,10 @@ public class ObjectMother {
         tags.put("lob", "hotel");
         tags.put("pos", "expedia-com");
         return tags;
+    }
+
+    private Detector buildDetector(String detectorUuid) {
+        return new Detector("cid", UUID.fromString(detectorUuid));
     }
 }
 

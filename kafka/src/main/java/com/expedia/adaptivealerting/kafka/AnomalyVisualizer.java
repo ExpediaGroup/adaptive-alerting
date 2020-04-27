@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.mapper;
+package com.expedia.adaptivealerting.kafka;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.expedia.adaptivealerting.kafka.visualizer.AnomalyConsumer;
+import lombok.Generated;
+import lombok.extern.slf4j.Slf4j;
 
-import java.util.UUID;
+@Slf4j
+public class AnomalyVisualizer {
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class Detector {
-    private String consumerId;
-    private UUID uuid;
+    @Generated
+    public static void main(String[] args) {
+        new AnomalyConsumer().listen();
+    }
 }
+
+
