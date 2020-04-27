@@ -42,6 +42,7 @@ import org.mockito.MockitoAnnotations;
 import java.util.Collections;
 import java.util.UUID;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -53,9 +54,11 @@ import static org.mockito.Mockito.when;
 public final class KafkaAnomalyDetectorMapperTest {
     private static final String KAFKA_KEY = "some-kafka-key";
     private static final String INPUT_TOPIC = "metrics";
-    private static final String OUTPUT_TOPIC = "mapped-metrics";
+    private static final String DEFAULT_OUTPUT_TOPIC = "mapped-metrics";
     private static final String INVALID_INPUT_VALUE = "invalid-input-value";
-    private static final String stateStoreName = "es-request-buffer";
+    private static final String STATE_STORE_NAME = "es-request-buffer";
+    private static final String INTERNAL_DETECTOR_CONSUMER_ID = "ad-manager";
+    private static final String EXTERNAL_DETECTOR_CONSUMER_ID = "external-detector";
 
     @Mock
     private DetectorMapper mapper;
@@ -69,6 +72,7 @@ public final class KafkaAnomalyDetectorMapperTest {
     // Test objects
     private MetricData metricData;
     private MappedMetricData mappedMetricData;
+    private MappedMetricData externalDetectorMappedMetricData;
 
     // Test machinery
     private TopologyTestDriver logAndFailDriver;
@@ -78,6 +82,7 @@ public final class KafkaAnomalyDetectorMapperTest {
     private StringDeserializer stringDeser;
     private Deserializer<MappedMetricData> mmdDeser;
     private Detector detector;
+    private Detector externalDetector;
     private KeyValueStore<String, MetricData> kvStore;
 
     @Before
@@ -97,10 +102,27 @@ public final class KafkaAnomalyDetectorMapperTest {
         logAndFailDriver.pipeInput(metricDataFactory.create(INPUT_TOPIC, KAFKA_KEY, metricData));
 
         // The streams app remaps the key to the detector UUID. [WLW]
-        val outputRecord = logAndFailDriver.readOutput(OUTPUT_TOPIC, stringDeser, mmdDeser);
+        val outputRecord = logAndFailDriver.readOutput(DEFAULT_OUTPUT_TOPIC, stringDeser, mmdDeser);
         log.trace("outputRecord={}", outputRecord);
         val outputKafkaKey = mappedMetricData.getDetectorUuid().toString();
         OutputVerifier.compareKeyValue(outputRecord, outputKafkaKey, mappedMetricData);
+        assertEquals(DEFAULT_OUTPUT_TOPIC, outputRecord.topic());
+        logAndFailDriver.close();
+    }
+
+    @Test
+    public void testMetricDataToExternalDetectorMappedMetricData() {
+        initLogAndFail();
+        when(mapper.getDetectorsFromCache(any(MetricDefinition.class)))
+                .thenReturn(Collections.singletonList(externalDetector));
+
+        logAndFailDriver.pipeInput(metricDataFactory.create(INPUT_TOPIC, KAFKA_KEY, metricData));
+        String externalDetectorKafkaTopic = DEFAULT_OUTPUT_TOPIC + "-" + EXTERNAL_DETECTOR_CONSUMER_ID;
+        val outputRecord = logAndFailDriver.readOutput(externalDetectorKafkaTopic, stringDeser, mmdDeser);
+        val outputKafkaKey = externalDetectorMappedMetricData.getDetectorUuid().toString();
+        log.info("outputRecord={}", outputRecord);
+        OutputVerifier.compareKeyValue(outputRecord, outputKafkaKey, externalDetectorMappedMetricData);
+        assertEquals(externalDetectorKafkaTopic, outputRecord.topic());
         logAndFailDriver.close();
     }
 
@@ -132,10 +154,10 @@ public final class KafkaAnomalyDetectorMapperTest {
         initLogAndContinue();
 
         logAndContinueDriver.pipeInput(metricDataFactory.create(INPUT_TOPIC, "key-1", TestObjectMother.metricData()));
-        kvStore = logAndContinueDriver.getKeyValueStore(stateStoreName);
-        Assert.assertEquals(kvStore.approximateNumEntries(), 1);
+        kvStore = logAndContinueDriver.getKeyValueStore(STATE_STORE_NAME);
+        assertEquals(kvStore.approximateNumEntries(), 1);
 
-        val outputRecord = logAndContinueDriver.readOutput(OUTPUT_TOPIC, stringDeser, mmdDeser);
+        val outputRecord = logAndContinueDriver.readOutput(DEFAULT_OUTPUT_TOPIC, stringDeser, mmdDeser);
         Assert.assertNull(outputRecord);
         logAndContinueDriver.close();
     }
@@ -146,8 +168,8 @@ public final class KafkaAnomalyDetectorMapperTest {
 
         logAndContinueDriver.pipeInput(metricDataFactory.create(INPUT_TOPIC, "key-1", TestObjectMother.metricData()));
         logAndContinueDriver.pipeInput(metricDataFactory.create(INPUT_TOPIC, "key-1", TestObjectMother.metricData()));
-        kvStore = logAndContinueDriver.getKeyValueStore(stateStoreName);
-        Assert.assertEquals(kvStore.approximateNumEntries(), 2);
+        kvStore = logAndContinueDriver.getKeyValueStore(STATE_STORE_NAME);
+        assertEquals(kvStore.approximateNumEntries(), 2);
 
         logAndContinueDriver.close();
     }
@@ -162,11 +184,11 @@ public final class KafkaAnomalyDetectorMapperTest {
 
         logAndContinueDriver.pipeInput(metricDataFactory.create(INPUT_TOPIC, "key-1", TestObjectMother.metricData()));
         logAndContinueDriver.pipeInput(metricDataFactory.create(INPUT_TOPIC, "key-1", TestObjectMother.metricData()));
-        kvStore = logAndContinueDriver.getKeyValueStore(stateStoreName);
-        val outputRecord = logAndContinueDriver.readOutput(OUTPUT_TOPIC, stringDeser, mmdDeser);
+        kvStore = logAndContinueDriver.getKeyValueStore(STATE_STORE_NAME);
+        val outputRecord = logAndContinueDriver.readOutput(DEFAULT_OUTPUT_TOPIC, stringDeser, mmdDeser);
 
         OutputVerifier.compareKeyValue(outputRecord, detector.getUuid().toString(), mappedMetricData);
-        Assert.assertEquals(kvStore.approximateNumEntries(), 0);
+        assertEquals(kvStore.approximateNumEntries(), 0);
 
         logAndContinueDriver.close();
     }
@@ -175,14 +197,16 @@ public final class KafkaAnomalyDetectorMapperTest {
     private void initConfig() {
         when(saConfig.getTypesafeConfig()).thenReturn(tsConfig);
         when(saConfig.getInputTopic()).thenReturn(INPUT_TOPIC);
-        when(saConfig.getOutputTopic()).thenReturn(OUTPUT_TOPIC);
+        when(saConfig.getOutputTopic()).thenReturn(DEFAULT_OUTPUT_TOPIC);
     }
 
     private void initTestObjects() {
         this.metricData = TestObjectMother.metricData();
         UUID uuid = UUID.randomUUID();
-        this.detector = new Detector("ad-manager", uuid);
-        this.mappedMetricData = TestObjectMother.mappedMetricData(metricData, "ad-manager", uuid);
+        this.detector = new Detector(INTERNAL_DETECTOR_CONSUMER_ID, uuid);
+        this.externalDetector = new Detector(EXTERNAL_DETECTOR_CONSUMER_ID, uuid);
+        this.mappedMetricData = TestObjectMother.mappedMetricData(metricData, INTERNAL_DETECTOR_CONSUMER_ID, uuid);
+        this.externalDetectorMappedMetricData = TestObjectMother.mappedMetricData(metricData, EXTERNAL_DETECTOR_CONSUMER_ID, uuid);
     }
 
     private void initLogAndFail() {
@@ -213,7 +237,7 @@ public final class KafkaAnomalyDetectorMapperTest {
 
     private void nullOnDeserException(TopologyTestDriver driver) {
         driver.pipeInput(stringFactory.create(INPUT_TOPIC, KAFKA_KEY, INVALID_INPUT_VALUE));
-        val record = driver.readOutput(OUTPUT_TOPIC, stringDeser, mmdDeser);
+        val record = driver.readOutput(DEFAULT_OUTPUT_TOPIC, stringDeser, mmdDeser);
         Assert.assertNull(record);
     }
 }
