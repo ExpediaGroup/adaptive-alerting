@@ -57,7 +57,9 @@ public class DetectorClient {
     // TODO Shouldn't these also include the /api/v2 prefix? [WLW]
     static final String FIND_MAPPINGS_BY_TAGS_PATH = "/api/detectorMappings/findMatchingByTags";
     static final String FIND_UPDATED_MAPPINGS_PATH = "/api/detectorMappings/lastUpdated?timeInSecs=%d";
+    static final String FIND_UPDATED_SINCE_MAPPINGS_PATH = "/api/detectorMappings/updatedSince?lastModifiedTime=%d";
     static final String FIND_MAPPINGS_BY_UUID_PATH = "/api/detectorMappings/search";
+    static final String GET_ENABLED_MAPPINGS_PATH = "/api/detectorMappings/count";
 
 
     @NonNull
@@ -108,6 +110,8 @@ public class DetectorClient {
 
         return document;
     }
+
+    
 
     /**
      * @param timeInSecs the time period in seconds
@@ -163,6 +167,44 @@ public class DetectorClient {
             val message = "IOException while reading detectorMatchResponse: tags=" + tagsList;
             throw new DetectorException(message, e);
         }
+    }
+
+    /**
+     * Find detector mappings updated since timestamp.
+     *
+     * @param lastModifiedTime the last modified timestamp in milliseconds
+     * @return the list of detectormappings that were modified in last since minutes
+     */
+    public List<DetectorMapping> findDetectorMappingsUpdatedSince(long lastModifiedTime) {
+        Content content;
+        List<DetectorMapping> result;
+
+        val uri = String.format(baseUri + FIND_UPDATED_SINCE_MAPPINGS_PATH, lastModifiedTime);
+        try {
+            content = httpClient.get(uri);
+        } catch (IOException e) {
+            val message = "IOException while getting updated detectors mappings" +
+                    ": lastModifiedTime=" + lastModifiedTime +
+                    ", httpMethod=GET" +
+                    ", uri=" + uri;
+            throw new DetectorException(message, e);
+        }
+
+        val typeRef = new TypeReference<List<DetectorMapping>>() {
+        };
+        try {
+            result = objectMapper.readValue(content.asBytes(), typeRef);
+        } catch (IOException e) {
+            val message = "IOException while reading updated detectors mappings" +
+                    ": lastModifiedTime=" + lastModifiedTime;
+            throw new DetectorException(message, e);
+        }
+
+        if (result == null) {
+            throw new DetectorException("Updated since detector mappings are null");
+        }
+
+        return result;
     }
 
     /**
@@ -240,6 +282,31 @@ public class DetectorClient {
                     ": uuid=" + uuid);
         }
         return result.get(0);
+    }
+
+ /**
+     * Gets the total count of detector mappings
+     *
+     * @return Detector mapping count
+     */
+    public long getEnabledDetectorMappingCount () {
+        Content content;
+        long result = 0;
+
+        val uri = String.format(baseUri + GET_ENABLED_MAPPINGS_PATH);
+        try {
+            content = httpClient.get(uri);
+        } catch (IOException e) {
+            val message = "IOException while getting detector mapping count, uri=" + uri;
+            throw new DetectorException(message, e);
+        }
+        try {
+            result = objectMapper.readValue(content.asBytes(), long.class);
+        } catch (IOException e) {
+            val message = "IOException while reading detector mappings count";
+            throw new DetectorException(message, e);
+        }
+        return result;
     }
 
 }
