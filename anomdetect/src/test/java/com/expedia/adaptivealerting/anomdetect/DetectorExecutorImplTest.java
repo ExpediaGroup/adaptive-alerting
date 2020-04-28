@@ -16,22 +16,24 @@
 package com.expedia.adaptivealerting.anomdetect;
 
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
+import com.expedia.adaptivealerting.anomdetect.detect.DetectorContainer;
+import com.expedia.adaptivealerting.anomdetect.detect.DetectorRequest;
+import com.expedia.adaptivealerting.anomdetect.detect.DetectorResponse;
 import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
-import com.expedia.adaptivealerting.anomdetect.detect.FilterableDetector;
-import com.expedia.adaptivealerting.anomdetect.filter.PostDetectionFilter;
-import com.expedia.adaptivealerting.anomdetect.filter.PreDetectionFilter;
-import com.expedia.adaptivealerting.anomdetect.filter.chain.PostDetectionFilterChain;
-import com.expedia.adaptivealerting.anomdetect.filter.chain.PreDetectionFilterChain;
+import com.expedia.adaptivealerting.anomdetect.filter.DetectionFilter;
+import com.expedia.adaptivealerting.anomdetect.filter.chain.DetectionFilterChain;
 import com.expedia.metrics.MetricData;
+import com.google.common.collect.ImmutableList;
+import lombok.val;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -39,44 +41,53 @@ public class DetectorExecutorImplTest {
 
     private DetectorExecutorImpl executorUnderTest = new DetectorExecutorImpl();
     @Mock
-    private FilterableDetector filterableDetector;
-    @Mock
     private Detector detector;
     @Mock
     private MetricData metricData;
     @Mock
-    private PreDetectionFilter preDetectionFilter;
-    @Mock
-    private PostDetectionFilter postDetectionFilter;
+    private DetectionFilter detectionFilter;
     @Mock
     private DetectorResult detectorResult;
+    @Mock
+    private DetectorContainer detectorContainer;
+    @Mock
+    private DetectorRequest detectorRequest;
+    @Mock
+    private DetectorResponse detectorResponse;
+
+    @Before
+    public void setUp() {
+        initDependencies();
+    }
 
     @Test
     public void doDetectionWithFiltering() {
-        when(filterableDetector.getPreDetectionFilters()).thenReturn(singletonList(preDetectionFilter));
-        when(filterableDetector.getPostDetectionFilters()).thenReturn(singletonList(postDetectionFilter));
-        when(preDetectionFilter.doFilter(same(metricData), any(PreDetectionFilterChain.class))).thenReturn(detectorResult);
-        when(postDetectionFilter.doFilter(same(detectorResult), any(PostDetectionFilterChain.class))).thenReturn(detectorResult);
-        DetectorResult actualResult = executorUnderTest.doDetectionWithOptionalFiltering(filterableDetector, metricData);
-        assertSame(this.detectorResult, actualResult);
-    }
+        when(detectorContainer.getFilters()).thenReturn(ImmutableList.of(detectionFilter));
+        val filterChain = new DetectionFilterChain(detectorContainer);
 
-    @Test(expected = IllegalArgumentException.class)
-    public void doDetectionWithFiltering_failsWithNullPreFilterList() {
-        when(filterableDetector.getPreDetectionFilters()).thenReturn(null);
-        executorUnderTest.doDetectionWithOptionalFiltering(filterableDetector, metricData);
-    }
+        doAnswer(invocation -> {
+            DetectorResponse response = invocation.getArgument(1);
+            response.setDetectorResult(detectorResult);
+            return null;
+        }).when(detectionFilter).doFilter(any(DetectorRequest.class), any(DetectorResponse.class), any(DetectionFilterChain.class));
 
-    @Test(expected = IllegalArgumentException.class)
-    public void doDetectionWithFiltering_failsWithNullPostFilterList() {
-        when(filterableDetector.getPostDetectionFilters()).thenReturn(null);
-        executorUnderTest.doDetectionWithOptionalFiltering(filterableDetector, metricData);
+        DetectorResult actualResult = executorUnderTest.doDetection(detectorContainer, metricData);
+        assertSame(detectorResult, actualResult);
     }
 
     @Test
     public void doDetectionWithNoFiltering() {
+        DetectorResult actualResult = executorUnderTest.doDetection(detectorContainer, metricData);
+        assertSame(detectorResult, actualResult);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void nullMetricDataNotAllowed() {
+        executorUnderTest.doDetection(detectorContainer, null);
+    }
+
+    private void initDependencies() {
+        when(detectorContainer.getDetector()).thenReturn(detector);
         when(detector.detect(metricData)).thenReturn(detectorResult);
-        DetectorResult actualResult = executorUnderTest.doDetectionWithOptionalFiltering(detector, metricData);
-        assertSame(this.detectorResult, actualResult);
     }
 }

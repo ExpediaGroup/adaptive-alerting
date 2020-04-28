@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.anomdetect.source;
 
-import com.expedia.adaptivealerting.anomdetect.detect.Detector;
 import com.expedia.adaptivealerting.anomdetect.DetectorManager;
+import com.expedia.adaptivealerting.anomdetect.detect.DetectorContainer;
 import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMapper;
 import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMapping;
 import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMatchResponse;
@@ -74,7 +74,7 @@ public interface DetectorSource {
      * @return The associated detector.
      * @throws DetectorException if there's a problem while trying to finding the detector
      */
-    Detector findDetector(UUID uuid);
+    DetectorContainer findDetector(UUID uuid);
 
     /**
      * Finds the list of detector UUIDs updated in last {@code timePeriod} seconds. This allows the Detector Manager to

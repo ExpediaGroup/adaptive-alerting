@@ -41,7 +41,7 @@ public class AssertUtil {
     public static void notNull(Object o, String message) {
         isTrue(o != null, message);
         // TODO: Replace with: java.util.Objects.requireNonNull(o, message);
-        // TODO: Overload with single argument method that doesn't require a message and delgated to: java.util.Objects.requireNonNull(o);
+        // TODO: Overload with single argument method that doesn't require a message and delegates to: java.util.Objects.requireNonNull(o);
     }
 
     public static void isEqual(int v1, int v2, String message) {

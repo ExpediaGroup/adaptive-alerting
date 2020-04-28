@@ -13,16 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect;
+package com.expedia.adaptivealerting.anomdetect.detect;
 
-import com.expedia.adaptivealerting.anomdetect.detect.DetectorContainer;
-import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
 import com.expedia.metrics.MetricData;
 import lombok.NonNull;
 
-public interface DetectorExecutor {
-    DetectorResult doDetection(DetectorContainer detector, @NonNull MetricData metricData);
-    // I would have expected a method declaration here -- something related to the fact that this is an execution contract.
-    //
-    //Would it make sense to just bake pre- and post-filters into the overall processing pipeline (kind of like how servlets do)?
+public class DetectorRequest {
+    private MetricData metricData;
+
+    public DetectorRequest(@NonNull MetricData metricData) {
+        this.metricData = metricData;
+    }
+
+    public MetricData getMetricData() {
+        return this.metricData;
+    }
 }

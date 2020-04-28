@@ -13,26 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.filter;
+package com.expedia.adaptivealerting.anomdetect.util;
 
-import lombok.Data;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.val;
+import org.junit.Test;
 
-import java.util.Collections;
-import java.util.List;
+import static org.junit.Assert.*;
 
-@Data
-@RequiredArgsConstructor
-public class DetectionFilters {
-    @NonNull
-    private List<PreDetectionFilter> preDetectionFilters;
+public class DetectorDocumentParserUtilTest {
 
-    @NonNull
-    private List<PostDetectionFilter> postDetectionFilters;
-
-    public DetectionFilters() {
-        this.preDetectionFilters = Collections.emptyList();
-        this.postDetectionFilters = Collections.emptyList();
+    @Test
+    public void parseFilters() {
+        val objectMapper = new ObjectMapper();
+        val fruits = new String[]{"apple", "banana", "cherry", "tomato"};
+        val result = ObjectMapperUtil.writeValueAsString(objectMapper, fruits);
+        assertEquals("[ \"apple\", \"banana\", \"cherry\", \"tomato\" ]", result);
     }
 }

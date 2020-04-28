@@ -20,6 +20,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
+import com.expedia.adaptivealerting.anomdetect.detect.DetectorContainer;
 import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
@@ -45,6 +46,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
+import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
+
 /**
  * Component that manages a given set of anomaly detectors.
  * <p>
@@ -52,7 +55,7 @@ import java.util.function.Function;
  * This cache is kept up-to-date by polling modelservice for changes.
  * <p>
  * An alternative event-based approach to keep cache updated is to compare last-modified timestamp of a detector.
- * This approach however doesn't provide a way to delete an existing detector .
+ * This approach however doesn't provide a way to delete an existing detector.
  */
 @RequiredArgsConstructor
 @Slf4j
@@ -68,7 +71,7 @@ public class DetectorManager {
 
     // TODO Consider making this an explicit class so we can mock it and verify interactions
     //  against it. [WLW]
-    private final Map<UUID, Detector> cachedDetectors;
+    private final Map<UUID, DetectorContainer> cachedDetectors;
     @Getter
     @NonNull
     private DetectorSource detectorSource;
@@ -89,7 +92,7 @@ public class DetectorManager {
     public DetectorManager(DetectorSource detectorSource,
                            DataInitializer dataInitializer,
                            Config config,
-                           Map<UUID, Detector> cachedDetectors,
+                           Map<UUID, DetectorContainer> cachedDetectors,
                            MetricRegistry metricRegistry) {
         // TODO: Seems odd to include this constructor, whose purpose seems to be to support unit testing.
         //  At least I don't think it should be public.
@@ -135,10 +138,10 @@ public class DetectorManager {
     public DetectorResult detect(@NonNull MappedMetricData mappedMetricData) {
         try {
             MDC.put("DetectorUuid", mappedMetricData.getDetectorUuid().toString());
-            Optional<Detector> detector = getDetector(mappedMetricData);
-            if (detector.isPresent()) {
-                val metricData = mappedMetricData.getMetricData();
-                Optional<DetectorResult> optionalDetectorResult = doDetection(detector.get(), metricData);
+            checkMappedMetricData(mappedMetricData);
+            Optional<DetectorContainer> container = getDetector(mappedMetricData);
+            if (container.isPresent()) {
+                Optional<DetectorResult> optionalDetectorResult = doDetection(container.get(), mappedMetricData.getMetricData());
                 return optionalDetectorResult.orElse(null);
             } else {
                 return null;
@@ -148,8 +151,8 @@ public class DetectorManager {
         }
     }
 
-    private Optional<Detector> getDetector(@NonNull MappedMetricData mappedMetricData) {
-        Optional<Detector> optionalDetector = detectorFor(mappedMetricData);
+    private Optional<DetectorContainer> getDetector(MappedMetricData mappedMetricData) {
+        Optional<DetectorContainer> optionalDetector = detectorFor(mappedMetricData);
         if (!optionalDetector.isPresent()) {
             log.warn("No detector for mappedMetricData={}", mappedMetricData);
             noDetectorFoundMeter.mark();
@@ -157,26 +160,30 @@ public class DetectorManager {
         return optionalDetector;
     }
 
-    private Optional<Detector> detectorFor(@NonNull MappedMetricData mappedMetricData) {
+    private Optional<DetectorContainer> detectorFor(MappedMetricData mappedMetricData) {
         try (Timer.Context autoClosable = detectorForTimer.time()) {
             val detectorUuid = mappedMetricData.getDetectorUuid();
-            Detector detector = cachedDetectors.get(detectorUuid);
-            if (detector == null) {
-                detector = detectorSource.findDetector(detectorUuid);
-                return initDataAndCacheIfSuccessful(mappedMetricData, detectorUuid, detector);
+            DetectorContainer container = cachedDetectors.get(detectorUuid);
+            if (container == null) {
+                container = detectorSource.findDetector(detectorUuid);
+                return (container == null) ? Optional.empty()
+                        : initDataAndCacheIfSuccessful(mappedMetricData, detectorUuid, container);
             } else {
                 log.trace("Got cached detector");
-                return Optional.of(detector);
+                return Optional.of(container);
             }
         }
     }
 
-    private Optional<Detector> initDataAndCacheIfSuccessful(@NonNull MappedMetricData mappedMetricData, @NonNull UUID detectorUuid, Detector detector) {
-        boolean dataInitCompleted = attemptDataInitialization(mappedMetricData, detector);
+    private Optional<DetectorContainer> initDataAndCacheIfSuccessful(MappedMetricData mappedMetricData,
+                                                                     UUID detectorUuid,
+                                                                     DetectorContainer container) {
+        // NPE HERE
+        boolean dataInitCompleted = attemptDataInitialization(mappedMetricData, container.getDetector());
         if (dataInitCompleted) {
-            cachedDetectors.put(detectorUuid, detector);
+            cachedDetectors.put(detectorUuid, container);
             log.debug("Data Initialization phase is complete.  Caching detector.");
-            return Optional.ofNullable(detector);
+            return Optional.ofNullable(container);
         } else {
             log.debug("Data Initialization incomplete.  Discarding detector from memory to allow future re-attempts.");
             return Optional.empty();
@@ -199,16 +206,16 @@ public class DetectorManager {
         return dataInitCompleted;
     }
 
-    private Optional<DetectorResult> doDetection(@NonNull Detector detector, @NonNull MetricData metricData) {
-        try (Timer.Context autoClosable = detectTimer.apply(detector.getName()).time()) {
+    private Optional<DetectorResult> doDetection(DetectorContainer container, MetricData metricData) {
+        try (Timer.Context autoClosable = detectTimer.apply(container.getName()).time()) {
             Optional<DetectorResult> optionalDetectorResult = Optional.empty();
             try {
-                DetectorResult detectorResult = detectorExecutor.doDetectionWithOptionalFiltering(detector, metricData);
+                DetectorResult detectorResult = detectorExecutor.doDetection(container, metricData);
                 optionalDetectorResult = Optional.of(detectorResult);
             } catch (Exception e) {
                 log.error("Error during anomaly detection", e);
             } finally {
-                markAnomalyLevelMeter(detector, optionalDetectorResult);
+                markAnomalyLevelMeter(container.getDetector(), optionalDetectorResult);
             }
             return optionalDetectorResult;
         }
@@ -222,6 +229,11 @@ public class DetectorManager {
     public Meter getDetectorAndLevelMeter(String name, AnomalyLevel anomalyLevel) {
         String anomalyLevelStr = (anomalyLevel == null) ? "NONE" : anomalyLevel.name();
         return metricRegistry.meter("detector." + name + "." + anomalyLevelStr);
+    }
+
+    private void checkMappedMetricData(MappedMetricData mappedMetricData) {
+        notNull(mappedMetricData.getMetricData(), "MappedMetricData contains illegal metricData=null");
+        notNull(mappedMetricData.getDetectorUuid(), "MappedMetricData contains illegal detectorUuid=null");
     }
 
     /**

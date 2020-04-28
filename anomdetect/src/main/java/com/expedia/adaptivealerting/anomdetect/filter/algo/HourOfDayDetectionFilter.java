@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.filter.algo.pre;
+package com.expedia.adaptivealerting.anomdetect.filter.algo;
 
-import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
+import com.expedia.adaptivealerting.anomdetect.detect.DetectorRequest;
+import com.expedia.adaptivealerting.anomdetect.detect.DetectorResponse;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
-import com.expedia.adaptivealerting.anomdetect.filter.PreDetectionFilter;
-import com.expedia.adaptivealerting.anomdetect.filter.chain.PreDetectionFilterChain;
+import com.expedia.adaptivealerting.anomdetect.filter.DetectionFilter;
+import com.expedia.adaptivealerting.anomdetect.filter.chain.DetectionFilterChain;
 import com.expedia.adaptivealerting.anomdetect.util.DateUtil;
 import com.expedia.metrics.MetricData;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -45,7 +46,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.DateUtil.isBetweenHou
 @Data
 @NoArgsConstructor
 @Setter(AccessLevel.NONE)
-public class HourOfDayDetectionFilter implements PreDetectionFilter {
+public class HourOfDayDetectionFilter implements DetectionFilter {
 
     private int utcStartHour;
     private int utcEndHour;
@@ -59,13 +60,16 @@ public class HourOfDayDetectionFilter implements PreDetectionFilter {
     }
 
     @Override
-    public DetectorResult doFilter(MetricData metricData, PreDetectionFilterChain chain) {
-        notNull(metricData, "metricData can't be null");
-        if (metricTimeFallsWithinFilter(metricData)) {
+    public void doFilter(DetectorRequest detectorRequest, DetectorResponse detectorResponse, DetectionFilterChain chain) {
+        notNull(detectorRequest, "metricData can't be null");
+        if (metricTimeFallsWithinFilter(detectorRequest.getMetricData())) {
             // Metric passes time filter - pass it along to the detector/next filter
-            return chain.doFilter(metricData);
+            chain.doFilter(detectorRequest, detectorResponse);
+        } else {
+            // Metric fails time filter - set empty response and abort chain
+            OutlierDetectorResult emptyResult = new OutlierDetectorResult();
+            detectorResponse.setDetectorResult(emptyResult);
         }
-        return new OutlierDetectorResult();
     }
 
     private boolean metricTimeFallsWithinFilter(MetricData metricData) {

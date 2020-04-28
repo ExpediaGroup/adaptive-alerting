@@ -15,11 +15,12 @@
  */
 package com.expedia.adaptivealerting.anomdetect.filter;
 
-import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
-import com.expedia.adaptivealerting.anomdetect.filter.algo.pre.HourOfDayDetectionFilter;
-import com.expedia.adaptivealerting.anomdetect.filter.algo.pre.PassThroughPreDetectionFilter;
-import com.expedia.adaptivealerting.anomdetect.filter.chain.PreDetectionFilterChain;
-import com.expedia.metrics.MetricData;
+import com.expedia.adaptivealerting.anomdetect.detect.DetectorRequest;
+import com.expedia.adaptivealerting.anomdetect.detect.DetectorResponse;
+import com.expedia.adaptivealerting.anomdetect.filter.algo.MOfNAggregationFilter;
+import com.expedia.adaptivealerting.anomdetect.filter.algo.HourOfDayDetectionFilter;
+import com.expedia.adaptivealerting.anomdetect.filter.algo.PassThroughDetectionFilter;
+import com.expedia.adaptivealerting.anomdetect.filter.chain.DetectionFilterChain;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -31,9 +32,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         property = "type")
 @JsonSubTypes({
         @JsonSubTypes.Type(value = HourOfDayDetectionFilter.class, name = "hourOfDayPreDetectionFilter"),
-        @JsonSubTypes.Type(value = PassThroughPreDetectionFilter.class, name = "passThroughPreDetectionFilter"),
+        @JsonSubTypes.Type(value = MOfNAggregationFilter.class, name = "mOfNAggregationFilter"),
+        @JsonSubTypes.Type(value = PassThroughDetectionFilter.class, name = "passThroughDetectionFilter"),
 })
-public interface PreDetectionFilter {
-
-    DetectorResult doFilter(MetricData metricData, PreDetectionFilterChain chain);
+public interface DetectionFilter {
+    void doFilter(DetectorRequest detectorRequest, DetectorResponse detectorResponse, DetectionFilterChain chain);
 }

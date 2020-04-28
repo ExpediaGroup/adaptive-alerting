@@ -13,24 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.anomdetect.filter.algo.post;
+package com.expedia.adaptivealerting.anomdetect.filter.algo;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
+import com.expedia.adaptivealerting.anomdetect.detect.DetectorRequest;
+import com.expedia.adaptivealerting.anomdetect.detect.DetectorResponse;
 import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
-import com.expedia.adaptivealerting.anomdetect.filter.PostDetectionFilter;
-import com.expedia.adaptivealerting.anomdetect.filter.chain.PostDetectionFilterChain;
+import com.expedia.adaptivealerting.anomdetect.filter.DetectionFilter;
+import com.expedia.adaptivealerting.anomdetect.filter.chain.DetectionFilterChain;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isTrue;
-import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 /**
  * m-of-n aggregator. The returned anomaly level is
@@ -44,7 +46,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 @Data
 @AllArgsConstructor
 @Setter(AccessLevel.NONE)
-public class MOfNAggregationFilter implements PostDetectionFilter {
+public class MOfNAggregationFilter implements DetectionFilter {
     private int m;
     private int n;
     private final AnomalyLevel[] buffer;
@@ -61,9 +63,11 @@ public class MOfNAggregationFilter implements PostDetectionFilter {
     }
 
     @Override
-    public DetectorResult doFilter(DetectorResult result, PostDetectionFilterChain chain) {
-        notNull(result, "result can't be null");
-
+    public void doFilter(@NonNull DetectorRequest detectorRequest,
+                         @NonNull DetectorResponse detectorResponse,
+                         @NonNull DetectionFilterChain chain) {
+        chain.doFilter(detectorRequest, detectorResponse);
+        DetectorResult result = detectorResponse.getDetectorResult();
         if (result instanceof OutlierDetectorResult) {
             buffer[bufferIndex++] = result.getAnomalyLevel();
             if (bufferIndex >= getN()) {
@@ -79,12 +83,12 @@ public class MOfNAggregationFilter implements PostDetectionFilter {
             if (numAnomalies() >= getM()) {
                 aggregatedResult.setAnomalyLevel(AnomalyLevel.STRONG);
             }
-            return chain.doFilter(aggregatedResult);
+            detectorResponse.setDetectorResult(aggregatedResult);
         } else {
             log.warn(String.format("%s can only be used with %s types of DetectorResults. Skipping aggregation.",
                     this.getClass().getSimpleName(),
                     OutlierDetectorResult.class.getSimpleName()));
-            return chain.doFilter(result);
+            chain.doFilter(detectorRequest, detectorResponse);
         }
     }
 

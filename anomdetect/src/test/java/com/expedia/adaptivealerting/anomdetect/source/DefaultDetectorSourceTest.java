@@ -16,6 +16,7 @@
 package com.expedia.adaptivealerting.anomdetect.source;
 
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
+import com.expedia.adaptivealerting.anomdetect.detect.DetectorContainer;
 import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMapping;
 import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMatchResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,7 @@ import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -113,8 +115,13 @@ public final class DefaultDetectorSourceTest {
         assertEquals(1, results.size());
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testFindUpdatedDetectors_invalidTimePeriod() {
+        sourceUnderTest.findUpdatedDetectors(0);
+    }
+
     @Test
-    public void testFindDetector() {
+    public void testBuildDetectorContainer() {
         val result = sourceUnderTest.findDetector(DETECTOR_UUID);
         assertNotNull(result);
     }
@@ -122,6 +129,14 @@ public final class DefaultDetectorSourceTest {
     @Test(expected = IllegalArgumentException.class)
     public void testFindDetector_nullMeta() {
         sourceUnderTest.findDetector(null);
+    }
+
+    @Test
+    public void testFindDetector_nullDetectorBuilt() {
+        when(detectorClient.findDetectorDocument(DETECTOR_UUID)).thenReturn(detectorDocument);
+        when(detectorFactory.buildDetector(detectorDocument)).thenReturn(null);
+        DetectorContainer detector = sourceUnderTest.findDetector(DETECTOR_UUID);
+        assertNull(detector);
     }
 
     @Test(expected = DetectorException.class)
