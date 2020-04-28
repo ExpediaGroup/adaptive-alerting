@@ -51,6 +51,7 @@ public class ElasticSearchBulkServiceTest {
                 .anomalyThresholds(null)
                 .tags(null)
                 .build();
+        anomalyModel = AnomalyModel.newBuilder(anomalyModel).build();
         List<AnomalyModel> anomalyModels = new ArrayList<>();
         anomalyModels.add(anomalyModel);
         BulkResponse bulkResponse = buildBulkResponseHappy();

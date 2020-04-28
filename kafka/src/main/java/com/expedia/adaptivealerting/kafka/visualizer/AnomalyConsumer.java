@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.errors.WakeupException;
+import org.msgpack.core.annotations.VisibleForTesting;
 
 import java.util.Collections;
 import java.util.Properties;
@@ -53,20 +54,39 @@ public class AnomalyConsumer {
     public void listen() {
         kafkaConsumer.subscribe(Collections.singletonList(consumerConfig.getString(TOPIC)));
         boolean continueProcessing = true;
-
         // See Kafka: The Definitive Guide, pp. 86 ff.
         while (continueProcessing) {
-            try {
-                ConsumerRecords<String, MappedMetricData> metricRecords = kafkaConsumer.poll(POLL_INTERVAL);
-                log.trace("Read {} metric records from topic={}", metricRecords.count(), consumerConfig.getString(TOPIC));
-                anomaliesProcessor.processMetrics(metricRecords, executorService);
-            } catch (WakeupException e) {
-                kafkaConsumer.close();
-                continueProcessing = false;
-            } catch (Exception e) {
-                log.error(e.getLocalizedMessage());
-                e.printStackTrace();
-            }
+            continueProcessing = process(kafkaConsumer, continueProcessing);
         }
+    }
+
+    public boolean process(KafkaConsumer kafkaConsumer, boolean continueProcessing) {
+        try {
+            ConsumerRecords<String, MappedMetricData> metricRecords = kafkaConsumer.poll(POLL_INTERVAL);
+            log.trace("Read {} metric records from topic={}", metricRecords.count(), consumerConfig.getString(TOPIC));
+            anomaliesProcessor.processMetrics(metricRecords, executorService);
+        } catch (WakeupException e) {
+            kafkaConsumer.close();
+            continueProcessing = false;
+        } catch (Exception e) {
+            log.error(e.getLocalizedMessage());
+            e.printStackTrace();
+        }
+
+        return continueProcessing;
+    }
+
+    @VisibleForTesting
+    public void setKafkaConsumer(KafkaConsumer<String, MappedMetricData> kafkaConsumer) {
+        this.kafkaConsumer = kafkaConsumer;
+    }
+
+    @VisibleForTesting
+    public void setExecutorService(ExecutorService executorService) {
+        this.executorService = executorService;
+    }
+
+    public AnomaliesProcessor getAnomaliesProcessor() {
+        return anomaliesProcessor;
     }
 }

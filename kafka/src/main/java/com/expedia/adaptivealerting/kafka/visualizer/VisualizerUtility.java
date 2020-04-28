@@ -26,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
+import java.util.TimeZone;
 
 @Slf4j
 public class VisualizerUtility {
@@ -46,6 +47,7 @@ public class VisualizerUtility {
     public static String convertToDate(long timestamp) {
         Date date = new Date(timestamp * 1000L);
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        format.setTimeZone(TimeZone.getTimeZone("UTC"));
         String dateString = format.format(date);
         return dateString;
     }
