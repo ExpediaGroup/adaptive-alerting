@@ -162,3 +162,36 @@ module "aa-metric-functions" {
   initContainer_image = "${var.aa-metric-functions["initContainer_image"]}"
   download_input_file_command = "${var.aa-metric-functions["download_input_file_command"]}"
 }
+
+module "visualizer" {
+  source = "visualizer"
+
+  # Docker
+  image = "${var.visualizer["image"]}"
+  image_pull_policy = "${var.visualizer["image_pull_policy"]}"
+
+  # Kubernetes
+  namespace = "${var.app_namespace}"
+  enabled = "${var.visualizer["enabled"]}"
+  replicas = "${var.visualizer["instances"]}"
+  cpu_limit = "${var.visualizer["cpu_limit"]}"
+  cpu_request = "${var.visualizer["cpu_request"]}"
+  memory_limit = "${var.visualizer["memory_limit"]}"
+  memory_request = "${var.visualizer["memory_request"]}"
+  node_selector_label = "${var.node_selector_label}"
+  kubectl_executable_name = "${var.kubectl_executable_name}"
+  kubectl_context_name = "${var.kubectl_context_name}"
+
+  # Environment
+  jvm_memory_limit = "${var.visualizer["jvm_memory_limit"]}"
+  graphite_hostname = "${var.graphite_hostname}"
+  graphite_port = "${var.graphite_port}"
+  graphite_enabled = "${var.graphite_enabled}"
+  graphite_prefix = "${var.graphite_prefix}"
+  env_vars = "${var.ad-mapper["environment_overrides"]}"
+
+  # App
+  kafka_endpoint = "${local.kafka_endpoint}"
+  modelservice_base_uri = "${var.ad-mapper["modelservice_base_uri"]}"
+  detector_mapping_cache_update_period = "${var.ad-mapper["detector_mapping_cache_update_period"]}"
+}
