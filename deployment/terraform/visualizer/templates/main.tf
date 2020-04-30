@@ -4,7 +4,7 @@ locals {
   deployment_yaml_file_path = "${path.module}/templates/deployment_yaml.tpl"
   count = "${var.enabled?1:0}"
   checksum = "${sha1("${data.template_file.config_data.rendered}")}"
-  configmap1_name = "aa-metric-functions-config-${local.checksum}"
+  configmap1_name = "visualizer"-config-${local.checksum}"
 
 }
 
