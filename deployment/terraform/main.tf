@@ -188,10 +188,8 @@ module "visualizer" {
   graphite_port = "${var.graphite_port}"
   graphite_enabled = "${var.graphite_enabled}"
   graphite_prefix = "${var.graphite_prefix}"
-  env_vars = "${var.ad-mapper["environment_overrides"]}"
+  env_vars = "${var.visualizer["environment_overrides"]}"
 
   # App
   kafka_endpoint = "${local.kafka_endpoint}"
-  modelservice_base_uri = "${var.ad-mapper["modelservice_base_uri"]}"
-  detector_mapping_cache_update_period = "${var.ad-mapper["detector_mapping_cache_update_period"]}"
 }

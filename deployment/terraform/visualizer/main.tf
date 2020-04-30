@@ -1,18 +1,16 @@
 locals {
-  app_name = "ad-mapper"
-  config_file_path = "${path.module}/templates/ad-mapper_conf.tpl"
+  app_name = "visualizer"
+  config_file_path = "${path.module}/templates/visualizer_conf.tpl"
   deployment_yaml_file_path = "${path.module}/templates/deployment_yaml.tpl"
   count = "${var.enabled?1:0}"
   checksum = "${sha1("${data.template_file.config_data.rendered}")}"
-  configmap_name = "ad-mapper-${local.checksum}"
+  configmap_name = "visualizer-${local.checksum}"
 }
 
 data "template_file" "config_data" {
   template = "${file("${local.config_file_path}")}"
   vars {
     kafka_endpoint = "${var.kafka_endpoint}"
-    modelservice_base_uri = "${var.modelservice_base_uri}"
-    detector_mapping_cache_update_period = "${var.detector_mapping_cache_update_period}"
   }
 }
 
@@ -45,13 +43,13 @@ data "template_file" "deployment_yaml" {
   }
 }
 
-resource "kubernetes_config_map" "ad-mapper-config" {
+resource "kubernetes_config_map" "visualizer-config" {
   metadata {
     name = "${local.configmap_name}"
     namespace = "${var.namespace}"
   }
   data {
-    "ad-mapper.conf" = "${data.template_file.config_data.rendered}"
+    "visualizer.conf" = "${data.template_file.config_data.rendered}"
   }
   count = "${local.count}"
 }

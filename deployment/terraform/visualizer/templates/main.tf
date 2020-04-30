@@ -1,6 +1,6 @@
 locals {
-  app_name = "aa-metric-functions"
-  config_file_path = "${path.module}/templates/aa-metric-functions_conf.tpl"
+  app_name = "visualizer"
+  config_file_path = "${path.module}/templates/visualizer_conf.tpl"
   deployment_yaml_file_path = "${path.module}/templates/deployment_yaml.tpl"
   count = "${var.enabled?1:0}"
   checksum = "${sha1("${data.template_file.config_data.rendered}")}"
@@ -12,10 +12,6 @@ locals {
   template = "${file("${local.config_file_path}")}"
   vars {
         kafka_endpoint = "${var.kafka_endpoint}"
-        aggregator_producer_topic = "${var.aggregator_producer_topic}"
-        metric_source_graphite_host = "${var.metric_source_graphite_host}"
-        is_graphite_server_metrictank = "${var.is_graphite_server_metrictank}"
-
   }
 }
 
@@ -50,13 +46,13 @@ locals {
   }
 }
 
- resource "kubernetes_config_map" "aa-metric-functions-config" {
+ resource "kubernetes_config_map" "visualizer-config" {
   metadata {
     name = "${local.configmap1_name}"
     namespace = "${var.namespace}"
   }
   data {
-    "aa-metric-functions.conf" = "${data.template_file.config_data.rendered}"
+    "visualizer.conf" = "${data.template_file.config_data.rendered}"
   }
   count = "${local.count}"
 }

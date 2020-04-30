@@ -28,7 +28,3 @@ variable "env_vars" {}
 
 # App
 variable "kafka_endpoint" {}
-variable "modelservice_base_uri" {}
-variable "detector_mapping_cache_update_period" {
-  default = 5
-}
