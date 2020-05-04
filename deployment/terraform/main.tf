@@ -192,4 +192,5 @@ module "visualizer" {
 
   # App
   kafka_endpoint = "${local.kafka_endpoint}"
+  elasticsearch_endpoint = "${var.elasticsearch_endpoint}"
 }

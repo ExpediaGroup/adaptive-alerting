@@ -28,3 +28,4 @@ variable "env_vars" {}
 
 # App
 variable "kafka_endpoint" {}
+variable "elasticsearch_endpoint" {}

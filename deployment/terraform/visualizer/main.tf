@@ -11,6 +11,7 @@ data "template_file" "config_data" {
   template = "${file("${local.config_file_path}")}"
   vars {
     kafka_endpoint = "${var.kafka_endpoint}"
+    elasticsearch_endpoint = "${var.elasticsearch_endpoint}"
   }
 }
 
