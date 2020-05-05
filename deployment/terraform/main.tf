@@ -1,5 +1,5 @@
 locals {
-  kafka_endpoint =  var.kafka_hostname}:${var.kafka_port}"
+  kafka_endpoint =  "${var.kafka_hostname}:${var.kafka_port}"
 }
 
 # ========================================
