@@ -38,7 +38,7 @@ spec:
             memory: ${memory_request}Mi
         env:
         - name: "AA_OVERRIDES_CONFIG_PATH"
-          value: "/config/aa-metric-functions.conf"
+          value: "/config/visualizer.conf"
         - name: "AA_GRAPHITE_HOST"
           value: "${graphite_host}"
         - name: "AA_GRAPHITE_PORT"

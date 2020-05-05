@@ -11,6 +11,10 @@ data "template_file" "config_data" {
   template = "${file("${local.config_file_path}")}"
   vars {
     kafka_endpoint = "${var.kafka_endpoint}"
+    group_id = "${var.group_id}"
+    topic = "${var.topic}"
+    key_deserializer = "${var.key_deserializer}"
+    value_deserializer = "${var.value_deserializer}"
     elasticsearch_endpoint = "${var.elasticsearch_endpoint}"
   }
 }

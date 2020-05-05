@@ -28,4 +28,8 @@ variable "env_vars" {}
 
 # App
 variable "kafka_endpoint" {}
+variable "group_id" {}
+variable "topic" {}
+variable "key_deserializer" {}
+variable "value_deserializer" {}
 variable "elasticsearch_endpoint" {}

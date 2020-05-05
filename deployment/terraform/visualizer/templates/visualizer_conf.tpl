@@ -1,10 +1,10 @@
 visualizer {
     metric-consumer {
       bootstrap.servers = "${kafka_endpoint}"
-      group.id = "my-group"
-      topic = "anomalies"
-      key.deserializer = "org.apache.kafka.common.serialization.StringDeserializer"
-      value.deserializer = "com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde$Deser"
+      group.id = "${group_id}"
+      topic = "${topic}"
+      key.deserializer = "${key_deserializer}"
+      value.deserializer = "${value_deserializer}"
     }
     elastic-search {
       host = "${elasticsearch_endpoint}"
