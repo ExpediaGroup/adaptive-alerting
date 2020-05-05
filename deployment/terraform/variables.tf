@@ -30,3 +30,7 @@ variable "modelservice" {
 variable "aa-metric-functions" {
   type = "map"
 }
+
+variable "visualizer" {
+  type = "map"
+}
