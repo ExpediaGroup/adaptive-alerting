@@ -192,9 +192,9 @@ module "visualizer" {
 
   # App
   kafka_endpoint = "${local.kafka_endpoint}"
-  group_id = "${var.group_id}"
-  topic = "${var.topic}"
-  key_deserializer = "${var.key_deserializer}"
-  value_deserializer = "${var.value_deserializer}"
-  elasticsearch_endpoint = "${var.elasticsearch_endpoint}"
+  group_id = "${var.visualizer["group_id"]}"
+  topic = "${var.visualizer["topic"]}"
+  key_deserializer = "${var.visualizer["key_deserializer"]}"
+  value_deserializer = "${var.visualizer["value_deserializer"]}"
+  elasticsearch_endpoint = "${var.visualizer["elasticsearch_endpoint"]}"
 }
