@@ -9,11 +9,11 @@ clean:
 build:
 	${MAVEN} install
 
+all: clean build
+
 docker_build:
 	cd modelservice && $(MAKE) docker_build && cd ..
 	cd kafka && $(MAKE) docker_build && cd ..
-
-all: clean build
 
 # build all and release
 release: all
