@@ -67,6 +67,6 @@ spec:
       volumes:
       - name: config-volume
         configMap:
-          name: ${configmap1_name}
+          name: ${configmap_name}
       - name: functions-volume
         emptyDir: {}
