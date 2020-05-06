@@ -197,4 +197,7 @@ module "visualizer" {
   key_deserializer = "${var.visualizer["key_deserializer"]}"
   value_deserializer = "${var.visualizer["value_deserializer"]}"
   elasticsearch_endpoint = "${var.visualizer["elasticsearch_endpoint"]}"
+  elasticsearch_port1 = "${var.visualizer["elasticsearch_port1"]}"
+  elasticsearch_port2 = "${var.visualizer["elasticsearch_port2"]}"
+  elasticsearch_scheme = "${var.visualizer["elasticsearch_scheme"]}"
 }

@@ -33,3 +33,6 @@ variable "topic" {}
 variable "key_deserializer" {}
 variable "value_deserializer" {}
 variable "elasticsearch_endpoint" {}
+variable "elasticsearch_port1" {}
+variable "elasticsearch_port2" {}
+variable "elasticsearch_scheme" {}

@@ -8,5 +8,8 @@ visualizer {
     }
     elastic-search {
       host = "${elasticsearch_endpoint}"
+       port1 = "${elasticsearch_port1}"
+       port2 = "${elasticsearch_port2}"
+       scheme = "${elasticsearch_scheme}"
     }
 }

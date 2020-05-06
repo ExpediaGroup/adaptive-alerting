@@ -18,10 +18,12 @@ package com.expedia.adaptivealerting.kafka.visualizer;
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
+import org.apache.http.client.config.RequestConfig;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 
 import java.io.IOException;
@@ -29,9 +31,9 @@ import java.io.IOException;
 @Slf4j
 public class ElasticSearchClient {
 
-    private static int PORT1 = 9200;
-    private static int PORT2 = 9201;
-    private static String SCHEME = "http";
+    private static String PORT1 = "port1";
+    private static String PORT2 = "port2";
+    private static String SCHEME = "scheme";
     private static String HOST = "host";
     private static String ELASTIC_SEARCH_CONFIG = "elastic-search";
 
@@ -49,8 +51,11 @@ public class ElasticSearchClient {
         RestHighLevelClient client = null;
         try {
             client = new RestHighLevelClient(
-                    RestClient.builder(new HttpHost(elasticSearchConfig.getString(HOST), PORT1, SCHEME),
-                            new HttpHost(elasticSearchConfig.getString(HOST), PORT2, SCHEME)));
+                    RestClient.builder(new HttpHost(elasticSearchConfig.getString(HOST),
+                                    elasticSearchConfig.getInt(PORT1), elasticSearchConfig.getString(SCHEME)),
+                            new HttpHost(elasticSearchConfig.getString(HOST), elasticSearchConfig.getInt(PORT2),
+                                    elasticSearchConfig.getString(SCHEME)))
+                            .setMaxRetryTimeoutMillis(1000));
         } catch (Exception e) {
             log.error(e.getMessage(),e);
         }

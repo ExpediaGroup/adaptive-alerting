@@ -16,6 +16,9 @@ data "template_file" "config_data" {
     key_deserializer = "${var.key_deserializer}"
     value_deserializer = "${var.value_deserializer}"
     elasticsearch_endpoint = "${var.elasticsearch_endpoint}"
+    elasticsearch_port1 = "${var.elasticsearch_port1}"
+    elasticsearch_port2 = "${var.elasticsearch_port2}"
+    elasticsearch_scheme = "${var.elasticsearch_scheme}"
   }
 }
 
