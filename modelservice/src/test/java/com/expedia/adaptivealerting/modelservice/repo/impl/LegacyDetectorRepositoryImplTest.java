@@ -93,6 +93,7 @@ public class LegacyDetectorRepositoryImplTest {
     private DetectorDocument illegalParamsDetector;
 
     private IndexResponse indexResponse;
+    private SearchResponse searchResponse;
     private DeleteResponse deleteResponse;
     private GetResponse getResponse;
     private List<DetectorDocument> detectors = new ArrayList<>();
