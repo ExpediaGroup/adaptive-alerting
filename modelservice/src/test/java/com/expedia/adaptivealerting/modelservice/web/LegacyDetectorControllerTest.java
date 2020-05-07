@@ -52,7 +52,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Slf4j
 @RunWith(MockitoJUnitRunner.class)
 @SpringBootTest
-public class LegacyDetectorConsumerInfoControllerTest {
+public class LegacyDetectorControllerTest {
 
     @InjectMocks
     private LegacyDetectorController controllerUnderTest;
@@ -127,7 +127,7 @@ public class LegacyDetectorConsumerInfoControllerTest {
 
     @Test
     public void testGetLastUpdatedDetectors() {
-        val actualDetectors = controllerUnderTest.getLastUpdatedOrUsedDetectors(5, "");
+        val actualDetectors = controllerUnderTest.getLastUpdatedOrUsedDetectors(5);
         assertNotNull(actualDetectors);
         assertSame(detectors, actualDetectors);
     }
@@ -157,13 +157,13 @@ public class LegacyDetectorConsumerInfoControllerTest {
     private void initTestObjects() {
         this.someUuid = UUID.randomUUID();
         val mom = ObjectMother.instance();
-        this.legalParamsDetector = mom.getDetectorDocument();
+        this.legalParamsDetector = mom.buildDetectorDocument();
         legalParamsDetector.setUuid(someUuid);
     }
 
     private void initDependencies() {
         when(detectorRepo.createDetector(any(DetectorDocument.class))).thenReturn(someUuid);
         when(detectorRepo.findByUuid(someUuid.toString())).thenReturn(detector);
-        when(detectorRepo.getLastUpdatedOrUsedDetectors(anyLong(), anyString())).thenReturn(detectors);
+        when(detectorRepo.getLastUpdatedDetectors(anyLong())).thenReturn(detectors);
     }
 }

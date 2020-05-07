@@ -92,8 +92,8 @@ public class LegacyDetectorController {
 
     @GetMapping(path = "/getLastUpdatedDetectors", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public List<DetectorDocument> getLastUpdatedOrUsedDetectors(@RequestParam long interval, @RequestParam(defaultValue = "updated") String condition) {
-        return detectorRepo.getLastUpdatedOrUsedDetectors(interval, condition);
+    public List<DetectorDocument> getLastUpdatedOrUsedDetectors(@RequestParam long interval) {
+        return detectorRepo.getLastUpdatedDetectors(interval);
     }
 
     @PutMapping

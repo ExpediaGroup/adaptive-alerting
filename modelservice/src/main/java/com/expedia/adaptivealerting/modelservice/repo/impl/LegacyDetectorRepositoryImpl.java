@@ -288,19 +288,15 @@ public class LegacyDetectorRepositoryImpl implements LegacyDetectorRepository {
     }
 
     @Override
-    public List<DetectorDocument> getLastUpdatedOrUsedDetectors(long interval, String condition) {
+    public List<DetectorDocument> getLastUpdatedDetectors(long interval) {
         // Replaced Lombok val with explicit types here because the Maven compiler plugin was breaking under
         // OpenJDK 12. Not sure what the issue was but this fixed it. [WLW]
         val now = DateUtil.now().toInstant();
         val fromDate = DateUtil.toUtcDateString((now.minus(interval, ChronoUnit.SECONDS)));
         val toDate = DateUtil.toUtcDateString(now);
         QueryBuilder queryBuilder = QueryBuilders.rangeQuery("lastUpdateTimestamp").from(fromDate).to(toDate);
-        if ("used".equals(condition)) {
-            queryBuilder = QueryBuilders.rangeQuery("meta.dateLastUsed").from(fromDate).to(toDate);
-        }
         val searchSourceBuilder = elasticsearchUtil.getSourceBuilder(queryBuilder).size(DEFAULT_ES_RESULTS_SIZE);
         val searchRequest = elasticsearchUtil.getSearchRequest(searchSourceBuilder, DETECTOR_INDEX, DETECTOR_DOC_TYPE);
-        log.info("searchRequest:{}", searchRequest);
         return getDetectorsFromElasticSearch(searchRequest);
     }
 

@@ -47,5 +47,5 @@ public interface LegacyDetectorRepository {
 
     void trustDetector(String uuid, Boolean trusted);
 
-    List<DetectorDocument> getLastUpdatedOrUsedDetectors(long interval, String condition);
+    List<DetectorDocument> getLastUpdatedDetectors(long interval);
 }

@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.modelservice.web;
 
-import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.modelservice.entity.Detector;
+import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
 import com.expedia.adaptivealerting.modelservice.service.DetectorService;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -54,13 +54,23 @@ public class DetectorController {
     @GetMapping(path = "/findByUuid", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public Detector findByUuid(@RequestParam String uuid) {
-        return service.findByUuid(uuid);
+        Detector detector = service.findByUuid(uuid);
+        if (detector == null) {
+            throw new RecordNotFoundException("Invalid UUID: " + uuid);
+        }
+        return detector;
     }
 
     @GetMapping(path = "/findByCreatedBy", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public List<Detector> findByCreatedBy(@RequestParam String user) {
-        return service.findByCreatedBy(user);
+        List<Detector> detectors = service.findByCreatedBy(user);
+        if (detectors == null || detectors.isEmpty()) {
+            // TODO: This should be RecordNotFoundException
+            throw new RecordNotFoundException("Invalid user: " + user);
+        }
+
+        return detectors;
     }
 
     @PostMapping(path = "/toggleDetector")
@@ -81,13 +91,13 @@ public class DetectorController {
 
     @GetMapping(path = "/getLastUpdatedDetectors", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public List<Detector> getLastUpdatedOrUsedDetectors(@RequestParam long intervalInSeconds) {
+    public List<Detector> getLastUpdatedDetectors(@RequestParam long intervalInSeconds) {
         return service.getLastUpdatedDetectors(intervalInSeconds);
     }
 
     @GetMapping(path = "/detectorLastUsed", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public List<Detector> getDetectorsLastUsed(@RequestParam int noOfWeeks) {
+    public List<Detector> getLastUsedDetectors(@RequestParam int noOfWeeks) {
         return service.getLastUpdatedDetectors(noOfWeeks);
     }
 

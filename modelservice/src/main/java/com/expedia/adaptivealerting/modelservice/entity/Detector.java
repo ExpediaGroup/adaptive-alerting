@@ -2,6 +2,7 @@ package com.expedia.adaptivealerting.modelservice.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import lombok.experimental.Accessors;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
@@ -17,6 +18,7 @@ import java.util.UUID;
  * Detector entity
  */
 @Data
+@Accessors(chain = true)
 @Document(indexName = "detectors_new", type = "detector")
 //This automatically creates an index if it doesn't exist
 public class Detector {

@@ -44,7 +44,7 @@ public class RequestValidatorTest {
 
     private void initTestObjects() {
         val mom = ObjectMother.instance();
-        legalParamsDetector = mom.getDetectorDocument();
+        legalParamsDetector = mom.buildDetectorDocument();
         legalParamsDetector.setUuid(UUID.randomUUID());
         illegalParamsDetector = mom.getIllegalParamsDetector();
     }

@@ -74,7 +74,7 @@ import static org.mockito.Mockito.when;
 
 @Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
-public class LegacyDetectorConsumerInfoRepositoryImplTest {
+public class LegacyDetectorRepositoryImplTest {
 
     @InjectMocks
     private LegacyDetectorRepository repoUnderTest = new LegacyDetectorRepositoryImpl();
@@ -93,7 +93,6 @@ public class LegacyDetectorConsumerInfoRepositoryImplTest {
     private DetectorDocument illegalParamsDetector;
 
     private IndexResponse indexResponse;
-    private SearchResponse searchResponse;
     private DeleteResponse deleteResponse;
     private GetResponse getResponse;
     private List<DetectorDocument> detectors = new ArrayList<>();
@@ -108,7 +107,7 @@ public class LegacyDetectorConsumerInfoRepositoryImplTest {
     @Test
     public void testCreateDetector() {
         val mom = ObjectMother.instance();
-        val document = mom.getDetectorDocument();
+        val document = mom.buildDetectorDocument();
 
         // Disabled these because the contract does not require returning an implementation-specific ID. [WLW]
 //        val actualCreationId = repoUnderTest.createDetector(document);
@@ -140,7 +139,7 @@ public class LegacyDetectorConsumerInfoRepositoryImplTest {
     @Test
     public void testCreateDetector_emptyMeta() {
         val mom = ObjectMother.instance();
-        val document = mom.getDetectorDocument();
+        val document = mom.buildDetectorDocument();
         document.setMeta(null);
         repoUnderTest.createDetector(document);
     }
@@ -148,7 +147,7 @@ public class LegacyDetectorConsumerInfoRepositoryImplTest {
     @Test
     public void testCreateDetector_populatedMeta() {
         val mom = ObjectMother.instance();
-        val document = mom.getDetectorDocument();
+        val document = mom.buildDetectorDocument();
         DetectorDocument.Meta metaBlock = new DetectorDocument.Meta();
         metaBlock.setCreatedBy("user");
         document.setMeta(metaBlock);
@@ -158,7 +157,7 @@ public class LegacyDetectorConsumerInfoRepositoryImplTest {
     @Test
     public void testCreateDetector_populatedMeta_noUser() {
         val mom = ObjectMother.instance();
-        val document = mom.getDetectorDocument();
+        val document = mom.buildDetectorDocument();
         DetectorDocument.Meta metaBlock = new DetectorDocument.Meta();
         metaBlock.setCreatedBy(null);
         document.setMeta(metaBlock);
@@ -188,7 +187,7 @@ public class LegacyDetectorConsumerInfoRepositoryImplTest {
     @Test
     public void testUpdateDetector_emptyMeta() {
         val mom = ObjectMother.instance();
-        val document = mom.getDetectorDocument();
+        val document = mom.buildDetectorDocument();
         document.setMeta(null);
         UUID someUuid = UUID.randomUUID();
         document.setUuid(someUuid);
@@ -198,7 +197,7 @@ public class LegacyDetectorConsumerInfoRepositoryImplTest {
     @Test
     public void testUpdateDetector_populatedMeta() {
         val mom = ObjectMother.instance();
-        val document = mom.getDetectorDocument();
+        val document = mom.buildDetectorDocument();
 
         DetectorDocument.Meta metaBlock = new DetectorDocument.Meta();
         metaBlock.setCreatedBy("user");
@@ -212,7 +211,7 @@ public class LegacyDetectorConsumerInfoRepositoryImplTest {
     @Test
     public void testUpdateDetector_populatedMeta_noUser() {
         val mom = ObjectMother.instance();
-        val document = mom.getDetectorDocument();
+        val document = mom.buildDetectorDocument();
 
         DetectorDocument.Meta metaBlock = new DetectorDocument.Meta();
         metaBlock.setCreatedBy(null);
@@ -228,7 +227,7 @@ public class LegacyDetectorConsumerInfoRepositoryImplTest {
         val updateResponse = mock(UpdateResponse.class);
         val result = updateResponse.getResult();
         val mom = ObjectMother.instance();
-        val document = mom.getDetectorDocument();
+        val document = mom.buildDetectorDocument();
         document.setUuid(UUID.randomUUID());
         Mockito.when(result).thenReturn(DocWriteResponse.Result.NOT_FOUND);
         Mockito.when(elasticsearchUtil.checkNullResponse(result)).thenReturn(true);
@@ -328,7 +327,7 @@ public class LegacyDetectorConsumerInfoRepositoryImplTest {
 
     @Test
     public void testGetLastUpdatedDetectors() {
-        List<DetectorDocument> actualDetectors = repoUnderTest.getLastUpdatedOrUsedDetectors(1, "");
+        List<DetectorDocument> actualDetectors = repoUnderTest.getLastUpdatedDetectors(1);
         assertNotNull(actualDetectors);
         assertCheck(actualDetectors);
     }
@@ -363,7 +362,6 @@ public class LegacyDetectorConsumerInfoRepositoryImplTest {
         Mockito.when(elasticSearchClient.update(any(UpdateRequest.class), any(RequestOptions.class))).thenReturn(new UpdateResponse());
 
     }
-
 
 
     private IndexResponse mockIndexResponse() {
