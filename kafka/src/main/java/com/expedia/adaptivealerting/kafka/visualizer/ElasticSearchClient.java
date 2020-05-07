@@ -52,8 +52,7 @@ public class ElasticSearchClient {
                     RestClient.builder(new HttpHost(elasticSearchConfig.getString(HOST),
                                     elasticSearchConfig.getInt(PORT1), elasticSearchConfig.getString(SCHEME)),
                             new HttpHost(elasticSearchConfig.getString(HOST), elasticSearchConfig.getInt(PORT2),
-                                    elasticSearchConfig.getString(SCHEME)))
-                            .setMaxRetryTimeoutMillis(1000));
+                                    elasticSearchConfig.getString(SCHEME))));
         } catch (Exception e) {
             log.error(e.getMessage(),e);
         }
