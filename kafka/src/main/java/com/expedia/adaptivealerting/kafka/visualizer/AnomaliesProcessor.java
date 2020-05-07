@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.kafka.visualizer;
 
+import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
 import com.expedia.metrics.MetricData;
@@ -36,28 +37,31 @@ public class AnomaliesProcessor {
 
         List<AnomalyModel> anomalyModels = new ArrayList();
         for (ConsumerRecord<String, MappedMetricData> consumerRecord : metricRecords) {
-            AnomalyModel.Builder anomalyModel = AnomalyModel.newBuilder();
             MappedMetricData mappedMetricData = consumerRecord.value();
             if (mappedMetricData != null) {
-                if (mappedMetricData.getDetectorUuid() != null) {
-                    anomalyModel.uuid(mappedMetricData.getDetectorUuid().toString());
-                }
-                MetricData metricData = mappedMetricData.getMetricData();
-                if (metricData != null) {
-                    anomalyModel.timestamp(VisualizerUtility.convertToDate(metricData.getTimestamp()));
-                    anomalyModel.value(metricData.getValue());
-                    if (metricData.getMetricDefinition() != null) {
-                        anomalyModel.key(metricData.getMetricDefinition().getKey());
-                        anomalyModel.tags(metricData.getMetricDefinition().getTags());
-                    }
-                }
                 OutlierDetectorResult outlierDetectorResult = (OutlierDetectorResult) mappedMetricData.getAnomalyResult();
-                if (outlierDetectorResult != null) {
-                    anomalyModel.level(outlierDetectorResult.getAnomalyLevel().toString());
-                    anomalyModel.anomalyThresholds(outlierDetectorResult.getThresholds());
+                if (outlierDetectorResult.getAnomalyLevel() != AnomalyLevel.NORMAL) {
+                    AnomalyModel.Builder anomalyModel = AnomalyModel.newBuilder();
+                    if (outlierDetectorResult != null) {
+                        anomalyModel.level(outlierDetectorResult.getAnomalyLevel().toString());
+                        anomalyModel.anomalyThresholds(outlierDetectorResult.getThresholds());
+                    }
+
+                    if (mappedMetricData.getDetectorUuid() != null) {
+                        anomalyModel.uuid(mappedMetricData.getDetectorUuid().toString());
+                    }
+                    MetricData metricData = mappedMetricData.getMetricData();
+                    if (metricData != null) {
+                        anomalyModel.timestamp(VisualizerUtility.convertToDate(metricData.getTimestamp()));
+                        anomalyModel.value(metricData.getValue());
+                        if (metricData.getMetricDefinition() != null) {
+                            anomalyModel.key(metricData.getMetricDefinition().getKey());
+                            anomalyModel.tags(metricData.getMetricDefinition().getTags());
+                        }
+                    }
+                    anomalyModels.add(anomalyModel.build());
                 }
             }
-            anomalyModels.add(anomalyModel.build());
         }
         if (anomalyModels.size() > 0) {
             ElasticSearchBulkService elasticSearchBulkService = new ElasticSearchBulkService(anomalyModels);
