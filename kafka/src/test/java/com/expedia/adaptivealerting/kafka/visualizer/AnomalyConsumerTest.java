@@ -1,5 +1,6 @@
 package com.expedia.adaptivealerting.kafka.visualizer;
 
+import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -37,14 +38,16 @@ public class AnomalyConsumerTest {
 
     @Test
     public void testProcess() {
-        ConsumerRecords<String, MappedMetricData> metricRecords = AnomaliesProcessorTest.buildMetricRecords(2);
+        ConsumerRecords<String, MappedMetricData> metricRecords = AnomaliesProcessorTest.buildMetricRecords(2,
+                AnomalyLevel.STRONG);
         when(kafkaConsumer.poll(anyLong())).thenReturn(metricRecords);
         assertTrue(anomalyConsumer.process(kafkaConsumer, true));
     }
 
     @Test
     public void testProcessZeroMetrics() {
-        ConsumerRecords<String, MappedMetricData> metricRecords = AnomaliesProcessorTest.buildMetricRecords(0);
+        ConsumerRecords<String, MappedMetricData> metricRecords = AnomaliesProcessorTest.buildMetricRecords(0,
+                AnomalyLevel.STRONG);
         when(kafkaConsumer.poll(anyLong())).thenReturn(metricRecords);
         assertTrue(anomalyConsumer.process(kafkaConsumer, true));
 

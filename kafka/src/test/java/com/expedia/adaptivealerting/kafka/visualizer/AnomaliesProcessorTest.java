@@ -40,7 +40,7 @@ public class AnomaliesProcessorTest {
 
     @Test
     public void testProcessMetrics() {
-        ConsumerRecords<String, MappedMetricData> metricDataConsumerRecords = buildMetricRecords(2);
+        ConsumerRecords<String, MappedMetricData> metricDataConsumerRecords = buildMetricRecords(2, AnomalyLevel.STRONG);
         List<AnomalyModel> anomalyModels = anomaliesProcessor.processMetrics(metricDataConsumerRecords, executorService);
         assertNotNull(anomalyModels);
         assertTrue(anomalyModels.size() == 2);
@@ -48,17 +48,26 @@ public class AnomaliesProcessorTest {
 
     @Test
     public void testProcessZeroMetrics() {
-        ConsumerRecords<String, MappedMetricData> metricDataConsumerRecords = buildMetricRecords(0);
+        ConsumerRecords<String, MappedMetricData> metricDataConsumerRecords = buildMetricRecords(0, AnomalyLevel.WEAK);
         List<AnomalyModel> anomalyModels = anomaliesProcessor.processMetrics(metricDataConsumerRecords, executorService);
         assertNotNull(anomalyModels);
         assertTrue(anomalyModels.size() == 0);
     }
 
-    public static ConsumerRecords<String, MappedMetricData> buildMetricRecords(int no){
+    @Test
+    public void testProcessZeroMetricsForNormalAnomalies() {
+        ConsumerRecords<String, MappedMetricData> metricDataConsumerRecords = buildMetricRecords(4, AnomalyLevel.NORMAL);
+        List<AnomalyModel> anomalyModels = anomaliesProcessor.processMetrics(metricDataConsumerRecords, executorService);
+        assertNotNull(anomalyModels);
+        assertTrue(anomalyModels.size() == 0);
+    }
+
+
+    public static ConsumerRecords<String, MappedMetricData> buildMetricRecords(int no, AnomalyLevel anomalyLevel){
         TopicPartition topicPartition = new TopicPartition("test",2);
         List<ConsumerRecord<String,MappedMetricData>> consumerRecordList = new ArrayList<>();
         for (int i=0 ; i< no; i++) {
-            consumerRecordList.add(buildConsumerRecord());
+            consumerRecordList.add(buildConsumerRecord(anomalyLevel));
         }
         Map<TopicPartition, List<ConsumerRecord<String,MappedMetricData>>> topicPartitionListHashMap = new HashMap<>();
         topicPartitionListHashMap.put(topicPartition, consumerRecordList);
@@ -66,16 +75,17 @@ public class AnomaliesProcessorTest {
         return consumerRecords;
     }
 
-    public static ConsumerRecord<String, MappedMetricData> buildConsumerRecord() {
-        ConsumerRecord<String, MappedMetricData> consumerRecord = new ConsumerRecord("", 1 , 2L,"key",buildMappedMetricData());
+    public static ConsumerRecord<String, MappedMetricData> buildConsumerRecord(AnomalyLevel anomalyLevel) {
+        ConsumerRecord<String, MappedMetricData> consumerRecord = new ConsumerRecord("", 1 , 2L,
+                "key",buildMappedMetricData(anomalyLevel));
         return consumerRecord;
     }
 
-    public static MappedMetricData buildMappedMetricData(){
+    public static MappedMetricData buildMappedMetricData(AnomalyLevel anomalyLevel){
         MappedMetricData mappedMetricData = new MappedMetricData();
         mappedMetricData.setDetectorUuid(UUID.randomUUID());
         mappedMetricData.setMetricData(buildMetricData());
-        mappedMetricData.setAnomalyResult(buildOutlierDetectorResult());
+        mappedMetricData.setAnomalyResult(buildOutlierDetectorResult(anomalyLevel));
         return mappedMetricData;
     }
 
@@ -92,9 +102,9 @@ public class AnomaliesProcessorTest {
         return metricDefinition;
     }
 
-    public static OutlierDetectorResult buildOutlierDetectorResult(){
+    public static OutlierDetectorResult buildOutlierDetectorResult(AnomalyLevel anomalyLevel){
         OutlierDetectorResult outlierDetectorResult = new OutlierDetectorResult();
-        outlierDetectorResult.setAnomalyLevel(AnomalyLevel.NORMAL);
+        outlierDetectorResult.setAnomalyLevel(anomalyLevel);
         outlierDetectorResult.setThresholds(buildAnomalyThresholds());
         return outlierDetectorResult;
     }
