@@ -22,7 +22,7 @@ import com.expedia.adaptivealerting.anomdetect.source.DetectorFactory;
 import com.expedia.adaptivealerting.modelservice.metricsource.graphite.GraphiteMetricSource;
 import com.expedia.adaptivealerting.modelservice.metricsource.MetricSource;
 import com.expedia.adaptivealerting.modelservice.metricsource.MetricSourceResult;
-import com.expedia.adaptivealerting.modelservice.repo.request.AnomalyRequest;
+import com.expedia.adaptivealerting.modelservice.web.request.AnomalyRequest;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;

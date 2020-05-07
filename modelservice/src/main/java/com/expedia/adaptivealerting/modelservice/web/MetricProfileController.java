@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.web;
 
 import com.expedia.adaptivealerting.modelservice.repo.MetricProfileRepository;
-import com.expedia.adaptivealerting.modelservice.repo.request.CreateMetricProfilingRequest;
+import com.expedia.adaptivealerting.modelservice.web.request.CreateMetricProfilingRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;

@@ -17,12 +17,6 @@ package com.expedia.adaptivealerting.modelservice;
 
 import com.codahale.metrics.MetricRegistry;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorFactory;
-import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticSearchProperties;
-import org.apache.http.HttpHost;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestClientBuilder;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -31,15 +25,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import javax.annotation.PreDestroy;
-import java.io.IOException;
-
 @SpringBootApplication
 @EnableConfigurationProperties
 public class ModelServiceApp {
-    
-    @Autowired
-    private RestHighLevelClient restHighLevelClient;
 
     public static void main(String[] args) {
         SpringApplication.run(ModelServiceApp.class, args);
@@ -70,29 +58,5 @@ public class ModelServiceApp {
     @Bean
     public DetectorFactory detectorRegistry() {
         return new DetectorFactory();
-    }
-
-    @Bean
-    public RestHighLevelClient restClientBuilder(ElasticSearchProperties elasticSearchProperties) {
-        RestClientBuilder builder = RestClient
-                .builder(HttpHost.create(elasticSearchProperties.getUrls()))
-                .setRequestConfigCallback(req -> {
-                    req.setConnectionRequestTimeout(elasticSearchProperties.getConfig().getConnectionTimeout());
-                    req.setConnectTimeout(elasticSearchProperties.getConfig().getConnectionTimeout());
-                    req.setSocketTimeout(elasticSearchProperties.getConfig().getConnectionTimeout());
-                    return req;
-                }).setMaxRetryTimeoutMillis(elasticSearchProperties.getConfig().getConnectionRetryTimeout())
-                .setHttpClientConfigCallback(req -> {
-                    req.setMaxConnTotal(elasticSearchProperties.getConfig().getMaxTotalConnections());
-                    req.setMaxConnPerRoute(500);
-                    return req;
-                });
-        restHighLevelClient = new RestHighLevelClient(builder);
-        return restHighLevelClient;
-    }
-
-    @PreDestroy
-    public void destroy() throws IOException {
-        restHighLevelClient.close();
     }
 }

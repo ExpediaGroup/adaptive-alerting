@@ -17,12 +17,13 @@ package com.expedia.adaptivealerting.modelservice.util;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorFactory;
-import com.expedia.adaptivealerting.modelservice.entity.Expression;
-import com.expedia.adaptivealerting.modelservice.entity.Operand;
-import com.expedia.adaptivealerting.modelservice.entity.Operator;
-import com.expedia.adaptivealerting.modelservice.entity.User;
 import com.expedia.adaptivealerting.modelservice.entity.Detector;
-import com.expedia.adaptivealerting.modelservice.repo.impl.percolator.PercolatorDetectorMapping;
+import com.expedia.adaptivealerting.modelservice.model.mapping.DetectorConsumerInfo;
+import com.expedia.adaptivealerting.modelservice.model.mapping.Expression;
+import com.expedia.adaptivealerting.modelservice.model.mapping.Operand;
+import com.expedia.adaptivealerting.modelservice.model.mapping.Operator;
+import com.expedia.adaptivealerting.modelservice.model.mapping.User;
+import com.expedia.adaptivealerting.modelservice.model.percolator.PercolatorDetectorMapping;
 import lombok.experimental.UtilityClass;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -45,7 +46,7 @@ public class RequestValidator {
         expression.getOperands().forEach(operand -> validateOperand(operand));
     }
 
-    public static void validateBoolean(Boolean condition){
+    public static void validateBoolean(Boolean condition) {
         Assert.notNull(condition, "Condition can't be null");
     }
 
@@ -60,12 +61,12 @@ public class RequestValidator {
                         operand.getField().getKey(), PercolatorDetectorMapping.AA_PREFIX));
     }
 
-    public static void validateMappingDetector(Detector detector) {
-        Assert.notNull(detector, "Detector can't be null");
-        Assert.notNull(detector.getUuid(), "Detector uuid can't be null");
+    public static void validateMappingDetector(DetectorConsumerInfo detectorConsumerInfo) {
+        Assert.notNull(detectorConsumerInfo, "Detector can't be null");
+        Assert.notNull(detectorConsumerInfo.getUuid(), "Detector uuid can't be null");
     }
 
-    public static void validateDetector(DetectorDocument document) {
+    public static void validateDetectorDocument(DetectorDocument document) {
         new DetectorFactory().buildDetector(document);
     }
 }

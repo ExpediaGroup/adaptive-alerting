@@ -15,8 +15,8 @@
  */
 package com.expedia.adaptivealerting.modelservice.util;
 
-import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticSearchClient;
-import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticSearchProperties;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
 import com.google.gson.JsonObject;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -32,12 +32,12 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-import static com.expedia.adaptivealerting.modelservice.repo.impl.percolator.PercolatorDetectorMapping.DETECTOR_CONFIG;
-import static com.expedia.adaptivealerting.modelservice.repo.impl.percolator.PercolatorDetectorMapping.DETECTOR_CREATED_BY;
-import static com.expedia.adaptivealerting.modelservice.repo.impl.percolator.PercolatorDetectorMapping.DETECTOR_CREATED_TIME;
-import static com.expedia.adaptivealerting.modelservice.repo.impl.percolator.PercolatorDetectorMapping.DETECTOR_ID_KEYWORD;
-import static com.expedia.adaptivealerting.modelservice.repo.impl.percolator.PercolatorDetectorMapping.DETECTOR_MOD_TIME;
-import static com.expedia.adaptivealerting.modelservice.repo.impl.percolator.PercolatorDetectorMapping.DETECTOR_TYPE;
+import static com.expedia.adaptivealerting.modelservice.model.percolator.PercolatorDetectorMapping.DETECTOR_CONFIG;
+import static com.expedia.adaptivealerting.modelservice.model.percolator.PercolatorDetectorMapping.DETECTOR_CREATED_BY;
+import static com.expedia.adaptivealerting.modelservice.model.percolator.PercolatorDetectorMapping.DETECTOR_CREATED_TIME;
+import static com.expedia.adaptivealerting.modelservice.model.percolator.PercolatorDetectorMapping.DETECTOR_ID_KEYWORD;
+import static com.expedia.adaptivealerting.modelservice.model.percolator.PercolatorDetectorMapping.DETECTOR_MOD_TIME;
+import static com.expedia.adaptivealerting.modelservice.model.percolator.PercolatorDetectorMapping.DETECTOR_TYPE;
 
 /**
  * Util class to create index with mappings if not found.

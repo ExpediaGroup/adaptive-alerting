@@ -16,12 +16,12 @@
 package com.expedia.adaptivealerting.modelservice.util;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
-import com.expedia.adaptivealerting.modelservice.entity.Expression;
-import com.expedia.adaptivealerting.modelservice.entity.Field;
-import com.expedia.adaptivealerting.modelservice.entity.Operand;
-import com.expedia.adaptivealerting.modelservice.entity.Operator;
-import com.expedia.adaptivealerting.modelservice.entity.Detector;
-import com.expedia.adaptivealerting.modelservice.entity.User;
+import com.expedia.adaptivealerting.modelservice.model.mapping.Expression;
+import com.expedia.adaptivealerting.modelservice.model.mapping.Field;
+import com.expedia.adaptivealerting.modelservice.model.mapping.Operand;
+import com.expedia.adaptivealerting.modelservice.model.mapping.Operator;
+import com.expedia.adaptivealerting.modelservice.model.mapping.DetectorConsumerInfo;
+import com.expedia.adaptivealerting.modelservice.model.mapping.User;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import lombok.val;
 import org.junit.Before;
@@ -77,13 +77,13 @@ public class RequestValidatorTest {
 
     @Test
     public void testValidateMappingDetector_successful() {
-        Detector detector = new Detector("cid", UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"));
-        RequestValidator.validateMappingDetector(detector);
+        DetectorConsumerInfo detectorConsumerInfo = new DetectorConsumerInfo("cid", UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"));
+        RequestValidator.validateMappingDetector(detectorConsumerInfo);
     }
 
     @Test
     public void testValidateDetector_successful() {
-        RequestValidator.validateDetector(legalParamsDetector);
+        RequestValidator.validateDetectorDocument(legalParamsDetector);
     }
 
     @Test
@@ -142,6 +142,6 @@ public class RequestValidatorTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testValidateInvalidDetector_illegal_params() {
-        RequestValidator.validateDetector(illegalParamsDetector);
+        RequestValidator.validateDetectorDocument(illegalParamsDetector);
     }
 }

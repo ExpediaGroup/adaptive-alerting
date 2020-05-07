@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.web;
 
 import com.expedia.adaptivealerting.modelservice.exception.CustomExceptionHandler;
-import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
+import com.expedia.adaptivealerting.modelservice.repo.LegacyDetectorRepository;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
@@ -47,18 +47,18 @@ public class CustomExceptionHandlerTest {
     private static final String DUMMY_USER = "Dummy User";
 
     @InjectMocks
-    private DetectorController controllerUnderTest;
+    private LegacyDetectorController controllerUnderTest;
 
     private MockMvc mockMvc;
 
     @Mock
-    private DetectorRepository detectorRepo;
+    private LegacyDetectorRepository detectorRepo;
 
     private UUID someUuid;
 
     @Before
     public void setUp() {
-        this.controllerUnderTest = new DetectorController();
+        this.controllerUnderTest = new LegacyDetectorController();
         mockMvc = MockMvcBuilders.standaloneSetup(controllerUnderTest)
                 .setControllerAdvice(new CustomExceptionHandler(new SimpleMeterRegistry()))
                 .build();

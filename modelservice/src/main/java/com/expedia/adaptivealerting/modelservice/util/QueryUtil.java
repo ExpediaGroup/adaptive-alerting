@@ -15,13 +15,13 @@
  */
 package com.expedia.adaptivealerting.modelservice.util;
 
-import com.expedia.adaptivealerting.modelservice.entity.Expression;
-import com.expedia.adaptivealerting.modelservice.entity.Field;
-import com.expedia.adaptivealerting.modelservice.entity.Operand;
-import com.expedia.adaptivealerting.modelservice.entity.Operator;
-import com.expedia.adaptivealerting.modelservice.repo.impl.percolator.BoolCondition;
-import com.expedia.adaptivealerting.modelservice.repo.impl.percolator.MustCondition;
-import com.expedia.adaptivealerting.modelservice.repo.impl.percolator.Query;
+import com.expedia.adaptivealerting.modelservice.model.mapping.Expression;
+import com.expedia.adaptivealerting.modelservice.model.mapping.Field;
+import com.expedia.adaptivealerting.modelservice.model.mapping.Operand;
+import com.expedia.adaptivealerting.modelservice.model.mapping.Operator;
+import com.expedia.adaptivealerting.modelservice.model.percolator.BoolCondition;
+import com.expedia.adaptivealerting.modelservice.model.percolator.MustCondition;
+import com.expedia.adaptivealerting.modelservice.model.percolator.Query;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,7 +38,6 @@ public class QueryUtil {
         Expression expression = new Expression();
         //TODO - derive operator from query. for now hardcoding to AND as this is the only operator supported now.
         expression.setOperator(Operator.AND);
-        log.info("query:{}", query);
         List<Operand> operands = query.getBool().getMust().stream()
                 .map(mustCondition -> {
                     Operand operand = new Operand();

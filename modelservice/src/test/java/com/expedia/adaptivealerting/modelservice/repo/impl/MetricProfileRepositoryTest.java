@@ -15,13 +15,13 @@
  */
 package com.expedia.adaptivealerting.modelservice.repo.impl;
 
-import com.expedia.adaptivealerting.modelservice.entity.Expression;
-import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticSearchClient;
-import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticSearchProperties;
+import com.expedia.adaptivealerting.modelservice.model.mapping.Expression;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
 import com.expedia.adaptivealerting.modelservice.repo.MetricProfileRepository;
-import com.expedia.adaptivealerting.modelservice.repo.request.CreateMetricProfilingRequest;
+import com.expedia.adaptivealerting.modelservice.web.request.CreateMetricProfilingRequest;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
-import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticsearchUtil;
+import com.expedia.adaptivealerting.modelservice.util.ElasticsearchUtil;
 import com.expedia.adaptivealerting.modelservice.util.ObjectMapperUtil;
 import lombok.SneakyThrows;
 import org.elasticsearch.action.index.IndexRequest;
