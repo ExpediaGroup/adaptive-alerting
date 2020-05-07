@@ -4,6 +4,7 @@ import com.expedia.adaptivealerting.modelservice.entity.Detector;
 import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
 import com.expedia.adaptivealerting.modelservice.util.DateUtil;
+import com.expedia.adaptivealerting.modelservice.util.RequestValidator;
 import lombok.val;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,7 @@ public class DetectorServiceImpl implements DetectorService {
         detector.setId(uuid.toString());
         detector.setUuid(uuid);
         detector.setMeta(buildDetectorMetaData(detector));
+        RequestValidator.validateDetector(detector);
         repository.save(detector);
         return uuid;
     }
@@ -95,24 +97,16 @@ public class DetectorServiceImpl implements DetectorService {
         Detector detectorToBeUpdated = repository.findByUuid(uuid);
         detectorToBeUpdated.setDetectorConfig(detector.getDetectorConfig());
         detectorToBeUpdated.setMeta(buildDetectorMetaData(detector));
+        RequestValidator.validateDetector(detectorToBeUpdated);
+
         repository.save(detectorToBeUpdated);
     }
 
     private Detector.Meta buildDetectorMetaData(Detector detector) {
         Date nowDate = DateUtil.now();
         Detector.Meta metaBlock = detector.getMeta();
-        if (metaBlock == null) {
-            metaBlock = new Detector.Meta();
-            metaBlock.setDateLastUpdated(nowDate);
-            metaBlock.setCreatedBy(detector.getCreatedBy());
-            detector.setMeta(metaBlock);
-        } else {
-            metaBlock = detector.getMeta();
-            metaBlock.setDateLastUpdated(nowDate);
-            if (metaBlock.getCreatedBy() == null) {
-                metaBlock.setCreatedBy(detector.getCreatedBy());
-            }
-        }
+        metaBlock = (metaBlock == null) ? new Detector.Meta() : detector.getMeta();
+        metaBlock.setDateLastUpdated(nowDate);
         return metaBlock;
     }
 }

@@ -69,4 +69,12 @@ public class RequestValidator {
     public static void validateDetectorDocument(DetectorDocument document) {
         new DetectorFactory().buildDetector(document);
     }
+
+    public static void validateDetector(Detector detector) {
+        DetectorDocument detectorDocument = new DetectorDocument();
+        detectorDocument.setUuid(detector.getUuid());
+        detectorDocument.setConfig(detector.getDetectorConfig());
+        detectorDocument.setType(detector.getType());
+        new DetectorFactory().buildDetector(detectorDocument);
+    }
 }

@@ -1,7 +1,6 @@
 package com.expedia.adaptivealerting.modelservice.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.DateFormat;
@@ -15,7 +14,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Detector entity. This will replace {@linkplain DetectorDocument} class later on.
+ * Detector entity
  */
 @Data
 @Document(indexName = "detectors_new", type = "detector")
@@ -44,13 +43,6 @@ public class Detector {
 
     @Field(type = FieldType.Object)
     private Meta meta;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    @Deprecated // Use Meta instead
-    private Date lastUpdateTimestamp;
-
-    @Deprecated // Use Meta instead
-    private String createdBy;
 
     @Data
     public static class Meta {
