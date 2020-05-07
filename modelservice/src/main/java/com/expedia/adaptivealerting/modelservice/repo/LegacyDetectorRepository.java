@@ -17,7 +17,6 @@ package com.expedia.adaptivealerting.modelservice.repo;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
