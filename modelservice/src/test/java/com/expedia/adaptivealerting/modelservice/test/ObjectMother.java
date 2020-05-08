@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class ObjectMother {
+
     private static final ObjectMother MOM = new ObjectMother();
 
     public static ObjectMother instance() {
@@ -55,7 +56,7 @@ public class ObjectMother {
         return new AnomalyRequest()
                 .setDetectorType("constant-detector")
                 .setDetectorUuid(UUID.randomUUID())
-                .setDetectorParams(getDetectorParams())
+                .setDetectorParams(getLegalDetectorParams())
                 .setMetricTags("what=bookings");
     }
 
@@ -68,13 +69,7 @@ public class ObjectMother {
         val detector = new DetectorDocument();
         detector.setCreatedBy("user");
         detector.setType("constant-detector");
-
-        Map<String, Object> detectorConfig = new HashMap<>();
-        val thresholds = "{\"thresholds\": {\"lowerStrong\": \"90\", \"lowerWeak\": \"70\"}}";
-        val detectorParams = toObject(thresholds);
-        detectorParams.put("type", "LEFT_TAILED");
-        detectorConfig.put("params", getDetectorParams());
-        detector.setConfig(detectorConfig);
+        detector.setConfig(buildDetectorConfig());
         return detector;
     }
 
@@ -84,44 +79,16 @@ public class ObjectMother {
      * @return Detector with the UUID set to {@literal null}.
      */
     public Detector buildDetector() {
-        Detector detector = new Detector();
-        detector.setType("constant-detector");
-        Map<String, Object> detectorConfig = new HashMap<>();
-        val thresholds = "{\"thresholds\": {\"lowerStrong\": \"90\", \"lowerWeak\": \"70\"}}";
-        val detectorParams = toObject(thresholds);
-        detectorParams.put("type", "LEFT_TAILED");
-        detectorConfig.put("params", getDetectorParams());
-        detector.setDetectorConfig(detectorConfig);
-        return detector;
-    }
-
-    private Map<String, Object> getDetectorParams() {
-        // FIXME Use serialization rather than hand-crafted JSON. [WLW]
-        val thresholds = "{\"thresholds\": {\"lowerStrong\": \"70\", \"lowerWeak\": \"90\"}}";
-        val detectorParams = toObject(thresholds);
-        detectorParams.put("type", "LEFT_TAILED");
-        return detectorParams;
-    }
-
-    public Map<String, Object> getIllegalDetectorParams() {
-        val thresholds = "{\"thresholds\": {\"lowerStrong\": \"90\", \"lowerWeak\": \"70\"}}";
-        val detectorParams = toObject(thresholds);
-        detectorParams.put("type", "LEFT_TAILED");
-        return detectorParams;
+        return new Detector()
+                .setType("constant-detector")
+                .setDetectorConfig(buildDetectorConfig());
     }
 
     public DetectorDocument getIllegalParamsDetector() {
-        DetectorDocument detector = new DetectorDocument();
-        detector.setCreatedBy("user");
-        detector.setType("constant-detector");
-
-        Map<String, Object> detectorConfig = new HashMap<>();
-        val thresholds = "{\"thresholds\": {\"lowerStrong\": \"90\", \"lowerWeak\": \"70\"}}";
-        val detectorParams = toObject(thresholds);
-        detectorParams.put("type", "LEFT_TAILED");
-        detectorConfig.put("params", getIllegalDetectorParams());
-        detector.setConfig(detectorConfig);
-        return detector;
+        return new DetectorDocument()
+                .setCreatedBy("user")
+                .setType("constant-detector")
+                .setConfig(buildIllegalDetectorConfig());
     }
 
     public DetectorDocument getElasticsearchDetector() {
@@ -143,6 +110,33 @@ public class ObjectMother {
         operandsList.add(testOperand);
         expression.setOperands(operandsList);
         return expression;
+    }
+
+    private Map<String, Object> buildDetectorConfig() {
+        Map<String, Object> detectorConfig = new HashMap<>();
+        detectorConfig.put("params", getLegalDetectorParams());
+        return detectorConfig;
+    }
+
+    private Map<String, Object> buildIllegalDetectorConfig() {
+        Map<String, Object> detectorConfig = new HashMap<>();
+        detectorConfig.put("params", getIllegalDetectorParams());
+        return detectorConfig;
+    }
+
+    private Map<String, Object> getLegalDetectorParams() {
+        // FIXME Use serialization rather than hand-crafted JSON. [WLW]
+        val thresholds = "{\"thresholds\": {\"lowerStrong\": \"70\", \"lowerWeak\": \"90\"}}";
+        val detectorParams = toObject(thresholds);
+        detectorParams.put("type", "LEFT_TAILED");
+        return detectorParams;
+    }
+
+    private Map<String, Object> getIllegalDetectorParams() {
+        val thresholds = "{\"thresholds\": {\"lowerStrong\": \"90\", \"lowerWeak\": \"70\"}}";
+        val detectorParams = toObject(thresholds);
+        detectorParams.put("type", "LEFT_TAILED");
+        return detectorParams;
     }
 
     @SneakyThrows
