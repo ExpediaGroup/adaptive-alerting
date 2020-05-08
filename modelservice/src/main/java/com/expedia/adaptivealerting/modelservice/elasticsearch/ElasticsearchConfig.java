@@ -16,6 +16,8 @@
 package com.expedia.adaptivealerting.modelservice.elasticsearch;
 
 import com.expedia.adaptivealerting.modelservice.exception.MissingSystemPropertyException;
+import lombok.Data;
+import lombok.experimental.Accessors;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -24,9 +26,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Elastic search config used by spring data elastic search
@@ -45,26 +44,25 @@ public class ElasticsearchConfig {
 
     @Bean(destroyMethod = "close")
     public RestHighLevelClient client() {
-        Map<String, String> stringMap = extractHostAndPortFromUrl();
-        String host = stringMap.get("host");
-        int port = Integer.parseInt(stringMap.get("port"));
-        RestHighLevelClient esClient = new RestHighLevelClient(RestClient.builder(new HttpHost(host, port)));
+        ElasticSearchProperties.Url url = extractHostAndPortFromUrls();
+        RestHighLevelClient esClient = new RestHighLevelClient(RestClient.builder(new HttpHost(url.getHost(), url.getPort())));
         return esClient;
     }
 
-    private Map<String, String> extractHostAndPortFromUrl() {
-        String url = elasticSearchProperties.getUrls();
-        if (url == null) {
+    //TODO Update the config to use host and port instead of storing whole URL as a string
+    private ElasticSearchProperties.Url extractHostAndPortFromUrls() {
+        ElasticSearchProperties.Url url = new ElasticSearchProperties.Url();
+        String urls = elasticSearchProperties.getUrls();
+        if (urls == null) {
             throw new MissingSystemPropertyException("Elastic search URL not set in config");
         }
-        String[] arrOfUrl = url.split(":");
+        String[] arrOfUrl = urls.split(":");
         if (arrOfUrl.length <= 1) {
             throw new MissingSystemPropertyException("Use host:port format to set URL in the config");
         }
 
-        Map<String, String> stringMap = new HashMap<>();
-        stringMap.put("host", arrOfUrl[0]);
-        stringMap.put("port", arrOfUrl[1]);
-        return stringMap;
+        url.setHost(arrOfUrl[0]);
+        url.setPort(Integer.parseInt(arrOfUrl[1]));
+        return url;
     }
 }

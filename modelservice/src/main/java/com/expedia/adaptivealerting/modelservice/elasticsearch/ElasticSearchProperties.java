@@ -38,6 +38,7 @@ public class ElasticSearchProperties {
     private String indexName;
     private boolean createIndexIfNotFound;
     private String docType;
+    //TODO Update the config to use host and port instead of storing whole URL as a string
     private String urls;
     private String detectorIndexName;
     private String detectorDocType;
@@ -54,13 +55,20 @@ public class ElasticSearchProperties {
         private String awsRegion;
     }
 
+    @Data
+    @Accessors(chain = true)
+    public static class Url {
+        private String host;
+        private int port;
+    }
+
     private Config config;
 
     public void addAWSRequestSignerInterceptor(RestClientBuilder clientBuilder) {
         if (config.isAwsIamAuthRequired()) { // this is optional security for elastic search running in AWS
             AWSSigningRequestInterceptor signingInterceptor = getAWSRequestSignerInterceptor();
             clientBuilder.setHttpClientConfigCallback(
-                clientConf -> clientConf.addInterceptorLast(signingInterceptor));
+                    clientConf -> clientConf.addInterceptorLast(signingInterceptor));
         }
     }
 
