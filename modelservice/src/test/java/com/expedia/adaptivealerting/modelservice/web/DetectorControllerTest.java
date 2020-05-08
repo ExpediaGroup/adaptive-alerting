@@ -43,6 +43,7 @@ import java.util.UUID;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
@@ -128,18 +129,6 @@ public class DetectorControllerTest {
     }
 
     @Test
-    public void testGetLastUpdatedDetectors() {
-        val actualDetectors = controllerUnderTest.getLastUpdatedDetectors(5);
-        assertNotNull(actualDetectors);
-        assertSame(detectors, actualDetectors);
-    }
-
-    @Test
-    public void testUpdateDetector() {
-        controllerUnderTest.updateDetector(someUuid.toString(), legalParamsDetector);
-    }
-
-    @Test
     public void testToggleDetector() {
         controllerUnderTest.toggleDetector(someUuid.toString(), true);
     }
@@ -147,6 +136,25 @@ public class DetectorControllerTest {
     @Test
     public void testTrustDetector() {
         controllerUnderTest.trustDetector(someUuid.toString(), true);
+    }
+
+    @Test
+    public void testGetLastUpdatedDetectors() {
+        val actualDetectors = controllerUnderTest.getLastUpdatedDetectors(5);
+        assertNotNull(actualDetectors);
+        assertSame(detectors, actualDetectors);
+    }
+
+    @Test
+    public void testGetLastUsedDetectors() {
+        val actualDetectors = controllerUnderTest.getLastUsedDetectors(5);
+        assertNotNull(actualDetectors);
+        assertSame(detectors, actualDetectors);
+    }
+
+    @Test
+    public void testUpdateDetector() {
+        controllerUnderTest.updateDetector(someUuid.toString(), legalParamsDetector);
     }
 
     @Test
@@ -167,6 +175,6 @@ public class DetectorControllerTest {
         when(detectorService.createDetector(any(Detector.class))).thenReturn(someUuid);
         when(detectorService.findByUuid(someUuid.toString())).thenReturn(detector);
         when(detectorService.getLastUpdatedDetectors(anyLong())).thenReturn(detectors);
+        when(detectorService.getLastUsedDetectors(anyInt())).thenReturn(detectors);
     }
-
 }

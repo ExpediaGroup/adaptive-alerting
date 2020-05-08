@@ -97,8 +97,8 @@ public class DetectorController {
 
     @GetMapping(path = "/detectorLastUsed", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public List<Detector> getLastUsedDetectors(@RequestParam int noOfWeeks) {
-        return service.getLastUpdatedDetectors(noOfWeeks);
+    public List<Detector> getLastUsedDetectors(@RequestParam int noOfDays) {
+        return service.getLastUsedDetectors(noOfDays);
     }
 
     @PutMapping

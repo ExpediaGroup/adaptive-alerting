@@ -93,15 +93,10 @@ public class DetectorServiceImpl implements DetectorService {
     }
 
     @Override
-    public List<Detector> getLastUsedDetectors(int noOfWeeks) {
+    public List<Detector> getLastUsedDetectors(int noOfDays) {
         val now = DateUtil.now().toInstant();
-        val fromDate = DateUtil.toUtcDateString((now.minus(noOfWeeks, ChronoUnit.WEEKS)));
+        val fromDate = DateUtil.toUtcDateString((now.minus(noOfDays, ChronoUnit.DAYS)));
         return repository.findByMeta_DateLastAccessedLessThan(fromDate);
-    }
-
-    @Override
-    public void deleteDetector(String uuid) {
-        repository.deleteByUuid(uuid);
     }
 
     @Override
@@ -115,6 +110,11 @@ public class DetectorServiceImpl implements DetectorService {
         RequestValidator.validateDetector(detectorToBeUpdated);
 
         repository.save(detectorToBeUpdated);
+    }
+
+    @Override
+    public void deleteDetector(String uuid) {
+        repository.deleteByUuid(uuid);
     }
 
     private Detector.Meta buildDetectorMetaData(Detector detector) {

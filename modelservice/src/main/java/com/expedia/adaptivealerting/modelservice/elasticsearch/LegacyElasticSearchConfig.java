@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.modelservice.elasticsearch;
 
+import lombok.Generated;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
@@ -28,10 +29,10 @@ import org.springframework.context.annotation.Configuration;
  * So we need to maintain an another elastic search client till then for percolate queries
  */
 @Configuration
+@Generated
 @Deprecated
 public class LegacyElasticSearchConfig {
-
-    @Bean(name = "legacyRestHighLevelClient")
+    @Bean(name = "legacyRestHighLevelClient", destroyMethod = "close")
     public RestHighLevelClient restClientBuilder(ElasticSearchProperties elasticSearchProperties) {
         RestClientBuilder builder = RestClient
                 .builder(HttpHost.create(elasticSearchProperties.getUrls()))

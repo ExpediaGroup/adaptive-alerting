@@ -41,10 +41,10 @@ public interface DetectorService {
 
     List<Detector> getLastUpdatedDetectors(long interval);
 
-    List<Detector> getLastUsedDetectors(int weeks);
-
-    void deleteDetector(String uuid);
+    List<Detector> getLastUsedDetectors(int noOfDays);
 
     void updateDetector(String uuid, Detector detector);
+
+    void deleteDetector(String uuid);
 
 }
