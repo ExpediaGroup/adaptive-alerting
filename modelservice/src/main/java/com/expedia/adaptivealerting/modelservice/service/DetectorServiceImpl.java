@@ -103,12 +103,22 @@ public class DetectorServiceImpl implements DetectorService {
     public void updateDetector(String uuid, Detector detector) {
         notNull(detector, "detector can't be null");
         MDC.put("DetectorUuid", uuid);
-        Date nowDate = DateUtil.now();
+
         Detector detectorToBeUpdated = repository.findByUuid(uuid);
         detectorToBeUpdated.setDetectorConfig(detector.getDetectorConfig());
         detectorToBeUpdated.setMeta(buildDetectorMetaData(detector));
         RequestValidator.validateDetector(detectorToBeUpdated);
+        repository.save(detectorToBeUpdated);
+    }
 
+    @Override
+    public void updateDetectorLastUsed(String uuid) {
+        notNull(uuid, "uuid can't be null");
+        MDC.put("DetectorUuid", uuid);
+
+        Detector detectorToBeUpdated = repository.findByUuid(uuid);
+        detectorToBeUpdated.setMeta(buildDetectorMetaData(detectorToBeUpdated));
+        RequestValidator.validateDetector(detectorToBeUpdated);
         repository.save(detectorToBeUpdated);
     }
 
@@ -122,6 +132,7 @@ public class DetectorServiceImpl implements DetectorService {
         Detector.Meta metaBlock = detector.getMeta();
         metaBlock = (metaBlock == null) ? new Detector.Meta() : detector.getMeta();
         metaBlock.setDateLastUpdated(nowDate);
+        metaBlock.setDateLastAccessed(nowDate);
         return metaBlock;
     }
 }

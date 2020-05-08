@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(path = "/api/v3/detectors")
@@ -105,6 +106,12 @@ public class DetectorController {
     @ResponseStatus(HttpStatus.OK)
     public void updateDetector(@RequestParam String uuid, @RequestBody Detector detector) {
         service.updateDetector(uuid, detector);
+    }
+
+    @PutMapping(path = "/updateDetectorLastUsed", consumes = "application/json", produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
+    public void updatedDetectorLastUsed(@RequestBody Map<String, String> params) {
+        service.updateDetectorLastUsed(params.get("uuid"));
     }
 
     @DeleteMapping

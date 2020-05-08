@@ -102,13 +102,6 @@ public class LegacyDetectorController {
         detectorRepo.updateDetector(uuid, document);
     }
 
-
-    @PostMapping(path = "/updateLastUsedDetector", consumes = "application/json", produces = "application/json")
-    @ResponseStatus(HttpStatus.OK)
-    public void updatedDetectorLastUsed(@RequestBody Map<String, String> params) {
-        detectorRepo.updateDetectorLastUsed(params.get("uuid"));
-    }
-
     @DeleteMapping
     @ResponseStatus(HttpStatus.OK)
     public void deleteDetector(@RequestParam String uuid) {

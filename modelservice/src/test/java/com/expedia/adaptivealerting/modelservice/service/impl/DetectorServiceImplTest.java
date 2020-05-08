@@ -67,11 +67,15 @@ public class DetectorServiceImplTest {
     @Test
     public void testToggleDetector() {
         serviceUnderTest.toggleDetector(someUuid.toString(), true);
+        verify(repository, times(1)).findByUuid(someUuid.toString());
+        verify(repository, times(1)).save(legalParamsDetector);
     }
 
     @Test
     public void testTrustDetector() {
         serviceUnderTest.trustDetector(someUuid.toString(), true);
+        verify(repository, times(1)).findByUuid(someUuid.toString());
+        verify(repository, times(1)).save(legalParamsDetector);
     }
 
     @Test
@@ -91,6 +95,15 @@ public class DetectorServiceImplTest {
     @Test
     public void testUpdateDetector() {
         serviceUnderTest.updateDetector(someUuid.toString(), legalParamsDetector);
+        verify(repository, times(1)).findByUuid(someUuid.toString());
+        verify(repository, times(1)).save(legalParamsDetector);
+    }
+
+    @Test
+    public void testUpdateDetectorLastUsed() {
+        serviceUnderTest.updateDetectorLastUsed(someUuid.toString());
+        verify(repository, times(1)).findByUuid(someUuid.toString());
+        verify(repository, times(1)).save(legalParamsDetector);
     }
 
     @Test

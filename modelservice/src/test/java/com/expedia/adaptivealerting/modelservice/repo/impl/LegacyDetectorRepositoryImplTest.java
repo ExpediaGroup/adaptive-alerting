@@ -240,10 +240,10 @@ public class LegacyDetectorRepositoryImplTest {
 
     @Test
     public void testDeleteDetector() {
-        val detectorRepository = mock(LegacyDetectorRepository.class);
-        doNothing().when(detectorRepository).deleteDetector(anyString());
-        detectorRepository.deleteDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639");
-        verify(detectorRepository, times(1)).deleteDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639");
+        val legacyDetectorRepository = mock(LegacyDetectorRepository.class);
+        doNothing().when(legacyDetectorRepository).deleteDetector(anyString());
+        legacyDetectorRepository.deleteDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639");
+        verify(legacyDetectorRepository, times(1)).deleteDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639");
     }
 
     @Test(expected = RuntimeException.class)

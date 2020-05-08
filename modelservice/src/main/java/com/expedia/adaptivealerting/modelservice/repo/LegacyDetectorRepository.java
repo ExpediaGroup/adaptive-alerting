@@ -36,8 +36,6 @@ public interface LegacyDetectorRepository {
 
     void updateDetector(String uuid, DetectorDocument document);
 
-    void updateDetectorLastUsed(String uuid);
-
     DetectorDocument findByUuid(String uuid);
 
     List<DetectorDocument> findByCreatedBy(String user);

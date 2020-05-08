@@ -27,6 +27,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -35,7 +36,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -57,6 +58,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 public class DetectorControllerTest {
 
+    @Spy
     @InjectMocks
     private DetectorController controllerUnderTest;
 
@@ -131,11 +133,13 @@ public class DetectorControllerTest {
     @Test
     public void testToggleDetector() {
         controllerUnderTest.toggleDetector(someUuid.toString(), true);
+        verify(detectorService, times(1)).toggleDetector(someUuid.toString(), true);
     }
 
     @Test
     public void testTrustDetector() {
         controllerUnderTest.trustDetector(someUuid.toString(), true);
+        verify(detectorService, times(1)).trustDetector(someUuid.toString(), true);
     }
 
     @Test
@@ -155,6 +159,14 @@ public class DetectorControllerTest {
     @Test
     public void testUpdateDetector() {
         controllerUnderTest.updateDetector(someUuid.toString(), legalParamsDetector);
+        verify(detectorService, times(1)).updateDetector(someUuid.toString(), legalParamsDetector);
+    }
+
+    @Test
+    public void testUpdatedDetectorLastUsed() {
+        Map<String, String> requestBody = Collections.singletonMap("uuid", someUuid.toString());
+        controllerUnderTest.updatedDetectorLastUsed(requestBody);
+        verify(detectorService, times(1)).updateDetectorLastUsed(someUuid.toString());
     }
 
     @Test

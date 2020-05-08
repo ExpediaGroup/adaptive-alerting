@@ -190,31 +190,6 @@ public class LegacyDetectorRepositoryImpl implements LegacyDetectorRepository {
     }
 
     @Override
-    public void updateDetectorLastUsed(String uuid) {
-        MDC.put("DetectorUuid", uuid);
-        UpdateRequest updateRequest = new UpdateRequest(
-                DETECTOR_INDEX,
-                DETECTOR_DOC_TYPE,
-                uuid);
-        Map<String, Object> jsonMap = new HashMap<>();
-        Map<String, Object> metaMap = new HashMap<>();
-        metaMap.put("dateLastUsed", DateUtil.now());
-        jsonMap.put("meta", metaMap);
-        updateRequest.doc(jsonMap);
-        try {
-            val updateResponse = elasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
-            if (elasticsearchUtil.checkNullResponse(updateResponse.getResult())) {
-                throw new RecordNotFoundException("Invalid request: " + uuid);
-            }
-        } catch (IOException e) {
-            log.error("Updating elastic search failed", e);
-            throw new RuntimeException(e);
-        } finally {
-            MDC.remove("DetectorUuid");
-        }
-    }
-
-    @Override
     public DetectorDocument findByUuid(String uuid) {
         MDC.put("DetectorUuid", uuid);
         val queryBuilder = QueryBuilders.termQuery("uuid", uuid);

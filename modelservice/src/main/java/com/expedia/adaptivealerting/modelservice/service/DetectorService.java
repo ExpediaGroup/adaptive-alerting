@@ -45,6 +45,8 @@ public interface DetectorService {
 
     void updateDetector(String uuid, Detector detector);
 
+    void updateDetectorLastUsed(String uuid);
+
     void deleteDetector(String uuid);
 
 }
