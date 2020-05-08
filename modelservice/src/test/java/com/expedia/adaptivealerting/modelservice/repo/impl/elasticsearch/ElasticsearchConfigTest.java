@@ -40,4 +40,11 @@ public class ElasticsearchConfigTest {
         val restHighLevelClient = elasticSearchConfig.client();
         assertNotNull(restHighLevelClient);
     }
+
+    @Test(expected = MissingSystemPropertyException.class)
+    public void testRestTemplate_invalid_config1() {
+        when(properties.getUrls()).thenReturn("localhost");
+        val restHighLevelClient = elasticSearchConfig.client();
+        assertNotNull(restHighLevelClient);
+    }
 }

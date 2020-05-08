@@ -25,6 +25,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Elastic search config used by spring data elastic search
  */
@@ -42,15 +45,26 @@ public class ElasticsearchConfig {
 
     @Bean(destroyMethod = "close")
     public RestHighLevelClient client() {
+        Map<String, String> stringMap = extractHostAndPortFromUrl();
+        String host = stringMap.get("host");
+        int port = Integer.parseInt(stringMap.get("port"));
+        RestHighLevelClient esClient = new RestHighLevelClient(RestClient.builder(new HttpHost(host, port)));
+        return esClient;
+    }
+
+    private Map<String, String> extractHostAndPortFromUrl() {
         String url = properties.getUrls();
         if (url == null) {
             throw new MissingSystemPropertyException("Elastic search URL not set in config");
         }
-
         String[] arrOfUrl = url.split(":");
-        String host = arrOfUrl[0];
-        int port = Integer.parseInt(arrOfUrl[1]);
-        RestHighLevelClient esClient = new RestHighLevelClient(RestClient.builder(new HttpHost(host, port)));
-        return esClient;
+        if (arrOfUrl.length <= 1) {
+            throw new MissingSystemPropertyException("Use host:port format to set URL in the config");
+        }
+
+        Map<String, String> stringMap = new HashMap<>();
+        stringMap.put("host", arrOfUrl[0]);
+        stringMap.put("port", arrOfUrl[1]);
+        return stringMap;
     }
 }
