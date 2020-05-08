@@ -16,7 +16,6 @@
 package com.expedia.adaptivealerting.modelservice.elasticsearch;
 
 import com.expedia.adaptivealerting.modelservice.exception.MissingSystemPropertyException;
-import lombok.Generated;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -30,7 +29,6 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
  * Elastic search config used by spring data elastic search
  */
 @Configuration
-@Generated
 @EnableElasticsearchRepositories(basePackages = "com.expedia.adaptivealerting.modelservice.repo")
 public class ElasticsearchConfig {
 
@@ -48,11 +46,11 @@ public class ElasticsearchConfig {
         if (url == null) {
             throw new MissingSystemPropertyException("Elastic search URL not set in config");
         }
+
         String[] arrOfUrl = url.split(":");
         String host = arrOfUrl[0];
         int port = Integer.parseInt(arrOfUrl[1]);
         RestHighLevelClient esClient = new RestHighLevelClient(RestClient.builder(new HttpHost(host, port)));
         return esClient;
     }
-
 }
