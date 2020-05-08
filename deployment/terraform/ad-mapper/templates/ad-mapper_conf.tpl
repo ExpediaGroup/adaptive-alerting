@@ -12,4 +12,5 @@ ad-mapper {
   outbound-topic = "mapped-metrics"
   detector-mapping-cache-update-period = "${detector_mapping_cache_update_period}"
   model-service-base-uri = "${modelservice_base_uri}"
+  detector-mapping-filter-enabled = "${detector_mapping_filter_enabled}"
 }

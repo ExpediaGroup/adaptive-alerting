@@ -32,3 +32,6 @@ variable "modelservice_base_uri" {}
 variable "detector_mapping_cache_update_period" {
   default = 5
 }
+variable "detector_mapping_filter_enabled" {
+  default = false
+}

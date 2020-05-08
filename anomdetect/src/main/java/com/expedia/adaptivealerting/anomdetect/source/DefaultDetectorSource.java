@@ -58,7 +58,7 @@ public class DefaultDetectorSource implements DetectorSource {
 
     @Override
     public List<DetectorMapping> findDetectorMappingsUpdatedSince(long lastModifiedTime) {
-        isTrue(lastModifiedTime > 0, "Required: lastModifiedTime > 0");
+        isTrue(lastModifiedTime >= 0, "Required: lastModifiedTime >= 0");
         return client.findDetectorMappingsUpdatedSince(lastModifiedTime);
     }
 

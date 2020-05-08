@@ -15,7 +15,6 @@
 #
 version: "2.4"
 services:
-
   # AA Components
   modelservice:
     image: adaptive-alerting-modelservice
@@ -26,6 +25,7 @@ services:
       - ./configs/modelservice:/config
     ports:
       - "8008:8008"
+      # - "8778:8778"
     depends_on:
       elasticsearch:
         condition: service_healthy
@@ -42,6 +42,8 @@ services:
     environment:
       AA_GRAPHITE_ENABLED: "true"
       JAVA_XMS: 128m
+    ports:
+      - "8778:8778"
     volumes:
       - ./configs/ad-mapper:/config
     depends_on:
@@ -55,6 +57,8 @@ services:
     environment:
       AA_GRAPHITE_ENABLED: "true"
       JAVA_XMS: 128m
+    # ports:
+    #   - "8778:8780"
     volumes:
       - ./configs/ad-manager:/config
     depends_on:

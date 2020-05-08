@@ -71,7 +71,7 @@ public class DetectorMappingController {
         detectorMappingRepo.deleteDetectorMapping(id);
     }
 
-    @RequestMapping(value = "/count", method = RequestMethod.POST)
+    @RequestMapping(value = "/count", method = RequestMethod.GET)
     public long enabledDetectorMappingCount() {
         return detectorMappingRepo.getEnabledDetectorMappingCount();
     }

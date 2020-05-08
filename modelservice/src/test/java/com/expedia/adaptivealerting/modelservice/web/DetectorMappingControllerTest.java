@@ -123,7 +123,8 @@ public class DetectorMappingControllerTest {
         searchMappingsRequest.setDetectorUuid(UUID.fromString(detectorUuid));
         searchMappingsRequest.setUserId(userVal);
         when(detectorMappingRepo.search(searchMappingsRequest)).thenReturn(detectorMappings);
-        List<DetectorMapping> detectorMappingsResponse = controllerUnderTest.searchDetectorMapping(searchMappingsRequest);
+        List<DetectorMapping> detectorMappingsResponse = controllerUnderTest
+                .searchDetectorMapping(searchMappingsRequest);
         assertEquals(id, detectorMappingsResponse.get(0).getId());
         assertEquals(detectorUuid, detectorMappingsResponse.get(0).getDetector().getUuid().toString());
         assertEquals("test-user", detectorMappingsResponse.get(0).getUser().getId());
@@ -135,6 +136,18 @@ public class DetectorMappingControllerTest {
         List<DetectorMapping> mockDetectorMappings = mockDetectorMappingsList();
         when(detectorMappingRepo.findLastUpdated(timeInSecs)).thenReturn(mockDetectorMappings);
         List<DetectorMapping> detectorMappings = controllerUnderTest.findDetectorMapping(timeInSecs);
+        assertNotNull("Response can't be null", detectorMappings);
+        assertEquals(1, detectorMappings.size());
+        assertEquals(UUID.fromString(detectorUuid), detectorMappings.get(0).getDetector().getUuid());
+        assertEquals(id, detectorMappings.get(0).getId());
+    }
+
+    @Test
+    public void testFindUpdatedSince() {
+        val lastUpdateTime = 0;
+        List<DetectorMapping> mockDetectorMappings = mockDetectorMappingsList();
+        when(detectorMappingRepo.findUpdatedSince(lastUpdateTime)).thenReturn(mockDetectorMappings);
+        List<DetectorMapping> detectorMappings = controllerUnderTest.findDetectorMappingsUpdatedSince(lastUpdateTime);
         assertNotNull("Response can't be null", detectorMappings);
         assertEquals(1, detectorMappings.size());
         assertEquals(UUID.fromString(detectorUuid), detectorMappings.get(0).getDetector().getUuid());
@@ -154,7 +167,8 @@ public class DetectorMappingControllerTest {
     public void testFindMatchingByTags() {
         val lookupTime = 60;
         List<Map<String, String>> tagsList = new ArrayList<>();
-        MatchingDetectorsResponse mockMatchingDetectorsResponse = mockMatchingDetectorsResponse(lookupTime, detectorUuid);
+        MatchingDetectorsResponse mockMatchingDetectorsResponse = mockMatchingDetectorsResponse(lookupTime,
+                detectorUuid);
         when(detectorMappingRepo.findMatchingDetectorMappings(tagsList)).thenReturn(mockMatchingDetectorsResponse);
         MatchingDetectorsResponse matchingDetectorsResult = controllerUnderTest.searchDetectorMapping(tagsList);
         Assert.assertEquals(1, matchingDetectorsResult.getGroupedDetectorsBySearchIndex().size());
@@ -190,7 +204,8 @@ public class DetectorMappingControllerTest {
         List<Detector> DetectorList = new ArrayList<>();
         DetectorList.add(buildDetector(detectorUuid));
         matchingDetectorsResponseMap.put(1, DetectorList);
-        MatchingDetectorsResponse matchingDetectorsResponse = new MatchingDetectorsResponse(matchingDetectorsResponseMap, lookupTime);
+        MatchingDetectorsResponse matchingDetectorsResponse = new MatchingDetectorsResponse(
+                matchingDetectorsResponseMap, lookupTime);
         return matchingDetectorsResponse;
     }
 

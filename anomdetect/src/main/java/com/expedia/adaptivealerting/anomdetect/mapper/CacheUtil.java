@@ -43,14 +43,10 @@ public final class CacheUtil {
      * @return Returns a string in this format {@literal "k1->v1,k2->v2,k3->v3"}
      */
     public static String getKey(Map<String, String> tags) {
-        List<String> listOfEntries = tags.entrySet()
-                .stream()
-                .map(entry -> {
-                    String encodedValue = Base64.getEncoder().encodeToString(entry.getValue().getBytes());
-                    return entry.getKey() + CACHE_KEY_DELIMITER + encodedValue;
-                })
-                .sorted()
-                .collect(Collectors.toList());
+        List<String> listOfEntries = tags.entrySet().stream().map(entry -> {
+            String encodedValue = Base64.getEncoder().encodeToString(entry.getValue().getBytes());
+            return entry.getKey() + CACHE_KEY_DELIMITER + encodedValue;
+        }).sorted().collect(Collectors.toList());
         return String.join(",", listOfEntries);
     }
 
@@ -75,7 +71,8 @@ public final class CacheUtil {
     /**
      * Converts a list of detectors to cache's value format
      *
-     * @param detectors A list of detectors [Detector(consumerId=c1, uuid=uuid1), Detector(consumerId=c2, uuid=uuid)]
+     * @param detectors A list of detectors [Detector(consumerId=c1, uuid=uuid1),
+     *                  Detector(consumerId=c2, uuid=uuid)]
      * @return Returns a string in this format "c1,uuid1|c2,uuid2"
      */
     public static String getDetectors(List<Detector> detectors) {
@@ -90,7 +87,8 @@ public final class CacheUtil {
      * Converts cache's value format to list of detectors
      *
      * @param detectorsString A String "c1,uuid1|c2,uuid2"
-     * @return Returns a list of detectors in this format [Detector(consumerId=c1, uuid=uuid1), Detector(consumerId=c2, uuid=uuid)]
+     * @return Returns a list of detectors in this format [Detector(consumerId=c1,
+     *         uuid=uuid1), Detector(consumerId=c2, uuid=uuid)]
      */
     public static List<Detector> buildDetectors(String detectorsString) {
         if (detectorsString == null || "".equals(detectorsString)) {
@@ -98,7 +96,7 @@ public final class CacheUtil {
         }
         String[] detectors = detectorsString.split("\\|");
         return Arrays.asList(detectors).stream()
-                .map(detector -> new Detector(detector.split(",")[0], UUID.fromString(detector.split(",")[1]))) //update
+                .map(detector -> new Detector(detector.split(",")[0], UUID.fromString(detector.split(",")[1]))) // update
                 .collect(Collectors.toList());
     }
 

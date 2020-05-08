@@ -45,10 +45,13 @@ import java.util.stream.Collectors;
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 /**
- * Kafka Streams adapter for {@link DetectorMapper}. Reads metric data from an input topic, classifies individual metric
- * data points, and publishes the classifications to type-specific topics where they can be picked up by the internal or external detectors
- * For internal detectors, ad-manager is the consumer and all the messages are routed to defaultOutputTopic for it's consumption
- * For external detectors, all the messages are routed to their own topics i.e. defaultOutputTopic + "-" + consumerId
+ * Kafka Streams adapter for {@link DetectorMapper}. Reads metric data from an
+ * input topic, classifies individual metric data points, and publishes the
+ * classifications to type-specific topics where they can be picked up by the
+ * internal or external detectors For internal detectors, ad-manager is the
+ * consumer and all the messages are routed to defaultOutputTopic for it's
+ * consumption For external detectors, all the messages are routed to their own
+ * topics i.e. defaultOutputTopic + "-" + consumerId
  */
 @Slf4j
 public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
@@ -80,7 +83,8 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
      * @param mapper             Anomaly detector mapper.
      * @param jmxReporterFactory JMX reporter factory.
      */
-    public KafkaAnomalyDetectorMapper(StreamsAppConfig config, DetectorMapper mapper, JmxReporterFactory jmxReporterFactory) {
+    public KafkaAnomalyDetectorMapper(StreamsAppConfig config, DetectorMapper mapper,
+            JmxReporterFactory jmxReporterFactory) {
         super(config, jmxReporterFactory.getJmxReporter());
         notNull(mapper, "mapper can't be null");
         this.mapper = mapper;
@@ -96,16 +100,16 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
         val builder = new StreamsBuilder();
 
         // create store
-        StoreBuilder<KeyValueStore<String, MetricData>> keyValueStoreBuilder =
-                Stores.keyValueStoreBuilder(Stores.inMemoryKeyValueStore(STATE_STORE_NAME),
-                        Serdes.String(),
+        StoreBuilder<KeyValueStore<String, MetricData>> keyValueStoreBuilder = Stores
+                .keyValueStoreBuilder(Stores.inMemoryKeyValueStore(STATE_STORE_NAME), Serdes.String(),
                         new MetricDataJsonSerde())
-                        .withLoggingDisabled();
+                .withLoggingDisabled();
         // register store
         builder.addStateStore(keyValueStoreBuilder);
 
-        //Dynamically choose kafka topic depending on the consumer id.
-        final TopicNameExtractor<String, MappedMetricData> kafkaTopicNameExtractor = (key, mappedMetricData, recordContext) -> {
+        // Dynamically choose kafka topic depending on the consumer id.
+        final TopicNameExtractor<String, MappedMetricData> kafkaTopicNameExtractor = (key, mappedMetricData,
+                recordContext) -> {
             final String consumerId = mappedMetricData.getConsumerId();
             if (DEFAULT_CONSUMER_ID.equals(consumerId)) {
                 return defaultOutputTopic;
@@ -114,9 +118,7 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
         };
 
         final KStream<String, MetricData> stream = builder.stream(inputTopic);
-        stream
-                .filter((key, md) -> md != null)
-                .filter((key, md) -> mapper.metricMightBeMapped(md.getMetricDefinition()))
+        stream.filter((key, md) -> md != null).filter((key, md) -> mapper.metricMightBeMapped(md.getMetricDefinition()))
                 .transform(new MetricDataTransformerSupplier(mapper, STATE_STORE_NAME), STATE_STORE_NAME)
                 .flatMap(this::metricsByDetector)
                 .to(kafkaTopicNameExtractor, Produced.with(outputKeySerde, outputValueSerde));
@@ -126,7 +128,8 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
     private Iterable<? extends KeyValue<String, MappedMetricData>> metricsByDetector(String key, MapperResult mmRes) {
         AssertUtil.notNull(mmRes, "MapperResult mmRes can't be null");
         return mmRes.getMatchingDetectors().stream()
-                .map(detector -> KeyValue.pair(detector.getUuid().toString(), new MappedMetricData(mmRes.getMetricData(), detector.getConsumerId(), detector.getUuid())))
+                .map(detector -> KeyValue.pair(detector.getUuid().toString(),
+                        new MappedMetricData(mmRes.getMetricData(), detector.getConsumerId(), detector.getUuid())))
                 .collect(Collectors.toSet());
     }
 }
