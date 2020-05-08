@@ -49,7 +49,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 @AutoConfigureMockMvc
-public class DetectorConsumerInfoMappingControllerTest {
+public class DetectorMappingControllerTest {
 
     @Mock
     private DetectorMappingRepository detectorMappingRepo;

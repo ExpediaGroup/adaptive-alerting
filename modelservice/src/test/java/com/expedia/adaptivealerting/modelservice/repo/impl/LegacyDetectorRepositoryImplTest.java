@@ -39,9 +39,13 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.common.bytes.BytesArray;
+import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.document.DocumentField;
 import org.elasticsearch.common.io.stream.ByteBufferStreamInput;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.Assert;
 import org.junit.Before;
@@ -62,7 +66,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -345,6 +348,7 @@ public class LegacyDetectorRepositoryImplTest {
 
         val searchIndex = "2";
         this.indexResponse = mockIndexResponse();
+        this.searchResponse = mockSearchResponse(searchIndex);
         this.deleteResponse = mockDeleteResponse("id");
         this.getResponse = mockGetResponse("id");
     }
@@ -364,11 +368,23 @@ public class LegacyDetectorRepositoryImplTest {
 
     }
 
-
     private IndexResponse mockIndexResponse() {
         IndexResponse indexResponse = mock(IndexResponse.class);
         when(indexResponse.getId()).thenReturn("1");
         return indexResponse;
+    }
+
+    private SearchResponse mockSearchResponse(String searchIndex) {
+        SearchResponse searchResponse = mock(SearchResponse.class);
+        Map<String, DocumentField> fields = new HashMap<>();
+        SearchHit searchHit = new SearchHit(101, "xxx", null, fields);
+        BytesReference source = new BytesArray("{\"uuid\":\"13456565\",\"createdBy\":\"user\",\"lastUpdateTimestamp\":\"2019-05-20 12:00:00\",\"enabled\":true,\"trusted\":true,\"detectorConfig\":{\"hyperparams\":{\"alpha\":0.5,\"beta\":0.6},\"trainingMetaData\":{\"alpha\":0.5},\"params\":{\"upperWeak\":123}}}}");
+        searchHit.sourceRef(source);
+        SearchHit[] bunchOfSearchHits = new SearchHit[1];
+        bunchOfSearchHits[0] = searchHit;
+        SearchHits searchHits = new SearchHits(bunchOfSearchHits, 1, 1);
+        when(searchResponse.getHits()).thenReturn(searchHits);
+        return searchResponse;
     }
 
     private DeleteResponse mockDeleteResponse(String id) {
