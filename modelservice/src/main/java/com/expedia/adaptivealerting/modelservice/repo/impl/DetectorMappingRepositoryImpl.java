@@ -107,13 +107,9 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
         // Index
         val indexRequest = new IndexRequest(indexName, docType);
         val now = System.currentTimeMillis();
-        val mapping = new PercolatorDetectorMapping()
-                .setUser(request.getUser())
-                .setDetector(request.getDetector())
-                .setQuery(QueryUtil.buildQuery(request.getExpression()))
-                .setEnabled(true)
-                .setLastModifiedTimeInMillis(now)
-                .setCreatedTimeInMillis(now);
+        val mapping = new PercolatorDetectorMapping().setUser(request.getUser()).setDetector(request.getDetector())
+                .setQuery(QueryUtil.buildQuery(request.getExpression())).setEnabled(true)
+                .setLastModifiedTimeInMillis(now).setCreatedTimeInMillis(now);
         val mappingJson = objectMapperUtil.convertToString(mapping);
         return elasticsearchUtil.index(indexRequest, mappingJson).getId();
     }
@@ -137,7 +133,7 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
 
             SearchSourceBuilder searchSourceBuilder = elasticsearchUtil.getSourceBuilder(boolQueryBuilder);
             searchSourceBuilder.timeout(new TimeValue(elasticSearchProperties.getConfig().getConnectionTimeout()));
-            //FIXME setting default result set size to 500.
+            // FIXME setting default result set size to 500.
             // This is for returning detectors matching for set of metrics
             searchSourceBuilder.size(500);
             return getDetectorMappings(searchSourceBuilder, tagsList);
@@ -149,8 +145,8 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
 
     @Override
     public DetectorMapping findDetectorMapping(String id) {
-        val getRequest = new GetRequest(elasticSearchProperties.getIndexName(),
-                elasticSearchProperties.getDocType(), id);
+        val getRequest = new GetRequest(elasticSearchProperties.getIndexName(), elasticSearchProperties.getDocType(),
+                id);
         try {
             val response = elasticSearchClient.get(getRequest, RequestOptions.DEFAULT);
             return getDetectorMapping(response.getSourceAsString(), response.getId(), Optional.empty());
@@ -161,19 +157,32 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
     }
 
     @Override
+    public List<DetectorMapping> findUpdatedSince(long lastModifiedTime) {
+        val sourceBuilder = new SearchSourceBuilder();
+        val boolQuery = QueryBuilders.boolQuery();
+        // val termQuery = QueryBuilders.termQuery("aa_enabled", true);
+        // LastModifiedTime may not be unique so 'greater than or equal to' ensures
+        // paging returns all records.
+        boolQuery.must(new RangeQueryBuilder(LAST_MOD_TIME_KEYWORD).gte(lastModifiedTime));
+        sourceBuilder.query(boolQuery);
+        sourceBuilder.size(500);
+        sourceBuilder.sort(LAST_MOD_TIME_KEYWORD);
+        val searchRequest = new SearchRequest().source(sourceBuilder).indices(elasticSearchProperties.getIndexName())
+                .types(elasticSearchProperties.getDocType());
+        return getDetectorMappings(searchRequest);
+    }
+
+    @Override
     public List<DetectorMapping> findLastUpdated(int timeInSeconds) {
         val sourceBuilder = new SearchSourceBuilder();
         val boolQuery = QueryBuilders.boolQuery();
         val fromTime = System.currentTimeMillis() - timeInSeconds * 1000;
         boolQuery.must(new RangeQueryBuilder(LAST_MOD_TIME_KEYWORD).gt(fromTime));
         sourceBuilder.query(boolQuery);
-        //FIXME setting default result set size to 500.
+        // FIXME setting default result set size to 500.
         sourceBuilder.size(500);
-        val searchRequest =
-                new SearchRequest()
-                        .source(sourceBuilder)
-                        .indices(elasticSearchProperties.getIndexName())
-                        .types(elasticSearchProperties.getDocType());
+        val searchRequest = new SearchRequest().source(sourceBuilder).indices(elasticSearchProperties.getIndexName())
+                .types(elasticSearchProperties.getDocType());
         return getDetectorMappings(searchRequest);
     }
 
@@ -188,11 +197,12 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
         }
 
         val searchSourceBuilder = elasticsearchUtil.getSourceBuilder(query);
-        //FIXME setting default result set size to 500 until we have pagination.
+        // FIXME setting default result set size to 500 until we have pagination.
         searchSourceBuilder.size(500);
-        SearchRequest searchRequest = elasticsearchUtil.getSearchRequest(searchSourceBuilder, elasticSearchProperties.getIndexName(), elasticSearchProperties.getDocType());
+        SearchRequest searchRequest = elasticsearchUtil.getSearchRequest(searchSourceBuilder,
+                elasticSearchProperties.getIndexName(), elasticSearchProperties.getDocType());
         List<DetectorMapping> result = getDetectorMappings(searchRequest);
-        //FIXME - move this condition to search query.
+        // FIXME - move this condition to search query.
         return result.stream().filter(detectorMapping -> detectorMapping.isEnabled()).collect(Collectors.toList());
     }
 
@@ -201,10 +211,8 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
         val detectorMapping = findDetectorMapping(id);
         if (detectorMapping.isEnabled()) {
             final PercolatorDetectorMapping percolatorDetectorMapping = new PercolatorDetectorMapping()
-                    .setUser(detectorMapping.getUser())
-                    .setDetector(detectorMapping.getDetector())
-                    .setQuery(QueryUtil.buildQuery(detectorMapping.getExpression()))
-                    .setEnabled(false)
+                    .setUser(detectorMapping.getUser()).setDetector(detectorMapping.getDetector())
+                    .setQuery(QueryUtil.buildQuery(detectorMapping.getExpression())).setEnabled(false)
                     .setLastModifiedTimeInMillis(System.currentTimeMillis())
                     .setCreatedTimeInMillis(detectorMapping.getCreatedTimeInMillis());
             updateDetectorMapping(id, percolatorDetectorMapping);
@@ -213,7 +221,8 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
 
     @Override
     public void deleteDetectorMapping(String id) {
-        val deleteRequest = new DeleteRequest(elasticSearchProperties.getIndexName(), elasticSearchProperties.getDocType(), id);
+        val deleteRequest = new DeleteRequest(elasticSearchProperties.getIndexName(),
+                elasticSearchProperties.getDocType(), id);
         try {
             val deleteResponse = elasticSearchClient.delete(deleteRequest, RequestOptions.DEFAULT);
             if (elasticsearchUtil.checkNullResponse(deleteResponse.getResult())) {
@@ -240,24 +249,25 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
 
     private NestedQueryBuilder detectorIdQuery(SearchMappingsRequest searchMappingsRequest) {
         return QueryBuilders.nestedQuery(PercolatorDetectorMapping.DETECTOR_KEYWORD,
-                QueryBuilders.boolQuery().must(QueryBuilders.matchPhraseQuery(
-                        PercolatorDetectorMapping.DETECTOR_KEYWORD + "." + PercolatorDetectorMapping.DETECTOR_ID_KEYWORD,
-                        searchMappingsRequest.getDetectorUuid().toString())),
+                QueryBuilders.boolQuery()
+                        .must(QueryBuilders.matchPhraseQuery(
+                                PercolatorDetectorMapping.DETECTOR_KEYWORD + "."
+                                        + PercolatorDetectorMapping.DETECTOR_ID_KEYWORD,
+                                searchMappingsRequest.getDetectorUuid().toString())),
                 ScoreMode.None);
     }
 
     private NestedQueryBuilder userIdQuery(SearchMappingsRequest searchMappingsRequest) {
-        return QueryBuilders.nestedQuery(PercolatorDetectorMapping.USER_KEYWORD,
-                QueryBuilders.boolQuery().must(QueryBuilders.matchPhraseQuery(
+        return QueryBuilders.nestedQuery(PercolatorDetectorMapping.USER_KEYWORD, QueryBuilders.boolQuery()
+                .must(QueryBuilders.matchPhraseQuery(
                         PercolatorDetectorMapping.USER_KEYWORD + "." + PercolatorDetectorMapping.USER_ID_KEYWORD,
                         searchMappingsRequest.getUserId())),
                 ScoreMode.None);
     }
 
     private MatchingDetectorsResponse getDetectorMappings(SearchSourceBuilder searchSourceBuilder,
-                                                          List<Map<String, String>> tagsList) throws IOException {
-        val searchRequest = new SearchRequest()
-                .source(searchSourceBuilder)
+            List<Map<String, String>> tagsList) throws IOException {
+        val searchRequest = new SearchRequest().source(searchSourceBuilder)
                 .indices(elasticSearchProperties.getIndexName());
 
         val searchResponse = elasticSearchClient.search(searchRequest, RequestOptions.DEFAULT);
@@ -266,21 +276,23 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
 
         List<DetectorMapping> detectorMappings = Arrays.asList(hits).stream()
                 .map(hit -> getDetectorMapping(hit.getSourceAsString(), hit.getId(), Optional.of(hit.getFields())))
-                // .filter(detectorMapping -> detectorMapping.isEnabled()) //FIXME - move this condition into search query
+                // .filter(detectorMapping -> detectorMapping.isEnabled()) //FIXME - move this
+                // condition into search query
                 .collect(Collectors.toList());
-        return convertToMatchingDetectorsResponse(new DetectorMatchResponse(detectorMappings,
-                searchResponse.getTook().getMillis()));
+        return convertToMatchingDetectorsResponse(
+                new DetectorMatchResponse(detectorMappings, searchResponse.getTook().getMillis()));
     }
 
-    private DetectorMapping getDetectorMapping(String json, String id, Optional<Map<String, DocumentField>> documentFieldMap) {
-        val detectorEntity = (PercolatorDetectorMapping) objectMapperUtil.convertToObject(json, new TypeReference<PercolatorDetectorMapping>() {
-        });
-        val detectorMapping = new DetectorMapping()
-                .setId(id)
-                .setDetector(new Detector(getConsumerId(detectorEntity.getDetector().getConsumerId()), detectorEntity.getDetector().getUuid()))
+    private DetectorMapping getDetectorMapping(String json, String id,
+            Optional<Map<String, DocumentField>> documentFieldMap) {
+        val detectorEntity = (PercolatorDetectorMapping) objectMapperUtil.convertToObject(json,
+                new TypeReference<PercolatorDetectorMapping>() {
+                });
+        val detectorMapping = new DetectorMapping().setId(id)
+                .setDetector(new Detector(getConsumerId(detectorEntity.getDetector().getConsumerId()),
+                        detectorEntity.getDetector().getUuid()))
                 .setExpression(QueryUtil.buildExpression(detectorEntity.getQuery()))
-                .setEnabled(detectorEntity.isEnabled())
-                .setCreatedTimeInMillis(detectorEntity.getCreatedTimeInMillis())
+                .setEnabled(detectorEntity.isEnabled()).setCreatedTimeInMillis(detectorEntity.getCreatedTimeInMillis())
                 .setLastModifiedTimeInMillis(detectorEntity.getLastModifiedTimeInMillis())
                 .setUser(detectorEntity.getUser());
         documentFieldMap.ifPresent(dfm -> {
@@ -311,14 +323,38 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
     }
 
     private void updateDetectorMapping(String index, PercolatorDetectorMapping percolatorDetectorMapping) {
-        val indexRequest = new IndexRequest(elasticSearchProperties.getIndexName(), elasticSearchProperties.getDocType(), index);
+        val indexRequest = new IndexRequest(elasticSearchProperties.getIndexName(),
+                elasticSearchProperties.getDocType(), index);
         val json = objectMapperUtil.convertToString(percolatorDetectorMapping);
         elasticsearchUtil.index(indexRequest, json).getId();
     }
 
-    //FIXME This is to prevent NULL consumerId for existing mappings.
-    // This field will be made NON NULL once we update all the existing mappings to have consumerId
+    // FIXME This is to prevent NULL consumerId for existing mappings.
+    // This field will be made NON NULL once we update all the existing mappings to
+    // have consumerId
     private String getConsumerId(String consumerId) {
         return consumerId == null ? DEFAULT_CONSUMER_ID : consumerId;
+    }
+
+    @Override
+    public long getEnabledDetectorMappingCount() {
+        val termQuery = QueryBuilders.termQuery("aa_enabled", true);
+
+        BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+        boolQueryBuilder.filter(termQuery);
+
+        SearchSourceBuilder searchSourceBuilder = elasticsearchUtil.getSourceBuilder(boolQueryBuilder);
+        searchSourceBuilder.size(0);
+
+        val searchRequest = new SearchRequest().source(searchSourceBuilder)
+                .indices(elasticSearchProperties.getIndexName());
+
+        try {
+            val searchResponse = elasticSearchClient.search(searchRequest, RequestOptions.DEFAULT);
+            return searchResponse.getHits().getTotalHits();
+        } catch (IOException e) {
+            log.error(String.format("Get enabled count failed"), e);
+            throw new RuntimeException(e);
+        }
     }
 }

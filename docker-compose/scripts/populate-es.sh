@@ -24,83 +24,88 @@ do
     sleep 1
 done
 
-# Prepare Sample Detector
-until detectoruuid=$(curl -s -X POST \
-    http://modelservice:8008/api/v2/detectors \
-    -H 'Content-Type: application/json' \
-    -d '{
-            "createdBy": "sampleuser",
-            "type": "constant-detector",
-            "detectorConfig": {
-                "hyperparams": {
-                    "strategy": "percentile",
-                    "upper_weak_multiplier": "0",
-                    "upper_strong_multiplier": "0"
-                },
-                "trainingMetaData": {},
-                "params": {
-                    "type": "RIGHT_TAILED",
-                    "thresholds": {
-                        "upperWeak": 125,
-                        "upperStrong": 155
+add_detector() {
+    # Prepare Sample Detector
+    until detectoruuid=$(curl -s -X POST \
+        http://modelservice:8008/api/v2/detectors \
+        -H 'Content-Type: application/json' \
+        -d '{
+                "createdBy": "sampleuser",
+                "type": "constant-detector",
+                "detectorConfig": {
+                    "hyperparams": {
+                        "strategy": "percentile",
+                        "upper_weak_multiplier": "0",
+                        "upper_strong_multiplier": "0"
+                    },
+                    "trainingMetaData": {},
+                    "params": {
+                        "type": "RIGHT_TAILED",
+                        "thresholds": {
+                            "upperWeak": 125,
+                            "upperStrong": 155
+                        }
                     }
+                },
+                "enabled": true,
+                "trusted": true
+                }')
+    do
+        sleep 1
+    done
+
+    # Prepare Sample Detector Mapping
+    until mapid=$(curl -s -X POST \
+        http://modelservice:8008/api/detectorMappings \
+        -H 'Content-Type: application/json' \
+        -H 'cache-control: no-cache' \
+        -d '{
+                "detector": {
+                    "uuid": "'$detectoruuid'"
+                },
+                "expression": {
+                "operator": "AND",
+                "operands": [
+                    {
+                    "field": {
+                        "key": "env",
+                        "value": "prod"
+                    },
+                    "expression": null
+                    },
+                    {
+                    "field": {
+                        "key": "region",
+                        "value": "primary"
+                    },
+                    "expression": null
+                    },
+                    {
+                    "field": {
+                        "key": "m_application",
+                        "value": "sample-web"
+                    },
+                    "expression": null
+                    },
+                    {
+                    "field": {
+                        "key": "what",
+                        "value": "samplemetric'$1'"
+                    },
+                    "expression": null
+                    }
+                ]
+                },
+                "user": {
+                    "id": "sampleuser"
                 }
-            },
-            "enabled": true,
-            "trusted": true
             }')
-do
-    sleep 1
-done
+    do
+        sleep 1
+    done
 
-# Prepare Sample Detector Mapping
-until mapid=$(curl -s -X POST \
-    http://modelservice:8008/api/detectorMappings \
-    -H 'Content-Type: application/json' \
-    -H 'cache-control: no-cache' \
-    -d '{
-            "detector": {
-                "uuid": "'$detectoruuid'"
-            },
-            "expression": {
-            "operator": "AND",
-            "operands": [
-                {
-                "field": {
-                    "key": "env",
-                    "value": "prod"
-                },
-                "expression": null
-                },
-                {
-                "field": {
-                    "key": "region",
-                    "value": "primary"
-                },
-                "expression": null
-                },
-                {
-                "field": {
-                    "key": "m_application",
-                    "value": "sample-web"
-                },
-                "expression": null
-                },
-                {
-                "field": {
-                    "key": "what",
-                    "value": "samplemetric"
-                },
-                "expression": null
-                }
-            ]
-            },
-            "user": {
-                "id": "sampleuser"
-            }
-        }')
-do
-    sleep 1
+    echo "--- Created Detector $detectoruuid with Mapping $mapid"
+}
+for i in $(seq 10000 $END); do 
+    add_detector $i
 done
-
-echo "--- Created Detector $detectoruuid with Mapping $mapid"

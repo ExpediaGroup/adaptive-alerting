@@ -60,6 +60,14 @@ public interface DetectorSource {
     List<DetectorMapping> findUpdatedDetectorMappings(long timePeriod);
 
     /**
+     * Finds the list of detector mappings updated since {@code lastModifiedTime}.
+     *
+     * @param lastModifiedTime Timestamp in millisecodns. Must be strictly positive.
+     * @return List of detector mappings.
+     */
+    List<DetectorMapping> findDetectorMappingsUpdatedSince(long lastModifiedTime);
+
+    /**
      * Finds a detector mapping for the given detector UUID
      *
      * @param uuid Detector UUID.
@@ -85,4 +93,12 @@ public interface DetectorSource {
      * @throws DetectorException if there's a problem finding the detectors
      */
     List<UUID> findUpdatedDetectors(long timePeriod);
+
+    /**
+     * Gets the total count of enabled detectors.
+     *
+     * @return The detector mapping count.
+     * @throws DetectorException if there's a problem getting the detector mapping count.
+     */
+    long getEnabledDetectorMappingCount();
 }

@@ -34,6 +34,8 @@ COPY docker/tmp/jmxtrans-agent.xml ${APP_HOME}/
 
 ADD https://github.com/jmxtrans/jmxtrans-agent/releases/download/${JMXTRANS_AGENT}/${JMXTRANS_AGENT}.jar ${APP_HOME}/
 
+ADD https://search.maven.org/remotecontent?filepath=org/jolokia/jolokia-jvm/1.6.2/jolokia-jvm-1.6.2-agent.jar ${APP_HOME}/jolokia-jvm-1.6.2-agent.jar
+
 WORKDIR ${APP_HOME}
 
 ENTRYPOINT ["./start-app.sh"]

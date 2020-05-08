@@ -25,7 +25,7 @@ import threading
 kafka_bootstrap_servers=['localhost:19092']
 
 def produce_to_kafka(topic):
-    num_samples = 250    # Minimum of 80 events need to be in Kafka topic to see output
+    num_samples = 1000000    # Minimum of 80 events need to be in Kafka topic to see output
     try:
         time.sleep(1)   # Wait to make sure we establish a connection to anomalies kafka first
         producer = KafkaProducer(bootstrap_servers=kafka_bootstrap_servers)
@@ -39,6 +39,7 @@ def produce_to_kafka(topic):
 
 # Default Msgpack Serde - Use if ad-mapper.conf is set to "com.expedia.adaptivealerting.kafka.serde.MetricDataMessagePackSerde"
 def send_msgpack_to_kafka(producer, topic):
+    random_tag_index = int(random.uniform(1,200000))
     metric_data = {
         "OrgId": 1, 
         "Name": "samplemetric", 
@@ -47,7 +48,7 @@ def send_msgpack_to_kafka(producer, topic):
         "Unit": "unknown",
         "Time": int(time.time()),
         "Mtype": "gauge",
-        "Tags": ["what=samplemetric", "m_application=sample-web", "region=primary", "env=prod"]
+        "Tags": [f"what=samplemetric{random_tag_index}", "m_application=sample-web", "region=primary", "env=prod"]
     }
     packed_metric_data = msgpack.packb(metric_data, use_bin_type=True)
     try:
@@ -115,9 +116,9 @@ def consume_from_kafka(topic):
         print("No Anomalies were found. Make sure your Docker Compose environment is up and running.")
     else:
         print("\n\n-- Found", len(anomaly_values['WEAK']), "WEAK Anomalies")
-        print("-- Weak Anomalous values:", anomaly_values['WEAK'])
+        # print("-- Weak Anomalous values:", anomaly_values['WEAK'])
         print("\n-- Found", len(anomaly_values['STRONG']), "STRONG Anomalies")
-        print("-- Strong Anomalous values:", anomaly_values['STRONG'])
+        # print("-- Strong Anomalous values:", anomaly_values['STRONG'])
 
     return anomaly_values
 

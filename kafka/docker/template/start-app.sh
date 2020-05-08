@@ -20,6 +20,7 @@
 set -e
 JAVA_OPTS="${JAVA_OPTS} \
 -javaagent:${APP_HOME}/${JMXTRANS_AGENT}.jar=${APP_HOME}/jmxtrans-agent.xml \
+-javaagent:${APP_HOME}/jolokia-jvm-1.6.2-agent.jar=port=8778,host=0.0.0.0 \
 -XX:+UseConcMarkSweepGC \
 -XX:+UseParNewGC \
 -Xmx${JAVA_XMX} \

@@ -37,6 +37,7 @@ module "ad-mapper" {
   kafka_endpoint = "${local.kafka_endpoint}"
   modelservice_base_uri = "${var.ad-mapper["modelservice_base_uri"]}"
   detector_mapping_cache_update_period = "${var.ad-mapper["detector_mapping_cache_update_period"]}"
+  detector_mapping_filter_enabled = "${var.ad-mapper["detector_mapping_filter_enabled"]}"
 }
 
 module "ad-manager" {
