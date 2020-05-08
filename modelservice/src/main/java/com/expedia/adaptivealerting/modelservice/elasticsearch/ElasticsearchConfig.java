@@ -36,7 +36,7 @@ import java.util.Map;
 public class ElasticsearchConfig {
 
     @Autowired
-    private ElasticSearchProperties properties;
+    private ElasticSearchProperties elasticSearchProperties;
 
     @Bean
     public ElasticsearchRestTemplate elasticsearchTemplate() {
@@ -53,7 +53,7 @@ public class ElasticsearchConfig {
     }
 
     private Map<String, String> extractHostAndPortFromUrl() {
-        String url = properties.getUrls();
+        String url = elasticSearchProperties.getUrls();
         if (url == null) {
             throw new MissingSystemPropertyException("Elastic search URL not set in config");
         }

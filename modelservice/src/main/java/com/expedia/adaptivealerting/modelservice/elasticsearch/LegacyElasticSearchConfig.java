@@ -42,7 +42,6 @@ public class LegacyElasticSearchConfig {
                     req.setSocketTimeout(elasticSearchProperties.getConfig().getConnectionTimeout());
                     return req;
                 });
-        RestHighLevelClient restHighLevelClient = new RestHighLevelClient(builder);
-        return restHighLevelClient;
+        return new RestHighLevelClient(builder);
     }
 }
