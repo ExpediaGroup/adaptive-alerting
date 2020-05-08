@@ -1,6 +1,7 @@
 package com.expedia.adaptivealerting.modelservice.service.impl;
 
 import com.expedia.adaptivealerting.modelservice.entity.Detector;
+import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
 import com.expedia.adaptivealerting.modelservice.service.DetectorService;
 import com.expedia.adaptivealerting.modelservice.service.DetectorServiceImpl;
@@ -35,6 +36,7 @@ public class DetectorServiceImplTest {
     private List<Detector> detectors;
 
     private UUID someUuid;
+
     private Detector legalParamsDetector;
 
     @Before
@@ -47,20 +49,44 @@ public class DetectorServiceImplTest {
 
     @Test
     public void testCreateDetector() {
-        val uuid = repository.save(legalParamsDetector);
+        legalParamsDetector.setUuid(null);
+        val uuid = serviceUnderTest.createDetector(legalParamsDetector);
         assertNotNull(uuid);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateDetector_null_detector() {
+        serviceUnderTest.createDetector(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateDetector_set_uuid() {
+        legalParamsDetector.setUuid(UUID.randomUUID());
+        serviceUnderTest.createDetector(legalParamsDetector);
     }
 
     @Test
     public void testFindByUuid() {
-        val actualDetector = repository.findByUuid(someUuid.toString());
+        val actualDetector = serviceUnderTest.findByUuid(someUuid.toString());
+        assertNotNull(actualDetector);
+    }
+
+
+    @Test(expected = RecordNotFoundException.class)
+    public void testFindByUuid_invalid_uuid() {
+        val actualDetector = serviceUnderTest.findByUuid(UUID.randomUUID().toString());
         assertNotNull(actualDetector);
     }
 
     @Test
     public void testFindByCreatedBy() {
-        when(repository.findByMeta_CreatedBy(anyString())).thenReturn(detectors);
-        val actualDetectors = serviceUnderTest.findByCreatedBy("kashah");
+        val actualDetectors = serviceUnderTest.findByCreatedBy("userName");
+        assertNotNull(actualDetectors);
+    }
+
+    @Test(expected = RecordNotFoundException.class)
+    public void testFindByCreatedBy_invalid_user() {
+        val actualDetectors = serviceUnderTest.findByCreatedBy("invalidUserName");
         assertNotNull(actualDetectors);
     }
 
@@ -123,6 +149,7 @@ public class DetectorServiceImplTest {
     private void initDependencies() {
         when(repository.save(any(Detector.class))).thenReturn(legalParamsDetector);
         when(repository.findByUuid(someUuid.toString())).thenReturn(legalParamsDetector);
+        when(repository.findByMeta_CreatedBy("userName")).thenReturn(detectors);
         when(repository.findByMeta_DateLastUpdatedGreaterThan(anyString())).thenReturn(detectors);
         when(repository.findByMeta_DateLastAccessedLessThan(anyString())).thenReturn(detectors);
     }
