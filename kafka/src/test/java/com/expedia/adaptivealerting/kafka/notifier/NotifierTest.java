@@ -54,7 +54,6 @@ public class NotifierTest {
                 "kafka.consumer.bootstrap.servers=" + bootstrapServers(kafka),
                 "webhook.url=http://localhost:" + webhook.getPort() + "/hook"
         ).applyTo(this.context);
-        ;
 
         context.register(PropertyPlaceholderAutoConfiguration.class, NotifierConfig.class, Notifier.class);
         context.refresh();
