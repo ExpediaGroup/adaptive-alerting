@@ -32,16 +32,26 @@ import org.springframework.context.annotation.Configuration;
 @Generated
 @Deprecated
 public class LegacyElasticSearchConfig {
+    
     @Bean(name = "legacyRestHighLevelClient", destroyMethod = "close")
-    public RestHighLevelClient restClientBuilder(ElasticSearchProperties elasticSearchProperties) {
-        RestClientBuilder builder = RestClient
-                .builder(HttpHost.create(elasticSearchProperties.getUrls()))
+    public RestHighLevelClient buildRestClient(ElasticSearchProperties elasticSearchProperties) {
+        RestHighLevelClient elasticsearchClient = new RestHighLevelClient(buildRestClientBuilder(elasticSearchProperties));
+        return elasticsearchClient;
+    }
+
+    private RestClientBuilder buildRestClientBuilder(ElasticSearchProperties elasticSearchProperties) {
+        return RestClient.builder(HttpHost.create(elasticSearchProperties.getUrls()))
                 .setRequestConfigCallback(req -> {
                     req.setConnectionRequestTimeout(elasticSearchProperties.getConfig().getConnectionTimeout());
                     req.setConnectTimeout(elasticSearchProperties.getConfig().getConnectionTimeout());
                     req.setSocketTimeout(elasticSearchProperties.getConfig().getConnectionTimeout());
                     return req;
+                })
+                .setMaxRetryTimeoutMillis(elasticSearchProperties.getConfig().getConnectionRetryTimeout())
+                .setHttpClientConfigCallback(req -> {
+                    req.setMaxConnTotal(elasticSearchProperties.getConfig().getMaxTotalConnections());
+                    req.setMaxConnPerRoute(500);
+                    return req;
                 });
-        return new RestHighLevelClient(builder);
     }
 }
