@@ -19,7 +19,7 @@ public class ElasticsearchConfigTest {
     private ElasticsearchConfig elasticSearchConfig;
 
     @Mock
-    private ElasticSearchProperties properties;
+    private ElasticSearchProperties elasticSearchProperties;
 
     @Before
     public void setUp() {
@@ -29,21 +29,21 @@ public class ElasticsearchConfigTest {
 
     @Test
     public void testRestTemplate() {
-        when(properties.getUrls()).thenReturn("localhost:8000");
+        when(elasticSearchProperties.getUrls()).thenReturn("localhost:8000");
         val elasticsearchRestTemplate = elasticSearchConfig.elasticsearchTemplate();
         assertNotNull(elasticsearchRestTemplate);
     }
 
     @Test(expected = MissingSystemPropertyException.class)
     public void testRestTemplate_invalid_config() {
-        when(properties.getUrls()).thenReturn(null);
+        when(elasticSearchProperties.getUrls()).thenReturn(null);
         val restHighLevelClient = elasticSearchConfig.client();
         assertNotNull(restHighLevelClient);
     }
 
     @Test(expected = MissingSystemPropertyException.class)
     public void testRestTemplate_invalid_config1() {
-        when(properties.getUrls()).thenReturn("localhost");
+        when(elasticSearchProperties.getUrls()).thenReturn("localhost");
         val restHighLevelClient = elasticSearchConfig.client();
         assertNotNull(restHighLevelClient);
     }
