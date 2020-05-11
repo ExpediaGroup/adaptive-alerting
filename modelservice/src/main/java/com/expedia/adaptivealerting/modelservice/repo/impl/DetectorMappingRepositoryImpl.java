@@ -202,7 +202,7 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
         if (detectorMapping.isEnabled()) {
             final PercolatorDetectorMapping percolatorDetectorMapping = new PercolatorDetectorMapping()
                     .setUser(detectorMapping.getUser())
-                    .setConsumerDetectorMapping(detectorMapping.getConsumerDetectorMapping())
+                    .setConsumerDetectorMapping(detectorMapping.getDetector())
                     .setQuery(QueryUtil.buildQuery(detectorMapping.getExpression()))
                     .setEnabled(false)
                     .setLastModifiedTimeInMillis(System.currentTimeMillis())
@@ -277,7 +277,7 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
         });
         val detectorMapping = new DetectorMapping()
                 .setId(id)
-                .setConsumerDetectorMapping(new ConsumerDetectorMapping(getConsumerId(detectorEntity.getConsumerDetectorMapping().getConsumerId()), detectorEntity.getConsumerDetectorMapping().getUuid()))
+                .setDetector(new ConsumerDetectorMapping(getConsumerId(detectorEntity.getConsumerDetectorMapping().getConsumerId()), detectorEntity.getConsumerDetectorMapping().getUuid()))
                 .setExpression(QueryUtil.buildExpression(detectorEntity.getQuery()))
                 .setEnabled(detectorEntity.isEnabled())
                 .setCreatedTimeInMillis(detectorEntity.getCreatedTimeInMillis())
@@ -301,7 +301,7 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
             detectorMapping.getSearchIndexes().forEach(searchIndex -> {
                 groupedDetectorsByIndex.computeIfAbsent(searchIndex, index -> new ArrayList<>());
                 groupedDetectorsByIndex.computeIfPresent(searchIndex, (index, list) -> {
-                    list.add(detectorMapping.getConsumerDetectorMapping());
+                    list.add(detectorMapping.getDetector());
                     return list;
                 });
             });
