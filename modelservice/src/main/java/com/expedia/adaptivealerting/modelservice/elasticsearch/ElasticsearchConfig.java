@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.modelservice.elasticsearch;
 
-import lombok.Generated;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
