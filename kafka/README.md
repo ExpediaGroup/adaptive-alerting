@@ -25,7 +25,7 @@ mvn clean package
 Build the docker image (use the appropriate script for the app):
 
 ```bash
-docker/scripts/build-{APP_NAME e.g. constant-consumerDetectorMapping}.sh -b
+docker/scripts/build-{APP_NAME e.g. constant-detector}.sh -b
 ```
 
 Run pre-built docker image:

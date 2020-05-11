@@ -35,7 +35,7 @@ class ConstantThresholdBasedE2ETestSpec extends IntegrationTestSpec {
   protected val adMapperStreamConfig = streamConfigProperties(ANOMALY_DETECTOR_MAPPER, "ad-mapper")
   protected val adManagerStreamConfig = streamConfigProperties(ANOMALY_DETECTOR_MANAGER, "ad-manager")
 
-  protected var mappedMetricsTopicConsumerConfig = consumerConfig("mapped-metrics-consumer", "mapped-metrics-consumerDetectorMapping")
+  protected var mappedMetricsTopicConsumerConfig = consumerConfig("mapped-metrics-consumer", "mapped-metrics-detector")
   protected var anomalyTopicConsumerConfig = consumerConfig("anomalies-consumer", "anomaly")
 
 
@@ -68,7 +68,7 @@ class ConstantThresholdBasedE2ETestSpec extends IntegrationTestSpec {
       adMapperSR.start()
       adManagerSR.start()
 
-      Then("'ad-mapper' should map the metrics to 'constant threshold outlier consumerDetectorMapping' ")
+      Then("'ad-mapper' should map the metrics to 'constant threshold outlier detector' ")
 
       val intermediateRecords: List[KeyValue[String, MetricData]] =
         IntegrationTestUtils.waitUntilMinKeyValueRecordsReceived[String, MetricData](
@@ -79,11 +79,11 @@ class ConstantThresholdBasedE2ETestSpec extends IntegrationTestSpec {
         record.value.getMetricDefinition.getTags.getKv.get("what") match {
           case "duration" => "success"
           case "latency" => "success"
-          case _ => fail("Unexpected metrics in input topic for 'constant threshold outlier consumerDetectorMapping'")
+          case _ => fail("Unexpected metrics in input topic for 'constant threshold outlier detector'")
         }
       })
 
-      Then("'constant threshold outlier consumerDetectorMapping' should read records from its topic and " +
+      Then("'constant threshold outlier detector' should read records from its topic and " +
         "write those anomalous records to output topic")
       val consumerPropAnomalyTopic = configToProps(anomalyTopicConsumerConfig.getConfig(STREAM))
       // No longer using this config. [WLW]

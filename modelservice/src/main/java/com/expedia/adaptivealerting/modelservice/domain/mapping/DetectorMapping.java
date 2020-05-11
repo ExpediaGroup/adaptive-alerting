@@ -29,7 +29,7 @@ import java.util.List;
 @Accessors(chain = true)
 public class DetectorMapping {
     private String id;
-    private ConsumerDetectorMapping consumerDetectorMapping;
+    private ConsumerDetectorMapping detector;
     private Expression expression;
     private User user;
     private long lastModifiedTimeInMillis;
