@@ -227,6 +227,48 @@ public class DetectorMappingRepositoryImplTest {
         assertTrue(tagsList.get(0).isEnabled());
     }
 
+    @Test
+    public void findUpdatedSince_successful() throws IOException {
+        List<DetectorMapping> tagsList = new ArrayList<>();
+        Map<String, String> tags = new HashMap<>();
+        Long LastModifiedTimeInMillis = new Long(1554828886);
+        Long CreatedTimeInMillis = new Long(1554828886);
+        val searchIndex = "2";
+        val lookUpTime = 100;
+        val detectorUuid = "aeb4d849-847a-45c0-8312-dc0fcf22b639";
+        SearchResponse searchResponse = mockSearchResponse(searchIndex, lookUpTime, detectorUuid);
+        when(elasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(searchResponse);
+        tagsList = repoUnderTest.findUpdatedSince(0L);
+        verify(elasticSearchClient, atLeastOnce()).search(any(SearchRequest.class), eq(RequestOptions.DEFAULT));
+        assertNotNull("Response can't be null", tagsList);
+        assertEquals(1, tagsList.size());
+        assertEquals(UUID.fromString(detectorUuid), tagsList.get(0).getDetector().getUuid());
+        assertEquals("test-user", tagsList.get(0).getUser().getId());
+        assertEquals(LastModifiedTimeInMillis, Long.valueOf(tagsList.get(0).getLastModifiedTimeInMillis()));
+        assertEquals(CreatedTimeInMillis, Long.valueOf(tagsList.get(0).getCreatedTimeInMillis()));
+        assertTrue(tagsList.get(0).isEnabled());
+    }
+
+    @Test
+    public void getEnabledDetectorMappingCount_success() throws IOException {
+        val searchIndex = "2";
+        val lookUpTime = 100;
+        val detectorUuid = "aeb4d849-847a-45c0-8312-dc0fcf22b639";
+        SearchResponse searchResponse = mockSearchResponse(searchIndex, lookUpTime, detectorUuid);
+        when(elasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(searchResponse);
+        Long enabledCount = repoUnderTest.getEnabledDetectorMappingCount();
+        verify(elasticSearchClient, atLeastOnce()).search(any(SearchRequest.class), eq(RequestOptions.DEFAULT));
+        assertNotNull("Response can't be null", enabledCount);
+        assertEquals(new Long(1), enabledCount);
+    }
+
+
+    @Test(expected = RuntimeException.class)
+    public void getEnabledDetectorMappingCount_fail() throws IOException {
+        when(elasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenThrow(new IOException());
+        repoUnderTest.getEnabledDetectorMappingCount();
+    }
+
     @Test(expected = RuntimeException.class)
     public void findLastUpdated_fail() throws IOException {
         int timeInSecs = 60;
@@ -339,6 +381,24 @@ public class DetectorMappingRepositoryImplTest {
         when(searchResponse.getTook()).thenReturn(timeValue);
         return searchResponse;
     }
+
+    // private SearchResponse mockCountResponse(Long enabledDetectorMappingCount) {
+    //     SearchResponse searchResponse = mock(SearchResponse.class);
+    //     fields.put("_percolator_document_slot", new DocumentField("_percolator_document_slot", Arrays.asList(new Integer(searchIndex))));
+    //     SearchHit searchHit = new SearchHit(101, "xxx", null, fields);
+    //     BytesReference source = new BytesArray("{\"aa_user\":{\"id\":\"test-user\"},\"aa_detector\":" +
+    //             "{\"id\":\"" + detectorUuid + "\"},\"aa_query\":{\"bool\":{\"must\":[{\"match\":" +
+    //             "{\"name\":\"sample-web\",\"env\":\"prod\"}}]}},\"aa_enabled\":true,\"aa_lastModifiedTime\":1554828886," +
+    //             "\"aa_createdTime\":1554828886}\n");
+    //     searchHit.sourceRef(source);
+    //     SearchHit[] bunchOfSearchHits = new SearchHit[1];
+    //     bunchOfSearchHits[0] = searchHit;
+    //     SearchHits searchHits = new SearchHits(bunchOfSearchHits, 1, 1);
+    //     when(searchResponse.getHits()).thenReturn(searchHits);
+    //     TimeValue timeValue = new TimeValue(lookUpTime);
+    //     when(searchResponse.getTook()).thenReturn(timeValue);
+    //     return searchResponse;
+    // }
 
     private GetResponse mockGetResponse(String id) {
         GetResponse getResponse = mock(GetResponse.class);

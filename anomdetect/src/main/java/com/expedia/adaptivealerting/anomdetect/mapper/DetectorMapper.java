@@ -74,9 +74,9 @@ public class DetectorMapper {
     private BloomFilter<String> detectorMappingBloomFilter;
     private Long detectorMappingFilterSize = FILTER_GROWTH_SIZE;
     private Long detectorMappingFilterItemCount = 0L;
-    private Gauge<Long> mappingFilterSizeGauge;
-    private Gauge<Long> mappingFilterItemCountGauge;
-    private Gauge<Double> mappingFilterSaturationGauge;
+    private Gauge<Long> mappingFilterSizeGauge = () -> detectorMappingFilterSize;
+    private Gauge<Long> mappingFilterItemCountGauge = () -> detectorMappingFilterItemCount;
+    private Gauge<Double> mappingFilterSaturationGauge = () -> (double) detectorMappingFilterItemCount / (double) detectorMappingFilterSize;
     private Counter mappingFilterMightMatchTotalCounter;
     private Counter mappingFilterMightMatchPositiveCounter;
     private Counter mappingFilterMightMatchNegativeCounter;
@@ -99,12 +99,8 @@ public class DetectorMapper {
         this.mappingFilterMightMatchNegativeCounter = metricRegistry.counter(DETECTOR_MAPPER_FILTER_NEGATIVE_COUNT);
         this.mappingLookupTotalCounter = metricRegistry.counter(DETECTOR_MAPPER_LOOKUP_TOTAL_COUNT);
         this.mappingLookupNoResultCounter = metricRegistry.counter(DETECTOR_MAPPER_LOOKUP_NO_RESULT_COUNT);
-        this.mappingFilterSizeGauge = () -> detectorMappingFilterSize;
         metricRegistry.register(DETECTOR_MAPPER_FILTER_SIZE, mappingFilterSizeGauge);
-        this.mappingFilterItemCountGauge = () -> detectorMappingFilterItemCount;
         metricRegistry.register(DETECTOR_MAPPER_FILTER_ITEM_COUNT, mappingFilterItemCountGauge);
-        this.mappingFilterSaturationGauge = () -> (double) detectorMappingFilterItemCount
-                / (double) detectorMappingFilterSize;
         metricRegistry.register(DETECTOR_MAPPER_FILTER_SATURATION, mappingFilterSaturationGauge);
         if (detectorMappingFilterEnabled) {
             this.initBloomFilter();

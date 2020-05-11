@@ -40,6 +40,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 @Slf4j
@@ -97,6 +98,17 @@ public final class DefaultDetectorSourceTest {
         sourceUnderTest.findUpdatedDetectorMappings(-1);
     }
 
+    @Test
+    public void testFindDetectorMappingsUpdatedSince() {
+        val results = sourceUnderTest.findDetectorMappingsUpdatedSince(0);
+        assertEquals(1, results.size());
+    }
+
+    @Test
+    public void testGetEnabledDetectorMappingCount() {
+        val result = sourceUnderTest.getEnabledDetectorMappingCount();
+        assertEquals(10, result);
+    }
 
     @Test
     public void testFindDetectorMappingByUuid() {
@@ -186,5 +198,9 @@ public final class DefaultDetectorSourceTest {
         when(detectorClient.findDetectorMappingByUuid(any(UUID.class)))
                 .thenReturn(this.detectorMapping);
         when(detectorFactory.buildDetector(any(DetectorDocument.class))).thenReturn(detector);
+        when(detectorClient.findDetectorMappingsUpdatedSince(anyLong()))
+                .thenReturn(Collections.singletonList(this.detectorMapping));
+        when(detectorClient.getEnabledDetectorMappingCount())
+        .thenReturn(10L);
     }
 }

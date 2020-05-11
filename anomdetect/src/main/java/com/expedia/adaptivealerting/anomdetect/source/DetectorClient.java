@@ -300,8 +300,10 @@ public class DetectorClient {
             val message = "IOException while getting detector mapping count, uri=" + uri;
             throw new DetectorException(message, e);
         }
+        val typeRef = new TypeReference<Long>() {
+        };
         try {
-            result = objectMapper.readValue(content.asBytes(), long.class);
+            result = objectMapper.readValue(content.asBytes(), typeRef);
         } catch (IOException e) {
             val message = "IOException while reading detector mappings count";
             throw new DetectorException(message, e);

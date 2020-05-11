@@ -11,10 +11,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.typesafe.config.Config;
 import org.hamcrest.collection.IsMapContaining;
+import org.hamcrest.number.IsCloseTo;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import lombok.val;
 
@@ -37,22 +40,42 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 
 /**
  * {@link DetectorMapper} unit test.
  */
 public final class DetectorMapperTest {
+
     private DetectorMapper detectorMapper;
+    private MetricRegistry metricRegistry;
+    private DetectorMapper detectorMapperFilterDisabled;
+    private MetricRegistry metricRegistryFilterDisabled;
     private int detectorMappingCacheUpdatePeriod = 5;
-    private Boolean detectorMappingFilterEnabled = true;
 
     @Mock
     private DetectorSource detectorSource;
 
     @Mock
+    private DetectorSource bigDetectorSource;
+
+    @Mock
+    private DetectorSource emptyDetectorSource;
+
+    @Mock
+    private DetectorSource smallDetectorSource;
+
+    @Mock
     private DetectorMapperCache cache;
+
+    @Mock
+    private DetectorMapperCache bigCache;
+
+    @Mock
+    private DetectorMapperCache emptyCache;
 
     @Mock
     private Config config;
@@ -71,8 +94,12 @@ public final class DetectorMapperTest {
         MockitoAnnotations.initMocks(this);
         initTestObjects();
         initDependencies();
+        this.metricRegistry = new MetricRegistry();
         this.detectorMapper = new DetectorMapper(detectorSource, cache, detectorMappingCacheUpdatePeriod,
-                detectorMappingFilterEnabled, new MetricRegistry());
+                true, metricRegistry);
+        this.metricRegistryFilterDisabled = new MetricRegistry();
+        this.detectorMapperFilterDisabled = new DetectorMapper(detectorSource, cache, detectorMappingCacheUpdatePeriod,
+                false, metricRegistryFilterDisabled);
     }
 
     @Test
@@ -109,7 +136,20 @@ public final class DetectorMapperTest {
 
     @Test
     public void testBloomFilter() {
-        // Out of 10,000 metrics, 9,696 are mapped (every 33rd was skipped)
+        // bigDetectorSource
+        when(bigDetectorSource.getEnabledDetectorMappingCount()).thenReturn(10_001L);
+        when(bigDetectorSource.findDetectorMappingsUpdatedSince(anyLong()))
+            .thenAnswer(new Answer() {
+                public Object answer(InvocationOnMock invocation) {
+                    Object[] args = invocation.getArguments();
+                    invocation.getMock();
+                    Long lastUpdatedTime = (long) args[0];
+                    return generateDetectorMappings(lastUpdatedTime, 10_001);
+                    }
+                });
+        MetricRegistry bigMetricRegistry = new MetricRegistry();
+        DetectorMapper bigDetectorMapper = new DetectorMapper(bigDetectorSource, bigCache, detectorMappingCacheUpdatePeriod, true, bigMetricRegistry);
+        // Out of 10,000 metrics, ca are mapped (every 33rd was skipped)
         // the Bloom Filter should accurately identify all positive cases, but may
         // have some false positives. The actual rate of false positives in the
         // test should not exceed the configured false positive threshold.
@@ -117,9 +157,9 @@ public final class DetectorMapperTest {
         int bloomFilterFalsePositiveCount = 0;
         int bloomFilterTrueNegativeCount = 0;
         int bloomFilterFalseNegativeCount = 0;
-        for (int i = 0; i < 10_000; i++) {
+        for (int i = 0; i < 10_001; i++) {
             MetricDefinition metricDefinition = new MetricDefinition(new TagCollection(generateTagsForIndex(i)));
-            Boolean metricMightBeMapped = detectorMapper.metricMightBeMapped(metricDefinition);
+            Boolean metricMightBeMapped = bigDetectorMapper.metricMightBeMapped(metricDefinition);
             if (i % 33 == 0) {
                 if (metricMightBeMapped) {
                     bloomFilterFalsePositiveCount++;
@@ -134,14 +174,20 @@ public final class DetectorMapperTest {
                 }
             }
         }
-        assertEquals(9696, bloomFilterTruePositiveCount);
-        assertTrue(bloomFilterFalsePositiveCount <= 10_000 * detectorMapper.FILTER_FALSE_POSITIVE_PROB_THRESHOLD);
+        Long mappingFilterSizeGaugeValue = (long) bigMetricRegistry.getGauges().get("detector-mapper.filter-size").getValue();
+        assertEquals(110_001L, mappingFilterSizeGaugeValue.longValue());
+        Long mappingFilterItemCountGaugeValue = (long) bigMetricRegistry.getGauges().get("detector-mapper.filter-item-count").getValue();
+        assertTrue(mappingFilterItemCountGaugeValue.longValue() > 9696L);
+        Double filterSaturation = (double) bigMetricRegistry.getGauges().get("detector-mapper.filter-saturation").getValue();
+        assertThat(filterSaturation, new IsCloseTo(0.088, 0.001));
+        assertEquals(9697, bloomFilterTruePositiveCount);
+        assertTrue(bloomFilterFalsePositiveCount <= 10_001 * bigDetectorMapper.FILTER_FALSE_POSITIVE_PROB_THRESHOLD);
         assertTrue(
-                bloomFilterTrueNegativeCount >= 303 - (10_000 * detectorMapper.FILTER_FALSE_POSITIVE_PROB_THRESHOLD));
+                bloomFilterTrueNegativeCount >= 303 - (10_001 * bigDetectorMapper.FILTER_FALSE_POSITIVE_PROB_THRESHOLD));
         assertEquals(0, bloomFilterFalseNegativeCount);
         System.out.println(String.format("Bloom Filter False Positive Threshold: %s%s, Actual: %s%s",
-                Math.floor(detectorMapper.FILTER_FALSE_POSITIVE_PROB_THRESHOLD * 10_000) / 100, "%",
-                Math.floor((bloomFilterFalsePositiveCount / 10_000.0) * 10_000) / 100, "%"));
+                Math.floor(bigDetectorMapper.FILTER_FALSE_POSITIVE_PROB_THRESHOLD * 10_001) / 100, "%",
+                Math.floor((bloomFilterFalsePositiveCount / 10_001.0) * 10_000) / 100, "%"));
     }
 
     // @Test(expected = RuntimeException.class)
@@ -150,6 +196,22 @@ public final class DetectorMapperTest {
     // RuntimeException());
     // detectorMapper.isSuccessfulDetectorMappingLookup(tag_bigList);
     // }
+
+    @Test
+    public void testDisabledBloomFilter() {
+        // when(config.getBoolean("detector-mapping-filter-enabled")).thenReturn(false);
+
+        for (int i = 0; i < 10_000; i++) {
+            MetricDefinition metricDefinition = new MetricDefinition(new TagCollection(generateTagsForIndex(i)));
+            detectorMapperFilterDisabled.metricMightBeMapped(metricDefinition);
+        }
+        Long mappingFilterSizeGaugeValue = (long) metricRegistryFilterDisabled.getGauges().get("detector-mapper.filter-size").getValue();
+        assertEquals(100_000L, mappingFilterSizeGaugeValue.longValue());
+        Long mappingFilterItemCountGaugeValue = (long) metricRegistryFilterDisabled.getGauges().get("detector-mapper.filter-item-count").getValue();
+        assertEquals(0L, mappingFilterItemCountGaugeValue.longValue());
+        Double filterSaturation = (double) metricRegistryFilterDisabled.getGauges().get("detector-mapper.filter-saturation").getValue();
+        assertEquals(new Double(0.0), filterSaturation);
+    }
 
     private void initTestObjects() {
         this.tags
@@ -167,6 +229,21 @@ public final class DetectorMapperTest {
         this.detectorMatchResponse_withMoreLookupTime = new DetectorMatchResponse(groupedDetectorsBySearchIndex, 400);
 
         this.emptyDetectorMatchResponse = null;
+    }
+
+    private List<DetectorMapping> generateDetectorMappings(Long lastUpdatedTime, int itemCount){
+        List<DetectorMapping> detectorMappings = new ArrayList<DetectorMapping>();
+        for (int i = lastUpdatedTime.intValue() + 1; i < (lastUpdatedTime + 501) && i < itemCount; i++) {
+            DetectorMapping newDetectorMapping = generateDetectorMapping(generateTagsForIndex(i));
+            newDetectorMapping.setLastModifiedTimeInMillis(i);
+            if (i % 33 != 0) {
+                detectorMappings.add(newDetectorMapping);
+            } else {
+                newDetectorMapping.setEnabled(false);
+                detectorMappings.add(newDetectorMapping);
+            }
+        }
+        return detectorMappings;
     }
 
     private DetectorMapping generateDetectorMapping(Map<String, String> tags) {
@@ -191,19 +268,15 @@ public final class DetectorMapperTest {
     }
 
     private void initDependencies() {
-        when(detectorSource.getEnabledDetectorMappingCount()).thenReturn(10_000L);
-        List<DetectorMapping> detectorMappings = new ArrayList<DetectorMapping>();
-        for (int i = 0; i < 10_000; i++) {
-            if (i % 33 != 0) {
-                detectorMappings.add(generateDetectorMapping(generateTagsForIndex(i)));
-            }
-        }
-        when(detectorSource.findDetectorMappingsUpdatedSince(anyLong())).thenReturn(detectorMappings);
+
+        when(config.getInt("detector-mapping-cache-update-period")).thenReturn(detectorMappingCacheUpdatePeriod);
+
+        when(detectorSource.getEnabledDetectorMappingCount()).thenReturn(0L);
+        when(detectorSource.findDetectorMappingsUpdatedSince(anyLong()))
+            .thenReturn(generateDetectorMappings(0L, 0));
         when(detectorSource.findDetectorMappings(tags)).thenReturn(detectorMatchResponse);
         when(detectorSource.findDetectorMappings(tag_bigList)).thenReturn(detectorMatchResponse_withMoreLookupTime);
         when(detectorSource.findDetectorMappings(tags_cantRetrieve)).thenReturn(emptyDetectorMatchResponse);
-
-        when(config.getInt("detector-mapping-cache-update-period")).thenReturn(detectorMappingCacheUpdatePeriod);
     }
 
     private void initTagsFromFile() throws IOException {
@@ -247,24 +320,36 @@ public final class DetectorMapperTest {
                 Collections.singletonList(buildDetector("", "d86b798c-cfee-4a2c-a17a-aa2ba79ccf51"))));
     }
 
-    @Test
-    public void detectorCacheUpdateTest() {
+    // @Test
+    // public void detectorCacheUpdateEmptyTest() {
+    //     DetectorMapper emptyCacheDetectorMapper = new DetectorMapper(emptyDetectorSource, emptyCache, detectorMappingCacheUpdatePeriod, true, new MetricRegistry());
+        
+    //     when(emptyDetectorSource.findDetectorMappingsUpdatedSince(anyLong())).thenReturn(new ArrayList<DetectorMapping>());
+    //     emptyCacheDetectorMapper.detectorMappingCacheSync();
 
-        DetectorMapping disabledDetectorMapping = generateDetectorMapping(generateTagsForIndex(1)).setEnabled(false);
-        DetectorMapping modifiedDetectorMapping = generateDetectorMapping(generateTagsForIndex(2));
-        List<DetectorMapping> updateDetectorMappings = Arrays.asList(disabledDetectorMapping, modifiedDetectorMapping);
+    //     verify(emptyCache, never()).removeDisabledDetectorMappings(anyList());
+    //     verify(emptyCache, never()).invalidateMetricsWithOldDetectorMappings(anyList());
+    // }
 
-        when(detectorSource.findDetectorMappingsUpdatedSince(anyLong())).thenReturn(updateDetectorMappings);
-        doAnswer((e) -> null).when(cache).removeDisabledDetectorMappings(anyList());
-        doAnswer((e) -> null).when(cache).invalidateMetricsWithOldDetectorMappings(anyList());
-
-        detectorMapper.detectorMappingCacheSync();
-
-        verify(cache).removeDisabledDetectorMappings(Collections.singletonList(disabledDetectorMapping));
-        verify(cache).invalidateMetricsWithOldDetectorMappings(Collections.singletonList(modifiedDetectorMapping));
-    }
 
     private Detector buildDetector(String consumerId, String detectorUuid) {
         return new Detector(consumerId, UUID.fromString(detectorUuid));
+    }
+
+    @Test
+    public void testSinglePageDetectorMappingResponse() {
+        when(smallDetectorSource.getEnabledDetectorMappingCount()).thenReturn(500L);
+        when(smallDetectorSource.findDetectorMappingsUpdatedSince(anyLong()))
+        .thenAnswer(new Answer() {
+            public Object answer(InvocationOnMock invocation) {
+                Object[] args = invocation.getArguments();
+                invocation.getMock();
+                Long lastUpdatedTime = (long) args[0];
+                return generateDetectorMappings(lastUpdatedTime, 500);
+                }
+            });
+        DetectorMapper smallDetectorMapper = new DetectorMapper(smallDetectorSource, config, new MetricRegistry());
+        MetricDefinition metricDefinition = new MetricDefinition(new TagCollection(generateTagsForIndex(1)));
+        assertTrue(smallDetectorMapper.metricMightBeMapped(metricDefinition));
     }
 }

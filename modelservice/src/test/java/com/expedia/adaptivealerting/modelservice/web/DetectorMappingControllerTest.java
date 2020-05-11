@@ -154,6 +154,12 @@ public class DetectorMappingControllerTest {
         assertEquals(id, detectorMappings.get(0).getId());
     }
 
+    @Test
+    public void testGetEnabledDetectorMappingCount() {
+        when(detectorMappingRepo.getEnabledDetectorMappingCount()).thenReturn(10L);
+        assertEquals(10L, controllerUnderTest.enabledDetectorMappingCount());
+    }
+
     @Test(expected = RuntimeException.class)
     public void testGetLastUpdated_fail() {
         val timeInSecs = 60;
