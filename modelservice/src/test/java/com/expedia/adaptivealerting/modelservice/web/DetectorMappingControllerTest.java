@@ -15,13 +15,13 @@
  */
 package com.expedia.adaptivealerting.modelservice.web;
 
-import com.expedia.adaptivealerting.modelservice.entity.Detector;
-import com.expedia.adaptivealerting.modelservice.entity.User;
-import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.ConsumerDetectorMapping;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.User;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.DetectorMapping;
 import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorMappingRepository;
-import com.expedia.adaptivealerting.modelservice.repo.request.SearchMappingsRequest;
-import com.expedia.adaptivealerting.modelservice.repo.response.MatchingDetectorsResponse;
+import com.expedia.adaptivealerting.modelservice.web.request.SearchMappingsRequest;
+import com.expedia.adaptivealerting.modelservice.web.response.MatchingDetectorsResponse;
 import lombok.val;
 import org.junit.Assert;
 import org.junit.Before;
@@ -73,7 +73,7 @@ public class DetectorMappingControllerTest {
         when(detectorMappingRepo.findDetectorMapping(id)).thenReturn(detectorMapping);
         DetectorMapping detectorMappingreturned = controllerUnderTest.getDetectorMapping(id);
         assertNotNull("Response can't be null", detectorMappingreturned);
-        assertEquals(UUID.fromString(detectorUuid), detectorMappingreturned.getDetector().getUuid());
+        assertEquals(UUID.fromString(detectorUuid), detectorMappingreturned.getConsumerDetectorMapping().getUuid());
         assertEquals(id, detectorMappingreturned.getId());
         assertEquals(userVal, detectorMapping.getUser().getId());
         assertEquals(true, detectorMapping.isEnabled());
@@ -90,7 +90,7 @@ public class DetectorMappingControllerTest {
         when(detectorMappingRepo.findDetectorMapping(id)).thenReturn(new DetectorMapping());
         DetectorMapping detectorMapping = controllerUnderTest.getDetectorMapping(id);
         assertNotNull("Response can't be null", detectorMapping);
-        assertEquals(detectorUuid, detectorMapping.getDetector().getUuid());
+        assertEquals(detectorUuid, detectorMapping.getConsumerDetectorMapping().getUuid());
         assertEquals(id, detectorMapping.getId());
     }
 
@@ -125,7 +125,7 @@ public class DetectorMappingControllerTest {
         when(detectorMappingRepo.search(searchMappingsRequest)).thenReturn(detectorMappings);
         List<DetectorMapping> detectorMappingsResponse = controllerUnderTest.searchDetectorMapping(searchMappingsRequest);
         assertEquals(id, detectorMappingsResponse.get(0).getId());
-        assertEquals(detectorUuid, detectorMappingsResponse.get(0).getDetector().getUuid().toString());
+        assertEquals(detectorUuid, detectorMappingsResponse.get(0).getConsumerDetectorMapping().getUuid().toString());
         assertEquals("test-user", detectorMappingsResponse.get(0).getUser().getId());
     }
 
@@ -137,7 +137,7 @@ public class DetectorMappingControllerTest {
         List<DetectorMapping> detectorMappings = controllerUnderTest.findDetectorMapping(timeInSecs);
         assertNotNull("Response can't be null", detectorMappings);
         assertEquals(1, detectorMappings.size());
-        assertEquals(UUID.fromString(detectorUuid), detectorMappings.get(0).getDetector().getUuid());
+        assertEquals(UUID.fromString(detectorUuid), detectorMappings.get(0).getConsumerDetectorMapping().getUuid());
         assertEquals(id, detectorMappings.get(0).getId());
     }
 
@@ -158,16 +158,16 @@ public class DetectorMappingControllerTest {
         when(detectorMappingRepo.findMatchingDetectorMappings(tagsList)).thenReturn(mockMatchingDetectorsResponse);
         MatchingDetectorsResponse matchingDetectorsResult = controllerUnderTest.searchDetectorMapping(tagsList);
         Assert.assertEquals(1, matchingDetectorsResult.getGroupedDetectorsBySearchIndex().size());
-        List<Detector> detectors = matchingDetectorsResult.getGroupedDetectorsBySearchIndex().get(1);
-        assertEquals(1, detectors.size());
-        assertEquals(UUID.fromString(detectorUuid), detectors.get(0).getUuid());
+        List<ConsumerDetectorMapping> consumerDetectorMappings = matchingDetectorsResult.getGroupedDetectorsBySearchIndex().get(1);
+        assertEquals(1, consumerDetectorMappings.size());
+        assertEquals(UUID.fromString(detectorUuid), consumerDetectorMappings.get(0).getUuid());
     }
 
     private DetectorMapping mockDetectorMapping(String id) {
         DetectorMapping detectorMapping = mock(DetectorMapping.class);
-        Detector detector = buildDetector(detectorUuid);
+        ConsumerDetectorMapping consumerDetectorMapping = buildDetector(detectorUuid);
         User user = new User(userVal);
-        when(detectorMapping.getDetector()).thenReturn(detector);
+        when(detectorMapping.getConsumerDetectorMapping()).thenReturn(consumerDetectorMapping);
         when(detectorMapping.getId()).thenReturn(id);
         when(detectorMapping.getUser()).thenReturn(user);
         when(detectorMapping.isEnabled()).thenReturn(true);
@@ -177,8 +177,8 @@ public class DetectorMappingControllerTest {
     private List<DetectorMapping> mockDetectorMappingsList() {
         DetectorMapping detectorMapping = mock(DetectorMapping.class);
         List<DetectorMapping> detectorMappingsList = new ArrayList<>();
-        Detector detector = buildDetector(detectorUuid);
-        when(detectorMapping.getDetector()).thenReturn(detector);
+        ConsumerDetectorMapping consumerDetectorMapping = buildDetector(detectorUuid);
+        when(detectorMapping.getConsumerDetectorMapping()).thenReturn(consumerDetectorMapping);
         when(detectorMapping.getId()).thenReturn(id);
         when(detectorMapping.getUser()).thenReturn(new User(userVal));
         detectorMappingsList.add(detectorMapping);
@@ -186,15 +186,15 @@ public class DetectorMappingControllerTest {
     }
 
     private MatchingDetectorsResponse mockMatchingDetectorsResponse(int lookupTime, String detectorUuid) {
-        Map<Integer, List<Detector>> matchingDetectorsResponseMap = new HashMap<>();
-        List<Detector> DetectorList = new ArrayList<>();
-        DetectorList.add(buildDetector(detectorUuid));
-        matchingDetectorsResponseMap.put(1, DetectorList);
+        Map<Integer, List<ConsumerDetectorMapping>> matchingDetectorsResponseMap = new HashMap<>();
+        List<ConsumerDetectorMapping> consumerDetectorMappingList = new ArrayList<>();
+        consumerDetectorMappingList.add(buildDetector(detectorUuid));
+        matchingDetectorsResponseMap.put(1, consumerDetectorMappingList);
         MatchingDetectorsResponse matchingDetectorsResponse = new MatchingDetectorsResponse(matchingDetectorsResponseMap, lookupTime);
         return matchingDetectorsResponse;
     }
 
-    private Detector buildDetector(String detectorUuid) {
-        return new Detector("cid", UUID.fromString(detectorUuid));
+    private ConsumerDetectorMapping buildDetector(String detectorUuid) {
+        return new ConsumerDetectorMapping("cid", UUID.fromString(detectorUuid));
     }
 }

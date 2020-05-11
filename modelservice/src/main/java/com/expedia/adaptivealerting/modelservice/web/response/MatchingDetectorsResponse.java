@@ -13,14 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.repo.request;
+package com.expedia.adaptivealerting.modelservice.web.response;
 
+import com.expedia.adaptivealerting.modelservice.domain.mapping.ConsumerDetectorMapping;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.UUID;
+import java.util.List;
+import java.util.Map;
 
 @Data
-public class SearchMappingsRequest {
-    private String userId;
-    private UUID detectorUuid;
+@AllArgsConstructor
+public class MatchingDetectorsResponse {
+    private Map<Integer, List<ConsumerDetectorMapping>> groupedDetectorsBySearchIndex;
+    private long lookupTimeInMillis;
+
 }

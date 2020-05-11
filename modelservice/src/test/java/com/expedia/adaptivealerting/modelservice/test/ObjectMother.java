@@ -16,20 +16,11 @@
 package com.expedia.adaptivealerting.modelservice.test;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
-import com.expedia.adaptivealerting.modelservice.entity.Expression;
-import com.expedia.adaptivealerting.modelservice.entity.Field;
-import com.expedia.adaptivealerting.modelservice.entity.Operand;
-import com.expedia.adaptivealerting.modelservice.entity.Operator;
-import com.expedia.adaptivealerting.modelservice.entity.User;
-import com.expedia.adaptivealerting.modelservice.entity.Detector;
-import com.expedia.adaptivealerting.modelservice.repo.impl.percolator.BoolCondition;
-import com.expedia.adaptivealerting.modelservice.repo.impl.percolator.MustCondition;
-import com.expedia.adaptivealerting.modelservice.repo.impl.percolator.PercolatorDetectorMapping;
-import com.expedia.adaptivealerting.modelservice.repo.impl.percolator.Query;
-import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
-import com.expedia.adaptivealerting.modelservice.metricsource.graphite.GraphiteResult;
-import com.expedia.adaptivealerting.modelservice.repo.response.MatchingDetectorsResponse;
-import com.expedia.adaptivealerting.modelservice.repo.request.AnomalyRequest;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.Expression;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.Field;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.Operand;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.Operator;
+import com.expedia.adaptivealerting.modelservice.web.request.AnomalyRequest;
 import com.expedia.adaptivealerting.modelservice.metricsource.MetricSourceResult;
 import com.expedia.adaptivealerting.modelservice.util.DateUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,23 +34,13 @@ import java.util.Map;
 import java.util.UUID;
 
 public class ObjectMother {
-    private static final ObjectMother MOM = new ObjectMother();
 
+    private static final ObjectMother MOM = new ObjectMother();
     public static ObjectMother instance() {
         return MOM;
     }
 
     private ObjectMother() {
-    }
-
-    public GraphiteResult[] getGraphiteData() {
-        GraphiteResult[] results = new GraphiteResult[1];
-        GraphiteResult result = new GraphiteResult();
-        result.setDatapoints(getDataPoints());
-        result.setTags(getTags());
-        result.setTarget("target");
-        results[0] = result;
-        return results;
     }
 
     public MetricSourceResult getMetricData() {
@@ -90,39 +71,18 @@ public class ObjectMother {
      *
      * @return Detector document with the UUID set to {@literal null}.
      */
-    public DetectorDocument getDetectorDocument() {
-        val detector = new DetectorDocument();
-        detector.setCreatedBy("user");
-        detector.setType("constant-detector");
-
-        Map<String, Object> detectorConfig = new HashMap<>();
-        val thresholds = "{\"thresholds\": {\"lowerStrong\": \"90\", \"lowerWeak\": \"70\"}}";
-        val detectorParams = toObject(thresholds);
-        detectorParams.put("type", "LEFT_TAILED");
-        detectorConfig.put("params", getDetectorParams());
-        detector.setConfig(detectorConfig);
-        return detector;
+    public DetectorDocument buildDetectorDocument() {
+        return new DetectorDocument()
+                .setCreatedBy("user")
+                .setType("constant-detector")
+                .setConfig(buildDetectorConfig());
     }
 
-    public Map<String, Object> getIllegalDetectorParams() {
-        val thresholds = "{\"thresholds\": {\"lowerStrong\": \"90\", \"lowerWeak\": \"70\"}}";
-        val detectorParams = toObject(thresholds);
-        detectorParams.put("type", "LEFT_TAILED");
-        return detectorParams;
-    }
-
-    public DetectorDocument getIllegalParamsDetector() {
-        DetectorDocument detector = new DetectorDocument();
-        detector.setCreatedBy("user");
-        detector.setType("constant-detector");
-
-        Map<String, Object> detectorConfig = new HashMap<>();
-        val thresholds = "{\"thresholds\": {\"lowerStrong\": \"90\", \"lowerWeak\": \"70\"}}";
-        val detectorParams = toObject(thresholds);
-        detectorParams.put("type", "LEFT_TAILED");
-        detectorConfig.put("params", getIllegalDetectorParams());
-        detector.setConfig(detectorConfig);
-        return detector;
+    public DetectorDocument buildIllegalParamsDetectorDocument() {
+        return new DetectorDocument()
+                .setCreatedBy("user")
+                .setType("constant-detector")
+                .setConfig(buildIllegalDetectorConfig());
     }
 
     public DetectorDocument getElasticsearchDetector() {
@@ -133,36 +93,6 @@ public class ObjectMother {
                 .setEnabled(true)
                 .setTrusted(true)
                 .setLastUpdateTimestamp(DateUtil.toUtcDate("2019-04-06 22:00:00"));
-    }
-
-    public PercolatorDetectorMapping getPercolatorDetectorMapping() {
-        PercolatorDetectorMapping percolatorDetectorMapping = new PercolatorDetectorMapping();
-        Query query = new Query();
-        BoolCondition boolCondition = new BoolCondition();
-        List<MustCondition> mustConditions = new ArrayList<>();
-        MustCondition mustCondition = new MustCondition();
-        Map match = new HashMap<>();
-        match.put("name", "sample-web");
-        mustCondition.setMatch(match);
-        mustConditions.add(mustCondition);
-        boolCondition.setMust(mustConditions);
-        query.setBool(boolCondition);
-        percolatorDetectorMapping.setCreatedTimeInMillis(1554828886);
-        percolatorDetectorMapping.setEnabled(true);
-        percolatorDetectorMapping.setLastModifiedTimeInMillis(1554828886);
-        percolatorDetectorMapping.setUser(new User("test-user"));
-        percolatorDetectorMapping.setDetector(buildDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639"));
-        percolatorDetectorMapping.setQuery(query);
-        return percolatorDetectorMapping;
-    }
-
-    public MatchingDetectorsResponse getMatchingDetectorsResponse() {
-        Map<Integer, List<Detector>> groupedDetectorsByIndex = new HashMap<>();
-        Detector detector = buildDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639");
-        List<Detector> detectors = new ArrayList<>();
-        detectors.add(detector);
-        groupedDetectorsByIndex.put(0, detectors);
-        return new MatchingDetectorsResponse(groupedDetectorsByIndex, 10000);
     }
 
     public Expression getExpression() {
@@ -176,29 +106,36 @@ public class ObjectMother {
         return expression;
     }
 
+    private Map<String, Object> buildDetectorConfig() {
+        Map<String, Object> detectorConfig = new HashMap<>();
+        detectorConfig.put("params", getLegalDetectorParams());
+        return detectorConfig;
+    }
+
+    private Map<String, Object> buildIllegalDetectorConfig() {
+        Map<String, Object> detectorConfig = new HashMap<>();
+        detectorConfig.put("params", getIllegalDetectorParams());
+        return detectorConfig;
+    }
+
+    private Map<String, Object> getLegalDetectorParams() {
+        // FIXME Use serialization rather than hand-crafted JSON. [WLW]
+        val thresholds = "{\"thresholds\": {\"lowerStrong\": \"70\", \"lowerWeak\": \"90\"}}";
+        val detectorParams = toObject(thresholds);
+        detectorParams.put("type", "LEFT_TAILED");
+        return detectorParams;
+    }
+
+    private Map<String, Object> getIllegalDetectorParams() {
+        val thresholds = "{\"thresholds\": {\"lowerStrong\": \"90\", \"lowerWeak\": \"70\"}}";
+        val detectorParams = toObject(thresholds);
+        detectorParams.put("type", "LEFT_TAILED");
+        return detectorParams;
+    }
+
     @SneakyThrows
     private Map<String, Object> toObject(String message) {
         return new ObjectMapper().readValue(message, HashMap.class);
-    }
-
-    private String[][] getDataPoints() {
-        String[][] datapoints = new String[2][2];
-        datapoints[0][0] = String.valueOf(78.0);
-        datapoints[0][1] = String.valueOf(1548829800);
-        datapoints[1][0] = String.valueOf(81.0);
-        datapoints[1][1] = String.valueOf(1548830400);
-        return datapoints;
-    }
-
-    private Map<String, Object> getTags() {
-        Map<String, Object> tags = new HashMap<String, Object>();
-        tags.put("lob", "hotel");
-        tags.put("pos", "expedia-com");
-        return tags;
-    }
-
-    private Detector buildDetector(String detectorUuid) {
-        return new Detector("cid", UUID.fromString(detectorUuid));
     }
 }
 

@@ -22,5 +22,5 @@ ad-manager {
   throttle-gate-likelihood = "${throttle_gate_likelihood}"
 
   # Detector refresh period in minutes
-  detector-refresh-period = ${detector_refresh_period}
+  consumerDetectorMapping-refresh-period = ${detector_refresh_period}
 }

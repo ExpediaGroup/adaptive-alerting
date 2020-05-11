@@ -13,19 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.repo.response;
+package com.expedia.adaptivealerting.modelservice.web.request;
 
-import com.expedia.adaptivealerting.modelservice.entity.Detector;
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
-import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Data
-@AllArgsConstructor
-public class MatchingDetectorsResponse {
-    private Map<Integer, List<Detector>> groupedDetectorsBySearchIndex;
-    private long lookupTimeInMillis;
+@Accessors(chain = true)
+public class AnomalyRequest {
+    private String metricTags;
+    private String detectorType;
+    private UUID detectorUuid;
 
+    // TODO This should be the detector config, not the detector params.
+    //  We need to be able to handle hyperparams too. [WLW]
+    private Map<String, Object> detectorParams;
 }

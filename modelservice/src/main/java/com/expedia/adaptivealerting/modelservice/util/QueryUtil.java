@@ -15,13 +15,13 @@
  */
 package com.expedia.adaptivealerting.modelservice.util;
 
-import com.expedia.adaptivealerting.modelservice.entity.Expression;
-import com.expedia.adaptivealerting.modelservice.entity.Field;
-import com.expedia.adaptivealerting.modelservice.entity.Operand;
-import com.expedia.adaptivealerting.modelservice.entity.Operator;
-import com.expedia.adaptivealerting.modelservice.repo.impl.percolator.BoolCondition;
-import com.expedia.adaptivealerting.modelservice.repo.impl.percolator.MustCondition;
-import com.expedia.adaptivealerting.modelservice.repo.impl.percolator.Query;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.Expression;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.Field;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.Operand;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.Operator;
+import com.expedia.adaptivealerting.modelservice.domain.percolator.BoolCondition;
+import com.expedia.adaptivealerting.modelservice.domain.percolator.MustCondition;
+import com.expedia.adaptivealerting.modelservice.domain.percolator.Query;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 

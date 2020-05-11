@@ -18,17 +18,17 @@ package com.expedia.adaptivealerting.modelservice.repo.impl;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.expedia.adaptivealerting.modelservice.entity.Detector;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.ConsumerDetectorMapping;
 import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
-import com.expedia.adaptivealerting.modelservice.repo.impl.percolator.PercolatorDetectorMapping;
-import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticSearchClient;
-import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticSearchProperties;
-import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
+import com.expedia.adaptivealerting.modelservice.domain.percolator.PercolatorDetectorMapping;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.DetectorMapping;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorMappingRepository;
-import com.expedia.adaptivealerting.modelservice.repo.request.CreateDetectorMappingRequest;
-import com.expedia.adaptivealerting.modelservice.repo.request.SearchMappingsRequest;
-import com.expedia.adaptivealerting.modelservice.repo.response.MatchingDetectorsResponse;
-import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticsearchUtil;
+import com.expedia.adaptivealerting.modelservice.web.request.CreateDetectorMappingRequest;
+import com.expedia.adaptivealerting.modelservice.web.request.SearchMappingsRequest;
+import com.expedia.adaptivealerting.modelservice.web.response.MatchingDetectorsResponse;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticsearchUtil;
 import com.expedia.adaptivealerting.modelservice.util.ObjectMapperUtil;
 import com.expedia.adaptivealerting.modelservice.util.QueryUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -65,7 +65,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static com.expedia.adaptivealerting.modelservice.repo.impl.percolator.PercolatorDetectorMapping.LAST_MOD_TIME_KEYWORD;
+import static com.expedia.adaptivealerting.modelservice.domain.percolator.PercolatorDetectorMapping.LAST_MOD_TIME_KEYWORD;
 
 @Service
 @Slf4j
@@ -109,7 +109,7 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
         val now = System.currentTimeMillis();
         val mapping = new PercolatorDetectorMapping()
                 .setUser(request.getUser())
-                .setDetector(request.getDetector())
+                .setConsumerDetectorMapping(request.getConsumerDetectorMapping())
                 .setQuery(QueryUtil.buildQuery(request.getExpression()))
                 .setEnabled(true)
                 .setLastModifiedTimeInMillis(now)
@@ -202,7 +202,7 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
         if (detectorMapping.isEnabled()) {
             final PercolatorDetectorMapping percolatorDetectorMapping = new PercolatorDetectorMapping()
                     .setUser(detectorMapping.getUser())
-                    .setDetector(detectorMapping.getDetector())
+                    .setConsumerDetectorMapping(detectorMapping.getConsumerDetectorMapping())
                     .setQuery(QueryUtil.buildQuery(detectorMapping.getExpression()))
                     .setEnabled(false)
                     .setLastModifiedTimeInMillis(System.currentTimeMillis())
@@ -277,7 +277,7 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
         });
         val detectorMapping = new DetectorMapping()
                 .setId(id)
-                .setDetector(new Detector(getConsumerId(detectorEntity.getDetector().getConsumerId()), detectorEntity.getDetector().getUuid()))
+                .setConsumerDetectorMapping(new ConsumerDetectorMapping(getConsumerId(detectorEntity.getConsumerDetectorMapping().getConsumerId()), detectorEntity.getConsumerDetectorMapping().getUuid()))
                 .setExpression(QueryUtil.buildExpression(detectorEntity.getQuery()))
                 .setEnabled(detectorEntity.isEnabled())
                 .setCreatedTimeInMillis(detectorEntity.getCreatedTimeInMillis())
@@ -295,13 +295,13 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
     }
 
     private MatchingDetectorsResponse convertToMatchingDetectorsResponse(DetectorMatchResponse res) {
-        Map<Integer, List<Detector>> groupedDetectorsByIndex = new HashMap<>();
+        Map<Integer, List<ConsumerDetectorMapping>> groupedDetectorsByIndex = new HashMap<>();
         log.info("Mapping-Cache: found {} matching mappings", res.getDetectorMappings().size());
         res.getDetectorMappings().forEach(detectorMapping -> {
             detectorMapping.getSearchIndexes().forEach(searchIndex -> {
                 groupedDetectorsByIndex.computeIfAbsent(searchIndex, index -> new ArrayList<>());
                 groupedDetectorsByIndex.computeIfPresent(searchIndex, (index, list) -> {
-                    list.add(detectorMapping.getDetector());
+                    list.add(detectorMapping.getConsumerDetectorMapping());
                     return list;
                 });
             });

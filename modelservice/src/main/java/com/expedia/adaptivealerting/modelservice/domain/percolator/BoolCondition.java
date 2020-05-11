@@ -13,14 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.entity;
+package com.expedia.adaptivealerting.modelservice.domain.percolator;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
-public class Expression {
-    private Operator operator;
-    private List<Operand> operands;
+@NoArgsConstructor
+@AllArgsConstructor
+public class BoolCondition {
+    private List<MustCondition> must;
 }

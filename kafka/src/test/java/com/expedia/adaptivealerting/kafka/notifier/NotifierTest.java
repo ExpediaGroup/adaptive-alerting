@@ -27,12 +27,12 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import static com.expedia.adaptivealerting.kafka.util.TestHelper.bootstrapServers;
 import static com.expedia.adaptivealerting.kafka.util.TestHelper.newMappedMetricData;
 import static org.mockito.Mockito.mock;
-import static org.springframework.boot.test.util.EnvironmentTestUtils.addEnvironment;
 
 public class NotifierTest {
 
@@ -42,17 +42,17 @@ public class NotifierTest {
     @ClassRule
     public static MockWebServer webhook = new MockWebServer();
 
-    AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+    private AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
 
-    Notifier notifier;
-    NotifierConfig notifierConfig;
+    private Notifier notifier;
+    private NotifierConfig notifierConfig;
 
     @Before
     public void init() {
-        addEnvironment(context,
+        TestPropertyValues.of(
                 "kafka.consumer.bootstrap.servers=" + bootstrapServers(kafka),
                 "webhook.url=http://localhost:" + webhook.getPort() + "/hook"
-        );
+        ).applyTo(this.context);
 
         context.register(PropertyPlaceholderAutoConfiguration.class, NotifierConfig.class, Notifier.class);
         context.refresh();

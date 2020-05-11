@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.repo.request;
+package com.expedia.adaptivealerting.modelservice.web.request;
 
-import com.expedia.adaptivealerting.modelservice.entity.Expression;
-import com.expedia.adaptivealerting.modelservice.entity.Detector;
-import com.expedia.adaptivealerting.modelservice.entity.User;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.Expression;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.ConsumerDetectorMapping;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.User;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import lombok.val;
 import org.junit.Before;
@@ -30,7 +30,7 @@ import static org.junit.Assert.assertNotEquals;
 
 public class CreateDetectorMappingRequestTest {
     private Expression expression;
-    private Detector detector;
+    private ConsumerDetectorMapping consumerDetectorMapping;
     private User user;
 
     @Before
@@ -42,19 +42,19 @@ public class CreateDetectorMappingRequestTest {
     private void initTestObjects() {
         val mom = ObjectMother.instance();
         this.expression = mom.getExpression();
-        this.detector = new Detector("cid", UUID.randomUUID());
+        this.consumerDetectorMapping = new ConsumerDetectorMapping("cid", UUID.randomUUID());
         this.user = new User("yoda");
     }
 
     @Test
     public void testEquals() {
-        val requestUnderTest = new CreateDetectorMappingRequest(expression, detector, user);
+        val requestUnderTest = new CreateDetectorMappingRequest(expression, consumerDetectorMapping, user);
         assertNotEquals(requestUnderTest, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testValidate_nullUser() {
-        val requestUnderTest = new CreateDetectorMappingRequest(expression, detector, null);
+        val requestUnderTest = new CreateDetectorMappingRequest(expression, consumerDetectorMapping, null);
         requestUnderTest.validate();
     }
 
@@ -66,7 +66,7 @@ public class CreateDetectorMappingRequestTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testValidate_nullExpression() {
-        val requestUnderTest = new CreateDetectorMappingRequest(null, detector, user);
+        val requestUnderTest = new CreateDetectorMappingRequest(null, consumerDetectorMapping, user);
         requestUnderTest.validate();
     }
 }

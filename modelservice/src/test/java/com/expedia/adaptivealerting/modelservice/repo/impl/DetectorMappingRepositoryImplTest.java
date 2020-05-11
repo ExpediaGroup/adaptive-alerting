@@ -18,18 +18,21 @@ package com.expedia.adaptivealerting.modelservice.repo.impl;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.expedia.adaptivealerting.modelservice.entity.Detector;
-import com.expedia.adaptivealerting.modelservice.entity.User;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.ConsumerDetectorMapping;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.User;
+import com.expedia.adaptivealerting.modelservice.domain.percolator.BoolCondition;
+import com.expedia.adaptivealerting.modelservice.domain.percolator.MustCondition;
+import com.expedia.adaptivealerting.modelservice.domain.percolator.Query;
 import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
-import com.expedia.adaptivealerting.modelservice.repo.impl.percolator.PercolatorDetectorMapping;
-import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticSearchClient;
-import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticSearchProperties;
-import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
-import com.expedia.adaptivealerting.modelservice.repo.request.CreateDetectorMappingRequest;
-import com.expedia.adaptivealerting.modelservice.repo.request.SearchMappingsRequest;
-import com.expedia.adaptivealerting.modelservice.repo.response.MatchingDetectorsResponse;
+import com.expedia.adaptivealerting.modelservice.domain.percolator.PercolatorDetectorMapping;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.DetectorMapping;
+import com.expedia.adaptivealerting.modelservice.web.request.CreateDetectorMappingRequest;
+import com.expedia.adaptivealerting.modelservice.web.request.SearchMappingsRequest;
+import com.expedia.adaptivealerting.modelservice.web.response.MatchingDetectorsResponse;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
-import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticsearchUtil;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticsearchUtil;
 import com.expedia.adaptivealerting.modelservice.util.ObjectMapperUtil;
 import lombok.val;
 import org.elasticsearch.action.DocWriteResponse;
@@ -104,10 +107,8 @@ public class DetectorMappingRepositoryImplTest {
 
     @Before
     public void setUp() {
-        val mom = ObjectMother.instance();
         val config = new ElasticSearchProperties.Config().setConnectionTimeout(100);
-
-        percolatorDetectorMapping = mom.getPercolatorDetectorMapping();
+        percolatorDetectorMapping = getPercolatorDetectorMapping();
         when(metricRegistry.timer(any())).thenReturn(mock(Timer.class));
         when(metricRegistry.counter(any())).thenReturn(mock(Counter.class));
         when(elasticSearchProperties.getIndexName()).thenReturn("detector-mappings");
@@ -131,9 +132,8 @@ public class DetectorMappingRepositoryImplTest {
     @Test
     public void testCreateDetectorMapping() {
         val mom = ObjectMother.instance();
-
         val expr = mom.getExpression();
-        val detector = new Detector("cid", UUID.randomUUID());
+        val detector = new ConsumerDetectorMapping("cid", UUID.randomUUID());
         val user = new User("yoda");
         val request = new CreateDetectorMappingRequest(expr, detector, user);
         repoUnderTest.createDetectorMapping(request);
@@ -152,9 +152,9 @@ public class DetectorMappingRepositoryImplTest {
         assertNotNull("Response can't be null", response);
         assertEquals("ES lookup time didn't match", lookUpTime, response.getLookupTimeInMillis());
         assertEquals(1, response.getGroupedDetectorsBySearchIndex().size());
-        List<Detector> detectors = response.getGroupedDetectorsBySearchIndex().get(new Integer(searchIndex));
-        assertEquals(1, detectors.size());
-        assertEquals(UUID.fromString(detectorUuid), detectors.get(0).getUuid());
+        List<ConsumerDetectorMapping> consumerDetectorMappings = response.getGroupedDetectorsBySearchIndex().get(new Integer(searchIndex));
+        assertEquals(1, consumerDetectorMappings.size());
+        assertEquals(UUID.fromString(detectorUuid), consumerDetectorMappings.get(0).getUuid());
     }
 
     @Test(expected = RuntimeException.class)
@@ -181,7 +181,7 @@ public class DetectorMappingRepositoryImplTest {
         assertEquals(LastModifiedTimeInMillis, Long.valueOf(detectorMapping.getLastModifiedTimeInMillis()));
         assertEquals(CreatedTimeInMillis, Long.valueOf(detectorMapping.getCreatedTimeInMillis()));
         assertTrue(detectorMapping.isEnabled());
-        assertEquals(UUID.fromString(detectorUuid), detectorMapping.getDetector().getUuid());
+        assertEquals(UUID.fromString(detectorUuid), detectorMapping.getConsumerDetectorMapping().getUuid());
 
     }
 
@@ -220,7 +220,7 @@ public class DetectorMappingRepositoryImplTest {
         verify(elasticSearchClient, atLeastOnce()).search(any(SearchRequest.class), eq(RequestOptions.DEFAULT));
         assertNotNull("Response can't be null", tagsList);
         assertEquals(1, tagsList.size());
-        assertEquals(UUID.fromString(detectorUuid), tagsList.get(0).getDetector().getUuid());
+        assertEquals(UUID.fromString(detectorUuid), tagsList.get(0).getConsumerDetectorMapping().getUuid());
         assertEquals("test-user", tagsList.get(0).getUser().getId());
         assertEquals(LastModifiedTimeInMillis, Long.valueOf(tagsList.get(0).getLastModifiedTimeInMillis()));
         assertEquals(CreatedTimeInMillis, Long.valueOf(tagsList.get(0).getCreatedTimeInMillis()));
@@ -252,7 +252,7 @@ public class DetectorMappingRepositoryImplTest {
         verify(elasticSearchClient, atLeastOnce()).search(any(SearchRequest.class), eq(RequestOptions.DEFAULT));
         assertNotNull("Response can't be null", tagsList);
         assertEquals(1, tagsList.size());
-        assertEquals(UUID.fromString(detectorUuid), tagsList.get(0).getDetector().getUuid());
+        assertEquals(UUID.fromString(detectorUuid), tagsList.get(0).getConsumerDetectorMapping().getUuid());
         assertEquals("test-user", tagsList.get(0).getUser().getId());
         assertEquals(LastModifiedTimeInMillis, Long.valueOf(tagsList.get(0).getLastModifiedTimeInMillis()));
         assertEquals(CreatedTimeInMillis, Long.valueOf(tagsList.get(0).getCreatedTimeInMillis()));
@@ -368,5 +368,30 @@ public class DetectorMappingRepositoryImplTest {
         } catch (IOException e) {
         }
         return deleteResponse;
+    }
+
+    public PercolatorDetectorMapping getPercolatorDetectorMapping() {
+        PercolatorDetectorMapping percolatorDetectorMapping = new PercolatorDetectorMapping();
+        Query query = new Query();
+        BoolCondition boolCondition = new BoolCondition();
+        List<MustCondition> mustConditions = new ArrayList<>();
+        MustCondition mustCondition = new MustCondition();
+        Map match = new HashMap<>();
+        match.put("name", "sample-web");
+        mustCondition.setMatch(match);
+        mustConditions.add(mustCondition);
+        boolCondition.setMust(mustConditions);
+        query.setBool(boolCondition);
+        percolatorDetectorMapping.setCreatedTimeInMillis(1554828886);
+        percolatorDetectorMapping.setEnabled(true);
+        percolatorDetectorMapping.setLastModifiedTimeInMillis(1554828886);
+        percolatorDetectorMapping.setUser(new User("test-user"));
+        percolatorDetectorMapping.setConsumerDetectorMapping(attachConsumerToDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639"));
+        percolatorDetectorMapping.setQuery(query);
+        return percolatorDetectorMapping;
+    }
+
+    private ConsumerDetectorMapping attachConsumerToDetector(String detectorUuid) {
+        return new ConsumerDetectorMapping("cid", UUID.fromString(detectorUuid));
     }
 }

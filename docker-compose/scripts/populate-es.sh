@@ -14,11 +14,11 @@
 #       See the License for the specific language governing permissions and
 #       limitations under the License.
 
-echo "--- Waiting for the Model Service API to become available before inserting sample detector and mapping..."
+echo "--- Waiting for the Model Service API to become available before inserting sample consumerDetectorMapping and mapping..."
 
-# Do not post sample detector to API until elasticsearch indexes pre-created by the modelservice
+# Do not post sample consumerDetectorMapping to API until elasticsearch indexes pre-created by the modelservice
 # Prevents race condition where index mappings are incorrectly auto-created by the API post before the modelservice can build them
-while [[ "$index_status" != *"detectors"* && "$index_status" != *"detector_mappings"* ]]
+while [[ "$index_status" != *"consumerDetectorMappings"* && "$index_status" != *"detector_mappings"* ]]
 do
     index_status=$(curl -s X GET http://elasticsearch:9200/_cat/indices?v)
     sleep 1
@@ -26,11 +26,11 @@ done
 
 # Prepare Sample Detector
 until detectoruuid=$(curl -s -X POST \
-    http://modelservice:8008/api/v2/detectors \
+    http://modelservice:8008/api/v2/consumerDetectorMappings \
     -H 'Content-Type: application/json' \
     -d '{
             "createdBy": "sampleuser",
-            "type": "constant-detector",
+            "type": "constant-consumerDetectorMapping",
             "detectorConfig": {
                 "hyperparams": {
                     "strategy": "percentile",
@@ -59,7 +59,7 @@ until mapid=$(curl -s -X POST \
     -H 'Content-Type: application/json' \
     -H 'cache-control: no-cache' \
     -d '{
-            "detector": {
+            "consumerDetectorMapping": {
                 "uuid": "'$detectoruuid'"
             },
             "expression": {

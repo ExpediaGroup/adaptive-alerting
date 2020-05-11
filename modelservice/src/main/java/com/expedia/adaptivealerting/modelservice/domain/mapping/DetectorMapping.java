@@ -13,22 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.repo.request;
+package com.expedia.adaptivealerting.modelservice.domain.mapping;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import java.util.Map;
-import java.util.UUID;
+import java.util.List;
 
+/**
+ * The type Detector mapping. Based on elastic search.
+ * <p>
+ * searchIndexes: index of matching metric-tag in request batch of metric-tags
+ */
 @Data
 @Accessors(chain = true)
-public class AnomalyRequest {
-    private String metricTags;
-    private String detectorType;
-    private UUID detectorUuid;
-
-    // TODO This should be the detector config, not the detector params.
-    //  We need to be able to handle hyperparams too. [WLW]
-    private Map<String, Object> detectorParams;
+public class DetectorMapping {
+    private String id;
+    private ConsumerDetectorMapping consumerDetectorMapping;
+    private Expression expression;
+    private User user;
+    private long lastModifiedTimeInMillis;
+    private long createdTimeInMillis;
+    private boolean isEnabled;
+    private List<Integer> searchIndexes;
 }

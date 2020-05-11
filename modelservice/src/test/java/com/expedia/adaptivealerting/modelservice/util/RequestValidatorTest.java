@@ -16,12 +16,12 @@
 package com.expedia.adaptivealerting.modelservice.util;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
-import com.expedia.adaptivealerting.modelservice.entity.Expression;
-import com.expedia.adaptivealerting.modelservice.entity.Field;
-import com.expedia.adaptivealerting.modelservice.entity.Operand;
-import com.expedia.adaptivealerting.modelservice.entity.Operator;
-import com.expedia.adaptivealerting.modelservice.entity.Detector;
-import com.expedia.adaptivealerting.modelservice.entity.User;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.Expression;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.Field;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.Operand;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.Operator;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.ConsumerDetectorMapping;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.User;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import lombok.val;
 import org.junit.Before;
@@ -44,9 +44,9 @@ public class RequestValidatorTest {
 
     private void initTestObjects() {
         val mom = ObjectMother.instance();
-        legalParamsDetector = mom.getDetectorDocument();
+        legalParamsDetector = mom.buildDetectorDocument();
         legalParamsDetector.setUuid(UUID.randomUUID());
-        illegalParamsDetector = mom.getIllegalParamsDetector();
+        illegalParamsDetector = mom.buildIllegalParamsDetectorDocument();
     }
 
     @Test
@@ -77,8 +77,8 @@ public class RequestValidatorTest {
 
     @Test
     public void testValidateMappingDetector_successful() {
-        Detector detector = new Detector("cid", UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"));
-        RequestValidator.validateMappingDetector(detector);
+        ConsumerDetectorMapping consumerDetectorMapping = new ConsumerDetectorMapping("cid", UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"));
+        RequestValidator.validateMappingDetector(consumerDetectorMapping);
     }
 
     @Test

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch;
+package com.expedia.adaptivealerting.modelservice.elasticsearch;
 
 import lombok.Generated;
 import org.elasticsearch.action.delete.DeleteRequest;
@@ -30,6 +30,7 @@ import org.elasticsearch.client.IndicesClient;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -48,6 +49,7 @@ import java.io.IOException;
 public class ElasticSearchClient {
 
     @Autowired
+    @Qualifier("legacyRestHighLevelClient")
     private RestHighLevelClient client;
 
     public IndicesClient indices() {

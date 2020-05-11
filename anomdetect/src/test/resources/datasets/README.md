@@ -18,5 +18,5 @@ These are public datasets for machine learning.
 ## white-noise-with-breakout-1.csv
 - **Source:** Expedia - Adaptive Alerting
 - **Notes:**
-  - We synthesized this dataset to test the EDMX breakout detector.
+  - We synthesized this dataset to test the EDMX breakout consumerDetectorMapping.
   - The series is Gaussian white noise (m=0, sd=1), but we've mean-shifted the series by 2 starting from row 600.

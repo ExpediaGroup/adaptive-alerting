@@ -30,6 +30,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -86,7 +87,33 @@ public class GraphiteMetricSourceTest {
         GraphiteProperties props = new GraphiteProperties();
         props.setUrlTemplate("https://graphiteUrl/render?from=-24hours&format=json&maxDataPoints=144&target={target}");
         when(restTemplate.getForObject(anyString(), eq(GraphiteResult[].class), any(Map.class))).thenReturn(
-                mom.getGraphiteData());
+                buildGraphiteData());
         when(BeanUtil.getBean(GraphiteProperties.class)).thenReturn(props);
+    }
+
+    private GraphiteResult[] buildGraphiteData() {
+        GraphiteResult[] results = new GraphiteResult[1];
+        GraphiteResult result = new GraphiteResult();
+        result.setDatapoints(getDataPoints());
+        result.setTags(getTags());
+        result.setTarget("target");
+        results[0] = result;
+        return results;
+    }
+
+    private String[][] getDataPoints() {
+        String[][] datapoints = new String[2][2];
+        datapoints[0][0] = String.valueOf(78.0);
+        datapoints[0][1] = String.valueOf(1548829800);
+        datapoints[1][0] = String.valueOf(81.0);
+        datapoints[1][1] = String.valueOf(1548830400);
+        return datapoints;
+    }
+
+    private Map<String, Object> getTags() {
+        Map<String, Object> tags = new HashMap<String, Object>();
+        tags.put("lob", "hotel");
+        tags.put("pos", "expedia-com");
+        return tags;
     }
 }

@@ -157,7 +157,7 @@ public class DetectorControllerTest {
     private void initTestObjects() {
         this.someUuid = UUID.randomUUID();
         val mom = ObjectMother.instance();
-        this.legalParamsDetector = mom.getDetectorDocument();
+        this.legalParamsDetector = mom.buildDetectorDocument();
         legalParamsDetector.setUuid(someUuid);
     }
 

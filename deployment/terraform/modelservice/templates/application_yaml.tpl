@@ -39,8 +39,8 @@ graphite:
 swagger:
   service:
     version: "1.0.0"
-    title: "Model service detector mapper"
-    description: "API documentation for model service detector mappings"
+    title: "Model service consumerDetectorMapping mapper"
+    description: "API documentation for model service consumerDetectorMapping mappings"
 
 # AWS
 security:

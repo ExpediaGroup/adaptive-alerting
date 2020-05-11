@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.repo.request;
+package com.expedia.adaptivealerting.modelservice.web.request;
 
-import com.expedia.adaptivealerting.modelservice.entity.Expression;
-import com.expedia.adaptivealerting.modelservice.entity.Detector;
-import com.expedia.adaptivealerting.modelservice.entity.User;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.ConsumerDetectorMapping;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.Expression;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.User;
 import com.expedia.adaptivealerting.modelservice.util.RequestValidator;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,13 +31,13 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class CreateDetectorMappingRequest {
     private Expression expression;
-    private Detector detector;
+    private ConsumerDetectorMapping consumerDetectorMapping;
     private User user;
 
     public void validate() {
         RequestValidator.validateExpression(this.getExpression());
         RequestValidator.validateUser(this.getUser());
-        RequestValidator.validateMappingDetector(this.getDetector());
+        RequestValidator.validateMappingDetector(this.getConsumerDetectorMapping());
     }
 
     public Set<String> getFields() {

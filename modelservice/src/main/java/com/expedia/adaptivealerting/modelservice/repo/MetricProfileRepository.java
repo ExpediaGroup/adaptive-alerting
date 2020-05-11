@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.modelservice.repo;
 
-import com.expedia.adaptivealerting.modelservice.repo.request.CreateMetricProfilingRequest;
+import com.expedia.adaptivealerting.modelservice.web.request.CreateMetricProfilingRequest;
 
 import java.util.Map;
 

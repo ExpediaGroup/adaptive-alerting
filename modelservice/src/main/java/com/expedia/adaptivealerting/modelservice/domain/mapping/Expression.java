@@ -13,8 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.entity;
+package com.expedia.adaptivealerting.modelservice.domain.mapping;
 
-public enum Operator {
-    AND, OR
+import lombok.Data;
+
+import java.util.List;
+
+@Data
+public class Expression {
+    private Operator operator;
+    private List<Operand> operands;
 }
