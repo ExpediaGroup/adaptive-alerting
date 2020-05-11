@@ -20,21 +20,26 @@ import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@Generated
 public class ElasticsearchConfig {
 
+    @Autowired
+    private ElasticSearchProperties elasticSearchProperties;
+
     @Bean(name = "legacyRestHighLevelClient", destroyMethod = "close")
-    public RestHighLevelClient buildRestClient(ElasticSearchProperties elasticSearchProperties) {
-        RestHighLevelClient elasticsearchClient = new RestHighLevelClient(buildRestClientBuilder(elasticSearchProperties));
+    public RestHighLevelClient buildRestClient() {
+        RestHighLevelClient elasticsearchClient = new RestHighLevelClient(buildRestClientBuilder());
         return elasticsearchClient;
     }
 
-    private RestClientBuilder buildRestClientBuilder(ElasticSearchProperties elasticSearchProperties) {
-        return RestClient.builder(HttpHost.create(elasticSearchProperties.getUrls()))
+    private RestClientBuilder buildRestClientBuilder() {
+        return RestClient.builder(
+                HttpHost.create(
+                        elasticSearchProperties.getUrls()))
                 .setRequestConfigCallback(req -> {
                     req.setConnectionRequestTimeout(elasticSearchProperties.getConfig().getConnectionTimeout());
                     req.setConnectTimeout(elasticSearchProperties.getConfig().getConnectionTimeout());
