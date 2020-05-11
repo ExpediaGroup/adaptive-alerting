@@ -93,7 +93,7 @@
         <query objectName="metrics:name=cache.exceptionRate" attributes="Value" resultAlias="mapping-cache.exceptionRate"/>
         <query objectName="metrics:name=cache.totalLoadTime" attributes="Value" resultAlias="mapping-cache.totalLoadTime"/>
 
-        <query objectName="metrics:name=detector-mapper.exceptions" attributes="Count" resultAlias="consumerDetectorMapping-mapper.exceptions"/>
+        <query objectName="metrics:name=detector-mapper.exceptions" attributes="Count" resultAlias="detector-mapper.exceptions"/>
 
 <!--        manager-->
         <query objectName="metrics:name=detector.*" resultAlias="%name%.#attribute#" />
