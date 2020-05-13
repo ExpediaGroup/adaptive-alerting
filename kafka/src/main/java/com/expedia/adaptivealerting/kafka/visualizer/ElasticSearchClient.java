@@ -23,6 +23,8 @@ import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.index.reindex.BulkByScrollResponse;
+import org.elasticsearch.index.reindex.DeleteByQueryRequest;
 
 import java.io.IOException;
 
@@ -57,6 +59,11 @@ public class ElasticSearchClient {
             log.error(e.getMessage(),e);
         }
         return client;
+    }
+
+    public BulkByScrollResponse deleteByQuery(DeleteByQueryRequest deleteByQueryRequest, RequestOptions requestOptions)
+            throws Exception {
+        return client.deleteByQuery(deleteByQueryRequest, RequestOptions.DEFAULT);
     }
 
     public RestHighLevelClient getClient() {

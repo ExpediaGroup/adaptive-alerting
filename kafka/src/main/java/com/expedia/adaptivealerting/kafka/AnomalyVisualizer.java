@@ -25,10 +25,9 @@ import java.util.concurrent.TimeUnit;
 public class AnomalyVisualizer {
 
     private static int PERIOD = 1;
-
     private static ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
-    public static void main(String[] args) {
 
+    public static void main(String[] args) {
         scheduledExecutorService.scheduleAtFixedRate(new ElasticSearchDataCleaner(),0, PERIOD, TimeUnit.DAYS);
         new AnomalyConsumer().listen();
     }

@@ -36,19 +36,28 @@ public class ElasticSearchDataCleaner implements Runnable {
 
     @Override
     public void run() {
+        ElasticSearchClient elasticSearchClient = new ElasticSearchClient();
+        deleteData(elasticSearchClient);
+    }
+
+    public BulkByScrollResponse deleteData(ElasticSearchClient elasticSearchClient) {
         log.info("deleting old data");
+        BulkByScrollResponse bulkByScrollResponse = null;
         DeleteByQueryRequest deleteByQueryRequest = new DeleteByQueryRequest(INDEX);
         RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(FIELD).lt("now-" + RETENTION_PERIOD_DAYS + "d/d");
         deleteByQueryRequest.setQuery(rangeQueryBuilder);
-        ElasticSearchClient elasticSearchClient = new ElasticSearchClient();
         try {
-            BulkByScrollResponse bulkResponse = elasticSearchClient.getClient()
+            bulkByScrollResponse = elasticSearchClient
                     .deleteByQuery(deleteByQueryRequest, RequestOptions.DEFAULT);
-            log.info(bulkResponse.toString());
+            log.info(bulkByScrollResponse.toString());
         } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
+            log.error(e.getLocalizedMessage(),e);
+        } catch (Exception e) {
+            log.error(e.getLocalizedMessage(),e);
+        }
+        finally {
             elasticSearchClient.close();
         }
+        return bulkByScrollResponse;
     }
 }
