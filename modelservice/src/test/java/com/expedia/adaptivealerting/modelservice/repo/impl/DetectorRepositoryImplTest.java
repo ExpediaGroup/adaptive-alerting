@@ -113,7 +113,7 @@ public class DetectorRepositoryImplTest {
     @Test
     public void testCreateDetector() {
         val mom = ObjectMother.instance();
-        val document = mom.buildDetectorDocument();
+        val document = mom.getDetectorDocument();
 
         // Disabled these because the contract does not require returning an implementation-specific ID. [WLW]
 //        val actualCreationId = repoUnderTest.createDetector(document);
@@ -145,7 +145,7 @@ public class DetectorRepositoryImplTest {
     @Test
     public void testCreateDetector_emptyMeta() {
         val mom = ObjectMother.instance();
-        val document = mom.buildDetectorDocument();
+        val document = mom.getDetectorDocument();
         document.setMeta(null);
         repoUnderTest.createDetector(document);
     }
@@ -153,7 +153,7 @@ public class DetectorRepositoryImplTest {
     @Test
     public void testCreateDetector_populatedMeta() {
         val mom = ObjectMother.instance();
-        val document = mom.buildDetectorDocument();
+        val document = mom.getDetectorDocument();
         DetectorDocument.Meta metaBlock = new DetectorDocument.Meta();
         metaBlock.setCreatedBy("user");
         document.setMeta(metaBlock);
@@ -163,7 +163,7 @@ public class DetectorRepositoryImplTest {
     @Test
     public void testCreateDetector_populatedMeta_noUser() {
         val mom = ObjectMother.instance();
-        val document = mom.buildDetectorDocument();
+        val document = mom.getDetectorDocument();
         DetectorDocument.Meta metaBlock = new DetectorDocument.Meta();
         metaBlock.setCreatedBy(null);
         document.setMeta(metaBlock);
@@ -193,7 +193,7 @@ public class DetectorRepositoryImplTest {
     @Test
     public void testUpdateDetector_emptyMeta() {
         val mom = ObjectMother.instance();
-        val document = mom.buildDetectorDocument();
+        val document = mom.getDetectorDocument();
         document.setMeta(null);
         UUID someUuid = UUID.randomUUID();
         document.setUuid(someUuid);
@@ -203,7 +203,7 @@ public class DetectorRepositoryImplTest {
     @Test
     public void testUpdateDetector_populatedMeta() {
         val mom = ObjectMother.instance();
-        val document = mom.buildDetectorDocument();
+        val document = mom.getDetectorDocument();
 
         DetectorDocument.Meta metaBlock = new DetectorDocument.Meta();
         metaBlock.setCreatedBy("user");
@@ -217,7 +217,7 @@ public class DetectorRepositoryImplTest {
     @Test
     public void testUpdateDetector_populatedMeta_noUser() {
         val mom = ObjectMother.instance();
-        val document = mom.buildDetectorDocument();
+        val document = mom.getDetectorDocument();
 
         DetectorDocument.Meta metaBlock = new DetectorDocument.Meta();
         metaBlock.setCreatedBy(null);
@@ -233,7 +233,7 @@ public class DetectorRepositoryImplTest {
         val updateResponse = mock(UpdateResponse.class);
         val result = updateResponse.getResult();
         val mom = ObjectMother.instance();
-        val document = mom.buildDetectorDocument();
+        val document = mom.getDetectorDocument();
         document.setUuid(UUID.randomUUID());
         Mockito.when(result).thenReturn(DocWriteResponse.Result.NOT_FOUND);
         Mockito.when(elasticsearchUtil.checkNullResponse(result)).thenReturn(true);
@@ -354,7 +354,7 @@ public class DetectorRepositoryImplTest {
         this.detector = mom.getElasticsearchDetector();
         detectors.add(detector);
 
-        this.illegalParamsDetector = mom.buildIllegalParamsDetectorDocument();
+        this.illegalParamsDetector = mom.getIllegalParamsDetector();
         illegalParamsDetector.setUuid(someUuid);
 
         val searchIndex = "2";

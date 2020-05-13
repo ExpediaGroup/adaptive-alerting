@@ -16,12 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.util;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
-import com.expedia.adaptivealerting.modelservice.domain.mapping.Expression;
-import com.expedia.adaptivealerting.modelservice.domain.mapping.Field;
-import com.expedia.adaptivealerting.modelservice.domain.mapping.Operand;
-import com.expedia.adaptivealerting.modelservice.domain.mapping.Operator;
-import com.expedia.adaptivealerting.modelservice.domain.mapping.ConsumerDetectorMapping;
-import com.expedia.adaptivealerting.modelservice.domain.mapping.User;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.*;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import lombok.val;
 import org.junit.Before;
@@ -44,9 +39,9 @@ public class RequestValidatorTest {
 
     private void initTestObjects() {
         val mom = ObjectMother.instance();
-        legalParamsDetector = mom.buildDetectorDocument();
+        legalParamsDetector = mom.getDetectorDocument();
         legalParamsDetector.setUuid(UUID.randomUUID());
-        illegalParamsDetector = mom.buildIllegalParamsDetectorDocument();
+        illegalParamsDetector = mom.getIllegalParamsDetector();
     }
 
     @Test
