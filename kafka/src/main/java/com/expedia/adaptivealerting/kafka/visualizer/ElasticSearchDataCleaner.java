@@ -36,8 +36,7 @@ public class ElasticSearchDataCleaner implements Runnable {
 
     @Override
     public void run() {
-        ElasticSearchClient elasticSearchClient = new ElasticSearchClient();
-        deleteData(elasticSearchClient);
+        deleteData(new ElasticSearchClient());
     }
 
     public BulkByScrollResponse deleteData(ElasticSearchClient elasticSearchClient) {
