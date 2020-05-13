@@ -16,10 +16,20 @@
 package com.expedia.adaptivealerting.kafka;
 
 import com.expedia.adaptivealerting.kafka.visualizer.AnomalyConsumer;
+import com.expedia.adaptivealerting.kafka.visualizer.ElasticSearchDataCleaner;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class AnomalyVisualizer {
 
+    private static int PERIOD = 1;
+
+    private static ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
     public static void main(String[] args) {
+
+        scheduledExecutorService.scheduleAtFixedRate(new ElasticSearchDataCleaner(),0, PERIOD, TimeUnit.DAYS);
         new AnomalyConsumer().listen();
     }
 }
