@@ -13,12 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.entity;
+package com.expedia.adaptivealerting.modelservice.domain.mapping;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
+// TODO Rename this. The anomdetect module already has a Detector class and it's confusing to have two.
+//  (There was a third actually, but I got rid of it.) [WLW]
 @Data
-public class Operand {
-    private Field field;
-    private Expression expression;
+@NoArgsConstructor
+@AllArgsConstructor
+public class ConsumerDetectorMapping {
+    private String consumerId;
+    private UUID uuid;
 }

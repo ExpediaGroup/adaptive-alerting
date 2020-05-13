@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.repo.impl.percolator;
+package com.expedia.adaptivealerting.modelservice.domain.mapping;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,6 +22,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Query {
-    private BoolCondition bool;
+public class Field {
+    private String key;
+    private String value;
 }

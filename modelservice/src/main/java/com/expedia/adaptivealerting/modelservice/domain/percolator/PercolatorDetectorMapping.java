@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.repo.impl.percolator;
+package com.expedia.adaptivealerting.modelservice.domain.percolator;
 
-import com.expedia.adaptivealerting.modelservice.entity.Detector;
-import com.expedia.adaptivealerting.modelservice.entity.User;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.ConsumerDetectorMapping;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.User;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -46,7 +46,7 @@ public class PercolatorDetectorMapping {
     @JsonProperty(USER_KEYWORD)
     private User user;
     @JsonProperty(DETECTOR_KEYWORD)
-    private Detector detector;
+    private ConsumerDetectorMapping consumerDetectorMapping;
     @JsonProperty(QUERY_KEYWORD)
     private Query query;
     @JsonProperty(ENABLED)

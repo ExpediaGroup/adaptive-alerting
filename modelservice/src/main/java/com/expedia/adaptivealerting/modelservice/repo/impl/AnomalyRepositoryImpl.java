@@ -22,7 +22,7 @@ import com.expedia.adaptivealerting.anomdetect.source.DetectorFactory;
 import com.expedia.adaptivealerting.anomdetect.util.MetricUtil;
 import com.expedia.adaptivealerting.modelservice.metricsource.MetricSource;
 import com.expedia.adaptivealerting.modelservice.repo.AnomalyRepository;
-import com.expedia.adaptivealerting.modelservice.repo.request.AnomalyRequest;
+import com.expedia.adaptivealerting.modelservice.web.request.AnomalyRequest;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;

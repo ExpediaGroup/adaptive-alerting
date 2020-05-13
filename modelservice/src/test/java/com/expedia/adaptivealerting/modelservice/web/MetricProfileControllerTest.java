@@ -15,9 +15,9 @@
  */
 package com.expedia.adaptivealerting.modelservice.web;
 
-import com.expedia.adaptivealerting.modelservice.entity.Expression;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.Expression;
 import com.expedia.adaptivealerting.modelservice.repo.MetricProfileRepository;
-import com.expedia.adaptivealerting.modelservice.repo.request.CreateMetricProfilingRequest;
+import com.expedia.adaptivealerting.modelservice.web.request.CreateMetricProfilingRequest;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import lombok.val;
 import org.junit.Before;

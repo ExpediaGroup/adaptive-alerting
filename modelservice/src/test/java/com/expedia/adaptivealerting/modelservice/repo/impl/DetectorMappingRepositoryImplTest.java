@@ -18,18 +18,18 @@ package com.expedia.adaptivealerting.modelservice.repo.impl;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.expedia.adaptivealerting.modelservice.entity.Detector;
-import com.expedia.adaptivealerting.modelservice.entity.User;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.ConsumerDetectorMapping;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.User;
 import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
-import com.expedia.adaptivealerting.modelservice.repo.impl.percolator.PercolatorDetectorMapping;
-import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticSearchClient;
-import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticSearchProperties;
-import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
-import com.expedia.adaptivealerting.modelservice.repo.request.CreateDetectorMappingRequest;
-import com.expedia.adaptivealerting.modelservice.repo.request.SearchMappingsRequest;
-import com.expedia.adaptivealerting.modelservice.repo.response.MatchingDetectorsResponse;
+import com.expedia.adaptivealerting.modelservice.domain.percolator.PercolatorDetectorMapping;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.DetectorMapping;
+import com.expedia.adaptivealerting.modelservice.web.request.CreateDetectorMappingRequest;
+import com.expedia.adaptivealerting.modelservice.web.request.SearchMappingsRequest;
+import com.expedia.adaptivealerting.modelservice.web.response.MatchingDetectorsResponse;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
-import com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch.ElasticsearchUtil;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticsearchUtil;
 import com.expedia.adaptivealerting.modelservice.util.ObjectMapperUtil;
 import lombok.val;
 import org.elasticsearch.action.DocWriteResponse;
@@ -133,9 +133,9 @@ public class DetectorMappingRepositoryImplTest {
         val mom = ObjectMother.instance();
 
         val expr = mom.getExpression();
-        val detector = new Detector("cid", UUID.randomUUID());
+        val consumerDetectorMapping = new ConsumerDetectorMapping("cid", UUID.randomUUID());
         val user = new User("yoda");
-        val request = new CreateDetectorMappingRequest(expr, detector, user);
+        val request = new CreateDetectorMappingRequest(expr, consumerDetectorMapping, user);
         repoUnderTest.createDetectorMapping(request);
     }
 
@@ -152,9 +152,9 @@ public class DetectorMappingRepositoryImplTest {
         assertNotNull("Response can't be null", response);
         assertEquals("ES lookup time didn't match", lookUpTime, response.getLookupTimeInMillis());
         assertEquals(1, response.getGroupedDetectorsBySearchIndex().size());
-        List<Detector> detectors = response.getGroupedDetectorsBySearchIndex().get(new Integer(searchIndex));
-        assertEquals(1, detectors.size());
-        assertEquals(UUID.fromString(detectorUuid), detectors.get(0).getUuid());
+        List<ConsumerDetectorMapping> consumerDetectorMappings = response.getGroupedDetectorsBySearchIndex().get(new Integer(searchIndex));
+        assertEquals(1, consumerDetectorMappings.size());
+        assertEquals(UUID.fromString(detectorUuid), consumerDetectorMappings.get(0).getUuid());
     }
 
     @Test(expected = RuntimeException.class)

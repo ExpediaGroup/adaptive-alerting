@@ -13,15 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.entity;
+package com.expedia.adaptivealerting.modelservice.domain.mapping;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
+import java.util.List;
+
+/**
+ * The type Detector mapping. Based on elastic search.
+ * <p>
+ * searchIndexes: index of matching metric-tag in request batch of metric-tags
+ */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class User {
+@Accessors(chain = true)
+public class DetectorMapping {
     private String id;
+    private ConsumerDetectorMapping detector;
+    private Expression expression;
+    private User user;
+    private long lastModifiedTimeInMillis;
+    private long createdTimeInMillis;
+    private boolean isEnabled;
+    private List<Integer> searchIndexes;
 }

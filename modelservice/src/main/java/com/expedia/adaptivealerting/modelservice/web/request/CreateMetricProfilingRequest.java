@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.repo.request;
+package com.expedia.adaptivealerting.modelservice.web.request;
 
-import com.expedia.adaptivealerting.modelservice.entity.Expression;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.Expression;
 import com.expedia.adaptivealerting.modelservice.util.RequestValidator;
 import lombok.Data;
 

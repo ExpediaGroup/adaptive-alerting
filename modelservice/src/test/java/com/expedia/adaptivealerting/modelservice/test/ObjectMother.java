@@ -16,20 +16,18 @@
 package com.expedia.adaptivealerting.modelservice.test;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
-import com.expedia.adaptivealerting.modelservice.entity.Expression;
-import com.expedia.adaptivealerting.modelservice.entity.Field;
-import com.expedia.adaptivealerting.modelservice.entity.Operand;
-import com.expedia.adaptivealerting.modelservice.entity.Operator;
-import com.expedia.adaptivealerting.modelservice.entity.User;
-import com.expedia.adaptivealerting.modelservice.entity.Detector;
-import com.expedia.adaptivealerting.modelservice.repo.impl.percolator.BoolCondition;
-import com.expedia.adaptivealerting.modelservice.repo.impl.percolator.MustCondition;
-import com.expedia.adaptivealerting.modelservice.repo.impl.percolator.PercolatorDetectorMapping;
-import com.expedia.adaptivealerting.modelservice.repo.impl.percolator.Query;
-import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.Expression;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.Field;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.Operand;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.Operator;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.User;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.ConsumerDetectorMapping;
+import com.expedia.adaptivealerting.modelservice.domain.percolator.BoolCondition;
+import com.expedia.adaptivealerting.modelservice.domain.percolator.MustCondition;
+import com.expedia.adaptivealerting.modelservice.domain.percolator.PercolatorDetectorMapping;
+import com.expedia.adaptivealerting.modelservice.domain.percolator.Query;
 import com.expedia.adaptivealerting.modelservice.metricsource.graphite.GraphiteResult;
-import com.expedia.adaptivealerting.modelservice.repo.response.MatchingDetectorsResponse;
-import com.expedia.adaptivealerting.modelservice.repo.request.AnomalyRequest;
+import com.expedia.adaptivealerting.modelservice.web.request.AnomalyRequest;
 import com.expedia.adaptivealerting.modelservice.metricsource.MetricSourceResult;
 import com.expedia.adaptivealerting.modelservice.util.DateUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -151,18 +149,9 @@ public class ObjectMother {
         percolatorDetectorMapping.setEnabled(true);
         percolatorDetectorMapping.setLastModifiedTimeInMillis(1554828886);
         percolatorDetectorMapping.setUser(new User("test-user"));
-        percolatorDetectorMapping.setDetector(buildDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639"));
+        percolatorDetectorMapping.setConsumerDetectorMapping(buildConsumerDetectorMapping("aeb4d849-847a-45c0-8312-dc0fcf22b639"));
         percolatorDetectorMapping.setQuery(query);
         return percolatorDetectorMapping;
-    }
-
-    public MatchingDetectorsResponse getMatchingDetectorsResponse() {
-        Map<Integer, List<Detector>> groupedDetectorsByIndex = new HashMap<>();
-        Detector detector = buildDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639");
-        List<Detector> detectors = new ArrayList<>();
-        detectors.add(detector);
-        groupedDetectorsByIndex.put(0, detectors);
-        return new MatchingDetectorsResponse(groupedDetectorsByIndex, 10000);
     }
 
     public Expression getExpression() {
@@ -197,8 +186,7 @@ public class ObjectMother {
         return tags;
     }
 
-    private Detector buildDetector(String detectorUuid) {
-        return new Detector("cid", UUID.fromString(detectorUuid));
+    private ConsumerDetectorMapping buildConsumerDetectorMapping(String detectorUuid) {
+        return new ConsumerDetectorMapping("cid", UUID.fromString(detectorUuid));
     }
 }
-

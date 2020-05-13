@@ -16,12 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.util;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
-import com.expedia.adaptivealerting.modelservice.entity.Expression;
-import com.expedia.adaptivealerting.modelservice.entity.Field;
-import com.expedia.adaptivealerting.modelservice.entity.Operand;
-import com.expedia.adaptivealerting.modelservice.entity.Operator;
-import com.expedia.adaptivealerting.modelservice.entity.Detector;
-import com.expedia.adaptivealerting.modelservice.entity.User;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.*;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import lombok.val;
 import org.junit.Before;
@@ -77,8 +72,8 @@ public class RequestValidatorTest {
 
     @Test
     public void testValidateMappingDetector_successful() {
-        Detector detector = new Detector("cid", UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"));
-        RequestValidator.validateMappingDetector(detector);
+        ConsumerDetectorMapping consumerDetectorMapping = new ConsumerDetectorMapping("cid", UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"));
+        RequestValidator.validateMappingDetector(consumerDetectorMapping);
     }
 
     @Test

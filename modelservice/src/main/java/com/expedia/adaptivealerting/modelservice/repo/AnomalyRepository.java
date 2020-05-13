@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.repo;
 
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
-import com.expedia.adaptivealerting.modelservice.repo.request.AnomalyRequest;
+import com.expedia.adaptivealerting.modelservice.web.request.AnomalyRequest;
 
 import java.util.List;
 

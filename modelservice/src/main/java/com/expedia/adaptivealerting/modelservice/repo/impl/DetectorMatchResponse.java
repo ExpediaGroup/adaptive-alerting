@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.modelservice.repo.impl;
 
-import com.expedia.adaptivealerting.modelservice.entity.DetectorMapping;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.DetectorMapping;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
