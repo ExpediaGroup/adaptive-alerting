@@ -42,25 +42,8 @@ public class ElasticsearchConfig {
 
     @Bean(destroyMethod = "close")
     public RestHighLevelClient client() {
-        ElasticSearchProperties.Url url = extractHostAndPortFromUrls();
+        ElasticSearchProperties.Url url = elasticSearchProperties.extractHostAndPortFromUrl(elasticSearchProperties.getUrls());
         RestHighLevelClient esClient = new RestHighLevelClient(RestClient.builder(new HttpHost(url.getHost(), url.getPort())));
         return esClient;
-    }
-
-    //TODO Update the config to use host and port instead of storing whole URL as a string
-    private ElasticSearchProperties.Url extractHostAndPortFromUrls() {
-        ElasticSearchProperties.Url url = new ElasticSearchProperties.Url();
-        String urls = elasticSearchProperties.getUrls();
-        if (urls == null) {
-            throw new MissingSystemPropertyException("Elastic search URL not set in config");
-        }
-        String[] arrOfUrl = urls.split(":");
-        if (arrOfUrl.length <= 1) {
-            throw new MissingSystemPropertyException("Use host:port format to set URL in the config");
-        }
-
-        url.setHost(arrOfUrl[0]);
-        url.setPort(Integer.parseInt(arrOfUrl[1]));
-        return url;
     }
 }

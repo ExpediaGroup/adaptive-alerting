@@ -15,6 +15,7 @@
  */
 package com.expedia.adaptivealerting.modelservice.elasticsearch;
 
+import com.expedia.adaptivealerting.modelservice.exception.MissingSystemPropertyException;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -47,11 +48,26 @@ public class ElasticSearchProperties {
 
     private Config config;
 
-    //TODO Update the config to use host and port instead of storing whole URL as a string
+    //TODO Update the elastic search config to use host and port instead of storing whole URL as a string
     @Data
     @Accessors(chain = true)
     public static class Url {
         private String host;
         private int port;
+    }
+
+    public static Url extractHostAndPortFromUrl(String urls) {
+        if (urls == null) {
+            throw new MissingSystemPropertyException("Elastic search URL not set in config");
+        }
+        String[] arrOfUrl = urls.split(":");
+        if (arrOfUrl.length <= 1) {
+            throw new MissingSystemPropertyException("Use host:port format to set URL in the config");
+        }
+
+        Url url = new Url();
+        url.setHost(arrOfUrl[0]);
+        url.setPort(Integer.parseInt(arrOfUrl[1]));
+        return url;
     }
 }
