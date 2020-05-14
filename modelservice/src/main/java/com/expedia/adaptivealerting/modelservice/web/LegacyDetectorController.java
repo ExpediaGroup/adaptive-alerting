@@ -37,6 +37,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path = "/api/v2/detectors")
+@Deprecated
 public class LegacyDetectorController {
 
     @Autowired

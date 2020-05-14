@@ -46,6 +46,7 @@ import java.io.IOException;
  */
 @Component
 @Generated // (excluding from code coverage)
+@Deprecated
 public class LegacyElasticSearchClient {
 
     @Autowired

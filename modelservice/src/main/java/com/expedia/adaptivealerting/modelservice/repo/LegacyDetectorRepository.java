@@ -20,6 +20,7 @@ import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import java.util.List;
 import java.util.UUID;
 
+@Deprecated
 public interface LegacyDetectorRepository {
 
     /**

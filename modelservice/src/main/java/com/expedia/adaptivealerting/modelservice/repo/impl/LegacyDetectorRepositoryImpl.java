@@ -57,6 +57,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 @Slf4j
 @Service
+@Deprecated
 public class LegacyDetectorRepositoryImpl implements LegacyDetectorRepository {
     private static final String DETECTOR_INDEX = "detectors";
     private static final String DETECTOR_DOC_TYPE = "detector";
