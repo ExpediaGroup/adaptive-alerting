@@ -95,7 +95,7 @@ public class DetectorController {
         return service.getLastUpdatedDetectors(intervalInSeconds);
     }
 
-    @GetMapping(path = "/getDetectorLastUsed", produces = "application/json")
+    @GetMapping(path = "/getLastUsedDetectors", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public List<Detector> getLastUsedDetectors(@RequestParam int noOfDays) {
         return service.getLastUsedDetectors(noOfDays);
