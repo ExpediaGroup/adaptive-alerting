@@ -20,7 +20,7 @@ import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import java.util.List;
 import java.util.UUID;
 
-public interface DetectorRepository {
+public interface LegacyDetectorRepository {
 
     /**
      * Saves a detector document to the detector store. The detector UUID must be {@literal null}, as this method

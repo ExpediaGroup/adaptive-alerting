@@ -17,7 +17,7 @@ package com.expedia.adaptivealerting.modelservice.repo.impl;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
-import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
+import com.expedia.adaptivealerting.modelservice.repo.LegacyDetectorRepository;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticsearchUtil;
 import com.expedia.adaptivealerting.modelservice.util.DateUtil;
@@ -57,7 +57,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 @Slf4j
 @Service
-public class DetectorRepositoryImpl implements DetectorRepository {
+public class LegacyDetectorRepositoryImpl implements LegacyDetectorRepository {
     private static final String DETECTOR_INDEX = "detectors";
     private static final String DETECTOR_DOC_TYPE = "detector";
     private static final int DEFAULT_ES_RESULTS_SIZE = 500;
@@ -99,7 +99,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
         }
 
         // Do this after setting the UUID since validation checks for the UUID.
-        RequestValidator.validateDetector(document);
+        RequestValidator.validateDetectorDocument(document);
 
         val indexRequest = new IndexRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, uuid.toString());
         val json = objectMapperUtil.convertToString(getElasticSearchDetector(document));
@@ -131,7 +131,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
     public void updateDetector(String uuid, DetectorDocument document) {
         notNull(document, "document can't be null");
         MDC.put("DetectorUuid", uuid);
-        RequestValidator.validateDetector(document);
+        RequestValidator.validateDetectorDocument(document);
 
         val updateRequest = new UpdateRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, uuid);
         Map<String, Object> jsonMap = new HashMap<>();

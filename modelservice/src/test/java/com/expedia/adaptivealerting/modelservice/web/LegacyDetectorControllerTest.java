@@ -17,7 +17,7 @@ package com.expedia.adaptivealerting.modelservice.web;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
-import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
+import com.expedia.adaptivealerting.modelservice.repo.LegacyDetectorRepository;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -52,15 +52,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Slf4j
 @RunWith(MockitoJUnitRunner.class)
 @SpringBootTest
-public class DetectorControllerTest {
+public class LegacyDetectorControllerTest {
 
     @InjectMocks
-    private DetectorController controllerUnderTest;
+    private LegacyDetectorController controllerUnderTest;
 
     private MockMvc mockMvc;
 
     @Mock
-    private DetectorRepository detectorRepo;
+    private LegacyDetectorRepository detectorRepo;
 
     @Mock
     private DetectorDocument detector;
@@ -73,7 +73,7 @@ public class DetectorControllerTest {
 
     @Before
     public void setUp() {
-        this.controllerUnderTest = new DetectorController();
+        this.controllerUnderTest = new LegacyDetectorController();
         mockMvc = MockMvcBuilders.standaloneSetup(controllerUnderTest).setHandlerExceptionResolvers(new ExceptionHandlerExceptionResolver()).build();
 
         MockitoAnnotations.initMocks(this);
@@ -157,7 +157,7 @@ public class DetectorControllerTest {
     private void initTestObjects() {
         this.someUuid = UUID.randomUUID();
         val mom = ObjectMother.instance();
-        this.legalParamsDetector = mom.getDetectorDocument();
+        this.legalParamsDetector = mom.buildDetectorDocument();
         legalParamsDetector.setUuid(someUuid);
     }
 

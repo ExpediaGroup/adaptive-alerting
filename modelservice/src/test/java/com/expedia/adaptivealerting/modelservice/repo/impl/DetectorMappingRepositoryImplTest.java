@@ -18,13 +18,11 @@ package com.expedia.adaptivealerting.modelservice.repo.impl;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.expedia.adaptivealerting.modelservice.domain.mapping.ConsumerDetectorMapping;
-import com.expedia.adaptivealerting.modelservice.domain.mapping.User;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.*;
+import com.expedia.adaptivealerting.modelservice.domain.percolator.*;
 import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
-import com.expedia.adaptivealerting.modelservice.domain.percolator.PercolatorDetectorMapping;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
-import com.expedia.adaptivealerting.modelservice.domain.mapping.DetectorMapping;
 import com.expedia.adaptivealerting.modelservice.web.request.CreateDetectorMappingRequest;
 import com.expedia.adaptivealerting.modelservice.web.request.SearchMappingsRequest;
 import com.expedia.adaptivealerting.modelservice.web.response.MatchingDetectorsResponse;
@@ -107,7 +105,7 @@ public class DetectorMappingRepositoryImplTest {
         val mom = ObjectMother.instance();
         val config = new ElasticSearchProperties.Config().setConnectionTimeout(100);
 
-        percolatorDetectorMapping = mom.getPercolatorDetectorMapping();
+        percolatorDetectorMapping = buildPercolatorDetectorMapping();
         when(metricRegistry.timer(any())).thenReturn(mock(Timer.class));
         when(metricRegistry.counter(any())).thenReturn(mock(Counter.class));
         when(elasticSearchProperties.getIndexName()).thenReturn("detector-mappings");
@@ -368,5 +366,30 @@ public class DetectorMappingRepositoryImplTest {
         } catch (IOException e) {
         }
         return deleteResponse;
+    }
+
+    public PercolatorDetectorMapping buildPercolatorDetectorMapping() {
+        PercolatorDetectorMapping percolatorDetectorMapping = new PercolatorDetectorMapping();
+        Query query = new Query();
+        BoolCondition boolCondition = new BoolCondition();
+        List<MustCondition> mustConditions = new ArrayList<>();
+        MustCondition mustCondition = new MustCondition();
+        Map match = new HashMap<>();
+        match.put("name", "sample-web");
+        mustCondition.setMatch(match);
+        mustConditions.add(mustCondition);
+        boolCondition.setMust(mustConditions);
+        query.setBool(boolCondition);
+        percolatorDetectorMapping.setCreatedTimeInMillis(1554828886);
+        percolatorDetectorMapping.setEnabled(true);
+        percolatorDetectorMapping.setLastModifiedTimeInMillis(1554828886);
+        percolatorDetectorMapping.setUser(new User("test-user"));
+        percolatorDetectorMapping.setConsumerDetectorMapping(attachConsumerToDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639"));
+        percolatorDetectorMapping.setQuery(query);
+        return percolatorDetectorMapping;
+    }
+
+    private ConsumerDetectorMapping attachConsumerToDetector(String detectorUuid) {
+        return new ConsumerDetectorMapping("cid", UUID.fromString(detectorUuid));
     }
 }

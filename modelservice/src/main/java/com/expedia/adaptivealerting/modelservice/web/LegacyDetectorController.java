@@ -17,7 +17,7 @@ package com.expedia.adaptivealerting.modelservice.web;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
-import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
+import com.expedia.adaptivealerting.modelservice.repo.LegacyDetectorRepository;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,10 +37,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path = "/api/v2/detectors")
-public class DetectorController {
+public class LegacyDetectorController {
 
     @Autowired
-    private DetectorRepository detectorRepo;
+    private LegacyDetectorRepository detectorRepo;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

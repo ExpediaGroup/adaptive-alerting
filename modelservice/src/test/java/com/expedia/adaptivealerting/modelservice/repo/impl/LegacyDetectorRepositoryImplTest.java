@@ -19,7 +19,7 @@ import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorException;
 import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
-import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
+import com.expedia.adaptivealerting.modelservice.repo.LegacyDetectorRepository;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticsearchUtil;
 import com.expedia.adaptivealerting.modelservice.util.ObjectMapperUtil;
@@ -79,10 +79,10 @@ import static org.mockito.Mockito.when;
 
 @Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
-public class DetectorRepositoryImplTest {
+public class LegacyDetectorRepositoryImplTest {
 
     @InjectMocks
-    private DetectorRepository repoUnderTest = new DetectorRepositoryImpl();
+    private LegacyDetectorRepository repoUnderTest = new LegacyDetectorRepositoryImpl();
 
     @Mock
     private ElasticSearchClient elasticSearchClient;
@@ -113,7 +113,7 @@ public class DetectorRepositoryImplTest {
     @Test
     public void testCreateDetector() {
         val mom = ObjectMother.instance();
-        val document = mom.getDetectorDocument();
+        val document = mom.buildDetectorDocument();
 
         // Disabled these because the contract does not require returning an implementation-specific ID. [WLW]
 //        val actualCreationId = repoUnderTest.createDetector(document);
@@ -145,7 +145,7 @@ public class DetectorRepositoryImplTest {
     @Test
     public void testCreateDetector_emptyMeta() {
         val mom = ObjectMother.instance();
-        val document = mom.getDetectorDocument();
+        val document = mom.buildDetectorDocument();
         document.setMeta(null);
         repoUnderTest.createDetector(document);
     }
@@ -153,7 +153,7 @@ public class DetectorRepositoryImplTest {
     @Test
     public void testCreateDetector_populatedMeta() {
         val mom = ObjectMother.instance();
-        val document = mom.getDetectorDocument();
+        val document = mom.buildDetectorDocument();
         DetectorDocument.Meta metaBlock = new DetectorDocument.Meta();
         metaBlock.setCreatedBy("user");
         document.setMeta(metaBlock);
@@ -163,7 +163,7 @@ public class DetectorRepositoryImplTest {
     @Test
     public void testCreateDetector_populatedMeta_noUser() {
         val mom = ObjectMother.instance();
-        val document = mom.getDetectorDocument();
+        val document = mom.buildDetectorDocument();
         DetectorDocument.Meta metaBlock = new DetectorDocument.Meta();
         metaBlock.setCreatedBy(null);
         document.setMeta(metaBlock);
@@ -172,10 +172,10 @@ public class DetectorRepositoryImplTest {
 
     @Test
     public void testUpdateDetector() {
-        DetectorRepository detectorRepository = mock(DetectorRepository.class);
-        doNothing().when(detectorRepository).updateDetector(anyString(), any(DetectorDocument.class));
-        detectorRepository.updateDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", new DetectorDocument());
-        verify(detectorRepository, times(1)).updateDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", new DetectorDocument());
+        LegacyDetectorRepository legacyDetectorRepository = mock(LegacyDetectorRepository.class);
+        doNothing().when(legacyDetectorRepository).updateDetector(anyString(), any(DetectorDocument.class));
+        legacyDetectorRepository.updateDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", new DetectorDocument());
+        verify(legacyDetectorRepository, times(1)).updateDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", new DetectorDocument());
     }
 
     @Test(expected = DetectorException.class)
@@ -193,7 +193,7 @@ public class DetectorRepositoryImplTest {
     @Test
     public void testUpdateDetector_emptyMeta() {
         val mom = ObjectMother.instance();
-        val document = mom.getDetectorDocument();
+        val document = mom.buildDetectorDocument();
         document.setMeta(null);
         UUID someUuid = UUID.randomUUID();
         document.setUuid(someUuid);
@@ -203,7 +203,7 @@ public class DetectorRepositoryImplTest {
     @Test
     public void testUpdateDetector_populatedMeta() {
         val mom = ObjectMother.instance();
-        val document = mom.getDetectorDocument();
+        val document = mom.buildDetectorDocument();
 
         DetectorDocument.Meta metaBlock = new DetectorDocument.Meta();
         metaBlock.setCreatedBy("user");
@@ -217,7 +217,7 @@ public class DetectorRepositoryImplTest {
     @Test
     public void testUpdateDetector_populatedMeta_noUser() {
         val mom = ObjectMother.instance();
-        val document = mom.getDetectorDocument();
+        val document = mom.buildDetectorDocument();
 
         DetectorDocument.Meta metaBlock = new DetectorDocument.Meta();
         metaBlock.setCreatedBy(null);
@@ -233,7 +233,7 @@ public class DetectorRepositoryImplTest {
         val updateResponse = mock(UpdateResponse.class);
         val result = updateResponse.getResult();
         val mom = ObjectMother.instance();
-        val document = mom.getDetectorDocument();
+        val document = mom.buildDetectorDocument();
         document.setUuid(UUID.randomUUID());
         Mockito.when(result).thenReturn(DocWriteResponse.Result.NOT_FOUND);
         Mockito.when(elasticsearchUtil.checkNullResponse(result)).thenReturn(true);
@@ -242,7 +242,7 @@ public class DetectorRepositoryImplTest {
 
     @Test
     public void testDeleteDetector() {
-        val detectorRepository = mock(DetectorRepository.class);
+        val detectorRepository = mock(LegacyDetectorRepository.class);
         doNothing().when(detectorRepository).deleteDetector(anyString());
         detectorRepository.deleteDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639");
         verify(detectorRepository, times(1)).deleteDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639");
@@ -296,10 +296,10 @@ public class DetectorRepositoryImplTest {
 
     @Test
     public void testToggleDetector() {
-        DetectorRepository detectorRepository = mock(DetectorRepository.class);
-        doNothing().when(detectorRepository).toggleDetector(anyString(), anyBoolean());
-        detectorRepository.toggleDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
-        verify(detectorRepository, times(1)).toggleDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
+        LegacyDetectorRepository legacyDetectorRepository = mock(LegacyDetectorRepository.class);
+        doNothing().when(legacyDetectorRepository).toggleDetector(anyString(), anyBoolean());
+        legacyDetectorRepository.toggleDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
+        verify(legacyDetectorRepository, times(1)).toggleDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
     }
 
     @Test(expected = RuntimeException.class)
@@ -319,10 +319,10 @@ public class DetectorRepositoryImplTest {
 
     @Test
     public void testTrustDetector() {
-        DetectorRepository detectorRepository = mock(DetectorRepository.class);
-        doNothing().when(detectorRepository).trustDetector(anyString(), anyBoolean());
-        detectorRepository.trustDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
-        verify(detectorRepository, times(1)).trustDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
+        LegacyDetectorRepository legacyDetectorRepository = mock(LegacyDetectorRepository.class);
+        doNothing().when(legacyDetectorRepository).trustDetector(anyString(), anyBoolean());
+        legacyDetectorRepository.trustDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
+        verify(legacyDetectorRepository, times(1)).trustDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
     }
 
     @Test(expected = RuntimeException.class)
