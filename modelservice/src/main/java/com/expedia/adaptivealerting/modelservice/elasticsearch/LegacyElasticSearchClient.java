@@ -44,6 +44,7 @@ import java.io.IOException;
  * we can't easily mock methods of class {@code RestHighLevelClient}, which are final.
  * So this wrapper class will help to address the issue.
  */
+//TODO Rename this to ElasticsearchClient
 @Component
 @Generated // (excluding from code coverage)
 @Deprecated

@@ -67,7 +67,6 @@ public class DetectorController {
     public List<Detector> findByCreatedBy(@RequestParam String user) {
         List<Detector> detectors = service.findByCreatedBy(user);
         if (detectors == null || detectors.isEmpty()) {
-            // TODO: This should be RecordNotFoundException
             throw new RecordNotFoundException("Invalid user: " + user);
         }
 
