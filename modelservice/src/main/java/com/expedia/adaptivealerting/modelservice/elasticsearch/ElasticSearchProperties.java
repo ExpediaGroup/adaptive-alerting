@@ -15,20 +15,10 @@
  */
 package com.expedia.adaptivealerting.modelservice.elasticsearch;
 
-import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
-import com.google.common.base.Supplier;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import lombok.val;
-import org.elasticsearch.client.RestClientBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
-import vc.inreach.aws.request.AWSSigner;
-import vc.inreach.aws.request.AWSSigningRequestInterceptor;
-
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 
 @Data
 @Component
@@ -56,18 +46,11 @@ public class ElasticSearchProperties {
 
     private Config config;
 
-    public void addAWSRequestSignerInterceptor(RestClientBuilder clientBuilder) {
-        if (config.isAwsIamAuthRequired()) { // this is optional security for elastic search running in AWS
-            AWSSigningRequestInterceptor signingInterceptor = getAWSRequestSignerInterceptor();
-            clientBuilder.setHttpClientConfigCallback(
-                clientConf -> clientConf.addInterceptorLast(signingInterceptor));
-        }
-    }
-
-    private AWSSigningRequestInterceptor getAWSRequestSignerInterceptor() {
-        final Supplier<LocalDateTime> clock = () -> LocalDateTime.now(ZoneOffset.UTC);
-        AWSCredentialsProvider credentialsProvider = new DefaultAWSCredentialsProviderChain();
-        val awsSigner = new AWSSigner(credentialsProvider, config.getAwsRegion(), "es", clock);
-        return new AWSSigningRequestInterceptor(awsSigner);
+    //TODO Update the config to use host and port instead of storing whole URL as a string
+    @Data
+    @Accessors(chain = true)
+    public static class Url {
+        private String host;
+        private int port;
     }
 }
