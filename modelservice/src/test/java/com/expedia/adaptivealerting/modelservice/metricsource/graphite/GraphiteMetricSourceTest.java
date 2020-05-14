@@ -91,7 +91,7 @@ public class GraphiteMetricSourceTest {
         when(BeanUtil.getBean(GraphiteProperties.class)).thenReturn(props);
     }
 
-    public GraphiteResult[] buildGraphiteData() {
+    private GraphiteResult[] buildGraphiteData() {
         GraphiteResult[] results = new GraphiteResult[1];
         GraphiteResult result = new GraphiteResult();
         result.setDatapoints(getDataPoints());
