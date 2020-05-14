@@ -18,13 +18,11 @@ package com.expedia.adaptivealerting.modelservice.repo.impl;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.expedia.adaptivealerting.modelservice.domain.mapping.ConsumerDetectorMapping;
-import com.expedia.adaptivealerting.modelservice.domain.mapping.User;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.*;
+import com.expedia.adaptivealerting.modelservice.domain.percolator.*;
 import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
-import com.expedia.adaptivealerting.modelservice.domain.percolator.PercolatorDetectorMapping;
-import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.LegacyElasticSearchClient;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
-import com.expedia.adaptivealerting.modelservice.domain.mapping.DetectorMapping;
 import com.expedia.adaptivealerting.modelservice.web.request.CreateDetectorMappingRequest;
 import com.expedia.adaptivealerting.modelservice.web.request.SearchMappingsRequest;
 import com.expedia.adaptivealerting.modelservice.web.response.MatchingDetectorsResponse;
@@ -87,7 +85,7 @@ public class DetectorMappingRepositoryImplTest {
     private MetricRegistry metricRegistry;
 
     @Mock
-    private ElasticSearchClient elasticSearchClient;
+    private LegacyElasticSearchClient legacyElasticSearchClient;
 
     @Mock
     private ElasticSearchProperties elasticSearchProperties;
@@ -107,7 +105,7 @@ public class DetectorMappingRepositoryImplTest {
         val mom = ObjectMother.instance();
         val config = new ElasticSearchProperties.Config().setConnectionTimeout(100);
 
-        percolatorDetectorMapping = mom.getPercolatorDetectorMapping();
+        percolatorDetectorMapping = buildPercolatorDetectorMapping();
         when(metricRegistry.timer(any())).thenReturn(mock(Timer.class));
         when(metricRegistry.counter(any())).thenReturn(mock(Counter.class));
         when(elasticSearchProperties.getIndexName()).thenReturn("detector-mappings");
@@ -115,7 +113,7 @@ public class DetectorMappingRepositoryImplTest {
         when(elasticSearchProperties.getConfig()).thenReturn(config);
 
         this.repoUnderTest = new DetectorMappingRepositoryImpl(metricRegistry);
-        ReflectionTestUtils.setField(repoUnderTest, "elasticSearchClient", elasticSearchClient);
+        ReflectionTestUtils.setField(repoUnderTest, "legacyElasticSearchClient", legacyElasticSearchClient);
         ReflectionTestUtils.setField(repoUnderTest, "elasticSearchProperties", elasticSearchProperties);
         ReflectionTestUtils.setField(repoUnderTest, "elasticsearchUtil", elasticsearchUtil);
         ReflectionTestUtils.setField(repoUnderTest, "objectMapperUtil", objectMapperUtil);
@@ -146,9 +144,9 @@ public class DetectorMappingRepositoryImplTest {
         val lookUpTime = 100;
         val detectorUuid = "aeb4d849-847a-45c0-8312-dc0fcf22b639";
         SearchResponse searchResponse = mockSearchResponse(searchIndex, lookUpTime, detectorUuid);
-        when(elasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(searchResponse);
+        when(legacyElasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(searchResponse);
         MatchingDetectorsResponse response = repoUnderTest.findMatchingDetectorMappings(tagsList);
-        verify(elasticSearchClient, atLeastOnce()).search(any(SearchRequest.class), eq(RequestOptions.DEFAULT));
+        verify(legacyElasticSearchClient, atLeastOnce()).search(any(SearchRequest.class), eq(RequestOptions.DEFAULT));
         assertNotNull("Response can't be null", response);
         assertEquals("ES lookup time didn't match", lookUpTime, response.getLookupTimeInMillis());
         assertEquals(1, response.getGroupedDetectorsBySearchIndex().size());
@@ -160,7 +158,7 @@ public class DetectorMappingRepositoryImplTest {
     @Test(expected = RuntimeException.class)
     public void findMatchingDetectorMappings_fail() throws IOException {
         List<Map<String, String>> tagsList = new ArrayList<>();
-        when(elasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenThrow(new IOException());
+        when(legacyElasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenThrow(new IOException());
         repoUnderTest.findMatchingDetectorMappings(tagsList);
     }
 
@@ -172,9 +170,9 @@ public class DetectorMappingRepositoryImplTest {
         Long LastModifiedTimeInMillis = new Long(1554828886);
         Long CreatedTimeInMillis = new Long(1554828886);
         GetResponse getResponse = mockGetResponse(id);
-        when(elasticSearchClient.get(any(GetRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(getResponse);
+        when(legacyElasticSearchClient.get(any(GetRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(getResponse);
         DetectorMapping detectorMapping = repoUnderTest.findDetectorMapping(id);
-        verify(elasticSearchClient, atLeastOnce()).get(any(GetRequest.class), eq(RequestOptions.DEFAULT));
+        verify(legacyElasticSearchClient, atLeastOnce()).get(any(GetRequest.class), eq(RequestOptions.DEFAULT));
         assertNotNull("Response can't be null", detectorMapping);
         assertEquals(id, detectorMapping.getId());
         assertEquals("test-user", detectorMapping.getUser().getId());
@@ -188,7 +186,7 @@ public class DetectorMappingRepositoryImplTest {
     @Test(expected = RuntimeException.class)
     public void findDetectorMapping_fail() throws IOException {
         String id = "adsvade8^szx";
-        when(elasticSearchClient.get(any(GetRequest.class), eq(RequestOptions.DEFAULT))).thenThrow(new IOException());
+        when(legacyElasticSearchClient.get(any(GetRequest.class), eq(RequestOptions.DEFAULT))).thenThrow(new IOException());
         repoUnderTest.findDetectorMapping(id);
     }
 
@@ -200,7 +198,7 @@ public class DetectorMappingRepositoryImplTest {
         tags.put("env", "prod");
         tags.put("type", "gauge");
         tagsList.add(tags);
-        when(elasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenThrow(new IOException());
+        when(legacyElasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenThrow(new IOException());
         repoUnderTest.findMatchingDetectorMappings(tagsList);
     }
 
@@ -215,9 +213,9 @@ public class DetectorMappingRepositoryImplTest {
         val detectorUuid = "aeb4d849-847a-45c0-8312-dc0fcf22b639";
         int TimeinSeconds = 60;
         SearchResponse searchResponse = mockSearchResponse(searchIndex, lookUpTime, detectorUuid);
-        when(elasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(searchResponse);
+        when(legacyElasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(searchResponse);
         tagsList = repoUnderTest.findLastUpdated(TimeinSeconds);
-        verify(elasticSearchClient, atLeastOnce()).search(any(SearchRequest.class), eq(RequestOptions.DEFAULT));
+        verify(legacyElasticSearchClient, atLeastOnce()).search(any(SearchRequest.class), eq(RequestOptions.DEFAULT));
         assertNotNull("Response can't be null", tagsList);
         assertEquals(1, tagsList.size());
         assertEquals(UUID.fromString(detectorUuid), tagsList.get(0).getDetector().getUuid());
@@ -230,7 +228,7 @@ public class DetectorMappingRepositoryImplTest {
     @Test(expected = RuntimeException.class)
     public void findLastUpdated_fail() throws IOException {
         int timeInSecs = 60;
-        when(elasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenThrow(new IOException());
+        when(legacyElasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenThrow(new IOException());
         repoUnderTest.findLastUpdated(timeInSecs);
     }
 
@@ -245,11 +243,11 @@ public class DetectorMappingRepositoryImplTest {
         val detectorUuid = "aeb4d849-847a-45c0-8312-dc0fcf22b639";
         SearchMappingsRequest searchMappingsRequest = new SearchMappingsRequest();
         SearchResponse searchResponse = mockSearchResponse(searchIndex, lookUpTime, detectorUuid);
-        when(elasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(searchResponse);
+        when(legacyElasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(searchResponse);
         Mockito.when(elasticsearchUtil.getSourceBuilder(any(QueryBuilder.class))).thenReturn(new SearchSourceBuilder());
 
         tagsList = repoUnderTest.search(searchMappingsRequest);
-        verify(elasticSearchClient, atLeastOnce()).search(any(SearchRequest.class), eq(RequestOptions.DEFAULT));
+        verify(legacyElasticSearchClient, atLeastOnce()).search(any(SearchRequest.class), eq(RequestOptions.DEFAULT));
         assertNotNull("Response can't be null", tagsList);
         assertEquals(1, tagsList.size());
         assertEquals(UUID.fromString(detectorUuid), tagsList.get(0).getDetector().getUuid());
@@ -264,14 +262,14 @@ public class DetectorMappingRepositoryImplTest {
         SearchMappingsRequest searchMappingsRequest = new SearchMappingsRequest();
         searchMappingsRequest.setUserId("test-user");
         searchMappingsRequest.setDetectorUuid(UUID.fromString("aeb4d849-847a-45c0-8312-dc0fcf22b639"));
-        when(elasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenThrow(new IOException());
+        when(legacyElasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenThrow(new IOException());
         repoUnderTest.search(searchMappingsRequest);
     }
 
     @Test(expected = RuntimeException.class)
     public void search_fail() throws IOException {
         int timeinSecs = 60;
-        when(elasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenThrow(new IOException());
+        when(legacyElasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenThrow(new IOException());
         repoUnderTest.findLastUpdated(timeinSecs);
     }
 
@@ -279,18 +277,18 @@ public class DetectorMappingRepositoryImplTest {
     public void disableDetectorMapping() throws IOException {
         val id = "adsvade8^szx";
         GetResponse getResponse = mockGetResponse(id);
-        when(elasticSearchClient.get(any(GetRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(getResponse);
+        when(legacyElasticSearchClient.get(any(GetRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(getResponse);
         repoUnderTest.disableDetectorMapping(id);
-        verify(elasticSearchClient, atLeastOnce()).get(any(GetRequest.class), eq(RequestOptions.DEFAULT));
+        verify(legacyElasticSearchClient, atLeastOnce()).get(any(GetRequest.class), eq(RequestOptions.DEFAULT));
     }
 
     @Test
     public void deleteDetectorMapping_successful() throws Exception {
         val id = "adsvade8^szx";
         DeleteResponse deleteResponse = mockDeleteResponse(id);
-        when(elasticSearchClient.delete(any(DeleteRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(new DeleteResponse());
+        when(legacyElasticSearchClient.delete(any(DeleteRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(new DeleteResponse());
         repoUnderTest.deleteDetectorMapping(id);
-        verify(elasticSearchClient, atLeastOnce()).delete(any(DeleteRequest.class), eq(RequestOptions.DEFAULT));
+        verify(legacyElasticSearchClient, atLeastOnce()).delete(any(DeleteRequest.class), eq(RequestOptions.DEFAULT));
         assertEquals(id, deleteResponse.getId());
         assertEquals(elasticSearchProperties.getIndexName(), deleteResponse.getIndex());
         assertEquals("DELETED", deleteResponse.getResult().toString());
@@ -301,7 +299,7 @@ public class DetectorMappingRepositoryImplTest {
         val id = "adsvade8^szx";
         DeleteRequest deleteRequest = new DeleteRequest(elasticSearchProperties.getIndexName(),
                 elasticSearchProperties.getDocType(), id);
-        when(elasticSearchClient.delete(any(DeleteRequest.class), eq(RequestOptions.DEFAULT))).thenThrow(new IOException());
+        when(legacyElasticSearchClient.delete(any(DeleteRequest.class), eq(RequestOptions.DEFAULT))).thenThrow(new IOException());
         repoUnderTest.deleteDetectorMapping(id);
     }
 
@@ -309,7 +307,7 @@ public class DetectorMappingRepositoryImplTest {
     @Test(expected = RecordNotFoundException.class)
     public void deleteDetectorMapping_illegal_args() throws Exception {
         val deleteResponse = mockDeleteResponse("1");
-        Mockito.when(elasticSearchClient.delete(any(DeleteRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(deleteResponse);
+        Mockito.when(legacyElasticSearchClient.delete(any(DeleteRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(deleteResponse);
         Mockito.when(deleteResponse.getResult()).thenReturn(DocWriteResponse.Result.NOT_FOUND);
         Mockito.when(elasticsearchUtil.checkNullResponse(deleteResponse.getResult())).thenReturn(true);
         repoUnderTest.deleteDetectorMapping("1");
@@ -368,5 +366,30 @@ public class DetectorMappingRepositoryImplTest {
         } catch (IOException e) {
         }
         return deleteResponse;
+    }
+
+    public PercolatorDetectorMapping buildPercolatorDetectorMapping() {
+        PercolatorDetectorMapping percolatorDetectorMapping = new PercolatorDetectorMapping();
+        Query query = new Query();
+        BoolCondition boolCondition = new BoolCondition();
+        List<MustCondition> mustConditions = new ArrayList<>();
+        MustCondition mustCondition = new MustCondition();
+        Map match = new HashMap<>();
+        match.put("name", "sample-web");
+        mustCondition.setMatch(match);
+        mustConditions.add(mustCondition);
+        boolCondition.setMust(mustConditions);
+        query.setBool(boolCondition);
+        percolatorDetectorMapping.setCreatedTimeInMillis(1554828886);
+        percolatorDetectorMapping.setEnabled(true);
+        percolatorDetectorMapping.setLastModifiedTimeInMillis(1554828886);
+        percolatorDetectorMapping.setUser(new User("test-user"));
+        percolatorDetectorMapping.setConsumerDetectorMapping(attachConsumerToDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639"));
+        percolatorDetectorMapping.setQuery(query);
+        return percolatorDetectorMapping;
+    }
+
+    private ConsumerDetectorMapping attachConsumerToDetector(String detectorUuid) {
+        return new ConsumerDetectorMapping("cid", UUID.fromString(detectorUuid));
     }
 }

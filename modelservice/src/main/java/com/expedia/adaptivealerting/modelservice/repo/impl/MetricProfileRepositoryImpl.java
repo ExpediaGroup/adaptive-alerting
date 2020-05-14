@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.repo.impl;
 
 import com.expedia.adaptivealerting.modelservice.domain.percolator.PercolatorMetricProfiling;
-import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.LegacyElasticSearchClient;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
 import com.expedia.adaptivealerting.modelservice.repo.MetricProfileRepository;
 import com.expedia.adaptivealerting.modelservice.web.request.CreateMetricProfilingRequest;
@@ -56,7 +56,7 @@ public class MetricProfileRepositoryImpl implements MetricProfileRepository {
     private ElasticSearchProperties elasticSearchProperties;
 
     @Autowired
-    private ElasticSearchClient elasticSearchClient;
+    private LegacyElasticSearchClient legacyElasticSearchClient;
 
     @Autowired
     private ElasticsearchUtil elasticsearchUtil;
@@ -87,7 +87,7 @@ public class MetricProfileRepositoryImpl implements MetricProfileRepository {
         jsonMap.put("isStationary", isStationary);
         updateRequest.doc(jsonMap);
         try {
-            elasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
+            legacyElasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
             log.error("Updating elastic search failed", e);
             throw new RuntimeException(e);
@@ -112,7 +112,7 @@ public class MetricProfileRepositoryImpl implements MetricProfileRepository {
             searchSourceBuilder.size(500);
 
             val searchRequest = new SearchRequest().source(searchSourceBuilder).indices(METRIC_PROFILING_INDEX);
-            val searchResponse = elasticSearchClient.search(searchRequest, RequestOptions.DEFAULT);
+            val searchResponse = legacyElasticSearchClient.search(searchRequest, RequestOptions.DEFAULT);
 
             return searchResponse.getHits().getHits().length > 0;
         } catch (IOException e) {

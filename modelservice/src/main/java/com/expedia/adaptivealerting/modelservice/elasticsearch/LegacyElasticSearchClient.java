@@ -46,7 +46,7 @@ import java.io.IOException;
  */
 @Component
 @Generated // (excluding from code coverage)
-public class ElasticSearchClient {
+public class LegacyElasticSearchClient {
 
     @Autowired
     @Qualifier("legacyRestHighLevelClient")

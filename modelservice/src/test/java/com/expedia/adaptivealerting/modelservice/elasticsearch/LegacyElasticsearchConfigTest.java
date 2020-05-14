@@ -10,10 +10,10 @@ import org.mockito.MockitoAnnotations;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
-public class ElasticsearchConfigTest {
+public class LegacyElasticsearchConfigTest {
 
     @InjectMocks
-    private ElasticsearchConfig elasticSearchConfig;
+    private LegacyElasticsearchConfig elasticSearchConfig;
 
     @Mock
     private ElasticSearchProperties elasticSearchProperties;
@@ -22,7 +22,7 @@ public class ElasticsearchConfigTest {
 
     @Before
     public void setUp() {
-        this.elasticSearchConfig = new ElasticsearchConfig();
+        this.elasticSearchConfig = new LegacyElasticsearchConfig();
         MockitoAnnotations.initMocks(this);
         initTestObjects();
     }

@@ -43,12 +43,12 @@ import java.util.Set;
 public class ElasticsearchUtil {
 
     @Autowired
-    private ElasticSearchClient elasticSearchClient;
+    private LegacyElasticSearchClient legacyElasticSearchClient;
 
     public IndexResponse index(IndexRequest indexRequest, String json) {
         try {
             indexRequest.source(json, XContentType.JSON);
-            return elasticSearchClient.index(indexRequest, RequestOptions.DEFAULT);
+            return legacyElasticSearchClient.index(indexRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
             log.error(String.format("Indexing mapping %s failed", json), e);
             throw new RuntimeException(e);
@@ -76,7 +76,7 @@ public class ElasticsearchUtil {
         request.indices(indexName);
 
         try {
-            GetMappingsResponse mappingsResponse = elasticSearchClient.indices().getMapping(request, RequestOptions.DEFAULT);
+            GetMappingsResponse mappingsResponse = legacyElasticSearchClient.indices().getMapping(request, RequestOptions.DEFAULT);
             Map<String, String> mapProperties = ((Map<String, String>) mappingsResponse.getMappings()
                     .get(indexName)
                     .get(docType)
@@ -109,7 +109,7 @@ public class ElasticsearchUtil {
         request.type(docType);
 
         try {
-            elasticSearchClient.indices().putMapping(request, RequestOptions.DEFAULT);
+            legacyElasticSearchClient.indices().putMapping(request, RequestOptions.DEFAULT);
         } catch (IOException e) {
             log.error("Error updating mappings", e);
             throw new RuntimeException(e);

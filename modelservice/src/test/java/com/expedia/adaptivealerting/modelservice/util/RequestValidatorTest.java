@@ -39,7 +39,7 @@ public class RequestValidatorTest {
 
     private void initTestObjects() {
         val mom = ObjectMother.instance();
-        legalParamsDetector = mom.getDetectorDocument();
+        legalParamsDetector = mom.buildDetectorDocument();
         legalParamsDetector.setUuid(UUID.randomUUID());
         illegalParamsDetector = mom.getIllegalParamsDetector();
     }
@@ -78,7 +78,7 @@ public class RequestValidatorTest {
 
     @Test
     public void testValidateDetector_successful() {
-        RequestValidator.validateDetector(legalParamsDetector);
+        RequestValidator.validateDetectorDocument(legalParamsDetector);
     }
 
     @Test
@@ -137,6 +137,6 @@ public class RequestValidatorTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testValidateInvalidDetector_illegal_params() {
-        RequestValidator.validateDetector(illegalParamsDetector);
+        RequestValidator.validateDetectorDocument(illegalParamsDetector);
     }
 }

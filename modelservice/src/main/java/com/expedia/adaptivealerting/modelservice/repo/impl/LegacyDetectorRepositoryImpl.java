@@ -17,8 +17,8 @@ package com.expedia.adaptivealerting.modelservice.repo.impl;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
-import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
-import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
+import com.expedia.adaptivealerting.modelservice.repo.LegacyDetectorRepository;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.LegacyElasticSearchClient;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticsearchUtil;
 import com.expedia.adaptivealerting.modelservice.util.DateUtil;
 import com.expedia.adaptivealerting.modelservice.util.ObjectMapperUtil;
@@ -57,13 +57,13 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
 @Slf4j
 @Service
-public class DetectorRepositoryImpl implements DetectorRepository {
+public class LegacyDetectorRepositoryImpl implements LegacyDetectorRepository {
     private static final String DETECTOR_INDEX = "detectors";
     private static final String DETECTOR_DOC_TYPE = "detector";
     private static final int DEFAULT_ES_RESULTS_SIZE = 500;
 
     @Autowired
-    private ElasticSearchClient elasticSearchClient;
+    private LegacyElasticSearchClient legacyElasticSearchClient;
 
     @Autowired
     private ObjectMapperUtil objectMapperUtil;
@@ -99,7 +99,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
         }
 
         // Do this after setting the UUID since validation checks for the UUID.
-        RequestValidator.validateDetector(document);
+        RequestValidator.validateDetectorDocument(document);
 
         val indexRequest = new IndexRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, uuid.toString());
         val json = objectMapperUtil.convertToString(getElasticSearchDetector(document));
@@ -115,7 +115,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
         MDC.put("DetectorUuid", uuid);
         val deleteRequest = new DeleteRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, uuid);
         try {
-            val deleteResponse = elasticSearchClient.delete(deleteRequest, RequestOptions.DEFAULT);
+            val deleteResponse = legacyElasticSearchClient.delete(deleteRequest, RequestOptions.DEFAULT);
             if (elasticsearchUtil.checkNullResponse(deleteResponse.getResult())) {
                 throw new RecordNotFoundException("Invalid request: " + uuid);
             }
@@ -131,7 +131,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
     public void updateDetector(String uuid, DetectorDocument document) {
         notNull(document, "document can't be null");
         MDC.put("DetectorUuid", uuid);
-        RequestValidator.validateDetector(document);
+        RequestValidator.validateDetectorDocument(document);
 
         val updateRequest = new UpdateRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, uuid);
         Map<String, Object> jsonMap = new HashMap<>();
@@ -176,7 +176,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
         val json = objectMapperUtil.convertToString(jsonMap);   // Convert hashmap to JSON for elasticsearch
         updateRequest.doc(json, XContentType.JSON);
         try {
-            val updateResponse = elasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
+            val updateResponse = legacyElasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
             if (elasticsearchUtil.checkNullResponse(updateResponse.getResult())) {
                 throw new RecordNotFoundException("Invalid request: " + uuid);
             }
@@ -222,7 +222,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
         jsonMap.put("meta", metaMap);
         updateRequest.doc(jsonMap);
         try {
-            val updateResponse = elasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
+            val updateResponse = legacyElasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
             if (elasticsearchUtil.checkNullResponse(updateResponse.getResult())) {
                 throw new RecordNotFoundException("Invalid request: " + uuid);
             }
@@ -249,7 +249,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
         jsonMap.put("meta", metaMap);
         updateRequest.doc(jsonMap);
         try {
-            val updateResponse = elasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
+            val updateResponse = legacyElasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
             if (elasticsearchUtil.checkNullResponse(updateResponse.getResult())) {
                 throw new RecordNotFoundException("Invalid request: " + uuid);
             }
@@ -282,7 +282,7 @@ public class DetectorRepositoryImpl implements DetectorRepository {
     private List<DetectorDocument> getDetectorsFromElasticSearch(SearchRequest searchRequest) {
         SearchResponse response;
         try {
-            response = elasticSearchClient.search(searchRequest, RequestOptions.DEFAULT);
+            response = legacyElasticSearchClient.search(searchRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
             log.error("Error ES lookup", e);
             throw new RuntimeException(e);

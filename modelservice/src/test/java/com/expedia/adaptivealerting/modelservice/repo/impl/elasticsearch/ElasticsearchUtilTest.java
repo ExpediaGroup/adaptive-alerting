@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.modelservice.repo.impl.elasticsearch;
 
-import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.LegacyElasticSearchClient;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticsearchUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +47,7 @@ public class ElasticsearchUtilTest {
     private ElasticsearchUtil elasticsearchUtil;
 
     @Mock
-    private ElasticSearchClient elasticSearchClient;
+    private LegacyElasticSearchClient legacyElasticSearchClient;
 
     @Before
     public void setUp() throws Exception {
@@ -60,7 +60,7 @@ public class ElasticsearchUtilTest {
     public void testGetIndexResponse() {
         IndexResponse indexResponse = mock(IndexResponse.class);
         when(indexResponse.getId()).thenReturn("1");
-        when(elasticSearchClient.index(any(IndexRequest.class), any(RequestOptions.class))).thenReturn(indexResponse);
+        when(legacyElasticSearchClient.index(any(IndexRequest.class), any(RequestOptions.class))).thenReturn(indexResponse);
         val actualIndexResponse = elasticsearchUtil.index(new IndexRequest(), "");
         assertNotNull(actualIndexResponse);
         assertEquals("1", actualIndexResponse.getId());

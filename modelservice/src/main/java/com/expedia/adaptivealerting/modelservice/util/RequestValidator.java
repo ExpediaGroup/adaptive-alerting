@@ -45,7 +45,7 @@ public class RequestValidator {
         expression.getOperands().forEach(operand -> validateOperand(operand));
     }
 
-    public static void validateBoolean(Boolean condition){
+    public static void validateBoolean(Boolean condition) {
         Assert.notNull(condition, "Condition can't be null");
     }
 
@@ -65,7 +65,7 @@ public class RequestValidator {
         Assert.notNull(consumerDetectorMapping.getUuid(), "Detector uuid can't be null");
     }
 
-    public static void validateDetector(DetectorDocument document) {
+    public static void validateDetectorDocument(DetectorDocument document) {
         new DetectorFactory().buildDetector(document);
     }
 }
