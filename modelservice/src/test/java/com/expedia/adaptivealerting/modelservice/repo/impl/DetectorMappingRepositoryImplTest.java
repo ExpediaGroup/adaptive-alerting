@@ -113,7 +113,7 @@ public class DetectorMappingRepositoryImplTest {
         when(elasticSearchProperties.getConfig()).thenReturn(config);
 
         this.repoUnderTest = new DetectorMappingRepositoryImpl(metricRegistry);
-        ReflectionTestUtils.setField(repoUnderTest, "elasticSearchClient", legacyElasticSearchClient);
+        ReflectionTestUtils.setField(repoUnderTest, "legacyElasticSearchClient", legacyElasticSearchClient);
         ReflectionTestUtils.setField(repoUnderTest, "elasticSearchProperties", elasticSearchProperties);
         ReflectionTestUtils.setField(repoUnderTest, "elasticsearchUtil", elasticsearchUtil);
         ReflectionTestUtils.setField(repoUnderTest, "objectMapperUtil", objectMapperUtil);
