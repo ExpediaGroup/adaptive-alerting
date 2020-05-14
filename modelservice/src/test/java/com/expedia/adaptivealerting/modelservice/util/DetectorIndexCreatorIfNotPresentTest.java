@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.modelservice.util;
 
-import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.LegacyElasticSearchClient;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,7 +35,7 @@ public class DetectorIndexCreatorIfNotPresentTest {
     private ElasticSearchProperties esProperties;
 
     @Mock
-    private ElasticSearchClient esClient;
+    private LegacyElasticSearchClient esClient;
 
     // TODO Can't mock this because it's final.
     //  Might want to make some kind of a DAO wrapper around the Elasticsearch client,

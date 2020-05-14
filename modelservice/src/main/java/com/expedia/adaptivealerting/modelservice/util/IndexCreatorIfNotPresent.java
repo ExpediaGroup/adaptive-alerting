@@ -15,7 +15,7 @@
  */
 package com.expedia.adaptivealerting.modelservice.util;
 
-import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.LegacyElasticSearchClient;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
 import com.google.gson.JsonObject;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +50,7 @@ public class IndexCreatorIfNotPresent implements ApplicationListener<Application
     private ElasticSearchProperties properties;
 
     @Autowired
-    private ElasticSearchClient client;
+    private LegacyElasticSearchClient client;
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {

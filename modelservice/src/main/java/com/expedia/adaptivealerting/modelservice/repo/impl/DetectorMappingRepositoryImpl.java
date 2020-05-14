@@ -21,7 +21,7 @@ import com.codahale.metrics.Timer;
 import com.expedia.adaptivealerting.modelservice.domain.mapping.ConsumerDetectorMapping;
 import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
 import com.expedia.adaptivealerting.modelservice.domain.percolator.PercolatorDetectorMapping;
-import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.LegacyElasticSearchClient;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
 import com.expedia.adaptivealerting.modelservice.domain.mapping.DetectorMapping;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorMappingRepository;
@@ -77,7 +77,7 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
     private ElasticSearchProperties elasticSearchProperties;
 
     @Autowired
-    private ElasticSearchClient elasticSearchClient;
+    private LegacyElasticSearchClient legacyElasticSearchClient;
 
     @Autowired
     private ElasticsearchUtil elasticsearchUtil;
@@ -152,7 +152,7 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
         val getRequest = new GetRequest(elasticSearchProperties.getIndexName(),
                 elasticSearchProperties.getDocType(), id);
         try {
-            val response = elasticSearchClient.get(getRequest, RequestOptions.DEFAULT);
+            val response = legacyElasticSearchClient.get(getRequest, RequestOptions.DEFAULT);
             return getDetectorMapping(response.getSourceAsString(), response.getId(), Optional.empty());
         } catch (IOException e) {
             log.error(String.format("Get mapping %s failed", id), e);
@@ -215,7 +215,7 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
     public void deleteDetectorMapping(String id) {
         val deleteRequest = new DeleteRequest(elasticSearchProperties.getIndexName(), elasticSearchProperties.getDocType(), id);
         try {
-            val deleteResponse = elasticSearchClient.delete(deleteRequest, RequestOptions.DEFAULT);
+            val deleteResponse = legacyElasticSearchClient.delete(deleteRequest, RequestOptions.DEFAULT);
             if (elasticsearchUtil.checkNullResponse(deleteResponse.getResult())) {
                 throw new RecordNotFoundException("Invalid request: " + id);
             }
@@ -227,7 +227,7 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
 
     private List<DetectorMapping> getDetectorMappings(SearchRequest searchRequest) {
         try {
-            val searchResponse = elasticSearchClient.search(searchRequest, RequestOptions.DEFAULT);
+            val searchResponse = legacyElasticSearchClient.search(searchRequest, RequestOptions.DEFAULT);
             val hits = searchResponse.getHits();
             return Arrays.asList(hits.getHits()).stream()
                     .map(hit -> getDetectorMapping(hit.getSourceAsString(), hit.getId(), Optional.empty()))
@@ -260,7 +260,7 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
                 .source(searchSourceBuilder)
                 .indices(elasticSearchProperties.getIndexName());
 
-        val searchResponse = elasticSearchClient.search(searchRequest, RequestOptions.DEFAULT);
+        val searchResponse = legacyElasticSearchClient.search(searchRequest, RequestOptions.DEFAULT);
         delayTimer.update(searchResponse.getTook().getMillis(), TimeUnit.MILLISECONDS);
         val hits = searchResponse.getHits().getHits();
 

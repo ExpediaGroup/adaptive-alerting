@@ -16,7 +16,7 @@
 package com.expedia.adaptivealerting.modelservice.repo.impl;
 
 import com.expedia.adaptivealerting.modelservice.domain.mapping.Expression;
-import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.LegacyElasticSearchClient;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
 import com.expedia.adaptivealerting.modelservice.repo.MetricProfileRepository;
 import com.expedia.adaptivealerting.modelservice.web.request.CreateMetricProfilingRequest;
@@ -69,7 +69,7 @@ public class MetricProfileRepositoryTest {
     private MetricProfileRepository repository = new MetricProfileRepositoryImpl();
 
     @Mock
-    private ElasticSearchClient elasticSearchClient;
+    private LegacyElasticSearchClient legacyElasticSearchClient;
 
     @Mock
     private ElasticsearchUtil elasticsearchUtil;
@@ -107,8 +107,8 @@ public class MetricProfileRepositoryTest {
         Mockito.when(elasticsearchUtil.index(any(IndexRequest.class), anyString())).thenReturn(indexResponse);
 
         Mockito.when(objectMapperUtil.convertToString(any())).thenReturn("");
-        Mockito.when(elasticSearchClient.search(any(SearchRequest.class), any(RequestOptions.class))).thenReturn(searchResponse);
-        Mockito.when(elasticSearchClient.update(any(UpdateRequest.class), any(RequestOptions.class))).thenReturn(new UpdateResponse());
+        Mockito.when(legacyElasticSearchClient.search(any(SearchRequest.class), any(RequestOptions.class))).thenReturn(searchResponse);
+        Mockito.when(legacyElasticSearchClient.update(any(UpdateRequest.class), any(RequestOptions.class))).thenReturn(new UpdateResponse());
 
         ElasticSearchProperties.Config config = new ElasticSearchProperties.Config().setConnectionTimeout(100);
         Mockito.when(elasticSearchProperties.getConfig()).thenReturn(config);
@@ -140,13 +140,13 @@ public class MetricProfileRepositoryTest {
 
     @Test(expected = RuntimeException.class)
     public void updateMetricProfileFail() throws IOException {
-        Mockito.when(elasticSearchClient.update(any(UpdateRequest.class), any(RequestOptions.class))).thenThrow(new IOException());
+        Mockito.when(legacyElasticSearchClient.update(any(UpdateRequest.class), any(RequestOptions.class))).thenThrow(new IOException());
         repository.updateMetricProfile("id", true);
     }
 
     @Test(expected = RuntimeException.class)
     public void findMatchingMetricProfilesFail() throws IOException {
-        Mockito.when(elasticSearchClient.search(any(SearchRequest.class), any(RequestOptions.class))).thenThrow(new IOException());
+        Mockito.when(legacyElasticSearchClient.search(any(SearchRequest.class), any(RequestOptions.class))).thenThrow(new IOException());
         repository.profilingExists(new HashMap<>());
     }
 

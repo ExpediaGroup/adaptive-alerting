@@ -18,7 +18,7 @@ package com.expedia.adaptivealerting.modelservice.repo.impl;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
 import com.expedia.adaptivealerting.modelservice.repo.LegacyDetectorRepository;
-import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.LegacyElasticSearchClient;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticsearchUtil;
 import com.expedia.adaptivealerting.modelservice.util.DateUtil;
 import com.expedia.adaptivealerting.modelservice.util.ObjectMapperUtil;
@@ -63,7 +63,7 @@ public class LegacyDetectorRepositoryImpl implements LegacyDetectorRepository {
     private static final int DEFAULT_ES_RESULTS_SIZE = 500;
 
     @Autowired
-    private ElasticSearchClient elasticSearchClient;
+    private LegacyElasticSearchClient legacyElasticSearchClient;
 
     @Autowired
     private ObjectMapperUtil objectMapperUtil;
@@ -115,7 +115,7 @@ public class LegacyDetectorRepositoryImpl implements LegacyDetectorRepository {
         MDC.put("DetectorUuid", uuid);
         val deleteRequest = new DeleteRequest(DETECTOR_INDEX, DETECTOR_DOC_TYPE, uuid);
         try {
-            val deleteResponse = elasticSearchClient.delete(deleteRequest, RequestOptions.DEFAULT);
+            val deleteResponse = legacyElasticSearchClient.delete(deleteRequest, RequestOptions.DEFAULT);
             if (elasticsearchUtil.checkNullResponse(deleteResponse.getResult())) {
                 throw new RecordNotFoundException("Invalid request: " + uuid);
             }
@@ -176,7 +176,7 @@ public class LegacyDetectorRepositoryImpl implements LegacyDetectorRepository {
         val json = objectMapperUtil.convertToString(jsonMap);   // Convert hashmap to JSON for elasticsearch
         updateRequest.doc(json, XContentType.JSON);
         try {
-            val updateResponse = elasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
+            val updateResponse = legacyElasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
             if (elasticsearchUtil.checkNullResponse(updateResponse.getResult())) {
                 throw new RecordNotFoundException("Invalid request: " + uuid);
             }
@@ -222,7 +222,7 @@ public class LegacyDetectorRepositoryImpl implements LegacyDetectorRepository {
         jsonMap.put("meta", metaMap);
         updateRequest.doc(jsonMap);
         try {
-            val updateResponse = elasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
+            val updateResponse = legacyElasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
             if (elasticsearchUtil.checkNullResponse(updateResponse.getResult())) {
                 throw new RecordNotFoundException("Invalid request: " + uuid);
             }
@@ -249,7 +249,7 @@ public class LegacyDetectorRepositoryImpl implements LegacyDetectorRepository {
         jsonMap.put("meta", metaMap);
         updateRequest.doc(jsonMap);
         try {
-            val updateResponse = elasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
+            val updateResponse = legacyElasticSearchClient.update(updateRequest, RequestOptions.DEFAULT);
             if (elasticsearchUtil.checkNullResponse(updateResponse.getResult())) {
                 throw new RecordNotFoundException("Invalid request: " + uuid);
             }
@@ -282,7 +282,7 @@ public class LegacyDetectorRepositoryImpl implements LegacyDetectorRepository {
     private List<DetectorDocument> getDetectorsFromElasticSearch(SearchRequest searchRequest) {
         SearchResponse response;
         try {
-            response = elasticSearchClient.search(searchRequest, RequestOptions.DEFAULT);
+            response = legacyElasticSearchClient.search(searchRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
             log.error("Error ES lookup", e);
             throw new RuntimeException(e);

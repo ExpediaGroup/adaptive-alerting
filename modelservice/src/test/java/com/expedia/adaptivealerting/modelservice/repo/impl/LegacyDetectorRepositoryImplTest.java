@@ -18,7 +18,7 @@ package com.expedia.adaptivealerting.modelservice.repo.impl;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorException;
 import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
-import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchClient;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.LegacyElasticSearchClient;
 import com.expedia.adaptivealerting.modelservice.repo.LegacyDetectorRepository;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticsearchUtil;
@@ -85,7 +85,7 @@ public class LegacyDetectorRepositoryImplTest {
     private LegacyDetectorRepository repoUnderTest = new LegacyDetectorRepositoryImpl();
 
     @Mock
-    private ElasticSearchClient elasticSearchClient;
+    private LegacyElasticSearchClient legacyElasticSearchClient;
 
     @Mock
     private ElasticsearchUtil elasticsearchUtil;
@@ -250,7 +250,7 @@ public class LegacyDetectorRepositoryImplTest {
 
     @Test(expected = RuntimeException.class)
     public void deleteDetectorFail() throws IOException {
-        Mockito.when(elasticSearchClient.delete(any(DeleteRequest.class), any(RequestOptions.class))).thenThrow(new IOException());
+        Mockito.when(legacyElasticSearchClient.delete(any(DeleteRequest.class), any(RequestOptions.class))).thenThrow(new IOException());
         repoUnderTest.deleteDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639");
     }
 
@@ -276,14 +276,14 @@ public class LegacyDetectorRepositoryImplTest {
         SearchHits hits = new SearchHits(new SearchHit[]{}, 0, 0);
         SearchResponseSections searchResponseSections = new SearchResponseSections(hits, null, null, false, null, null, 5);
         SearchResponse emptySearchResponse = new SearchResponse(searchResponseSections, "", 0, 0, 0, 0, null, null);
-        Mockito.when(elasticSearchClient.search(any(SearchRequest.class), any(RequestOptions.class))).thenReturn(emptySearchResponse);
+        Mockito.when(legacyElasticSearchClient.search(any(SearchRequest.class), any(RequestOptions.class))).thenReturn(emptySearchResponse);
         DetectorDocument actualDetector = repoUnderTest.findByUuid("missing-uuid");
         assertNull(actualDetector);
     }
 
     @Test(expected = RuntimeException.class)
     public void searchDetectorFail() throws IOException {
-        Mockito.when(elasticSearchClient.search(any(SearchRequest.class), any(RequestOptions.class))).thenThrow(new IOException());
+        Mockito.when(legacyElasticSearchClient.search(any(SearchRequest.class), any(RequestOptions.class))).thenThrow(new IOException());
         repoUnderTest.findByUuid("aeb4d849-847a-45c0-8312-dc0fcf22b639");
     }
 
@@ -304,7 +304,7 @@ public class LegacyDetectorRepositoryImplTest {
 
     @Test(expected = RuntimeException.class)
     public void toggleDetectorFail() throws IOException {
-        Mockito.when(elasticSearchClient.update(any(UpdateRequest.class), any(RequestOptions.class))).thenThrow(new IOException());
+        Mockito.when(legacyElasticSearchClient.update(any(UpdateRequest.class), any(RequestOptions.class))).thenThrow(new IOException());
         repoUnderTest.toggleDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
     }
 
@@ -327,7 +327,7 @@ public class LegacyDetectorRepositoryImplTest {
 
     @Test(expected = RuntimeException.class)
     public void trustDetectorFail() throws IOException {
-        Mockito.when(elasticSearchClient.update(any(UpdateRequest.class), any(RequestOptions.class))).thenThrow(new IOException());
+        Mockito.when(legacyElasticSearchClient.update(any(UpdateRequest.class), any(RequestOptions.class))).thenThrow(new IOException());
         repoUnderTest.trustDetector("aeb4d849-847a-45c0-8312-dc0fcf22b639", true);
     }
 
@@ -372,10 +372,10 @@ public class LegacyDetectorRepositoryImplTest {
 
         Mockito.when(objectMapperUtil.convertToString(any())).thenReturn("");
         Mockito.when(objectMapperUtil.convertToObject(anyString(), any())).thenReturn(detector);
-        Mockito.when(elasticSearchClient.search(any(SearchRequest.class), any(RequestOptions.class))).thenReturn(searchResponse);
-        Mockito.when(elasticSearchClient.get(any(GetRequest.class), any(RequestOptions.class))).thenReturn(getResponse);
-        Mockito.when(elasticSearchClient.delete(any(DeleteRequest.class), any(RequestOptions.class))).thenReturn(deleteResponse);
-        Mockito.when(elasticSearchClient.update(any(UpdateRequest.class), any(RequestOptions.class))).thenReturn(new UpdateResponse());
+        Mockito.when(legacyElasticSearchClient.search(any(SearchRequest.class), any(RequestOptions.class))).thenReturn(searchResponse);
+        Mockito.when(legacyElasticSearchClient.get(any(GetRequest.class), any(RequestOptions.class))).thenReturn(getResponse);
+        Mockito.when(legacyElasticSearchClient.delete(any(DeleteRequest.class), any(RequestOptions.class))).thenReturn(deleteResponse);
+        Mockito.when(legacyElasticSearchClient.update(any(UpdateRequest.class), any(RequestOptions.class))).thenReturn(new UpdateResponse());
 
     }
 
