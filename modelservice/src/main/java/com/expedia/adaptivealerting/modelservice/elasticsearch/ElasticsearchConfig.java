@@ -15,7 +15,6 @@
  */
 package com.expedia.adaptivealerting.modelservice.elasticsearch;
 
-import com.expedia.adaptivealerting.modelservice.exception.MissingSystemPropertyException;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
