@@ -41,19 +41,19 @@
                resultAlias="tomcat.bytesReceived"/>
       
         <!-- HTTP Status -->
-        <query objectName="spring:name=counterStatus200" attribute="Count"
+        <query objectName="spring:name=counterStatus200,type=meters" attribute="Count"
                resultAlias="http.200Count"/>
-        <query objectName="spring:name=counterStatus201" attribute="Count"
+        <query objectName="spring:name=counterStatus201,type=meters" attribute="Count"
                resultAlias="http.201Count"/>
-        <query objectName="spring:name=counterStatus400" attribute="Count"
+        <query objectName="spring:name=counterStatus400,type=meters" attribute="Count"
                resultAlias="http.400Count"/>
-        <query objectName="spring:name=counterStatus404" attribute="Count"
+        <query objectName="spring:name=counterStatus404,type=meters" attribute="Count"
                resultAlias="http.404Count"/>
-        <query objectName="spring:name=counterStatus500" attribute="Count"
+        <query objectName="spring:name=counterStatus500,type=meters" attribute="Count"
                resultAlias="http.500Count"/>
 
         <!--Exception Counter -->
-        <query objectName="spring:name=exceptionCounter" attribute="Count"
+        <query objectName="spring:name=exceptionCounter,type=meters" attribute="Count"
                resultAlias="exception-counter"/>
     </queries>
     <outputWriter class="org.jmxtrans.agent.GraphitePlainTextTcpOutputWriter">
