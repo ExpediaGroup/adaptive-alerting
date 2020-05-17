@@ -62,6 +62,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -222,6 +223,20 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
         } catch (IOException e) {
             log.error(String.format("Deleting mapping %s failed", id), e);
             throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void deleteMappingByDetectorUUID(UUID id) {
+        SearchMappingsRequest searchMappingsRequest = new SearchMappingsRequest();
+        searchMappingsRequest.setDetectorUuid(id);
+
+        List<DetectorMapping> detectorMappingList = search(searchMappingsRequest);
+        if(detectorMappingList.size() == 0){
+            throw new RecordNotFoundException("Invalid UUID: " + id);
+        }
+        for(DetectorMapping detectorMapping: detectorMappingList){
+            deleteDetectorMapping(detectorMapping.getId());
         }
     }
 

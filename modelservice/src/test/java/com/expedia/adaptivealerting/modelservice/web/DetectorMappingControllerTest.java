@@ -163,6 +163,18 @@ public class DetectorMappingControllerTest {
         assertEquals(UUID.fromString(detectorUuid), consumerDetectorMappings.get(0).getUuid());
     }
 
+    @Test
+    @ResponseStatus(value = HttpStatus.OK)
+    public void testDeleteByDetector_successful() {
+        val detectorUuid = UUID.randomUUID();
+        controllerUnderTest.deleteMappingByDetectorUUID(detectorUuid);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testDeleteByDetector_fail() {
+        controllerUnderTest.deleteMappingByDetectorUUID(null);
+    }
+
     private DetectorMapping mockDetectorMapping(String id) {
         DetectorMapping detectorMapping = mock(DetectorMapping.class);
         ConsumerDetectorMapping consumerDetectorMapping = buildDetector(detectorUuid);
