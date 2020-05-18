@@ -41,8 +41,8 @@ public class ElasticsearchConfig {
 
     @Bean(destroyMethod = "close")
     public RestHighLevelClient client() {
-        ElasticSearchProperties.Url url = elasticSearchProperties.extractHostAndPortFromUrl(elasticSearchProperties.getUrls());
-        RestHighLevelClient esClient = new RestHighLevelClient(RestClient.builder(new HttpHost(url.getHost(), url.getPort())));
+        ElasticSearchProperties.HostAndPort hostAndPort = elasticSearchProperties.extractHostAndPortFromUrl(elasticSearchProperties.getUrls());
+        RestHighLevelClient esClient = new RestHighLevelClient(RestClient.builder(new HttpHost(hostAndPort.getHost(), hostAndPort.getPort())));
         return esClient;
     }
 }

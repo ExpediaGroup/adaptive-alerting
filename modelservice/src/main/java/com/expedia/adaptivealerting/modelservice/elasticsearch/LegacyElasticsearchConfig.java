@@ -37,6 +37,7 @@ public class LegacyElasticsearchConfig {
     }
 
     private RestClientBuilder buildRestClientBuilder() {
+        System.out.println(elasticSearchProperties.getUrls());
         return RestClient.builder(
                 HttpHost.create(
                         elasticSearchProperties.getUrls()))

@@ -51,12 +51,12 @@ public class ElasticSearchProperties {
     //TODO Update the elastic search config to use host and port instead of storing whole URL as a string
     @Data
     @Accessors(chain = true)
-    public static class Url {
+    public static class HostAndPort {
         private String host;
         private int port;
     }
 
-    public static Url extractHostAndPortFromUrl(String urls) {
+    public static HostAndPort extractHostAndPortFromUrl(String urls) {
         if (urls == null) {
             throw new MissingSystemPropertyException("Elastic search URL not set in config");
         }
@@ -65,9 +65,9 @@ public class ElasticSearchProperties {
             throw new MissingSystemPropertyException("Use host:port format to set URL in the config");
         }
 
-        Url url = new Url();
-        url.setHost(arrOfUrl[0]);
-        url.setPort(Integer.parseInt(arrOfUrl[1]));
-        return url;
+        HostAndPort hostAndPort = new HostAndPort();
+        hostAndPort.setHost(arrOfUrl[0]);
+        hostAndPort.setPort(Integer.parseInt(arrOfUrl[1]));
+        return hostAndPort;
     }
 }
