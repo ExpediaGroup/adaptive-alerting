@@ -18,22 +18,17 @@ package com.expedia.adaptivealerting.modelservice.repo.impl;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.expedia.adaptivealerting.modelservice.domain.mapping.ConsumerDetectorMapping;
-import com.expedia.adaptivealerting.modelservice.domain.mapping.DetectorMapping;
-import com.expedia.adaptivealerting.modelservice.domain.mapping.User;
-import com.expedia.adaptivealerting.modelservice.domain.percolator.BoolCondition;
-import com.expedia.adaptivealerting.modelservice.domain.percolator.MustCondition;
-import com.expedia.adaptivealerting.modelservice.domain.percolator.PercolatorDetectorMapping;
-import com.expedia.adaptivealerting.modelservice.domain.percolator.Query;
-import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
-import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticsearchUtil;
-import com.expedia.adaptivealerting.modelservice.elasticsearch.LegacyElasticSearchClient;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.*;
+import com.expedia.adaptivealerting.modelservice.domain.percolator.*;
 import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
-import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
-import com.expedia.adaptivealerting.modelservice.util.ObjectMapperUtil;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.LegacyElasticSearchClient;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticSearchProperties;
 import com.expedia.adaptivealerting.modelservice.web.request.CreateDetectorMappingRequest;
 import com.expedia.adaptivealerting.modelservice.web.request.SearchMappingsRequest;
 import com.expedia.adaptivealerting.modelservice.web.response.MatchingDetectorsResponse;
+import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
+import com.expedia.adaptivealerting.modelservice.elasticsearch.ElasticsearchUtil;
+import com.expedia.adaptivealerting.modelservice.util.ObjectMapperUtil;
 import lombok.val;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.DocWriteResponse.Result;
@@ -65,11 +60,23 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DetectorMappingRepositoryImplTest {
