@@ -50,7 +50,6 @@ public class CustomActuatorMetricServiceImpl implements CustomActuatorMetricServ
     public void increaseCount(final int status) {
         String counterName = "counter.status." + status;
         registry.counter(counterName).increment(1);
-        System.out.println("increasing");
         if (!statusList.contains(counterName)) {
             statusList.add(counterName);
         }
