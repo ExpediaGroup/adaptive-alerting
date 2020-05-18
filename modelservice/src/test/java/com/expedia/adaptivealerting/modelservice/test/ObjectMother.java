@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.modelservice.test;
 
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.modelservice.domain.mapping.*;
+import com.expedia.adaptivealerting.modelservice.entity.Detector;
 import com.expedia.adaptivealerting.modelservice.web.request.AnomalyRequest;
 import com.expedia.adaptivealerting.modelservice.metricsource.MetricSourceResult;
 import com.expedia.adaptivealerting.modelservice.util.DateUtil;
@@ -67,6 +68,17 @@ public class ObjectMother {
         detector.setType("constant-detector");
         detector.setConfig(buildDetectorConfig());
         return detector;
+    }
+
+    /**
+     * Returns a detector entity with the UUID set to {@literal null}.
+     *
+     * @return Detector with the UUID set to {@literal null}.
+     */
+    public Detector buildDetector() {
+        return new Detector()
+                .setType("constant-detector")
+                .setDetectorConfig(buildDetectorConfig());
     }
 
     public DetectorDocument getIllegalParamsDetector() {

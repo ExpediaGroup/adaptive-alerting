@@ -13,38 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.expedia.adaptivealerting.modelservice.repo;
+package com.expedia.adaptivealerting.modelservice.service;
 
-import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
+import com.expedia.adaptivealerting.modelservice.entity.Detector;
 
 import java.util.List;
 import java.util.UUID;
 
-@Deprecated
-public interface LegacyDetectorRepository {
+public interface DetectorService {
 
     /**
-     * Saves a detector document to the detector store. The detector UUID must be {@literal null}, as this method
+     * Saves a detector to the detector store. The detector UUID must be {@literal null}, as this method
      * assigns a UUID.
      *
-     * @param document Detector document
+     * @param detector Detector
      * @return Detector UUID assigned by this call
      */
-    UUID createDetector(DetectorDocument document);
+    UUID createDetector(Detector detector);
 
-    void deleteDetector(String uuid);
+    Detector findByUuid(String uuid);
 
-    void updateDetector(String uuid, DetectorDocument document);
-
-    DetectorDocument findByUuid(String uuid);
-
-    List<DetectorDocument> findByCreatedBy(String user);
+    List<Detector> findByCreatedBy(String user);
 
     void toggleDetector(String uuid, Boolean enabled);
 
     void trustDetector(String uuid, Boolean trusted);
 
-    List<DetectorDocument> getLastUpdatedDetectors(long interval);
+    List<Detector> getLastUpdatedDetectors(long interval);
 
-    List<DetectorDocument> getLastUpdatedDetectors(String fromDate, String toDate);
+    List<Detector> getLastUsedDetectors(int noOfDays);
+
+    void updateDetector(String uuid, Detector detector);
+
+    void updateDetectorLastUsed(String uuid);
+
+    void deleteDetector(String uuid);
+
 }

@@ -15,21 +15,13 @@
  */
 package com.expedia.adaptivealerting.modelservice.elasticsearch;
 
-import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
-import com.google.common.base.Supplier;
+import com.expedia.adaptivealerting.modelservice.exception.MissingSystemPropertyException;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import lombok.val;
-import org.elasticsearch.client.RestClientBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
-import vc.inreach.aws.request.AWSSigner;
-import vc.inreach.aws.request.AWSSigningRequestInterceptor;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-
+//TODO Rename this to ElasticsearchProperties
 @Data
 @Component
 @ConfigurationProperties(prefix = "datasource-es")
@@ -56,18 +48,26 @@ public class ElasticSearchProperties {
 
     private Config config;
 
-    public void addAWSRequestSignerInterceptor(RestClientBuilder clientBuilder) {
-        if (config.isAwsIamAuthRequired()) { // this is optional security for elastic search running in AWS
-            AWSSigningRequestInterceptor signingInterceptor = getAWSRequestSignerInterceptor();
-            clientBuilder.setHttpClientConfigCallback(
-                clientConf -> clientConf.addInterceptorLast(signingInterceptor));
-        }
+    //TODO Update the elastic search config to use host and port instead of storing whole URL as a string
+    @Data
+    @Accessors(chain = true)
+    public static class HostAndPort {
+        private String host;
+        private int port;
     }
 
-    private AWSSigningRequestInterceptor getAWSRequestSignerInterceptor() {
-        final Supplier<LocalDateTime> clock = () -> LocalDateTime.now(ZoneOffset.UTC);
-        AWSCredentialsProvider credentialsProvider = new DefaultAWSCredentialsProviderChain();
-        val awsSigner = new AWSSigner(credentialsProvider, config.getAwsRegion(), "es", clock);
-        return new AWSSigningRequestInterceptor(awsSigner);
+    public static HostAndPort extractHostAndPortFromUrl(String urls) {
+        if (urls == null) {
+            throw new MissingSystemPropertyException("Elastic search URL not set in config");
+        }
+        String[] arrOfUrl = urls.split(":");
+        if (arrOfUrl.length <= 1) {
+            throw new MissingSystemPropertyException("Use host:port format to set URL in the config");
+        }
+
+        HostAndPort hostAndPort = new HostAndPort();
+        hostAndPort.setHost(arrOfUrl[0]);
+        hostAndPort.setPort(Integer.parseInt(arrOfUrl[1]));
+        return hostAndPort;
     }
 }

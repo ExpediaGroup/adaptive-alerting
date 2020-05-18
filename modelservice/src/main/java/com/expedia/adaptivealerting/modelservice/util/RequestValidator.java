@@ -23,6 +23,7 @@ import com.expedia.adaptivealerting.modelservice.domain.mapping.Operand;
 import com.expedia.adaptivealerting.modelservice.domain.mapping.Operator;
 import com.expedia.adaptivealerting.modelservice.domain.mapping.User;
 import com.expedia.adaptivealerting.modelservice.domain.percolator.PercolatorDetectorMapping;
+import com.expedia.adaptivealerting.modelservice.entity.Detector;
 import lombok.experimental.UtilityClass;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -67,5 +68,13 @@ public class RequestValidator {
 
     public static void validateDetectorDocument(DetectorDocument document) {
         new DetectorFactory().buildDetector(document);
+    }
+
+    public static void validateDetector(Detector detector) {
+        DetectorDocument detectorDocument = new DetectorDocument()
+                .setUuid(detector.getUuid())
+                .setConfig(detector.getDetectorConfig())
+                .setType(detector.getType());
+        validateDetectorDocument(detectorDocument);
     }
 }
