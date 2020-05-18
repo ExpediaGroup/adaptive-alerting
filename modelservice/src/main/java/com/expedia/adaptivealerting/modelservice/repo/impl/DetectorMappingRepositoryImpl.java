@@ -227,13 +227,13 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
     }
 
     @Override
-    public void deleteMappingByDetectorUUID(UUID id) {
+    public void deleteMappingByDetectorUUID(UUID uuid) {
         SearchMappingsRequest searchMappingsRequest = new SearchMappingsRequest();
-        searchMappingsRequest.setDetectorUuid(id);
+        searchMappingsRequest.setDetectorUuid(uuid);
 
         List<DetectorMapping> detectorMappingList = search(searchMappingsRequest);
         if(detectorMappingList.size() == 0){
-            throw new RecordNotFoundException("Invalid UUID: " + id);
+            throw new RecordNotFoundException("Invalid UUID: " + uuid);
         }
         for(DetectorMapping detectorMapping: detectorMappingList){
             deleteDetectorMapping(detectorMapping.getId());

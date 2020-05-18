@@ -46,5 +46,5 @@ public interface DetectorMappingRepository {
 
     void deleteDetectorMapping(String id);
 
-    void deleteMappingByDetectorUUID(UUID id);
+    void deleteMappingByDetectorUUID(UUID uuid);
 }
