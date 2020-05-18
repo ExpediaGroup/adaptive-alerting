@@ -56,13 +56,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -227,15 +221,15 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
     }
 
     @Override
-    public void deleteMappingByDetectorUUID(UUID uuid) {
-        SearchMappingsRequest searchMappingsRequest = new SearchMappingsRequest();
+    public void deleteMappingsByDetectorUUID(UUID uuid) {
+        val searchMappingsRequest = new SearchMappingsRequest();
         searchMappingsRequest.setDetectorUuid(uuid);
 
-        List<DetectorMapping> detectorMappingList = search(searchMappingsRequest);
-        if(detectorMappingList.size() == 0){
+        val detectorMappingList = search(searchMappingsRequest);
+        if (detectorMappingList.size() == 0) {
             throw new RecordNotFoundException("Invalid UUID: " + uuid);
         }
-        for(DetectorMapping detectorMapping: detectorMappingList){
+        for (DetectorMapping detectorMapping : detectorMappingList) {
             deleteDetectorMapping(detectorMapping.getId());
         }
     }

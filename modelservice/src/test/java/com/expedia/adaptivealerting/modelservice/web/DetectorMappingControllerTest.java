@@ -167,12 +167,12 @@ public class DetectorMappingControllerTest {
     @ResponseStatus(value = HttpStatus.OK)
     public void testDeleteByDetector_successful() {
         val detectorUuid = UUID.randomUUID();
-        controllerUnderTest.deleteMappingByDetectorUUID(detectorUuid);
+        controllerUnderTest.deleteMappingsByDetectorUUID(detectorUuid);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testDeleteByDetector_fail() {
-        controllerUnderTest.deleteMappingByDetectorUUID(null);
+        controllerUnderTest.deleteMappingsByDetectorUUID(null);
     }
 
     private DetectorMapping mockDetectorMapping(String id) {

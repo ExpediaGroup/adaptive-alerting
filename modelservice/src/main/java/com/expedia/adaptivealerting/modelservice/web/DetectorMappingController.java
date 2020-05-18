@@ -91,10 +91,10 @@ public class DetectorMappingController {
         return matchingDetectorMappings;
     }
 
-    @RequestMapping(value="/search/findByDetector", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/search/findByDetector", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.OK)
-    public void deleteMappingByDetectorUUID(@RequestParam UUID uuid){
+    public void deleteMappingsByDetectorUUID(@RequestParam UUID uuid) {
         AssertUtil.notNull(uuid, "detector uuid can't be null");
-        detectorMappingRepo.deleteMappingByDetectorUUID(uuid);
+        detectorMappingRepo.deleteMappingsByDetectorUUID(uuid);
     }
 }
