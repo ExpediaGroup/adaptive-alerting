@@ -47,9 +47,7 @@ public class ElasticsearchConfig {
     }
 
     private RestClientBuilder buildRestClientBuilder() {
-        return RestClient.builder(
-                HttpHost.create(
-                        elasticSearchProperties.getUrls()))
+        return RestClient.builder(HttpHost.create(elasticSearchProperties.getUrls()))
                 .setRequestConfigCallback(req -> {
                     req.setConnectionRequestTimeout(elasticSearchProperties.getConfig().getConnectionTimeout());
                     req.setConnectTimeout(elasticSearchProperties.getConfig().getConnectionTimeout());
@@ -59,6 +57,7 @@ public class ElasticsearchConfig {
                 .setMaxRetryTimeoutMillis(elasticSearchProperties.getConfig().getConnectionRetryTimeout())
                 .setHttpClientConfigCallback(req -> {
                     req.setMaxConnTotal(elasticSearchProperties.getConfig().getMaxTotalConnections());
+                    //TODO Move hardcoded value to config
                     req.setMaxConnPerRoute(500);
                     return req;
                 });
