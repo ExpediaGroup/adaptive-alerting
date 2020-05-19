@@ -119,4 +119,5 @@ public class ElasticsearchUtil {
     public Boolean checkNullResponse(DocWriteResponse.Result result) {
         return (result == null || result == DocWriteResponse.Result.NOT_FOUND);
     }
+
 }

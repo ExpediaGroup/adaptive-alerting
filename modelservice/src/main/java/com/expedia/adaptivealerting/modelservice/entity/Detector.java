@@ -75,5 +75,4 @@ public class Detector {
         @Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyy-MM-dd HH:mm:ss")
         private Date dateLastUpdated;
     }
-
 }

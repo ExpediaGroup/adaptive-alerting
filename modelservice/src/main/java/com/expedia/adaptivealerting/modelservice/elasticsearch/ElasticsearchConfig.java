@@ -17,6 +17,7 @@ package com.expedia.adaptivealerting.modelservice.elasticsearch;
 
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -41,8 +42,25 @@ public class ElasticsearchConfig {
 
     @Bean(destroyMethod = "close")
     public RestHighLevelClient client() {
-        ElasticSearchProperties.HostAndPort hostAndPort = elasticSearchProperties.extractHostAndPortFromUrl(elasticSearchProperties.getUrls());
-        RestHighLevelClient esClient = new RestHighLevelClient(RestClient.builder(new HttpHost(hostAndPort.getHost(), hostAndPort.getPort())));
+        RestHighLevelClient esClient = new RestHighLevelClient(buildRestClientBuilder());
         return esClient;
+    }
+
+    private RestClientBuilder buildRestClientBuilder() {
+        return RestClient.builder(
+                HttpHost.create(
+                        elasticSearchProperties.getUrls()))
+                .setRequestConfigCallback(req -> {
+                    req.setConnectionRequestTimeout(elasticSearchProperties.getConfig().getConnectionTimeout());
+                    req.setConnectTimeout(elasticSearchProperties.getConfig().getConnectionTimeout());
+                    req.setSocketTimeout(elasticSearchProperties.getConfig().getConnectionTimeout());
+                    return req;
+                })
+                .setMaxRetryTimeoutMillis(elasticSearchProperties.getConfig().getConnectionRetryTimeout())
+                .setHttpClientConfigCallback(req -> {
+                    req.setMaxConnTotal(elasticSearchProperties.getConfig().getMaxTotalConnections());
+                    req.setMaxConnPerRoute(500);
+                    return req;
+                });
     }
 }
