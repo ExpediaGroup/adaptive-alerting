@@ -1,6 +1,5 @@
 package com.expedia.adaptivealerting.modelservice.elasticsearch;
 
-import com.expedia.adaptivealerting.modelservice.exception.MissingSystemPropertyException;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,30 +18,28 @@ public class ElasticsearchConfigTest {
     @Mock
     private ElasticSearchProperties elasticSearchProperties;
 
+    private ElasticSearchProperties.Config config;
+
     @Before
     public void setUp() {
         this.elasticSearchConfig = new ElasticsearchConfig();
         MockitoAnnotations.initMocks(this);
+        initTestObjects();
     }
 
     @Test
     public void testRestTemplate() {
         when(elasticSearchProperties.getUrls()).thenReturn("localhost:8000");
+        when(elasticSearchProperties.getConfig()).thenReturn(config);
         val elasticsearchRestTemplate = elasticSearchConfig.elasticsearchTemplate();
         assertNotNull(elasticsearchRestTemplate);
     }
 
-    @Test(expected = MissingSystemPropertyException.class)
-    public void testRestTemplate_invalid_config() {
-        when(elasticSearchProperties.getUrls()).thenReturn(null);
-        val restHighLevelClient = elasticSearchConfig.client();
-        assertNotNull(restHighLevelClient);
-    }
-
-    @Test(expected = MissingSystemPropertyException.class)
-    public void testRestTemplate_invalid_config1() {
-        when(elasticSearchProperties.getUrls()).thenReturn("localhost");
-        val restHighLevelClient = elasticSearchConfig.client();
-        assertNotNull(restHighLevelClient);
+    private void initTestObjects() {
+        this.config = new ElasticSearchProperties.Config();
+        config.setConnectionTimeout(100);
+        config.setConnectionRetryTimeout(100);
+        config.setConnectionRetryTimeout(100);
+        config.setMaxTotalConnections(50);
     }
 }
