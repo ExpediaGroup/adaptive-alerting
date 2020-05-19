@@ -47,7 +47,8 @@ public class ElasticsearchConfig {
     }
 
     private RestClientBuilder buildRestClientBuilder() {
-        return RestClient.builder(HttpHost.create(elasticSearchProperties.getUrls()))
+        return RestClient
+                .builder(HttpHost.create(elasticSearchProperties.getUrls()))
                 .setRequestConfigCallback(req -> {
                     req.setConnectionRequestTimeout(elasticSearchProperties.getConfig().getConnectionTimeout());
                     req.setConnectTimeout(elasticSearchProperties.getConfig().getConnectionTimeout());
