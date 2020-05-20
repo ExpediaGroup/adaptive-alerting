@@ -360,19 +360,7 @@ public class DetectorClientTest {
         when(updatedDocsContent_cantRead.asBytes()).thenReturn(updatedDocsBytes_cantRead);
         when(objectMapper.readValue(updatedDocsBytes_cantRead, DetectorDocument[].class)).thenThrow(new IOException());
     }
-
-    private void initUpdatedDetectorLastUsed() throws IOException {
-        when(httpClient.get(FIND_UPDATED_DOCS_URI)).thenReturn(updatedDocsContent);
-        when(updatedDocsContent.asBytes()).thenReturn(updatedDocsBytes);
-        when(objectMapper.readValue(updatedDocsBytes, DetectorDocument[].class)).thenReturn(docs);
-
-        when(httpClient.get(FIND_UPDATED_DOCS_URI_CANT_GET)).thenThrow(new IOException());
-
-        when(httpClient.get(FIND_UPDATED_DOCS_URI_CANT_READ)).thenReturn(updatedDocsContent_cantRead);
-        when(updatedDocsContent_cantRead.asBytes()).thenReturn(updatedDocsBytes_cantRead);
-        when(objectMapper.readValue(updatedDocsBytes_cantRead, DetectorDocument[].class)).thenThrow(new IOException());
-    }
-
+    
     private void initFindMatchingDetectorMappings() throws IOException {
         when(objectMapper.writeValueAsString(tags)).thenReturn(tagsBody);
         when(httpClient.post(FIND_MAPPINGS_URI, tagsBody)).thenReturn(mappingContent);
