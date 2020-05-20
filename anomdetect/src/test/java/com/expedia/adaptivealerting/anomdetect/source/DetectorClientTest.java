@@ -63,8 +63,6 @@ public class DetectorClientTest {
     private static final UUID DETECTOR_UUID_NO_DOCS = UUID.fromString("2c656ea0-dbf7-4081-aa01-55e86439ad24");
     private static final UUID DETECTOR_UUID_CANT_POST = UUID.fromString("2c656ea0-dbf7-4081-aa01-55e86439ad25");
 
-
-
     private static final int TIME_PERIOD_INVALID = 0;
     private static final int TIME_PERIOD_VALID = 1000;
     private static final int TIME_PERIOD_CANT_GET = 2000;
@@ -81,8 +79,6 @@ public class DetectorClientTest {
     private static final String FIND_UPDATED_DOCS_URI_CANT_READ = uri(FIND_UPDATED_DOCUMENTS_PATH, TIME_PERIOD_CANT_READ);
 
     private static final String FIND_MAPPINGS_URI = BASE_URI + FIND_MAPPINGS_BY_TAGS_PATH;
-
-
     private static final String UPDATE_DETECTOR_LAST_USED_URI = BASE_URI + UPDATE_DETECTOR_LAST_USED_PATH;
 
     private static final String FIND_UPDATED_MAPPINGS_URI = uri(FIND_UPDATED_MAPPINGS_PATH, TIME_PERIOD_VALID);
