@@ -20,7 +20,6 @@ import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMatchResponse;
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.http.client.fluent.Content;
