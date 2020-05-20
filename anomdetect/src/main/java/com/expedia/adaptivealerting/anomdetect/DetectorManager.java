@@ -78,9 +78,9 @@ public class DetectorManager {
     @NonNull
     private DetectorSource detectorSource;
     private int detectorRefreshTimePeriod;
-    private Queue<UUID> detectorsToBeUpdated;
+    private Queue<UUID> detectorsLastUsedTimeToBeUpdated;
     private long cacheSyncedTillTime = System.currentTimeMillis();
-    private long detectorLastUsedSyncedTillTime = System.currentTimeMillis();
+    private long detectorsLastUsedSyncedTillTime = System.currentTimeMillis();
     private DataInitializer dataInitializer;
 
     /**
@@ -104,7 +104,7 @@ public class DetectorManager {
         this.dataInitializer = dataInitializer;
         this.detectorSource = detectorSource;
         this.detectorRefreshTimePeriod = config.getInt(CK_DETECTOR_REFRESH_PERIOD);
-        this.detectorsToBeUpdated = new LinkedList<>();
+        this.detectorsLastUsedTimeToBeUpdated = new LinkedList<>();
 
         this.metricRegistry = metricRegistry;
         detectorForTimer = metricRegistry.timer("detector.detectorFor");
@@ -169,7 +169,7 @@ public class DetectorManager {
         try (Timer.Context autoClosable = detectorForTimer.time()) {
             val detectorUuid = mappedMetricData.getDetectorUuid();
             DetectorContainer container = cachedDetectors.get(detectorUuid);
-            detectorsToBeUpdated.add(detectorUuid);
+            detectorsLastUsedTimeToBeUpdated.add(detectorUuid);
             if (container == null) {
                 container = detectorSource.findDetector(detectorUuid);
                 return (container == null) ? Optional.empty()
@@ -275,14 +275,14 @@ public class DetectorManager {
      * On successful sync, update detectorLastUsedSyncedTillTime to currentTime
      */
     void detectorLastUsedTimeSync(long currentTime) {
-        long updateDurationInSeconds = (currentTime - detectorLastUsedSyncedTillTime) / 1000;
+        long updateDurationInSeconds = (currentTime - detectorsLastUsedSyncedTillTime) / 1000;
         if (updateDurationInSeconds <= 0) {
             return;
         }
-        UUID uuid = detectorsToBeUpdated.remove();
+        UUID uuid = detectorsLastUsedTimeToBeUpdated.remove();
         if (uuid != null) {
             detectorSource.updatedDetectorLastUsed(uuid);
         }
-        detectorLastUsedSyncedTillTime = currentTime;
+        detectorsLastUsedSyncedTillTime = currentTime;
     }
 }
