@@ -163,6 +163,8 @@ public class DetectorManager {
     private Optional<DetectorContainer> detectorFor(MappedMetricData mappedMetricData) {
         try (Timer.Context autoClosable = detectorForTimer.time()) {
             val detectorUuid = mappedMetricData.getDetectorUuid();
+            //TODO This will call elastic search for every incoming metric.
+            // We can add a scheduler and make bulk updates using a single call instead.
             DetectorContainer container = cachedDetectors.get(detectorUuid);
             detectorSource.updatedDetectorLastUsed(detectorUuid);
             if (container == null) {
