@@ -276,14 +276,15 @@ public class DetectorManager {
      */
     void detectorLastUsedTimeSync(long currentTime) {
         long updateDurationInSeconds = (currentTime - detectorsLastUsedSyncedTillTime) / 1000;
-        if (updateDurationInSeconds <= 0 || detectorsLastUsedTimeToBeUpdated.isEmpty()) {
+        int queueSize = detectorsLastUsedTimeToBeUpdated.size();
+
+        if (updateDurationInSeconds <= 0 || queueSize <= 3) {
             return;
         }
-
-        int queueSize = detectorsLastUsedTimeToBeUpdated.size();
+        
         //Update last used time only for 1/4th of queue's size at one go for better performance
         for (int i = 0; i < queueSize / 4; i++) {
-            UUID uuid = detectorsLastUsedTimeToBeUpdated.remove();
+            UUID uuid = detectorsLastUsedTimeToBeUpdated.poll();
             if (uuid != null) {
                 detectorSource.updatedDetectorLastUsed(uuid);
             }
