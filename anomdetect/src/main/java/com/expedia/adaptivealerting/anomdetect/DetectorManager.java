@@ -164,6 +164,7 @@ public class DetectorManager {
         try (Timer.Context autoClosable = detectorForTimer.time()) {
             val detectorUuid = mappedMetricData.getDetectorUuid();
             DetectorContainer container = cachedDetectors.get(detectorUuid);
+            detectorSource.updatedDetectorLastUsed(detectorUuid);
             if (container == null) {
                 container = detectorSource.findDetector(detectorUuid);
                 return (container == null) ? Optional.empty()

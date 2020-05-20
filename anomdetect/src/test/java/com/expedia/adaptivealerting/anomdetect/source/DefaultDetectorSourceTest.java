@@ -40,6 +40,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @Slf4j
@@ -148,6 +150,18 @@ public final class DefaultDetectorSourceTest {
     public void testFindDetector_exception() {
         sourceUnderTest.findDetector(DETECTOR_UUID_EXCEPTION);
     }
+
+    @Test
+    public void testUpdatedDetectorLastUsed() {
+        sourceUnderTest.updatedDetectorLastUsed(DETECTOR_UUID);
+        verify(detectorClient, times(1)).updatedDetectorLastUsed(DETECTOR_UUID);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void tesUpdatedDetectorLastUsed_nullUuid() {
+        sourceUnderTest.updatedDetectorLastUsed(null);
+    }
+
 
     private void initTestObjects() {
         this.metricTags = new ArrayList<>();

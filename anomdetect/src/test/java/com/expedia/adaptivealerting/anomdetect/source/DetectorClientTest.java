@@ -20,6 +20,7 @@ import com.expedia.adaptivealerting.anomdetect.mapper.DetectorMatchResponse;
 import com.expedia.adaptivealerting.anomdetect.util.HttpClientWrapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.http.client.fluent.Content;
@@ -45,6 +46,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -227,6 +230,19 @@ public class DetectorClientTest {
     @Test(expected = DetectorException.class)
     public void testFindUpdatedDetectorDocuments_cantRead() {
         clientUnderTest.findUpdatedDetectorDocuments(TIME_PERIOD_CANT_READ);
+    }
+
+
+    // ================================================================================
+    // updatedDetectorLastUsed
+    // ================================================================================
+
+    @Test
+    @SneakyThrows
+    public void testUpdatedDetectorLastUsed() {
+        clientUnderTest.updatedDetectorLastUsed(DETECTOR_UUID);
+        val bodyMap = Collections.singletonMap("uuid", DETECTOR_UUID);
+        verify(objectMapper, times(1)).writeValueAsString(bodyMap);
     }
 
     // ================================================================================
