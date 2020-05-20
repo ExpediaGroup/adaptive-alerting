@@ -278,7 +278,7 @@ public class DetectorManager {
         long updateDurationInSeconds = (currentTime - detectorsLastUsedSyncedTillTime) / 1000;
         int detectorToBeUpdatedQueueSize = detectorsLastUsedTimeToBeUpdated.size();
 
-        if (updateDurationInSeconds <= 0 || detectorToBeUpdatedQueueSize <= 3) {
+        if (updateDurationInSeconds <= 0 || detectorToBeUpdatedQueueSize < 4) {
             return;
         }
 
