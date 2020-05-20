@@ -110,7 +110,7 @@ public class DetectorController {
     @PutMapping(path = "/updateDetectorLastUsed", consumes = "application/json", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public void updatedDetectorLastUsed(@RequestBody Map<String, String> params) {
-        service.updateDetectorLastUsed(params.get("uuid"));
+        service.updateDetectorLastUsed(params.get("detectorUuid"));
     }
 
     @DeleteMapping

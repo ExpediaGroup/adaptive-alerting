@@ -144,7 +144,7 @@ public class DetectorClient {
      */
     public void updatedDetectorLastUsed(UUID uuid) {
         val uri = String.format(baseUri + UPDATE_DETECTOR_LAST_USED_PATH);
-        val bodyMap = Collections.singletonMap("uuid", uuid);
+        val bodyMap = Collections.singletonMap("detectorUuid", uuid);
         try {
             val body = objectMapper.writeValueAsString(bodyMap);
             httpClient.post(uri, body);

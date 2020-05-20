@@ -164,7 +164,7 @@ public class DetectorControllerTest {
 
     @Test
     public void testUpdatedDetectorLastUsed() {
-        Map<String, String> requestBody = Collections.singletonMap("uuid", someUuid.toString());
+        Map<String, String> requestBody = Collections.singletonMap("detectorUuid", someUuid.toString());
         controllerUnderTest.updatedDetectorLastUsed(requestBody);
         verify(detectorService, times(1)).updateDetectorLastUsed(someUuid.toString());
     }
