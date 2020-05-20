@@ -360,7 +360,7 @@ public class DetectorClientTest {
         when(updatedDocsContent_cantRead.asBytes()).thenReturn(updatedDocsBytes_cantRead);
         when(objectMapper.readValue(updatedDocsBytes_cantRead, DetectorDocument[].class)).thenThrow(new IOException());
     }
-    
+
     private void initFindMatchingDetectorMappings() throws IOException {
         when(objectMapper.writeValueAsString(tags)).thenReturn(tagsBody);
         when(httpClient.post(FIND_MAPPINGS_URI, tagsBody)).thenReturn(mappingContent);
