@@ -63,6 +63,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 @Slf4j
 // TODO: This class is getting much too big. Refactor by breaking out smaller, single-purpose collaborator classes.
 public class DetectorManager {
+    public static final int MAX_ITEMS_TO_BE_PROCESSED_QUEUE_FACTOR = 4;
     private static final String CK_DETECTOR_REFRESH_PERIOD = "detector-refresh-period";
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final Timer detectorForTimer;
@@ -78,7 +79,7 @@ public class DetectorManager {
     @NonNull
     private DetectorSource detectorSource;
     private int detectorRefreshTimePeriod;
-    private Queue<UUID> detectorsLastUsedTimeToBeUpdated;
+    private Queue<UUID> detectorsLastUsedTimeToBeUpdatedQ;
     private long cacheSyncedTillTime = System.currentTimeMillis();
     private long detectorsLastUsedSyncedTillTime = System.currentTimeMillis();
     private DataInitializer dataInitializer;
@@ -104,7 +105,7 @@ public class DetectorManager {
         this.dataInitializer = dataInitializer;
         this.detectorSource = detectorSource;
         this.detectorRefreshTimePeriod = config.getInt(CK_DETECTOR_REFRESH_PERIOD);
-        this.detectorsLastUsedTimeToBeUpdated = new LinkedList<>();
+        this.detectorsLastUsedTimeToBeUpdatedQ = new LinkedList<>();
 
         this.metricRegistry = metricRegistry;
         detectorForTimer = metricRegistry.timer("detector.detectorFor");
@@ -169,7 +170,7 @@ public class DetectorManager {
         try (Timer.Context autoClosable = detectorForTimer.time()) {
             val detectorUuid = mappedMetricData.getDetectorUuid();
             DetectorContainer container = cachedDetectors.get(detectorUuid);
-            detectorsLastUsedTimeToBeUpdated.add(detectorUuid);
+            detectorsLastUsedTimeToBeUpdatedQ.add(detectorUuid);
             if (container == null) {
                 container = detectorSource.findDetector(detectorUuid);
                 return (container == null) ? Optional.empty()
@@ -276,15 +277,15 @@ public class DetectorManager {
      */
     void detectorLastUsedTimeSync(long currentTime) {
         long updateDurationInSeconds = (currentTime - detectorsLastUsedSyncedTillTime) / 1000;
-        int detectorToBeUpdatedQueueSize = detectorsLastUsedTimeToBeUpdated.size();
+        int detectorToBeUpdatedQueueSize = detectorsLastUsedTimeToBeUpdatedQ.size();
 
-        if (updateDurationInSeconds <= 0 || detectorToBeUpdatedQueueSize < 4) {
+        if (updateDurationInSeconds <= 0 || detectorToBeUpdatedQueueSize < MAX_ITEMS_TO_BE_PROCESSED_QUEUE_FACTOR) {
             return;
         }
 
         //Update last used time only for 1/4th of queue's size at one go for better performance
-        for (int i = 0; i < detectorToBeUpdatedQueueSize / 4; i++) {
-            UUID uuid = detectorsLastUsedTimeToBeUpdated.poll();
+        for (int i = 0; i < detectorToBeUpdatedQueueSize / MAX_ITEMS_TO_BE_PROCESSED_QUEUE_FACTOR; i++) {
+            UUID uuid = detectorsLastUsedTimeToBeUpdatedQ.poll();
             if (uuid != null) {
                 detectorSource.updatedDetectorLastUsed(uuid);
             }

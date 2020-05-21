@@ -41,12 +41,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static com.expedia.adaptivealerting.anomdetect.DetectorManager.MAX_ITEMS_TO_BE_PROCESSED_QUEUE_FACTOR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.atMost;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -135,6 +138,20 @@ public final class DetectorManagerTest {
         val result = managerUnderTest.detectorCacheSync(System.currentTimeMillis() + 1000 * 60);
         assertNotNull(result);
         assertEquals(updatedDetectors, result);
+    }
+
+    @Test
+    public void testDetectorLastUsedTimeSync() {
+        populateDetectorsLastUsedTimeQueue(4 * MAX_ITEMS_TO_BE_PROCESSED_QUEUE_FACTOR);
+        managerUnderTest.detectorLastUsedTimeSync(System.currentTimeMillis() + 1000 * 60);
+        verify(detectorSource, atLeast(MAX_ITEMS_TO_BE_PROCESSED_QUEUE_FACTOR)).updatedDetectorLastUsed(any(UUID.class));
+    }
+
+    @Test
+    public void testDetectorLastUsedTimeSync_queue_size_less_than_factor() {
+        populateDetectorsLastUsedTimeQueue(MAX_ITEMS_TO_BE_PROCESSED_QUEUE_FACTOR - 1);
+        managerUnderTest.detectorLastUsedTimeSync(System.currentTimeMillis() + 1000 * 60);
+        verify(detectorSource, atMost(0)).updatedDetectorLastUsed(any(UUID.class));
     }
 
     @Test
@@ -241,5 +258,11 @@ public final class DetectorManagerTest {
 
         when(config.getInt("detector-refresh-period")).thenReturn(detectorRefreshPeriod);
         when(badConfig.getInt("detector-refresh-period")).thenReturn(badDetectorRefreshPeriod);
+    }
+
+    private void populateDetectorsLastUsedTimeQueue(int size) {
+        for (int i = 0; i < size; i++) {
+            managerUnderTest.detect(goodMappedMetricData);
+        }
     }
 }
