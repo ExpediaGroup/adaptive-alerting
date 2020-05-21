@@ -85,4 +85,11 @@ public interface DetectorSource {
      * @throws DetectorException if there's a problem finding the detectors
      */
     List<UUID> findUpdatedDetectors(long timePeriod);
+
+    /**
+     * Updates detectors' dateLastAccessed field to keep track of detector usage
+     *
+     * @param uuid Detector UUID.
+     */
+    void updatedDetectorLastUsed(UUID uuid);
 }

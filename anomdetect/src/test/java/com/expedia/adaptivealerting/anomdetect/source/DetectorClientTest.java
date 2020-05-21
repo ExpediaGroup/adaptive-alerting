@@ -40,11 +40,14 @@ import static com.expedia.adaptivealerting.anomdetect.source.DetectorClient.FIND
 import static com.expedia.adaptivealerting.anomdetect.source.DetectorClient.FIND_MAPPINGS_BY_UUID_PATH;
 import static com.expedia.adaptivealerting.anomdetect.source.DetectorClient.FIND_UPDATED_DOCUMENTS_PATH;
 import static com.expedia.adaptivealerting.anomdetect.source.DetectorClient.FIND_UPDATED_MAPPINGS_PATH;
+import static com.expedia.adaptivealerting.anomdetect.source.DetectorClient.UPDATE_DETECTOR_LAST_USED_PATH;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -76,6 +79,7 @@ public class DetectorClientTest {
     private static final String FIND_UPDATED_DOCS_URI_CANT_READ = uri(FIND_UPDATED_DOCUMENTS_PATH, TIME_PERIOD_CANT_READ);
 
     private static final String FIND_MAPPINGS_URI = BASE_URI + FIND_MAPPINGS_BY_TAGS_PATH;
+    private static final String UPDATE_DETECTOR_LAST_USED_URI = BASE_URI + UPDATE_DETECTOR_LAST_USED_PATH;
 
     private static final String FIND_UPDATED_MAPPINGS_URI = uri(FIND_UPDATED_MAPPINGS_PATH, TIME_PERIOD_VALID);
     private static final String FIND_UPDATED_MAPPINGS_URI_CANT_GET = uri(FIND_UPDATED_MAPPINGS_PATH, TIME_PERIOD_CANT_GET);
@@ -227,6 +231,26 @@ public class DetectorClientTest {
     @Test(expected = DetectorException.class)
     public void testFindUpdatedDetectorDocuments_cantRead() {
         clientUnderTest.findUpdatedDetectorDocuments(TIME_PERIOD_CANT_READ);
+    }
+
+
+    // ================================================================================
+    // updatedDetectorLastUsed
+    // ================================================================================
+
+    @Test
+    public void testUpdatedDetectorLastUsed() throws IOException {
+        clientUnderTest.updatedDetectorLastUsed(DETECTOR_UUID);
+        val bodyMap = buildDetectorMappingByUuidBody(DETECTOR_UUID);
+        verify(objectMapper, times(1)).writeValueAsString(bodyMap);
+    }
+
+    @Test(expected = DetectorException.class)
+    public void testUpdatedDetectorLastUsed_detector_exception() throws IOException {
+        val bodyMap_cantPost = buildDetectorMappingByUuidBody(DETECTOR_UUID);
+        when(objectMapper.writeValueAsString(bodyMap_cantPost)).thenReturn(bodyMap_cantPost.toString());
+        when(httpClient.post(UPDATE_DETECTOR_LAST_USED_URI, bodyMap_cantPost.toString())).thenThrow(new IOException());
+        clientUnderTest.updatedDetectorLastUsed(DETECTOR_UUID);
     }
 
     // ================================================================================

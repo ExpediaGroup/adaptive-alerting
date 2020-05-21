@@ -51,8 +51,9 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 @RequiredArgsConstructor
 @Slf4j
 public class DetectorClient {
-    static final String FIND_DOCUMENT_PATH = "/api/v2/detectors/findByUuid?uuid=%s";
-    static final String FIND_UPDATED_DOCUMENTS_PATH = "/api/v2/detectors/getLastUpdatedDetectors?interval=%d";
+    static final String FIND_DOCUMENT_PATH = "/api/v3/detectors/findByUuid?uuid=%s";
+    static final String FIND_UPDATED_DOCUMENTS_PATH = "/api/v3/detectors/getLastUpdatedDetectors?interval=%d";
+    static final String UPDATE_DETECTOR_LAST_USED_PATH = "/api/v3/detectors/updateDetectorLastUsed";
 
     // TODO Shouldn't these also include the /api/v2 prefix? [WLW]
     static final String FIND_MAPPINGS_BY_TAGS_PATH = "/api/detectorMappings/findMatchingByTags";
@@ -137,6 +138,26 @@ public class DetectorClient {
     }
 
     /**
+     * Updates detectors' dateLastAccessed field to keep track of detector usage
+     *
+     * @param uuid Detector UUID.
+     */
+    public void updatedDetectorLastUsed(UUID uuid) {
+        val uri = String.format(baseUri + UPDATE_DETECTOR_LAST_USED_PATH);
+        val bodyMap = Collections.singletonMap("detectorUuid", uuid);
+        try {
+            val body = objectMapper.writeValueAsString(bodyMap);
+            httpClient.post(uri, body);
+        } catch (IOException e) {
+            val message = "IOException while updating detector's dateLastAccessed value for" +
+                    ": uuid=" + uuid +
+                    ", httpMethod=POST" +
+                    ", uri=" + uri;
+            throw new DetectorException(message, e);
+        }
+    }
+
+    /**
      * Find matching detectors for a list of metrics, represented by a set of tags
      *
      * @param tagsList list of metric tags
@@ -164,6 +185,7 @@ public class DetectorClient {
             throw new DetectorException(message, e);
         }
     }
+
 
     /**
      * Find updated detector mappings list.

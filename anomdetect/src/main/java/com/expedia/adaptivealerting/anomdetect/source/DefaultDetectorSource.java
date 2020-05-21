@@ -88,4 +88,10 @@ public class DefaultDetectorSource implements DetectorSource {
                 .map(document -> document.getUuid())
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public void updatedDetectorLastUsed(UUID uuid) {
+        notNull(uuid, "uuid can't be null");
+        client.updatedDetectorLastUsed(uuid);
+    }
 }

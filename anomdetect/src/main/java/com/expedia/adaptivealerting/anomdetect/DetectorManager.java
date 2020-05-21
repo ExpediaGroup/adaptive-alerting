@@ -37,9 +37,11 @@ import org.slf4j.MDC;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -61,6 +63,7 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 @Slf4j
 // TODO: This class is getting much too big. Refactor by breaking out smaller, single-purpose collaborator classes.
 public class DetectorManager {
+    public static final int MAX_ITEMS_TO_BE_PROCESSED_QUEUE_FACTOR = 4;
     private static final String CK_DETECTOR_REFRESH_PERIOD = "detector-refresh-period";
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final Timer detectorForTimer;
@@ -76,9 +79,10 @@ public class DetectorManager {
     @NonNull
     private DetectorSource detectorSource;
     private int detectorRefreshTimePeriod;
-    private long synchedTilTime = System.currentTimeMillis();
+    private Queue<UUID> detectorsLastUsedTimeToBeUpdatedQ;
+    private long cacheSyncedTillTime = System.currentTimeMillis();
+    private long detectorsLastUsedSyncedTillTime = System.currentTimeMillis();
     private DataInitializer dataInitializer;
-
 
     /**
      * Creates a new detector manager from the given parameters.
@@ -97,10 +101,11 @@ public class DetectorManager {
         // TODO: Seems odd to include this constructor, whose purpose seems to be to support unit testing.
         //  At least I don't think it should be public.
         //  This is conceptually just the base constructor with the cache exposed.[WLW]
-        this.detectorSource = detectorSource;
-        this.detectorRefreshTimePeriod = config.getInt(CK_DETECTOR_REFRESH_PERIOD);
         this.cachedDetectors = cachedDetectors;
         this.dataInitializer = dataInitializer;
+        this.detectorSource = detectorSource;
+        this.detectorRefreshTimePeriod = config.getInt(CK_DETECTOR_REFRESH_PERIOD);
+        this.detectorsLastUsedTimeToBeUpdatedQ = new LinkedList<>();
 
         this.metricRegistry = metricRegistry;
         detectorForTimer = metricRegistry.timer("detector.detectorFor");
@@ -122,6 +127,7 @@ public class DetectorManager {
             try {
                 log.trace("Refreshing detectors");
                 this.detectorCacheSync(System.currentTimeMillis());
+                this.detectorLastUsedTimeSync(System.currentTimeMillis());
             } catch (Exception e) {
                 log.error("Error refreshing detectors", e);
             }
@@ -164,6 +170,7 @@ public class DetectorManager {
         try (Timer.Context autoClosable = detectorForTimer.time()) {
             val detectorUuid = mappedMetricData.getDetectorUuid();
             DetectorContainer container = cachedDetectors.get(detectorUuid);
+            detectorsLastUsedTimeToBeUpdatedQ.add(detectorUuid);
             if (container == null) {
                 container = detectorSource.findDetector(detectorUuid);
                 return (container == null) ? Optional.empty()
@@ -240,12 +247,11 @@ public class DetectorManager {
      * Sync with detector data store by polling to get all deleted detectors
      * The deleted detectors will be cleaned up and the detectors modified will be reloaded
      * when corresponding mapped-metric comes in.
-     * On successful sync update syncUptill time to currentTime
+     * On successful sync update cacheSyncedTillTime to currentTime
      */
     List<UUID> detectorCacheSync(long currentTime) {
         List<UUID> updatedDetectors = new ArrayList<>();
-
-        long updateDurationInSeconds = (currentTime - synchedTilTime) / 1000;
+        long updateDurationInSeconds = (currentTime - cacheSyncedTillTime) / 1000;
 
         if (updateDurationInSeconds <= 0) {
             return updatedDetectors;
@@ -261,7 +267,29 @@ public class DetectorManager {
         if (!updatedDetectors.isEmpty()) {
             log.info("Removed these updated detectors from cache (so they can be reloaded at time of next metric observation): {}", updatedDetectors);
         }
-        synchedTilTime = currentTime;
+        cacheSyncedTillTime = currentTime;
         return updatedDetectors;
+    }
+
+    /**
+     * Sync detector last used time to keep a track of detector usage.
+     * On successful sync, update detectorLastUsedSyncedTillTime to currentTime
+     */
+    void detectorLastUsedTimeSync(long currentTime) {
+        long updateDurationInSeconds = (currentTime - detectorsLastUsedSyncedTillTime) / 1000;
+        int detectorToBeUpdatedQueueSize = detectorsLastUsedTimeToBeUpdatedQ.size();
+
+        if (updateDurationInSeconds <= 0 || detectorToBeUpdatedQueueSize < MAX_ITEMS_TO_BE_PROCESSED_QUEUE_FACTOR) {
+            return;
+        }
+
+        //Update last used time only for 1/4th of queue's size at one go for better performance
+        for (int i = 0; i < detectorToBeUpdatedQueueSize / MAX_ITEMS_TO_BE_PROCESSED_QUEUE_FACTOR; i++) {
+            UUID uuid = detectorsLastUsedTimeToBeUpdatedQ.poll();
+            if (uuid != null) {
+                detectorSource.updatedDetectorLastUsed(uuid);
+            }
+        }
+        detectorsLastUsedSyncedTillTime = currentTime;
     }
 }
