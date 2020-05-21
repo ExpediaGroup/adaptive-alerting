@@ -42,7 +42,10 @@ public class DetectorManager {
             MappedMetricData mappedMetricData = consumerRecord.value();
             if (mappedMetricData != null) {
                 MetricData metricData = mappedMetricData.getMetricData();
-                DetectorResult detectorResult = detectorRegistry.getDetector().detect(metricData);
+                DetectorResult detectorResult = null;
+                if(detectorRegistry.getDetector() != null) {
+                    detectorResult = detectorRegistry.getDetector().detect(metricData);
+                }
                 mappedMetricData.setAnomalyResult(detectorResult);
             }
             mappedMetricDataList.add(mappedMetricData);
