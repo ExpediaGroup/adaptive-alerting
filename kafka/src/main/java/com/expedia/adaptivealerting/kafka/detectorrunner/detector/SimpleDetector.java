@@ -1,6 +1,7 @@
-package com.expedia.adaptivealerting.kafka.detector;
+package com.expedia.adaptivealerting.kafka.detectorrunner.detector;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
+import com.expedia.adaptivealerting.anomdetect.detect.AnomalyThresholds;
 import com.expedia.adaptivealerting.anomdetect.detect.Detector;
 import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.outlier.OutlierDetectorResult;
@@ -28,17 +29,20 @@ public class SimpleDetector implements Detector {
         if (metricData != null) {
             log.info(metricData.toString());
             queue.add(metricData);
+            AnomalyThresholds anomalyThresholds = new AnomalyThresholds(100d, 75d, 50d, 25d);
             if (metricData.getValue() < min) {
                 min = metricData.getValue();
                 outlierDetectorResult.setAnomalyLevel(AnomalyLevel.WEAK);
-            }
-            if (metricData.getValue() > max) {
+            } else if (metricData.getValue() > max) {
                 max = metricData.getValue();
                 outlierDetectorResult.setAnomalyLevel(AnomalyLevel.STRONG);
+            } else {
+                outlierDetectorResult.setAnomalyLevel(AnomalyLevel.NORMAL);
             }
             if (metricData.getMetricDefinition() != null) {
                 log.info(metricData.getMetricDefinition().toString());
             }
+            outlierDetectorResult.setThresholds(anomalyThresholds);
         }
 
         return outlierDetectorResult;

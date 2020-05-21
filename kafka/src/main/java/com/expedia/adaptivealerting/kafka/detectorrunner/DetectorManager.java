@@ -1,4 +1,4 @@
-package com.expedia.adaptivealerting.kafka.detector;
+package com.expedia.adaptivealerting.kafka.detectorrunner;
 
 import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
@@ -17,7 +17,7 @@ import java.util.List;
 public class DetectorManager {
 
     @Autowired
-    private SimpleDetector simpleDetector;
+    private DetectorRegistry detectorRegistry;
 
     public List<MappedMetricData> detect(ConsumerRecords<String, MappedMetricData> metricRecords) {
         log.info(String.valueOf(metricRecords.count()));
@@ -26,7 +26,7 @@ public class DetectorManager {
             MappedMetricData mappedMetricData = consumerRecord.value();
             if (mappedMetricData != null) {
                 MetricData metricData = mappedMetricData.getMetricData();
-                DetectorResult detectorResult = simpleDetector.detect(metricData);
+                DetectorResult detectorResult = detectorRegistry.getDetector().detect(metricData);
                 mappedMetricData.setAnomalyResult(detectorResult);
             }
             mappedMetricDataList.add(mappedMetricData);

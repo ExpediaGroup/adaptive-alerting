@@ -1,4 +1,4 @@
-package com.expedia.adaptivealerting.kafka.detector;
+package com.expedia.adaptivealerting.kafka.detectorrunner;
 
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
 import com.expedia.adaptivealerting.kafka.TypesafeConfigLoader;
@@ -56,9 +56,9 @@ public class MetricConsumer {
             log.info("Read {} metric records from topic={}", metricRecords.count(), "mapped-metrics");
             List<MappedMetricData> mmd = detectorManager.detect(metricRecords);
             for (MappedMetricData mappedMetricData : mmd) {
-                if(mappedMetricData != null && mappedMetricData.getMetricData() != null) {
+                if (mappedMetricData != null && mappedMetricData.getMetricData() != null) {
                     MetricData metricData = mappedMetricData.getMetricData();
-                    if(metricData.getMetricDefinition() != null && metricData.getMetricDefinition().getKey() != null) {
+                    if (metricData.getMetricDefinition() != null && metricData.getMetricDefinition().getKey() != null) {
                         String key = metricData.getMetricDefinition().getKey();
                         ProducerRecord<String, MappedMetricData> producerRecord = new ProducerRecord<>(
                                 anomalyProducer.getAnomalyProducerConfig().getString("outbound-topic"),
