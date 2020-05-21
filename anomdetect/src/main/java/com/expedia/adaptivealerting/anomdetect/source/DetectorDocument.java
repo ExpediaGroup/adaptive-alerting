@@ -41,28 +41,49 @@ public class DetectorDocument {
 
     @JsonProperty("detectorConfig")
     private Map<String, Object> config;
-    
+
     private Meta meta;
 
     @Data
     public static class Meta {
-        private Date dateCreated;
-        private Date dateUpdated;
+
         private String createdBy;
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+        private Date dateLastAccessed;
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+        private Date dateLastUpdated;
+
+        // ================================================================================
+        // Deprecated.
+        // These fields are not being used and will be removed in upcoming releases
+        // ================================================================================
+
+        @Deprecated
         private String updatedBy;
+
+        @Deprecated
+        private Date dateUpdated;
+
+        @Deprecated
+        private Date dateCreated;
     }
 
     // ================================================================================
-    // Deprecated
+    // Deprecated.
+    // dateCreated will be removed in upcoming releases
+    // lastUpdateTimestamp is part of meta now and has been renamed to dateLastUpdated
+    // createdBy has been moved to meta
     // ================================================================================
 
-    @Deprecated // Use Meta instead
+    @Deprecated
     private Date dateCreated;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    @Deprecated // Use Meta instead
+    @Deprecated
     private Date lastUpdateTimestamp;
 
-    @Deprecated // Use Meta instead
+    @Deprecated
     private String createdBy;
 }
