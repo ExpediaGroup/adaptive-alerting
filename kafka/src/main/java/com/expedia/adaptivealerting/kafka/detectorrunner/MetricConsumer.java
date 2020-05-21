@@ -1,3 +1,19 @@
+/*
+ * Copyright 2018-2019 Expedia Group, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.expedia.adaptivealerting.kafka.detectorrunner;
 
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
@@ -11,21 +27,26 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.errors.WakeupException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PreDestroy;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 @Component
-public class MetricConsumer {
+public class MetricConsumer implements ApplicationListener<ApplicationReadyEvent> {
 
     private KafkaConsumer<String, MappedMetricData> kafkaConsumer;
     private static String METRIC_CONSUMER = "metric-consumer";
     private static long POLL_INTERVAL = 1000L;
     private static String APP = "detector-runner";
+
+    final AtomicBoolean running = new AtomicBoolean();
 
     @Autowired
     private DetectorManager detectorManager;
@@ -40,7 +61,6 @@ public class MetricConsumer {
         kafkaConsumer = new KafkaConsumer(metricConsumerProps);
     }
 
-    @Bean
     public void consume() {
         kafkaConsumer.subscribe(Collections.singletonList("mapped-metrics"));
         boolean continueProcessing = true;
@@ -77,5 +97,20 @@ public class MetricConsumer {
             continueProcessing = false;
         }
         return continueProcessing;
+    }
+
+    @Override
+    public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {
+        if (!running.compareAndSet(false, true)) return; // already running
+
+        Thread consumerLoop = new Thread(this::consume);
+        consumerLoop.setName("adaptivealerting detector runner consumer loop");
+        consumerLoop.setDaemon(true);
+        consumerLoop.start();
+    }
+
+    @PreDestroy
+    public void stopLooperThread() {
+        running.set(false);
     }
 }
