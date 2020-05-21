@@ -107,7 +107,7 @@ public class DetectorController {
         service.updateDetector(uuid, detector);
     }
 
-    @PutMapping(path = "/updateDetectorLastUsed", consumes = "application/json", produces = "application/json")
+    @PostMapping(path = "/updateDetectorLastUsed", consumes = "application/json", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public void updatedDetectorLastUsed(@RequestBody Map<String, String> params) {
         service.updateDetectorLastUsed(params.get("detectorUuid"));
