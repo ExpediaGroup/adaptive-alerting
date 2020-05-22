@@ -22,7 +22,6 @@ import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -31,16 +30,15 @@ import java.util.Collection;
 @Slf4j
 public class DetectorRegistry {
 
-    private Config config = new TypesafeConfigLoader("detector-runner").loadMergedConfig();
+    private static String APP_ID = "detector-runner";
+    private static String DETECTOR = "detector";
+    private static Config config = new TypesafeConfigLoader(APP_ID).loadMergedConfig();
     private Detector detector;
-
-    @Autowired
-    ApplicationContext applicationContext;
 
     @Autowired
     public DetectorRegistry(ListableBeanFactory beanFactory) {
         Collection<Detector> detectorBeans = beanFactory.getBeansOfType(Detector.class).values();
-        this.detector = detectorBeans.stream().filter(d -> config.getString("detector").equalsIgnoreCase(d.getName()))
+        this.detector = detectorBeans.stream().filter(d -> config.getString(DETECTOR).equalsIgnoreCase(d.getName()))
                 .findFirst().get();
         if(detector != null) {
             log.info("Detector in use is : " + detector.getName());

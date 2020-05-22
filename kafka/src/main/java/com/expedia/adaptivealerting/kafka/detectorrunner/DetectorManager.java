@@ -36,7 +36,6 @@ public class DetectorManager {
     private DetectorRegistry detectorRegistry;
 
     public List<MappedMetricData> detect(ConsumerRecords<String, MappedMetricData> metricRecords) {
-        log.info(String.valueOf(metricRecords.count()));
         List<MappedMetricData> mappedMetricDataList = new ArrayList<>();
         for (ConsumerRecord<String, MappedMetricData> consumerRecord : metricRecords) {
             MappedMetricData mappedMetricData = consumerRecord.value();

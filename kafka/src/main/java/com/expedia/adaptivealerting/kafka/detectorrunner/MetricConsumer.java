@@ -45,6 +45,11 @@ public class MetricConsumer implements ApplicationListener<ApplicationReadyEvent
     private static String METRIC_CONSUMER = "metric-consumer";
     private static long POLL_INTERVAL = 1000L;
     private static String APP = "detector-runner";
+    private static String OUTBOUND_TOPIC = "outbound-topic";
+    private static String INBOUND_TOPIC = "inbound-topic";
+    private static Config config = new TypesafeConfigLoader(APP).loadMergedConfig();
+    private static Config metricConsumerConfig = config.getConfig(METRIC_CONSUMER);
+
 
     final AtomicBoolean running = new AtomicBoolean();
 
@@ -55,14 +60,12 @@ public class MetricConsumer implements ApplicationListener<ApplicationReadyEvent
     private AnomalyProducer anomalyProducer;
 
     public MetricConsumer() {
-        Config config = new TypesafeConfigLoader(APP).loadMergedConfig();
-        Config consumerConfig = config.getConfig(METRIC_CONSUMER);
-        Properties metricConsumerProps = ConfigUtil.toConsumerConfig(consumerConfig);
+        Properties metricConsumerProps = ConfigUtil.toConsumerConfig(metricConsumerConfig);
         kafkaConsumer = new KafkaConsumer(metricConsumerProps);
     }
 
     public void consume() {
-        kafkaConsumer.subscribe(Collections.singletonList("mapped-metrics"));
+        kafkaConsumer.subscribe(Collections.singletonList(metricConsumerConfig.getString(INBOUND_TOPIC)));
         boolean continueProcessing = true;
         // See Kafka: The Definitive Guide, pp. 86 ff.
         while (continueProcessing) {
@@ -73,17 +76,23 @@ public class MetricConsumer implements ApplicationListener<ApplicationReadyEvent
     public boolean process(KafkaConsumer kafkaConsumer, boolean continueProcessing) {
         try {
             ConsumerRecords<String, MappedMetricData> metricRecords = kafkaConsumer.poll(POLL_INTERVAL);
-            log.info("Read {} metric records from topic={}", metricRecords.count(), "mapped-metrics");
-            List<MappedMetricData> mmd = detectorManager.detect(metricRecords);
-            for (MappedMetricData mappedMetricData : mmd) {
-                if (mappedMetricData != null && mappedMetricData.getMetricData() != null) {
-                    MetricData metricData = mappedMetricData.getMetricData();
-                    if (metricData.getMetricDefinition() != null && metricData.getMetricDefinition().getKey() != null) {
-                        String key = metricData.getMetricDefinition().getKey();
-                        ProducerRecord<String, MappedMetricData> producerRecord = new ProducerRecord<>(
-                                anomalyProducer.getAnomalyProducerConfig().getString("outbound-topic"),
-                                null, 1000L, key, mappedMetricData);
-                        anomalyProducer.getProducer().send(producerRecord);
+            log.info("Read {} metric records from topic={}", metricRecords.count(),
+                    metricConsumerConfig.getString(INBOUND_TOPIC));
+            if(metricRecords.count() > 0) {
+                List<MappedMetricData> mmd = detectorManager.detect(metricRecords);
+                log.info("sending anomalies {} to {}", mmd.size(),
+                        anomalyProducer.getAnomalyProducerConfig().getString(OUTBOUND_TOPIC));
+
+                for (MappedMetricData mappedMetricData : mmd) {
+                    if (mappedMetricData != null && mappedMetricData.getMetricData() != null) {
+                        MetricData metricData = mappedMetricData.getMetricData();
+                        if (metricData.getMetricDefinition() != null && metricData.getMetricDefinition().getKey() != null) {
+                            String key = metricData.getMetricDefinition().getKey();
+                            ProducerRecord<String, MappedMetricData> producerRecord = new ProducerRecord<>(
+                                    anomalyProducer.getAnomalyProducerConfig().getString(OUTBOUND_TOPIC),
+                                    null, 1000L, key, mappedMetricData);
+                            anomalyProducer.getProducer().send(producerRecord);
+                        }
                     }
                 }
             }

@@ -43,7 +43,6 @@ public class SimpleDetector implements Detector {
     public DetectorResult detect(MetricData metricData) {
         OutlierDetectorResult outlierDetectorResult = new OutlierDetectorResult();
         if (metricData != null) {
-            log.info(metricData.toString());
             queue.add(metricData);
             AnomalyThresholds anomalyThresholds = new AnomalyThresholds(100d, 75d, 50d, 25d);
             if (metricData.getValue() < min) {
@@ -54,9 +53,6 @@ public class SimpleDetector implements Detector {
                 outlierDetectorResult.setAnomalyLevel(AnomalyLevel.STRONG);
             } else {
                 outlierDetectorResult.setAnomalyLevel(AnomalyLevel.NORMAL);
-            }
-            if (metricData.getMetricDefinition() != null) {
-                log.info(metricData.getMetricDefinition().toString());
             }
             outlierDetectorResult.setThresholds(anomalyThresholds);
         }
