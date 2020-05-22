@@ -79,7 +79,10 @@ public class DetectorManager {
     @NonNull
     private DetectorSource detectorSource;
     private int detectorRefreshTimePeriod;
+
+    //This assumes that we are running single thread per consumer
     private Queue<UUID> detectorsLastUsedTimeToBeUpdatedQ;
+
     private long cacheSyncedTillTime = System.currentTimeMillis();
     private long detectorsLastUsedSyncedTillTime = System.currentTimeMillis();
     private DataInitializer dataInitializer;
@@ -283,12 +286,10 @@ public class DetectorManager {
             return;
         }
 
-        //Update last used time only for 1/4th of queue's size at one go for better performance
+        //Update last used time only for some of the queue items in order to avoid too much load on DB
         for (int i = 0; i < detectorToBeUpdatedQueueSize / MAX_ITEMS_TO_BE_PROCESSED_QUEUE_FACTOR; i++) {
             UUID uuid = detectorsLastUsedTimeToBeUpdatedQ.poll();
-            if (uuid != null) {
-                detectorSource.updatedDetectorLastUsed(uuid);
-            }
+            detectorSource.updatedDetectorLastUsed(uuid);
         }
         detectorsLastUsedSyncedTillTime = currentTime;
     }
