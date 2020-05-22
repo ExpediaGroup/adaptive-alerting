@@ -22,7 +22,6 @@ import com.expedia.metrics.MetricData;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -32,8 +31,6 @@ import java.util.List;
 @Slf4j
 public class DetectorManager {
 
-    @Autowired
-    private DetectorRegistry detectorRegistry;
 
     public List<MappedMetricData> detect(ConsumerRecords<String, MappedMetricData> metricRecords) {
         List<MappedMetricData> mappedMetricDataList = new ArrayList<>();
@@ -41,15 +38,12 @@ public class DetectorManager {
             MappedMetricData mappedMetricData = consumerRecord.value();
             if (mappedMetricData != null) {
                 MetricData metricData = mappedMetricData.getMetricData();
-                DetectorResult detectorResult = null;
-                if(detectorRegistry.getDetector() != null) {
-                    detectorResult = detectorRegistry.getDetector().detect(metricData);
-                }
+                SimpleDetector simpleDetector = new SimpleDetector();
+                DetectorResult detectorResult = simpleDetector.detect(metricData);
                 mappedMetricData.setAnomalyResult(detectorResult);
             }
             mappedMetricDataList.add(mappedMetricData);
         }
-
         return mappedMetricDataList;
     }
 

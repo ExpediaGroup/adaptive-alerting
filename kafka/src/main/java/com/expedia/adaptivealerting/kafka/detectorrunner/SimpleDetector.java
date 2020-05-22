@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.expedia.adaptivealerting.kafka.detectorrunner.detector;
+package com.expedia.adaptivealerting.kafka.detectorrunner;
 
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyLevel;
 import com.expedia.adaptivealerting.anomdetect.detect.AnomalyThresholds;
