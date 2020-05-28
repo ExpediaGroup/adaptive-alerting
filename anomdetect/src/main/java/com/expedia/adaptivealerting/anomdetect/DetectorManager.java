@@ -63,7 +63,6 @@ import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 @Slf4j
 // TODO: This class is getting much too big. Refactor by breaking out smaller, single-purpose collaborator classes.
 public class DetectorManager {
-    public static final int MAX_ITEMS_TO_BE_PROCESSED_QUEUE_FACTOR = 4;
     private static final String CK_DETECTOR_REFRESH_PERIOD = "detector-refresh-period";
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final Timer detectorForTimer;
@@ -280,14 +279,15 @@ public class DetectorManager {
      */
     void detectorLastUsedTimeSync(long currentTime) {
         long updateDurationInSeconds = (currentTime - detectorsLastUsedSyncedTillTime) / 1000;
-        int detectorToBeUpdatedQueueSize = detectorsLastUsedTimeToBeUpdatedQ.size();
 
-        if (updateDurationInSeconds <= 0 || detectorToBeUpdatedQueueSize < MAX_ITEMS_TO_BE_PROCESSED_QUEUE_FACTOR) {
+        if (updateDurationInSeconds <= 0 || detectorsLastUsedTimeToBeUpdatedQ.isEmpty()) {
             return;
         }
 
-        //Update last used time only for some of the queue items in order to avoid too much load on DB
-        for (int i = 0; i < detectorToBeUpdatedQueueSize / MAX_ITEMS_TO_BE_PROCESSED_QUEUE_FACTOR; i++) {
+        int detectorsToBeUpdatedQueueSize = detectorsLastUsedTimeToBeUpdatedQ.size();
+        log.info("Updating last used time for a total of {} invoked detectors", detectorsToBeUpdatedQueueSize);
+
+        for (int i = 0; i < detectorsToBeUpdatedQueueSize; i++) {
             UUID uuid = detectorsLastUsedTimeToBeUpdatedQ.poll();
             detectorSource.updatedDetectorLastUsed(uuid);
         }

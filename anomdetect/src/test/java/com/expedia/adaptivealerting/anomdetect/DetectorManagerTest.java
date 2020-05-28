@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.expedia.adaptivealerting.anomdetect.DetectorManager.MAX_ITEMS_TO_BE_PROCESSED_QUEUE_FACTOR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -142,16 +141,10 @@ public final class DetectorManagerTest {
 
     @Test
     public void testDetectorLastUsedTimeSync() {
-        populateDetectorsLastUsedTimeQueue(4 * MAX_ITEMS_TO_BE_PROCESSED_QUEUE_FACTOR);
+        int queueSize = 4;
+        populateDetectorsLastUsedTimeQueue(queueSize);
         managerUnderTest.detectorLastUsedTimeSync(System.currentTimeMillis() + 1000 * 60);
-        verify(detectorSource, atLeast(MAX_ITEMS_TO_BE_PROCESSED_QUEUE_FACTOR)).updatedDetectorLastUsed(any(UUID.class));
-    }
-
-    @Test
-    public void testDetectorLastUsedTimeSync_queue_size_less_than_factor() {
-        populateDetectorsLastUsedTimeQueue(MAX_ITEMS_TO_BE_PROCESSED_QUEUE_FACTOR - 1);
-        managerUnderTest.detectorLastUsedTimeSync(System.currentTimeMillis() + 1000 * 60);
-        verify(detectorSource, atMost(0)).updatedDetectorLastUsed(any(UUID.class));
+        verify(detectorSource, atLeast(queueSize)).updatedDetectorLastUsed(any(UUID.class));
     }
 
     @Test

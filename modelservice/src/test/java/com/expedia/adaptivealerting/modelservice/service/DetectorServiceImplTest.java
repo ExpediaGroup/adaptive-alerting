@@ -1,10 +1,8 @@
-package com.expedia.adaptivealerting.modelservice.service.impl;
+package com.expedia.adaptivealerting.modelservice.service;
 
 import com.expedia.adaptivealerting.modelservice.entity.Detector;
 import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
-import com.expedia.adaptivealerting.modelservice.service.DetectorService;
-import com.expedia.adaptivealerting.modelservice.service.DetectorServiceImpl;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import lombok.val;
 import org.junit.Before;
