@@ -47,7 +47,7 @@ public class DetectorServiceImpl implements DetectorService {
         val uuid = UUID.randomUUID();
         detector.setId(uuid.toString());
         detector.setUuid(uuid);
-        detector.setMeta(buildDetectorMetaData(detector));
+        detector.setMeta(buildNewDetectorMetaData(detector));
         RequestValidator.validateDetector(detector);
         repository.save(detector);
         return uuid;
@@ -106,7 +106,7 @@ public class DetectorServiceImpl implements DetectorService {
 
         Detector detectorToBeUpdated = repository.findByUuid(uuid);
         detectorToBeUpdated.setDetectorConfig(detector.getDetectorConfig());
-        detectorToBeUpdated.setMeta(buildDetectorMetaData(detector));
+        detectorToBeUpdated.setMeta(buildLastUpdatedDetectorMetaData(detector));
         RequestValidator.validateDetector(detectorToBeUpdated);
         repository.save(detectorToBeUpdated);
     }
@@ -117,7 +117,7 @@ public class DetectorServiceImpl implements DetectorService {
         MDC.put("DetectorUuid", uuid);
 
         Detector detectorToBeUpdated = repository.findByUuid(uuid);
-        detectorToBeUpdated.setMeta(buildDetectorMetaData(detectorToBeUpdated));
+        detectorToBeUpdated.setMeta(buildLastUsedDetectorMetaData(detectorToBeUpdated));
         RequestValidator.validateDetector(detectorToBeUpdated);
         repository.save(detectorToBeUpdated);
     }
@@ -127,12 +127,30 @@ public class DetectorServiceImpl implements DetectorService {
         repository.deleteByUuid(uuid);
     }
 
-    private Detector.Meta buildDetectorMetaData(Detector detector) {
+    private Detector.Meta buildNewDetectorMetaData(Detector detector) {
+        Detector.Meta metaBlock = buildDetectorMeta(detector);
         Date nowDate = DateUtil.now();
-        Detector.Meta metaBlock = detector.getMeta();
-        metaBlock = (metaBlock == null) ? new Detector.Meta() : detector.getMeta();
         metaBlock.setDateLastUpdated(nowDate);
         metaBlock.setDateLastAccessed(nowDate);
         return metaBlock;
+    }
+
+    private Detector.Meta buildLastUpdatedDetectorMetaData(Detector detector) {
+        Detector.Meta metaBlock = buildDetectorMeta(detector);
+        Date nowDate = DateUtil.now();
+        metaBlock.setDateLastUpdated(nowDate);
+        return metaBlock;
+    }
+
+    private Detector.Meta buildLastUsedDetectorMetaData(Detector detector) {
+        Detector.Meta metaBlock = buildDetectorMeta(detector);
+        Date nowDate = DateUtil.now();
+        metaBlock.setDateLastAccessed(nowDate);
+        return metaBlock;
+    }
+
+    private Detector.Meta buildDetectorMeta(Detector detector) {
+        Detector.Meta metaBlock = detector.getMeta();
+        return (metaBlock == null) ? new Detector.Meta() : detector.getMeta();
     }
 }
