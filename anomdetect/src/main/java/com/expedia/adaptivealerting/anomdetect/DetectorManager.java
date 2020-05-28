@@ -286,7 +286,7 @@ public class DetectorManager {
 
         int detectorToBeUpdatedQueueSize = detectorsLastUsedTimeToBeUpdatedQ.size();
         log.info("Updating last used time for a total of {} invoked detectors", detectorToBeUpdatedQueueSize);
-        
+
         for (int i = 0; i < detectorToBeUpdatedQueueSize; i++) {
             UUID uuid = detectorsLastUsedTimeToBeUpdatedQ.poll();
             detectorSource.updatedDetectorLastUsed(uuid);
