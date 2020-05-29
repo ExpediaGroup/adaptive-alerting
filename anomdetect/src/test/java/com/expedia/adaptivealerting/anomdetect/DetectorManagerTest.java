@@ -155,6 +155,18 @@ public final class DetectorManagerTest {
     }
 
     @Test
+    public void testDetectorLastUsedTimeSync_invalid_time() {
+        managerUnderTest.detectorLastUsedTimeSync(System.currentTimeMillis());
+        verify(detectorSource, never()).updatedDetectorLastUsed(any(UUID.class));
+    }
+
+    @Test
+    public void testDetectorLastUsedTimeSync_emptySet() {
+        managerUnderTest.detectorLastUsedTimeSync(System.currentTimeMillis() + 1000 * 60);
+        verify(detectorSource, never()).updatedDetectorLastUsed(any(UUID.class));
+    }
+
+    @Test
     public void testClassify() {
         val result = managerUnderTest.detect(goodMappedMetricData);
         assertNotNull(result);
