@@ -140,11 +140,19 @@ public final class DetectorManagerTest {
     }
 
     @Test
-    public void testDetectorLastUsedTimeSync() {
-        int queueSize = 4;
-        populateDetectorsLastUsedTimeQueue(queueSize);
+    public void testDetectorLastUsedTimeSync_unique_detectors() {
+        int setSize = 4;
+        populateSetWithUniqueUUIDs(setSize);
         managerUnderTest.detectorLastUsedTimeSync(System.currentTimeMillis() + 1000 * 60);
-        verify(detectorSource, atLeast(queueSize)).updatedDetectorLastUsed(any(UUID.class));
+        verify(detectorSource, atMost(setSize)).updatedDetectorLastUsed(any(UUID.class));
+    }
+
+    @Test
+    public void testDetectorLastUsedTimeSync_duplicate_detectors() {
+        int setSize = 4;
+        populateSetWithDuplicateUUIDs(setSize);
+        managerUnderTest.detectorLastUsedTimeSync(System.currentTimeMillis() + 1000 * 60);
+        verify(detectorSource, atMost(1)).updatedDetectorLastUsed(any(UUID.class));
     }
 
     @Test
@@ -253,7 +261,14 @@ public final class DetectorManagerTest {
         when(badConfig.getInt("detector-refresh-period")).thenReturn(badDetectorRefreshPeriod);
     }
 
-    private void populateDetectorsLastUsedTimeQueue(int size) {
+    private void populateSetWithUniqueUUIDs(int size) {
+        for (int i = 0; i < size; i++) {
+            goodMappedMetricData.setDetectorUuid(UUID.randomUUID());
+            managerUnderTest.detect(goodMappedMetricData);
+        }
+    }
+
+    private void populateSetWithDuplicateUUIDs(int size) {
         for (int i = 0; i < size; i++) {
             managerUnderTest.detect(goodMappedMetricData);
         }
