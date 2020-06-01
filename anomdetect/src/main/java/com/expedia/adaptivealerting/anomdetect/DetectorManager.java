@@ -37,11 +37,12 @@ import org.slf4j.MDC;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Queue;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -80,7 +81,7 @@ public class DetectorManager {
     private int detectorRefreshTimePeriod;
 
     //This assumes that we are running single thread per consumer
-    private Queue<UUID> detectorsLastUsedTimeToBeUpdatedQ;
+    private Set<UUID> detectorsLastUsedTimeToBeUpdatedSet;
 
     private long cacheSyncedTillTime = System.currentTimeMillis();
     private long detectorsLastUsedSyncedTillTime = System.currentTimeMillis();
@@ -107,7 +108,7 @@ public class DetectorManager {
         this.dataInitializer = dataInitializer;
         this.detectorSource = detectorSource;
         this.detectorRefreshTimePeriod = config.getInt(CK_DETECTOR_REFRESH_PERIOD);
-        this.detectorsLastUsedTimeToBeUpdatedQ = new LinkedList<>();
+        this.detectorsLastUsedTimeToBeUpdatedSet = new HashSet<>();
 
         this.metricRegistry = metricRegistry;
         detectorForTimer = metricRegistry.timer("detector.detectorFor");
@@ -172,7 +173,7 @@ public class DetectorManager {
         try (Timer.Context autoClosable = detectorForTimer.time()) {
             val detectorUuid = mappedMetricData.getDetectorUuid();
             DetectorContainer container = cachedDetectors.get(detectorUuid);
-            detectorsLastUsedTimeToBeUpdatedQ.add(detectorUuid);
+            detectorsLastUsedTimeToBeUpdatedSet.add(detectorUuid);
             if (container == null) {
                 container = detectorSource.findDetector(detectorUuid);
                 return (container == null) ? Optional.empty()
@@ -280,17 +281,22 @@ public class DetectorManager {
     void detectorLastUsedTimeSync(long currentTime) {
         long updateDurationInSeconds = (currentTime - detectorsLastUsedSyncedTillTime) / 1000;
 
-        if (updateDurationInSeconds <= 0 || detectorsLastUsedTimeToBeUpdatedQ.isEmpty()) {
+        if (updateDurationInSeconds <= 0 || detectorsLastUsedTimeToBeUpdatedSet.isEmpty()) {
             return;
         }
 
-        int detectorsToBeUpdatedQueueSize = detectorsLastUsedTimeToBeUpdatedQ.size();
-        log.info("Updating last used time for a total of {} invoked detectors", detectorsToBeUpdatedQueueSize);
+        log.info("Updating last used time for a total of {} invoked detectors", detectorsLastUsedTimeToBeUpdatedSet.size());
 
-        for (int i = 0; i < detectorsToBeUpdatedQueueSize; i++) {
-            UUID uuid = detectorsLastUsedTimeToBeUpdatedQ.poll();
-            detectorSource.updatedDetectorLastUsed(uuid);
-        }
+        processDetectorsLastUsedTimeSet();
         detectorsLastUsedSyncedTillTime = currentTime;
+    }
+
+    //Set.remove() during iteration throws a ConcurrentModificationException, so have to use Iterator.remove() instead. [KS]
+    private void processDetectorsLastUsedTimeSet() {
+        for (Iterator<UUID> iterator = detectorsLastUsedTimeToBeUpdatedSet.iterator(); iterator.hasNext(); ) {
+            UUID detectorUuid = iterator.next();
+            detectorSource.updatedDetectorLastUsed(detectorUuid);
+            iterator.remove();
+        }
     }
 }

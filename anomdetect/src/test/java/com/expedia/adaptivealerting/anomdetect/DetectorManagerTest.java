@@ -46,7 +46,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.atMost;
 import static org.mockito.Mockito.doNothing;
@@ -140,11 +139,31 @@ public final class DetectorManagerTest {
     }
 
     @Test
-    public void testDetectorLastUsedTimeSync() {
-        int queueSize = 4;
-        populateDetectorsLastUsedTimeQueue(queueSize);
+    public void testDetectorLastUsedTimeSync_unique_detectors() {
+        int setSize = 4;
+        populateSetWithUniqueUUIDs(setSize);
         managerUnderTest.detectorLastUsedTimeSync(System.currentTimeMillis() + 1000 * 60);
-        verify(detectorSource, atLeast(queueSize)).updatedDetectorLastUsed(any(UUID.class));
+        verify(detectorSource, atMost(setSize)).updatedDetectorLastUsed(any(UUID.class));
+    }
+
+    @Test
+    public void testDetectorLastUsedTimeSync_duplicate_detectors() {
+        int setSize = 4;
+        populateSetWithDuplicateUUIDs(setSize);
+        managerUnderTest.detectorLastUsedTimeSync(System.currentTimeMillis() + 1000 * 60);
+        verify(detectorSource, atMost(1)).updatedDetectorLastUsed(any(UUID.class));
+    }
+
+    @Test
+    public void testDetectorLastUsedTimeSync_invalid_time() {
+        managerUnderTest.detectorLastUsedTimeSync(System.currentTimeMillis());
+        verify(detectorSource, never()).updatedDetectorLastUsed(any(UUID.class));
+    }
+
+    @Test
+    public void testDetectorLastUsedTimeSync_emptySet() {
+        managerUnderTest.detectorLastUsedTimeSync(System.currentTimeMillis() + 1000 * 60);
+        verify(detectorSource, never()).updatedDetectorLastUsed(any(UUID.class));
     }
 
     @Test
@@ -253,7 +272,14 @@ public final class DetectorManagerTest {
         when(badConfig.getInt("detector-refresh-period")).thenReturn(badDetectorRefreshPeriod);
     }
 
-    private void populateDetectorsLastUsedTimeQueue(int size) {
+    private void populateSetWithUniqueUUIDs(int size) {
+        for (int i = 0; i < size; i++) {
+            goodMappedMetricData.setDetectorUuid(UUID.randomUUID());
+            managerUnderTest.detect(goodMappedMetricData);
+        }
+    }
+
+    private void populateSetWithDuplicateUUIDs(int size) {
         for (int i = 0; i < size; i++) {
             managerUnderTest.detect(goodMappedMetricData);
         }
