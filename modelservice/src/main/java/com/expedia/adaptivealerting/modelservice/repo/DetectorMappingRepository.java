@@ -22,6 +22,7 @@ import com.expedia.adaptivealerting.modelservice.web.response.MatchingDetectorsR
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public interface DetectorMappingRepository {
 
@@ -44,4 +45,6 @@ public interface DetectorMappingRepository {
     void disableDetectorMapping(String id);
 
     void deleteDetectorMapping(String id);
+
+    void deleteMappingsByDetectorUUID(UUID uuid);
 }

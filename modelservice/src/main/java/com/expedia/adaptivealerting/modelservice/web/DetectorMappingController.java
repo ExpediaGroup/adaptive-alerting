@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/detectorMappings")
@@ -88,5 +89,12 @@ public class DetectorMappingController {
     public MatchingDetectorsResponse searchDetectorMapping(@RequestBody List<Map<String, String>> tagsList) {
         MatchingDetectorsResponse matchingDetectorMappings = detectorMappingRepo.findMatchingDetectorMappings(tagsList);
         return matchingDetectorMappings;
+    }
+
+    @RequestMapping(value = "/search/findByDetector", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteMappingsByDetectorUUID(@RequestParam UUID uuid) {
+        AssertUtil.notNull(uuid, "detector uuid can't be null");
+        detectorMappingRepo.deleteMappingsByDetectorUUID(uuid);
     }
 }

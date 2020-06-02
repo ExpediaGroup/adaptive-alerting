@@ -313,6 +313,49 @@ public class DetectorMappingRepositoryImplTest {
         repoUnderTest.deleteDetectorMapping("1");
     }
 
+    @Test
+    public void deleteMappingsByDetectorUUID_successful() throws Exception {
+        val id = "adsvade8^szx";
+        val detectorUuid = UUID.randomUUID();
+        val searchIndex = "2";
+        val lookUpTime = 100;
+
+        val deleteResponse = mockDeleteResponse(id);
+        val searchResponse = mockSearchResponse(searchIndex, lookUpTime, detectorUuid.toString());
+        when(legacyElasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(searchResponse);
+        when(legacyElasticSearchClient.delete(any(DeleteRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(new DeleteResponse());
+        repoUnderTest.deleteMappingsByDetectorUUID(detectorUuid);
+        verify(legacyElasticSearchClient, atLeastOnce()).delete(any(DeleteRequest.class), eq(RequestOptions.DEFAULT));
+        assertEquals(id, deleteResponse.getId());
+        assertEquals(elasticSearchProperties.getIndexName(), deleteResponse.getIndex());
+        assertEquals("DELETED", deleteResponse.getResult().toString());
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void deleteMappingsByDetectorUUID_fail() throws IOException {
+        val detectorUuid = UUID.randomUUID();
+        val searchIndex = "2";
+        val lookUpTime = 100;
+        val searchResponse = mockSearchResponse(searchIndex, lookUpTime, detectorUuid.toString());
+        when(legacyElasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(searchResponse);
+        when(legacyElasticSearchClient.delete(any(DeleteRequest.class), eq(RequestOptions.DEFAULT))).thenThrow(new IOException());
+        repoUnderTest.deleteMappingsByDetectorUUID(detectorUuid);
+    }
+
+
+    @Test(expected = RecordNotFoundException.class)
+    public void deleteMappingsByDetectorUUID_illegal_args() throws Exception {
+        val detectorUuid = UUID.randomUUID();
+        val searchIndex = "2";
+        val lookUpTime = 100;
+        val emptyHits = new SearchHits(new SearchHit[]{}, 0, 0);
+        val searchResponse = mockSearchResponse(searchIndex, lookUpTime, detectorUuid.toString());
+        Mockito.when(searchResponse.getHits()).thenReturn(emptyHits);
+        when(legacyElasticSearchClient.search(any(SearchRequest.class), eq(RequestOptions.DEFAULT))).thenReturn(searchResponse);
+
+        repoUnderTest.deleteMappingsByDetectorUUID(detectorUuid);
+    }
+
     private IndexResponse mockIndexResponse() {
         IndexResponse indexResponse = mock(IndexResponse.class);
         when(indexResponse.getId()).thenReturn("1");

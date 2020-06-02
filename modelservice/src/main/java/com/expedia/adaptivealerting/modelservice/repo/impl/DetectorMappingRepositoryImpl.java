@@ -64,6 +64,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.UUID;
 
 import static com.expedia.adaptivealerting.modelservice.domain.percolator.PercolatorDetectorMapping.LAST_MOD_TIME_KEYWORD;
 
@@ -222,6 +223,20 @@ public class DetectorMappingRepositoryImpl implements DetectorMappingRepository 
         } catch (IOException e) {
             log.error(String.format("Deleting mapping %s failed", id), e);
             throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void deleteMappingsByDetectorUUID(UUID uuid) {
+        val searchMappingsRequest = new SearchMappingsRequest();
+        searchMappingsRequest.setDetectorUuid(uuid);
+
+        val detectorMappingList = search(searchMappingsRequest);
+        if (detectorMappingList.size() == 0) {
+            throw new RecordNotFoundException("Invalid UUID: " + uuid);
+        }
+        for (DetectorMapping detectorMapping : detectorMappingList) {
+            deleteDetectorMapping(detectorMapping.getId());
         }
     }
 
