@@ -23,6 +23,7 @@ import com.expedia.adaptivealerting.anomdetect.detect.Detector;
 import com.expedia.adaptivealerting.anomdetect.detect.DetectorContainer;
 import com.expedia.adaptivealerting.anomdetect.detect.DetectorResult;
 import com.expedia.adaptivealerting.anomdetect.detect.MappedMetricData;
+import com.expedia.adaptivealerting.anomdetect.source.DetectorException;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorSource;
 import com.expedia.adaptivealerting.anomdetect.source.data.initializer.DataInitializer;
 import com.expedia.adaptivealerting.anomdetect.source.data.initializer.DetectorDataInitializationThrottledException;
@@ -37,8 +38,8 @@ import org.slf4j.MDC;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -108,7 +109,7 @@ public class DetectorManager {
         this.dataInitializer = dataInitializer;
         this.detectorSource = detectorSource;
         this.detectorRefreshTimePeriod = config.getInt(CK_DETECTOR_REFRESH_PERIOD);
-        this.detectorsLastUsedTimeToBeUpdatedSet = new LinkedHashSet<>();
+        this.detectorsLastUsedTimeToBeUpdatedSet = new HashSet<>();
 
         this.metricRegistry = metricRegistry;
         detectorForTimer = metricRegistry.timer("detector.detectorFor");
@@ -295,11 +296,14 @@ public class DetectorManager {
         int counter = 0;
         for (Iterator<UUID> iterator = detectorsLastUsedTimeToBeUpdatedSet.iterator(); iterator.hasNext(); ) {
             UUID detectorUuid = iterator.next();
-            detectorSource.updatedDetectorLastUsed(detectorUuid);
+            try {
+                detectorSource.updatedDetectorLastUsed(detectorUuid);
+            } catch (DetectorException ex) {
+                log.error("Error updating last accessed time for detector UUID: {}", detectorUuid);
+            }
             iterator.remove();
             counter++;
         }
-
         log.info("Updated last used time for a total of {} invoked detectors", counter);
     }
 }
