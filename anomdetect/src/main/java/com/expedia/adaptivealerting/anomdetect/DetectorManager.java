@@ -37,8 +37,8 @@ import org.slf4j.MDC;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -108,7 +108,7 @@ public class DetectorManager {
         this.dataInitializer = dataInitializer;
         this.detectorSource = detectorSource;
         this.detectorRefreshTimePeriod = config.getInt(CK_DETECTOR_REFRESH_PERIOD);
-        this.detectorsLastUsedTimeToBeUpdatedSet = new HashSet<>();
+        this.detectorsLastUsedTimeToBeUpdatedSet = new LinkedHashSet<>();
 
         this.metricRegistry = metricRegistry;
         detectorForTimer = metricRegistry.timer("detector.detectorFor");
