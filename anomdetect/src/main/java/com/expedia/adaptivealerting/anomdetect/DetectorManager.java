@@ -298,11 +298,11 @@ public class DetectorManager {
             UUID detectorUuid = iterator.next();
             try {
                 detectorSource.updatedDetectorLastUsed(detectorUuid);
+                counter++;
             } catch (DetectorException ex) {
                 log.error("Error updating last accessed time for detector UUID: {}", detectorUuid);
             }
             iterator.remove();
-            counter++;
         }
         log.info("Updated last used time for a total of {} invoked detectors", counter);
     }
