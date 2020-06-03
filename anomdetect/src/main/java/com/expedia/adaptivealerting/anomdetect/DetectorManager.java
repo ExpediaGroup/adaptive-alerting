@@ -290,11 +290,8 @@ public class DetectorManager {
     }
 
     private void processDetectorsLastUsedTimeSet() {
-
+        
         Set<UUID> detectorsLastUsedTimeSetClone = buildDetectorLastUsedSetClone();
-
-        log.info("Updating last used time for a total of {} invoked detectors", detectorsLastUsedTimeSetClone.size());
-
         int counter = 0;
         for (Iterator<UUID> iterator = detectorsLastUsedTimeSetClone.iterator(); iterator.hasNext(); ) {
             UUID detectorUuid = iterator.next();
@@ -306,7 +303,6 @@ public class DetectorManager {
             }
             iterator.remove();
         }
-
         log.info("Updated last used time for a total of {} invoked detectors", counter);
     }
 
@@ -318,6 +314,8 @@ public class DetectorManager {
             detectorsLastUsedTimeSetClone.add(detectorUuid);
         }
         detectorsLastUsedTimeToBeUpdatedSet.removeAll(detectorsLastUsedTimeSetClone);
+
+        log.info("Updating last used time for a total of {} invoked detectors", detectorsLastUsedTimeSetClone.size());
         return detectorsLastUsedTimeSetClone;
     }
 }
