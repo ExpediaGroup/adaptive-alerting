@@ -286,17 +286,20 @@ public class DetectorManager {
         }
 
         log.info("Updating last used time for a total of {} invoked detectors", detectorsLastUsedTimeToBeUpdatedSet.size());
-
         processDetectorsLastUsedTimeSet();
         detectorsLastUsedSyncedTillTime = currentTime;
     }
 
     //Set.remove() during iteration throws a ConcurrentModificationException, so have to use Iterator.remove() instead. [KS]
     private void processDetectorsLastUsedTimeSet() {
+        int counter = 0;
         for (Iterator<UUID> iterator = detectorsLastUsedTimeToBeUpdatedSet.iterator(); iterator.hasNext(); ) {
             UUID detectorUuid = iterator.next();
             detectorSource.updatedDetectorLastUsed(detectorUuid);
             iterator.remove();
+            counter++;
         }
+
+        log.info("Updated last used time for a total of {} invoked detectors", counter);
     }
 }
