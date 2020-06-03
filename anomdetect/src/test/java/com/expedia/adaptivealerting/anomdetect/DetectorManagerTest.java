@@ -140,7 +140,7 @@ public final class DetectorManagerTest {
 
     @Test
     public void testDetectorLastUsedTimeSync_unique_detectors() {
-        int setSize = 4;
+        int setSize = 50;
         populateSetWithUniqueUUIDs(setSize);
         managerUnderTest.detectorLastUsedTimeSync(System.currentTimeMillis() + 1000 * 60);
         verify(detectorSource, atMost(setSize)).updatedDetectorLastUsed(any(UUID.class));
