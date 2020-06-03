@@ -36,7 +36,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
@@ -158,15 +157,16 @@ public final class DetectorManagerTest {
 
     @Test
     public void testDetectorLastUsedTimeSync_invalid_detectors() {
-        UUID detectorUuid1 = UUID.fromString("fd98dbab-8d38-4148-b244-b53925e5cc66");
-        UUID detectorUuid2 = UUID.fromString("ab5fea71-094d-48a7-9b25-caf6a7715704");
+        UUID detectorUuid = UUID.fromString("fd98dbab-8d38-4148-b244-b53925e5cc66");
+        UUID invalidDetectorUuid = UUID.fromString("ab5fea71-094d-48a7-9b25-caf6a7715704");
 
-        goodMappedMetricData.setDetectorUuid(detectorUuid1);
+        goodMappedMetricData.setDetectorUuid(detectorUuid);
         managerUnderTest.detect(goodMappedMetricData);
-        goodMappedMetricData.setDetectorUuid(detectorUuid2);
-        managerUnderTest.detect(goodMappedMetricData);
-        doThrow(DetectorException.class).when(detectorSource).updatedDetectorLastUsed(detectorUuid1);
 
+        goodMappedMetricData.setDetectorUuid(invalidDetectorUuid);
+        managerUnderTest.detect(goodMappedMetricData);
+
+        doThrow(DetectorException.class).when(detectorSource).updatedDetectorLastUsed(invalidDetectorUuid);
         managerUnderTest.detectorLastUsedTimeSync(System.currentTimeMillis() + 1000 * 60);
         verify(detectorSource, atMost(2)).updatedDetectorLastUsed(any(UUID.class));
     }
