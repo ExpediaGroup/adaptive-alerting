@@ -285,16 +285,18 @@ public class DetectorManager {
         if (updateDurationInSeconds <= 0 || detectorsLastUsedTimeToBeUpdatedSet.isEmpty()) {
             return;
         }
-
-        log.info("Updating last used time for a total of {} invoked detectors", detectorsLastUsedTimeToBeUpdatedSet.size());
         processDetectorsLastUsedTimeSet();
         detectorsLastUsedSyncedTillTime = currentTime;
     }
 
-    //Set.remove() during iteration throws a ConcurrentModificationException, so have to use Iterator.remove() instead. [KS]
     private void processDetectorsLastUsedTimeSet() {
+
+        Set<UUID> detectorsLastUsedTimeSetClone = buildDetectorLastUsedSetClone();
+
+        log.info("Updating last used time for a total of {} invoked detectors", detectorsLastUsedTimeSetClone.size());
+
         int counter = 0;
-        for (Iterator<UUID> iterator = detectorsLastUsedTimeToBeUpdatedSet.iterator(); iterator.hasNext(); ) {
+        for (Iterator<UUID> iterator = detectorsLastUsedTimeSetClone.iterator(); iterator.hasNext(); ) {
             UUID detectorUuid = iterator.next();
             try {
                 detectorSource.updatedDetectorLastUsed(detectorUuid);
@@ -304,6 +306,18 @@ public class DetectorManager {
             }
             iterator.remove();
         }
+
         log.info("Updated last used time for a total of {} invoked detectors", counter);
+    }
+
+    private Set<UUID> buildDetectorLastUsedSetClone() {
+        log.info("Cloning last used time set of size {}", detectorsLastUsedTimeToBeUpdatedSet.size());
+
+        Set<UUID> detectorsLastUsedTimeSetClone = new HashSet<>();
+        for (UUID detectorUuid : detectorsLastUsedTimeToBeUpdatedSet) {
+            detectorsLastUsedTimeSetClone.add(detectorUuid);
+        }
+        detectorsLastUsedTimeToBeUpdatedSet.removeAll(detectorsLastUsedTimeSetClone);
+        return detectorsLastUsedTimeSetClone;
     }
 }
