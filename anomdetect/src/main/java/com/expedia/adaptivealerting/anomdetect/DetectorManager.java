@@ -310,9 +310,9 @@ public class DetectorManager {
         return detectorsLastUsedTimeToBeUpdatedSet;
     }
 
-    private void processDetectorLastUsedSet(Set<UUID> detectorsLastUsedTimeSetClone) {
+    private void processDetectorLastUsedSet(Set<UUID> detectorsLastUsedTimeSet) {
         int counter = 0;
-        for (Iterator<UUID> iterator = detectorsLastUsedTimeSetClone.iterator(); iterator.hasNext(); ) {
+        for (Iterator<UUID> iterator = detectorsLastUsedTimeSet.iterator(); iterator.hasNext(); ) {
             UUID detectorUuid = iterator.next();
             try {
                 detectorSource.updatedDetectorLastUsed(detectorUuid);
