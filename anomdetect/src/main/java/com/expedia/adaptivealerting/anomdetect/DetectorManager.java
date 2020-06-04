@@ -295,32 +295,23 @@ public class DetectorManager {
         int detectorsLastUsedTimeQueueSize = detectorsLastUsedTimeToBeUpdatedQueue.size();
         log.info("Detectors last used time queue size {}", detectorsLastUsedTimeQueueSize);
 
-        Set<UUID> detectorsLastUsedTimeToBeUpdatedSet = buildDetectorsLastTimeToBeUpdatedSet(detectorsLastUsedTimeQueueSize);
-        log.info("Updating last used time for a total of {} invoked detectors", detectorsLastUsedTimeToBeUpdatedSet.size());
-
-        processDetectorLastUsedSet(detectorsLastUsedTimeToBeUpdatedSet);
+        processDetectorLastUsedQueue(detectorsLastUsedTimeQueueSize);
     }
 
-    private Set<UUID> buildDetectorsLastTimeToBeUpdatedSet(int detectorsLastUsedTimeQueueSize) {
+    private void processDetectorLastUsedQueue(int detectorsLastUsedTimeQueueSize) {
         Set<UUID> detectorsLastUsedTimeToBeUpdatedSet = new HashSet<>();
+        int counter = 0;
         for (int i = 0; i < detectorsLastUsedTimeQueueSize; i++) {
             UUID detectorUUID = detectorsLastUsedTimeToBeUpdatedQueue.poll();
-            detectorsLastUsedTimeToBeUpdatedSet.add(detectorUUID);
-        }
-        return detectorsLastUsedTimeToBeUpdatedSet;
-    }
-
-    private void processDetectorLastUsedSet(Set<UUID> detectorsLastUsedTimeSet) {
-        int counter = 0;
-        for (Iterator<UUID> iterator = detectorsLastUsedTimeSet.iterator(); iterator.hasNext(); ) {
-            UUID detectorUuid = iterator.next();
-            try {
-                detectorSource.updatedDetectorLastUsed(detectorUuid);
-                counter++;
-            } catch (DetectorException ex) {
-                log.error("Error updating last accessed time for detector UUID: {}", detectorUuid);
+            if (!detectorsLastUsedTimeToBeUpdatedSet.contains(detectorUUID)) {
+                detectorsLastUsedTimeToBeUpdatedSet.add(detectorUUID);
+                try {
+                    detectorSource.updatedDetectorLastUsed(detectorUUID);
+                    counter++;
+                } catch (DetectorException ex) {
+                    log.error("Error updating last accessed time for detector UUID: {}", detectorUUID);
+                }
             }
-            iterator.remove();
         }
         log.info("Updated last used time for a total of {} invoked detectors", counter);
     }
