@@ -313,6 +313,6 @@ public class DetectorManager {
                 }
             }
         }
-        log.info("Updated last used time for a total of {} invoked detectors", counter);
+        log.info("Updated last used time of {} detectors out of {} invoked detectors ", counter, detectorsLastUsedTimeToBeUpdatedSet.size());
     }
 }
