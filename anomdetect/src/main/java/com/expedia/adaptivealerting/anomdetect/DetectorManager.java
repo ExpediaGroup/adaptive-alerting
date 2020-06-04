@@ -300,19 +300,19 @@ public class DetectorManager {
 
     private void processDetectorLastUsedQueue(int detectorsLastUsedTimeQueueSize) {
         Set<UUID> detectorsLastUsedTimeToBeUpdatedSet = new HashSet<>();
-        int counter = 0;
+        int noOfDetectorsUpdated = 0;
         for (int i = 0; i < detectorsLastUsedTimeQueueSize; i++) {
             UUID detectorUUID = detectorsLastUsedTimeToBeUpdatedQueue.poll();
             if (!detectorsLastUsedTimeToBeUpdatedSet.contains(detectorUUID)) {
                 detectorsLastUsedTimeToBeUpdatedSet.add(detectorUUID);
                 try {
                     detectorSource.updatedDetectorLastUsed(detectorUUID);
-                    counter++;
+                    noOfDetectorsUpdated++;
                 } catch (DetectorException ex) {
                     log.error("Error updating last accessed time for detector UUID: {}", detectorUUID);
                 }
             }
         }
-        log.info("Updated last used time of {} detectors out of {} invoked detectors ", counter, detectorsLastUsedTimeToBeUpdatedSet.size());
+        log.info("Updated last used time of {} detectors out of {} invoked detectors ", noOfDetectorsUpdated, detectorsLastUsedTimeToBeUpdatedSet.size());
     }
 }
