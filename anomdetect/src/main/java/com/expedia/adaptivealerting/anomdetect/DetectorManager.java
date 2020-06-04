@@ -43,12 +43,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
@@ -82,7 +86,7 @@ public class DetectorManager {
     private int detectorRefreshTimePeriod;
 
     //This assumes that we are running single thread per consumer
-    private Set<UUID> detectorsLastUsedTimeToBeUpdatedSet;
+    private Queue<UUID> detectorsLastUsedTimeToBeUpdatedQueue;
 
     private long cacheSyncedTillTime = System.currentTimeMillis();
     private long detectorsLastUsedSyncedTillTime = System.currentTimeMillis();
@@ -109,7 +113,7 @@ public class DetectorManager {
         this.dataInitializer = dataInitializer;
         this.detectorSource = detectorSource;
         this.detectorRefreshTimePeriod = config.getInt(CK_DETECTOR_REFRESH_PERIOD);
-        this.detectorsLastUsedTimeToBeUpdatedSet = new HashSet<>();
+        this.detectorsLastUsedTimeToBeUpdatedQueue = new ConcurrentLinkedQueue<>();
 
         this.metricRegistry = metricRegistry;
         detectorForTimer = metricRegistry.timer("detector.detectorFor");
@@ -174,7 +178,7 @@ public class DetectorManager {
         try (Timer.Context autoClosable = detectorForTimer.time()) {
             val detectorUuid = mappedMetricData.getDetectorUuid();
             DetectorContainer container = cachedDetectors.get(detectorUuid);
-            detectorsLastUsedTimeToBeUpdatedSet.add(detectorUuid);
+            detectorsLastUsedTimeToBeUpdatedQueue.add(detectorUuid);
             if (container == null) {
                 container = detectorSource.findDetector(detectorUuid);
                 return (container == null) ? Optional.empty()
@@ -282,16 +286,33 @@ public class DetectorManager {
     void detectorLastUsedTimeSync(long currentTime) {
         long updateDurationInSeconds = (currentTime - detectorsLastUsedSyncedTillTime) / 1000;
 
-        if (updateDurationInSeconds <= 0 || detectorsLastUsedTimeToBeUpdatedSet.isEmpty()) {
+        if (updateDurationInSeconds <= 0 || detectorsLastUsedTimeToBeUpdatedQueue.isEmpty()) {
             return;
         }
-        processDetectorsLastUsedTimeSet();
+        updateDetectorsLastTimeUsed();
         detectorsLastUsedSyncedTillTime = currentTime;
     }
 
-    private void processDetectorsLastUsedTimeSet() {
-        
-        Set<UUID> detectorsLastUsedTimeSetClone = buildDetectorLastUsedSetClone();
+    private void updateDetectorsLastTimeUsed() {
+        int detectorsLastUsedTimeQueueSize = detectorsLastUsedTimeToBeUpdatedQueue.size();
+        log.info("Detectors last used time queue size {}", detectorsLastUsedTimeQueueSize);
+
+        Set<UUID> detectorsLastUsedTimeToBeUpdatedSet = buildDetectorsLastTimeToBeUpdatedSet(detectorsLastUsedTimeQueueSize);
+        log.info("Updating last used time for a total of {} invoked detectors", detectorsLastUsedTimeToBeUpdatedSet.size());
+
+        processDetectorLastUsedSet(detectorsLastUsedTimeToBeUpdatedSet);
+    }
+
+    private Set<UUID> buildDetectorsLastTimeToBeUpdatedSet(int detectorsLastUsedTimeQueueSize) {
+        Set<UUID> detectorsLastUsedTimeToBeUpdatedSet = new HashSet<>();
+        for (int i = 0; i < detectorsLastUsedTimeQueueSize; i++) {
+            UUID detectorUUID = detectorsLastUsedTimeToBeUpdatedQueue.poll();
+            detectorsLastUsedTimeToBeUpdatedSet.add(detectorUUID);
+        }
+        return detectorsLastUsedTimeToBeUpdatedSet;
+    }
+
+    private void processDetectorLastUsedSet(Set<UUID> detectorsLastUsedTimeSetClone) {
         int counter = 0;
         for (Iterator<UUID> iterator = detectorsLastUsedTimeSetClone.iterator(); iterator.hasNext(); ) {
             UUID detectorUuid = iterator.next();
@@ -304,18 +325,5 @@ public class DetectorManager {
             iterator.remove();
         }
         log.info("Updated last used time for a total of {} invoked detectors", counter);
-    }
-
-    private Set<UUID> buildDetectorLastUsedSetClone() {
-        log.info("Cloning last used time set of size {}", detectorsLastUsedTimeToBeUpdatedSet.size());
-
-        Set<UUID> detectorsLastUsedTimeSetClone = new HashSet<>();
-        for (UUID detectorUuid : detectorsLastUsedTimeToBeUpdatedSet) {
-            detectorsLastUsedTimeSetClone.add(detectorUuid);
-        }
-        detectorsLastUsedTimeToBeUpdatedSet.removeAll(detectorsLastUsedTimeSetClone);
-
-        log.info("Updating last used time for a total of {} invoked detectors", detectorsLastUsedTimeSetClone.size());
-        return detectorsLastUsedTimeSetClone;
     }
 }
