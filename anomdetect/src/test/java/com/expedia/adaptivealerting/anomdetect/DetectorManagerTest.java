@@ -178,7 +178,7 @@ public final class DetectorManagerTest {
     }
 
     @Test
-    public void testDetectorLastUsedTimeSync_emptySet() {
+    public void testDetectorLastUsedTimeSync_emptyQueue() {
         managerUnderTest.detectorLastUsedTimeSync(System.currentTimeMillis() + 1000 * 60);
         verify(detectorSource, never()).updatedDetectorLastUsed(any(UUID.class));
     }
