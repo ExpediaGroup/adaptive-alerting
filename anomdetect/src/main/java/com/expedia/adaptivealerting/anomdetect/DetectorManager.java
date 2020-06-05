@@ -306,6 +306,7 @@ public class DetectorManager {
                 }
             }
         }
-        log.info("Updated detectors last time used: detectorsUpdated={}, uniqueDetectorsInvoked={} , totalDetectorsInvoked={}", noOfDetectorsUpdated, detectorsLastUsedTimeToBeUpdatedSet.size(), detectorsLastUsedTimeQueueSize);
+        log.info("Updated detectors last time used: detectorsUpdated={}, uniqueDetectorsInvoked={} , totalDetectorsInvoked={}",
+                noOfDetectorsUpdated, detectorsLastUsedTimeToBeUpdatedSet.size(), detectorsLastUsedTimeQueueSize);
     }
 }
