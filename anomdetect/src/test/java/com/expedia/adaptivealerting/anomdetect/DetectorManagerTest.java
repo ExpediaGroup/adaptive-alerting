@@ -37,6 +37,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -140,6 +141,14 @@ public final class DetectorManagerTest {
     }
 
     @Test
+    public void testDetectorRefresh_invalid_time() {
+        val result = managerUnderTest.detectorCacheSync(System.currentTimeMillis());
+        assertNotNull(result);
+        val emptyList = new ArrayList<>();
+        assertEquals(emptyList, result);
+    }
+
+    @Test
     public void testDetectorLastUsedTimeSync_unique_detectors() {
         int setSize = 50;
         populateSetWithUniqueUUIDs(setSize);
@@ -178,7 +187,7 @@ public final class DetectorManagerTest {
     }
 
     @Test
-    public void testDetectorLastUsedTimeSync_emptySet() {
+    public void testDetectorLastUsedTimeSync_emptyQueue() {
         managerUnderTest.detectorLastUsedTimeSync(System.currentTimeMillis() + 1000 * 60);
         verify(detectorSource, never()).updatedDetectorLastUsed(any(UUID.class));
     }

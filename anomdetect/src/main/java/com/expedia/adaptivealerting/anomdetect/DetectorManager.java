@@ -286,18 +286,12 @@ public class DetectorManager {
         if (updateDurationInSeconds <= 0 || detectorsLastUsedTimeToBeUpdatedQueue.isEmpty()) {
             return;
         }
-        updateDetectorsLastTimeUsed();
+        processDetectorsLastTimeUsedQueue();
         detectorsLastUsedSyncedTillTime = currentTime;
     }
 
-    private void updateDetectorsLastTimeUsed() {
+    private void processDetectorsLastTimeUsedQueue() {
         int detectorsLastUsedTimeQueueSize = detectorsLastUsedTimeToBeUpdatedQueue.size();
-        log.info("Detectors last used time queue size {}", detectorsLastUsedTimeQueueSize);
-
-        processDetectorLastUsedQueue(detectorsLastUsedTimeQueueSize);
-    }
-
-    private void processDetectorLastUsedQueue(int detectorsLastUsedTimeQueueSize) {
         Set<UUID> detectorsLastUsedTimeToBeUpdatedSet = new HashSet<>();
         int noOfDetectorsUpdated = 0;
         for (int i = 0; i < detectorsLastUsedTimeQueueSize; i++) {
@@ -312,6 +306,7 @@ public class DetectorManager {
                 }
             }
         }
-        log.info("Updated last used time of {} detectors out of {} invoked detectors ", noOfDetectorsUpdated, detectorsLastUsedTimeToBeUpdatedSet.size());
+        log.info("Updated detectors last time used: detectorsUpdated={}, uniqueDetectorsInvoked={} , totalDetectorsInvoked={}",
+                noOfDetectorsUpdated, detectorsLastUsedTimeToBeUpdatedSet.size(), detectorsLastUsedTimeQueueSize);
     }
 }
