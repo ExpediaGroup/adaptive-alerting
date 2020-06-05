@@ -286,11 +286,11 @@ public class DetectorManager {
         if (updateDurationInSeconds <= 0 || detectorsLastUsedTimeToBeUpdatedQueue.isEmpty()) {
             return;
         }
-        processDetectorLastTimeUsedQueue();
+        processDetectorsLastTimeUsedQueue();
         detectorsLastUsedSyncedTillTime = currentTime;
     }
 
-    private void processDetectorLastTimeUsedQueue() {
+    private void processDetectorsLastTimeUsedQueue() {
         int detectorsLastUsedTimeQueueSize = detectorsLastUsedTimeToBeUpdatedQueue.size();
         Set<UUID> detectorsLastUsedTimeToBeUpdatedSet = new HashSet<>();
         int noOfDetectorsUpdated = 0;
