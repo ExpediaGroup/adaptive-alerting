@@ -37,6 +37,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -137,6 +138,14 @@ public final class DetectorManagerTest {
         val result = managerUnderTest.detectorCacheSync(System.currentTimeMillis() + 1000 * 60);
         assertNotNull(result);
         assertEquals(updatedDetectors, result);
+    }
+
+    @Test
+    public void testDetectorRefresh_invalid_time() {
+        val result = managerUnderTest.detectorCacheSync(System.currentTimeMillis());
+        assertNotNull(result);
+        val emptyList = new ArrayList<>();
+        assertEquals(emptyList, result);
     }
 
     @Test
