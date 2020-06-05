@@ -52,7 +52,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
-import static com.expedia.adaptivealerting.anomdetect.util.DateUtil.epochSecondToInstant;
 
 /**
  * Component that manages a given set of anomaly detectors.
