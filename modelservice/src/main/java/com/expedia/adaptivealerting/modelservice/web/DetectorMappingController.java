@@ -91,7 +91,7 @@ public class DetectorMappingController {
         return matchingDetectorMappings;
     }
 
-    @RequestMapping(value = "/search/findByDetector", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/deleteMappingsByDetectorUuid", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.OK)
     public void deleteMappingsByDetectorUUID(@RequestParam UUID uuid) {
         AssertUtil.notNull(uuid, "detector uuid can't be null");
