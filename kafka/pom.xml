@@ -97,7 +97,7 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <!-- Defining this explicitly because kafka-junit needs it [WLW] -->
-            <version>23.3-jre</version>
+            <version>24.1.1-jre</version>
             <scope>runtime</scope>
         </dependency>
 
