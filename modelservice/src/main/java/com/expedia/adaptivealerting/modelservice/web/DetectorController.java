@@ -18,10 +18,14 @@ package com.expedia.adaptivealerting.modelservice.web;
 import com.expedia.adaptivealerting.modelservice.entity.Detector;
 import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
 import com.expedia.adaptivealerting.modelservice.service.DetectorService;
+import com.expedia.adaptivealerting.modelservice.tracing.Trace;
+import com.expedia.www.haystack.client.Span;
+import io.opentracing.SpanContext;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -45,20 +50,29 @@ public class DetectorController {
     @Autowired
     private DetectorService service;
 
+    @Autowired
+    private Trace trace;
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public String createDetector(@Valid @RequestBody Detector detector) {
+    public String createDetector(@Valid @RequestBody Detector detector, @RequestHeader HttpHeaders headers) {
+        SpanContext parentSpanContext = trace.extractParentSpan(headers);
+        Span span= trace.startSpan("create-detector", parentSpanContext);
         val uuid = service.createDetector(detector);
+        span.finish();
         return uuid.toString();
     }
 
     @GetMapping(path = "/findByUuid", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public Detector findByUuid(@RequestParam String uuid) {
+    public Detector findByUuid(@RequestParam String uuid, @RequestHeader HttpHeaders headers) {
+        SpanContext parentSpanContext = trace.extractParentSpan(headers);
+        Span span = trace.startSpan("find-detector-by-uuid", parentSpanContext);
         Detector detector = service.findByUuid(uuid);
         if (detector == null) {
             throw new RecordNotFoundException("Invalid UUID: " + uuid);
         }
+        span.finish();
         return detector;
     }
 

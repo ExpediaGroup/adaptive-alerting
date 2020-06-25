@@ -15,23 +15,33 @@
  */
 package com.expedia.adaptivealerting.modelservice.web;
 
-import com.expedia.adaptivealerting.modelservice.domain.mapping.ConsumerDetectorMapping;
-import com.expedia.adaptivealerting.modelservice.domain.mapping.User;
-import com.expedia.adaptivealerting.modelservice.domain.mapping.DetectorMapping;
+import com.expedia.adaptivealerting.modelservice.domain.mapping.*;
 import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorMappingRepository;
+import com.expedia.adaptivealerting.modelservice.tracing.Trace;
+import com.expedia.adaptivealerting.modelservice.web.request.CreateDetectorMappingRequest;
 import com.expedia.adaptivealerting.modelservice.web.request.SearchMappingsRequest;
 import com.expedia.adaptivealerting.modelservice.web.response.MatchingDetectorsResponse;
+import com.expedia.www.haystack.client.Clock;
+import com.expedia.www.haystack.client.Span;
+import com.expedia.www.haystack.client.SpanContext;
+import com.expedia.www.haystack.client.Tracer;
+import com.expedia.www.haystack.client.dispatchers.NoopDispatcher;
+import com.expedia.www.haystack.client.metrics.NoopMetricsRegistry;
+import io.opentracing.propagation.Format;
+import io.opentracing.propagation.TextMapAdapter;
 import lombok.val;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -44,8 +54,9 @@ import java.util.UUID;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 @AutoConfigureMockMvc
@@ -61,10 +72,20 @@ public class DetectorMappingControllerTest {
     @InjectMocks
     private DetectorMappingController controllerUnderTest;
 
+    private HttpHeaders httpHeaders = new HttpHeaders();
+    private Trace trace = Mockito.mock(Trace.class);
+    private Tracer noOpsTracer;
+
+
+
     @Before
     public void setUp() {
         this.controllerUnderTest = new DetectorMappingController();
         MockitoAnnotations.initMocks(this);
+        httpHeaders.add("test-header-key", "test-header-value");
+        val metrics = new NoopMetricsRegistry();
+        val dispatcher = new NoopDispatcher();
+        noOpsTracer = new Tracer.Builder(metrics, "testTrace", dispatcher).build();
     }
 
     @Test
@@ -122,11 +143,43 @@ public class DetectorMappingControllerTest {
         SearchMappingsRequest searchMappingsRequest = new SearchMappingsRequest();
         searchMappingsRequest.setDetectorUuid(UUID.fromString(detectorUuid));
         searchMappingsRequest.setUserId(userVal);
+        val testDetectorMappingSpanContext = new SpanContext(UUID.randomUUID(), UUID.randomUUID(),
+                UUID.randomUUID());
+        val testChildSpan = noOpsTracer.buildSpan("mappings-search").asChildOf(testDetectorMappingSpanContext).start();
         when(detectorMappingRepo.search(searchMappingsRequest)).thenReturn(detectorMappings);
-        List<DetectorMapping> detectorMappingsResponse = controllerUnderTest.searchDetectorMapping(searchMappingsRequest);
+        when(trace.extractParentSpan(httpHeaders)).thenReturn(testDetectorMappingSpanContext);
+        when(trace.startSpan("mappings-search", testDetectorMappingSpanContext)).thenReturn(testChildSpan);
+        List<DetectorMapping> detectorMappingsResponse = controllerUnderTest.searchDetectorMapping(searchMappingsRequest,
+                httpHeaders);
         assertEquals(id, detectorMappingsResponse.get(0).getId());
         assertEquals(detectorUuid, detectorMappingsResponse.get(0).getDetector().getUuid().toString());
         assertEquals("test-user", detectorMappingsResponse.get(0).getUser().getId());
+    }
+
+    @Test
+    public void testDetectorCreateMappings() {
+        List<DetectorMapping> detectorMappings = mockDetectorMappingsList();
+        CreateDetectorMappingRequest createDetectorMappingRequest = new CreateDetectorMappingRequest();
+        List<Operand> operandsList = new ArrayList<Operand>();
+        Operand testOperand = new Operand();
+        testOperand.setField(new Field("name", "sample-web"));
+        operandsList.add(testOperand);
+        Expression validateExpression = new Expression();
+        validateExpression.setOperands(operandsList);
+        validateExpression.setOperator(Operator.AND);
+        createDetectorMappingRequest.setExpression(validateExpression);
+        createDetectorMappingRequest.setConsumerDetectorMapping(buildDetector(UUID.randomUUID().toString()));
+        createDetectorMappingRequest.setUser(new User(userVal));
+        String detectorMapping = mockDetectorMapping(id).toString();
+        val testDetectorMappingSpanContext = new SpanContext(UUID.randomUUID(), UUID.randomUUID(),
+                UUID.randomUUID());
+        val testChildSpan = noOpsTracer.buildSpan("create-mappings").asChildOf(testDetectorMappingSpanContext).start();
+        when(detectorMappingRepo.createDetectorMapping(createDetectorMappingRequest)).thenReturn(detectorMapping);
+        when(trace.extractParentSpan(httpHeaders)).thenReturn(testDetectorMappingSpanContext);
+        when(trace.startSpan("create-mappings", testDetectorMappingSpanContext)).thenReturn(testChildSpan);
+        String detectorMappingsResponse = controllerUnderTest.createDetectorMapping(createDetectorMappingRequest,
+                httpHeaders);
+        assertEquals(detectorMapping.toString(), detectorMappingsResponse);
     }
 
     @Test

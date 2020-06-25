@@ -21,6 +21,13 @@ data "template_file" "config_data" {
     detector_mapper_es_config_connection_retry_timeout = "${var.detector_mapper_es_config_connection_retry_timeout}"
     detector_mapper_es_config_max_total_connection = "${var.detector_mapper_es_config_max_total_connection}"
     detector_mapper_es_config_aws_iam_auth_required = "${var.detector_mapper_es_config_aws_iam_auth_required}"
+    apikey = "${var.modelservice_haystack_tracer_apikey}"
+    clientid = "${var.modelservice_haystack_tracer_clientid}"
+    endpoint = "${var.haystack_tracer_endpoint}"
+    queueSize = "${var.haystack_tracer_queue_size}"
+    flushInterval = "${var.haystack_tracer_flush_interval}"
+    shutdownTimeout = "${var.haystack_tracer_shutdown_timeout}"
+    threadCount = "${var.haystack_tracer_thread_count}"
   }
 }
 

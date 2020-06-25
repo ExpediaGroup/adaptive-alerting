@@ -19,17 +19,20 @@ import com.expedia.adaptivealerting.modelservice.entity.Detector;
 import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
 import com.expedia.adaptivealerting.modelservice.service.DetectorService;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
+import com.expedia.adaptivealerting.modelservice.tracing.Trace;
+import com.expedia.www.haystack.client.SpanContext;
+import com.expedia.www.haystack.client.Tracer;
+import com.expedia.www.haystack.client.dispatchers.NoopDispatcher;
+import com.expedia.www.haystack.client.metrics.NoopMetricsRegistry;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
+import org.mockito.*;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -75,6 +78,9 @@ public class DetectorControllerTest {
 
     private UUID someUuid;
     private Detector legalParamsDetector;
+    private HttpHeaders httpHeaders = new HttpHeaders();
+    private Trace trace = Mockito.mock(Trace.class);
+    private Tracer noOpsTracer;
 
     @Before
     public void setUp() {
@@ -84,25 +90,40 @@ public class DetectorControllerTest {
         MockitoAnnotations.initMocks(this);
         initTestObjects();
         initDependencies();
+        httpHeaders.add("test-header-key", "test-header-value");
+        val metrics = new NoopMetricsRegistry();
+        val dispatcher = new NoopDispatcher();
+        noOpsTracer = new Tracer.Builder(metrics, "testTrace", dispatcher).build();
     }
 
     @Test
     public void testCreateDetector() {
-        val uuidStr = controllerUnderTest.createDetector(legalParamsDetector);
+        val testDetectorMappingSpanContext = new SpanContext(UUID.randomUUID(), UUID.randomUUID(),
+                UUID.randomUUID());
+        val testChildSpan = noOpsTracer.buildSpan("create-detector").asChildOf(testDetectorMappingSpanContext).start();
+        when(trace.extractParentSpan(httpHeaders)).thenReturn(testDetectorMappingSpanContext);
+        when(trace.startSpan("create-detector", testDetectorMappingSpanContext)).thenReturn(testChildSpan);
+        val uuidStr = controllerUnderTest.createDetector(legalParamsDetector, httpHeaders);
         val uuid = UUID.fromString(uuidStr);
         assertNotNull(uuid);
     }
 
     @Test
     public void testFindByUuid() {
-        val actualDetector = controllerUnderTest.findByUuid(someUuid.toString());
+        val testDetectorMappingSpanContext = new SpanContext(UUID.randomUUID(), UUID.randomUUID(),
+                UUID.randomUUID());
+        val testChildSpan = noOpsTracer.buildSpan("find-detector-by-uuid").asChildOf(testDetectorMappingSpanContext).start();
+        when(trace.extractParentSpan(httpHeaders)).thenReturn(testDetectorMappingSpanContext);
+        when(trace.startSpan("find-detector-by-uuid", testDetectorMappingSpanContext)).thenReturn(testChildSpan);
+        val actualDetector = controllerUnderTest.findByUuid(someUuid.toString(), httpHeaders);
         assertNotNull(actualDetector);
     }
+
 
     @Test(expected = RecordNotFoundException.class)
     public void testFindByUuid_record_not_found_null_response() {
         when(detectorService.findByUuid(anyString())).thenReturn(null);
-        controllerUnderTest.findByUuid(someUuid.toString());
+        controllerUnderTest.findByUuid(someUuid.toString(), httpHeaders);
     }
 
     @Test

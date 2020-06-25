@@ -42,6 +42,14 @@ variable "modelservice_base_uri" {}
 variable "graphite_base_uri" {}
 variable "graphite_data_retrieval_key" {}
 variable "throttle_gate_likelihood" {}
+variable "ad_manager_tracing_status" {}
+variable "ad_manager_tracing_apikey" {}
+variable "ad_manager_tracing_clientid" {}
+variable "haystack_collector_endpoint" {}
+variable "haystack_tracer_queue_size" {}
+variable "haystack_tracer_flush_interval" {}
+variable "haystack_tracer_shutdown_timeout" {}
+variable "haystack_tracer_thread_count" {}
 variable "detector_refresh_period" {
   default = 5
 }

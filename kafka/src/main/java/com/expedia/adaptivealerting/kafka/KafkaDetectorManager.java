@@ -26,19 +26,26 @@ import com.expedia.adaptivealerting.anomdetect.util.JmxReporterFactory;
 import com.expedia.adaptivealerting.kafka.util.ConfigUtil;
 import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
 import com.typesafe.config.Config;
+import io.opentracing.contrib.kafka.TracingConsumerInterceptor;
+import io.opentracing.contrib.kafka.TracingProducerInterceptor;
 import lombok.Generated;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.errors.WakeupException;
+import io.opentracing.util.GlobalTracer;
 
 import java.util.Collections;
+import java.util.HashMap;
+import com.expedia.adaptivealerting.kafka.util.TracingUtil;
 
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
 
@@ -58,6 +65,9 @@ public class KafkaDetectorManager implements Runnable {
     private static final String TOPIC = "topic";
     private static final String OUTLIER_TOPIC = "outlier-topic";
     private static final String BREAKOUT_TOPIC = "breakout-topic";
+    private static final String DM_TRACING = "tracing";
+    private static final String TRACING_STATUS_STRING = "tracingStatus";
+    private static final String TRACING_STATUS_CHECK_STRING = "enabled";
     private static final long POLL_PERIOD = 1000L;
 
     @Getter
@@ -96,11 +106,21 @@ public class KafkaDetectorManager implements Runnable {
 
         val metricConsumerConfig = config.getConfig(METRIC_CONSUMER);
         val metricConsumerProps = ConfigUtil.toConsumerConfig(metricConsumerConfig);
-        val metricConsumer = new KafkaConsumer<String, MappedMetricData>(metricConsumerProps);
-        val metricConsumerTopic = metricConsumerConfig.getString(TOPIC);
 
         val anomalyProducerConfig = config.getConfig(ANOMALY_PRODUCER);
         val anomalyProducerProps = ConfigUtil.toProducerConfig(anomalyProducerConfig);
+        if (config.getConfig(DM_TRACING).getString(TRACING_STATUS_STRING).equals(TRACING_STATUS_CHECK_STRING)){
+            metricConsumerProps.put(ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG,
+                    TracingConsumerInterceptor.class.getName());
+            anomalyProducerProps.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG,
+                    TracingProducerInterceptor.class.getName());
+            val collectorHeaders = new HashMap<String, String>();
+            Config tracingDetectorManagerConfig = config.getConfig(DM_TRACING);
+            GlobalTracer.registerIfAbsent(TracingUtil.getTracer(collectorHeaders, tracingDetectorManagerConfig));
+        }
+        val metricConsumer = new KafkaConsumer<String, MappedMetricData>(metricConsumerProps);
+        val metricConsumerTopic = metricConsumerConfig.getString(TOPIC);
+
         val anomalyProducer = new KafkaProducer<String, MappedMetricData>(anomalyProducerProps);
         val anomalyProducerOutlierTopic = anomalyProducerConfig.getString(OUTLIER_TOPIC);
         val anomalyProducerBreakoutTopic = anomalyProducerConfig.getString(BREAKOUT_TOPIC);
