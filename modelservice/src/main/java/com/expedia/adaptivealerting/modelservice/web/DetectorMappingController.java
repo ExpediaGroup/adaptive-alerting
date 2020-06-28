@@ -67,8 +67,9 @@ public class DetectorMappingController {
         SpanContext parentSpanContext = trace.extractParentSpan(header);
         Span span = trace.startSpan("create-mappings", parentSpanContext);
         request.validate();
+        String detectorMappingJsonString = detectorMappingRepo.createDetectorMapping(request);
         span.finish();
-        return detectorMappingRepo.createDetectorMapping(request);
+        return detectorMappingJsonString;
     }
 
     @RequestMapping(value = "/disable", method = RequestMethod.PUT)
@@ -92,8 +93,9 @@ public class DetectorMappingController {
         Span span = trace.startSpan("mappings-search", parentSpanContext);
         AssertUtil.isTrue(request.getUserId() != null || request.getDetectorUuid() != null,
                 "User id and Detector UUID can't both be null");
+        List<DetectorMapping> resultSearchDetectorMapping = detectorMappingRepo.search(request);
         span.finish();
-        return detectorMappingRepo.search(request);
+        return resultSearchDetectorMapping;
     }
 
     @RequestMapping(value = "/lastUpdated", method = RequestMethod.GET)

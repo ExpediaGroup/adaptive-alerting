@@ -147,16 +147,12 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
     }
 
     private KafkaStreams getStreams(){
-        if (this.getConfig().getTracingConfig().getString(TRACING_STATUS_STRING).equals(TRACING_STATUS_CHECK_STRING)) {
-            val tracingConfig = this.getConfig().getTracingConfig();
+        val tracingConfig = getConfig().getTracingConfig();
+        if (tracingConfig.getString(TRACING_STATUS_STRING).equals(TRACING_STATUS_CHECK_STRING)) {
             KafkaClientSupplier detectorMapperClientSupplier = new TracingKafkaClientSupplier(initTracer(tracingConfig));
-            val streams = new KafkaStreams(buildTopology(), this.getConfig().getStreamsConfig(), detectorMapperClientSupplier);
-            return streams;
+            return new KafkaStreams(buildTopology(), this.getConfig().getStreamsConfig(), detectorMapperClientSupplier);
         }
-        else {
-            val streams = new KafkaStreams(buildTopology(), this.getConfig().getStreamsConfig());
-            return streams;
-        }
+        return new KafkaStreams(buildTopology(), this.getConfig().getStreamsConfig());
     }
 
     private Tracer initTracer(Config tracingConfig) {

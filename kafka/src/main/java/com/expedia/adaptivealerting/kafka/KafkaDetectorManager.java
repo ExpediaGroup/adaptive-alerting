@@ -109,13 +109,13 @@ public class KafkaDetectorManager implements Runnable {
 
         val anomalyProducerConfig = config.getConfig(ANOMALY_PRODUCER);
         val anomalyProducerProps = ConfigUtil.toProducerConfig(anomalyProducerConfig);
-        if (config.getConfig(DM_TRACING).getString(TRACING_STATUS_STRING).equals(TRACING_STATUS_CHECK_STRING)){
+        val tracingDetectorManagerConfig = config.getConfig(DM_TRACING);
+        if (tracingDetectorManagerConfig.getString(TRACING_STATUS_STRING).equals(TRACING_STATUS_CHECK_STRING)){
             metricConsumerProps.put(ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG,
                     TracingConsumerInterceptor.class.getName());
             anomalyProducerProps.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG,
                     TracingProducerInterceptor.class.getName());
             val collectorHeaders = new HashMap<String, String>();
-            Config tracingDetectorManagerConfig = config.getConfig(DM_TRACING);
             GlobalTracer.registerIfAbsent(TracingUtil.getTracer(collectorHeaders, tracingDetectorManagerConfig));
         }
         val metricConsumer = new KafkaConsumer<String, MappedMetricData>(metricConsumerProps);

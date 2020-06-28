@@ -60,7 +60,7 @@ public class Trace {
             log.info("parentSpan {}", parentSpan);
             return parentSpan;
         } catch (IllegalArgumentException e) {
-            log.info("Exception during extracting parentSpan", e);
+            log.error("Exception during extracting parentSpan", e);
         }
         return null;
 

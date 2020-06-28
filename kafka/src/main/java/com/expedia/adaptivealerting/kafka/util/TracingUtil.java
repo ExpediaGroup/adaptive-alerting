@@ -46,20 +46,8 @@ public class TracingUtil {
         collectorHeaders.put(TRACER_HEADER_APIKEY_STRING, tracingConfig.getString(TRACING_APIKEY_STRING));
         collectorHeaders.put(TRACER_HEADER_CLIENTID_STRING, tracingConfig.getString(TRACING_CLIENTID_STRING));
         val metricsRegistry = new NoopMetricsRegistry();
-
-        val dispatcher = new RemoteDispatcher.Builder(
-                metricsRegistry,
-                new HttpCollectorClient(tracingConfig.getString(TRACING_ENDPOINT_STRING), collectorHeaders)
-        ).withBlockingQueueLimit(tracingConfig.getInt(TRACING_QUEUESIZE_STRING))
-                .withShutdownTimeoutMillis(tracingConfig.getLong(TRACING_SHUTDOWNTIMEOUT_STRING))
-                .withFlushIntervalMillis(tracingConfig.getLong(TRACING_FLUSHINTERVAL_STRING))
-                .withExecutorThreadCount(tracingConfig.getInt(TRACING_THREADCOUNT_STRING))
-                .build();
-
-        val textMapPropagator = new TextMapPropagator.Builder()
-                .withKeyConvention(new DefaultKeyConvention())
-                .withURLCodex()
-                .build();
+        val dispatcher = createRemoteDispatcher(metricsRegistry, collectorHeaders, tracingConfig);
+        val textMapPropagator = createTextMapPropagator();
 
         return new Tracer.Builder(metricsRegistry, tracingConfig.getString("clientId"), dispatcher)
                 .withFormat(
@@ -67,6 +55,26 @@ public class TracingUtil {
                 ).withFormat(Format.Builtin.TEXT_MAP, (Injector<TextMap>) textMapPropagator)
                 .withDualSpanMode()
                 .withIdGenerator(new RandomUUIDGenerator())
+                .build();
+    }
+
+    private static RemoteDispatcher createRemoteDispatcher(NoopMetricsRegistry metricsRegistry,
+                                                           HashMap<String, String> collectorHeaders,
+                                                           Config tracingConfig){
+        return new RemoteDispatcher.Builder(
+                metricsRegistry,
+                new HttpCollectorClient(tracingConfig.getString(TRACING_ENDPOINT_STRING), collectorHeaders)
+        ).withBlockingQueueLimit(tracingConfig.getInt(TRACING_QUEUESIZE_STRING))
+                .withShutdownTimeoutMillis(tracingConfig.getLong(TRACING_SHUTDOWNTIMEOUT_STRING))
+                .withFlushIntervalMillis(tracingConfig.getLong(TRACING_FLUSHINTERVAL_STRING))
+                .withExecutorThreadCount(tracingConfig.getInt(TRACING_THREADCOUNT_STRING))
+                .build();
+    }
+
+    private static TextMapPropagator createTextMapPropagator() {
+        return new TextMapPropagator.Builder()
+                .withKeyConvention(new DefaultKeyConvention())
+                .withURLCodex()
                 .build();
     }
 }

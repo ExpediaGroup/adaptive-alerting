@@ -70,6 +70,7 @@ public class DetectorController {
         Span span = trace.startSpan("find-detector-by-uuid", parentSpanContext);
         Detector detector = service.findByUuid(uuid);
         if (detector == null) {
+            span.setTag("Error", "Invalid UUID");
             throw new RecordNotFoundException("Invalid UUID: " + uuid);
         }
         span.finish();

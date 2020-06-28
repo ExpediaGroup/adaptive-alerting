@@ -122,6 +122,11 @@ public class DetectorControllerTest {
 
     @Test(expected = RecordNotFoundException.class)
     public void testFindByUuid_record_not_found_null_response() {
+        val testDetectorMappingSpanContext = new SpanContext(UUID.randomUUID(), UUID.randomUUID(),
+                UUID.randomUUID());
+        val testChildSpan = noOpsTracer.buildSpan("find-detector-by-uuid").asChildOf(testDetectorMappingSpanContext).start();
+        when(trace.extractParentSpan(httpHeaders)).thenReturn(testDetectorMappingSpanContext);
+        when(trace.startSpan("find-detector-by-uuid", testDetectorMappingSpanContext)).thenReturn(testChildSpan);
         when(detectorService.findByUuid(anyString())).thenReturn(null);
         controllerUnderTest.findByUuid(someUuid.toString(), httpHeaders);
     }
