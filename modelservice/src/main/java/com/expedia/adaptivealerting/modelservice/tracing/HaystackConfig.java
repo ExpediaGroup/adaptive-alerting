@@ -31,6 +31,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import java.util.HashMap;
 
+// TODO It could be reviewed if a common util like TracingUtil from kafka module
+//   be reused with no cyclical dependencies between kafka and modelservice modules.
 @Configuration
 public class HaystackConfig {
 
