@@ -71,6 +71,7 @@ public class DetectorController {
         Detector detector = service.findByUuid(uuid);
         if (detector == null) {
             span.setTag("Error", "Invalid UUID");
+            span.finish();
             throw new RecordNotFoundException("Invalid UUID: " + uuid);
         }
         span.finish();
