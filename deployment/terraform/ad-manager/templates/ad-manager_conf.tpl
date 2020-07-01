@@ -23,4 +23,16 @@ ad-manager {
 
   # Detector refresh period in minutes
   detector-refresh-period = ${detector_refresh_period}
+
+  # Haystack tracing config
+  tracing {
+      tracingStatus = "${ad_manager_tracing_status}"
+      apiKey = "${ad_manager_tracing_apikey}"
+      clientId = "${ad_manager_tracing_clientid}"
+      endpoint = "${haystack_collector_endpoint}"
+      queueSize = "${haystack_tracer_queue_size}"
+      flushInterval = "${haystack_tracer_flush_interval}"
+      shutdownTimeout = "${haystack_tracer_shutdown_timeout}"
+      threadCount = "${haystack_tracer_thread_count}"
+  }
 }

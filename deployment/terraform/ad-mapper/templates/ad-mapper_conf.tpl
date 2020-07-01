@@ -12,4 +12,16 @@ ad-mapper {
   outbound-topic = "mapped-metrics"
   detector-mapping-cache-update-period = "${detector_mapping_cache_update_period}"
   model-service-base-uri = "${modelservice_base_uri}"
+
+  # Haystack tracing config
+    tracing {
+        tracingStatus = "${ad_mapper_tracing_status}"
+        apiKey = "${ad_mapper_tracing_apikey}"
+        clientId = "${ad_mapper_tracing_clientid}"
+        endpoint = "${haystack_collector_endpoint}"
+        queueSize = "${haystack_tracer_queue_size}"
+        flushInterval = "${haystack_tracer_flush_interval}"
+        shutdownTimeout = "${haystack_tracer_shutdown_timeout}"
+        threadCount = "${haystack_tracer_thread_count}"
+    }
 }

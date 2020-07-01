@@ -42,6 +42,13 @@ variable "detector_mapper_es_config_connection_timeout" {}
 variable "detector_mapper_es_config_connection_retry_timeout" {}
 variable "detector_mapper_es_config_max_total_connection" {}
 variable "detector_mapper_es_config_aws_iam_auth_required" {}
+variable "modelservice_haystack_tracer_apikey" {}
+variable "modelservice_haystack_tracer_clientid" {}
+variable "haystack_collector_endpoint" {}
+variable "haystack_tracer_queue_size" {}
+variable "haystack_tracer_flush_interval" {}
+variable "haystack_tracer_shutdown_timeout" {}
+variable "haystack_tracer_thread_count" {}
 
 # Unsure what this is, but we don't seem to be using it.
 #variable "termination_grace_period" {

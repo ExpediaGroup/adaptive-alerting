@@ -22,25 +22,35 @@ import com.expedia.adaptivealerting.modelservice.repo.DetectorMappingRepository;
 import com.expedia.adaptivealerting.modelservice.web.request.CreateDetectorMappingRequest;
 import com.expedia.adaptivealerting.modelservice.web.request.SearchMappingsRequest;
 import com.expedia.adaptivealerting.modelservice.web.response.MatchingDetectorsResponse;
+import com.expedia.www.haystack.client.Span;
+import io.opentracing.SpanContext;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import com.expedia.adaptivealerting.modelservice.tracing.Trace;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/detectorMappings")
 public class DetectorMappingController {
 
     @Autowired
     private DetectorMappingRepository detectorMappingRepo;
+
+    @Autowired
+    private Trace trace;
 
     @RequestMapping(produces = "application/json", method = RequestMethod.GET)
     public DetectorMapping getDetectorMapping(@RequestParam String id) {
@@ -53,9 +63,13 @@ public class DetectorMappingController {
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public String createDetectorMapping(@RequestBody CreateDetectorMappingRequest request) {
+    public String createDetectorMapping(@RequestBody CreateDetectorMappingRequest request, @RequestHeader HttpHeaders header) {
+        SpanContext parentSpanContext = trace.extractParentSpan(header);
+        Span span = trace.startSpan("create-mappings", parentSpanContext);
         request.validate();
-        return detectorMappingRepo.createDetectorMapping(request);
+        String detectorMappingJsonString = detectorMappingRepo.createDetectorMapping(request);
+        span.finish();
+        return detectorMappingJsonString;
     }
 
     @RequestMapping(value = "/disable", method = RequestMethod.PUT)
@@ -73,10 +87,15 @@ public class DetectorMappingController {
     }
 
     @RequestMapping(value = "/search", method = RequestMethod.POST)
-    public List<DetectorMapping> searchDetectorMapping(@RequestBody SearchMappingsRequest request) {
+    public List<DetectorMapping> searchDetectorMapping(@RequestBody SearchMappingsRequest request,
+                                                       @RequestHeader HttpHeaders httpHeaders) {
+        SpanContext parentSpanContext = trace.extractParentSpan(httpHeaders);
+        Span span = trace.startSpan("mappings-search", parentSpanContext);
         AssertUtil.isTrue(request.getUserId() != null || request.getDetectorUuid() != null,
                 "User id and Detector UUID can't both be null");
-        return detectorMappingRepo.search(request);
+        List<DetectorMapping> resultSearchDetectorMapping = detectorMappingRepo.search(request);
+        span.finish();
+        return resultSearchDetectorMapping;
     }
 
     @RequestMapping(value = "/lastUpdated", method = RequestMethod.GET)
