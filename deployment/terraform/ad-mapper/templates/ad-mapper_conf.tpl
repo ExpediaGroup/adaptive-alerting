@@ -15,7 +15,7 @@ ad-mapper {
 
   # Haystack tracing config
     tracing {
-        tracingStatus = "${ad_mapper_tracing_status}"
+        tracingStatus = "${tracing_status}"
         apiKey = "${ad_mapper_tracing_apikey}"
         clientId = "${ad_mapper_tracing_clientid}"
         endpoint = "${haystack_collector_endpoint}"

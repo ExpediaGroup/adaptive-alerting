@@ -13,14 +13,14 @@ data "template_file" "config_data" {
     kafka_endpoint = "${var.kafka_endpoint}"
     modelservice_base_uri = "${var.modelservice_base_uri}"
     detector_mapping_cache_update_period = "${var.detector_mapping_cache_update_period}"
-    tracingStatus = "${var.ad_mapper_tracing_status}"
-    apiKey = "${var.ad_mapper_tracing_apikey}"
-    clientId = "${var.ad_mapper_tracing_clientid}"
-    endpoint = "${var.haystack_collector_endpoint}"
-    queueSize = "${var.haystack_tracer_queue_size}"
-    flushInterval = "${var.haystack_tracer_flush_interval}"
-    shutdownTimeout = "${var.haystack_tracer_shutdown_timeout}"
-    threadCount = "${var.haystack_tracer_thread_count}"
+    tracing_status = "${var.tracing_status}"
+    ad_mapper_apikey = "${var.ad_mapper_tracing_apikey}"
+    ad_mapper_clientid = "${var.ad_mapper_tracing_clientid}"
+    haystack_collector_endpoint = "${var.haystack_collector_endpoint}"
+    haystack_tracer_queue_size = "${var.haystack_tracer_queue_size}"
+    haystack_tracer_flush_interval = "${var.haystack_tracer_flush_interval}"
+    haystack_tracer_shutdown_timeout = "${var.haystack_tracer_shutdown_timeout}"
+    haystack_tracer_thread_count = "${var.haystack_tracer_thread_count}"
   }
 }
 

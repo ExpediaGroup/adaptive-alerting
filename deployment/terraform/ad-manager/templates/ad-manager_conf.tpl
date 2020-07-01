@@ -26,7 +26,7 @@ ad-manager {
 
   # Haystack tracing config
   tracing {
-      tracingStatus = "${ad_manager_tracing_status}"
+      tracingStatus = "${tracing_status}"
       apiKey = "${ad_manager_tracing_apikey}"
       clientId = "${ad_manager_tracing_clientid}"
       endpoint = "${haystack_collector_endpoint}"

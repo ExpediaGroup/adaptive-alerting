@@ -48,9 +48,9 @@ security:
 
 # Haystack
 haystack:
-  apiKey: "${modelservice_haystack_tracer_apikey}"
-  clientId: "${modelservice_haystack_tracer_clientid}"
-  endpoint: "${haystack_tracer_endpoint}"
+  apiKey: "${modelservice_tracing_apikey}"
+  clientId: "${modelservice_tracing_clientid}"
+  endpoint: "${haystack_collector_endpoint}"
   queueSize: "${haystack_tracer_queue_size}"
   flushInterval: "${haystack_tracer_flush_interval}"
   shutdownTimeout: "${haystack_tracer_shutdown_timeout}"

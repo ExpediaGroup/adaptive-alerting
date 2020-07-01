@@ -26,14 +26,14 @@ data "template_file" "config_data" {
     graphite_data_retrieval_key = "${var.graphite_data_retrieval_key}"
     throttle_gate_likelihood = "${var.throttle_gate_likelihood}"
     detector_refresh_period = "${var.detector_refresh_period}"
-    tracingStatus = "${var.ad_manager_tracing_status}"
-    apiKey = "${var.ad_manager_tracing_apikey}"
-    clientId = "${var.ad_manager_tracing_clientid}"
-    endpoint = "${var.haystack_collector_endpoint}"
-    queueSize = "${var.haystack_tracer_queue_size}"
-    flushInterval = "${var.haystack_tracer_flush_interval}"
-    shutdownTimeout = "${var.haystack_tracer_shutdown_timeout}"
-    threadCount = "${var.haystack_tracer_thread_count}"
+    tracing_status = "${var.tracing_status}"
+    ad_manager_apikey = "${var.ad_manager_tracing_apikey}"
+    ad_manager_clientId = "${var.ad_manager_tracing_clientid}"
+    haystack_collector_endpoint = "${var.haystack_collector_endpoint}"
+    haystack_tracer_queue_size = "${var.haystack_tracer_queue_size}"
+    haystack_tracer_flush_interval = "${var.haystack_tracer_flush_interval}"
+    haystack_tracer_shutdown_timeout = "${var.haystack_tracer_shutdown_timeout}"
+    haystack_tracer_thread_count = "${var.haystack_tracer_thread_count}"
   }
 }
 

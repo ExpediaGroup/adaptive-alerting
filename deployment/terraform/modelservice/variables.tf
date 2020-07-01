@@ -42,8 +42,8 @@ variable "detector_mapper_es_config_connection_timeout" {}
 variable "detector_mapper_es_config_connection_retry_timeout" {}
 variable "detector_mapper_es_config_max_total_connection" {}
 variable "detector_mapper_es_config_aws_iam_auth_required" {}
-variable "modelservice_haystack_tracer_apikey" {}
-variable "modelservice_haystack_tracer_clientid" {}
+variable "modelservice_tracing_apikey" {}
+variable "modelservice_tracing_clientid" {}
 variable "haystack_collector_endpoint" {}
 variable "haystack_tracer_queue_size" {}
 variable "haystack_tracer_flush_interval" {}
