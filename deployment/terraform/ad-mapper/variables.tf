@@ -29,7 +29,7 @@ variable "env_vars" {}
 # App
 variable "kafka_endpoint" {}
 variable "modelservice_base_uri" {}
-variable "ad_mapper_tracing_status" {}
+variable "tracing_status" {}
 variable "ad_mapper_tracing_apikey" {}
 variable "ad_mapper_tracing_clientid" {}
 variable "haystack_collector_endpoint" {}
