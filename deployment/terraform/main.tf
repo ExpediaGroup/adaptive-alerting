@@ -141,6 +141,7 @@ module "modelservice" {
   detector_mapper_es_config_max_total_connection = "${var.modelservice["detector_mapper_es_config_max_total_connection"]}"
   # Additional security for es in AWS
   detector_mapper_es_config_aws_iam_auth_required = "${var.modelservice["detector_mapper_es_config_aws_iam_auth_required"]}"
+  # Haystack based tracing config
   modelservice_tracing_apikey = "${var.modelservice["modelservice_tracing_apikey"]}"
   modelservice_tracing_clientid = "${var.modelservice["modelservice_tracing_clientid"]}"
   haystack_collector_endpoint = "${var.modelservice["haystack_collector_endpoint"]}"
