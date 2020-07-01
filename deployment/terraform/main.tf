@@ -38,13 +38,13 @@ module "ad-mapper" {
   modelservice_base_uri = "${var.ad-mapper["modelservice_base_uri"]}"
   detector_mapping_cache_update_period = "${var.ad-mapper["detector_mapping_cache_update_period"]}"
   tracing_status = "${var.ad-mapper["tracing_status"]}"
-  apiKey = "${var.ad-mapper["ad_mapper_tracing_apikey"]}"
-  clientId = "${var.ad-mapper["ad_mapper_tracing_clientid"]}"
-  endpoint = "${var.ad-mapper["haystack_collector_endpoint"]}"
-  queueSize = "${var.ad-mapper["haystack_tracer_queue_size"]}"
-  flushInterval = "${var.ad-mapper["haystack_tracer_flush_interval"]}"
-  shutdownTimeout = "${var.ad-mapper["haystack_tracer_shutdown_timeout"]}"
-  threadCount = "${var.ad-mapper["haystack_tracer_thread_count"]}"
+  ad_mapper_tracing_apikey = "${var.ad-mapper["ad_mapper_tracing_apikey"]}"
+  ad_mapper_tracing_clientid = "${var.ad-mapper["ad_mapper_tracing_clientid"]}"
+  haystack_collector_endpoint = "${var.ad-mapper["haystack_collector_endpoint"]}"
+  haystack_tracer_queue_size = "${var.ad-mapper["haystack_tracer_queue_size"]}"
+  haystack_tracer_flush_interval = "${var.ad-mapper["haystack_tracer_flush_interval"]}"
+  haystack_tracer_shutdown_timeout = "${var.ad-mapper["haystack_tracer_shutdown_timeout"]}"
+  haystack_tracer_thread_count = "${var.ad-mapper["haystack_tracer_thread_count"]}"
 }
 
 module "ad-manager" {
@@ -92,13 +92,13 @@ module "ad-manager" {
   throttle_gate_likelihood = "${var.ad-manager["throttle_gate_likelihood"]}"
   detector_refresh_period = "${var.ad-manager["detector_refresh_period"]}"
   tracing_status = "${var.ad-manager["tracing_status"]}"
-  apiKey = "${var.ad-manager["ad_manager_tracing_apikey"]}"
-  clientId = "${var.ad-manager["ad_manager_tracing_clientid"]}"
-  endpoint = "${var.ad-manager["haystack_collector_endpoint"]}"
-  queueSize = "${var.ad-manager["haystack_tracer_queue_size"]}"
-  flushInterval = "${var.ad-manager["haystack_tracer_flush_interval"]}"
-  shutdownTimeout = "${var.ad-manager["haystack_tracer_shutdown_timeout"]}"
-  threadCount = "${var.ad-manager["haystack_tracer_thread_count"]}"
+  ad_manager_tracing_apikey = "${var.ad-manager["ad_manager_tracing_apikey"]}"
+  ad_manager_tracing_clientid = "${var.ad-manager["ad_manager_tracing_clientid"]}"
+  haystack_collector_endpoint = "${var.ad-manager["haystack_collector_endpoint"]}"
+  haystack_tracer_queue_size = "${var.ad-manager["haystack_tracer_queue_size"]}"
+  haystack_tracer_flush_interval = "${var.ad-manager["haystack_tracer_flush_interval"]}"
+  haystack_tracer_shutdown_timeout = "${var.ad-manager["haystack_tracer_shutdown_timeout"]}"
+  haystack_tracer_thread_count = "${var.ad-manager["haystack_tracer_thread_count"]}"
 }
 
 module "modelservice" {
@@ -141,13 +141,14 @@ module "modelservice" {
   detector_mapper_es_config_max_total_connection = "${var.modelservice["detector_mapper_es_config_max_total_connection"]}"
   # Additional security for es in AWS
   detector_mapper_es_config_aws_iam_auth_required = "${var.modelservice["detector_mapper_es_config_aws_iam_auth_required"]}"
-  apiKey = "${var.modelservice["modelservice_tracing_apikey"]}"
-  clientId = "${var.modelservice["modelservice_tracing_clientid"]}"
-  endpoint = "${var.modelservice["haystack_collector_endpoint"]}"
-  queueSize = "${var.modelservice["haystack_tracer_queue_size"]}"
-  flushInterval = "${var.modelservice["haystack_tracer_flush_interval"]}"
-  shutdownTimeout = "${var.modelservice["haystack_tracer_shutdown_timeout"]}"
-  threadCount = "${var.modelservice["haystack_tracer_thread_count"]}"
+  # Haystack based tracing config
+  modelservice_tracing_apikey = "${var.modelservice["modelservice_tracing_apikey"]}"
+  modelservice_tracing_clientid = "${var.modelservice["modelservice_tracing_clientid"]}"
+  haystack_collector_endpoint = "${var.modelservice["haystack_collector_endpoint"]}"
+  haystack_tracer_queue_size = "${var.modelservice["haystack_tracer_queue_size"]}"
+  haystack_tracer_flush_interval = "${var.modelservice["haystack_tracer_flush_interval"]}"
+  haystack_tracer_shutdown_timeout = "${var.modelservice["haystack_tracer_shutdown_timeout"]}"
+  haystack_tracer_thread_count = "${var.modelservice["haystack_tracer_thread_count"]}"
 }
 
 module "aa-metric-functions" {
