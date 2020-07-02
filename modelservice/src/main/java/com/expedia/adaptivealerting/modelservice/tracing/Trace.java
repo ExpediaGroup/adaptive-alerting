@@ -53,11 +53,9 @@ public class Trace {
         headers.forEach((key, value) -> {
             mapHeaders.put(key, value.get(0));
         });
-        log.info("mapHeaders {}", mapHeaders);
 
         try {
             SpanContext parentSpan = modelServiceApiTracer.extract(Format.Builtin.HTTP_HEADERS, new TextMapAdapter(mapHeaders));
-            log.info("parentSpan {}", parentSpan);
             return parentSpan;
         } catch (IllegalArgumentException e) {
             log.error("Exception during extracting parentSpan", e);

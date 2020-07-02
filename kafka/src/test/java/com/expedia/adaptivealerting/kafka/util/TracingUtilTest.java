@@ -30,7 +30,7 @@ public class TracingUtilTest {
 
     private static final String TRACING_APIKEY_STRING = "apiKey";
     private static final String TRACING_CLIENTID_STRING = "clientId";
-    private static final String TRACING_ENDPOINT_STRING = "endPoint";
+    private static final String TRACING_ENDPOINT_STRING = "endpoint";
     private static final String TRACING_QUEUESIZE_STRING = "queueSize";
     private static final String TRACING_SHUTDOWNTIMEOUT_STRING = "shutdownTimeout";
     private static final String TRACING_FLUSHINTERVAL_STRING = "flushInterval";
