@@ -29,14 +29,6 @@ variable "env_vars" {}
 # App
 variable "kafka_endpoint" {}
 variable "modelservice_base_uri" {}
-variable "tracing_status" {}
-variable "ad_mapper_tracing_apikey" {}
-variable "ad_mapper_tracing_clientid" {}
-variable "haystack_collector_endpoint" {}
-variable "haystack_tracer_queue_size" {}
-variable "haystack_tracer_flush_interval" {}
-variable "haystack_tracer_shutdown_timeout" {}
-variable "haystack_tracer_thread_count" {}
 variable "detector_mapping_cache_update_period" {
   default = 5
 }

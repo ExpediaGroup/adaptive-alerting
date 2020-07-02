@@ -37,14 +37,6 @@ module "ad-mapper" {
   kafka_endpoint = "${local.kafka_endpoint}"
   modelservice_base_uri = "${var.ad-mapper["modelservice_base_uri"]}"
   detector_mapping_cache_update_period = "${var.ad-mapper["detector_mapping_cache_update_period"]}"
-  tracing_status = "${var.ad-mapper["tracing_status"]}"
-  ad_mapper_tracing_apikey = "${var.ad-mapper["ad_mapper_tracing_apikey"]}"
-  ad_mapper_tracing_clientid = "${var.ad-mapper["ad_mapper_tracing_clientid"]}"
-  haystack_collector_endpoint = "${var.ad-mapper["haystack_collector_endpoint"]}"
-  haystack_tracer_queue_size = "${var.ad-mapper["haystack_tracer_queue_size"]}"
-  haystack_tracer_flush_interval = "${var.ad-mapper["haystack_tracer_flush_interval"]}"
-  haystack_tracer_shutdown_timeout = "${var.ad-mapper["haystack_tracer_shutdown_timeout"]}"
-  haystack_tracer_thread_count = "${var.ad-mapper["haystack_tracer_thread_count"]}"
 }
 
 module "ad-manager" {

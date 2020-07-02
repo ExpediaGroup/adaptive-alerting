@@ -24,16 +24,12 @@ import com.expedia.adaptivealerting.kafka.processor.MetricDataTransformerSupplie
 import com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde;
 import com.expedia.adaptivealerting.kafka.serde.MetricDataJsonSerde;
 import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
-import com.expedia.adaptivealerting.kafka.util.TracingUtil;
 import com.expedia.metrics.MetricData;
-import com.expedia.www.haystack.client.Tracer;
-import com.typesafe.config.Config;
 import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.Topology;
@@ -43,10 +39,7 @@ import org.apache.kafka.streams.processor.TopicNameExtractor;
 import org.apache.kafka.streams.state.KeyValueStore;
 import org.apache.kafka.streams.state.StoreBuilder;
 import org.apache.kafka.streams.state.Stores;
-import io.opentracing.contrib.kafka.streams.TracingKafkaClientSupplier;
-import org.apache.kafka.streams.KafkaClientSupplier;
 
-import java.util.HashMap;
 import java.util.stream.Collectors;
 
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.notNull;
@@ -62,8 +55,6 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
     private static final String CK_AD_MAPPER = "ad-mapper";
     private static final String STATE_STORE_NAME = "es-request-buffer";
     private static final String DEFAULT_CONSUMER_ID = "ad-manager";
-    private static final String TRACING_STATUS_STRING = "tracingStatus";
-    private static final String TRACING_STATUS_CHECK_STRING = "enabled";
     private final DetectorMapper mapper;
 
     // TODO Make these configurable. [WLW]
@@ -136,27 +127,5 @@ public final class KafkaAnomalyDetectorMapper extends AbstractStreamsApp {
         return mmRes.getMatchingDetectors().stream()
                 .map(detector -> KeyValue.pair(detector.getUuid().toString(), new MappedMetricData(mmRes.getMetricData(), detector.getConsumerId(), detector.getUuid())))
                 .collect(Collectors.toSet());
-    }
-
-    @Override
-    public void start() {
-        val streams = getStreams();
-        Runtime.getRuntime().addShutdownHook(new Thread(streams::close));
-        this.getJmxReporter().start();
-        streams.start();
-    }
-
-    private KafkaStreams getStreams(){
-        val tracingConfig = getConfig().getTracingConfig();
-        if (tracingConfig.getString(TRACING_STATUS_STRING).equals(TRACING_STATUS_CHECK_STRING)) {
-            KafkaClientSupplier detectorMapperClientSupplier = new TracingKafkaClientSupplier(initTracer(tracingConfig));
-            return new KafkaStreams(buildTopology(), this.getConfig().getStreamsConfig(), detectorMapperClientSupplier);
-        }
-        return new KafkaStreams(buildTopology(), this.getConfig().getStreamsConfig());
-    }
-
-    private Tracer initTracer(Config tracingConfig) {
-        val collectorHeaders = new HashMap<String, String>();
-        return TracingUtil.getTracer(collectorHeaders, tracingConfig);
     }
 }
