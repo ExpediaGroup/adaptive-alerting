@@ -49,19 +49,11 @@ public class StreamsAppConfig {
      */
     private static final String CK_HEALTH_STATUS_PATH = "health.status.path";
 
-    /**
-     * Tracing Config.
-     */
-    private static final String CK_TRACING = "tracing";
-
     @Getter
     private final Config typesafeConfig;
 
     @Getter
     private final StreamsConfig streamsConfig;
-
-    @Getter
-    private final Config tracingConfig;
 
     @Getter
     private final String inputTopic;
@@ -79,7 +71,6 @@ public class StreamsAppConfig {
         this.inputTopic = typesafeConfig.getString(CK_INPUT_TOPIC);
         this.outputTopic = typesafeConfig.getString(CK_OUTPUT_TOPIC);
         this.healthStatusPath = typesafeConfig.getString(CK_HEALTH_STATUS_PATH);
-        this.tracingConfig = typesafeConfig.getConfig(CK_TRACING);
     }
 
     private StreamsConfig toStreamsConfig(Config config) {

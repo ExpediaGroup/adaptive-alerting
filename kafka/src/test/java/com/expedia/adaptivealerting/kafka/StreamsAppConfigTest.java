@@ -30,7 +30,6 @@ public class StreamsAppConfigTest {
         val saConfig = new StreamsAppConfig(config);
         assertNotNull(saConfig.getTypesafeConfig());
         assertNotNull(saConfig.getStreamsConfig());
-        assertNotNull(saConfig.getTracingConfig());
         assertEquals("metrics", saConfig.getInputTopic());
         assertEquals("mapped-metrics", saConfig.getOutputTopic());
         assertEquals("/app/isHealthy", saConfig.getHealthStatusPath());
