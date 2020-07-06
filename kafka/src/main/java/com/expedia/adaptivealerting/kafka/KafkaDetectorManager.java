@@ -26,7 +26,10 @@ import com.expedia.adaptivealerting.anomdetect.util.JmxReporterFactory;
 import com.expedia.adaptivealerting.kafka.util.ConfigUtil;
 import com.expedia.adaptivealerting.kafka.util.DetectorUtil;
 import com.typesafe.config.Config;
+import io.opentracing.Span;
+import io.opentracing.SpanContext;
 import io.opentracing.contrib.kafka.TracingConsumerInterceptor;
+import io.opentracing.contrib.kafka.TracingKafkaUtils;
 import io.opentracing.contrib.kafka.TracingProducerInterceptor;
 import lombok.Generated;
 import lombok.Getter;
@@ -88,6 +91,9 @@ public class KafkaDetectorManager implements Runnable {
     @Getter
     private final String breakoutTopic;
 
+    @Getter
+    private final String tracingEnabled;
+
     // Cleaned code coverage
     // https://reflectoring.io/100-percent-test-coverage/
     @Generated
@@ -110,7 +116,8 @@ public class KafkaDetectorManager implements Runnable {
         val anomalyProducerConfig = config.getConfig(ANOMALY_PRODUCER);
         val anomalyProducerProps = ConfigUtil.toProducerConfig(anomalyProducerConfig);
         val tracingDetectorManagerConfig = config.getConfig(DM_TRACING);
-        if (tracingDetectorManagerConfig.getString(TRACING_STATUS_STRING).equals(TRACING_STATUS_CHECK_STRING)){
+        val tracingEnabled = tracingDetectorManagerConfig.getString(TRACING_STATUS_STRING);
+        if (tracingEnabled.equals(TRACING_STATUS_CHECK_STRING)){
             metricConsumerProps.put(ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG,
                     TracingConsumerInterceptor.class.getName());
             anomalyProducerProps.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG,
@@ -131,7 +138,8 @@ public class KafkaDetectorManager implements Runnable {
                 anomalyProducer,
                 metricConsumerTopic,
                 anomalyProducerOutlierTopic,
-                anomalyProducerBreakoutTopic);
+                anomalyProducerBreakoutTopic,
+                tracingEnabled);
     }
 
     private static MetricRegistry getMetricRegistry() {
@@ -146,7 +154,8 @@ public class KafkaDetectorManager implements Runnable {
             Producer<String, MappedMetricData> anomalyProducer,
             String metricTopic,
             String outlierTopic,
-            String breakoutTopic) {
+            String breakoutTopic,
+            String tracingEnabled) {
 
         notNull(detectorManager, "detectorManager can't be null");
         notNull(metricConsumer, "metricConsumer can't be null");
@@ -154,6 +163,7 @@ public class KafkaDetectorManager implements Runnable {
         notNull(metricTopic, "metricTopic can't be null");
         notNull(outlierTopic, "outlierTopic can't be null");
         notNull(breakoutTopic, "breakoutTopic can't be null");
+        notNull(tracingEnabled, "tracingEnabled can't be null");
 
         this.detectorManager = detectorManager;
         this.metricConsumer = metricConsumer;
@@ -161,6 +171,7 @@ public class KafkaDetectorManager implements Runnable {
         this.metricTopic = metricTopic;
         this.outlierTopic = outlierTopic;
         this.breakoutTopic = breakoutTopic;
+        this.tracingEnabled = tracingEnabled;
     }
 
     @Override
@@ -224,7 +235,11 @@ public class KafkaDetectorManager implements Runnable {
         val outputTopic = getOutputTopic(detectorResult);
         val anomalyMMD = new MappedMetricData(metricMMD, detectorResult);
 
-        return new ProducerRecord<>(outputTopic, null, timestampMillis, key, anomalyMMD);
+        val anomalyRecord = new ProducerRecord<>(outputTopic, null, timestampMillis, key, anomalyMMD);
+        if (tracingEnabled.equals(TRACING_STATUS_CHECK_STRING)) {
+            detectorManagerExtractAndInjectSpan(metricRecord, anomalyRecord);
+        }
+        return anomalyRecord;
     }
 
     private String getOutputTopic(DetectorResult result) {
@@ -242,4 +257,25 @@ public class KafkaDetectorManager implements Runnable {
             throw new RuntimeException("Unknown DetectorResult class: " + resultClass);
         }
     }
+
+    private void detectorManagerExtractAndInjectSpan(ConsumerRecord<String, MappedMetricData> metricRecord,
+                                                     ProducerRecord<String, MappedMetricData> anomalyRecord) {
+        SpanContext detectorManagerSpanContext = TracingKafkaUtils.extractSpanContext(
+                metricRecord.headers(), GlobalTracer.get());
+        Span detectorManagerSpan;
+        if (detectorManagerSpanContext != null) {
+            detectorManagerSpan = GlobalTracer.get().buildSpan("detector-manager").
+                    asChildOf(detectorManagerSpanContext).
+                    withTag("metric", metricRecord.key()).start();
+        }
+        // TODO
+        // If there is a way to add custom tags without creating span that should be used
+        else {
+            detectorManagerSpan = GlobalTracer.get().buildSpan("detector-manager").
+                    withTag("metric", metricRecord.key()).start();
+        }
+        detectorManagerSpan.setTag("detectorUUID", anomalyRecord.key());
+        TracingKafkaUtils.inject(detectorManagerSpan.context(), anomalyRecord.headers(), GlobalTracer.get());
+    }
+
 }

@@ -54,6 +54,7 @@ public class KafkaDetectorManagerTest {
     private static final String METRIC_SER = "com.expedia.adaptivealerting.kafka.serde.MappedMetricDataJsonSerde$Ser";
 
     // Anomaly producer
+    private static final String TRACING_ENABLED = "enabled";
     private static final String OUTLIER_TOPIC = "outliers";
     private static final String BREAKOUT_TOPIC = "breakouts";
     private static final String STRING_SER = "org.apache.kafka.common.serialization.StringSerializer";
@@ -93,7 +94,8 @@ public class KafkaDetectorManagerTest {
                 anomalyProducer,
                 METRIC_TOPIC,
                 OUTLIER_TOPIC,
-                BREAKOUT_TOPIC);
+                BREAKOUT_TOPIC,
+                TRACING_ENABLED);
 
         this.objectMapper = new ObjectMapper()
                 .registerModule(new MetricsJavaModule())
@@ -109,6 +111,7 @@ public class KafkaDetectorManagerTest {
         assertEquals(METRIC_TOPIC, manager.getMetricTopic());
         assertEquals(OUTLIER_TOPIC, manager.getOutlierTopic());
         assertEquals(BREAKOUT_TOPIC, manager.getBreakoutTopic());
+        assertEquals(TRACING_ENABLED, manager.getTracingEnabled());
     }
 
     @Test
