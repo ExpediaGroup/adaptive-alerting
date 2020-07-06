@@ -270,12 +270,14 @@ public class KafkaDetectorManager implements Runnable {
         }
         // TODO
         // If there is a way to add custom tags without creating span that should be used
+        // Span is being created only to add tags to the complete trace managed by library.
         else {
             detectorManagerSpan = GlobalTracer.get().buildSpan("detector-manager").
                     withTag("metric", metricRecord.key()).start();
         }
         detectorManagerSpan.setTag("detectorUUID", anomalyRecord.key());
         TracingKafkaUtils.inject(detectorManagerSpan.context(), anomalyRecord.headers(), GlobalTracer.get());
+        detectorManagerSpan.finish();
     }
 
 }
