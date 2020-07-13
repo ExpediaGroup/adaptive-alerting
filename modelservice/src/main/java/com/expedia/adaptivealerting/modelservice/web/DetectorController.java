@@ -134,4 +134,28 @@ public class DetectorController {
     public void deleteDetector(@RequestParam String uuid) {
         service.deleteDetector(uuid);
     }
+
+    @GetMapping(path = "/getNextTrainDetectors", produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Detector> findByNextRun(@RequestHeader HttpHeaders headers) {
+        SpanContext parentSpanContext = trace.extractParentSpan(headers);
+        Span span = trace.startSpan("find-detectors-to-train-next", parentSpanContext);
+        val detectorList = service.getByNextRunLessThanOrNull();
+        span.finish();
+
+        return detectorList;
+    }
+
+    @PostMapping(path = "/updateDetectorTrainingTime")
+    public void updateTrainingRunTime(@RequestParam String uuid,
+                                      @RequestParam Long nextRun,
+                                      @RequestHeader HttpHeaders headers) {
+        Assert.notNull(uuid, "uuid can't be null");
+        Assert.notNull(nextRun, "nextRun can't be null");
+        SpanContext parentSpanContext = trace.extractParentSpan(headers);
+        Span span = trace.startSpan("update-detector-training-time", parentSpanContext);
+        span.setTag("detectorUuid", uuid);
+        service.updateTrainingRunTime(uuid, nextRun);
+        span.finish();
+    }
 }

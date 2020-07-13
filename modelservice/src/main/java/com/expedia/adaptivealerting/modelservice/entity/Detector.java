@@ -26,6 +26,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -56,10 +57,18 @@ public class Detector {
     private boolean trusted;
 
     @Field(type = FieldType.Object)
-    private Map<String, Object> detectorConfig;
+    private DetectorConfig detectorConfig;
 
     @Field(type = FieldType.Object)
     private Meta meta;
+
+    public void setTrainingMetaData(TrainingMetaData trainingMetaData) {
+        this.getDetectorConfig().setTrainingMetaData(trainingMetaData);
+    }
+
+    public TrainingMetaData getTrainingMetaData() {
+        return this.getDetectorConfig().getTrainingMetaData();
+    }
 
     @Data
     public static class Meta {
@@ -76,4 +85,58 @@ public class Detector {
         private Date dateLastUpdated;
     }
 
+    @Data
+    public static class TrainingMetaData {
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+        @Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyy-MM-dd HH:mm:ss")
+        private Date dateLastTrained;
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+        @Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyy-MM-dd HH:mm:ss")
+        private Date dateNextTraining;
+
+        @Field(type = FieldType.Text)
+        private String cronSchedule;
+
+        @Field(type = FieldType.Text)
+        private String trainingInterval;
+
+        public Map<String, Object> toMap() {
+            return new HashMap() {{
+                    put("dateLastTrained", dateLastTrained);
+                    put("dateNextTraining", dateNextTraining);
+                    put("cronSchedule", cronSchedule);
+                    put("trainingInterval", trainingInterval);
+                }};
+        }
+    }
+
+    @Data
+    public static class DetectorConfig {
+
+        @Field(type = FieldType.Object)
+        private Map<String, Object> hyperparams;
+
+        @Field(type = FieldType.Object)
+        private Map<String, Object> params;
+
+        @Field(type = FieldType.Object)
+        private TrainingMetaData trainingMetaData;
+
+        //For backward compatibility for with request validator
+        public Map<String, Object> toMap() {
+            return new HashMap() {{
+                    if (hyperparams != null) {
+                        put("hyperparams", hyperparams);
+                    }
+                    if (params != null) {
+                        put("params", params);
+                    }
+                    if (trainingMetaData != null) {
+                        put("trainingMetaData", trainingMetaData.toMap());
+                    }
+                }};
+        }
+    }
 }

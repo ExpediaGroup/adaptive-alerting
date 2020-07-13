@@ -100,6 +100,15 @@ public class DetectorServiceImpl implements DetectorService {
     }
 
     @Override
+    public List<Detector> getByNextRunLessThanOrNull() {
+        val now = DateUtil.now().toInstant();
+        val date = DateUtil.toUtcDateString(now);
+        List<Detector> detectorList = repository.findByDetectorConfig_TrainingMetaData_DateNextTrainingLessThan(date);
+
+        return detectorList;
+    }
+
+    @Override
     public void updateDetector(String uuid, Detector detector) {
         notNull(detector, "detector can't be null");
         MDC.put("DetectorUuid", uuid);
@@ -119,6 +128,15 @@ public class DetectorServiceImpl implements DetectorService {
         Detector detectorToBeUpdated = repository.findByUuid(uuid);
         detectorToBeUpdated.setMeta(buildLastUsedDetectorMeta(detectorToBeUpdated));
         RequestValidator.validateDetector(detectorToBeUpdated);
+        repository.save(detectorToBeUpdated);
+    }
+
+    @Override
+    public void updateTrainingRunTime(String uuid, long nextRun) {
+        notNull(uuid, "uuid can't be null");
+        MDC.put("DetectorUuid", uuid);
+        Detector detectorToBeUpdated = repository.findByUuid(uuid);
+        detectorToBeUpdated.setTrainingMetaData(buildTrainingMeta(detectorToBeUpdated, nextRun));
         repository.save(detectorToBeUpdated);
     }
 
@@ -149,8 +167,21 @@ public class DetectorServiceImpl implements DetectorService {
         return metaBlock;
     }
 
+    private Detector.TrainingMetaData buildTrainingMeta(Detector detector, Long nextRun) {
+        Detector.TrainingMetaData trainingMetaDataBlock = buildDetectorTrainingMeta(detector);
+        Date nowDate = DateUtil.now();
+        trainingMetaDataBlock.setDateLastTrained(nowDate);
+        trainingMetaDataBlock.setDateNextTraining(new Date(nextRun));
+        return trainingMetaDataBlock;
+    }
+
     private Detector.Meta buildDetectorMeta(Detector detector) {
         Detector.Meta metaBlock = detector.getMeta();
         return (metaBlock == null) ? new Detector.Meta() : detector.getMeta();
+    }
+
+    private Detector.TrainingMetaData buildDetectorTrainingMeta(Detector detector) {
+        Detector.TrainingMetaData metaBlock = detector.getTrainingMetaData();
+        return (metaBlock == null) ? new Detector.TrainingMetaData() : detector.getTrainingMetaData();
     }
 }

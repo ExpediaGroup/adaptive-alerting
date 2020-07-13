@@ -202,6 +202,31 @@ public class DetectorControllerTest {
         verify(detectorService, times(1)).deleteDetector(someUuidStr);
     }
 
+    @Test
+    public void testFindByNextRun() {
+        val testDetectorMappingSpanContext = new SpanContext(UUID.randomUUID(), UUID.randomUUID(),
+            UUID.randomUUID());
+        val testChildSpan = noOpsTracer.buildSpan("find-detectors-to-train-next").asChildOf(testDetectorMappingSpanContext).start();
+        when(trace.extractParentSpan(httpHeaders)).thenReturn(testDetectorMappingSpanContext);
+        when(trace.startSpan("find-detectors-to-train-next", testDetectorMappingSpanContext)).thenReturn(testChildSpan);
+
+        controllerUnderTest.findByNextRun(httpHeaders);
+        verify(detectorService, times(1)).getByNextRunLessThanOrNull();
+    }
+
+    @Test
+    public void testUpdateTrainingRunTime() {
+        val timestamp = System.currentTimeMillis();
+        val uuid = this.someUuid.toString();
+        val testDetectorMappingSpanContext = new SpanContext(uuid, uuid, uuid);
+        val testChildSpan = noOpsTracer.buildSpan("update-detector-training-time").asChildOf(testDetectorMappingSpanContext).start();
+        when(trace.extractParentSpan(httpHeaders)).thenReturn(testDetectorMappingSpanContext);
+        when(trace.startSpan("update-detector-training-time", testDetectorMappingSpanContext)).thenReturn(testChildSpan);
+
+        controllerUnderTest.updateTrainingRunTime(uuid, timestamp, httpHeaders);
+        verify(detectorService, times(1)).updateTrainingRunTime(uuid, timestamp);
+    }
+
     private void initTestObjects() {
         this.someUuid = UUID.randomUUID();
         val mom = ObjectMother.instance();

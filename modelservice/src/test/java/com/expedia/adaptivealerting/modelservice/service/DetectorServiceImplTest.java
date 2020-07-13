@@ -137,6 +137,20 @@ public class DetectorServiceImplTest {
         verify(repository, times(1)).deleteByUuid(someUuidStr);
     }
 
+    @Test
+    public void testGetByNextRunLessThanOrNull() {
+        serviceUnderTest.getByNextRunLessThanOrNull();
+        verify(repository, times(1)).findByDetectorConfig_TrainingMetaData_DateNextTrainingLessThan(anyString());
+    }
+
+    @Test
+    public void testUpdateTrainingRunTime() {
+        val uuid = this.someUuid.toString();
+        serviceUnderTest.updateTrainingRunTime(uuid, 0L);
+        verify(repository, times(1)).findByUuid(someUuid.toString());
+        verify(repository, times(1)).save(legalParamsDetector);
+    }
+
     private void initTestObjects() {
         this.someUuid = UUID.randomUUID();
         val mom = ObjectMother.instance();

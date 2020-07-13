@@ -66,7 +66,7 @@ public class ObjectMother {
         val detector = new DetectorDocument();
         detector.setCreatedBy("user");
         detector.setType("constant-detector");
-        detector.setConfig(buildDetectorConfig());
+        detector.setConfig(buildDetectorConfig().toMap());
         return detector;
     }
 
@@ -109,9 +109,9 @@ public class ObjectMother {
         return expression;
     }
 
-    private Map<String, Object> buildDetectorConfig() {
-        Map<String, Object> detectorConfig = new HashMap<>();
-        detectorConfig.put("params", getLegalDetectorParams());
+    private Detector.DetectorConfig buildDetectorConfig() {
+        Detector.DetectorConfig detectorConfig = new Detector.DetectorConfig();
+        detectorConfig.setParams(getLegalDetectorParams());
         return detectorConfig;
     }
 

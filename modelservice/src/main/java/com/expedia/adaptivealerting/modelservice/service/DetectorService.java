@@ -43,9 +43,13 @@ public interface DetectorService {
 
     List<Detector> getLastUsedDetectors(int noOfDays);
 
+    List<Detector> getByNextRunLessThanOrNull();
+
     void updateDetector(String uuid, Detector detector);
 
     void updateDetectorLastUsed(String uuid);
+
+    void updateTrainingRunTime(String uuid, long nextRun);
 
     void deleteDetector(String uuid);
 

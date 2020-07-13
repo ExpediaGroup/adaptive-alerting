@@ -34,6 +34,8 @@ public interface DetectorRepository extends ElasticsearchRepository<Detector, St
 
     List<Detector> findByMeta_DateLastAccessedLessThan(String date);
 
+    List<Detector> findByDetectorConfig_TrainingMetaData_DateNextTrainingLessThan(String date);
+
     void deleteByUuid(String uuid);
 
     boolean existsById(String primaryKey);
