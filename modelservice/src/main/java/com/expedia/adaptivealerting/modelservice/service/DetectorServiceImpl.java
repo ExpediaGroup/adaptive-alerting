@@ -103,6 +103,7 @@ public class DetectorServiceImpl implements DetectorService {
     public List<Detector> getByNextRunLessThanOrNull() {
         val now = DateUtil.now().toInstant();
         val date = DateUtil.toUtcDateString(now);
+        //TODO: handle isNULL condition....
         List<Detector> detectorList = repository.findByDetectorConfig_TrainingMetaData_DateNextTrainingLessThan(date);
 
         return detectorList;
@@ -136,7 +137,10 @@ public class DetectorServiceImpl implements DetectorService {
         notNull(uuid, "uuid can't be null");
         MDC.put("DetectorUuid", uuid);
         Detector detectorToBeUpdated = repository.findByUuid(uuid);
-        detectorToBeUpdated.setTrainingMetaData(buildTrainingMeta(detectorToBeUpdated, nextRun));
+        if (detectorToBeUpdated.getDetectorConfig() == null) {
+            detectorToBeUpdated.setDetectorConfig(new Detector.DetectorConfig());
+        }
+        detectorToBeUpdated.getDetectorConfig().setTrainingMetaData(buildTrainingMeta(detectorToBeUpdated, nextRun));
         repository.save(detectorToBeUpdated);
     }
 
@@ -181,7 +185,7 @@ public class DetectorServiceImpl implements DetectorService {
     }
 
     private Detector.TrainingMetaData buildDetectorTrainingMeta(Detector detector) {
-        Detector.TrainingMetaData metaBlock = detector.getTrainingMetaData();
-        return (metaBlock == null) ? new Detector.TrainingMetaData() : detector.getTrainingMetaData();
+        Detector.TrainingMetaData metaBlock = detector.getDetectorConfig().getTrainingMetaData();
+        return (metaBlock == null) ? new Detector.TrainingMetaData() : metaBlock;
     }
 }

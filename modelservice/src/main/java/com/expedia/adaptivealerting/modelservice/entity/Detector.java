@@ -62,14 +62,6 @@ public class Detector {
     @Field(type = FieldType.Object)
     private Meta meta;
 
-    public void setTrainingMetaData(TrainingMetaData trainingMetaData) {
-        this.getDetectorConfig().setTrainingMetaData(trainingMetaData);
-    }
-
-    public TrainingMetaData getTrainingMetaData() {
-        return this.getDetectorConfig().getTrainingMetaData();
-    }
-
     @Data
     public static class Meta {
 
