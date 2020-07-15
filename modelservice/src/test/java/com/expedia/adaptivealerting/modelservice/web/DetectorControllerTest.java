@@ -210,8 +210,8 @@ public class DetectorControllerTest {
         when(trace.extractParentSpan(httpHeaders)).thenReturn(testDetectorMappingSpanContext);
         when(trace.startSpan("find-detectors-to-train-next", testDetectorMappingSpanContext)).thenReturn(testChildSpan);
 
-        controllerUnderTest.findByNextRun(httpHeaders);
-        verify(detectorService, times(1)).getByTrainingNextRunLessThan();
+        controllerUnderTest.getNextDetectorsToTrain(httpHeaders);
+        verify(detectorService, times(1)).getDetectorsToBeTrained();
     }
 
     @Test
@@ -223,8 +223,8 @@ public class DetectorControllerTest {
         when(trace.extractParentSpan(httpHeaders)).thenReturn(testDetectorMappingSpanContext);
         when(trace.startSpan("update-detector-training-time", testDetectorMappingSpanContext)).thenReturn(testChildSpan);
 
-        controllerUnderTest.updateTrainingRunTime(uuid, timestamp, httpHeaders);
-        verify(detectorService, times(1)).updateTrainingRunTime(uuid, timestamp);
+        controllerUnderTest.updateDetectorTrainingTime(uuid, timestamp, httpHeaders);
+        verify(detectorService, times(1)).updateDetectorTrainingTime(uuid, timestamp);
     }
 
     private void initTestObjects() {

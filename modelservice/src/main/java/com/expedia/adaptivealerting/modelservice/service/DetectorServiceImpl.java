@@ -100,7 +100,7 @@ public class DetectorServiceImpl implements DetectorService {
     }
 
     @Override
-    public List<Detector> getByTrainingNextRunLessThan() {
+    public List<Detector> getDetectorsToBeTrained() {
         val now = DateUtil.now().toInstant();
         val date = DateUtil.toUtcDateString(now);
         List<Detector> detectorList = repository.findByDetectorConfig_TrainingMetaData_DateNextTrainingLessThan(date);
@@ -135,7 +135,7 @@ public class DetectorServiceImpl implements DetectorService {
     }
 
     @Override
-    public void updateTrainingRunTime(String uuid, long nextRun) {
+    public void updateDetectorTrainingTime(String uuid, long nextRun) {
         notNull(uuid, "uuid can't be null");
         MDC.put("DetectorUuid", uuid);
         Detector detectorToBeUpdated = repository.findByUuid(uuid);
