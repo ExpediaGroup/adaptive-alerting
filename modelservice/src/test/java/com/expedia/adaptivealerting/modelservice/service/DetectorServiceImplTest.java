@@ -124,6 +124,16 @@ public class DetectorServiceImplTest {
     }
 
     @Test
+    public void testUpdateDetectorWithTrainingMetaData() {
+        Detector.TrainingMetaData trainingMetaData = new Detector.TrainingMetaData();
+        trainingMetaData.setCronSchedule("42 1 * * 3");
+        legalParamsDetector.getDetectorConfig().setTrainingMetaData(trainingMetaData);
+        serviceUnderTest.updateDetector(someUuid.toString(), legalParamsDetector);
+        verify(repository, times(1)).findByUuid(someUuid.toString());
+        verify(repository, times(1)).save(legalParamsDetector);
+    }
+
+    @Test
     public void testUpdateDetectorLastUsed() {
         serviceUnderTest.updateDetectorLastUsed(someUuid.toString());
         verify(repository, times(1)).findByUuid(someUuid.toString());
