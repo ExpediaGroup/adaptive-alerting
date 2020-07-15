@@ -139,7 +139,7 @@ public class DetectorServiceImplTest {
 
     @Test
     public void testGetByNextRunLessThanOrNull() {
-        serviceUnderTest.getByNextRunLessThanOrNull();
+        serviceUnderTest.getByTrainingNextRunLessThan();
         verify(repository, times(1)).findByDetectorConfig_TrainingMetaData_DateNextTrainingLessThan(anyString());
     }
 

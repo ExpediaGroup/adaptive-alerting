@@ -100,10 +100,9 @@ public class DetectorServiceImpl implements DetectorService {
     }
 
     @Override
-    public List<Detector> getByNextRunLessThanOrNull() {
+    public List<Detector> getByTrainingNextRunLessThan() {
         val now = DateUtil.now().toInstant();
         val date = DateUtil.toUtcDateString(now);
-        //TODO: handle isNULL condition....
         List<Detector> detectorList = repository.findByDetectorConfig_TrainingMetaData_DateNextTrainingLessThan(date);
 
         return detectorList;
@@ -115,7 +114,10 @@ public class DetectorServiceImpl implements DetectorService {
         MDC.put("DetectorUuid", uuid);
 
         Detector detectorToBeUpdated = repository.findByUuid(uuid);
-        detectorToBeUpdated.setDetectorConfig(detector.getDetectorConfig());
+        Detector.DetectorConfig detectorConfigToUpdate = mergeDetectorConfig(
+            detectorToBeUpdated.getDetectorConfig(),
+            detector.getDetectorConfig());
+        detectorToBeUpdated.setDetectorConfig(detectorConfigToUpdate);
         detectorToBeUpdated.setMeta(buildLastUpdatedDetectorMeta(detector));
         RequestValidator.validateDetector(detectorToBeUpdated);
         repository.save(detectorToBeUpdated);
@@ -187,5 +189,25 @@ public class DetectorServiceImpl implements DetectorService {
     private Detector.TrainingMetaData buildDetectorTrainingMeta(Detector detector) {
         Detector.TrainingMetaData metaBlock = detector.getDetectorConfig().getTrainingMetaData();
         return (metaBlock == null) ? new Detector.TrainingMetaData() : metaBlock;
+    }
+
+    private Detector.DetectorConfig mergeDetectorConfig(Detector.DetectorConfig existingConfig,
+                                                        Detector.DetectorConfig newConfig) {
+        if (existingConfig == null) {
+            existingConfig = new Detector.DetectorConfig();
+        }
+        if (newConfig == null) {
+            newConfig = new Detector.DetectorConfig();
+        }
+        if (existingConfig.getTrainingMetaData() != null && newConfig.getTrainingMetaData() == null) {
+            newConfig.setTrainingMetaData(existingConfig.getTrainingMetaData());
+        }
+        if (existingConfig.getHyperparams() != null && newConfig.getHyperparams() == null) {
+            newConfig.setHyperparams(existingConfig.getHyperparams());
+        }
+        if (existingConfig.getParams() != null && newConfig.getParams() == null) {
+            newConfig.setParams(existingConfig.getParams());
+        }
+        return newConfig;
     }
 }

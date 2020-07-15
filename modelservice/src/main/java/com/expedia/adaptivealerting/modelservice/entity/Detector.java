@@ -94,6 +94,7 @@ public class Detector {
         @Field(type = FieldType.Text)
         private String trainingInterval;
 
+        //For backward compatibility for with request validator
         public Map<String, Object> toMap() {
             return new HashMap() {{
                     put("dateLastTrained", dateLastTrained);
@@ -111,10 +112,10 @@ public class Detector {
         private Map<String, Object> hyperparams;
 
         @Field(type = FieldType.Object)
-        private Map<String, Object> params;
+        private TrainingMetaData trainingMetaData;
 
         @Field(type = FieldType.Object)
-        private TrainingMetaData trainingMetaData;
+        private Map<String, Object> params;
 
         //For backward compatibility for with request validator
         public Map<String, Object> toMap() {
@@ -122,11 +123,11 @@ public class Detector {
                     if (hyperparams != null) {
                         put("hyperparams", hyperparams);
                     }
-                    if (params != null) {
-                        put("params", params);
-                    }
                     if (trainingMetaData != null) {
                         put("trainingMetaData", trainingMetaData.toMap());
+                    }
+                    if (params != null) {
+                        put("params", params);
                     }
                 }};
         }

@@ -211,7 +211,7 @@ public class DetectorControllerTest {
         when(trace.startSpan("find-detectors-to-train-next", testDetectorMappingSpanContext)).thenReturn(testChildSpan);
 
         controllerUnderTest.findByNextRun(httpHeaders);
-        verify(detectorService, times(1)).getByNextRunLessThanOrNull();
+        verify(detectorService, times(1)).getByTrainingNextRunLessThan();
     }
 
     @Test
