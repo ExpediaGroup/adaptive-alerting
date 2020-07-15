@@ -20,6 +20,7 @@ import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundExcepti
 import com.expedia.adaptivealerting.modelservice.service.DetectorService;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import com.expedia.adaptivealerting.modelservice.tracing.Trace;
+import com.expedia.adaptivealerting.modelservice.util.DateUtil;
 import com.expedia.www.haystack.client.SpanContext;
 import com.expedia.www.haystack.client.Tracer;
 import com.expedia.www.haystack.client.dispatchers.NoopDispatcher;
@@ -216,7 +217,7 @@ public class DetectorControllerTest {
 
     @Test
     public void testUpdateDetectorTrainingTime() {
-        val timestamp = System.currentTimeMillis();
+        val timestamp = DateUtil.toUtcDate("2020-07-15 20:00:00").toInstant().toEpochMilli();
         val uuid = this.someUuid.toString();
         val testDetectorMappingSpanContext = new SpanContext(uuid, uuid, uuid);
         val testChildSpan = noOpsTracer.buildSpan("update-detector-training-time").asChildOf(testDetectorMappingSpanContext).start();
