@@ -11,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -124,11 +125,20 @@ public class DetectorServiceImplTest {
     }
 
     @Test
-    public void testUpdateDetectorWithTrainingMetaData() {
-        Detector.TrainingMetaData trainingMetaData = new Detector.TrainingMetaData();
-        trainingMetaData.setCronSchedule("42 1 * * 3");
-        legalParamsDetector.getDetectorConfig().setTrainingMetaData(trainingMetaData);
-        serviceUnderTest.updateDetector(someUuid.toString(), legalParamsDetector);
+    public void testUpdateDetectorWithConfigData() {
+        val detectorToUpdate = getDetectorToUpdate();
+        fillDetectorConfigValues(legalParamsDetector);
+        serviceUnderTest.updateDetector(someUuid.toString(), detectorToUpdate);
+        verify(repository, times(1)).findByUuid(someUuid.toString());
+        verify(repository, times(1)).save(legalParamsDetector);
+    }
+
+    @Test
+    public void testUpdateDetectorWithNoConfig() {
+        val detectorToUpdate = getDetectorToUpdate();
+        detectorToUpdate.setDetectorConfig(null); // No config data passed in update
+        fillDetectorConfigValues(legalParamsDetector);
+        serviceUnderTest.updateDetector(someUuid.toString(), detectorToUpdate);
         verify(repository, times(1)).findByUuid(someUuid.toString());
         verify(repository, times(1)).save(legalParamsDetector);
     }
@@ -166,6 +176,24 @@ public class DetectorServiceImplTest {
         val mom = ObjectMother.instance();
         this.legalParamsDetector = mom.buildDetector();
         legalParamsDetector.setUuid(someUuid);
+    }
+
+    private Detector getDetectorToUpdate() {
+        val mom = ObjectMother.instance();
+        val detectorToUpdate = mom.buildDetector();
+        detectorToUpdate.setUuid(someUuid);
+
+        return detectorToUpdate;
+    }
+
+    private void fillDetectorConfigValues(Detector detector) {
+        val trainingMetaData = new Detector.TrainingMetaData();
+        trainingMetaData.setCronSchedule("42 1 * * 3");
+        detector.getDetectorConfig().setTrainingMetaData(trainingMetaData);
+
+        val hyperParams = new HashMap<String, Object>();
+        hyperParams.put("hampel_n_signma", 4);
+        detector.getDetectorConfig().setHyperparams(hyperParams);
     }
 
     private void initDependencies() {

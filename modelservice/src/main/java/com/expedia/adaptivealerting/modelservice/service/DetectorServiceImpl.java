@@ -139,9 +139,6 @@ public class DetectorServiceImpl implements DetectorService {
         notNull(uuid, "uuid can't be null");
         MDC.put("DetectorUuid", uuid);
         Detector detectorToBeUpdated = repository.findByUuid(uuid);
-        if (detectorToBeUpdated.getDetectorConfig() == null) {
-            detectorToBeUpdated.setDetectorConfig(new Detector.DetectorConfig());
-        }
         detectorToBeUpdated.getDetectorConfig().setTrainingMetaData(buildTrainingMeta(detectorToBeUpdated, nextRun));
         repository.save(detectorToBeUpdated);
     }
@@ -193,9 +190,6 @@ public class DetectorServiceImpl implements DetectorService {
 
     private Detector.DetectorConfig mergeDetectorConfig(Detector.DetectorConfig existingConfig,
                                                         Detector.DetectorConfig newConfig) {
-        if (existingConfig == null) {
-            existingConfig = new Detector.DetectorConfig();
-        }
         if (newConfig == null) {
             newConfig = new Detector.DetectorConfig();
         }
