@@ -203,7 +203,7 @@ public class DetectorControllerTest {
     }
 
     @Test
-    public void testFindByNextRun() {
+    public void testGetNextDetectorsToTrain() {
         val testDetectorMappingSpanContext = new SpanContext(UUID.randomUUID(), UUID.randomUUID(),
             UUID.randomUUID());
         val testChildSpan = noOpsTracer.buildSpan("find-detectors-to-train-next").asChildOf(testDetectorMappingSpanContext).start();
@@ -215,7 +215,7 @@ public class DetectorControllerTest {
     }
 
     @Test
-    public void testUpdateTrainingRunTime() {
+    public void testUpdateDetectorTrainingTime() {
         val timestamp = System.currentTimeMillis();
         val uuid = this.someUuid.toString();
         val testDetectorMappingSpanContext = new SpanContext(uuid, uuid, uuid);

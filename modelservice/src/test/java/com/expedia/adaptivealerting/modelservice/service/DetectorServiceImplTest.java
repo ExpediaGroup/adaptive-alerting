@@ -138,13 +138,13 @@ public class DetectorServiceImplTest {
     }
 
     @Test
-    public void testGetByNextRunLessThanOrNull() {
+    public void testGetDetectorsToBeTrained() {
         serviceUnderTest.getDetectorsToBeTrained();
         verify(repository, times(1)).findByDetectorConfig_TrainingMetaData_DateNextTrainingLessThan(anyString());
     }
 
     @Test
-    public void testUpdateTrainingRunTime() {
+    public void testUpdateDetectorTrainingTime() {
         val uuid = this.someUuid.toString();
         serviceUnderTest.updateDetectorTrainingTime(uuid, 0L);
         verify(repository, times(1)).findByUuid(someUuid.toString());
