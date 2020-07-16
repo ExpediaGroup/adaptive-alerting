@@ -114,7 +114,7 @@ public class DetectorServiceImpl implements DetectorService {
         MDC.put("DetectorUuid", uuid);
 
         Detector detectorToBeUpdated = repository.findByUuid(uuid);
-        DetectorConfig detectorConfigToUpdate = DetectorDataUtil.mergeDetectorConfig(
+        DetectorConfig detectorConfigToUpdate = DetectorDataUtil.buildMergedDetectorConfig(
             detectorToBeUpdated.getDetectorConfig(),
             detector.getDetectorConfig());
         detectorToBeUpdated.setDetectorConfig(detectorConfigToUpdate);

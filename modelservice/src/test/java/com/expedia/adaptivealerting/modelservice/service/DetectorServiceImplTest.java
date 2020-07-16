@@ -200,10 +200,11 @@ public class DetectorServiceImplTest {
     }
 
     private void fillDetectorConfigValues(Detector detector) {
-        val trainingMetaData = new TrainingMetaData();
-        trainingMetaData.setCronSchedule("42 1 * * 3");
-        trainingMetaData.setDateTrainingLastRun(DateUtil.toUtcDate("2020-07-15 20:00:00"));
-        trainingMetaData.setDateTrainingNextRun(DateUtil.toUtcDate("2020-07-22 20:00:00"));
+        val trainingMetaData = TrainingMetaData.builder()
+            .cronSchedule("42 1 * * 3")
+            .dateTrainingLastRun(DateUtil.toUtcDate("2020-07-15 20:00:00"))
+            .dateTrainingNextRun(DateUtil.toUtcDate("2020-07-22 20:00:00"))
+            .build();
         detector.getDetectorConfig().setTrainingMetaData(trainingMetaData);
 
         val hyperParams = new HashMap<String, Object>();

@@ -66,29 +66,20 @@ public class DetectorDataUtil {
         return trainingMetaDataBlock;
     }
 
-    public static DetectorConfig mergeDetectorConfig(DetectorConfig existingConfig,
-                                               DetectorConfig newConfig) {
-        val mergedDetectorConfig = new DetectorConfig();
+    public static DetectorConfig buildMergedDetectorConfig(DetectorConfig existingConfig,
+                                                           DetectorConfig newConfig) {
         val newConfigExists = newConfig != null;
+        val trainingMetaData = (newConfigExists && newConfig.getTrainingMetaData() != null) ?
+               newConfig.getTrainingMetaData(): existingConfig.getTrainingMetaData();
+        val hyperParamsMap = newConfigExists && newConfig.getHyperparams() != null ?
+            newConfig.getHyperparams(): existingConfig.getHyperparams();
+        val paramsMap = newConfigExists && newConfig.getParams() != null ?
+            newConfig.getParams(): existingConfig.getParams();
 
-        if (newConfigExists && newConfig.getTrainingMetaData() != null) {
-            mergedDetectorConfig.setTrainingMetaData(new TrainingMetaData(newConfig.getTrainingMetaData()));
-        } else if (existingConfig.getTrainingMetaData() != null ) {
-            mergedDetectorConfig.setTrainingMetaData(new TrainingMetaData(existingConfig.getTrainingMetaData()));
-        }
-
-        if (newConfigExists && newConfig.getHyperparams() != null) {
-            mergedDetectorConfig.setHyperparams(new HashMap<>(newConfig.getHyperparams()));
-        } else if (existingConfig.getHyperparams() != null) {
-            mergedDetectorConfig.setHyperparams(new HashMap(existingConfig.getHyperparams()));
-        }
-
-        if (newConfigExists && newConfig.getParams() != null) {
-            mergedDetectorConfig.setParams(new HashMap<>(newConfig.getParams()));
-        } else if (existingConfig.getParams() != null) {
-            mergedDetectorConfig.setParams(new HashMap(existingConfig.getParams()));
-        }
-        return mergedDetectorConfig;
+        return DetectorConfig.builder()
+            .hyperparams(hyperParamsMap != null ? new HashMap<>(hyperParamsMap) : null)
+            .trainingMetaData(trainingMetaData != null ? trainingMetaData.toBuilder().build(): null)
+            .params(paramsMap != null ? new HashMap<>(paramsMap) : null)
+            .build();
     }
 }
-
