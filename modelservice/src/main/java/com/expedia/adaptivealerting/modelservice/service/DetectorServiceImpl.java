@@ -105,7 +105,7 @@ public class DetectorServiceImpl implements DetectorService {
     public List<Detector> getDetectorsToBeTrained() {
         val now = DateUtil.now().toInstant();
         val date = DateUtil.toUtcDateString(now);
-        return repository.findByDetectorConfig_TrainingMetaData_DateNextTrainingLessThan(date);
+        return repository.findByDetectorConfig_TrainingMetaData_DateTrainingNextRunLessThan(date);
     }
 
     @Override

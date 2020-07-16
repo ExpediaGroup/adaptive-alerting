@@ -162,7 +162,7 @@ public class DetectorServiceImplTest {
     @Test
     public void testGetDetectorsToBeTrained() {
         serviceUnderTest.getDetectorsToBeTrained();
-        verify(repository, times(1)).findByDetectorConfig_TrainingMetaData_DateNextTrainingLessThan(anyString());
+        verify(repository, times(1)).findByDetectorConfig_TrainingMetaData_DateTrainingNextRunLessThan(anyString());
     }
 
     @Test
