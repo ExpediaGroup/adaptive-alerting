@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.modelservice.test;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.modelservice.domain.mapping.*;
 import com.expedia.adaptivealerting.modelservice.entity.Detector;
+import com.expedia.adaptivealerting.modelservice.entity.Detector.DetectorConfig;
 import com.expedia.adaptivealerting.modelservice.web.request.AnomalyRequest;
 import com.expedia.adaptivealerting.modelservice.metricsource.MetricSourceResult;
 import com.expedia.adaptivealerting.modelservice.util.DateUtil;
@@ -109,8 +110,8 @@ public class ObjectMother {
         return expression;
     }
 
-    private Detector.DetectorConfig buildDetectorConfig() {
-        Detector.DetectorConfig detectorConfig = new Detector.DetectorConfig();
+    private DetectorConfig buildDetectorConfig() {
+        DetectorConfig detectorConfig = new DetectorConfig();
         detectorConfig.setParams(getLegalDetectorParams());
         return detectorConfig;
     }

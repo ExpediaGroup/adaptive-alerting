@@ -1,6 +1,7 @@
 package com.expedia.adaptivealerting.modelservice.service;
 
 import com.expedia.adaptivealerting.modelservice.entity.Detector;
+import com.expedia.adaptivealerting.modelservice.entity.Detector.TrainingMetaData;
 import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
@@ -199,7 +200,7 @@ public class DetectorServiceImplTest {
     }
 
     private void fillDetectorConfigValues(Detector detector) {
-        val trainingMetaData = new Detector.TrainingMetaData();
+        val trainingMetaData = new TrainingMetaData();
         trainingMetaData.setCronSchedule("42 1 * * 3");
         trainingMetaData.setDateTrainingLastRun(DateUtil.toUtcDate("2020-07-15 20:00:00"));
         trainingMetaData.setDateTrainingNextRun(DateUtil.toUtcDate("2020-07-22 20:00:00"));

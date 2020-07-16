@@ -94,6 +94,17 @@ public class Detector {
         @Field(type = FieldType.Text)
         private String trainingInterval;
 
+        public TrainingMetaData() {
+
+        }
+
+        public TrainingMetaData(TrainingMetaData originalTrainingMeta) {
+            dateTrainingLastRun = originalTrainingMeta.dateTrainingLastRun;
+            dateTrainingNextRun = originalTrainingMeta.dateTrainingNextRun;
+            trainingInterval = originalTrainingMeta.trainingInterval;
+            cronSchedule = originalTrainingMeta.cronSchedule;
+        }
+
         //For backward compatibility for with request validator
         public Map<String, Object> toMap() {
             return new HashMap() {{

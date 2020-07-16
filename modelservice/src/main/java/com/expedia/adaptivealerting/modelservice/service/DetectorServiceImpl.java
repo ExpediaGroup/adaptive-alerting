@@ -16,9 +16,12 @@
 package com.expedia.adaptivealerting.modelservice.service;
 
 import com.expedia.adaptivealerting.modelservice.entity.Detector;
+import com.expedia.adaptivealerting.modelservice.entity.Detector.DetectorConfig;
+import com.expedia.adaptivealerting.modelservice.entity.Detector.TrainingMetaData;
 import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
 import com.expedia.adaptivealerting.modelservice.util.DateUtil;
+import com.expedia.adaptivealerting.modelservice.util.DetectorDataUtil;
 import com.expedia.adaptivealerting.modelservice.util.RequestValidator;
 import lombok.val;
 import org.slf4j.MDC;
@@ -26,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,7 +49,7 @@ public class DetectorServiceImpl implements DetectorService {
         val uuid = UUID.randomUUID();
         detector.setId(uuid.toString());
         detector.setUuid(uuid);
-        detector.setMeta(buildNewDetectorMeta(detector));
+        detector.setMeta(DetectorDataUtil.buildNewDetectorMeta(detector));
         RequestValidator.validateDetector(detector);
         repository.save(detector);
         return uuid;
@@ -103,9 +105,7 @@ public class DetectorServiceImpl implements DetectorService {
     public List<Detector> getDetectorsToBeTrained() {
         val now = DateUtil.now().toInstant();
         val date = DateUtil.toUtcDateString(now);
-        List<Detector> detectorList = repository.findByDetectorConfig_TrainingMetaData_DateNextTrainingLessThan(date);
-
-        return detectorList;
+        return repository.findByDetectorConfig_TrainingMetaData_DateNextTrainingLessThan(date);
     }
 
     @Override
@@ -114,11 +114,11 @@ public class DetectorServiceImpl implements DetectorService {
         MDC.put("DetectorUuid", uuid);
 
         Detector detectorToBeUpdated = repository.findByUuid(uuid);
-        Detector.DetectorConfig detectorConfigToUpdate = mergeDetectorConfig(
+        DetectorConfig detectorConfigToUpdate = DetectorDataUtil.mergeDetectorConfig(
             detectorToBeUpdated.getDetectorConfig(),
             detector.getDetectorConfig());
         detectorToBeUpdated.setDetectorConfig(detectorConfigToUpdate);
-        detectorToBeUpdated.setMeta(buildLastUpdatedDetectorMeta(detector));
+        detectorToBeUpdated.setMeta(DetectorDataUtil.buildLastUpdatedDetectorMeta(detector));
         RequestValidator.validateDetector(detectorToBeUpdated);
         repository.save(detectorToBeUpdated);
     }
@@ -129,7 +129,7 @@ public class DetectorServiceImpl implements DetectorService {
         MDC.put("DetectorUuid", uuid);
 
         Detector detectorToBeUpdated = repository.findByUuid(uuid);
-        detectorToBeUpdated.setMeta(buildLastUsedDetectorMeta(detectorToBeUpdated));
+        detectorToBeUpdated.setMeta(DetectorDataUtil.buildLastUsedDetectorMeta(detectorToBeUpdated));
         RequestValidator.validateDetector(detectorToBeUpdated);
         repository.save(detectorToBeUpdated);
     }
@@ -139,7 +139,9 @@ public class DetectorServiceImpl implements DetectorService {
         notNull(uuid, "uuid can't be null");
         MDC.put("DetectorUuid", uuid);
         Detector detectorToBeUpdated = repository.findByUuid(uuid);
-        detectorToBeUpdated.getDetectorConfig().setTrainingMetaData(buildTrainingMeta(detectorToBeUpdated, nextRun));
+        TrainingMetaData updatedTrainingTimeMeta = DetectorDataUtil.buildUpdatedRuntimeTrainingMeta(
+            detectorToBeUpdated, nextRun);
+        detectorToBeUpdated.getDetectorConfig().setTrainingMetaData(updatedTrainingTimeMeta);
         repository.save(detectorToBeUpdated);
     }
 
@@ -148,60 +150,4 @@ public class DetectorServiceImpl implements DetectorService {
         repository.deleteByUuid(uuid);
     }
 
-    private Detector.Meta buildNewDetectorMeta(Detector detector) {
-        Detector.Meta metaBlock = buildDetectorMeta(detector);
-        Date nowDate = DateUtil.now();
-        metaBlock.setDateLastUpdated(nowDate);
-        metaBlock.setDateLastAccessed(nowDate);
-        return metaBlock;
-    }
-
-    private Detector.Meta buildLastUpdatedDetectorMeta(Detector detector) {
-        Detector.Meta metaBlock = buildDetectorMeta(detector);
-        Date nowDate = DateUtil.now();
-        metaBlock.setDateLastUpdated(nowDate);
-        return metaBlock;
-    }
-
-    private Detector.Meta buildLastUsedDetectorMeta(Detector detector) {
-        Detector.Meta metaBlock = buildDetectorMeta(detector);
-        Date nowDate = DateUtil.now();
-        metaBlock.setDateLastAccessed(nowDate);
-        return metaBlock;
-    }
-
-    private Detector.TrainingMetaData buildTrainingMeta(Detector detector, Long nextRun) {
-        Detector.TrainingMetaData trainingMetaDataBlock = buildDetectorTrainingMeta(detector);
-        Date nowDate = DateUtil.now();
-        trainingMetaDataBlock.setDateTrainingLastRun(nowDate);
-        trainingMetaDataBlock.setDateTrainingNextRun(new Date(nextRun));
-        return trainingMetaDataBlock;
-    }
-
-    private Detector.Meta buildDetectorMeta(Detector detector) {
-        Detector.Meta metaBlock = detector.getMeta();
-        return (metaBlock == null) ? new Detector.Meta() : detector.getMeta();
-    }
-
-    private Detector.TrainingMetaData buildDetectorTrainingMeta(Detector detector) {
-        Detector.TrainingMetaData metaBlock = detector.getDetectorConfig().getTrainingMetaData();
-        return (metaBlock == null) ? new Detector.TrainingMetaData() : metaBlock;
-    }
-
-    private Detector.DetectorConfig mergeDetectorConfig(Detector.DetectorConfig existingConfig,
-                                                        Detector.DetectorConfig newConfig) {
-        if (newConfig == null) {
-            newConfig = new Detector.DetectorConfig();
-        }
-        if (existingConfig.getTrainingMetaData() != null && newConfig.getTrainingMetaData() == null) {
-            newConfig.setTrainingMetaData(existingConfig.getTrainingMetaData());
-        }
-        if (existingConfig.getHyperparams() != null && newConfig.getHyperparams() == null) {
-            newConfig.setHyperparams(existingConfig.getHyperparams());
-        }
-        if (existingConfig.getParams() != null && newConfig.getParams() == null) {
-            newConfig.setParams(existingConfig.getParams());
-        }
-        return newConfig;
-    }
 }
