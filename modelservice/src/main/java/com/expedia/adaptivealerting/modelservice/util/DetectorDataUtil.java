@@ -23,6 +23,7 @@ import lombok.val;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Optional;
 
 public class DetectorDataUtil {
 
@@ -67,19 +68,19 @@ public class DetectorDataUtil {
     }
 
     public static DetectorConfig buildMergedDetectorConfig(DetectorConfig existingConfig,
-                                                           DetectorConfig newConfig) {
-        val newConfigExists = newConfig != null;
-        val trainingMetaData = (newConfigExists && newConfig.getTrainingMetaData() != null) ?
-               newConfig.getTrainingMetaData(): existingConfig.getTrainingMetaData();
-        val hyperParamsMap = newConfigExists && newConfig.getHyperparams() != null ?
-            newConfig.getHyperparams(): existingConfig.getHyperparams();
-        val paramsMap = newConfigExists && newConfig.getParams() != null ?
-            newConfig.getParams(): existingConfig.getParams();
+                                                           Optional<DetectorConfig> newConfigOptional) {
+
+        val trainingMetaData = newConfigOptional.map(DetectorConfig::getTrainingMetaData)
+            .orElse(existingConfig.getTrainingMetaData());
+        val hyperParamsMap = newConfigOptional.map(DetectorConfig::getHyperparams)
+            .orElse(existingConfig.getHyperparams());
+        val paramsMap = newConfigOptional.map(DetectorConfig::getParams)
+            .orElse(existingConfig.getParams());
 
         return DetectorConfig.builder()
-            .hyperparams(hyperParamsMap != null ? new HashMap<>(hyperParamsMap) : null)
-            .trainingMetaData(trainingMetaData != null ? trainingMetaData.toBuilder().build(): null)
-            .params(paramsMap != null ? new HashMap<>(paramsMap) : null)
+            .hyperparams(hyperParamsMap != null ? new HashMap<>(hyperParamsMap) : new HashMap<>())
+            .trainingMetaData(trainingMetaData != null ? trainingMetaData.toBuilder().build(): new TrainingMetaData())
+            .params(paramsMap != null ? new HashMap<>(paramsMap) : new HashMap<>())
             .build();
     }
 }

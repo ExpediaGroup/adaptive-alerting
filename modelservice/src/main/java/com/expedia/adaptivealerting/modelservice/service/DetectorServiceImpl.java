@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isNull;
@@ -116,7 +117,7 @@ public class DetectorServiceImpl implements DetectorService {
         Detector detectorToBeUpdated = repository.findByUuid(uuid);
         DetectorConfig detectorConfigToUpdate = DetectorDataUtil.buildMergedDetectorConfig(
             detectorToBeUpdated.getDetectorConfig(),
-            detector.getDetectorConfig());
+            Optional.ofNullable(detector.getDetectorConfig()));
         detectorToBeUpdated.setDetectorConfig(detectorConfigToUpdate);
         detectorToBeUpdated.setMeta(DetectorDataUtil.buildLastUpdatedDetectorMeta(detector));
         RequestValidator.validateDetector(detectorToBeUpdated);
