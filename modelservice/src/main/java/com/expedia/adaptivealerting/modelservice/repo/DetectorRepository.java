@@ -41,3 +41,4 @@ public interface DetectorRepository extends ElasticsearchRepository<Detector, St
     boolean existsById(String primaryKey);
 
 }
+
