@@ -82,11 +82,11 @@ public class Detector {
 
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
         @Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyy-MM-dd HH:mm:ss")
-        private Date dateLastTrained;
+        private Date dateTrainingLastRun;
 
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
         @Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyy-MM-dd HH:mm:ss")
-        private Date dateNextTraining;
+        private Date dateTrainingNextRun;
 
         @Field(type = FieldType.Text)
         private String cronSchedule;
@@ -97,8 +97,8 @@ public class Detector {
         //For backward compatibility for with request validator
         public Map<String, Object> toMap() {
             return new HashMap() {{
-                    put("dateLastTrained", dateLastTrained);
-                    put("dateNextTraining", dateNextTraining);
+                    put("dateTrainingLastRun", dateTrainingLastRun);
+                    put("dateTrainingNextRun", dateTrainingNextRun);
                     put("cronSchedule", cronSchedule);
                     put("trainingInterval", trainingInterval);
                 }};

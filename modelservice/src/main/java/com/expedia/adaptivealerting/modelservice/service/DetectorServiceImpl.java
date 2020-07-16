@@ -173,8 +173,8 @@ public class DetectorServiceImpl implements DetectorService {
     private Detector.TrainingMetaData buildTrainingMeta(Detector detector, Long nextRun) {
         Detector.TrainingMetaData trainingMetaDataBlock = buildDetectorTrainingMeta(detector);
         Date nowDate = DateUtil.now();
-        trainingMetaDataBlock.setDateLastTrained(nowDate);
-        trainingMetaDataBlock.setDateNextTraining(new Date(nextRun));
+        trainingMetaDataBlock.setDateTrainingLastRun(nowDate);
+        trainingMetaDataBlock.setDateTrainingNextRun(new Date(nextRun));
         return trainingMetaDataBlock;
     }
 

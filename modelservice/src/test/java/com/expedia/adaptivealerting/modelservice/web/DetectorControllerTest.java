@@ -204,14 +204,14 @@ public class DetectorControllerTest {
     }
 
     @Test
-    public void testGetNextDetectorsToTrain() {
+    public void testGetDetectorsToTrain() {
         val testDetectorMappingSpanContext = new SpanContext(UUID.randomUUID(), UUID.randomUUID(),
             UUID.randomUUID());
         val testChildSpan = noOpsTracer.buildSpan("find-detectors-to-train-next").asChildOf(testDetectorMappingSpanContext).start();
         when(trace.extractParentSpan(httpHeaders)).thenReturn(testDetectorMappingSpanContext);
         when(trace.startSpan("find-detectors-to-train-next", testDetectorMappingSpanContext)).thenReturn(testChildSpan);
 
-        controllerUnderTest.getNextDetectorsToTrain(httpHeaders);
+        controllerUnderTest.getDetectorsToTrain(httpHeaders);
         verify(detectorService, times(1)).getDetectorsToBeTrained();
     }
 

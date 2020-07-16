@@ -135,9 +135,9 @@ public class DetectorController {
         service.deleteDetector(uuid);
     }
 
-    @GetMapping(path = "/getNextDetectorsToTrain", produces = "application/json")
+    @GetMapping(path = "/getDetectorsToTrain", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public List<Detector> getNextDetectorsToTrain(@RequestHeader HttpHeaders headers) {
+    public List<Detector> getDetectorsToTrain(@RequestHeader HttpHeaders headers) {
         SpanContext parentSpanContext = trace.extractParentSpan(headers);
         Span span = trace.startSpan("find-detectors-to-train-next", parentSpanContext);
         val detectorList = service.getDetectorsToBeTrained();
