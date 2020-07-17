@@ -16,9 +16,12 @@
 package com.expedia.adaptivealerting.modelservice.service;
 
 import com.expedia.adaptivealerting.modelservice.entity.Detector;
+import com.expedia.adaptivealerting.modelservice.entity.Detector.DetectorConfig;
+import com.expedia.adaptivealerting.modelservice.entity.Detector.TrainingMetaData;
 import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
 import com.expedia.adaptivealerting.modelservice.util.DateUtil;
+import com.expedia.adaptivealerting.modelservice.util.DetectorDataUtil;
 import com.expedia.adaptivealerting.modelservice.util.RequestValidator;
 import lombok.val;
 import org.slf4j.MDC;
@@ -26,8 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.expedia.adaptivealerting.anomdetect.util.AssertUtil.isNull;
@@ -47,7 +50,7 @@ public class DetectorServiceImpl implements DetectorService {
         val uuid = UUID.randomUUID();
         detector.setId(uuid.toString());
         detector.setUuid(uuid);
-        detector.setMeta(buildNewDetectorMeta(detector));
+        detector.setMeta(DetectorDataUtil.buildNewDetectorMeta(detector));
         RequestValidator.validateDetector(detector);
         repository.save(detector);
         return uuid;
@@ -100,13 +103,23 @@ public class DetectorServiceImpl implements DetectorService {
     }
 
     @Override
+    public List<Detector> getDetectorsToBeTrained() {
+        val now = DateUtil.now().toInstant();
+        val date = DateUtil.toUtcDateString(now);
+        return repository.findByDetectorConfig_TrainingMetaData_DateTrainingNextRunLessThan(date);
+    }
+
+    @Override
     public void updateDetector(String uuid, Detector detector) {
         notNull(detector, "detector can't be null");
         MDC.put("DetectorUuid", uuid);
 
         Detector detectorToBeUpdated = repository.findByUuid(uuid);
-        detectorToBeUpdated.setDetectorConfig(detector.getDetectorConfig());
-        detectorToBeUpdated.setMeta(buildLastUpdatedDetectorMeta(detector));
+        DetectorConfig detectorConfigToUpdate = DetectorDataUtil.buildMergedDetectorConfig(
+            detectorToBeUpdated.getDetectorConfig(),
+            Optional.ofNullable(detector.getDetectorConfig()));
+        detectorToBeUpdated.setDetectorConfig(detectorConfigToUpdate);
+        detectorToBeUpdated.setMeta(DetectorDataUtil.buildLastUpdatedDetectorMeta(detector));
         RequestValidator.validateDetector(detectorToBeUpdated);
         repository.save(detectorToBeUpdated);
     }
@@ -117,8 +130,19 @@ public class DetectorServiceImpl implements DetectorService {
         MDC.put("DetectorUuid", uuid);
 
         Detector detectorToBeUpdated = repository.findByUuid(uuid);
-        detectorToBeUpdated.setMeta(buildLastUsedDetectorMeta(detectorToBeUpdated));
+        detectorToBeUpdated.setMeta(DetectorDataUtil.buildLastUsedDetectorMeta(detectorToBeUpdated));
         RequestValidator.validateDetector(detectorToBeUpdated);
+        repository.save(detectorToBeUpdated);
+    }
+
+    @Override
+    public void updateDetectorTrainingTime(String uuid, long nextRun) {
+        notNull(uuid, "uuid can't be null");
+        MDC.put("DetectorUuid", uuid);
+        Detector detectorToBeUpdated = repository.findByUuid(uuid);
+        TrainingMetaData updatedTrainingTimeMeta = DetectorDataUtil.buildUpdatedRuntimeTrainingMeta(
+            detectorToBeUpdated, nextRun);
+        detectorToBeUpdated.getDetectorConfig().setTrainingMetaData(updatedTrainingTimeMeta);
         repository.save(detectorToBeUpdated);
     }
 
@@ -127,30 +151,4 @@ public class DetectorServiceImpl implements DetectorService {
         repository.deleteByUuid(uuid);
     }
 
-    private Detector.Meta buildNewDetectorMeta(Detector detector) {
-        Detector.Meta metaBlock = buildDetectorMeta(detector);
-        Date nowDate = DateUtil.now();
-        metaBlock.setDateLastUpdated(nowDate);
-        metaBlock.setDateLastAccessed(nowDate);
-        return metaBlock;
-    }
-
-    private Detector.Meta buildLastUpdatedDetectorMeta(Detector detector) {
-        Detector.Meta metaBlock = buildDetectorMeta(detector);
-        Date nowDate = DateUtil.now();
-        metaBlock.setDateLastUpdated(nowDate);
-        return metaBlock;
-    }
-
-    private Detector.Meta buildLastUsedDetectorMeta(Detector detector) {
-        Detector.Meta metaBlock = buildDetectorMeta(detector);
-        Date nowDate = DateUtil.now();
-        metaBlock.setDateLastAccessed(nowDate);
-        return metaBlock;
-    }
-
-    private Detector.Meta buildDetectorMeta(Detector detector) {
-        Detector.Meta metaBlock = detector.getMeta();
-        return (metaBlock == null) ? new Detector.Meta() : detector.getMeta();
-    }
 }

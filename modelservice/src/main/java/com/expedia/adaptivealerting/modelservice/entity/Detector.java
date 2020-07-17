@@ -16,7 +16,10 @@
 package com.expedia.adaptivealerting.modelservice.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.DateFormat;
@@ -26,6 +29,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -56,7 +60,7 @@ public class Detector {
     private boolean trusted;
 
     @Field(type = FieldType.Object)
-    private Map<String, Object> detectorConfig;
+    private DetectorConfig detectorConfig;
 
     @Field(type = FieldType.Object)
     private Meta meta;
@@ -76,4 +80,65 @@ public class Detector {
         private Date dateLastUpdated;
     }
 
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder(toBuilder = true)
+    public static class TrainingMetaData {
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+        @Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyy-MM-dd HH:mm:ss")
+        private Date dateTrainingLastRun;
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+        @Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyy-MM-dd HH:mm:ss")
+        private Date dateTrainingNextRun;
+
+        @Field(type = FieldType.Text)
+        private String cronSchedule;
+
+        @Field(type = FieldType.Text)
+        private String trainingInterval;
+
+        //For backward compatibility for with request validator
+        public Map<String, Object> toMap() {
+            return new HashMap() {{
+                    put("dateTrainingLastRun", dateTrainingLastRun);
+                    put("dateTrainingNextRun", dateTrainingNextRun);
+                    put("cronSchedule", cronSchedule);
+                    put("trainingInterval", trainingInterval);
+                }};
+        }
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class DetectorConfig {
+
+        @Field(type = FieldType.Object)
+        private Map<String, Object> hyperparams;
+
+        @Field(type = FieldType.Object)
+        private TrainingMetaData trainingMetaData;
+
+        @Field(type = FieldType.Object)
+        private Map<String, Object> params;
+
+        //For backward compatibility for with request validator
+        public Map<String, Object> toMap() {
+            return new HashMap() {{
+                    if (hyperparams != null) {
+                        put("hyperparams", hyperparams);
+                    }
+                    if (trainingMetaData != null) {
+                        put("trainingMetaData", trainingMetaData.toMap());
+                    }
+                    if (params != null) {
+                        put("params", params);
+                    }
+                }};
+        }
+    }
 }

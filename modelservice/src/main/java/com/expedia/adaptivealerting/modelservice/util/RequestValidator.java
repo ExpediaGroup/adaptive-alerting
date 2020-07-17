@@ -73,7 +73,7 @@ public class RequestValidator {
     public static void validateDetector(Detector detector) {
         DetectorDocument detectorDocument = new DetectorDocument()
                 .setUuid(detector.getUuid())
-                .setConfig(detector.getDetectorConfig())
+                .setConfig(detector.getDetectorConfig().toMap())
                 .setType(detector.getType());
         validateDetectorDocument(detectorDocument);
     }

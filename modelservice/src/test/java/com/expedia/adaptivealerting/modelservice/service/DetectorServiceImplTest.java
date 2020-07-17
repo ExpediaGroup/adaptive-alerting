@@ -1,9 +1,11 @@
 package com.expedia.adaptivealerting.modelservice.service;
 
 import com.expedia.adaptivealerting.modelservice.entity.Detector;
+import com.expedia.adaptivealerting.modelservice.entity.Detector.TrainingMetaData;
 import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundException;
 import com.expedia.adaptivealerting.modelservice.repo.DetectorRepository;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
+import com.expedia.adaptivealerting.modelservice.util.DateUtil;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -124,6 +127,25 @@ public class DetectorServiceImplTest {
     }
 
     @Test
+    public void testUpdateDetectorWithConfigData() {
+        val detectorToUpdate = getDetectorToUpdate();
+        fillDetectorConfigValues(legalParamsDetector);
+        serviceUnderTest.updateDetector(someUuid.toString(), detectorToUpdate);
+        verify(repository, times(1)).findByUuid(someUuid.toString());
+        verify(repository, times(1)).save(legalParamsDetector);
+    }
+
+    @Test
+    public void testUpdateDetectorWithNoConfig() {
+        val detectorToUpdate = getDetectorToUpdate();
+        detectorToUpdate.setDetectorConfig(null); // No config data passed in update
+        fillDetectorConfigValues(legalParamsDetector);
+        serviceUnderTest.updateDetector(someUuid.toString(), detectorToUpdate);
+        verify(repository, times(1)).findByUuid(someUuid.toString());
+        verify(repository, times(1)).save(legalParamsDetector);
+    }
+
+    @Test
     public void testUpdateDetectorLastUsed() {
         serviceUnderTest.updateDetectorLastUsed(someUuid.toString());
         verify(repository, times(1)).findByUuid(someUuid.toString());
@@ -137,11 +159,57 @@ public class DetectorServiceImplTest {
         verify(repository, times(1)).deleteByUuid(someUuidStr);
     }
 
+    @Test
+    public void testGetDetectorsToBeTrained() {
+        serviceUnderTest.getDetectorsToBeTrained();
+        verify(repository, times(1)).findByDetectorConfig_TrainingMetaData_DateTrainingNextRunLessThan(anyString());
+    }
+
+    @Test
+    public void testUpdateDetectorTrainingTime() {
+        val uuid = this.someUuid.toString();
+        val timestamp = DateUtil.toUtcDate("2020-07-15 20:00:00").toInstant().toEpochMilli();
+        serviceUnderTest.updateDetectorTrainingTime(uuid, timestamp);
+        verify(repository, times(1)).findByUuid(someUuid.toString());
+        verify(repository, times(1)).save(legalParamsDetector);
+    }
+
+    @Test
+    public void testUpdateDetectorTrainingTime_withPreviousTrainingInfo() {
+        fillDetectorConfigValues(legalParamsDetector);
+        val uuid = this.someUuid.toString();
+        val timestamp = DateUtil.toUtcDate("2020-07-20 20:00:00").toInstant().toEpochMilli();
+        serviceUnderTest.updateDetectorTrainingTime(uuid, timestamp);
+        verify(repository, times(1)).findByUuid(someUuid.toString());
+        verify(repository, times(1)).save(legalParamsDetector);
+    }
+
     private void initTestObjects() {
         this.someUuid = UUID.randomUUID();
         val mom = ObjectMother.instance();
         this.legalParamsDetector = mom.buildDetector();
         legalParamsDetector.setUuid(someUuid);
+    }
+
+    private Detector getDetectorToUpdate() {
+        val mom = ObjectMother.instance();
+        val detectorToUpdate = mom.buildDetector();
+        detectorToUpdate.setUuid(someUuid);
+
+        return detectorToUpdate;
+    }
+
+    private void fillDetectorConfigValues(Detector detector) {
+        val trainingMetaData = TrainingMetaData.builder()
+            .cronSchedule("42 1 * * 3")
+            .dateTrainingLastRun(DateUtil.toUtcDate("2020-07-15 20:00:00"))
+            .dateTrainingNextRun(DateUtil.toUtcDate("2020-07-22 20:00:00"))
+            .build();
+        detector.getDetectorConfig().setTrainingMetaData(trainingMetaData);
+
+        val hyperParams = new HashMap<String, Object>();
+        hyperParams.put("hampel_n_signma", 4);
+        detector.getDetectorConfig().setHyperparams(hyperParams);
     }
 
     private void initDependencies() {

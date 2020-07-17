@@ -18,6 +18,7 @@ package com.expedia.adaptivealerting.modelservice.test;
 import com.expedia.adaptivealerting.anomdetect.source.DetectorDocument;
 import com.expedia.adaptivealerting.modelservice.domain.mapping.*;
 import com.expedia.adaptivealerting.modelservice.entity.Detector;
+import com.expedia.adaptivealerting.modelservice.entity.Detector.DetectorConfig;
 import com.expedia.adaptivealerting.modelservice.web.request.AnomalyRequest;
 import com.expedia.adaptivealerting.modelservice.metricsource.MetricSourceResult;
 import com.expedia.adaptivealerting.modelservice.util.DateUtil;
@@ -66,7 +67,7 @@ public class ObjectMother {
         val detector = new DetectorDocument();
         detector.setCreatedBy("user");
         detector.setType("constant-detector");
-        detector.setConfig(buildDetectorConfig());
+        detector.setConfig(buildDetectorConfig().toMap());
         return detector;
     }
 
@@ -109,9 +110,9 @@ public class ObjectMother {
         return expression;
     }
 
-    private Map<String, Object> buildDetectorConfig() {
-        Map<String, Object> detectorConfig = new HashMap<>();
-        detectorConfig.put("params", getLegalDetectorParams());
+    private DetectorConfig buildDetectorConfig() {
+        DetectorConfig detectorConfig = new DetectorConfig();
+        detectorConfig.setParams(getLegalDetectorParams());
         return detectorConfig;
     }
 

@@ -20,6 +20,7 @@ import com.expedia.adaptivealerting.modelservice.exception.RecordNotFoundExcepti
 import com.expedia.adaptivealerting.modelservice.service.DetectorService;
 import com.expedia.adaptivealerting.modelservice.test.ObjectMother;
 import com.expedia.adaptivealerting.modelservice.tracing.Trace;
+import com.expedia.adaptivealerting.modelservice.util.DateUtil;
 import com.expedia.www.haystack.client.SpanContext;
 import com.expedia.www.haystack.client.Tracer;
 import com.expedia.www.haystack.client.dispatchers.NoopDispatcher;
@@ -200,6 +201,31 @@ public class DetectorControllerTest {
         val someUuidStr = someUuid.toString();
         controllerUnderTest.deleteDetector(someUuidStr);
         verify(detectorService, times(1)).deleteDetector(someUuidStr);
+    }
+
+    @Test
+    public void testGetDetectorsToTrain() {
+        val testDetectorMappingSpanContext = new SpanContext(UUID.randomUUID(), UUID.randomUUID(),
+            UUID.randomUUID());
+        val testChildSpan = noOpsTracer.buildSpan("find-detectors-to-train-next").asChildOf(testDetectorMappingSpanContext).start();
+        when(trace.extractParentSpan(httpHeaders)).thenReturn(testDetectorMappingSpanContext);
+        when(trace.startSpan("find-detectors-to-train-next", testDetectorMappingSpanContext)).thenReturn(testChildSpan);
+
+        controllerUnderTest.getDetectorsToTrain(httpHeaders);
+        verify(detectorService, times(1)).getDetectorsToBeTrained();
+    }
+
+    @Test
+    public void testUpdateDetectorTrainingTime() {
+        val timestamp = DateUtil.toUtcDate("2020-07-15 20:00:00").toInstant().toEpochMilli();
+        val uuid = this.someUuid.toString();
+        val testDetectorMappingSpanContext = new SpanContext(uuid, uuid, uuid);
+        val testChildSpan = noOpsTracer.buildSpan("update-detector-training-time").asChildOf(testDetectorMappingSpanContext).start();
+        when(trace.extractParentSpan(httpHeaders)).thenReturn(testDetectorMappingSpanContext);
+        when(trace.startSpan("update-detector-training-time", testDetectorMappingSpanContext)).thenReturn(testChildSpan);
+
+        controllerUnderTest.updateDetectorTrainingTime(uuid, timestamp, httpHeaders);
+        verify(detectorService, times(1)).updateDetectorTrainingTime(uuid, timestamp);
     }
 
     private void initTestObjects() {
