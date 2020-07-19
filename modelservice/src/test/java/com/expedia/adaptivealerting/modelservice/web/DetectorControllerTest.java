@@ -211,8 +211,8 @@ public class DetectorControllerTest {
         when(trace.extractParentSpan(httpHeaders)).thenReturn(testDetectorMappingSpanContext);
         when(trace.startSpan("find-detectors-to-train-next", testDetectorMappingSpanContext)).thenReturn(testChildSpan);
 
-        controllerUnderTest.getDetectorsToTrain(httpHeaders);
-        verify(detectorService, times(1)).getDetectorsToBeTrained();
+        controllerUnderTest.getDetectorsToTrain(1595152176000L, httpHeaders);
+        verify(detectorService, times(1)).getDetectorsToBeTrained(1595152176000L);
     }
 
     @Test

@@ -137,10 +137,10 @@ public class DetectorController {
 
     @GetMapping(path = "/getDetectorsToTrain", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public List<Detector> getDetectorsToTrain(@RequestHeader HttpHeaders headers) {
+    public List<Detector> getDetectorsToTrain(@RequestParam Long timestampMs, @RequestHeader HttpHeaders headers) {
         SpanContext parentSpanContext = trace.extractParentSpan(headers);
         Span span = trace.startSpan("find-detectors-to-train-next", parentSpanContext);
-        val detectorList = service.getDetectorsToBeTrained();
+        val detectorList = service.getDetectorsToBeTrained(timestampMs);
         span.finish();
 
         return detectorList;

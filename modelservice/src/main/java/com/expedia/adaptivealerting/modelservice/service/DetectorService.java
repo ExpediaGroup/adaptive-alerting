@@ -43,7 +43,7 @@ public interface DetectorService {
 
     List<Detector> getLastUsedDetectors(int noOfDays);
 
-    List<Detector> getDetectorsToBeTrained();
+    List<Detector> getDetectorsToBeTrained(long timestampMs);
 
     void updateDetector(String uuid, Detector detector);
 
