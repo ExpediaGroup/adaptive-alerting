@@ -105,7 +105,8 @@ public class DetectorServiceImpl implements DetectorService {
 
     @Override
     public List<Detector> getDetectorsToBeTrained(long timestampMs) {
-        val date = DateUtil.toUtcDateString(Instant.ofEpochMilli(timestampMs));
+        val trainInstant = Instant.ofEpochMilli(timestampMs);
+        val date = DateUtil.toUtcDateString(trainInstant);
         return repository.findByDetectorConfig_TrainingMetaData_DateTrainingNextRunLessThan(date);
     }
 
