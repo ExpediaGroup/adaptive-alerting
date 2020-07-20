@@ -161,7 +161,7 @@ public class DetectorServiceImplTest {
 
     @Test
     public void testGetDetectorsToBeTrained() {
-        serviceUnderTest.getDetectorsToBeTrained();
+        serviceUnderTest.getDetectorsToBeTrained(1595152176000L);
         verify(repository, times(1)).findByDetectorConfig_TrainingMetaData_DateTrainingNextRunLessThan(anyString());
     }
 

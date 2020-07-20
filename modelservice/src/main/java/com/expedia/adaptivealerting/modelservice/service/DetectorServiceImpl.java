@@ -28,6 +28,7 @@ import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
@@ -103,9 +104,9 @@ public class DetectorServiceImpl implements DetectorService {
     }
 
     @Override
-    public List<Detector> getDetectorsToBeTrained() {
-        val now = DateUtil.now().toInstant();
-        val date = DateUtil.toUtcDateString(now);
+    public List<Detector> getDetectorsToBeTrained(long timestampMs) {
+        val trainInstant = Instant.ofEpochMilli(timestampMs);
+        val date = DateUtil.toUtcDateString(trainInstant);
         return repository.findByDetectorConfig_TrainingMetaData_DateTrainingNextRunLessThan(date);
     }
 
