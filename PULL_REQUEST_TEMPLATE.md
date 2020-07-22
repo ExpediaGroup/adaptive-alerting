@@ -9,13 +9,14 @@ Please delete options that are not relevant.
 - [ ] This change requires a documentation update
 
 ### Checklist
-- [ ] My code follows the style guidelines of this project
+- [ ] My code follows the style guidelines of this project (Checkout CONTRIBUTING.md)
 - [ ] I have made corresponding changes to the documentation
+- [ ] I have commented my code, particularly in hard-to-understand areas
 - [ ] My changes generate no new warnings
+- [ ] I have added tests that prove my fix is effective or that my feature works
 - [ ] New and existing unit tests pass locally with my changes
-- [ ] I added tests to cover my changes
+- [ ] Test coverage has not decreased in my branch as a result of my additions
 - [ ] I wrote a description of requested changes  
 - [ ] There is no commented out code
 - [ ] There is no unnecessary logging or debugging code
 - [ ] Code coverage is greater than 88% (https://codecov.io/gh/ExpediaDotCom/adaptive-alerting/pulls)
-
