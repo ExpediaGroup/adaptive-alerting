@@ -95,7 +95,7 @@
         <micrometer.version>1.1.3</micrometer.version>
         <mockito.version>2.23.0</mockito.version>
         <msgpack.version>0.8.13</msgpack.version>
-        <mysql.connector.version>8.0.16</mysql.connector.version>
+        <mysql.connector.version>8.0.28</mysql.connector.version>
         <opencsv.version>4.1</opencsv.version>
         <pegdown.version>1.6.0</pegdown.version>
         <scalatest.version>3.0.5</scalatest.version>
