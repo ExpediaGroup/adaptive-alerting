@@ -105,7 +105,7 @@
              https://docs.scala-lang.org/overviews/jdk-compatibility/overview.html -->
         <scala.library.version>2.12.7</scala.library.version>
         <slf4j.version>1.7.25</slf4j.version>
-        <spring.boot.version>2.2.6.RELEASE</spring.boot.version>
+        <spring.boot.version>2.2.11.RELEASE</spring.boot.version>
         <spring.security.jwt.version>1.0.9.RELEASE</spring.security.jwt.version>
         <spring.security.oauth2.version>2.3.5.RELEASE</spring.security.oauth2.version>
 
