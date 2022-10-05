@@ -82,7 +82,7 @@
         <codahale.metrics.version>3.0.2</codahale.metrics.version>
         <guava.version>28.0-jre</guava.version>
         <hamcrest.version>2.1</hamcrest.version>
-        <jackson.version>2.10.0.pr1</jackson.version>
+        <jackson.version>2.12.6.1</jackson.version>
         <jfreechart.version>1.0.19</jfreechart.version>
         <jopt.version>4.9</jopt.version>
         <junit.version>4.12</junit.version>
